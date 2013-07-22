@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <st.alr.mqttitude.preferences.PreferencesBroker
+        android:key="brokerPreference"
+        android:negativeButtonText="@string/preferencesServerCancel"
+        android:positiveButtonText="@string/preferencesServerConnect"
+        android:title="@string/preferencesServerTitle" />
+
+    <EditTextPreference
+        android:dialogTitle="Topic"
+        android:key="location_topic"
+        android:summary="The topic to which the location will be published"
+        android:title="Topic" />
+
+        <EditTextPreference
+            android:inputType="number" 
+        android:dialogTitle="Interval"
+        android:key="updateIntervall"
+        android:summary="Interval in minutes between publishes"
+        android:title="Interval" />
+    
+    
+    
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="runInBackgroundPreference"
+        android:summary="@string/preferencesNotificationSummary"
+        android:title="@string/preferencesNotificationTitle" />
+	
+    <st.alr.mqttitude.preferences.ImplementedDialogPreference
+        android:dialogLayout="@layout/preferences_licenses"
+        android:negativeButtonText=""
+        android:positiveButtonText="@string/preferencesLicensesDismiss"
+        android:summary="@string/preferencesLicensesSummary"
+        android:title="@string/preferencesLicensesTitle" />
+
+    <Preference
+        android:key="versionReadOnly"
+        android:title="@string/preferencesVersionTitle" />
+
+</PreferenceScreen>

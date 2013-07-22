@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mqttitude</string>
+    <string name="action_settings">Settings</string>
+    <string name="titleActivityMain">HomA</string>
+   	<string name="titleActivityPreferences">"Settings"</string>
+    <string name="preferencesServerTitle">"Broker"</string>
+    <string name="preferencesServerAddress">"Host"</string>
+    <string name="preferencesServerPort">"Port"</string>
+    <string name="preferencesServerCancel">"Disconnect"</string>
+    <string name="preferencesServerConnect">"Connect"</string>
+    <string name="preferencesLicensesTitle">"Licenses"</string>
+    <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
+    <string name="preferencesLicensesDismiss">"Dismiss"</string>
+    <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
+    <string name="preferencesNotificationTitle">"Notification"</string>
+    <string name="preferencesVersionTitle">"Version"</string>
+    
+    <string name="connectivityConnecting">"Connecting"</string>
+    <string name="connectivityConnected">"Connected"</string>
+    <string name="connectivityDisconnecting">"Disconnecting"</string>
+    <string name="connectivityDisconnected">"Disconnected"</string>    
+    
+    <string-array name="connect_options_security">
+        <item>None</item>
+        <item>SSL</item>
+    </string-array>
+    
+</resources>
