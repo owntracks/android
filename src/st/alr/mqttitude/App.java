@@ -147,9 +147,18 @@ public class App extends Application implements MqttPublish{
     private void scheduleNextUpdate()
     {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(st.alr.mqttitude.support.Defaults.UPDATE_INTEND_ID), PendingIntent.FLAG_UPDATE_CURRENT);
-
+        Integer updateInterval;
+        
+        try {
+            updateInterval = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("updateIntervall", st.alr.mqttitude.support.Defaults.VALUE_UPDATE_INTERVAL));             
+            updateInterval = updateInterval<1 ? 1 : updateInterval; // Enforce minimal update interval of 1. The wakeup timer goes haywire if the interval is set to 0 
+        } catch (NumberFormatException e) {
+            updateInterval = 30;
+        }        
+        
+        
         Calendar wakeUpTime = Calendar.getInstance();
-        wakeUpTime.add(Calendar.MINUTE, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("updateIntervall", st.alr.mqttitude.support.Defaults.VALUE_UPDATE_INTERVAL)));
+        wakeUpTime.add(Calendar.MINUTE, updateInterval);
 
         AlarmManager aMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
         aMgr.set(AlarmManager.RTC_WAKEUP, wakeUpTime.getTimeInMillis(), pendingIntent);
