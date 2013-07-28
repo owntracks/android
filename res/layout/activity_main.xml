@@ -10,114 +10,111 @@
     tools:context=".ActivityMain" >
 
     <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+        android:id="@+id/separator"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Current location"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="Current location" />
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp" >
+        android:layout_height="50dp"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" >
 
-        <TableRow
-            android:id="@+id/tableRow1"
+        <ImageView
+            android:id="@+id/locatorIcon"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:src="@drawable/ic_location" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" >
 
             <TextView
+                android:id="@+id/currentLocation"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Latitude: " />
-
-            <TextView
-                android:id="@+id/latitude"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="not available" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Longitude: " />
-
-            <TextView
-                android:id="@+id/longitude"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="not available" />
-        </TableRow>
-    </TableLayout>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/na"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/textView10"
-        android:layout_width="wrap_content"
+        android:id="@+id/separator"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="App state"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="Status" />
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp" >
+        android:orientation="vertical"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:paddingTop="10dp" >
 
-        <TableRow
-            android:id="@+id/tableRow3"
+        <TextView
+            android:id="@+id/locatorTitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:text="Locator"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Broker: " />
-
-            <TextView
-                android:id="@+id/connectivity"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Disconnected" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow5"
+        <TextView
+            android:id="@+id/locatorSubtitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Updated: " />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:paddingTop="10dp" >
 
-            <TextView
-                android:id="@+id/lastUpdate"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="not available" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow4"
+        <TextView
+            android:id="@+id/lastupdatTitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:text="Last upload"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status:  " />
+        <TextView
+            android:id="@+id/lastupdateSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Idle" />
-        </TableRow>
-    </TableLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/brokerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Broker"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/brokerSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
 
 </LinearLayout>

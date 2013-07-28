@@ -4,6 +4,9 @@ import android.location.Location;
 import st.alr.mqttitude.services.ServiceMqtt;
 
 public class Events {
+    public static class PublishSuccessfull {
+
+    }
     public static class LocationUpdated {
         Location l; 
         
@@ -29,4 +32,6 @@ public class Events {
 			return connectivity;
 		}
 	}
+    
+    public static class StateChanged {}
 }

@@ -1,13 +1,17 @@
     
 package st.alr.mqttitude;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Set;
 
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.services.ServiceMqtt.MQTT_CONNECTIVITY;
 import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Locator;
 import st.alr.mqttitude.support.LocatorCallback;
@@ -25,6 +29,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateFormat;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -38,13 +43,21 @@ public class App extends Application implements MqttPublish{
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private NotificationManager notificationManager;
     private static NotificationCompat.Builder notificationBuilder;
-
+    private Set<Defaults.State> state;
+    private Location lastLocation;
+    private Date lastUpdate;
+    private java.text.DateFormat lastUpdateDateFormat;
+    
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+        state = EnumSet.of(Defaults.State.Idle);
         locator = new Locator(this);
         receiver = new UpdateReceiver();
+        lastUpdateDateFormat = new SimpleDateFormat("y/M/d H:m:s");
+
+
         registerReceiver(receiver, new IntentFilter(st.alr.mqttitude.support.Defaults.UPDATE_INTEND_ID));
         
         notificationManager = (NotificationManager) App.getInstance().getSystemService(
@@ -62,9 +75,43 @@ public class App extends Application implements MqttPublish{
 
         scheduleNextUpdate();
         EventBus.getDefault().register(this);
-
     }
 
+    public String getLocatorText() {
+        if(this.state.contains(State.Publishing)) {
+            Log.v(this.toString(), "1");
+            return "Publishing";
+        }
+        if(this.state.contains(State.PublishConnectionTimeout)) {
+            Log.v(this.toString(), "2");
+            return "Error: Publish timeout";
+
+        }
+        if(this.state.contains(State.PublishConnectionWaiting)) {
+            Log.v(this.toString(), "3");
+
+            return "Wainting for connection";
+
+        }
+        if(this.state.contains(State.LocatingFail)) {
+            Log.v(this.toString(), "4");
+
+            return "Error: Unable to acqire location";
+        }
+        if(this.state.contains(State.Locating)) {
+            Log.v(this.toString(), "5");
+
+            return "Locating";
+        }
+        Log.v(this.toString(), "6");
+
+        return "Idle";
+    }
+    
+    public Location getLocation(){
+        return lastLocation;
+    }
+    
     public static App getInstance() {
         return instance;
     }
@@ -76,11 +123,10 @@ public class App extends Application implements MqttPublish{
     }
     
     
-    public void onEvent(Events.LocationUpdated e) {
-        Log.v(this.toString(), "LocationUpdated: " + e.getLocation().getLatitude() + ":" + e.getLocation().getLongitude());
-    }
 
-    public void updateLocation(final boolean publish) {
+    
+    
+    public void publishLocation(final boolean publish) {
         locator.get(new LocatorCallback() {
             
             @Override
@@ -89,6 +135,7 @@ public class App extends Application implements MqttPublish{
                 if(publish) {
                     Intent service = new Intent(App.getInstance(), ServiceMqtt.class);
                     startService(service);                    
+
                     ServiceMqtt.getInstance().publishWithTimeout(PreferenceManager.getDefaultSharedPreferences(App.getInstance()).getString("location_topic", null), location.getLatitude()+":"+location.getLongitude(), true, 20, App.getInstance());
                 }
                     
@@ -114,7 +161,7 @@ public class App extends Application implements MqttPublish{
         public void onReceive(Context arg0, Intent intent) {
             if(intent.getAction() != null && intent.getAction().equals(Defaults.UPDATE_INTEND_ID)){
 
-            updateLocation(true);
+            publishLocation(true);
             scheduleNextUpdate();
             }
         }
@@ -149,7 +196,6 @@ public class App extends Application implements MqttPublish{
     public void updateTicker(String text) {
      notificationBuilder.setTicker(text);   
      notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
-
     }
 
     public void updateNotification() {
@@ -157,23 +203,71 @@ public class App extends Application implements MqttPublish{
         notificationBuilder
                 .setSmallIcon(R.drawable.notification)
                 .setOngoing(true)
-                .setContentText("Idle")
+                .setContentText(getLocatorText())
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setWhen(0);
       
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
+    public void onEventMainThread(Events.StateChanged e) {
+        updateNotification();
+    }
+    
+    public void onEvent(Events.LocationUpdated e) {
+        this.lastLocation = e.getLocation();
+        Log.v(this.toString(), "LocationUpdated: " + e.getLocation().getLatitude() + ":" + e.getLocation().getLongitude());
+    }
+    
     @Override
     public void publishSuccessfull() {
-        updateTicker("Location published");
+        Log.v(this.toString(), "publishSuccessfull");
+        lastUpdate = new Date();
+        EventBus.getDefault().post(new Events.PublishSuccessfull());
+        this.resetState(); // Go back to idle;
+    }
+    
+
+
+    public void setStateTo(State s) {
+        this.state.clear();
+        this.state.add(s);
+    }
+    
+    public void addState(State s){
+        this.state.add(s);
+        EventBus.getDefault().post(new Events.StateChanged());
+    }
+    public void removeState(State s){
+        this.state.remove(s);
+        EventBus.getDefault().post(new Events.StateChanged());
+    }
+    public void resetState(){
+        this.setStateTo(State.Idle);
+        EventBus.getDefault().post(new Events.StateChanged());
+    }
+
+    public String getLastupdateText() {
+        if(lastUpdate != null)
+            return lastUpdateDateFormat.format(lastUpdate);
+        else 
+            return getResources().getString(R.string.na);
     }
 
     @Override
-    public void publishFailed() {
-        Log.v(this.toString(), "fail");
-        updateTicker("Error: Location publish failed");
+    public void publishTimeout() {
+        this.addState(State.PublishConnectionTimeout);        
     }
-    
+
+    @Override
+    public void publishing() {
+        this.addState(State.Publishing);
+
+    }
+
+    @Override
+    public void waiting() {
+        this.addState(State.PublishConnectionWaiting);
+    }
 }
 

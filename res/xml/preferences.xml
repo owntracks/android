@@ -25,7 +25,7 @@
     
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="runInBackgroundPreference"
+        android:key="notificationEnabled"
         android:summary="@string/preferencesNotificationSummary"
         android:title="@string/preferencesNotificationTitle" />
 	

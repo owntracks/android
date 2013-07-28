@@ -56,7 +56,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     
     private static final int NOTIFCATION_ID = 1337;
 
-    private static MQTT_CONNECTIVITY mqttConnectivity;
+    private static MQTT_CONNECTIVITY mqttConnectivity = MQTT_CONNECTIVITY.DISCONNECTED;
     private short keepAliveSeconds;
     private String mqttClientId;
     private MqttClient mqttClient;
@@ -525,6 +525,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     public void deliveryComplete(MqttDeliveryToken arg0) { }
     
     public static String getConnectivityText() {
+        
         switch (ServiceMqtt.getConnectivity()) {
             case CONNECTED:
                 return App.getInstance().getString(R.string.connectivityConnected);
@@ -541,16 +542,19 @@ public class ServiceMqtt extends Service implements MqttCallback
     public void publishWithTimeout(final String topic, final String payload, final boolean retained, int timeout, final MqttPublish callback) {
         Log.v(this.toString(), topic + ":" + payload);
         if (getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
+            callback.publishing();
             publish(topic, payload, retained);
             callback.publishSuccessfull();
             
         } else {
             Log.d(this.toString(), "No broker connection established yet, deferring publish");
+            callback.waiting();
             deferredPublish = new Runnable() {
                 @Override
                 public void run() {
                     deferredPublish = null;
                     Log.d(this.toString(), "Broker connection established, publishing deferred message");
+                    callback.publishing();
                     publish(topic, payload, retained);
                     callback.publishSuccessfull();
                 }
@@ -562,7 +566,7 @@ public class ServiceMqtt extends Service implements MqttCallback
                 public void run() {
                     Log.d(this.toString(),  "Publish timed out");
                     deferredPublish = null;
-                    callback.publishFailed();
+                    callback.publishTimeout();
                 }
             }, timeout * 1000);        
         }

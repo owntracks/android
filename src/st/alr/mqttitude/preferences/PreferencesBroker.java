@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -158,11 +159,26 @@ public class PreferencesBroker extends DialogPreference {
                 
                 
                 editor.apply();
+                Runnable r = new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        ServiceMqtt.getInstance().reconnect();                        
+                    }
+                };
+                new Thread( r ).start();
 
-                ServiceMqtt.getInstance().reconnect();
                 break;
             case DialogInterface.BUTTON_NEGATIVE:
-                ServiceMqtt.getInstance().disconnect(true);
+                Runnable s = new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        ServiceMqtt.getInstance().disconnect(true);
+                        
+                    }
+                };
+                new Thread( s ).start();
         }
         super.onClick(dialog, which);
     }
@@ -204,10 +220,10 @@ public class PreferencesBroker extends DialogPreference {
         if (v == null)
             return;
 
-        if (ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_DATADISABLED
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED) {
+        if (ServiceMqtt.getInstance().getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET
+                || ServiceMqtt.getInstance().getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT
+                || ServiceMqtt.getInstance().getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_DATADISABLED
+                || ServiceMqtt.getInstance().getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED) {
             v.setEnabled(false);
         } else {
             v.setEnabled(true);
