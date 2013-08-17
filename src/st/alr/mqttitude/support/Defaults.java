@@ -12,7 +12,7 @@ public class Defaults {
     public static final String SETTINGS_KEY_BROKER_USERNAME = "brokerUsername";
     public static final String SETTINGS_KEY_BROKER_SECURITY = "brokerSecurity";
     public static final String SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH = "brokerSecuritySslCaPath";
-    public static final String SETTINGS_KEY_UPDATE_INTERVAL = "updateInterval";
+    public static final String SETTINGS_KEY_UPDATE_INTERVAL = "backgroundUpdateInterval";
 
     public static final String SETTINGS_KEY_NOTIFICATION_ENABLED = "notificationEnabled";
     

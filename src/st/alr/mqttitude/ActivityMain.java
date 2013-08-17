@@ -19,22 +19,32 @@ import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.services.ServiceMqtt.MQTT_CONNECTIVITY;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Events.LocationUpdated;
 import st.alr.mqttitude.support.Events.MqttConnectivityChanged;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.R.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.drawable.LayerDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -54,6 +64,7 @@ public class ActivityMain extends FragmentActivity {
     private TextView locationAccuracy;
     private TextView locationLatlong;
     private TextView locationAddress;
+    private TextView locationZipcode;
     private Marker mMarker;
     private Circle mCircle;
 
@@ -157,9 +168,15 @@ public class ActivityMain extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-
+        App.getInstance().getLocator().enableForegroundMode();
     }
 
+    @Override
+    protected void onPause(){
+        App.getInstance().getLocator().enableBackgroundMode();
+        super.onPause();
+    }
+    
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -188,10 +205,98 @@ public class ActivityMain extends FragmentActivity {
         setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
 
-        locationAddress = (TextView) findViewById(R.id.locationAddress);
-        locationLatlong = (TextView) findViewById(R.id.locationLatlong);
-        locationAccuracy = (TextView) findViewById(R.id.locationAccuracy);
         
+        final LinearLayout draggableView = (LinearLayout) findViewById(R.id.draggableView);
+        final LinearLayout expandablePart = (LinearLayout) findViewById(R.id.expandablePart);
+        
+        final LinearLayout visiblePart = (LinearLayout) findViewById(R.id.visiblePart);
+        ViewTreeObserver vto = visiblePart.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+            @Override
+            public void onGlobalLayout() {
+                
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)draggableView.getLayoutParams();
+                Log.v(this.toString(), "height of expandable part: " + expandablePart.getHeight());
+                params.setMargins(0, 0, 0, -expandablePart.getHeight()); //substitute parameters for left, top, right, bottom
+                draggableView.setLayoutParams(params);
+
+                ViewTreeObserver obs = visiblePart.getViewTreeObserver();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    obs.removeOnGlobalLayoutListener(this);
+                } else {
+                    obs.removeGlobalOnLayoutListener(this);
+                }
+            }
+
+        });
+        
+        
+//        view.setLayoutParams(...);  // set to (x, y)
+//        
+//     // then animate the view translating from (0, 0)
+//     TranslationAnimation ta = new TranslateAnimation(-x, -y, 0, 0);
+//     ta.setDuration(1000);
+//     view.startAnimation(ta);
+
+//        visiblePart.setOnTouchListener(new OnTouchListener()
+//        {
+//            PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
+//            PointF StartPT = new PointF(); // Record Start Position of 'img'
+//            int minMargin = -expandablePart.getHeight();
+//            int maxMargin = 0;
+//            
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event)
+//            {
+//                int eid = event.getAction();
+//                switch (eid)
+//                {
+//                    case MotionEvent.ACTION_MOVE :
+//                      //  Log.v(this.toString(), "MOVE");
+//                        
+//                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)draggableView.getLayoutParams();
+////                        Log.v(this.toString(), "bottom margin: " + );
+//
+//                        
+//                        //params.setMargins(0, 0, 0, (int) -(expandablePart.getHeight() - (event.getY() -DownPT.y))); //substitute parameters for left, top, right, bottom
+//                        //draggableView.setLayoutParams(params);
+////                        
+//                        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams)draggableView.getLayoutParams();
+//                        p.setMargins(0, 0, 0, (int) Math.min(-expandablePart.getHeight() + Math.max(DownPT.y - event.getY(),0), 0)); //substitute parameters for left, top, right, bottom
+//                        draggableView.setLayoutParams(p);
+// 
+//                        //                        PointF mv = new PointF( event.getX() - DownPT.x, event.getY() - DownPT.y);
+////                        img.setX((int)(StartPT.x+mv.x));
+////                        img.setY((int)(StartPT.y+mv.y));
+////                        StartPT = new PointF  ( img.getX(), img.getY() );
+//                        break;
+//                    case MotionEvent.ACTION_DOWN :
+//                      //  Log.v(this.toString(), "DOWN");
+////
+//                        DownPT.x = event.getX();
+//                        DownPT.y = event.getY();
+////                        StartPT = new PointF( img.getX(), img.getY() );
+//                        break;
+//                    case MotionEvent.ACTION_UP :
+//                     //   Log.v(this.toString(), "UP");
+//
+//                        // Nothing have to do
+//                        break;
+//                    default :
+//                        break;
+//                }
+//                return true;
+//            }
+//
+//        });
+
+
+        
+        locationAddress = (TextView) findViewById(R.id.locationAddress);
+      //  locationLatlong = (TextView) findViewById(R.id.locationLatlong);
+        locationZipcode = (TextView) findViewById(R.id.locationZipcode);
 //        statusLocator = (TextView) findViewById(R.id.locatorSubtitle);
 //        statusLastupdate = (TextView) findViewById(R.id.lastupdateSubtitle);
 //        statusServer = (TextView) findViewById(R.id.brokerSubtitle);
@@ -240,12 +345,11 @@ public class ActivityMain extends FragmentActivity {
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
 
-        locationLatlong.setText(l.getLatitude() + " / " + l.getLongitude());
-        locationAccuracy.setText("±" + Math.round(l.getAccuracy()*100)/100.0d+"m");
+       // locationLatlong.setText(l.getLatitude() + " / " + l.getLongitude());
+       // locationAccuracy.setText("±" + Math.round(l.getAccuracy()*100)/100.0d+"m");
         
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses = null;
-        StringBuffer addressBuffer = new StringBuffer();
         try {
             addresses = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
         } catch (IOException e) {
@@ -255,15 +359,9 @@ public class ActivityMain extends FragmentActivity {
         if(addresses != null && addresses.size() > 0) {
             Address a = addresses.get(0);
 
-            if(a.getAddressLine(0) != null) {
-                addressBuffer.append(a.getAddressLine(0));
-                addressBuffer.append(" - ");
-            }
-            if(a.getAddressLine(0) != null) 
-                addressBuffer.append(a.getAddressLine(1));
+            locationAddress.setText(a.getAddressLine(0));
+            locationZipcode.setText(a.getAddressLine(1));
 
-            
-            locationAddress.setText(addressBuffer.toString());
         }
     }
     

@@ -1,15 +1,19 @@
 
 package st.alr.mqttitude;
 
+import java.util.Calendar;
+
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.FusedLocationLocator;
 import st.alr.mqttitude.support.Locator;
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -26,6 +30,7 @@ public class App extends Application {
     private static NotificationCompat.Builder notificationBuilder;
 
     private Locator locator;
+    private PendingIntent updateIntent;
 
     @Override
     public void onCreate() {
@@ -97,20 +102,20 @@ public class App extends Application {
     }
 
     public void updateNotification() {
+        String text = locator.getStateAsText();
         notificationBuilder.setContentTitle(getResources().getString(R.string.app_name));
         notificationBuilder
                 .setSmallIcon(R.drawable.notification)
                 .setOngoing(true)
-                .setContentText(locator.getStateAsText())
+                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setWhen(0);
-
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
-    public void onEventMainThread(Events.StateChanged e) {
-        updateNotification();
-    }
+//    public void onEventMainThread(Events.StateChanged e) {
+//        updateNotification();
+//    }
     public void onEventMainThread(Events.MqttConnectivityChanged e) {
 
     }
@@ -122,6 +127,5 @@ public class App extends Application {
 
     public Locator getLocator(){
         return this.locator;
-    }
-    
+    } 
 }

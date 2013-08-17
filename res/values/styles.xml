@@ -6,52 +6,48 @@
         <item name="android:actionBarStyle">@style/actionBar</item>
     </style>
 
-    <color name="lightGrey">#676767</color>
-
+    <color name="lightGrey">#d9d9d9</color>
+    <color name="mediumGrey">#a7a7a7</color>
+	<color name="darkGrey">#4f4f4f</color>
+    <color name="background">#f2f2f2</color>
+    
     <style name="actionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#f2f2f2</item>
+        <item name="android:background">@color/background</item>
     </style>
 
     <style name="seperator">
-        <item name="android:background">#ececec</item>
+        <item name="android:background">@color/lightGrey</item>
         <item name="android:visibility">visible</item>
     </style>
 
     <style name="seperatorH" parent="seperator">
         <item name="android:layout_height">1dp</item>
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_marginLeft">5dp</item>
-        <item name="android:layout_marginRight">5dp</item>
     </style>
 
     <style name="seperatorV" parent="seperator">
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">fill_parent</item>
-        <item name="android:layout_marginTop">5dp</item>
-        <item name="android:layout_marginBottom">5dp</item>
     </style>
 
     <style name="title">
-        <item name="android:textColor">@color/lightGrey</item>
-        <item name="android:textSize">20dp</item>
-                <item name="android:textStyle">bold</item>
-        
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="subtitle">
-        <item name="android:textColor">@color/lightGrey</item>
-        <item name="android:textSize">16.0dp</item>
+        <item name="android:textColor">@color/mediumGrey</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="cardButton">
         <item name="android:textSize">16.0sp</item>
         <item name="android:textColor">@color/lightGrey</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:gravity">left|center</item>
-        <item name="android:paddingLeft">8.0dip</item>
-        <item name="android:paddingRight">16dip</item>
-        <item name="android:maxLines">2</item>
-        <item name="android:drawablePadding">4.0dip</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:drawablePadding">0dp</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 

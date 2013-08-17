@@ -15,17 +15,17 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="automaticPublishes"
+        android:key="backgroundUpdates"
         android:summary="@string/preferencesAutomaticPublishes"
         android:title="@string/preferencesAutomaticPublishesTitle" />
     
     <EditTextPreference
                 android:defaultValue="30"
         
-        android:dependency="automaticPublishes"
+        android:dependency="backgroundUpdates"
         android:inputType="number" 
         android:dialogTitle="Interval"
-        android:key="updateInterval"
+        android:key="backgroundUpdateInterval"
         android:summary="Interval in minutes between publishes"
         android:title="Interval" />
     

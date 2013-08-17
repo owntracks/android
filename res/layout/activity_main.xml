@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
+    android:background="#fbfbfb"
     android:orientation="vertical"
     android:paddingBottom="0dp"
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context=".ActivityMain" 
-    android:background="#fbfbfb">
+    tools:context=".ActivityMain" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,73 +24,120 @@
             class="com.google.android.gms.maps.SupportMapFragment"
             android:apiKey="AIzaSyBY0BET1DXidyhs4CvxrEz5PS5Xovv3Jls" />
     </LinearLayout>
-    <View
-        android:id="@+id/separator"
-   	style="@style/seperatorH"
-    />
-    
-    
+
+
     <LinearLayout
+                    android:id="@+id/draggableView"
+        
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="-90dp"
+        android:layout_weight="0"
+        android:background="@color/background"
         android:orientation="vertical"
-        android:padding="16dp" >
-
-        <TextView
-            android:id="@+id/locationAddress"
-            style="@style/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
-
-        <TextView
-            android:id="@+id/locationLatlong"
-            style="@style/subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
-
-        <TextView
-            android:id="@+id/locationAccuracy"
-            style="@style/subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
-    </LinearLayout>
-
-    <View
-        android:id="@+id/separator"
-		style="@style/seperatorH"
-/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/uploadButton"
-            style="@style/cardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-        android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_upload"
-            android:text="Upload"
-            android:onClick="upload" />
-    <View
-		style="@style/seperatorV"
-        android:id="@+id/separator2"
-	 />
+        android:padding="0dp" >
+    	<View
+     	   android:id="@+id/separator"
+    	    style="@style/seperatorH" />
         
-        <Button
-            android:id="@+id/button1"
-            style="@style/cardButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/visiblePart"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_share"
-            android:text="Share"
-            android:textSize="16sp"
-            android:onClick="share" />
+            android:orientation="horizontal"
+            android:paddingBottom="20dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="20dp" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/locationAddress"
+                    style="@style/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na" />
+
+                <TextView
+                    android:id="@+id/locationZipcode"
+                    style="@style/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/View01"
+                style="@style/seperatorV"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="0dp" />
+
+            <ImageButton
+                android:id="@+id/uploadButton"
+                style="@style/cardButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:baselineAlignBottom="true"
+                android:onClick="upload"
+                android:src="@drawable/ic_upload" />
+
+            <ImageButton
+                android:id="@+id/button1"
+                style="@style/cardButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:onClick="share"
+                android:scaleType="center"
+                android:src="@drawable/ic_share"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+                        android:id="@+id/expandablePart"
+            
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
 
     </LinearLayout>
 
