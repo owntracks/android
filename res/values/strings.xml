@@ -3,7 +3,6 @@
 
     <string name="app_name">Mqttitude</string>
     <string name="action_settings">Settings</string>
-    <string name="titleActivityMain">HomA</string>
     <string name="titleActivityPreferences">"Settings"</string>
     <string name="preferencesServerTitle">"Broker"</string>
     <string name="preferencesServerAddress">"Host"</string>

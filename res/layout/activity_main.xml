@@ -21,8 +21,10 @@
             android:id="@+id/map"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_marginBottom="-40dp"
             class="com.google.android.gms.maps.SupportMapFragment"
             android:apiKey="AIzaSyBY0BET1DXidyhs4CvxrEz5PS5Xovv3Jls" />
+
     </LinearLayout>
 
 
