@@ -1,3 +1,4 @@
+
 package st.alr.mqttitude.support;
 
 import java.text.SimpleDateFormat;
@@ -22,112 +23,109 @@ import android.util.Log;
 public abstract class Locator implements MqttPublish {
     protected Context context;
     protected SharedPreferences sharedPreferences;
-    private  OnSharedPreferenceChangeListener preferencesChangedListener;
+    private OnSharedPreferenceChangeListener preferencesChangedListener;
     protected Date lastPublish;
     private java.text.DateFormat lastPublishDateFormat;
     private Set<Defaults.State> state;
     protected final String TAG = this.toString();
     private boolean even = true;
 
-    Locator (Context context) {
+    Locator(Context context) {
         this.context = context;
-        this.lastPublishDateFormat =  new SimpleDateFormat("y/M/d H:m:s");
+        this.lastPublishDateFormat = new SimpleDateFormat("y/M/d H:m:s");
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.state = EnumSet.of(Defaults.State.Idle);
-        
+
         preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                    handlePreferences();
+                handlePreferences();
             }
         };
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
     }
-    
-    abstract public Location getLastKnownLocation();    
+
+    abstract public Location getLastKnownLocation();
+
     abstract protected void handlePreferences();
+
     abstract public void start();
+
     abstract public void enableForegroundMode();
+
     abstract public void enableBackgroundMode();
 
     public void publishLastKnownLocation() {
         Log.v(TAG, "publishLastKnownLocation");
-        
-        Location l = getLastKnownLocation();
+
+        Intent service = new Intent(context, ServiceMqtt.class);
         StringBuilder payload = new StringBuilder();
         Date d = new Date();
-        if(l != null) {
-            Intent service = new Intent(context, ServiceMqtt.class);
-            context.startService(service);        
-            String topic = sharedPreferences.getString("location_topic", null);
-            
-            if(topic == null) {
-               addState(State.NOTOPIC);
-               return;
-            }
-            
-//            {
-//                "lat": "xx.xxxxxx", 
-//                "lon": "y.yyyyyy", 
-//                "tst": "1376715317",
-//                "acc": "75m",
-//                "mo" : "<type>",
-//                "alt" : "mmmmm",
-//                "vac" : "xxxx"
-//            }
-            
+        Location l = getLastKnownLocation();
+        String topic = sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC, Defaults.VALUE_TOPIC);
 
-            payload.append("{");
-            payload.append("\"lat\": ").append("\"").append(l.getLatitude()).append("\"");
-            payload.append(", \"lon\": ").append("\"").append(l.getLongitude()).append("\"");
-            payload.append(", \"tst\": ").append("\"").append(d.getTime()).append("\"");
-            payload.append(", \"acc\": ").append("\"").append(Math.round(l.getAccuracy()*100)/100.0d).append("m").append("\"");
-            payload.append(", \"alt\": ").append("\"").append(l.getAltitude()).append("\"");
-            payload.append("}");
-            
-            
-            ServiceMqtt.getInstance().publishWithTimeout(topic, payload.toString(), true, 20, this);
-        } else {
-            this.addState(State.LocatingFail);
+        if (topic == Defaults.VALUE_TOPIC) {
+            addState(State.NOTOPIC);
+            return;
         }
+        if (l == null) {
+            this.addState(State.LocatingFail);
+            return;
+        }
+
+        context.startService(service);
+
+        payload.append("{");
+        payload.append("\"lat\": ").append("\"").append(l.getLatitude()).append("\"");
+        payload.append(", \"lon\": ").append("\"").append(l.getLongitude()).append("\"");
+        payload.append(", \"tst\": ").append("\"").append(d.getTime()).append("\"");
+        payload.append(", \"acc\": ").append("\"").append(Math.round(l.getAccuracy() * 100) / 100.0d).append("m").append("\"");
+        payload.append(", \"alt\": ").append("\"").append(l.getAltitude()).append("\"");
+        payload.append("}");
+
+        ServiceMqtt.getInstance().publishWithTimeout(
+                topic,
+                payload.toString(),
+                sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
+                sharedPreferences.getInt(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS)
+                , 20, this);
+
     }
 
-    
     public void publishSuccessfull() {
         Log.v(TAG, "publishSuccessfull");
         lastPublish = new Date();
         EventBus.getDefault().post(new Events.PublishSuccessfull());
-        // This is a bit hacked as we append an empty space on every second ticker update. Otherwise consecutive tickers with the same text would not be shown
-        App.getInstance().updateTicker("Location published" + ((even = even ? false : true)? " " : ""));
-        ;
+        // This is a bit hacked as we append an empty space on every second
+        // ticker update. Otherwise consecutive tickers with the same text would
+        // not be shown
+        App.getInstance().updateTicker(
+                App.getInstance().getString(R.string.statePublished) + ((even = even ? false : true) ? " " : ""));
         this.resetState();
     }
 
-        
     public Set<State> getState() {
         return this.state;
     }
-    
-    public String getStateAsText() {        
+
+    public String getStateAsText() {
         if (this.state.contains(State.NOTOPIC)) {
-            return "Error: No topic set";
-        }  
+            return App.getInstance().getString(R.string.stateNotopic);
+        }
         if (this.state.contains(State.PublishConnectionTimeout)) {
-            return "Error: Publish timeout";
+            return App.getInstance().getString(R.string.statePublishTimeout);
         }
         if (this.state.contains(State.LocatingFail)) {
-            return "Error: Unable to acqire location";
+            return App.getInstance().getString(R.string.stateLocatingFail);
         }
 
         if (this.state.contains(State.Publishing)) {
-            return "Publishing";
+            return App.getInstance().getString(R.string.statePublishing);
         }
         if (this.state.contains(State.PublishConnectionWaiting)) {
-            return "Waiting for connection";
+            return App.getInstance().getString(R.string.stateWaiting);
         }
-
-
-        return "Idle";
+        return App.getInstance().getString(R.string.stateIdle);
     }
 
     public void publishTimeout() {
@@ -144,7 +142,7 @@ public abstract class Locator implements MqttPublish {
         Log.v(TAG, "waiting for broker connection");
         this.addState(State.PublishConnectionWaiting);
     }
-    
+
     protected void setStateTo(State s) {
         this.state.clear();
         this.state.add(s);
@@ -152,7 +150,7 @@ public abstract class Locator implements MqttPublish {
 
     protected void addState(State s) {
         this.state.add(s);
-        if(isErrorState(s)) {
+        if (isErrorState(s)) {
             App.getInstance().updateTicker(getStateAsText());
         }
         App.getInstance().updateNotification();
@@ -160,7 +158,8 @@ public abstract class Locator implements MqttPublish {
     }
 
     private boolean isErrorState(State s) {
-        return s == Defaults.State.LocatingFail || s == Defaults.State.NOTOPIC || s == Defaults.State.PublishConnectionTimeout;
+        return s == Defaults.State.LocatingFail || s == Defaults.State.NOTOPIC
+                || s == Defaults.State.PublishConnectionTimeout;
     }
 
     protected void removeState(State s) {
@@ -180,13 +179,14 @@ public abstract class Locator implements MqttPublish {
         else
             return context.getResources().getString(R.string.na);
     }
-    
-    public int getUpdateIntervall(){
-        return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_UPDATE_INTERVAL, Defaults.VALUE_UPDATE_INTERVAL));
+
+    public int getUpdateIntervall() {
+        return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_UPDATE_INTERVAL,
+                Defaults.VALUE_UPDATE_INTERVAL));
     }
-    
-    public int getUpdateIntervallInMiliseconds(){
-        return getUpdateIntervall()*60*1000;
+
+    public int getUpdateIntervallInMiliseconds() {
+        return getUpdateIntervall() * 60 * 1000;
     }
-   
+
 }

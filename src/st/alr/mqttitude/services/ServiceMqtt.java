@@ -352,10 +352,14 @@ public class ServiceMqtt extends Service implements MqttCallback
 
 
     public void publish(String topicStr, String payload) {
-        publish(topicStr, payload, true);
+        publish(topicStr, payload, false, 0);
     }
     
     public void publish(String topicStr, String payload, boolean retained) {
+        publish(topicStr, payload, retained, 0);
+    }
+    
+    public void publish(String topicStr, String payload, boolean retained, int qos) {
         boolean isOnline = isOnline(false);
         boolean isConnected = isConnected();
 
@@ -363,7 +367,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             return;
         }
         MqttMessage message = new MqttMessage(payload.getBytes());
-        message.setQos(0);
+        message.setQos(qos);
         message.setRetained(retained);
         
         try
@@ -535,33 +539,32 @@ public class ServiceMqtt extends Service implements MqttCallback
         }
     }
     
-    public void publishWithTimeout(final String topic, final String payload, final boolean retained, int timeout, final MqttPublish callback) {
-        Log.v(this.toString(), topic + ":" + payload);
+    public void publishWithTimeout(final String topic, final String payload, final boolean retained, final int qos,  int timeout, final MqttPublish callback) {
+        
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                deferredPublish = null;
+                Log.d(this.toString(), "Broker connection established, publishing message");
+                callback.publishing();
+                publish(topic, payload, retained, qos);
+                callback.publishSuccessfull();                
+            }
+        };
+        
+
         if (getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
-            callback.publishing();
-            publish(topic, payload, retained);
-            callback.publishSuccessfull();
-            
+            r.run();
         } else {
             Log.d(this.toString(), "No broker connection established yet, deferring publish");
             callback.publishWaiting();
-            deferredPublish = new Runnable() {
-                @Override
-                public void run() {
-                    deferredPublish = null;
-                    Log.d(this.toString(), "Broker connection established, publishing deferred message");
-                    callback.publishing();
-                    publish(topic, payload, retained);
-                    callback.publishSuccessfull();
-                }
-                
-            };
+            deferredPublish = r;                
+
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(this.toString(),  "Publish timed out");
-                    deferredPublish = null;
+                    deferredPublish = null;                        
                     callback.publishTimeout();
                 }
             }, timeout * 1000);        
