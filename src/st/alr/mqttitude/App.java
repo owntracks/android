@@ -101,6 +101,7 @@ public class App extends Application {
 
     public void updateTicker(String text) {
         notificationBuilder.setTicker(text + ((even = even ? false : true) ? " " : ""));
+        notificationBuilder.setSmallIcon(R.drawable.ic_notification);
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
@@ -112,7 +113,7 @@ public class App extends Application {
         String text = locator.getStateAsText();
         notificationBuilder.setContentTitle(getResources().getString(R.string.app_name));
         notificationBuilder
-                .setSmallIcon(R.drawable.notification)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_MIN)

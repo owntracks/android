@@ -28,7 +28,7 @@
     <application
         android:name="st.alr.mqttitude.App"
         android:allowBackup="true"
-        android:icon="@drawable/launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <meta-data
