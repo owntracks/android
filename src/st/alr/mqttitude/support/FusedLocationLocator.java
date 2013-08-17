@@ -139,7 +139,7 @@ public class FusedLocationLocator extends Locator implements GooglePlayServicesC
             return;
         }
         
-        if(foreground || backgroundUpdatesEnabled()) 
+        if(foreground || areBackgroundUpdatesEnabled()) 
             mLocationClient.requestLocationUpdates(mLocationRequest, this);
         else 
             Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
@@ -171,7 +171,5 @@ public class FusedLocationLocator extends Locator implements GooglePlayServicesC
         requestLocationUpdates();
     }
  
-    private boolean backgroundUpdatesEnabled(){
-        return sharedPreferences.getBoolean("backgroundUpdates", false);
-    }
+
 }

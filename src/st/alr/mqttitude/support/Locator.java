@@ -87,7 +87,7 @@ public abstract class Locator implements MqttPublish {
                 topic,
                 payload.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
-                sharedPreferences.getInt(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS)
+                Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
                 , 20, this);
 
     }
@@ -180,9 +180,15 @@ public abstract class Locator implements MqttPublish {
             return context.getResources().getString(R.string.na);
     }
 
+    public boolean areBackgroundUpdatesEnabled() {
+        return sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES,
+                Defaults.VALUE_BACKGROUND_UPDATES);
+    }
+
+    
     public int getUpdateIntervall() {
-        return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_UPDATE_INTERVAL,
-                Defaults.VALUE_UPDATE_INTERVAL));
+        return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
+                Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL));
     }
 
     public int getUpdateIntervallInMiliseconds() {

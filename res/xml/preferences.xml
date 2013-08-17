@@ -13,6 +13,9 @@
         <EditTextPreference
             android:dialogTitle="Topic"
             android:key="topic"
+                        android:defaultValue="/mqttitude"
+            android:hint="/mqttitude"
+            
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
@@ -23,13 +26,12 @@
             android:key="qos"
             android:summary="@string/preferencesQOSSummary"
             android:title="@string/preferencesQOS" />
-        
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="retain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-        
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"
@@ -47,6 +49,7 @@
 
         <EditTextPreference
             android:defaultValue="30"
+            android:hint="30"
             android:dependency="backgroundUpdates"
             android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
             android:inputType="number"

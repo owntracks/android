@@ -16,26 +16,19 @@
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationTitle">"Notification"</string>
     <string name="preferencesVersionTitle">"Version"</string>
-    
     <string name="preferencesTopicSettings">"Location publishes"</string>
     <string name="preferencesTopic">"Topic"</string>
-        <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
-    
+    <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
     <string name="preferencesRetain">"Retain"</string>
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
     <string name="preferencesQOS">"Quality of Service"</string>
     <string name="preferencesQOSSummary">"QOS for publishes"</string>
-    
-    	<string name="preferencesActivity">"Background activity"</string>
-    
- 	
- 	<string name="preferencesBackgroundUpdatesInterval">Publish interval</string>
- 	<string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between background location publishes</string>
- 	<string name="preferencesBackroundUpdates">Background publishes</string>
- 	<string name="preferencesBackgroundUpdatesSummary">Publish locations in the background</string>
- 	
-	<string name="preferencesInfo">Information</string>    
-    
+    <string name="preferencesActivity">"Background activity"</string>
+    <string name="preferencesBackgroundUpdatesInterval">Publish interval</string>
+    <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between background location publishes</string>
+    <string name="preferencesBackroundUpdates">Background publishes</string>
+    <string name="preferencesBackgroundUpdatesSummary">Publish locations in the background</string>
+    <string name="preferencesInfo">Information</string>
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
     <string name="connectivityDisconnecting">"Disconnecting"</string>
@@ -67,5 +60,5 @@
         <item>"1"</item>
         <item>"2"</item>
     </string-array>
-    
+
 </resources>

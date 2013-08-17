@@ -77,9 +77,11 @@ public class App extends Application {
         Log.v(this.toString(), "handleNotification()");
         notificationManager.cancel(Defaults.NOTIFCATION_ID);
 
-        if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_NOTIFICATION_ENABLED,
-                Defaults.VALUE_NOTIFICATION_ENABLED))
+        if (notificationEnabled())
             createNotification();
+    }
+    private boolean notificationEnabled() {
+        return sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_NOTIFICATION_ENABLED, Defaults.VALUE_NOTIFICATION_ENABLED);
     }
 
     private void createNotification() {
@@ -102,6 +104,10 @@ public class App extends Application {
     }
 
     public void updateNotification() {
+        if(!notificationEnabled())
+            return;
+        
+        
         String text = locator.getStateAsText();
         notificationBuilder.setContentTitle(getResources().getString(R.string.app_name));
         notificationBuilder
