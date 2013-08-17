@@ -31,7 +31,8 @@ public class App extends Application {
 
     private Locator locator;
     private PendingIntent updateIntent;
-
+    private boolean even = false;
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -99,7 +100,7 @@ public class App extends Application {
     }
 
     public void updateTicker(String text) {
-        notificationBuilder.setTicker(text);
+        notificationBuilder.setTicker(text + ((even = even ? false : true) ? " " : ""));
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 

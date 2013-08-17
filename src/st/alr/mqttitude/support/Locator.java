@@ -28,7 +28,6 @@ public abstract class Locator implements MqttPublish {
     private java.text.DateFormat lastPublishDateFormat;
     private Set<Defaults.State> state;
     protected final String TAG = this.toString();
-    private boolean even = true;
 
     Locator(Context context) {
         this.context = context;
@@ -64,7 +63,7 @@ public abstract class Locator implements MqttPublish {
         Location l = getLastKnownLocation();
         String topic = sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC, Defaults.VALUE_TOPIC);
 
-        if (topic == Defaults.VALUE_TOPIC) {
+        if (topic == null) {
             addState(State.NOTOPIC);
             return;
         }
@@ -100,7 +99,7 @@ public abstract class Locator implements MqttPublish {
         // ticker update. Otherwise consecutive tickers with the same text would
         // not be shown
         App.getInstance().updateTicker(
-                App.getInstance().getString(R.string.statePublished) + ((even = even ? false : true) ? " " : ""));
+                App.getInstance().getString(R.string.statePublished));
         this.resetState();
     }
 
@@ -148,9 +147,10 @@ public abstract class Locator implements MqttPublish {
         this.state.add(s);
     }
 
-    protected void addState(State s) {
+    protected void addState(State s) {       
         this.state.add(s);
         if (isErrorState(s)) {
+            Log.v(this.toString(), "error state");
             App.getInstance().updateTicker(getStateAsText());
         }
         App.getInstance().updateNotification();
