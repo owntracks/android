@@ -236,9 +236,12 @@ public class PreferencesBroker extends DialogPreference {
             case Defaults.VALUE_BROKER_SECURITY_NONE:
                 brokerSecuritySSLOptions.setVisibility(View.GONE);
                 brokerSecurityNoneOptions.setVisibility(View.VISIBLE);
-
                 break;
             case Defaults.VALUE_BROKER_SECURITY_SSL:
+                brokerSecuritySSLOptions.setVisibility(View.GONE);
+                brokerSecurityNoneOptions.setVisibility(View.VISIBLE);
+                break;
+            case Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT:
                 brokerSecuritySSLOptions.setVisibility(View.VISIBLE);
                 brokerSecurityNoneOptions.setVisibility(View.GONE);
                 break;

@@ -1,20 +1,58 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
+
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:actionBarStyle">@style/actionBar</item>
     </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    <color name="lightGrey">#676767</color>
+
+    <style name="actionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#f2f2f2</item>
+    </style>
+
+    <style name="seperator">
+        <item name="android:background">#ececec</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <style name="seperatorH" parent="seperator">
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+    </style>
+
+    <style name="seperatorV" parent="seperator">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+    </style>
+
+    <style name="title">
+        <item name="android:textColor">@color/lightGrey</item>
+        <item name="android:textSize">20dp</item>
+                <item name="android:textStyle">bold</item>
+        
+    </style>
+
+    <style name="subtitle">
+        <item name="android:textColor">@color/lightGrey</item>
+        <item name="android:textSize">16.0dp</item>
+    </style>
+
+    <style name="cardButton">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textColor">@color/lightGrey</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">left|center</item>
+        <item name="android:paddingLeft">8.0dip</item>
+        <item name="android:paddingRight">16dip</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:drawablePadding">4.0dip</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
 </resources>

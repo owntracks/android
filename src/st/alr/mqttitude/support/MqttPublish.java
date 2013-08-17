@@ -4,5 +4,5 @@ public interface MqttPublish {
     public void publishSuccessfull(); 
     public void publishTimeout();
     public void publishing();
-    public void waiting();
+    public void publishWaiting();
 }

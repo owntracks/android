@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -189,13 +190,9 @@ public class ServiceMqtt extends Service implements MqttCallback
         {
             String brokerAddress = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_HOST, Defaults.VALUE_BROKER_HOST);
             String brokerPort = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PORT, Defaults.VALUE_BROKER_PORT);
-
-            String handle = "ssl";
+            String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE? "tcp" : "ssl";
             
-            if(sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, Defaults.VALUE_BROKER_SECURITY_NONE) == Defaults.VALUE_BROKER_SECURITY_NONE)
-                handle = "tcp";
-            
-            mqttClient = new MqttClient(handle+"://" + brokerAddress + ":" + brokerPort, getClientId(), null);
+            mqttClient = new MqttClient(prefix +"://" + brokerAddress + ":" + brokerPort, getClientId(), null);
             mqttClient.setCallback(this);
         
         } catch (MqttException e)
@@ -204,12 +201,13 @@ public class ServiceMqtt extends Service implements MqttCallback
             mqttClient = null;
             changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
         }
-
-
-        
-
+    }
+    
+    private int getBrokerSecurityMode(){
+        return sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, Defaults.VALUE_BROKER_SECURITY_NONE);
     }
 
+    //
     private javax.net.ssl.SSLSocketFactory getSSLSocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         // From https://www.washington.edu/itconnect/security/ca/load-der.crt
@@ -251,11 +249,9 @@ public class ServiceMqtt extends Service implements MqttCallback
             changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
 
-            
-
-         // TODO: Make this nicer
-         if(sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, Defaults.VALUE_BROKER_SECURITY_NONE) == Defaults.VALUE_BROKER_SECURITY_SSL)
-            options.setSocketFactory(getSSLSocketFactory());
+         
+         if(getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
+             options.setSocketFactory(this.getSSLSocketFactory());
                         
          if(!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").equals(""))
              options.setPassword(sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
@@ -548,7 +544,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             
         } else {
             Log.d(this.toString(), "No broker connection established yet, deferring publish");
-            callback.waiting();
+            callback.publishWaiting();
             deferredPublish = new Runnable() {
                 @Override
                 public void run() {

@@ -12,6 +12,7 @@ public class Defaults {
     public static final String SETTINGS_KEY_BROKER_USERNAME = "brokerUsername";
     public static final String SETTINGS_KEY_BROKER_SECURITY = "brokerSecurity";
     public static final String SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH = "brokerSecuritySslCaPath";
+    public static final String SETTINGS_KEY_UPDATE_INTERVAL = "updateInterval";
 
     public static final String SETTINGS_KEY_NOTIFICATION_ENABLED = "notificationEnabled";
     
@@ -22,8 +23,9 @@ public class Defaults {
     
     public static final int VALUE_BROKER_SECURITY_NONE = 0;
     public static final int VALUE_BROKER_SECURITY_SSL = 1;
+    public static final int VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT = 2;
 
     public static final boolean VALUE_NOTIFICATION_ENABLED = true;
 
-    public enum State {Idle, Locating, LocatingFail, PublishConnectionWaiting, PublishConnectionTimeout, Publishing};
+    public enum State {Idle, Locating, LocatingFail, PublishConnectionWaiting, PublishConnectionTimeout, Publishing, NOTOPIC};
 }

@@ -24,11 +24,14 @@
     <string name="na">Not available"</string>    
         <string name="shareLocation">Share location"</string>    
     
-    
+              <string name="preferencesAutomaticPublishes">Publish location automatically</string>
+          <string name="preferencesAutomaticPublishesTitle">Automatic publishes</string>
+        
     
     <string-array name="connect_options_security">
         <item>None</item>
         <item>SSL</item>
+        <item>SSL (Custom Certificate)</item>
     </string-array>
     
 </resources>

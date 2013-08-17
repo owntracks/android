@@ -1,120 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ActivityMain" >
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    tools:context=".ActivityMain" 
+    android:background="#fbfbfb">
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:apiKey="AIzaSyBY0BET1DXidyhs4CvxrEz5PS5Xovv3Jls" />
+    </LinearLayout>
+    <View
         android:id="@+id/separator"
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Current location" />
-
+   	style="@style/seperatorH"
+    />
+    
+    
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp" >
 
-        <ImageView
-            android:id="@+id/locatorIcon"
+        <TextView
+            android:id="@+id/locationAddress"
+            style="@style/title"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_location" />
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" >
+        <TextView
+            android:id="@+id/locationLatlong"
+            style="@style/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
 
-            <TextView
-                android:id="@+id/currentLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/na"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/locationAccuracy"
+            style="@style/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
     </LinearLayout>
 
-    <TextView
+    <View
         android:id="@+id/separator"
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Status" />
+		style="@style/seperatorH"
+/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:paddingTop="10dp" >
+        android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/locatorTitle"
+        <Button
+            android:id="@+id/uploadButton"
+            style="@style/cardButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Locator"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/locatorSubtitle"
+        android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_upload"
+            android:text="Upload"
+            android:onClick="upload" />
+    <View
+		style="@style/seperatorV"
+        android:id="@+id/separator2"
+	 />
+        
+        <Button
+            android:id="@+id/button1"
+            style="@style/cardButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </LinearLayout>
+        android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_share"
+            android:text="Share"
+            android:textSize="16sp"
+            android:onClick="share" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:paddingTop="10dp" >
-
-        <TextView
-            android:id="@+id/lastupdatTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last upload"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/lastupdateSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:paddingTop="10dp" >
-
-        <TextView
-            android:id="@+id/brokerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Broker"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/brokerSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
 </LinearLayout>
