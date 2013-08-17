@@ -36,7 +36,7 @@
         android:defaultValue="true"
         android:key="notificationEnabled"
         android:summary="@string/preferencesNotificationSummary"
-        android:title="@string/preferencesAutomaticPublishesTitle" />
+        android:title="@string/preferencesNotificationTitle" />
 	
     <st.alr.mqttitude.preferences.ImplementedDialogPreference
         android:dialogLayout="@layout/preferences_licenses"
