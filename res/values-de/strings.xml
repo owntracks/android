@@ -4,7 +4,7 @@
     <string name="app_name">Mqttitude</string>
     <string name="action_settings">Einstellungen</string>
     <string name="titleActivityPreferences">"Einstellungen"</string>
-    <string name="preferencesServerTitle">"Broker"</string>
+    <string name="preferencesServerTitle">"Server"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
     <string name="preferencesServerCancel">"Trennen"</string>
