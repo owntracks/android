@@ -11,11 +11,10 @@
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
         <EditTextPreference
+            android:defaultValue="/mqttitude"
             android:dialogTitle="Topic"
-            android:key="topic"
-                        android:defaultValue="/mqttitude"
             android:hint="/mqttitude"
-            
+            android:key="topic"
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
@@ -32,15 +31,6 @@
             android:key="retain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:key="activitySettings"
-        android:title="@string/preferencesActivity" >
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="notificationEnabled"
-            android:summary="@string/preferencesNotificationSummary"
-            android:title="@string/preferencesNotificationTitle" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="backgroundUpdates"
@@ -49,13 +39,27 @@
 
         <EditTextPreference
             android:defaultValue="30"
-            android:hint="30"
             android:dependency="backgroundUpdates"
             android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
+            android:hint="30"
             android:inputType="number"
             android:key="backgroundUpdatesInterval"
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="activitySettings"
+        android:title="@string/preferencesNotification" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="notificationEnabled"
+            android:summary="@string/preferencesNotificationSummary"
+            android:title="@string/preferencesNotificationTitle" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="notificationTickerOnPublishEnabled"
+            android:summary="@string/preferencesNotificationTickerOnPublishSummary"
+            android:title="@string/preferencesNotificationTickerOnPublishTitle" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"

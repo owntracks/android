@@ -44,7 +44,9 @@
     <string name="stateWaiting">"Warten auf Verbindung"</string>
     <string name="stateIdle">"Idle"</string>
     <string name="currentLocation">Aktuelle Position</string>
-    
+                    <string name="preferencesNotificationTickerOnPublishSummary">Ticker bei erfolgreicher Veröffentlichung anzeigen</string>
+           <string name="preferencesNotificationTickerOnPublishTitle" >Ticker bei Veröffentlichung</string>
+    <string name="preferencesNotification">Benachrichtigungen</string>
     <string-array name="connect_options_security">
         <item>Keine</item>
         <item>SSL</item>

@@ -97,8 +97,8 @@ public abstract class Locator implements MqttPublish {
         // This is a bit hacked as we append an empty space on every second
         // ticker update. Otherwise consecutive tickers with the same text would
         // not be shown
-        App.getInstance().updateTicker(
-                App.getInstance().getString(R.string.statePublished));
+        if(isTickerOnPublishEnabled())
+            App.getInstance().updateTicker(App.getInstance().getString(R.string.statePublished));
         this.resetState();
     }
 
@@ -182,6 +182,11 @@ public abstract class Locator implements MqttPublish {
     public boolean areBackgroundUpdatesEnabled() {
         return sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES,
                 Defaults.VALUE_BACKGROUND_UPDATES);
+    }
+    
+    public boolean isTickerOnPublishEnabled(){
+        return  sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH,
+                Defaults.VALUE_TICKER_ON_PUBLISH);
     }
 
     

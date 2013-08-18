@@ -18,6 +18,7 @@ public class Defaults {
     public static final String SETTINGS_KEY_RETAIN = "retain";
     public static final String SETTINGS_KEY_QOS = "qos";
     public static final String SETTINGS_KEY_NOTIFICATION_ENABLED = "notificationEnabled";
+    public static final String SETTINGS_KEY_TICKER_ON_PUBLISH = "notificationTickerOnPublishEnabled";
     
     public static final String VALUE_BROKER_HOST = "192.168.8.2";
     public static final String VALUE_BROKER_PORT = "1883";
@@ -31,6 +32,7 @@ public class Defaults {
     public static final String VALUE_TOPIC = "/mqttitude";
     public static final boolean VALUE_RETAIN = false;
     public static final String VALUE_QOS = "0";
+    public static final boolean VALUE_TICKER_ON_PUBLISH = true;
 
 
     
