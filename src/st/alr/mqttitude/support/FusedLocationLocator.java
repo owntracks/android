@@ -1,84 +1,75 @@
+
 package st.alr.mqttitude.support;
 
-import java.util.Calendar;
 import java.util.Date;
-
-import st.alr.mqttitude.App;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import android.content.IntentFilter;
 import de.greenrobot.event.EventBus;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
-public class FusedLocationLocator extends Locator implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, LocationListener{
+public class FusedLocationLocator extends Locator implements
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private LocationClient mLocationClient;
     private LocationRequest mLocationRequest;
-    private final int MINUTES_TO_MILISECONDS = 60*1000;
+    private final int MINUTES_TO_MILISECONDS = 60 * 1000;
     private boolean ready = false;
     private boolean foreground = false;
-    private PendingIntent updateIntent;
-    
+
     public FusedLocationLocator(Context context) {
         super(context);
         setupLocationRequest();
 
         mLocationClient = new LocationClient(context, this, this);
     }
-    
 
-
+    @Override
     public void start() {
-        if(!mLocationClient.isConnected() && !mLocationClient.isConnecting())
+        if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
             mLocationClient.connect();
     }
 
     @Override
     public Location getLastKnownLocation() {
-        if(ready)
+        if (ready)
             return mLocationClient.getLastLocation();
-        else 
+        else
             return null;
     }
 
     @Override
     public void onLocationChanged(Location arg0) {
         Log.v(TAG, "FusedLocationLocator onLocationChanged");
-        EventBus.getDefault().postSticky(new Events.LocationUpdated(mLocationClient.getLastLocation()));
-        
-        if(shouldPublishLocation()) {
+        EventBus.getDefault().postSticky(
+                new Events.LocationUpdated(mLocationClient.getLastLocation()));
+
+        if (shouldPublishLocation()) {
             Log.d(TAG, "should publish");
 
             publishLastKnownLocation();
         }
-        }
+    }
 
-    private boolean shouldPublishLocation(){
+    private boolean shouldPublishLocation() {
         Date now = new Date();
-        if(lastPublish == null)
+        if (lastPublish == null)
             return true;
         Log.v(TAG, "time: " + (now.getTime() - lastPublish.getTime()));
         Log.v(TAG, "interval: " + getUpdateIntervallInMiliseconds());
 
-        if(now.getTime() - lastPublish.getTime() > getUpdateIntervallInMiliseconds())
+        if (now.getTime() - lastPublish.getTime() > getUpdateIntervallInMiliseconds())
             return true;
-        
-        
+
         return false;
     }
-    
+
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "FusedLocationLocator failed to connect");
@@ -100,8 +91,7 @@ public class FusedLocationLocator extends Locator implements GooglePlayServicesC
         disableLocationUpdates();
     }
 
-    
-    private void setupBackgroundLocationRequest() {        
+    private void setupBackgroundLocationRequest() {
         Log.v(TAG, "setupBackgroundLocationRequest. Interval: " + getUpdateIntervall());
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -109,51 +99,52 @@ public class FusedLocationLocator extends Locator implements GooglePlayServicesC
         mLocationRequest.setFastestInterval(500);
         mLocationRequest.setSmallestDisplacement(500);
     }
-    
-    private void setupForegroundLocationRequest() {        
+
+    private void setupForegroundLocationRequest() {
         Log.v(TAG, "setupForegroundLocationRequest. Interval: " + 0.5);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1*MINUTES_TO_MILISECONDS);
+        mLocationRequest.setInterval(1 * MINUTES_TO_MILISECONDS);
         mLocationRequest.setFastestInterval(500);
         mLocationRequest.setSmallestDisplacement(100);
     }
 
-    
     @Override
     protected void handlePreferences() {
-        setupLocationRequest();     
+        setupLocationRequest();
         requestLocationUpdates();
     }
-    
-    private void disableLocationUpdates(){
-        if(ready && mLocationRequest != null) {
+
+    private void disableLocationUpdates() {
+        if (ready && mLocationRequest != null) {
             mLocationClient.removeLocationUpdates(this);
             mLocationRequest = null;
         }
     }
-    
-    private void requestLocationUpdates(){
-        if(!ready) {
-            Log.e(TAG, "requestLocationUpdates but not connected. Updates will be requested again once connected");
+
+    private void requestLocationUpdates() {
+        if (!ready) {
+            Log.e(TAG,
+                    "requestLocationUpdates but not connected. Updates will be requested again once connected");
             return;
         }
-        
-        if(foreground || areBackgroundUpdatesEnabled()) 
+
+        if (foreground || areBackgroundUpdatesEnabled())
             mLocationClient.requestLocationUpdates(mLocationRequest, this);
-        else 
-            Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
+        else
+            Log.d(TAG,
+                    "Location updates are disabled (not in foreground or background updates disabled)");
     }
 
     private void setupLocationRequest() {
         disableLocationUpdates();
 
-        if(foreground)
+        if (foreground)
             setupForegroundLocationRequest();
         else
-            setupBackgroundLocationRequest();        
+            setupBackgroundLocationRequest();
     }
-    
+
     @Override
     public void enableForegroundMode() {
         Log.d(TAG, "enableForegroundMode");
@@ -166,10 +157,9 @@ public class FusedLocationLocator extends Locator implements GooglePlayServicesC
     public void enableBackgroundMode() {
         foreground = false;
         Log.d(TAG, "enableBackgroundMode");
-        
+
         setupLocationRequest();
         requestLocationUpdates();
     }
- 
 
 }

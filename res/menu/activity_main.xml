@@ -1,5 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+ 		<item
+        android:id="@+id/menu_publish"
+        android:orderInCategory="2"
+        android:title="Upload"
+        android:icon="@drawable/ic_upload"
+        android:showAsAction="ifRoom"
+        />
+       	<item
+        android:id="@+id/menu_share"
+        android:orderInCategory="3"
+        android:title="Share"
+        android:icon="@drawable/ic_share"
+        android:showAsAction="ifRoom"
+         />
+        
+        />
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"

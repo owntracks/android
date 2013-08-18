@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -28,7 +27,6 @@ import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
-//import st.alr.mqttitude.support.OnNewLocationListener;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -55,8 +53,6 @@ public class ServiceMqtt extends Service implements MqttCallback
         INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED
     }
     
-    private static final int NOTIFCATION_ID = 1337;
-
     private static MQTT_CONNECTIVITY mqttConnectivity = MQTT_CONNECTIVITY.DISCONNECTED;
     private short keepAliveSeconds;
     private String mqttClientId;
@@ -426,35 +422,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     public static MQTT_CONNECTIVITY getConnectivity() {
         return mqttConnectivity;
     }
-    
-
-//    
-//    /**
-//     * @category OBSERVERS
-//     */
-//    private class NetworkConnectionIntentReceiver extends BroadcastReceiver
-//    {
-//
-//        @SuppressLint("Wakelock")
-//        @Override
-//        public void onReceive(Context ctx, Intent intent)
-//        {
-//            Log.v(this.toString(), "NetworkConnectionIntentReceiver: onReceive");
-//            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-//            WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
-//            wl.acquire();
-//
-//            if (isOnline(true) && !isConnected() && !isConnecting()) {
-//                Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggerting doStart(null, -1)");
-//                doStart(null, 1);
-//            
-//            }
-//            wl.release();
-//        }
-//    }
-//        
-//
-
+   
     /**
      * @category MISC
      */

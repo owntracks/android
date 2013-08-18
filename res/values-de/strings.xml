@@ -43,7 +43,8 @@
     <string name="statePublishing">"Veröffentlichen"</string>
     <string name="stateWaiting">"Warten auf Verbindung"</string>
     <string name="stateIdle">"Idle"</string>
-
+    <string name="currentLocation">Aktuelle Position</string>
+    
     <string-array name="connect_options_security">
         <item>Keine</item>
         <item>SSL</item>

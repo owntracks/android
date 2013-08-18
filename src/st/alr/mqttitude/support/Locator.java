@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
-import java.util.prefs.PreferenceChangeListener;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.App;

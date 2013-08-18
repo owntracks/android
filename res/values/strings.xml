@@ -33,6 +33,7 @@
     <string name="connectivityDisconnecting">"Disconnecting"</string>
     <string name="connectivityDisconnected">"Disconnected"</string>
     <string name="na">Not available"</string>
+    <string name="currentLocation">Current location</string>
     <string name="shareLocation">Share location"</string>
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
