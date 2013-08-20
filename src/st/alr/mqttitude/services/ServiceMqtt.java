@@ -1,3 +1,4 @@
+
 package st.alr.mqttitude.services;
 
 import java.io.BufferedInputStream;
@@ -11,6 +12,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.Date;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -45,14 +48,13 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
-
 public class ServiceMqtt extends Service implements MqttCallback
 {
 
     public static enum MQTT_CONNECTIVITY {
         INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED
     }
-    
+
     private static MQTT_CONNECTIVITY mqttConnectivity = MQTT_CONNECTIVITY.DISCONNECTED;
     private short keepAliveSeconds;
     private String mqttClientId;
@@ -70,7 +72,6 @@ public class ServiceMqtt extends Service implements MqttCallback
     // A PendingIntent for calling a receiver in special times
     public PendingIntent pendingIntentPositioning;
 
-    
     /**
      * @category SERVICE HANDLING
      */
@@ -96,17 +97,16 @@ public class ServiceMqtt extends Service implements MqttCallback
     }
 
     private void doStart(final Intent intent, final int startId) {
-   //     init();
-        
+        // init();
 
-        Thread thread1 = new Thread(){
+        Thread thread1 = new Thread() {
             @Override
             public void run() {
                 handleStart(intent, startId);
                 if (this == workerThread) // Clean up worker thread
                     workerThread = null;
             }
-            
+
             @Override
             public void interrupt() {
                 if (this == workerThread) // Clean up worker thread
@@ -117,19 +117,16 @@ public class ServiceMqtt extends Service implements MqttCallback
         thread1.start();
     }
 
-
-
-     void handleStart(Intent intent, int startId) {
+    void handleStart(Intent intent, int startId) {
         Log.v(this.toString(), "handleStart");
 
-        
         // If there is no mqttClient, something went horribly wrong
-//        if (mqttClient == null) {
-//            Log.e(this.toString(), "handleStart: !mqttClient");
-//            stopSelf();
-//            return;
-//        }        
-        
+        // if (mqttClient == null) {
+        // Log.e(this.toString(), "handleStart: !mqttClient");
+        // stopSelf();
+        // return;
+        // }
+
         // Respect user's wish to stay disconnected
         if ((mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT) && startId != -1) {
             return;
@@ -139,7 +136,7 @@ public class ServiceMqtt extends Service implements MqttCallback
         if (isConnecting()) {
             return;
         }
-        
+
         // Respect user's wish to not use data
         if (!isBackgroundDataEnabled()) {
             Log.e(this.toString(), "handleStart: !isBackgroundDataEnabled");
@@ -168,29 +165,30 @@ public class ServiceMqtt extends Service implements MqttCallback
         }
     }
 
-
     /**
      * @category CONNECTION HANDLING
      */
     private void init()
     {
         Log.v(this.toString(), "initMqttClient");
-       
+
         if (mqttClient != null) {
             return;
         }
-        
-
 
         try
         {
-            String brokerAddress = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_HOST, Defaults.VALUE_BROKER_HOST);
-            String brokerPort = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PORT, Defaults.VALUE_BROKER_PORT);
-            String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE? "tcp" : "ssl";
-            
-            mqttClient = new MqttClient(prefix +"://" + brokerAddress + ":" + brokerPort, getClientId(), null);
+            String brokerAddress = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_HOST,
+                    Defaults.VALUE_BROKER_HOST);
+            String brokerPort = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PORT,
+                    Defaults.VALUE_BROKER_PORT);
+            String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp"
+                    : "ssl";
+
+            mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + brokerPort,
+                    getClientId(), null);
             mqttClient.setCallback(this);
-        
+
         } catch (MqttException e)
         {
             // something went wrong!
@@ -198,16 +196,19 @@ public class ServiceMqtt extends Service implements MqttCallback
             changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
         }
     }
-    
-    private int getBrokerSecurityMode(){
-        return sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, Defaults.VALUE_BROKER_SECURITY_NONE);
+
+    private int getBrokerSecurityMode() {
+        return sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY,
+                Defaults.VALUE_BROKER_SECURITY_NONE);
     }
 
     //
-    private javax.net.ssl.SSLSocketFactory getSSLSocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
+    private javax.net.ssl.SSLSocketFactory getSSLSocketFactory() throws CertificateException,
+            KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-        InputStream caInput = new BufferedInputStream(new FileInputStream(sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, "")));
+        InputStream caInput = new BufferedInputStream(new FileInputStream(
+                sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, "")));
         java.security.cert.Certificate ca;
         try {
             ca = cf.generateCertificate(caInput);
@@ -232,67 +233,75 @@ public class ServiceMqtt extends Service implements MqttCallback
 
         return context.getSocketFactory();
     }
-    
+
     private boolean connect()
     {
-        workerThread = Thread.currentThread(); // We connect, so we're the worker thread
+        workerThread = Thread.currentThread(); // We connect, so we're the
+                                               // worker thread
         Log.v(this.toString(), "connectToBroker");
 
         init();
-        
+
         try
         {
             changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
 
-         
-         if(getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
-             options.setSocketFactory(this.getSSLSocketFactory());
-                        
-         if(!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").equals(""))
-             options.setPassword(sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
-        
-         if(!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "").equals(""))
-             options.setUserName(sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, ""));
-         
+            if (getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
+                options.setSocketFactory(this.getSSLSocketFactory());
 
+            if (!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").equals(""))
+                options.setPassword(sharedPreferences.getString(
+                        Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
 
-            
-            options.setKeepAliveInterval(keepAliveSeconds); 
+            if (!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "").equals(""))
+                options.setUserName(sharedPreferences.getString(
+                        Defaults.SETTINGS_KEY_BROKER_USERNAME, ""));
+
+            setWill(options);
+            options.setKeepAliveInterval(keepAliveSeconds);
             options.setConnectionTimeout(10);
-            
+
             mqttClient.connect(options);
 
             changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTED);
 
             return true;
-        } 
-         catch (Exception e) // Catch paho and socket factory exceptions 
-        {
+
+        } catch (Exception e) { // Catch paho and socket factory exceptions
             Log.e(this.toString(), e.toString());
-            //TODO: send reason to user
+            // TODO: send reason to user
             changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
             return false;
         }
 
     }
 
+    private void setWill(MqttConnectOptions m) {
+        StringBuffer payload = new StringBuffer();
+        payload.append("{");
+        payload.append("\"type\": ").append("\"").append("_lwt").append("\"");
+        payload.append(", \"tst\": ").append("\"").append((int) (new Date().getTime() / 1000))
+                .append("\"");
+        payload.append("}");
 
-   
-    private void onConnect() {
-   
-        
-        if (!isConnected()) {
-            Log.e(this.toString(), "onConnect: !isConnected");
-        }  
+        m.setWill(mqttClient.getTopic(sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC,
+                Defaults.VALUE_TOPIC)), payload.toString().getBytes(), 0, false);
+
     }
 
+    private void onConnect() {
+
+        if (!isConnected()) {
+            Log.e(this.toString(), "onConnect: !isConnected");
+        }
+    }
 
     public void disconnect(boolean fromUser)
     {
         Log.v(this.toString(), "disconnect");
-        if(fromUser)
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT);            
+        if (fromUser)
+            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT);
 
         try
         {
@@ -305,15 +314,15 @@ public class ServiceMqtt extends Service implements MqttCallback
         } finally {
             mqttClient = null;
 
-            if(workerThread != null) {
+            if (workerThread != null) {
                 workerThread.interrupt();
             }
 
         }
     }
 
-    
-    @SuppressLint("Wakelock") // Lint check derps with the wl.release() call. 
+    @SuppressLint("Wakelock")
+    // Lint check derps with the wl.release() call.
     @Override
     public void connectionLost(Throwable t)
     {
@@ -334,27 +343,25 @@ public class ServiceMqtt extends Service implements MqttCallback
         }
         wl.release();
     }
-    
 
     public void reconnect() {
         disconnect(true);
         doStart(null, -1);
     }
+
     @Override
     public void messageArrived(MqttTopic topic, MqttMessage message) throws MqttException {
 
-
-    }    
-
+    }
 
     public void publish(String topicStr, String payload) {
         publish(topicStr, payload, false, 0);
     }
-    
+
     public void publish(String topicStr, String payload, boolean retained) {
         publish(topicStr, payload, retained, 0);
     }
-    
+
     public void publish(String topicStr, String payload, boolean retained, int qos) {
         boolean isOnline = isOnline(false);
         boolean isConnected = isConnected();
@@ -365,10 +372,10 @@ public class ServiceMqtt extends Service implements MqttCallback
         MqttMessage message = new MqttMessage(payload.getBytes());
         message.setQos(qos);
         message.setRetained(retained);
-        
+
         try
         {
-            mqttClient.getTopic(topicStr).publish(message);            
+            mqttClient.getTopic(topicStr).publish(message);
         } catch (MqttException e)
         {
             Log.e(this.toString(), e.getMessage());
@@ -382,9 +389,6 @@ public class ServiceMqtt extends Service implements MqttCallback
             deferredPublish.run();
 
     }
-    
-    
-  
 
     /**
      * @category CONNECTIVITY STATUS
@@ -394,42 +398,43 @@ public class ServiceMqtt extends Service implements MqttCallback
         EventBus.getDefault().post(new Events.MqttConnectivityChanged(newConnectivity));
         mqttConnectivity = newConnectivity;
     }
-    
+
     private boolean isOnline(boolean shouldCheckIfOnWifi)
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
-        return     netInfo != null 
-             //   && (!shouldCheckIfOnWifi || (netInfo.getType() == ConnectivityManager.TYPE_WIFI))
-                && netInfo.isAvailable() 
+        return netInfo != null
+                // && (!shouldCheckIfOnWifi || (netInfo.getType() ==
+                // ConnectivityManager.TYPE_WIFI))
+                && netInfo.isAvailable()
                 && netInfo.isConnected();
     }
-    
+
     public boolean isConnected()
     {
         return ((mqttClient != null) && (mqttClient.isConnected() == true));
     }
-    
+
     public boolean isConnecting() {
         return (mqttClient != null) && mqttConnectivity == MQTT_CONNECTIVITY.CONNECTING;
     }
-    
+
     private boolean isBackgroundDataEnabled() {
         return isOnline(false);
     }
-    
+
     public static MQTT_CONNECTIVITY getConnectivity() {
         return mqttConnectivity;
     }
-   
+
     /**
      * @category MISC
      */
     public static ServiceMqtt getInstance() {
         return instance;
     }
-    
+
     private String getClientId()
     {
         if (mqttClientId == null)
@@ -443,7 +448,7 @@ public class ServiceMqtt extends Service implements MqttCallback
 
         return mqttClientId;
     }
-    
+
     @Override
     public IBinder onBind(Intent intent)
     {
@@ -453,6 +458,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     public class LocalBinder<T> extends Binder
     {
         private WeakReference<ServiceMqtt> mService;
+
         public LocalBinder(ServiceMqtt service) {
             mService = new WeakReference<ServiceMqtt>(service);
         }
@@ -464,10 +470,8 @@ public class ServiceMqtt extends Service implements MqttCallback
         public void close() {
             mService = null;
         }
-    }    
-    
+    }
 
-    
     @Override
     public void onDestroy()
     {
@@ -482,18 +486,18 @@ public class ServiceMqtt extends Service implements MqttCallback
         }
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferencesChangedListener);
 
-        if(this.alarmManagerPositioning != null)
+        if (this.alarmManagerPositioning != null)
             this.alarmManagerPositioning.cancel(pendingIntentPositioning);
-        
-        
+
         super.onDestroy();
     }
 
     @Override
-    public void deliveryComplete(MqttDeliveryToken arg0) { }
-    
+    public void deliveryComplete(MqttDeliveryToken arg0) {
+    }
+
     public static String getConnectivityText() {
-        
+
         switch (ServiceMqtt.getConnectivity()) {
             case CONNECTED:
                 return App.getInstance().getString(R.string.connectivityConnected);
@@ -501,14 +505,16 @@ public class ServiceMqtt extends Service implements MqttCallback
                 return App.getInstance().getString(R.string.connectivityConnecting);
             case DISCONNECTING:
                 return App.getInstance().getString(R.string.connectivityDisconnecting);
-            // More verbose disconnect states could be added here. For now any flavor of disconnected is treated the same
+                // More verbose disconnect states could be added here. For now
+                // any flavor of disconnected is treated the same
             default:
                 return App.getInstance().getString(R.string.connectivityDisconnected);
         }
     }
-    
-    public void publishWithTimeout(final String topic, final String payload, final boolean retained, final int qos,  int timeout, final MqttPublish callback) {
-        
+
+    public void publishWithTimeout(final String topic, final String payload,
+            final boolean retained, final int qos, int timeout, final MqttPublish callback) {
+
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -516,29 +522,26 @@ public class ServiceMqtt extends Service implements MqttCallback
                 Log.d(this.toString(), "Broker connection established, publishing message");
                 callback.publishing();
                 publish(topic, payload, retained, qos);
-                callback.publishSuccessfull();                
+                callback.publishSuccessfull();
             }
         };
-        
 
         if (getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
             r.run();
         } else {
             Log.d(this.toString(), "No broker connection established yet, deferring publish");
             callback.publishWaiting();
-            deferredPublish = r;                
+            deferredPublish = r;
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    deferredPublish = null;                        
+                    deferredPublish = null;
                     callback.publishTimeout();
                 }
-            }, timeout * 1000);        
+            }, timeout * 1000);
         }
     }
 
 }
-
-
