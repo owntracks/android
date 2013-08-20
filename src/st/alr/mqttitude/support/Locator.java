@@ -74,6 +74,7 @@ public abstract class Locator implements MqttPublish {
         context.startService(service);
 
         payload.append("{");
+        payload.append("\"type\": ").append("\"").append("_location").append("\"");
         payload.append("\"lat\": ").append("\"").append(l.getLatitude()).append("\"");
         payload.append(", \"lon\": ").append("\"").append(l.getLongitude()).append("\"");
         payload.append(", \"tst\": ").append("\"").append((int)(d.getTime()/1000)).append("\"");
