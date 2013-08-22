@@ -71,6 +71,14 @@
             android:summary="@string/preferencesLicensesSummary"
             android:title="@string/preferencesLicensesTitle" />
 
+            public boolean onPreferenceClick(Preference preference) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("http://some_url_here"));
+        startActivity(intent);
+        return true;
+    }
+        
+        
         <Preference
             android:key="versionReadOnly"
             android:title="@string/preferencesVersionTitle" />
