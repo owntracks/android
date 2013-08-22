@@ -82,7 +82,7 @@ public abstract class Locator implements MqttPublish {
         payload.append(", \"alt\": ").append("\"").append(l.getAltitude()).append("\"");
         payload.append("}");
 
-        ServiceMqtt.getInstance().publishWithTimeout(
+        ServiceMqtt.getInstance().publish(
                 topic,
                 payload.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
@@ -127,7 +127,7 @@ public abstract class Locator implements MqttPublish {
         return App.getInstance().getString(R.string.stateIdle);
     }
 
-    public void publishTimeout() {
+    public void publishFailed() {
         Log.e(TAG, "publishTimeout");
         this.addState(State.PublishConnectionTimeout);
     }

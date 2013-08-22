@@ -13,6 +13,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -64,7 +67,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private LocalBinder<ServiceMqtt> mBinder;
     private Thread workerThread;
-    private Runnable deferredPublish;
+    private LinkedList<DeferredPublishable> deferredPublishables;
 
     // An alarm for rising in special times to fire the
     // pendingIntentPositioning
@@ -85,7 +88,7 @@ public class ServiceMqtt extends Service implements MqttCallback
         mBinder = new LocalBinder<ServiceMqtt>(this);
         keepAliveSeconds = 15 * 60;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
+        deferredPublishables = new LinkedList<DeferredPublishable>();
         EventBus.getDefault().register(this);
     }
 
@@ -354,39 +357,35 @@ public class ServiceMqtt extends Service implements MqttCallback
 
     }
 
-    public void publish(String topicStr, String payload) {
-        publish(topicStr, payload, false, 0);
-    }
-
-    public void publish(String topicStr, String payload, boolean retained) {
-        publish(topicStr, payload, retained, 0);
-    }
-
-    public void publish(String topicStr, String payload, boolean retained, int qos) {
-        boolean isOnline = isOnline(false);
-        boolean isConnected = isConnected();
-
-        if (!isOnline || !isConnected) {
-            return;
-        }
-        MqttMessage message = new MqttMessage(payload.getBytes());
-        message.setQos(qos);
-        message.setRetained(retained);
-
-        try
-        {
-            mqttClient.getTopic(topicStr).publish(message);
-        } catch (MqttException e)
-        {
-            Log.e(this.toString(), e.getMessage());
-            e.printStackTrace();
-        }
-    }
+    // private boolean publish(String topicStr, String payload, boolean
+    // retained, int qos) {
+    // boolean isOnline = isOnline(false);
+    // boolean isConnected = isConnected();
+    //
+    // if (!isOnline || !isConnected) {
+    // return false;
+    // }
+    // MqttMessage message = new MqttMessage(payload.getBytes());
+    // message.setQos(qos);
+    // message.setRetained(retained);
+    //
+    // try
+    // {
+    // mqttClient.getTopic(topicStr).publish(message);
+    // return true;
+    // } catch (MqttException e)
+    // {
+    // Log.e(this.toString(), e.getMessage());
+    // e.printStackTrace();
+    // return false;
+    // }
+    // }
 
     public void onEvent(Events.MqttConnectivityChanged event) {
         mqttConnectivity = event.getConnectivity();
-        if (deferredPublish != null && event.getConnectivity() == MQTT_CONNECTIVITY.CONNECTED)
-            deferredPublish.run();
+
+        if (event.getConnectivity() == MQTT_CONNECTIVITY.CONNECTED)
+            publishDeferrables();
 
     }
 
@@ -512,35 +511,124 @@ public class ServiceMqtt extends Service implements MqttCallback
         }
     }
 
-    public void publishWithTimeout(final String topic, final String payload,
-            final boolean retained, final int qos, int timeout, final MqttPublish callback) {
+    private void deferPublish(final DeferredPublishable p) {
+        p.wait(deferredPublishables, new Runnable() {
 
-        Runnable r = new Runnable() {
             @Override
             public void run() {
-                deferredPublish = null;
-                Log.d(this.toString(), "Broker connection established, publishing message");
-                callback.publishing();
-                publish(topic, payload, retained, qos);
-                callback.publishSuccessfull();
+                deferredPublishables.remove(p);
+                if(!p.isPublishing)//might haben that the publish is in progress while the timeout occurs.
+                    p.publishFailed();
             }
-        };
+        });
+    }
 
-        if (getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
-            r.run();
-        } else {
-            Log.d(this.toString(), "No broker connection established yet, deferring publish");
-            callback.publishWaiting();
-            deferredPublish = r;
+    public void publish(String topic, String payload) {
+        publish(topic, payload, false, 0, 0, null);
+    }
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    deferredPublish = null;
-                    callback.publishTimeout();
-                }
-            }, timeout * 1000);
+    public void publish(String topic, String payload, boolean retained) {
+        publish(topic, payload, retained, 0, 0, null);
+    }
+
+    public void publish(String topic, String payload, boolean retained, int qos, int timeout,
+            MqttPublish callback) {
+        publish(new DeferredPublishable(topic, payload, retained, qos, timeout, callback));
+    }
+
+    private void publish(DeferredPublishable p) {
+        boolean isOnline = isOnline(false);
+        boolean isConnected = isConnected();
+
+        if (!isOnline || !isConnected) {
+            deferPublish(p);
+            return;
+        }
+
+        try
+        {
+            p.publishing();
+            mqttClient.getTopic(p.getTopic()).publish(p);
+            p.publishSuccessfull();
+        } catch (MqttException e)
+        {
+            Log.e(this.toString(), e.getMessage());
+            e.printStackTrace();
+            p.publishFailed();
+        }
+    }
+
+    private void publishDeferrables() {        
+        for (Iterator<DeferredPublishable> iter = deferredPublishables.iterator(); iter.hasNext(); ) {
+            DeferredPublishable p = iter.next();
+            iter.remove();
+            publish(p);
+        }
+    }
+
+    private class DeferredPublishable extends MqttMessage {
+        Handler timeoutHandler;
+        MqttPublish callback;
+        String topic;
+        int timeout = 0;
+        boolean isPublishing;
+
+        public DeferredPublishable(String topic, String payload, boolean retained, int qos,
+                int timeout, MqttPublish callback) {
+            super(payload.getBytes());
+            this.setQos(qos);
+            this.setRetained(retained);
+
+            this.callback = callback;
+            this.topic = topic;
+            this.timeout = timeout;
+        }
+
+        public void publishFailed() {
+            if (callback != null)
+                callback.publishFailed();
+        }
+
+        public void publishSuccessfull() {
+            if (callback != null)
+                callback.publishSuccessfull();
+            cancelWait();
+
+        }
+
+        public void publishing() {
+            isPublishing = true;
+            if (callback != null)
+                callback.publishing();
+        }
+        
+        public boolean isPublishing(){
+            return isPublishing;
+        }
+
+        public String getTopic() {
+            return topic;
+        }
+        
+        public void cancelWait(){
+            if(timeoutHandler != null)
+                this.timeoutHandler.removeCallbacksAndMessages(this);
+        }
+
+        public void wait(LinkedList<DeferredPublishable> queue, Runnable onRemove) {
+            if (timeoutHandler != null) {
+                Log.d(this.toString(), "This DeferredPublishable already has a timeout set");
+                return;
+            }
+
+            // No need signal waiting for timeouts of 0. The command will be
+            // failed right away
+            if (callback != null && timeout > 0)
+                callback.publishWaiting();
+
+            queue.addLast(this);
+            this.timeoutHandler = new Handler();
+            this.timeoutHandler.postDelayed(onRemove, timeout * 1000);
         }
     }
 

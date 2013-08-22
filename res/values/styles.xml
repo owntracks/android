@@ -1,18 +1,32 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
+  
+    <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
+    <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
+    <item name="android:textAllCaps">false</item>
+    
+</style>
 
-    <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:actionBarStyle">@style/actionBar</item>
-    </style>
+<style name="AppTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+    <item name="android:background">@drawable/ab_bottom_solid</item>
+    <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
+</style>
+
+  <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    <item name="android:textColor">@android:color/white</item>
+  </style>
+
+  
+
+
 
     <color name="lightGrey">#d9d9d9</color>
     <color name="mediumGrey">#a7a7a7</color>
 	<color name="darkGrey">#4f4f4f</color>
     <color name="background">#f2f2f2</color>
     
-    <style name="actionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/background</item>
+    <style name="actionBar" parent="@android:style/Widget.Holo.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_bottom_solid</item>
     </style>
 
     <style name="seperator">
