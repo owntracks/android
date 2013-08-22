@@ -517,7 +517,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             @Override
             public void run() {
                 deferredPublishables.remove(p);
-                if(!p.isPublishing)//might haben that the publish is in progress while the timeout occurs.
+                if(!p.isPublishing())//might haben that the publish is in progress while the timeout occurs.
                     p.publishFailed();
             }
         });
@@ -567,11 +567,11 @@ public class ServiceMqtt extends Service implements MqttCallback
     }
 
     private class DeferredPublishable extends MqttMessage {
-        Handler timeoutHandler;
-        MqttPublish callback;
-        String topic;
-        int timeout = 0;
-        boolean isPublishing;
+        private Handler timeoutHandler;
+        private MqttPublish callback;
+        private String topic;
+        private int timeout = 0;
+        private boolean isPublishing;
 
         public DeferredPublishable(String topic, String payload, boolean retained, int qos,
                 int timeout, MqttPublish callback) {
