@@ -28,20 +28,17 @@
     <application
         android:name="st.alr.mqttitude.App"
         android:allowBackup="true"
-        android:logo="@drawable/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        
-        
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDL80DnlIzyG5GNcMoy9yX7uuWEJcCvW7c" />
 
         <activity
             android:name="st.alr.mqttitude.ActivityMain"
-            android:label="@string/app_name" 
-            android:icon="@drawable/ic_launcher"
-            android:logo="@drawable/ic_icon">
+            android:label="@string/app_name"
+      >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,6 +55,11 @@
             android:name="st.alr.mqttitude.services.ServiceMqtt"
             android:exported="false" >
         </service>
+
+        <activity
+            android:name="st.alr.mqttitude.ActivityLauncher"
+            android:label="@string/title_activity_activity_launcher" >
+        </activity>
     </application>
 
 </manifest>

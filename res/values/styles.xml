@@ -10,6 +10,8 @@
 <style name="AppTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
     <item name="android:background">@drawable/ab_bottom_solid</item>
     <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
+        <item name="android:icon">@drawable/ic_icon</item>
+    
 </style>
 
   <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">

@@ -61,7 +61,11 @@ public abstract class Locator implements MqttPublish {
         Date d = new Date();
         Location l = getLastKnownLocation();
         String topic = sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC, Defaults.VALUE_TOPIC);
-
+        ServiceMqtt s = ServiceMqtt.getInstance();
+        if(s == null) {
+            return;
+        }
+        
         if (topic == null) {
             addState(State.NOTOPIC);
             return;

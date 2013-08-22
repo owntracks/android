@@ -44,12 +44,10 @@
     <string name="statePublishing">"Error: Unable to acqire location"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
+    <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker that notifies about successful publishes</string>
+    <string name="preferencesNotificationTickerOnPublishTitle">Ticker on publish</string>
+    <string name="preferencesNotification">Notifications</string>
 
-                <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker that notifies about successful publishes</string>
-           <string name="preferencesNotificationTickerOnPublishTitle" >Ticker on publish</string>
-        <string name="preferencesNotification">Notifications</string>
-           
-    
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
@@ -65,5 +63,8 @@
         <item>"1"</item>
         <item>"2"</item>
     </string-array>
+
+    <string name="title_activity_activity_launcher">ActivityLauncher</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
