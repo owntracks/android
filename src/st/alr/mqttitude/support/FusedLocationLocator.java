@@ -47,8 +47,7 @@ public class FusedLocationLocator extends Locator implements
     @Override
     public void onLocationChanged(Location arg0) {
         Log.v(TAG, "FusedLocationLocator onLocationChanged");
-        EventBus.getDefault().postSticky(
-                new Events.LocationUpdated(mLocationClient.getLastLocation()));
+        EventBus.getDefault().postSticky(new Events.LocationUpdated(mLocationClient.getLastLocation()));
 
         if (shouldPublishLocation()) {
             Log.d(TAG, "should publish");

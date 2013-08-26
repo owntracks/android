@@ -219,13 +219,11 @@ public class PreferencesBroker extends DialogPreference {
         if (v == null)
             return;
 
-        if (ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED_DATADISABLED
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.DISCONNECTED) {
-            v.setEnabled(false);
-        } else {
+        if (ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.CONNECTING
+                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
             v.setEnabled(true);
+        } else {
+            v.setEnabled(false);
         }
 
     }

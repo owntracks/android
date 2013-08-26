@@ -2,6 +2,7 @@
 package st.alr.mqttitude;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -39,14 +41,15 @@ public class ActivityMain extends FragmentActivity {
     TextView statusServer;
     private GoogleMap mMap;
 
-    private TextView locationAddress;
-    private TextView locationZipcode;
-    private TextView gecoderUnavilableLatLong;
-    private LinearLayout geocoderAvailable;
-    private LinearLayout geocoderUnavailable;
+    private TextView locationPrimary;
+    private TextView locationMeta;
+    private LinearLayout locationAvailable;
+    private LinearLayout locationUnavailable;
 
     private Marker mMarker;
     private Circle mCircle;
+    private TextView locationNotAvailable;
+    private Geocoder geocoder;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -125,14 +128,14 @@ public class ActivityMain extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
+        geocoder = new Geocoder(this, Locale.getDefault());
+        locationAvailable = (LinearLayout) findViewById(R.id.locationAvailable);
+        locationUnavailable = (LinearLayout) findViewById(R.id.locationUnavailable);
 
-        geocoderAvailable = (LinearLayout) findViewById(R.id.geocoderAvailable);
-        geocoderUnavailable = (LinearLayout) findViewById(R.id.geocoderUnavailable);
-
-        locationAddress = (TextView) findViewById(R.id.locationAddress);
-        locationZipcode = (TextView) findViewById(R.id.locationZipcode);
-        gecoderUnavilableLatLong = (TextView) findViewById(R.id.geocoderUnavailableLatLon);
-
+        locationPrimary = (TextView) findViewById(R.id.locationPrimary);
+        locationMeta = (TextView) findViewById(R.id.locationMeta);
+        locationNotAvailable = (TextView) findViewById(R.id.locationNotAvailable);
+        
         showLocationUnavailable();
         
         EventBus.getDefault().register(this);
@@ -147,7 +150,7 @@ public class ActivityMain extends FragmentActivity {
        if(l == null) {
            showLocationUnavailable();
            return;
-       }
+       } 
        
         LatLng latlong = new LatLng(l.getLatitude(), l.getLongitude());
         CameraUpdate center = CameraUpdateFactory.newLatLng(latlong);
@@ -159,58 +162,45 @@ public class ActivityMain extends FragmentActivity {
         if (mCircle != null)
             mCircle.remove();
 
-        mMarker = mMap.addMarker(new MarkerOptions().position(latlong).icon(
-                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        
+        mMarker = mMap.addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
 
-        // if(l.getAccuracy() < 20) {
-        // mCircle = mMap.addCircle(new
-        // CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0x330072ff).fillColor(0x260072ff).strokeWidth(3));
-        // }
+         if(l.getAccuracy() >= 50) {
+                 mCircle = mMap.addCircle(new
+                 CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0xff1082ac).fillColor(0x1c15bffe).strokeWidth(3));
+         }
 
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
 
-        gecoderUnavilableLatLong.setText(l.getLatitude() + " / " + l.getLongitude());
-
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        List<Address> addresses = null;
+        locationPrimary.setText(l.getLatitude() + " / " + l.getLongitude());
+        locationMeta.setText(App.getInstance().formatDate(new Date()));
+        showLocationAvailable();
+        
         try {
-            addresses = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
+            if (addresses != null && addresses.size() > 0) {            
+                Address a = addresses.get(0);
+                locationPrimary.setText(a.getAddressLine(0));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (addresses != null && addresses.size() > 0) {
-            showGeocoderAvailable();
-            
-            Address a = addresses.get(0);
-
-            locationAddress.setText(a.getAddressLine(0));
-            locationZipcode.setText(a.getAddressLine(1));
-
-        } else {
-            showGeocoderUnavailable();
-        }
         
         
     }
 
-    private void showGeocoderAvailable() {
-        
-        geocoderUnavailable.setVisibility(View.GONE);
-        if(!geocoderAvailable.isShown())
-            geocoderAvailable.setVisibility(View.VISIBLE);
+    private void showLocationAvailable() {
+        locationUnavailable.setVisibility(View.GONE);
+        if(!locationAvailable.isShown())
+            locationAvailable.setVisibility(View.VISIBLE);
     }
-    
-    private void showGeocoderUnavailable() {        
-        geocoderAvailable.setVisibility(View.GONE);
-        if(!geocoderUnavailable.isShown())          
-            geocoderUnavailable.setVisibility(View.VISIBLE);        
-    }
-    
+
     private void showLocationUnavailable(){
-        showGeocoderUnavailable();
-        gecoderUnavilableLatLong.setText(getString(R.string.na));
+        locationAvailable.setVisibility(View.GONE);
+        if(!locationUnavailable.isShown())          
+            locationUnavailable.setVisibility(View.VISIBLE);        
     }
     
     public void share(View view) {

@@ -1,7 +1,10 @@
 package st.alr.mqttitude.support;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import android.location.Location;
 import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.services.ServiceMqtt.MQTT_CONNECTIVITY;
 
 public class Events {
     public static class PublishSuccessfull {

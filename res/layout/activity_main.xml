@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:background="#fbfbfb"
+    android:background="#e9e9e9"
     android:orientation="vertical"
     android:paddingBottom="0dp"
     android:paddingLeft="0dp"
@@ -12,50 +12,48 @@
     tools:context=".ActivityMain" >
 
     <LinearLayout
+        style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@color/border"
         android:orientation="vertical" >
 
         <fragment
             android:id="@+id/map"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_margin="1dp"
+            android:layout_marginBottom="2dp"
             class="com.google.android.gms.maps.SupportMapFragment" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottomBar"
+        style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
         android:layout_weight="0"
-        android:background="@color/background"
         android:orientation="vertical"
-        android:padding="0dp" >
-
-        <View
-            android:id="@+id/separator"
-            style="@style/seperatorH" />
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp" >
 
         <FrameLayout
             android:id="@+id/bottomBarStatefull"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="20dp" >
+            android:layout_height="wrap_content" >
 
             <LinearLayout
-                android:id="@+id/geocoderAvailable"
+                android:id="@+id/locationAvailable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone" >
 
                 <TextView
-                    android:id="@+id/locationAddress"
+                    android:id="@+id/locationPrimary"
                     style="@style/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -63,7 +61,7 @@
                     android:text="@string/na" />
 
                 <TextView
-                    android:id="@+id/locationZipcode"
+                    android:id="@+id/locationMeta"
                     style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -72,22 +70,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/geocoderUnavailable"
+                android:id="@+id/locationUnavailable"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/locationNotAvailable"
                     style="@style/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/currentLocation" />
-
-                <TextView
-                    android:id="@+id/geocoderUnavailableLatLon"
-                    style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

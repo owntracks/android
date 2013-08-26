@@ -30,7 +30,6 @@ public abstract class Locator implements MqttPublish {
 
     Locator(Context context) {
         this.context = context;
-        this.lastPublishDateFormat = new SimpleDateFormat("y/M/d H:m:s");
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.state = EnumSet.of(Defaults.State.Idle);
 
@@ -55,6 +54,7 @@ public abstract class Locator implements MqttPublish {
 
     public void publishLastKnownLocation() {
         Log.v(TAG, "publishLastKnownLocation");
+        lastPublish = new Date();
 
         Intent service = new Intent(context, ServiceMqtt.class);
         StringBuilder payload = new StringBuilder();
@@ -75,6 +75,8 @@ public abstract class Locator implements MqttPublish {
             return;
         }
 
+         
+        
         context.startService(service);
 
         payload.append("{");
@@ -97,7 +99,6 @@ public abstract class Locator implements MqttPublish {
 
     public void publishSuccessfull() {
         Log.v(TAG, "publishSuccessfull");
-        lastPublish = new Date();
         EventBus.getDefault().post(new Events.PublishSuccessfull());
         // This is a bit hacked as we append an empty space on every second
         // ticker update. Otherwise consecutive tickers with the same text would
@@ -153,17 +154,16 @@ public abstract class Locator implements MqttPublish {
 
     protected void addState(State s) {       
         this.state.add(s);
-        if (isErrorState(s)) {
-            Log.v(this.toString(), "error state");
+        if (isTickerState(s) && isTickerOnPublishEnabled()) {
             App.getInstance().updateTicker(getStateAsText());
         }
         App.getInstance().updateNotification();
         EventBus.getDefault().post(new Events.StateChanged());
     }
 
-    private boolean isErrorState(State s) {
+    private boolean isTickerState(State s) {
         return s == Defaults.State.LocatingFail || s == Defaults.State.NOTOPIC
-                || s == Defaults.State.PublishConnectionTimeout;
+                || s == Defaults.State.PublishConnectionTimeout || s == Defaults.State.PublishConnectionWaiting || s == Defaults.State.Publishing;
     }
 
     protected void removeState(State s) {
@@ -177,11 +177,8 @@ public abstract class Locator implements MqttPublish {
         App.getInstance().updateNotification();
     }
 
-    public String getLastupdateText() {
-        if (lastPublish != null)
-            return lastPublishDateFormat.format(lastPublish);
-        else
-            return context.getResources().getString(R.string.na);
+    public Date getLastPublishDate() {
+        return lastPublish;
     }
 
     public boolean areBackgroundUpdatesEnabled() {

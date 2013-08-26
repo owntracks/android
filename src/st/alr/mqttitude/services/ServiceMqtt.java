@@ -55,7 +55,7 @@ public class ServiceMqtt extends Service implements MqttCallback
 {
 
     public static enum MQTT_CONNECTIVITY {
-        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED
+        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED, DISCONNECTED_ERROR
     }
 
     private static MQTT_CONNECTIVITY mqttConnectivity = MQTT_CONNECTIVITY.DISCONNECTED;
@@ -68,6 +68,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     private LocalBinder<ServiceMqtt> mBinder;
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
+    private static MqttException error;
 
     // An alarm for rising in special times to fire the
     // pendingIntentPositioning
@@ -84,6 +85,7 @@ public class ServiceMqtt extends Service implements MqttCallback
         super.onCreate();
         instance = this;
         workerThread = null;
+        error = null;
         changeMqttConnectivity(MQTT_CONNECTIVITY.INITIAL);
         mBinder = new LocalBinder<ServiceMqtt>(this);
         keepAliveSeconds = 15 * 60;
@@ -123,14 +125,8 @@ public class ServiceMqtt extends Service implements MqttCallback
     void handleStart(Intent intent, int startId) {
         Log.v(this.toString(), "handleStart");
 
-        // If there is no mqttClient, something went horribly wrong
-        // if (mqttClient == null) {
-        // Log.e(this.toString(), "handleStart: !mqttClient");
-        // stopSelf();
-        // return;
-        // }
-
-        // Respect user's wish to stay disconnected
+ 
+        // Respect user's wish to stay disconnected. Overwrite with startId == -1 to reconnect manually afterwards
         if ((mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT) && startId != -1) {
             return;
         }
@@ -147,8 +143,8 @@ public class ServiceMqtt extends Service implements MqttCallback
             return;
         }
 
-        // Don't do anything when already connected
-        if (!isConnected())
+        // Don't do anything unless we're disconnected
+        if (isDisconnected())
         {
             Log.v(this.toString(), "handleStart: !isConnected");
             // Check if there is a data connection
@@ -165,7 +161,14 @@ public class ServiceMqtt extends Service implements MqttCallback
                 Log.e(this.toString(), "handleStart: !isOnline");
                 changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET);
             }
+        } else {
+            Log.d(this.toString(), "handleStart: not disconnected");
+
         }
+    }
+    
+    private boolean isDisconnected(){
+        return mqttConnectivity == MQTT_CONNECTIVITY.INITIAL || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_ERROR;
     }
 
     /**
@@ -271,9 +274,12 @@ public class ServiceMqtt extends Service implements MqttCallback
 
             return true;
 
-        } catch (Exception e) { // Catch paho and socket factory exceptions
+        } catch (MqttException e) { // Catch paho and socket factory exceptions
             Log.e(this.toString(), e.toString());
-            // TODO: send reason to user
+            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_ERROR, e);
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
             changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
             return false;
         }
@@ -392,8 +398,12 @@ public class ServiceMqtt extends Service implements MqttCallback
     /**
      * @category CONNECTIVITY STATUS
      */
+    private void changeMqttConnectivity(MQTT_CONNECTIVITY newConnectivity, MqttException e) {
+        error = e; 
+        changeMqttConnectivity(newConnectivity);
+    }
+    
     private void changeMqttConnectivity(MQTT_CONNECTIVITY newConnectivity) {
-
         EventBus.getDefault().post(new Events.MqttConnectivityChanged(newConnectivity));
         mqttConnectivity = newConnectivity;
     }
@@ -413,6 +423,14 @@ public class ServiceMqtt extends Service implements MqttCallback
     public boolean isConnected()
     {
         return ((mqttClient != null) && (mqttClient.isConnected() == true));
+    }
+    
+    public static boolean isErrorState(MQTT_CONNECTIVITY c) {
+        return c == MQTT_CONNECTIVITY.DISCONNECTED_ERROR;
+    }
+    
+    public static boolean hasError(){
+        return error != null;
     }
 
     public boolean isConnecting() {
@@ -495,22 +513,25 @@ public class ServiceMqtt extends Service implements MqttCallback
     public void deliveryComplete(MqttDeliveryToken arg0) {
     }
 
-    public static String getConnectivityText() {
 
-        switch (ServiceMqtt.getConnectivity()) {
+    public static String getConnectivityText() {
+        MQTT_CONNECTIVITY c = getConnectivity();
+        if(isErrorState(c) && hasError())
+            return error.toString();
+        
+        switch (c) {
             case CONNECTED:
                 return App.getInstance().getString(R.string.connectivityConnected);
             case CONNECTING:
                 return App.getInstance().getString(R.string.connectivityConnecting);
             case DISCONNECTING:
                 return App.getInstance().getString(R.string.connectivityDisconnecting);
-                // More verbose disconnect states could be added here. For now
-                // any flavor of disconnected is treated the same
             default:
                 return App.getInstance().getString(R.string.connectivityDisconnected);
         }
-    }
 
+    }
+    
     private void deferPublish(final DeferredPublishable p) {
         p.wait(deferredPublishables, new Runnable() {
 
@@ -554,6 +575,7 @@ public class ServiceMqtt extends Service implements MqttCallback
         {
             Log.e(this.toString(), e.getMessage());
             e.printStackTrace();
+            p.cancelWait();
             p.publishFailed();
         }
     }

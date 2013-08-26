@@ -1,6 +1,8 @@
 
 package st.alr.mqttitude.preferences;
 
+import com.google.android.gms.internal.ee;
+
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -26,16 +28,19 @@ public class ActivityPreferences extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Not starting the service for the preferences prevents fuzzy states during error cases
+        // The service should have been started earlier by the ActivityMain
+        // TODO: investigate what happens if this activity gets started without starting the service first and if this is possible
+        
         // Start service if it is not already started
-        Intent service = new Intent(this, ServiceMqtt.class);
-        startService(service);
+        //Intent service = new Intent(this, ServiceMqtt.class);
+        //tartService(service);
 
-        // Register for connection changed events
-        EventBus.getDefault().register(this);
 
         // Replace content with fragment for custom preferences
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new CustomPreferencesFragment()).commit();
+        
 
     }
 
@@ -74,6 +79,9 @@ public class ActivityPreferences extends PreferenceActivity {
 
             serverPreference = findPreference("brokerPreference");
             setServerPreferenceSummary();
+
+            // Register for connection changed events
+            EventBus.getDefault().register(getActivity());
 
         }
     }
