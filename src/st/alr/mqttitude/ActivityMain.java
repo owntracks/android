@@ -184,7 +184,7 @@ public class ActivityMain extends FragmentActivity {
                 locationPrimary.setText(a.getAddressLine(0));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // Geocoder information not available. LatLong is already shown and just not overwritten. Nothing to do here
         }
 
         

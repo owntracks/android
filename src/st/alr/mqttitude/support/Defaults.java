@@ -33,6 +33,7 @@ public class Defaults {
     public static final boolean VALUE_RETAIN = false;
     public static final String VALUE_QOS = "0";
     public static final boolean VALUE_TICKER_ON_PUBLISH = true;
+    public static final String BUGSNAG_API_KEY = "f3302f4853372edcdd12dfcc102a3578";
 
 
     

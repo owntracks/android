@@ -128,11 +128,14 @@ public class ServiceMqtt extends Service implements MqttCallback
  
         // Respect user's wish to stay disconnected. Overwrite with startId == -1 to reconnect manually afterwards
         if ((mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT) && startId != -1) {
+            Log.d(this.toString(), "handleStart: respecting user disconnect ");
+
             return;
         }
 
         // No need to connect if we're already connecting
         if (isConnecting()) {
+            Log.d(this.toString(), "handleStart: already connecting");
             return;
         }
 
@@ -152,7 +155,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             {
                 if (connect())
                 {
-                    Log.v(this.toString(), "handleStart: connectToBroker() == true");
+                    Log.v(this.toString(), "handleStart: connec sucessfull");
                     onConnect();
                 }
             }
@@ -162,7 +165,7 @@ public class ServiceMqtt extends Service implements MqttCallback
                 changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET);
             }
         } else {
-            Log.d(this.toString(), "handleStart: not disconnected");
+            Log.d(this.toString(), "handleStart: already connected");
 
         }
     }
@@ -244,7 +247,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     {
         workerThread = Thread.currentThread(); // We connect, so we're the
                                                // worker thread
-        Log.v(this.toString(), "connectToBroker");
+        Log.v(this.toString(), "connect");
 
         init();
 
@@ -264,12 +267,13 @@ public class ServiceMqtt extends Service implements MqttCallback
                 options.setUserName(sharedPreferences.getString(
                         Defaults.SETTINGS_KEY_BROKER_USERNAME, ""));
 
-            setWill(options);
+            //setWill(options);
             options.setKeepAliveInterval(keepAliveSeconds);
             options.setConnectionTimeout(10);
 
             mqttClient.connect(options);
 
+            Log.d(this.toString(), "No error during connect");
             changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTED);
 
             return true;
@@ -301,9 +305,8 @@ public class ServiceMqtt extends Service implements MqttCallback
 
     private void onConnect() {
 
-        if (!isConnected()) {
+        if (!isConnected())
             Log.e(this.toString(), "onConnect: !isConnected");
-        }
     }
 
     public void disconnect(boolean fromUser)
@@ -314,10 +317,8 @@ public class ServiceMqtt extends Service implements MqttCallback
 
         try
         {
-            if (mqttClient != null && mqttClient.isConnected())
-            {
+            if (isConnected())
                 mqttClient.disconnect();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -404,8 +405,13 @@ public class ServiceMqtt extends Service implements MqttCallback
     }
     
     private void changeMqttConnectivity(MQTT_CONNECTIVITY newConnectivity) {
+        Log.d(this.toString(), "Connectivity changed to: " + newConnectivity);
         EventBus.getDefault().post(new Events.MqttConnectivityChanged(newConnectivity));
         mqttConnectivity = newConnectivity;
+        if(newConnectivity == MQTT_CONNECTIVITY.DISCONNECTED) {
+            Log.e(this.toString(), " disconnect");
+            
+        }
     }
 
     private boolean isOnline(boolean shouldCheckIfOnWifi)

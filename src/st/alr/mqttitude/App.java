@@ -18,6 +18,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
+
+import com.bugsnag.android.Bugsnag;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -38,6 +40,10 @@ public class App extends Application {
         int resp = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
         instance = this;
+        
+        Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);
+        Bugsnag.setNotifyReleaseStages("production", "testing");
+
         EventBus.getDefault().register(this);
 
         if (resp == ConnectionResult.SUCCESS) {
