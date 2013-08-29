@@ -66,5 +66,6 @@
 
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_activity_status">ActivityStatus</string>
 
 </resources>

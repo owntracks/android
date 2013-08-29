@@ -14,7 +14,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityMain extends FragmentActivity {
+public class ActivityMain extends android.support.v4.app.FragmentActivity {
     MenuItem publish;
     TextView location;
     TextView statusLocator;
@@ -58,6 +57,10 @@ public class ActivityMain extends FragmentActivity {
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
+        }  else if (itemId == R.id.menu_status) {
+                Intent intent1 = new Intent(this, ActivityStatus.class);
+                startActivity(intent1);
+                return true;
         } else if (itemId == R.id.menu_publish) {
             App.getInstance().getLocator().publishLastKnownLocation();
             return true;
