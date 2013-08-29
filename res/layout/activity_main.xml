@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:background="#e9e9e9"
     android:orientation="vertical"
     android:paddingBottom="0dp"
     android:paddingLeft="0dp"
@@ -28,8 +27,9 @@
             class="com.google.android.gms.maps.SupportMapFragment" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/bottomBar"
+
+        <FrameLayout
+                    android:id="@+id/bottomBar"
         style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,11 +39,7 @@
         android:paddingBottom="16dp"
         android:paddingLeft="16dp"
         android:paddingTop="16dp" >
-
-        <FrameLayout
-            android:id="@+id/bottomBarStatefull"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            
 
             <LinearLayout
                 android:id="@+id/locationAvailable"
@@ -79,11 +75,10 @@
                     android:id="@+id/locationNotAvailable"
                     style="@style/title"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/na" />
             </LinearLayout>
         </FrameLayout>
-    </LinearLayout>
 
 </LinearLayout>

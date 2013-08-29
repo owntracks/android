@@ -15,7 +15,6 @@
         android:showAsAction="ifRoom"
          />
         
-        />
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"
