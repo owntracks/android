@@ -15,24 +15,23 @@ import java.security.cert.CertificateFactory;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+import st.alr.mqttitude.App;
+import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -43,7 +42,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
@@ -69,6 +70,8 @@ public class ServiceMqtt extends Service implements MqttCallback
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
     private static MqttException error;
+    private HandlerThread pubThread;
+    private Handler pubHandler;
 
     // An alarm for rising in special times to fire the
     // pendingIntentPositioning
@@ -92,6 +95,11 @@ public class ServiceMqtt extends Service implements MqttCallback
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         deferredPublishables = new LinkedList<DeferredPublishable>();
         EventBus.getDefault().register(this);
+        
+        pubThread = new HandlerThread("MQTTPUBTHREAD");
+        pubThread.start();
+        pubHandler = new Handler(pubThread.getLooper());
+
     }
 
     @Override
@@ -336,6 +344,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     @Override
     public void connectionLost(Throwable t)
     {
+        Log.e(this.toString(), "error: " + t.toString());
         // we protect against the phone switching off while we're doing this
         // by requesting a wake lock - we request the minimum possible wake
         // lock - just enough to keep the CPU running until we've finished
@@ -359,7 +368,6 @@ public class ServiceMqtt extends Service implements MqttCallback
         doStart(null, -1);
     }
 
-    @Override
     public void messageArrived(MqttTopic topic, MqttMessage message) throws MqttException {
 
     }
@@ -515,9 +523,6 @@ public class ServiceMqtt extends Service implements MqttCallback
         super.onDestroy();
     }
 
-    @Override
-    public void deliveryComplete(MqttDeliveryToken arg0) {
-    }
 
 
     public static String getConnectivityText() {
@@ -544,7 +549,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             @Override
             public void run() {
                 deferredPublishables.remove(p);
-                if(!p.isPublishing())//might haben that the publish is in progress while the timeout occurs.
+                if(!p.isPublishing())//might happen that the publish is in progress while the timeout occurs.
                     p.publishFailed();
             }
         });
@@ -558,16 +563,31 @@ public class ServiceMqtt extends Service implements MqttCallback
         publish(topic, payload, retained, 0, 0, null);
     }
 
-    public void publish(String topic, String payload, boolean retained, int qos, int timeout,
-            MqttPublish callback) {
-        publish(new DeferredPublishable(topic, payload, retained, qos, timeout, callback));
+    public void publish(final String topic, final String payload, final boolean retained, final int qos, final int timeout,
+            final MqttPublish callback) {
+        
+        
+                      publish(new DeferredPublishable(topic, payload, retained, qos, timeout, callback));
+                
     }
 
-    private void publish(DeferredPublishable p) {
-        boolean isOnline = isOnline(false);
-        boolean isConnected = isConnected();
+    private void publish(final DeferredPublishable p) {
+  
+        
+        pubHandler.post(new Runnable() {
+            
+            @Override
+            public void run() {
 
-        if (!isOnline || !isConnected) {
+        if(Looper.getMainLooper().getThread() == Thread.currentThread()){
+            Log.e(this.toString(), "PUB ON MAIN THREAD");
+        } else {
+            Log.d(this.toString(), "pub on background thread");
+        }
+        
+        
+        if (!isOnline(false) || !isConnected()) {
+            Log.d(this.toString(), "pub deferred");
             deferPublish(p);
             return;
         }
@@ -584,6 +604,9 @@ public class ServiceMqtt extends Service implements MqttCallback
             p.cancelWait();
             p.publishFailed();
         }
+            }
+        });
+
     }
 
     private void publishDeferrables() {        
@@ -658,6 +681,18 @@ public class ServiceMqtt extends Service implements MqttCallback
             this.timeoutHandler = new Handler();
             this.timeoutHandler.postDelayed(onRemove, timeout * 1000);
         }
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -48,6 +48,7 @@ public class App extends Application {
 
         if (resp == ConnectionResult.SUCCESS) {
             locator = new FusedLocationLocator(this);
+            Log.v(this.toString(), "Play  services version: " + GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
         } else {
             locator = new FusedLocationLocator(this);
             Log.e(this.toString(),  "play services not available and no other locator implemented yet ");

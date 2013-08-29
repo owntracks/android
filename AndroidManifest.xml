@@ -56,10 +56,6 @@
             android:exported="false" >
         </service>
 
-        <activity
-            android:name="st.alr.mqttitude.ActivityLauncher"
-            android:label="@string/title_activity_activity_launcher" >
-        </activity>
     </application>
 
 </manifest>
