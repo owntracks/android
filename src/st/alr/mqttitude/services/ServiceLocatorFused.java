@@ -1,7 +1,10 @@
 
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.services;
 
 import java.util.Date;
+
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Events.LocationUpdated;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -10,11 +13,13 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import de.greenrobot.event.EventBus;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 
-public class FusedLocationLocator extends Locator implements
+public class ServiceLocatorFused extends ServiceLocator implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private LocationClient mLocationClient;
@@ -22,13 +27,15 @@ public class FusedLocationLocator extends Locator implements
     private final int MINUTES_TO_MILISECONDS = 60 * 1000;
     private boolean ready = false;
     private boolean foreground = false;
-
-    public FusedLocationLocator(Context context) {
-        super(context);
+    
+    @Override
+    public void onCreate() {
+        super.onCreate();
         setupLocationRequest();
-
-        mLocationClient = new LocationClient(context, this, this);
+        mLocationClient = new LocationClient(this, this, this);
     }
+
+    
 
     @Override
     public void start() {
@@ -46,7 +53,7 @@ public class FusedLocationLocator extends Locator implements
 
     @Override
     public void onLocationChanged(Location arg0) {
-        Log.v(TAG, "FusedLocationLocator onLocationChanged");
+        Log.v(TAG, "ServiceLocatorFused onLocationChanged");
         EventBus.getDefault().postSticky(new Events.LocationUpdated(mLocationClient.getLastLocation()));
 
         if (shouldPublishLocation()) {
@@ -71,14 +78,14 @@ public class FusedLocationLocator extends Locator implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "FusedLocationLocator failed to connect");
+        Log.e(TAG, "ServiceLocatorFused failed to connect");
     }
 
     @Override
     public void onConnected(Bundle arg0) {
         ready = true;
 
-        Log.v(TAG, "FusedLocationLocator connected");
+        Log.v(TAG, "ServiceLocatorFused connected");
         requestLocationUpdates();
     }
 
@@ -86,7 +93,7 @@ public class FusedLocationLocator extends Locator implements
     public void onDisconnected() {
         ready = false;
 
-        Log.v(TAG, "FusedLocationLocator disconnected");
+        Log.v(TAG, "ServiceLocatorFused disconnected");
         disableLocationUpdates();
     }
 

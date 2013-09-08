@@ -4,10 +4,10 @@ package st.alr.mqttitude;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import st.alr.mqttitude.services.ServiceLocator;
+import st.alr.mqttitude.services.ServiceLocatorFused;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.FusedLocationLocator;
-import st.alr.mqttitude.support.Locator;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -31,7 +31,6 @@ public class App extends Application {
     private NotificationManager notificationManager;
     private static NotificationCompat.Builder notificationBuilder;
 
-    private Locator locator;
     private boolean even = false;
     private SimpleDateFormat dateFormater;
     
@@ -47,11 +46,13 @@ public class App extends Application {
 
         EventBus.getDefault().register(this);
 
+        Intent locator = null;
         if (resp == ConnectionResult.SUCCESS) {
-            locator = new FusedLocationLocator(this);
+            locator = new Intent(this, ServiceLocatorFused.class);
             Log.v(this.toString(), "Play  services version: " + GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
         } else {
-            locator = new FusedLocationLocator(this);
+            // TODO: implement fallback locator
+            locator = new Intent(this, ServiceLocatorFused.class);
             Log.e(this.toString(),  "play services not available and no other locator implemented yet ");
         }
         this.dateFormater = new SimpleDateFormat("y/M/d H:m:s", getResources().getConfiguration().locale);
@@ -70,7 +71,7 @@ public class App extends Application {
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
         handleNotification();
         
-        locator.start();
+        startService(locator);
 
     }
 
@@ -121,7 +122,8 @@ public class App extends Application {
             return;
         
         
-        String text = locator.getStateAsText();
+        //String text = locator.getStateAsText();
+        String text = "todo";
         notificationBuilder.setContentTitle(getResources().getString(R.string.app_name));
         notificationBuilder
                 .setSmallIcon(R.drawable.ic_notification)
@@ -147,9 +149,9 @@ public class App extends Application {
                 + e.getLocation().getLongitude());
     }
 
-    public Locator getLocator(){
-        return this.locator;
-    } 
+//    public ServiceLocator getLocator(){
+//        return this.locator;
+//    } 
     
     public boolean isDebugBuild(){
         return 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE );

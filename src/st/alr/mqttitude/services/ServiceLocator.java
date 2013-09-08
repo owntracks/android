@@ -1,25 +1,42 @@
 
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.services;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.services.ServiceMqtt.LocalBinder;
+import st.alr.mqttitude.services.ServiceMqtt.MQTT_CONNECTIVITY;
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.MqttPublish;
 import st.alr.mqttitude.support.Defaults.State;
+import st.alr.mqttitude.support.Events.PublishSuccessfull;
+import st.alr.mqttitude.support.Events.StateChanged;
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
+import android.net.Proxy;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public abstract class Locator implements MqttPublish {
+public abstract class ServiceLocator extends Service implements MqttPublish {
     protected Context context;
     protected SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
@@ -28,8 +45,10 @@ public abstract class Locator implements MqttPublish {
     private Set<Defaults.State> state;
     protected final String TAG = this.toString();
 
-    Locator(Context context) {
-        this.context = context;
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.state = EnumSet.of(Defaults.State.Idle);
 
@@ -40,6 +59,7 @@ public abstract class Locator implements MqttPublish {
             }
         };
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
+        
     }
 
     abstract public Location getLastKnownLocation();
@@ -113,6 +133,9 @@ public abstract class Locator implements MqttPublish {
     }
 
     public String getStateAsText() {
+        if(this.state == null)
+            return App.getInstance().getString(R.string.stateIdle);
+                    
         if (this.state.contains(State.NOTOPIC)) {
             return App.getInstance().getString(R.string.stateNotopic);
         }
@@ -199,6 +222,64 @@ public abstract class Locator implements MqttPublish {
 
     public int getUpdateIntervallInMiliseconds() {
         return getUpdateIntervall() * 60 * 1000;
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+      //TODO do something useful
+      return Service.START_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return new LocatorBinder();
+    }
+    
+    public class LocatorBinder extends Binder
+    {
+            public ServiceLocator getService ()
+            {
+                    return ServiceLocator.this;
+            }
+    }
+
+    // This is how activities get hold of the service implementation as an interface!!!
+    // All invocations will be executed async in the UI thread!!!
+    public static ServiceLocator getAsyncService(final Context context) {
+        final Intent intent = new Intent(context, ServiceLocator.class);
+
+        // Unmark the following if you want the service to keep on leaving even after the passed activity was destroyed.
+        context.startService(intent);
+
+        ServiceLocator proxy = (ServiceLocator) Proxy.newProxyInstance(context.getClassLoader(), new Class<?>[] { ServiceLocator.class }, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+                ServiceConnection connection = new ServiceConnection() {
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                    }
+
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        // this is the implementation itself!!!
+                        ServiceLocator mainInterface = ((LocatorBinder) service).getService();
+                        try {
+                            method.invoke(mainInterface, args);
+                        } catch (Exception e) {
+                            // Alternatively, you can notify the service's error mechanism
+                            Log.e("", "Error invoking service method: " + method.getName(), e);
+                        }
+                    }
+                };
+                // This is how you bind async the connection to the service.
+                // The service will be created if it was not yet created.
+                context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+                return null;            }
+        });
+
+        return proxy;
     }
 
 }
