@@ -119,8 +119,8 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
     
-        if (App.getInstance().isDebugBuild())
-                menu.getItem(R.id.menu_status).setVisible(true);
+        if (App.getInstance().isDebugBuild())            
+                menu.findItem(R.id.menu_status).setVisible(true);
         
         return true;
     }
