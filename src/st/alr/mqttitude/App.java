@@ -30,6 +30,7 @@ public class App extends Application {
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private NotificationManager notificationManager;
     private static NotificationCompat.Builder notificationBuilder;
+    private static Class<?> locatorClass;
 
     private boolean even = false;
     private SimpleDateFormat dateFormater;
@@ -48,13 +49,16 @@ public class App extends Application {
 
         Intent locator = null;
         if (resp == ConnectionResult.SUCCESS) {
-            locator = new Intent(this, ServiceLocatorFused.class);
             Log.v(this.toString(), "Play  services version: " + GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
+            locatorClass = ServiceLocatorFused.class;
         } else {
             // TODO: implement fallback locator
-            locator = new Intent(this, ServiceLocatorFused.class);
             Log.e(this.toString(),  "play services not available and no other locator implemented yet ");
+            locatorClass = ServiceLocatorFused.class;
         }
+
+        locator = new Intent(this, getServiceLocatorClass());
+        
         this.dateFormater = new SimpleDateFormat("y/M/d H:m:s", getResources().getConfiguration().locale);
 
         notificationManager = (NotificationManager) App.getInstance().getSystemService(
@@ -71,8 +75,8 @@ public class App extends Application {
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
         handleNotification();
         
-        startService(locator);
-
+        Log.v(this.toString(), "Starting locator service " + getServiceLocatorClass().toString());
+        startService(locator); // Service remains running after binds by activity
     }
 
     public String formatDate(Date d) {
@@ -155,5 +159,9 @@ public class App extends Application {
     
     public boolean isDebugBuild(){
         return 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE );
+    }
+
+    public static Class<?> getServiceLocatorClass() {
+        return locatorClass;
     }
 }

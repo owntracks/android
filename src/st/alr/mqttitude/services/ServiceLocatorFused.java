@@ -31,18 +31,17 @@ public class ServiceLocatorFused extends ServiceLocator implements
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.v(this.toString(), "onCreate");
+
         setupLocationRequest();
         mLocationClient = new LocationClient(this, this, this);
     }
 
-    
-
-    @Override
-    public void start() {
+    public void onStartOnce(){
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
-            mLocationClient.connect();
+            mLocationClient.connect();        
     }
-
+    
     @Override
     public Location getLastKnownLocation() {
         if (ready)

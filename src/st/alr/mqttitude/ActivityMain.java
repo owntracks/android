@@ -7,13 +7,20 @@ import java.util.List;
 import java.util.Locale;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
+import st.alr.mqttitude.services.ServiceLocator;
 import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.services.ServiceLocator.LocatorBinder;
 import st.alr.mqttitude.support.Events;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +55,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     private Marker mMarker;
     private Circle mCircle;
     private Geocoder geocoder;
+    private ServiceLocator locator;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -62,8 +70,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
                 i = new Intent(this, ActivityStatus.class);
                 startActivity(i);
                 return true;
-        } else if (itemId == R.id.menu_publish) {
-            App.getInstance().getLocator().publishLastKnownLocation();
+        } else if (itemId == R.id.menu_publish) {           
+            if(locator != null)
+                locator.publishLastKnownLocation();
             return true;
         } else if (itemId == R.id.menu_share) {
             this.share(null);
@@ -92,21 +101,38 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        
+        Log.v(this.toString(), "binding");
 
-        Intent service = new Intent(this, ServiceMqtt.class);
-        startService(service);
+        bindService(new Intent(this, App.getServiceLocatorClass()), new ServiceConnection() {
+            
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                location = null;                
+            }
+            
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.v(this.toString(), "bound");
+
+                locator = ((ServiceLocator.LocatorBinder)service).getService();
+                
+            }
+        }, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-        App.getInstance().getLocator().enableForegroundMode();
+        if(locator != null)
+            locator.enableForegroundMode();
     }
 
     @Override
     protected void onPause() {
-        App.getInstance().getLocator().enableBackgroundMode();
+        if(locator != null)
+            locator.enableBackgroundMode();
         super.onPause();
     }
 
@@ -120,7 +146,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
     
         if (App.getInstance().isDebugBuild())
-                menu.getItem(R.id.menu_status).setVisible(true);
+                menu.findItem(R.id.menu_status).setVisible(true);
         
         return true;
     }
@@ -134,10 +160,11 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
+
+        locator = null;
         geocoder = new Geocoder(this, Locale.getDefault());
         locationAvailable = (LinearLayout) findViewById(R.id.locationAvailable);
         locationUnavailable = (LinearLayout) findViewById(R.id.locationUnavailable);
-
         locationPrimary = (TextView) findViewById(R.id.locationPrimary);
         locationMeta = (TextView) findViewById(R.id.locationMeta);
         
@@ -209,8 +236,10 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     }
     
     public void share(View view) {
-
-        Location l = App.getInstance().getLocator().getLastKnownLocation();
+        if(locator != null)
+            return;
+        
+        Location l = locator.getLastKnownLocation();
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(
@@ -224,6 +253,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     }
 
     public void upload(View view) {
-        App.getInstance().getLocator().publishLastKnownLocation();
+        if(locator != null)
+            locator.publishLastKnownLocation();
     }
 }

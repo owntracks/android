@@ -22,7 +22,6 @@ import st.alr.mqttitude.support.Events.PublishSuccessfull;
 import st.alr.mqttitude.support.Events.StateChanged;
 import android.app.Service;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -37,19 +36,22 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public abstract class ServiceLocator extends Service implements MqttPublish {
-    protected Context context;
     protected SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
     protected Date lastPublish;
     private java.text.DateFormat lastPublishDateFormat;
     private Set<Defaults.State> state;
     protected final String TAG = this.toString();
-
+    protected boolean started;
+    
     @Override
     public void onCreate()
     {
         super.onCreate();
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.v(this.TAG, "onCreate");
+
+        this.started = false;
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         this.state = EnumSet.of(Defaults.State.Idle);
 
         preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -65,8 +67,8 @@ public abstract class ServiceLocator extends Service implements MqttPublish {
     abstract public Location getLastKnownLocation();
 
     abstract protected void handlePreferences();
-
-    abstract public void start();
+    
+    abstract protected void onStartOnce();
 
     abstract public void enableForegroundMode();
 
@@ -76,7 +78,7 @@ public abstract class ServiceLocator extends Service implements MqttPublish {
         Log.v(TAG, "publishLastKnownLocation");
         lastPublish = new Date();
 
-        Intent service = new Intent(context, ServiceMqtt.class);
+        Intent service = new Intent(this, ServiceMqtt.class);
         StringBuilder payload = new StringBuilder();
         Date d = new Date();
         Location l = getLastKnownLocation();
@@ -97,7 +99,7 @@ public abstract class ServiceLocator extends Service implements MqttPublish {
 
          
         
-        context.startService(service);
+        startService(service);
 
         payload.append("{");
         payload.append("\"_type\": ").append("\"").append("location").append("\"");
@@ -227,12 +229,22 @@ public abstract class ServiceLocator extends Service implements MqttPublish {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-      //TODO do something useful
-      return Service.START_STICKY;
+        Log.v(this.TAG, "onStartCommand");
+        if(!started) {
+            started = true;
+            onStartOnce();
+        }
+        
+        return Service.START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.v(this.TAG, "onBind");
+        if(!started) {
+            started = true;
+            onStartOnce();
+        }
         return new LocatorBinder();
     }
     
@@ -243,43 +255,4 @@ public abstract class ServiceLocator extends Service implements MqttPublish {
                     return ServiceLocator.this;
             }
     }
-
-    // This is how activities get hold of the service implementation as an interface!!!
-    // All invocations will be executed async in the UI thread!!!
-    public static ServiceLocator getAsyncService(final Context context) {
-        final Intent intent = new Intent(context, ServiceLocator.class);
-
-        // Unmark the following if you want the service to keep on leaving even after the passed activity was destroyed.
-        context.startService(intent);
-
-        ServiceLocator proxy = (ServiceLocator) Proxy.newProxyInstance(context.getClassLoader(), new Class<?>[] { ServiceLocator.class }, new InvocationHandler() {
-            @Override
-            public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-                ServiceConnection connection = new ServiceConnection() {
-                    @Override
-                    public void onServiceDisconnected(ComponentName name) {
-                    }
-
-                    @Override
-                    public void onServiceConnected(ComponentName name, IBinder service) {
-                        // this is the implementation itself!!!
-                        ServiceLocator mainInterface = ((LocatorBinder) service).getService();
-                        try {
-                            method.invoke(mainInterface, args);
-                        } catch (Exception e) {
-                            // Alternatively, you can notify the service's error mechanism
-                            Log.e("", "Error invoking service method: " + method.getName(), e);
-                        }
-                    }
-                };
-                // This is how you bind async the connection to the service.
-                // The service will be created if it was not yet created.
-                context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-                return null;            }
-        });
-
-        return proxy;
-    }
-
 }
