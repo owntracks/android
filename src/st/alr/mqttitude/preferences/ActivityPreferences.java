@@ -39,14 +39,14 @@ public class ActivityPreferences extends PreferenceActivity {
     }
     
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         EventBus.getDefault().unregister(this);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStop();
         EventBus.getDefault().register(this);
     }
 
