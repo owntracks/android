@@ -47,20 +47,19 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
 
     private Marker mMarker;
     private Circle mCircle;
+    private TextView locationNotAvailable;
     private Geocoder geocoder;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        Intent i = null;
-        
         if (itemId == R.id.menu_settings) {
-            i = new Intent(this, ActivityPreferences.class);
-            startActivity(i);
+            Intent intent1 = new Intent(this, ActivityPreferences.class);
+            startActivity(intent1);
             return true;
         }  else if (itemId == R.id.menu_status) {
-                i = new Intent(this, ActivityStatus.class);
-                startActivity(i);
+                Intent intent1 = new Intent(this, ActivityStatus.class);
+                startActivity(intent1);
                 return true;
         } else if (itemId == R.id.menu_publish) {
             App.getInstance().getLocator().publishLastKnownLocation();
@@ -77,8 +76,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         if (mMap == null) {
             mMap = ((com.google.android.gms.maps.SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map)).getMap();
-            if (mMap != null)
+            if (mMap != null) {
                 setUpMap();
+            }
         }
     }
 
@@ -118,10 +118,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-    
-        if (App.getInstance().isDebugBuild())            
-                menu.findItem(R.id.menu_status).setVisible(true);
-        
+
         return true;
     }
 
@@ -140,6 +137,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
 
         locationPrimary = (TextView) findViewById(R.id.locationPrimary);
         locationMeta = (TextView) findViewById(R.id.locationMeta);
+        locationNotAvailable = (TextView) findViewById(R.id.locationNotAvailable);
         
         showLocationUnavailable();
         

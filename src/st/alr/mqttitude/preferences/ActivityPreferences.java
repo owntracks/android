@@ -37,24 +37,11 @@ public class ActivityPreferences extends PreferenceActivity {
         else
             onCreatePreferenceActivity();
     }
-    
-    @Override
-    public void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        EventBus.getDefault().register(this);
-    }
-
 
     private boolean supportsFragment() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
-    
+
     @SuppressWarnings("deprecation")
     private void onCreatePreferenceActivity() {
         addPreferencesFromResource(R.xml.preferences);
@@ -71,25 +58,28 @@ public class ActivityPreferences extends PreferenceActivity {
 
     @TargetApi(11)
     private void onCreatePreferenceFragment() {
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new CustomPreferencesFragment()).commit();
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new CustomPreferencesFragment()).commit();
     }
 
     @TargetApi(11)
-    private void onSetupPreferenceFragment(PreferenceFragment f) {
+    private static void onSetupPreferenceFragment(PreferenceFragment f) {
         version = f.findPreference("versionReadOnly");
         serverPreference = f.findPreference("brokerPreference");
-        backgroundUpdatesIntervall = f.findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
+        backgroundUpdatesIntervall = f
+                .findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
         onSetupCommon();
     }
-    
-    private void onSetupCommon() {
-        PackageManager pm = getPackageManager();
-        final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+
+    private static void onSetupCommon() {
+        PackageManager pm = activity.getPackageManager();
 
         backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 Log.v(this.toString(), newValue.toString());
                 if (newValue.toString().equals("0")) {
+                    SharedPreferences.Editor editor = PreferenceManager
+                            .getDefaultSharedPreferences(activity).edit();
                     editor.putString(preference.getKey(), "1");
                     editor.commit();
                     return false;
@@ -105,6 +95,9 @@ public class ActivityPreferences extends PreferenceActivity {
         }
 
         setServerPreferenceSummary();
+
+        // Register for connection changed events
+        EventBus.getDefault().register(activity);
     }
 
     @TargetApi(11)
@@ -114,7 +107,7 @@ public class ActivityPreferences extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-            ((ActivityPreferences) getActivity()).onSetupPreferenceFragment(this);
+            onSetupPreferenceFragment(this);
 
         }
     }
