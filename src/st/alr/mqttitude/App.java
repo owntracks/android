@@ -17,13 +17,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-<<<<<<< HEAD
-=======
 import android.content.pm.ApplicationInfo;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
->>>>>>> refactor-to-service
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -245,12 +242,6 @@ public class App extends Application {
         Log.v(this.toString(), "LocationUpdated: " + e.getGeocodableLocation().getLatitude() + ":"
                 + e.getGeocodableLocation().getLongitude());
     }
-<<<<<<< HEAD
-
-    public Locator getLocator(){
-        return this.locator;
-    } 
-=======
     
     public boolean isDebugBuild(){
         return 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE );
@@ -259,5 +250,4 @@ public class App extends Application {
     public static Class<?> getServiceLocatorClass() {
         return locatorClass;
     }
->>>>>>> refactor-to-service
 }

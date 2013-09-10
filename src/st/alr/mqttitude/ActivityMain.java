@@ -58,14 +58,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
 
     private Marker mMarker;
     private Circle mCircle;
-<<<<<<< HEAD
-    private TextView locationNotAvailable;
-    private Geocoder geocoder;
-=======
     private ServiceLocator serviceLocator;
     private ServiceConnection locatorConnection;
     private static Handler handler;
->>>>>>> refactor-to-service
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -168,14 +163,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-<<<<<<< HEAD
-
-=======
     
         if (App.getInstance().isDebugBuild())
                 menu.findItem(R.id.menu_status).setVisible(true);
-        
->>>>>>> refactor-to-service
         return true;
     }
 
@@ -194,20 +184,13 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         locationUnavailable = (LinearLayout) findViewById(R.id.locationUnavailable);
         locationPrimary = (TextView) findViewById(R.id.locationPrimary);
         locationMeta = (TextView) findViewById(R.id.locationMeta);
-<<<<<<< HEAD
-        locationNotAvailable = (TextView) findViewById(R.id.locationNotAvailable);
-        
-        showLocationUnavailable();
-        
-        EventBus.getDefault().register(this);
-=======
+
         // Handler for updating text fields on the UI like the lat/long and address.
         handler = new Handler() {
             public void handleMessage(Message msg) {
                 onHandlerMessage(msg);
             }
         };
->>>>>>> refactor-to-service
 
         showLocationUnavailable();        
     }
