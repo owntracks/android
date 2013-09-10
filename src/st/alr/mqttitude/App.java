@@ -155,7 +155,7 @@ public class App extends Application {
         
         
         if(lastPublishedLocation != null && sharedPreferences.getBoolean("notificationLocation", true)) {
-            time = lastPublishedLocation.getLocation().getTime();
+            time = lastPublishedLocationTime.getTime();
 
             if(lastPublishedLocation.getGeocoder() != null && sharedPreferences.getBoolean("notificationGeocoder", false)) {
                 title = lastPublishedLocation.getGeocoder();
