@@ -3,8 +3,9 @@ package st.alr.mqttitude.services;
 
 import java.util.Date;
 
+import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.Events.LocationUpdated;
+import st.alr.mqttitude.support.GeocodableLocation;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -12,11 +13,8 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import de.greenrobot.event.EventBus;
-import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 
 public class ServiceLocatorFused extends ServiceLocator implements
@@ -27,6 +25,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private final int MINUTES_TO_MILISECONDS = 60 * 1000;
     private boolean ready = false;
     private boolean foreground = false;
+    private final String TAG = "ServiceLocatorFused";
+    private GeocodableLocation lastKnownLocation;
     
     @Override
     public void onCreate() {
@@ -37,27 +37,26 @@ public class ServiceLocatorFused extends ServiceLocator implements
         mLocationClient = new LocationClient(this, this, this);
     }
 
+    @Override
     public void onStartOnce(){
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
             mLocationClient.connect();        
     }
     
     @Override
-    public Location getLastKnownLocation() {
-        if (ready)
-            return mLocationClient.getLastLocation();
-        else
-            return null;
+    public GeocodableLocation getLastKnownLocation() {
+        return lastKnownLocation;
     }
 
     @Override
     public void onLocationChanged(Location arg0) {
         Log.v(TAG, "ServiceLocatorFused onLocationChanged");
-        EventBus.getDefault().postSticky(new Events.LocationUpdated(mLocationClient.getLastLocation()));
+        this.lastKnownLocation = new GeocodableLocation(arg0);
+        
+        EventBus.getDefault().postSticky(new Events.LocationUpdated(this.lastKnownLocation));
 
         if (shouldPublishLocation()) {
             Log.d(TAG, "should publish");
-
             publishLastKnownLocation();
         }
     }

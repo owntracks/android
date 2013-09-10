@@ -5,7 +5,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -35,15 +34,12 @@ import st.alr.mqttitude.support.MqttPublish;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -52,7 +48,7 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
-public class ServiceMqtt extends Service implements MqttCallback
+public class ServiceMqtt extends ServiceBindable implements MqttCallback
 {
 
     public static enum MQTT_CONNECTIVITY {
@@ -66,7 +62,6 @@ public class ServiceMqtt extends Service implements MqttCallback
     private static SharedPreferences sharedPreferences;
     private static ServiceMqtt instance;
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
-    private LocalBinder<ServiceMqtt> mBinder;
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
     private static MqttException error;
@@ -90,7 +85,6 @@ public class ServiceMqtt extends Service implements MqttCallback
         workerThread = null;
         error = null;
         changeMqttConnectivity(MQTT_CONNECTIVITY.INITIAL);
-        mBinder = new LocalBinder<ServiceMqtt>(this);
         keepAliveSeconds = 15 * 60;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         deferredPublishables = new LinkedList<DeferredPublishable>();
@@ -106,7 +100,7 @@ public class ServiceMqtt extends Service implements MqttCallback
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         doStart(intent, startId);
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void doStart(final Intent intent, final int startId) {
@@ -372,30 +366,6 @@ public class ServiceMqtt extends Service implements MqttCallback
 
     }
 
-    // private boolean publish(String topicStr, String payload, boolean
-    // retained, int qos) {
-    // boolean isOnline = isOnline(false);
-    // boolean isConnected = isConnected();
-    //
-    // if (!isOnline || !isConnected) {
-    // return false;
-    // }
-    // MqttMessage message = new MqttMessage(payload.getBytes());
-    // message.setQos(qos);
-    // message.setRetained(retained);
-    //
-    // try
-    // {
-    // mqttClient.getTopic(topicStr).publish(message);
-    // return true;
-    // } catch (MqttException e)
-    // {
-    // Log.e(this.toString(), e.getMessage());
-    // e.printStackTrace();
-    // return false;
-    // }
-    // }
-
     public void onEvent(Events.MqttConnectivityChanged event) {
         mqttConnectivity = event.getConnectivity();
 
@@ -480,28 +450,6 @@ public class ServiceMqtt extends Service implements MqttCallback
         return mqttClientId;
     }
 
-    @Override
-    public IBinder onBind(Intent intent)
-    {
-        return mBinder;
-    }
-
-    public class LocalBinder<T> extends Binder
-    {
-        private WeakReference<ServiceMqtt> mService;
-
-        public LocalBinder(ServiceMqtt service) {
-            mService = new WeakReference<ServiceMqtt>(service);
-        }
-
-        public ServiceMqtt getService() {
-            return mService.get();
-        }
-
-        public void close() {
-            mService = null;
-        }
-    }
 
     @Override
     public void onDestroy()
@@ -511,10 +459,6 @@ public class ServiceMqtt extends Service implements MqttCallback
 
         changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
 
-        if (mBinder != null) {
-            mBinder.close();
-            mBinder = null;
-        }
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferencesChangedListener);
 
         if (this.alarmManagerPositioning != null)
@@ -556,18 +500,18 @@ public class ServiceMqtt extends Service implements MqttCallback
     }
 
     public void publish(String topic, String payload) {
-        publish(topic, payload, false, 0, 0, null);
+        publish(topic, payload, false, 0, 0, null, null);
     }
 
     public void publish(String topic, String payload, boolean retained) {
-        publish(topic, payload, retained, 0, 0, null);
+        publish(topic, payload, retained, 0, 0, null, null);
     }
 
     public void publish(final String topic, final String payload, final boolean retained, final int qos, final int timeout,
-            final MqttPublish callback) {
+            final MqttPublish callback, final Object extra) {
         
         
-                      publish(new DeferredPublishable(topic, payload, retained, qos, timeout, callback));
+                      publish(new DeferredPublishable(topic, payload, retained, qos, timeout, callback, extra));
                 
     }
 
@@ -623,13 +567,15 @@ public class ServiceMqtt extends Service implements MqttCallback
         private String topic;
         private int timeout = 0;
         private boolean isPublishing;
-
+        private Object extra;
+        
         public DeferredPublishable(String topic, String payload, boolean retained, int qos,
-                int timeout, MqttPublish callback) {
+                int timeout, MqttPublish callback, Object extra) {
+            
             super(payload.getBytes());
             this.setQos(qos);
             this.setRetained(retained);
-
+            this.extra = extra;
             this.callback = callback;
             this.topic = topic;
             this.timeout = timeout;
@@ -637,12 +583,12 @@ public class ServiceMqtt extends Service implements MqttCallback
 
         public void publishFailed() {
             if (callback != null)
-                callback.publishFailed();
+                callback.publishFailed(extra);
         }
 
         public void publishSuccessfull() {
             if (callback != null)
-                callback.publishSuccessfull();
+                callback.publishSuccessfull(extra);
             cancelWait();
 
         }
@@ -650,7 +596,7 @@ public class ServiceMqtt extends Service implements MqttCallback
         public void publishing() {
             isPublishing = true;
             if (callback != null)
-                callback.publishing();
+                callback.publishing(extra);
         }
         
         public boolean isPublishing(){
@@ -675,7 +621,7 @@ public class ServiceMqtt extends Service implements MqttCallback
             // No need signal waiting for timeouts of 0. The command will be
             // failed right away
             if (callback != null && timeout > 0)
-                callback.publishWaiting();
+                callback.publishWaiting(extra);
 
             queue.addLast(this);
             this.timeoutHandler = new Handler();
@@ -684,15 +630,12 @@ public class ServiceMqtt extends Service implements MqttCallback
     }
 
     @Override
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
-        // TODO Auto-generated method stub
-        
-    }
+    public void messageArrived(String topic, MqttMessage message) throws Exception {}
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void deliveryComplete(IMqttDeliveryToken token) {}
+
+    @Override
+    protected void onStartOnce() {}
 
 }

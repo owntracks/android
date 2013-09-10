@@ -57,10 +57,26 @@
             android:title="@string/preferencesNotificationTitle" />
         <CheckBoxPreference
             android:defaultValue="true"
+            android:dependency="notificationEnabled"
+            
+            android:key="notificationLocation"
+            android:summary="@string/preferencesNotificationLocationSummary"
+            android:title="@string/preferencesNotificationLocationTitle" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="notificationLocation"
+            android:key="notificationGeocoder"
+            android:summary="@string/preferencesNotificationGeocoderSummary"
+            android:title="@string/preferencesNotificationGeocoderTitle" />
+          
+          <CheckBoxPreference
+            android:defaultValue="true"
             android:key="notificationTickerOnPublishEnabled"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
-    </PreferenceScreen>
+        
+        </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >

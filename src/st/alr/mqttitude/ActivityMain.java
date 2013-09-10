@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Locale;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
+import st.alr.mqttitude.services.ServiceBindable;
 import st.alr.mqttitude.services.ServiceLocator;
-import st.alr.mqttitude.services.ServiceMqtt;
-import st.alr.mqttitude.services.ServiceLocator.LocatorBinder;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
+import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -43,7 +44,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends android.support.v4.app.FragmentActivity {
-    private static final int GEOCODER_RESULT = 1;
     MenuItem publish;
     TextView location;
     TextView statusLocator;
@@ -80,7 +80,8 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
                 serviceLocator.publishLastKnownLocation();
             return true;
         } else if (itemId == R.id.menu_share) {
-            this.share(null);
+            if(serviceLocator != null)
+                this.share(null);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -121,19 +122,26 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 Log.v(this.toString(), "bound");
 
-                serviceLocator = ((ServiceLocator.LocatorBinder)service).getService();
-                
+                serviceLocator = (ServiceLocator) ((ServiceBindable.ServiceBinder)service).getService();                
             }
         };
         
         bindService(new Intent(this, App.getServiceLocatorClass()), locatorConnection, Context.BIND_AUTO_CREATE);
         EventBus.getDefault().register(this);
+        
+        if(serviceLocator != null)
+            serviceLocator.enableForegroundMode();
+
     }
     
     @Override
     public void onStop() {
         unbindService(locatorConnection);
         EventBus.getDefault().unregister(this);
+
+        if(serviceLocator != null)
+            serviceLocator.enableBackgroundMode();
+
         super.onStop();
     }
     
@@ -141,14 +149,10 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-        if(serviceLocator != null)
-            serviceLocator.enableForegroundMode();
     }
 
     @Override
     protected void onPause() {
-        if(serviceLocator != null)
-            serviceLocator.enableBackgroundMode();
         super.onPause();
     }
 
@@ -194,17 +198,22 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     
     private void onHandlerMessage(Message msg) {
         switch (msg.what) {
-            case GEOCODER_RESULT:
-                locationPrimary.setText((String) msg.obj);
+            case ReverseGeocodingTask.GEOCODER_RESULT:
+                Log.v(this.toString(), "Geocoder result_ " + ((GeocodableLocation) msg.obj).getGeocoder());
+                locationPrimary.setText(((GeocodableLocation) msg.obj).getGeocoder());
                 break;
+            case ReverseGeocodingTask.GEOCODER_NORESULT:
+                break;
+
         }
     }   
 
     public void onEvent(Events.LocationUpdated e) {
-        setLocation(e.getLocation());
+        setLocation(e.getGeocodableLocation());
     }
 
-    public void setLocation(Location l) {
+    public void setLocation(GeocodableLocation location) {
+       Location l = location.getLocation();
        if(l == null) {
            showLocationUnavailable();
            return;
@@ -236,60 +245,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         showLocationAvailable();
         
         if (Geocoder.isPresent())
-            (new ReverseGeocodingTask(this)).execute(new Location[] {l});
+            (new ReverseGeocodingTask(this, handler)).execute(new GeocodableLocation[] {location});
         
     }
-    // AsyncTask encapsulating the reverse-geocoding API.  Since the geocoder API is blocked,
-    // we do not want to invoke it from the UI thread.
-    private class ReverseGeocodingTask extends AsyncTask<Location, Void, Void> {
-        Context mContext;
-
-        public ReverseGeocodingTask(Context context) {
-            super();
-            mContext = context;
-        }
-
-        @Override
-        protected Void doInBackground(Location... params) {
-            Log.v(this.toString(), "Doing reverse Geocoder lookup of location");
-            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-            Location l = params[0];
-
-            try {
-                List<Address> addresses = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
-                if (addresses != null && addresses.size() > 0) {            
-                    Address a = addresses.get(0);
-                    Message.obtain(handler, GEOCODER_RESULT, a.getAddressLine(0)).sendToTarget();
-                }
-            } catch (IOException e) {
-                // Geocoder information not available. LatLong is already shown and just not overwritten. Nothing to do here
-            }
-
-//            
-//            Location loc = params[0];
-//            List<Address> addresses = null;
-//            try {
-//                addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                // Update address field with the exception.
-//                Message.obtain(mHandler, UPDATE_ADDRESS, e.toString()).sendToTarget();
-//            }
-//            if (addresses != null && addresses.size() > 0) {
-//                Address address = addresses.get(0);
-//                // Format the first line of address (if available), city, and country name.
-//                String addressText = String.format("%s, %s, %s",
-//                        address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-//                        address.getLocality(),
-//                        address.getCountryName());
-//                // Update address field on UI.
-//                Message.obtain(mHandler, UPDATE_ADDRESS, addressText).sendToTarget();
-//            }
-            return null;
-        }
-    }
-
-
 
     private void showLocationAvailable() {
         locationUnavailable.setVisibility(View.GONE);
@@ -304,10 +262,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     }
     
     public void share(View view) {
-        if(serviceLocator != null)
-            return;
-        
-        Location l = serviceLocator.getLastKnownLocation();
+        GeocodableLocation l = serviceLocator.getLastKnownLocation();
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(
@@ -321,7 +276,6 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     }
 
     public void upload(View view) {
-        if(serviceLocator != null)
             serviceLocator.publishLastKnownLocation();
     }
 }
