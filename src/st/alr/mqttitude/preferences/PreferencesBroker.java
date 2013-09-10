@@ -2,7 +2,6 @@
 package st.alr.mqttitude.preferences;
 
 import st.alr.mqttitude.services.ServiceMqtt;
-import st.alr.mqttitude.services.ServiceMqtt.MQTT_CONNECTIVITY;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.R;
 
@@ -219,8 +218,8 @@ public class PreferencesBroker extends DialogPreference {
         if (v == null)
             return;
 
-        if (ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.CONNECTING
-                || ServiceMqtt.getConnectivity() == MQTT_CONNECTIVITY.CONNECTED) {
+        if (ServiceMqtt.getState() == Defaults.State.ServiceMqtt.CONNECTING
+                || ServiceMqtt.getState() == Defaults.State.ServiceMqtt.CONNECTED) {
             v.setEnabled(true);
         } else {
             v.setEnabled(false);

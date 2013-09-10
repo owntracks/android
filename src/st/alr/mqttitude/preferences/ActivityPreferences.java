@@ -117,12 +117,12 @@ public class ActivityPreferences extends PreferenceActivity {
         super.onDestroy();
     }
 
-    public void onEventMainThread(Events.MqttConnectivityChanged event) {
+    public void onEventMainThread(Events.StateChanged.ServiceMqtt event) {
         setServerPreferenceSummary();
     }
 
     private static void setServerPreferenceSummary() {
-        serverPreference.setSummary(ServiceMqtt.getConnectivityText());
+        serverPreference.setSummary(ServiceMqtt.getStateAsString());
     }
 
     @Override

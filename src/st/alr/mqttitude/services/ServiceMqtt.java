@@ -26,14 +26,11 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -51,32 +48,21 @@ import de.greenrobot.event.EventBus;
 public class ServiceMqtt extends ServiceBindable implements MqttCallback
 {
 
-    public static enum MQTT_CONNECTIVITY {
-        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED, DISCONNECTED_ERROR
-    }
 
-    private static MQTT_CONNECTIVITY mqttConnectivity = MQTT_CONNECTIVITY.DISCONNECTED;
+    private static State.ServiceMqtt state = State.ServiceMqtt.INITIAL;
+    
     private short keepAliveSeconds;
     private String mqttClientId;
     private MqttClient mqttClient;
-    private static SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
     private static ServiceMqtt instance;
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
-    private static MqttException error;
+    private MqttException error;
     private HandlerThread pubThread;
     private Handler pubHandler;
 
-    // An alarm for rising in special times to fire the
-    // pendingIntentPositioning
-    private AlarmManager alarmManagerPositioning;
-    // A PendingIntent for calling a receiver in special times
-    public PendingIntent pendingIntentPositioning;
-
-    /**
-     * @category SERVICE HANDLING
-     */
     @Override
     public void onCreate()
     {
@@ -84,7 +70,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         instance = this;
         workerThread = null;
         error = null;
-        changeMqttConnectivity(MQTT_CONNECTIVITY.INITIAL);
+        changeState(Defaults.State.ServiceMqtt.INITIAL);
         keepAliveSeconds = 15 * 60;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         deferredPublishables = new LinkedList<DeferredPublishable>();
@@ -129,7 +115,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
  
         // Respect user's wish to stay disconnected. Overwrite with startId == -1 to reconnect manually afterwards
-        if ((mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT) && startId != -1) {
+        if ((state == Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT) && startId != -1) {
             Log.d(this.toString(), "handleStart: respecting user disconnect ");
 
             return;
@@ -144,7 +130,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // Respect user's wish to not use data
         if (!isBackgroundDataEnabled()) {
             Log.e(this.toString(), "handleStart: !isBackgroundDataEnabled");
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_DATADISABLED);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_DATADISABLED);
             return;
         }
 
@@ -164,7 +150,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             else
             {
                 Log.e(this.toString(), "handleStart: !isOnline");
-                changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET);
+                changeState(Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET);
             }
         } else {
             Log.d(this.toString(), "handleStart: already connected");
@@ -173,7 +159,11 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     }
     
     private boolean isDisconnected(){
-        return mqttConnectivity == MQTT_CONNECTIVITY.INITIAL || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET || mqttConnectivity == MQTT_CONNECTIVITY.DISCONNECTED_ERROR;
+        return state == Defaults.State.ServiceMqtt.INITIAL 
+                || state == Defaults.State.ServiceMqtt.DISCONNECTED 
+                || state == Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT 
+                || state == Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET 
+                || state == Defaults.State.ServiceMqtt.DISCONNECTED_ERROR;
     }
 
     /**
@@ -204,7 +194,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         {
             // something went wrong!
             mqttClient = null;
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
         }
     }
 
@@ -255,7 +245,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
         try
         {
-            changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTING);
+            changeState(Defaults.State.ServiceMqtt.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
 
             if (getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
@@ -276,17 +266,17 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             mqttClient.connect(options);
 
             Log.d(this.toString(), "No error during connect");
-            changeMqttConnectivity(MQTT_CONNECTIVITY.CONNECTED);
+            changeState(Defaults.State.ServiceMqtt.CONNECTED);
 
             return true;
 
         } catch (MqttException e) { // Catch paho and socket factory exceptions
             Log.e(this.toString(), e.toString());
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_ERROR, e);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_ERROR, e);
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
             return false;
         }
 
@@ -315,7 +305,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     {
         Log.v(this.toString(), "disconnect");
         if (fromUser)
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_USERDISCONNECT);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT);
 
         try
         {
@@ -348,11 +338,11 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
         if (!isOnline(true))
         {
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED_WAITINGFORINTERNET);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET);
         }
         else
         {
-            changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
+            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
         }
         wl.release();
     }
@@ -366,30 +356,20 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
     }
 
-    public void onEvent(Events.MqttConnectivityChanged event) {
-        mqttConnectivity = event.getConnectivity();
-
-        if (event.getConnectivity() == MQTT_CONNECTIVITY.CONNECTED)
+    public void onEvent(Events.StateChanged.ServiceMqtt event) {
+        if (event.getState() == Defaults.State.ServiceMqtt.CONNECTED)
             publishDeferrables();
-
     }
 
-    /**
-     * @category CONNECTIVITY STATUS
-     */
-    private void changeMqttConnectivity(MQTT_CONNECTIVITY newConnectivity, MqttException e) {
+    private void changeState(Defaults.State.ServiceMqtt newState, MqttException e) {
         error = e; 
-        changeMqttConnectivity(newConnectivity);
+        changeState(newState);
     }
     
-    private void changeMqttConnectivity(MQTT_CONNECTIVITY newConnectivity) {
-        Log.d(this.toString(), "Connectivity changed to: " + newConnectivity);
-        EventBus.getDefault().post(new Events.MqttConnectivityChanged(newConnectivity));
-        mqttConnectivity = newConnectivity;
-        if(newConnectivity == MQTT_CONNECTIVITY.DISCONNECTED) {
-            Log.e(this.toString(), " disconnect");
-            
-        }
+    private void changeState(Defaults.State.ServiceMqtt newState) {
+        Log.d(this.toString(), "ServiceMqtt state changed to: " + newState);
+        state = newState;
+        EventBus.getDefault().post(new Events.StateChanged.ServiceMqtt(newState));
     }
 
     private boolean isOnline(boolean shouldCheckIfOnWifi)
@@ -409,24 +389,20 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         return ((mqttClient != null) && (mqttClient.isConnected() == true));
     }
     
-    public static boolean isErrorState(MQTT_CONNECTIVITY c) {
-        return c == MQTT_CONNECTIVITY.DISCONNECTED_ERROR;
+    public static boolean isErrorState(Defaults.State.ServiceMqtt state) {
+        return state == Defaults.State.ServiceMqtt.DISCONNECTED_ERROR;
     }
     
-    public static boolean hasError(){
+    public boolean hasError(){
         return error != null;
     }
 
     public boolean isConnecting() {
-        return (mqttClient != null) && mqttConnectivity == MQTT_CONNECTIVITY.CONNECTING;
+        return (mqttClient != null) && state == Defaults.State.ServiceMqtt.CONNECTING;
     }
 
     private boolean isBackgroundDataEnabled() {
         return isOnline(false);
-    }
-
-    public static MQTT_CONNECTIVITY getConnectivity() {
-        return mqttConnectivity;
     }
 
     /**
@@ -457,36 +433,28 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // disconnect immediately
         disconnect(false);
 
-        changeMqttConnectivity(MQTT_CONNECTIVITY.DISCONNECTED);
+        changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
 
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferencesChangedListener);
-
-        if (this.alarmManagerPositioning != null)
-            this.alarmManagerPositioning.cancel(pendingIntentPositioning);
 
         super.onDestroy();
     }
 
 
+    public static Defaults.State.ServiceMqtt getState() {
+        return state;
+    }
+    public static String getStateAsString(){
+        if(isErrorState(state) || (getInstance() != null && getInstance().hasError()))
+            return getInstance().error.toString();
 
-    public static String getConnectivityText() {
-        MQTT_CONNECTIVITY c = getConnectivity();
-        if(isErrorState(c) && hasError())
-            return error.toString();
-        
-        switch (c) {
-            case CONNECTED:
-                return App.getInstance().getString(R.string.connectivityConnected);
-            case CONNECTING:
-                return App.getInstance().getString(R.string.connectivityConnecting);
-            case DISCONNECTING:
-                return App.getInstance().getString(R.string.connectivityDisconnecting);
-            default:
-                return App.getInstance().getString(R.string.connectivityDisconnected);
-        }
-
+        return Defaults.State.toString(state);
     }
     
+    public static String stateAsString(Defaults.State.ServiceLocator state) {
+        return Defaults.State.toString(state);
+    }
+
     private void deferPublish(final DeferredPublishable p) {
         p.wait(deferredPublishables, new Runnable() {
 
@@ -525,8 +493,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
         if(Looper.getMainLooper().getThread() == Thread.currentThread()){
             Log.e(this.toString(), "PUB ON MAIN THREAD");
-        } else {
-            Log.d(this.toString(), "pub on background thread");
         }
         
         

@@ -1,5 +1,8 @@
 package st.alr.mqttitude.support;
 
+import st.alr.mqttitude.App;
+import st.alr.mqttitude.R;
+
 public class Defaults {
 
     public static final int NOTIFCATION_ID = 1338;
@@ -35,7 +38,59 @@ public class Defaults {
     public static final boolean VALUE_TICKER_ON_PUBLISH = true;
     public static final String BUGSNAG_API_KEY = "f3302f4853372edcdd12dfcc102a3578";
 
+    public static class State {
+        public static enum ServiceMqtt {
+            INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
+        }
+        public static String toString(ServiceMqtt state) {
+            int id; 
+            switch (state) {
+                case CONNECTED:
+                    id = R.string.connectivityConnected;
+                    break;
+                case CONNECTING:
+                    id = R.string.connectivityConnecting;
+                    break;
+                case DISCONNECTING:
+                    id = R.string.connectivityDisconnecting;
+                    break;
+                default:
+                    id = R.string.connectivityDisconnected;
+                    
+            }
+            return App.getInstance().getString(id);
+        }
+        
+        public static enum ServiceLocator {
+            INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION}
+        
+            public static String toString(st.alr.mqttitude.support.Defaults.State.ServiceLocator state) {
+                int id; 
+                switch (state) {
+                    case PUBLISHING:
+                        id = R.string.statePublishing;
+                        break;
+                    case PUBLISHING_WAITING:
+                        id = R.string.stateWaiting;                                  
+                        break;
+                    case PUBLISHING_TIMEOUT:
+                        id = R.string.statePublishTimeout;
+                        break;
+                    case NOTOPIC:
+                        id = R.string.stateNotopic;
+                        break;
+                    case NOLOCATION: 
+                        id = R.string.stateLocatingFail;    
+                        break;
+                    default:
+                        id = R.string.stateIdle;
+                }
+                
+                return App.getInstance().getString(id);
+            };
+        
+    }
+    
 
     
-    public enum State {Idle, Locating, LocatingFail, PublishConnectionWaiting, PublishConnectionTimeout, Publishing, NOTOPIC};
 }

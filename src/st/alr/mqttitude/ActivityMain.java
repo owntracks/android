@@ -89,7 +89,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     private void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = ((com.google.android.gms.maps.SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map)).getMap();
+                    .findFragmentById(R.id.gmap)).getMap();
             if (mMap != null) {
                 setUpMap();
             }
@@ -229,7 +229,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
             mCircle.remove();
 
         
-        mMarker = mMap.addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+        mMarker = mMap.addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
          if(l.getAccuracy() >= 50) {
                  mCircle = mMap.addCircle(new

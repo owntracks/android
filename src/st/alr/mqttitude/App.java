@@ -166,7 +166,7 @@ public class App extends Application {
             title = getString(R.string.app_name);
         }
         
-        subtitle = ServiceLocator.getStateAsText() + " | " + ServiceMqtt.getConnectivityText();
+        subtitle = ServiceLocator.getStateAsString() + " | " + ServiceMqtt.getStateAsString();
 
         notificationBuilder.setContentTitle(title);
         notificationBuilder
@@ -179,18 +179,13 @@ public class App extends Application {
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
-//    public void onEventMainThread(Events.StateChanged e) {
-//        updateNotification();
-//    }
-    public void onEventMainThread(Events.MqttConnectivityChanged e) {
+    public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
+        updateNotification();
+    }
+    public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
         updateNotification();
     }
 
-    public void onEventMainThread(Events.StateChanged e) {
-        updateNotification();
-    }
-
-    
     private void onHandlerMessage(Message msg) {
         switch (msg.what) {
             case ReverseGeocodingTask.GEOCODER_RESULT:
@@ -201,11 +196,10 @@ public class App extends Application {
     
     private void geocoderAvailableForLocation(GeocodableLocation l) {
         if(l == lastPublishedLocation) {
-            Log.v(this.toString(), "geocoder now available for lastPublishedLocation");
+            Log.v(this.toString(), "Geocoder now available for lastPublishedLocation");
             updateNotification();
-
         } else {
-            Log.v(this.toString(), "geocoder now available for an old location");           
+            Log.v(this.toString(), "Geocoder now available for an old location");           
         }
     }
 
@@ -218,14 +212,11 @@ public class App extends Application {
             this.lastPublishedLocation = l;
             this.lastPublishedLocationTime = e.getDate();
             
-            if(sharedPreferences.getBoolean("notificationGeocoder", false))
+            if(sharedPreferences.getBoolean("notificationGeocoder", false) && l.getGeocoder() == null)
                 (new ReverseGeocodingTask(this, handler)).execute(new GeocodableLocation[] {l});
     
             updateNotification();
-    
-            // This is a bit hacked as we append an empty space on every second
-            // ticker update. Otherwise consecutive tickers with the same text would
-            // not be shown
+
             if(sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH,
                     Defaults.VALUE_TICKER_ON_PUBLISH))
                 updateTicker(getString(R.string.statePublished));

@@ -36,18 +36,27 @@ public class Events {
         
         
     }
-    public static class MqttConnectivityChanged {
-		private ServiceMqtt.MQTT_CONNECTIVITY connectivity;
-
-		public MqttConnectivityChanged(
-				ServiceMqtt.MQTT_CONNECTIVITY connectivity) {
-			this.connectivity = connectivity;
-		}
-
-		public ServiceMqtt.MQTT_CONNECTIVITY getConnectivity() {
-			return connectivity;
-		}
-	}
     
-    public static class StateChanged {}
+    public static class StateChanged {
+        public static class ServiceMqtt {
+            private Defaults.State.ServiceMqtt state;
+            public ServiceMqtt(Defaults.State.ServiceMqtt state) {
+                this.state = state;
+            }
+            public Defaults.State.ServiceMqtt getState() {
+                return this.state;
+            }
+            
+        }
+        public static class ServiceLocator {
+            private Defaults.State.ServiceLocator state;
+            public ServiceLocator(Defaults.State.ServiceLocator state) {
+                this.state = state;
+            }
+            public Defaults.State.ServiceLocator getState() {
+                return this.state;
+            }
+            
+        }
+   }
 }

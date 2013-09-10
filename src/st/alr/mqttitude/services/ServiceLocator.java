@@ -27,7 +27,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     protected SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
     protected Date lastPublish;
-    private static Set<Defaults.State> state;
+    private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
     private final String TAG = "ServiceLocator";
     protected ServiceMqtt serviceMqtt;
     private ServiceConnection mqttConnection;
@@ -42,7 +42,6 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         instance = this;
         this.started = false;        
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        state = EnumSet.of(Defaults.State.Idle);
 
         preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -91,12 +90,12 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
 
            
         if (topic == null) {
-            addState(State.NOTOPIC);
+            changeState(Defaults.State.ServiceLocator.NOTOPIC);
             return;
         }
         
         if (l == null) {
-            this.addState(State.LocatingFail);
+            changeState(Defaults.State.ServiceLocator.NOLOCATION);
             return;
         }
 
@@ -121,83 +120,52 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     @Override
     public void publishSuccessfull(Object extra) {
         Log.v(TAG, "publishSuccessfull");
-        this.resetState();
+        changeState(Defaults.State.ServiceLocator.INITIAL);
         EventBus.getDefault().post(new Events.PublishSuccessfull(extra));       
     }
 
-    public static Set<State> getState() {
+    public static Defaults.State.ServiceLocator getState() {
         return state;
     }
-    
-    
-
-    
-    public static String getStateAsText() {
-        int id = R.string.stateIdle;
-        
-        if(state != null) {
-
-            if (state.contains(State.Publishing))
-                id = R.string.statePublishing;
-            else if (state.contains(State.PublishConnectionWaiting))
-                id = R.string.stateWaiting;                        
-            else if (state.contains(State.PublishConnectionTimeout))
-                id = R.string.statePublishTimeout;
-            else if (state.contains(State.LocatingFail))
-                id = R.string.stateLocatingFail;    
-            else if (state.contains(State.NOTOPIC))
-                id = R.string.stateNotopic;
-        }
-        return App.getInstance().getString(id);
+    public static String getStateAsString(){
+        return stateAsString(getState());
     }
+    
+    public static String stateAsString(Defaults.State.ServiceLocator state) {
+        return Defaults.State.toString(state);
+    }
+
+    private void changeState(Defaults.State.ServiceLocator newState) {
+        Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
+        EventBus.getDefault().post(new Events.StateChanged.ServiceLocator(newState));
+        state = newState;
+    }
+
+    
+
 
     @Override
     public void publishFailed(Object extra) {
-        Log.e(TAG, "publishTimeout");
-        this.addState(State.PublishConnectionTimeout);
+        changeState(Defaults.State.ServiceLocator.PUBLISHING_TIMEOUT);
     }
 
     @Override
     public void publishing(Object extra) {
-        Log.v(TAG, "publishing");
-        this.addState(State.Publishing);
+        changeState(Defaults.State.ServiceLocator.PUBLISHING);
     }
 
     @Override
     public void publishWaiting(Object extra) {
-        Log.v(TAG, "waiting for broker connection");
-        this.addState(State.PublishConnectionWaiting);
+        changeState(Defaults.State.ServiceLocator.PUBLISHING_WAITING);
     }
 
-    protected void setStateTo(State s) {
-        state.clear();
-        state.add(s);
-    }
 
-    protected void addState(State s) {       
-        state.add(s);
-        if (isTickerState(s)) {
-            App.getInstance().updateTicker(getStateAsText());
-        }
-        App.getInstance().updateNotification();
-        EventBus.getDefault().post(new Events.StateChanged());
-    }
-
-    private boolean isTickerState(State s) {
-        return s == Defaults.State.LocatingFail || s == Defaults.State.NOTOPIC
-                || s == Defaults.State.PublishConnectionTimeout || s == Defaults.State.PublishConnectionWaiting || (s == Defaults.State.PublishConnectionWaiting && sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH,
-                        Defaults.VALUE_TICKER_ON_PUBLISH));
-    }
-
-    protected void removeState(State s) {
-        state.remove(s);
-        EventBus.getDefault().post(new Events.StateChanged());
-    }
-
-    public void resetState() {
-        this.setStateTo(State.Idle);
-        EventBus.getDefault().post(new Events.StateChanged());
-        App.getInstance().updateNotification();
+    private boolean isTickerState(Defaults.State.ServiceLocator s) {
+        return s == Defaults.State.ServiceLocator.NOLOCATION 
+                || s == Defaults.State.ServiceLocator.NOTOPIC
+                || s == Defaults.State.ServiceLocator.PUBLISHING_TIMEOUT 
+                || (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH, Defaults.VALUE_TICKER_ON_PUBLISH && 
+                        (s == Defaults.State.ServiceLocator.PUBLISHING || s == Defaults.State.ServiceLocator.PUBLISHING_WAITING)));
     }
 
     public Date getLastPublishDate() {
@@ -208,8 +176,6 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         return sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES,
                 Defaults.VALUE_BACKGROUND_UPDATES);
     }
-    
-
     
     public int getUpdateIntervall() {
         return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
