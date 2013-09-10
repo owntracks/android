@@ -1,21 +1,36 @@
 package st.alr.mqttitude.support;
 
 
+import java.util.Date;
+
 import android.location.Location;
 import st.alr.mqttitude.services.ServiceMqtt;
 
 public class Events {
     public static class PublishSuccessfull {
+        Object extra;
+        Date date;
+        public PublishSuccessfull(Object extra) {
+            this.extra = extra;
+            this.date = new Date();
+        }
+        public Object getExtra() {
+            return extra;
+        }
+        public Date getDate() {
+            return date;
+        }
 
     }
+    
     public static class LocationUpdated {
-        Location l; 
+        GeocodableLocation l; 
         
-        public LocationUpdated(Location l) {
+        public LocationUpdated(GeocodableLocation l) {
             this.l = l;
         }
 
-        public Location getLocation() {
+        public GeocodableLocation getGeocodableLocation() {
             return l;
         }
         

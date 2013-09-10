@@ -1,8 +1,8 @@
 package st.alr.mqttitude.support;
 
 public interface MqttPublish {
-    public void publishSuccessfull(); 
-    public void publishFailed();
-    public void publishing();
-    public void publishWaiting();
+    public void publishSuccessfull(Object extra); 
+    public void publishFailed(Object extra);
+    public void publishing(Object extra);
+    public void publishWaiting(Object extra);
 }

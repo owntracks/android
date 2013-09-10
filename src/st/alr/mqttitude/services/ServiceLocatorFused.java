@@ -1,7 +1,11 @@
 
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.services;
 
 import java.util.Date;
+
+import st.alr.mqttitude.support.Defaults.State;
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -9,12 +13,11 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import de.greenrobot.event.EventBus;
-import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
-public class FusedLocationLocator extends Locator implements
+public class ServiceLocatorFused extends ServiceLocator implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private LocationClient mLocationClient;
@@ -22,36 +25,38 @@ public class FusedLocationLocator extends Locator implements
     private final int MINUTES_TO_MILISECONDS = 60 * 1000;
     private boolean ready = false;
     private boolean foreground = false;
+    private final String TAG = "ServiceLocatorFused";
+    private GeocodableLocation lastKnownLocation;
+    
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.v(this.toString(), "onCreate");
 
-    public FusedLocationLocator(Context context) {
-        super(context);
         setupLocationRequest();
-
-        mLocationClient = new LocationClient(context, this, this);
+        mLocationClient = new LocationClient(this, this, this);
     }
 
     @Override
-    public void start() {
+    public void onStartOnce(){
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
-            mLocationClient.connect();
+            mLocationClient.connect();        
     }
-
+    
     @Override
-    public Location getLastKnownLocation() {
-        if (ready)
-            return mLocationClient.getLastLocation();
-        else
-            return null;
+    public GeocodableLocation getLastKnownLocation() {
+        return lastKnownLocation;
     }
 
     @Override
     public void onLocationChanged(Location arg0) {
-        Log.v(TAG, "FusedLocationLocator onLocationChanged");
-        EventBus.getDefault().postSticky(new Events.LocationUpdated(mLocationClient.getLastLocation()));
+        Log.v(TAG, "ServiceLocatorFused onLocationChanged");
+        this.lastKnownLocation = new GeocodableLocation(arg0);
+        
+        EventBus.getDefault().postSticky(new Events.LocationUpdated(this.lastKnownLocation));
 
         if (shouldPublishLocation()) {
             Log.d(TAG, "should publish");
-
             publishLastKnownLocation();
         }
     }
@@ -71,14 +76,14 @@ public class FusedLocationLocator extends Locator implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "FusedLocationLocator failed to connect");
+        Log.e(TAG, "ServiceLocatorFused failed to connect");
     }
 
     @Override
     public void onConnected(Bundle arg0) {
         ready = true;
 
-        Log.v(TAG, "FusedLocationLocator connected");
+        Log.v(TAG, "ServiceLocatorFused connected");
         requestLocationUpdates();
     }
 
@@ -86,7 +91,7 @@ public class FusedLocationLocator extends Locator implements
     public void onDisconnected() {
         ready = false;
 
-        Log.v(TAG, "FusedLocationLocator disconnected");
+        Log.v(TAG, "ServiceLocatorFused disconnected");
         disableLocationUpdates();
     }
 

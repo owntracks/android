@@ -37,6 +37,22 @@ public class ActivityPreferences extends PreferenceActivity {
         else
             onCreatePreferenceActivity();
     }
+<<<<<<< HEAD
+=======
+    
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStop();
+        EventBus.getDefault().register(this);
+    }
+
+>>>>>>> refactor-to-service
 
     private boolean supportsFragment() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
