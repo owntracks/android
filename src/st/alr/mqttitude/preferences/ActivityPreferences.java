@@ -143,12 +143,12 @@ public class ActivityPreferences extends PreferenceActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().unregister(this);
         super.onStop();
     }
 

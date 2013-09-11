@@ -120,13 +120,12 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 Log.v(this.toString(), "bound");
-
                 serviceLocator = (ServiceLocator) ((ServiceBindable.ServiceBinder)service).getService();                
             }
         };
         
         bindService(new Intent(this, App.getServiceLocatorClass()), locatorConnection, Context.BIND_AUTO_CREATE);
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().registerSticky(this);
         
         if(serviceLocator != null)
             serviceLocator.enableForegroundMode();
@@ -176,6 +175,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        Log.v(this.toString(), "OnCreate");
         setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
 
@@ -212,8 +212,9 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     }
 
     public void setLocation(GeocodableLocation location) {
-       Location l = location.getLocation();
+        Location l = location.getLocation();
        if(l == null) {
+           Log.v(this.toString(), "location not available");
            showLocationUnavailable();
            return;
        } 

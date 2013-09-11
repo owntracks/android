@@ -124,13 +124,21 @@ public class App extends Application {
 
     private void createNotification() {
 
-        Intent resultIntent = new Intent(App.getInstance(), ActivityMain.class);
-        android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder
-                .create(this);
-        stackBuilder.addParentStack(ActivityMain.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent resultIntent = new Intent(this, ActivityMain.class);
+        resultIntent.setAction("android.intent.action.MAIN");
+        resultIntent.addCategory("android.intent.category.LAUNCHER");           
+
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+//        android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder
+//                .create(this);
+//        stackBuilder.addParentStack(ActivityMain.class);
+//        stackBuilder.addNextIntent(resultIntent);
+//        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+//                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                
         notificationBuilder.setContentIntent(resultPendingIntent);
         updateNotification();
     }

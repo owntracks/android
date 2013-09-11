@@ -159,6 +159,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     }
     
     private boolean isDisconnected(){
+        Log.v(this.toString(), "disconnect check: " + state);
         return state == Defaults.State.ServiceMqtt.INITIAL 
                 || state == Defaults.State.ServiceMqtt.DISCONNECTED 
                 || state == Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT 
@@ -378,8 +379,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         return netInfo != null
-                // && (!shouldCheckIfOnWifi || (netInfo.getType() ==
-                // ConnectivityManager.TYPE_WIFI))
                 && netInfo.isAvailable()
                 && netInfo.isConnected();
     }
@@ -498,7 +497,9 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         
         if (!isOnline(false) || !isConnected()) {
             Log.d(this.toString(), "pub deferred");
+            
             deferPublish(p);
+            doStart(null, 1);
             return;
         }
 
