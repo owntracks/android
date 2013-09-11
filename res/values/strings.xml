@@ -35,10 +35,18 @@
     <string name="preferencesBackroundUpdates">Background publishes</string>
     <string name="preferencesBackgroundUpdatesSummary">Publish locations in the background</string>
     <string name="preferencesInfo">Credits</string>
+    <string name="preferencesRepositoryTitle">Repository</string>
+    <string name="preferencesRepositorySummary">Explore the code at Github</string>
+ 
+    <string name="preferencesMailTitle">Contact</string>
+    <string name="preferencesMailSummary">Contact the developers directly via mail</string>
+          
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
     <string name="connectivityDisconnecting">"Disconnecting"</string>
     <string name="connectivityDisconnected">"Disconnected"</string>
+    <string name="connectivityDisconnectedUserDisconnect">"Disconnected: By user"</string>
+    <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
     <string name="na">Not available"</string>
     <string name="currentLocation">Current location</string>
     <string name="shareLocation">Share location"</string>

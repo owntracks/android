@@ -1,18 +1,23 @@
 
 package st.alr.mqttitude.preferences;
 
+import java.util.prefs.Preferences;
+
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.R;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -24,14 +29,18 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference serverPreference;
     private static Preference backgroundUpdatesIntervall;
     private static Preference version;
+    private static Preference repo;
+    private static Preference mail;
     private static PreferenceActivity activity;
+    static String ver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
-        
-        // Thanks Google for not providing a support version of the PreferenceFragment for older API versions
+
+        // Thanks Google for not providing a support version of the
+        // PreferenceFragment for older API versions
         if (supportsFragment())
             onCreatePreferenceFragment();
         else
@@ -50,6 +59,8 @@ public class ActivityPreferences extends PreferenceActivity {
 
     @SuppressWarnings("deprecation")
     private void onSetupPreferenceActivity() {
+        repo = findPreference("repo");
+        mail = findPreference("mail");
         version = findPreference("versionReadOnly");
         serverPreference = findPreference("brokerPreference");
         backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
@@ -64,6 +75,8 @@ public class ActivityPreferences extends PreferenceActivity {
 
     @TargetApi(11)
     private static void onSetupPreferenceFragment(PreferenceFragment f) {
+        repo = f.findPreference("repo");
+        mail = f.findPreference("mail");
         version = f.findPreference("versionReadOnly");
         serverPreference = f.findPreference("brokerPreference");
         backgroundUpdatesIntervall = f
@@ -73,6 +86,11 @@ public class ActivityPreferences extends PreferenceActivity {
 
     private static void onSetupCommon() {
         PackageManager pm = activity.getPackageManager();
+        try {
+            ver = pm.getPackageInfo(activity.getPackageName(), 0).versionName;
+        } catch (NameNotFoundException e) {
+            ver = activity.getString(R.string.na);
+        }
 
         backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -88,16 +106,40 @@ public class ActivityPreferences extends PreferenceActivity {
             }
         });
 
-        try {
-            version.setSummary(pm.getPackageInfo(activity.getPackageName(), 0).versionName);
-        } catch (NameNotFoundException e) {
-            version.setSummary(activity.getString(R.string.na));
-        }
+        version.setSummary(ver);
+
+        repo.setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(Defaults.VALUE_REPO_URL));
+                        activity.startActivity(intent);
+                        return false;
+                    }
+                });
+
+        mail.setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        // intent.setType("text/html");
+                        intent.setType("message/rfc822");
+
+                        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
+                            Defaults.VALUE_ISSUES_MAIL
+                        });
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
+                        activity.startActivity(Intent.createChooser(intent, "Send Email"));
+                        return false;
+                    }
+                });
 
         setServerPreferenceSummary();
 
     }
-    
+
     @Override
     public void onStart() {
         super.onStart();
@@ -109,7 +151,6 @@ public class ActivityPreferences extends PreferenceActivity {
         EventBus.getDefault().register(this);
         super.onStop();
     }
-
 
     @TargetApi(11)
     public static class CustomPreferencesFragment extends PreferenceFragment {

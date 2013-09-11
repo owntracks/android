@@ -80,6 +80,19 @@
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
+
+        <Preference
+            android:key="mail"
+            android:title="@string/preferencesMailTitle" 
+           android:summary="@string/preferencesMailSummary"/>
+        
+        <Preference
+            android:key="repo"
+            android:title="@string/preferencesRepositoryTitle" 
+            android:summary="@string/preferencesRepositorySummary"/>
+        
+        
+        
         <st.alr.mqttitude.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"
             android:negativeButtonText=""
