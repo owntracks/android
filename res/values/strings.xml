@@ -19,7 +19,7 @@
     <string name="preferencesNotificationTitle">"Notification"</string>
     <string name="preferencesNotificationLocationSummary">"Display last published location and time"</string>
     <string name="preferencesNotificationLocationTitle">"Last published location"</string>
-    <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to adresses"</string>
+    <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
     <string name="preferencesNotificationGeocoderTitle">"Geocoder"</string>
     <string name="preferencesVersionTitle">"Version"</string>
     <string name="preferencesTopicSettings">"Location publishes"</string>
