@@ -262,6 +262,11 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     
     public void share(View view) {
         GeocodableLocation l = serviceLocator.getLastKnownLocation();
+        if(l == null) {
+            //TODO: signal to user
+            return;            
+        }
+        
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(

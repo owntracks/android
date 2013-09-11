@@ -96,9 +96,20 @@ public class ActivityPreferences extends PreferenceActivity {
 
         setServerPreferenceSummary();
 
-        // Register for connection changed events
-        EventBus.getDefault().register(activity);
     }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().register(this);
+        super.onStop();
+    }
+
 
     @TargetApi(11)
     public static class CustomPreferencesFragment extends PreferenceFragment {
