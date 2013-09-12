@@ -213,6 +213,8 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
 
     public void setLocation(GeocodableLocation location) {
         Location l = location.getLocation();
+        Log.v(this.toString(), "Setting location");
+
        if(l == null) {
            Log.v(this.toString(), "location not available");
            showLocationUnavailable();
@@ -240,13 +242,21 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
 
-        locationPrimary.setText(l.getLatitude() + " / " + l.getLongitude());
-        locationMeta.setText(App.getInstance().formatDate(new Date()));
+        if(location.getGeocoder() != null) {
+            Log.v(this.toString(), "Reusing geocoder");
+            locationPrimary.setText(location.getGeocoder());            
+        } else {
+            // Start async geocoder lookup and display latlon until geocoder reeturns something
+            if (Geocoder.isPresent()) {
+                Log.v(this.toString(), "Requesting geocoder");
+                (new ReverseGeocodingTask(this, handler)).execute(new GeocodableLocation[] {location});
+            
+            }
+            locationPrimary.setText(l.getLatitude() + " / " + l.getLongitude());
+        }
+        locationMeta.setText(App.getInstance().formatDate(new Date()));            
+
         showLocationAvailable();
-        
-        if (Geocoder.isPresent())
-            (new ReverseGeocodingTask(this, handler)).execute(new GeocodableLocation[] {location});
-        
     }
 
     private void showLocationAvailable() {

@@ -241,7 +241,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         workerThread = Thread.currentThread(); // We connect, so we're the
                                                // worker thread
         Log.v(this.toString(), "connect");
-
+        error = null; // clear previous error on connect
         init();
 
         try
