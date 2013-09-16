@@ -19,6 +19,8 @@ public class BackgroundPublishReceiver extends BroadcastReceiver {
             ServiceLocator s = ServiceLocator.getInstance();
             if(s != null)
                 s.publishLastKnownLocation();
+            else
+                Log.e(this.toString(), "No service connection, aborting pub from notification");
         }
     }
 

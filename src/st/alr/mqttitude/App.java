@@ -7,6 +7,7 @@ import java.util.Date;
 import st.alr.mqttitude.services.ServiceLocator;
 import st.alr.mqttitude.services.ServiceLocatorFused;
 import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.support.BackgroundPublishReceiver;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
@@ -14,8 +15,10 @@ import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.location.Location;
@@ -39,6 +42,7 @@ public class App extends Application {
     private static Class<?> locatorClass;
     private GeocodableLocation lastPublishedLocation;
     private Date lastPublishedLocationTime;
+    private BroadcastReceiver backgroundPublishReceiver;
 
     private boolean even = false;
     private SimpleDateFormat dateFormater;
@@ -60,6 +64,7 @@ public class App extends Application {
             }
         };
 
+        
         
         EventBus.getDefault().register(this);
 
@@ -98,6 +103,12 @@ public class App extends Application {
 
         Log.v(this.toString(), "Starting locator service " + getServiceLocatorClass().toString());
         startService(serviceLocator); // Service remains running after binds by activity
+        
+        backgroundPublishReceiver = new BackgroundPublishReceiver();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+        registerReceiver(backgroundPublishReceiver, filter);
     }
 
     public String formatDate(Date d) {
@@ -142,11 +153,11 @@ public class App extends Application {
         notificationBuilder.setContentIntent(resultPendingIntent);
 
         Intent intent = new Intent(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, Intent.FLAG_ACTIVITY_NO_USER_ACTION);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         notificationBuilder.addAction(
-                0,
-                "pub",
+                R.drawable.ic_upload,
+                "Publish",
                 pIntent);
 
         

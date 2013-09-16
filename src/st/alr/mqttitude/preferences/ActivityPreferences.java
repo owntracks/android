@@ -6,6 +6,8 @@ import java.util.prefs.Preferences;
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.ActivityStatus;
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -23,6 +25,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import de.greenrobot.event.EventBus;
 
 public class ActivityPreferences extends PreferenceActivity {
@@ -177,6 +180,14 @@ public class ActivityPreferences extends PreferenceActivity {
         serverPreference.setSummary(ServiceMqtt.getStateAsString());
     }
 
+    
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_status, menu);
+        return true;
+    }
+    
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -186,6 +197,18 @@ public class ActivityPreferences extends PreferenceActivity {
     @Override
     public boolean onIsMultiPane() {
         return false;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_status) {
+                Intent intent1 = new Intent(this, ActivityStatus.class);
+                startActivity(intent1);
+                return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
 }
