@@ -39,6 +39,7 @@ public class Defaults {
     public static final String BUGSNAG_API_KEY = "f3302f4853372edcdd12dfcc102a3578";
     public static final String VALUE_REPO_URL = "http://github.com/binarybucks/mqttitude";
     public static final String VALUE_ISSUES_MAIL = "issues@mqttitude.org";
+    public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "st.alr.mqttitude.intent.PUB_LASTKNOWN";
 
     public static class State {
         public static enum ServiceMqtt {
@@ -61,6 +62,9 @@ public class Defaults {
                     break;
                 case DISCONNECTED_DATADISABLED:
                     id = R.string.connectivityDisconnectedDataDisabled;
+                    break;
+                case DISCONNECTED_ERROR:
+                    id = R.string.error;
                     break;
                 default:
                     id = R.string.connectivityDisconnected;

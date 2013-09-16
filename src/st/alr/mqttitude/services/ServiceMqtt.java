@@ -26,6 +26,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
@@ -59,7 +60,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
-    private MqttException error;
+    private Exception error;
     private HandlerThread pubThread;
     private Handler pubHandler;
 
@@ -121,7 +122,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             return;
         }
 
-        // No need to connect if we're already connecting
         if (isConnecting()) {
             Log.d(this.toString(), "handleStart: already connecting");
             return;
@@ -143,7 +143,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             {
                 if (connect())
                 {
-                    Log.v(this.toString(), "handleStart: connec sucessfull");
+                    Log.v(this.toString(), "handleStart: connect sucessfull");
                     onConnect();
                 }
             }
@@ -167,6 +167,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
                 || state == Defaults.State.ServiceMqtt.DISCONNECTED_ERROR;
     }
 
+    
     /**
      * @category CONNECTION HANDLING
      */
@@ -271,16 +272,11 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
             return true;
 
-        } catch (MqttException e) { // Catch paho and socket factory exceptions
+        } catch (Exception e) { // Catch paho and socket factory exceptions
             Log.e(this.toString(), e.toString());
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_ERROR, e);
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
+            changeState(e);
             return false;
         }
-
     }
 
     private void setWill(MqttConnectOptions m) {
@@ -305,6 +301,10 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     public void disconnect(boolean fromUser)
     {
         Log.v(this.toString(), "disconnect");
+        
+        if(isConnecting()) // throws MqttException.REASON_CODE_CONNECT_IN_PROGRESS when disconnecting while connect is in progress. 
+            return;
+        
         if (fromUser)
             changeState(Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT);
 
@@ -362,15 +362,20 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             publishDeferrables();
     }
 
-    private void changeState(Defaults.State.ServiceMqtt newState, MqttException e) {
+    private void changeState(Exception e) {
         error = e; 
-        changeState(newState);
+        changeState(Defaults.State.ServiceMqtt.DISCONNECTED_ERROR, e);
     }
-    
+
     private void changeState(Defaults.State.ServiceMqtt newState) {
+        changeState(newState, null);
+    }
+
+    
+    private void changeState(Defaults.State.ServiceMqtt newState, Exception e) {
         Log.d(this.toString(), "ServiceMqtt state changed to: " + newState);
         state = newState;
-        EventBus.getDefault().post(new Events.StateChanged.ServiceMqtt(newState));
+        EventBus.getDefault().postSticky(new Events.StateChanged.ServiceMqtt(newState, e));
     }
 
     private boolean isOnline(boolean shouldCheckIfOnWifi)
@@ -443,10 +448,18 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     public static Defaults.State.ServiceMqtt getState() {
         return state;
     }
-    public static String getStateAsString(){
-        if(isErrorState(state) || (getInstance() != null && getInstance().hasError()))
-            return getInstance().error.toString();
+    
+    public static String getErrorMessage() {
+        Exception e = getInstance().error;
 
+        if(getInstance() != null && getInstance().hasError() && e.getCause() != null)
+            return "Error: " + e.getCause().getLocalizedMessage();
+        else
+            return "Error: " + getInstance().getString(R.string.na);
+
+    }
+    
+    public static String getStateAsString(){
         return Defaults.State.toString(state);
     }
     

@@ -3,21 +3,18 @@
     <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="android:textAllCaps">false</item>
-                    <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
-        
+        <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
     </style>
 
     <style name="AppTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">@drawable/ab_bottom_solid</item>
         <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
         <item name="android:icon">@drawable/ic_icon</item>
-        
     </style>
-    
+
     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
-    <item name="android:src">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
-</style>
-    
+        <item name="android:src">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
+    </style>
 
     <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
@@ -56,6 +53,26 @@
     <style name="subtitle">
         <item name="android:textColor">@color/mediumGrey</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="listItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+    </style>
+
+    <style name="listItemTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+    </style>
+
+    <style name="listItemSubtitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
     </style>
 
     <style name="card">

@@ -140,6 +140,16 @@ public class App extends Application {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 
         notificationBuilder.setContentIntent(resultPendingIntent);
+
+        Intent intent = new Intent(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, Intent.FLAG_ACTIVITY_NO_USER_ACTION);
+
+        notificationBuilder.addAction(
+                0,
+                "pub",
+                pIntent);
+
+        
         updateNotification();
     }
 
@@ -166,9 +176,9 @@ public class App extends Application {
             time = lastPublishedLocationTime.getTime();
 
             if(lastPublishedLocation.getGeocoder() != null && sharedPreferences.getBoolean("notificationGeocoder", false)) {
-                title = lastPublishedLocation.getGeocoder();
+                title = lastPublishedLocation.toString();
             } else {
-                title = lastPublishedLocation.getLatitude() + ":" + lastPublishedLocation.getLongitude();
+                title = lastPublishedLocation.toLatLonString();
             }
         } else {
             title = getString(R.string.app_name);

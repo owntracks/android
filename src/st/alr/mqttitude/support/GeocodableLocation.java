@@ -34,5 +34,15 @@ public class GeocodableLocation {
     public double getLongitude() {
         return location.getLongitude();
     }
+    public String toString() {
+        if(geocoder != null)
+            return geocoder;
+        else
+            return toLatLonString();
+    }
+    public String toLatLonString(){
+        return getLatitude() + " / " + getLongitude();
+
+    }
     
 }

@@ -79,6 +79,10 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
 
     abstract public void enableBackgroundMode();
 
+    public static ServiceLocator getInstance(){
+        return instance;
+    }
+    
     public void publishLastKnownLocation() {
         Log.v(TAG, "publishLastKnownLocation");
         lastPublish = new Date();
@@ -121,7 +125,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     public void publishSuccessfull(Object extra) {
         Log.v(TAG, "publishSuccessfull");
         changeState(Defaults.State.ServiceLocator.INITIAL);
-        EventBus.getDefault().post(new Events.PublishSuccessfull(extra));       
+        EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra));       
     }
 
     public static Defaults.State.ServiceLocator getState() {
@@ -137,7 +141,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
 
     private void changeState(Defaults.State.ServiceLocator newState) {
         Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
-        EventBus.getDefault().post(new Events.StateChanged.ServiceLocator(newState));
+        EventBus.getDefault().postSticky(new Events.StateChanged.ServiceLocator(newState));
         state = newState;
     }
 

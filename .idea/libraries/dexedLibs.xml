@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="dexedLibs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/bugsnag-android-2.0.9-cf0e1b85e9a883dee90be325e80f11a1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/paho-e2379d886c8edc7fe9ac04d3a32000f5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/google-play-services_lib-e5850ad5b1b63375855bad6bfda598b7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/android-support-v4-deb60a97e5592805fd4f24bba0e1664c.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/eventbus-2.0.1-1b34094c80f6e1e0418cd21d63194285.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/google-play-services-4c24ed4dba04564f9bddda7e33dbf030.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

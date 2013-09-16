@@ -3,7 +3,10 @@
 
     <string name="app_name">MQTTitude</string>
     <string name="action_settings">Settings</string>
+   
     <string name="titleActivityPreferences">"Settings"</string>
+      <string name="titleActivityStatus">""Status"</string>
+    
     <string name="preferencesServerTitle">"Broker"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
@@ -52,6 +55,8 @@
     <string name="shareLocation">Share location"</string>
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
+        <string name="error">"Error"</string>
+    
     <string name="statePublished">"Location published"</string>
     <string name="stateNotopic">"Error: No topic set"</string>
     <string name="statePublishTimeout">"Error: Publish timeout"</string>
@@ -77,8 +82,5 @@
         <item>"2"</item>
     </string-array>
 
-    <string name="title_activity_activity_launcher">ActivityLauncher</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_activity_status">ActivityStatus</string>
 
 </resources>
