@@ -11,12 +11,14 @@ public class Defaults {
 
     public static final String SETTINGS_KEY_BROKER_HOST = "brokerHost";
     public static final String SETTINGS_KEY_BROKER_PORT = "brokerPort";    
+    public static final String SETTINGS_KEY_BROKER_CLIENT_ID = "brokerClientId";
     public static final String SETTINGS_KEY_BROKER_PASSWORD = "brokerPassword";
     public static final String SETTINGS_KEY_BROKER_USERNAME = "brokerUsername";
     public static final String SETTINGS_KEY_BROKER_SECURITY = "brokerSecurity";
     public static final String SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH = "brokerSecuritySslCaPath";
     public static final String SETTINGS_KEY_BACKGROUND_UPDATES = "backgroundUpdates";
     public static final String SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL = "backgroundUpdatesInterval";
+
     public static final String SETTINGS_KEY_TOPIC = "topic";
     public static final String SETTINGS_KEY_RETAIN = "retain";
     public static final String SETTINGS_KEY_QOS = "qos";

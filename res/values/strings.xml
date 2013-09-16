@@ -9,9 +9,11 @@
     
     <string name="preferencesServerTitle">"Broker"</string>
     <string name="preferencesServerAddress">"Host"</string>
+    <string name="preferencesBrokerClientId">"Client ID"</string>
     <string name="preferencesServerPort">"Port"</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
+    
     <string name="preferencesLicensesTitle">"Licenses"</string>
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
     <string name="preferencesLicensesDismiss">"Dismiss"</string>

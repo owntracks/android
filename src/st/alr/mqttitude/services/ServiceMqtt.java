@@ -26,6 +26,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
@@ -187,9 +188,10 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
                     Defaults.VALUE_BROKER_PORT);
             String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp"
                     : "ssl";
-
+            String cid = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_CLIENT_ID, "");
+            
             mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + brokerPort,
-                    getClientId(), null);
+                    cid.equals("") ? getDefaultClientId() : cid , null);
             mqttClient.setCallback(this);
 
         } catch (MqttException e)
@@ -416,16 +418,13 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         return instance;
     }
 
-    private String getClientId()
+    public static String getDefaultClientId()
     {
-        if (mqttClientId == null)
-        {
-            mqttClientId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+            String mqttClientId = Secure.getString(App.getInstance().getContentResolver(), Secure.ANDROID_ID);
 
             // MQTT specification doesn't allow client IDs longer than 23 chars
             if (mqttClientId.length() > 22)
                 mqttClientId = mqttClientId.substring(0, 22);
-        }
 
         return mqttClientId;
     }
