@@ -42,7 +42,7 @@ public class App extends Application {
     private static Class<?> locatorClass;
     private GeocodableLocation lastPublishedLocation;
     private Date lastPublishedLocationTime;
-    private BroadcastReceiver backgroundPublishReceiver;
+//    private BroadcastReceiver backgroundPublishReceiver;
 
     private boolean even = false;
     private SimpleDateFormat dateFormater;
@@ -51,6 +51,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.v(this.toString(), "MQTTITUDE STARTING");
         int resp = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
         instance = this;
@@ -104,11 +105,11 @@ public class App extends Application {
         Log.v(this.toString(), "Starting locator service " + getServiceLocatorClass().toString());
         startService(serviceLocator); // Service remains running after binds by activity
         
-        backgroundPublishReceiver = new BackgroundPublishReceiver();
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
-        registerReceiver(backgroundPublishReceiver, filter);
+//        backgroundPublishReceiver = new BackgroundPublishReceiver();
+//
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+//        registerReceiver(backgroundPublishReceiver, filter);
     }
 
     public String formatDate(Date d) {

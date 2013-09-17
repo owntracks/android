@@ -9,7 +9,7 @@
         android:required="true" />
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
     <permission
@@ -50,13 +50,11 @@
             android:label="Preferences"
             android:parentActivityName="st.alr.mqttitude.ActivityMain" >
         </activity>
-        
         <activity
             android:name="st.alr.mqttitude.ActivityStatus"
             android:label="@string/titleActivityStatus"
             android:parentActivityName="st.alr.mqttitude.ActivityMain" >
         </activity>
-        
 
         <service
             android:name="st.alr.mqttitude.services.ServiceMqtt"
@@ -67,6 +65,13 @@
             android:exported="false" >
         </service>
 
+        <receiver
+            android:name=".BackgroundPublishReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="st.alr.mqttitude.PUBLISH_LASTKNOWN" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

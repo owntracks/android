@@ -66,11 +66,11 @@ public class ActivityStatus extends Activity {
         }
     }
 
-    public void onEvent(Events.StateChanged.ServiceLocator e) {
+    public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
        locatorStatus.setText(Defaults.State.toString(e.getState()));
     }
 
-    public void onEvent(Events.StateChanged.ServiceMqtt e) {
+    public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
         brokerStatus.setText(Defaults.State.toString(e.getState()));
         if(e.getExtra() != null && e.getExtra() instanceof Exception && e.getExtra().getClass() != null) {
             brokerError.setText( ((Exception)e.getExtra()).getCause().getLocalizedMessage());

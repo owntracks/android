@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceBindable;
@@ -16,6 +17,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -34,6 +36,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -61,7 +64,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
     private ServiceLocator serviceLocator;
     private ServiceConnection locatorConnection;
     private static Handler handler;
-
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
@@ -101,6 +104,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.setMyLocationEnabled(false);
         mMap.setTrafficEnabled(false);
+        
     }
 
     @Override
@@ -199,6 +203,8 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
                 locationPrimary.setText(((GeocodableLocation) msg.obj).getGeocoder());
                 break;
             case ReverseGeocodingTask.GEOCODER_NORESULT:
+                locationPrimary.setText(((GeocodableLocation) msg.obj).toLatLonString());
+
                 break;
 
         }
@@ -230,7 +236,7 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
 
         
         mMarker = mMap.addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
+        
          if(l.getAccuracy() >= 50) {
                  mCircle = mMap.addCircle(new
                  CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0xff1082ac).fillColor(0x1c15bffe).strokeWidth(3));
@@ -248,14 +254,29 @@ public class ActivityMain extends android.support.v4.app.FragmentActivity {
                 Log.v(this.toString(), "Requesting geocoder");
                 (new ReverseGeocodingTask(this, handler)).execute(new GeocodableLocation[] {location});
             
+            } else {
+                locationPrimary.setText(location.toLatLonString());                
             }
-            locationPrimary.setText(l.getLatitude() + " / " + l.getLongitude());
         }
         locationMeta.setText(App.getInstance().formatDate(new Date()));            
 
         showLocationAvailable();
     }
 
+//    protected Bitmap adjustImage(Bitmap image) {
+//        int dpi = image.getDensity();
+//        if (dpi == mDpi)
+//            return image;
+//        else {
+//            int width = (image.getWidth() * mDpi + dpi / 2) / dpi;
+//            int height = (image.getHeight() * mDpi + dpi / 2) / dpi;
+//            Bitmap adjustedImage = Bitmap.createScaledBitmap(image, width, height, true);
+//            adjustedImage.setDensity(mDpi);
+//            return adjustedImage;
+//        }
+//    }
+
+    
     private void showLocationAvailable() {
         locationUnavailable.setVisibility(View.GONE);
         if(!locationAvailable.isShown())

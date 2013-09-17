@@ -23,7 +23,7 @@
     <color name="lightGrey">#d9d9d9</color>
     <color name="mediumGrey">#acacac</color>
     <color name="darkGrey">#626262</color>
-    <color name="background">#e5e5e5</color>
+    <color name="background">#f2f2f2</color>
     <color name="border">#acacac</color>
 
     <style name="actionBar" parent="@android:style/Widget.Holo.ActionBar.Solid">
