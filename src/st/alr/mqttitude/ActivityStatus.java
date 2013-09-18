@@ -39,8 +39,20 @@ public class ActivityStatus extends Activity {
         brokerStatus = (TextView) findViewById(R.id.brokerStatus);
         brokerError = (TextView) findViewById(R.id.brokerError);
 
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
         EventBus.getDefault().registerSticky(this);
     }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
