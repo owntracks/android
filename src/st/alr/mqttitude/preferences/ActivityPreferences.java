@@ -10,6 +10,7 @@ import st.alr.mqttitude.ActivityStatus;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -34,13 +35,11 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference version;
     private static Preference repo;
     private static Preference mail;
-    private static PreferenceActivity activity;
     static String ver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
 
         // Thanks Google for not providing a support version of the
         // PreferenceFragment for older API versions
@@ -67,7 +66,7 @@ public class ActivityPreferences extends PreferenceActivity {
         version = findPreference("versionReadOnly");
         serverPreference = findPreference("brokerPreference");
         backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-        onSetupCommon();
+        onSetupCommon(this);
     }
 
     @TargetApi(11)
@@ -84,15 +83,15 @@ public class ActivityPreferences extends PreferenceActivity {
         serverPreference = f.findPreference("brokerPreference");
         backgroundUpdatesIntervall = f
                 .findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-        onSetupCommon();
+        onSetupCommon(f.getActivity());
     }
 
-    private static void onSetupCommon() {
-        PackageManager pm = activity.getPackageManager();
+    private static void onSetupCommon(final Activity a) {
+        PackageManager pm = a.getPackageManager();
         try {
-            ver = pm.getPackageInfo(activity.getPackageName(), 0).versionName;
+            ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
         } catch (NameNotFoundException e) {
-            ver = activity.getString(R.string.na);
+            ver = a.getString(R.string.na);
         }
 
         backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -100,7 +99,7 @@ public class ActivityPreferences extends PreferenceActivity {
                 Log.v(this.toString(), newValue.toString());
                 if (newValue.toString().equals("0")) {
                     SharedPreferences.Editor editor = PreferenceManager
-                            .getDefaultSharedPreferences(activity).edit();
+                            .getDefaultSharedPreferences(a).edit();
                     editor.putString(preference.getKey(), "1");
                     editor.commit();
                     return false;
@@ -117,7 +116,7 @@ public class ActivityPreferences extends PreferenceActivity {
                     public boolean onPreferenceClick(Preference preference) {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(Defaults.VALUE_REPO_URL));
-                        activity.startActivity(intent);
+                        a.startActivity(intent);
                         return false;
                     }
                 });
@@ -134,7 +133,7 @@ public class ActivityPreferences extends PreferenceActivity {
                             Defaults.VALUE_ISSUES_MAIL
                         });
                         intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
-                        activity.startActivity(Intent.createChooser(intent, "Send Email"));
+                        a.startActivity(Intent.createChooser(intent, "Send Email"));
                         return false;
                     }
                 });
