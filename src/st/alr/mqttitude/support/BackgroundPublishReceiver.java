@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class BackgroundPublishReceiver extends BroadcastReceiver {
-
+    
     @Override
     public void onReceive(Context arg0, Intent arg1) {
         if (arg1.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {

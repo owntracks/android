@@ -66,11 +66,9 @@
         </service>
 
         <receiver
-            android:name=".BackgroundPublishReceiver"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="st.alr.mqttitude.PUBLISH_LASTKNOWN" />
-            </intent-filter>
+            android:name="st.alr.mqttitude.support.BackgroundPublishReceiver" 
+            android:enabled="true" >
+            <action android:name="st.alr.mqttitude.UPDATE"/>
         </receiver>
     </application>
 
