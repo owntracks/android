@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="st.alr.mqttitude"
-    android:versionCode="0309"
-    android:versionName="0.3.09" >
+    android:versionCode="0310"
+    android:versionName="0.3.10" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
