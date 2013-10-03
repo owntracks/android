@@ -3,6 +3,8 @@ package st.alr.mqttitude.support;
 
 import java.util.Date;
 
+import android.location.Location;
+
 public class Events {
     public static abstract class E {
         Date date;
@@ -29,17 +31,42 @@ public class Events {
     public static class LocationUpdated  extends E{
         GeocodableLocation l; 
         
+        public LocationUpdated(Location l) {
+            this.l = new GeocodableLocation(l);
+        }
+
         public LocationUpdated(GeocodableLocation l) {
             this.l = l;
-            
         }
 
         public GeocodableLocation getGeocodableLocation() {
             return l;
         }
-        
-        
+
     }
+
+    public static class ContactLocationUpdated  extends E{
+        private String t; 
+        private GeocodableLocation l; 
+
+        public ContactLocationUpdated(Location l, String t) {
+            this(new GeocodableLocation(l), t);
+        }
+        public ContactLocationUpdated(GeocodableLocation l, String t) {
+            super();
+            this.l = l;
+            this.t = t;
+        }
+
+
+        public String getTopic(){
+            return t;
+        }
+        public GeocodableLocation getGeocodableLocation() {
+            return l;
+        }
+    }
+
     
     public static class StateChanged {
         public static class ServiceMqtt extends E{

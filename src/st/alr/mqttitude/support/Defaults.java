@@ -49,6 +49,8 @@ public class Defaults {
     public static final String VALUE_ISSUES_MAIL = "issues@mqttitude.org";
     public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "st.alr.mqttitude.intent.PUB_LASTKNOWN";
     public static final String INTENT_ACTION_PUBLICH_PING = "st.alr.mqttitude.intent.PUB_PING";
+    public static final String SETTINGS_KEY_TOPIC_SUBSCRIBE = "mqttitude/+/loc";
+    public static final String SETTINGS_KEY_TOPIC_SUBSCRIBE_MANUAL = "mqttitude/+/loc/m";
 
 
 
