@@ -242,7 +242,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     }
 
     public void onEventMainThread(Events.ContactLocationUpdated e) {
-        Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime()));
+        Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
     }
     
     public static class MapFragment extends SupportMapFragment {
