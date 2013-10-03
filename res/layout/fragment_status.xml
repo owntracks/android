@@ -1,0 +1,106 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".ActivityMain" >
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Locator" />
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Status" />
+
+            <TextView
+                android:id="@+id/locatorStatus"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Current location" />
+
+            <TextView
+                android:id="@+id/locatorCurLatLon"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        <TextView
+                android:id="@+id/locatorCurAccuracy"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                                    <TextView
+                android:id="@+id/locatorCurLatLonTime"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        
+        </LinearLayout>
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Last publish location" />
+
+            <TextView
+                android:id="@+id/locatorLastPubLatLon"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+
+                        <TextView
+                android:id="@+id/locatorLastPubAccuracy"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+            
+                                    <TextView
+                android:id="@+id/locatorLastPubLatLonTime"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        
+            </LinearLayout>
+
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Broker" />
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Status" />
+
+            <TextView
+                android:id="@+id/brokerStatus"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Error" />
+
+            <TextView
+                android:id="@+id/brokerError"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
