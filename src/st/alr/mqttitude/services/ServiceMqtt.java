@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -27,6 +28,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -51,6 +53,7 @@ import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.MqttPublish;
 
 public class ServiceMqtt extends ServiceBindable implements MqttCallback
@@ -320,6 +323,15 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         }
         
         scheduleNextPing();
+        
+        try {
+            mqttClient.subscribe(Defaults.SETTINGS_KEY_TOPIC_SUBSCRIBE);
+            //mqttClient.subscribe(Defaults.SETTINGS_KEY_TOPIC_SUBSCRIBE_MANUAL);
+            
+        } catch (MqttException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
     
@@ -398,9 +410,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         doStart(null, -1);
     }
 
-    public void messageArrived(MqttTopic topic, MqttMessage message) throws MqttException {
-
-    }
 
     public void onEvent(Events.StateChanged.ServiceMqtt event) {
         if (event.getState() == Defaults.State.ServiceMqtt.CONNECTED)
@@ -654,6 +663,42 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         scheduleNextPing();
+        String msg = new String(message.getPayload());
+        String type; 
+        JSONObject json = new JSONObject(msg);
+        
+        try {
+            type = json.getString("_type");
+        } catch (Exception e) {
+            Log.e(this.toString(), "Received invalid message: " + msg);
+            return;            
+        }
+        if(!type.equals("location")) {
+            Log.d(this.toString(), "Ignoring message of type " + type);
+            return;            
+        }
+        
+        
+        Double lat;
+        Double lon;
+        Float acc;
+        Long tst;
+        Double alt;
+        
+        try {lat = json.getDouble("lat"); } catch(Exception e) { lat = (double) 0; };
+        try {lon = json.getDouble("lon");} catch(Exception e) { lon = (double) 0; };
+        try {acc = Float.parseFloat(json.getString("acc")); } catch(Exception e) { acc = (float) 0; };
+        try {tst = Long.parseLong(json.getString("tst")); } catch(Exception e) { tst = (long) 0; };
+        try {alt = json.getDouble("alt"); } catch(Exception e) { alt = (double) 0; };
+
+        Location l = new Location("sub-provided");            
+        l.setLatitude(lat);
+        l.setLongitude(lon);
+        l.setAccuracy(acc);
+        l.setTime(tst);
+        l.setAltitude(alt);
+        
+        EventBus.getDefault().postSticky(new Events.ContactLocationUpdated(l, topic));
     }
 
     @Override

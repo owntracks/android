@@ -6,6 +6,8 @@ import android.util.Log;
 public class GeocodableLocation {
     String geocoder; 
     Location location;
+    
+    
     public GeocodableLocation(Location location){
         this(location, null);
     }

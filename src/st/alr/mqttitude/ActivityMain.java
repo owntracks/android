@@ -54,6 +54,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     ServiceApplication serviceApplication;
     ServiceConnection serviceApplicationConnection;
 
+    
+    
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,7 +228,23 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             return null;
         }
     }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().registerSticky(this);
+    }
 
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    public void onEventMainThread(Events.ContactLocationUpdated e) {
+        Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime()));
+    }
+    
     public static class MapFragment extends SupportMapFragment {
         
         public static MapFragment newInstance() {
@@ -275,10 +294,20 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
 
         
-        public void onEvent(Events.LocationUpdated e) {
+        public void onEventMainThread(Events.LocationUpdated e) {
             setLocation(e.getGeocodableLocation());
         }
 
+        public void centerMap(double lat, double lon) {
+            centerMap(new LatLng(lat, lon));
+        }
+        public void centerMap(LatLng latlon) {
+            CameraUpdate center = CameraUpdateFactory.newLatLng(latlon);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+            getMap().moveCamera(center);
+            getMap().animateCamera(zoom);
+        }
+        
         public void setLocation(GeocodableLocation location) {
             Location l = location.getLocation();
             Log.v(this.toString(), "Setting location");
@@ -290,8 +319,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
            } 
            
             LatLng latlong = new LatLng(l.getLatitude(), l.getLongitude());
-            CameraUpdate center = CameraUpdateFactory.newLatLng(latlong);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
 
             if (mMarker != null)
                 mMarker.remove();
@@ -302,13 +329,14 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             
             mMarker = getMap().addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             
+            centerMap(latlong);
+
+            
              if(l.getAccuracy() >= 50) {
                      mCircle = getMap().addCircle(new
                      CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0xff1082ac).fillColor(0x1c15bffe).strokeWidth(3));
              }
 
-             getMap().moveCamera(center);
-             getMap().animateCamera(zoom);
 
             if(location.getGeocoder() != null) {
                 Log.v(this.toString(), "Reusing geocoder");
@@ -339,6 +367,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 //      }
 //  
   }
+    
     
     
     public static class FriendsFragment extends Fragment {

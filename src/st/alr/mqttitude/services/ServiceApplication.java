@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.os.Handler;
 import android.os.IBinder;
@@ -72,7 +73,7 @@ public class ServiceApplication extends ServiceBindable {
             }
         };
 
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().registerSticky(this);
 
         if (resp == ConnectionResult.SUCCESS) {
             Log.v(this.toString(), "Play  services version: "
@@ -289,6 +290,8 @@ public class ServiceApplication extends ServiceBindable {
 
         }
     }
+    
+    
 
     public void onEvent(Events.LocationUpdated e) {
         if (e.getGeocodableLocation() == null)
@@ -296,6 +299,7 @@ public class ServiceApplication extends ServiceBindable {
 
         Log.v(this.toString(), "LocationUpdated: " + e.getGeocodableLocation().getLatitude() + ":"
                 + e.getGeocodableLocation().getLongitude());
+        
     }
 
     public boolean isDebugBuild() {
