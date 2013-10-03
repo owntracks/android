@@ -56,9 +56,8 @@ public final class R {
         public static final int locatorLastPubLatLonTime=0x7f0a0007;
         public static final int locatorStatus=0x7f0a0001;
         public static final int menu_publish=0x7f0a0021;
-        public static final int menu_settings=0x7f0a0024;
+        public static final int menu_settings=0x7f0a0023;
         public static final int menu_share=0x7f0a0022;
-        public static final int menu_status=0x7f0a0023;
         public static final int pager=0x7f0a0000;
         public static final int pahoHeader=0x7f0a001d;
         public static final int pahoLicense=0x7f0a001e;
@@ -81,8 +80,7 @@ public final class R {
     }
     public static final class menu {
         public static final int activity_main=0x7f090000;
-        public static final int activity_preferences=0x7f090001;
-        public static final int activity_status=0x7f090002;
+        public static final int activity_status=0x7f090001;
     }
     public static final class string {
         public static final int action_settings=0x7f050001;

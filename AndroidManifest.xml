@@ -57,6 +57,10 @@
         </activity>
 
         <service
+            android:name="st.alr.mqttitude.services.ServiceApplication"
+            android:exported="false" >
+        </service>
+        <service
             android:name="st.alr.mqttitude.services.ServiceMqtt"
             android:exported="false" >
         </service>

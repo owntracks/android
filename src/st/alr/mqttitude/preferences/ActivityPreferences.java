@@ -17,8 +17,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
