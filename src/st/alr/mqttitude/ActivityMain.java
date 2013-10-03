@@ -2,6 +2,8 @@ package st.alr.mqttitude;
 
 import java.util.Locale;
 
+import com.google.android.gms.maps.SupportMapFragment;
+
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -110,14 +113,19 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a DummySectionFragment (defined as a static inner class
-            // below) with the page number as its lone argument.
-            Fragment fragment = new DummySectionFragment();
-            Bundle args = new Bundle();
-            args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-            fragment.setArguments(args);
-            return fragment;
+            switch (position) {
+                case 0:
+//                    Bundle args = new Bundle();
+//                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+//                    fragment.setArguments(args);
+//                    return fragment;
+
+                    return new MapFragment();
+                case 1:
+                    return FriendsFragment.newInstance();
+                default:
+                    return new StatusFragment();
+            }
         }
 
         @Override
@@ -131,38 +139,81 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return "1";
+                    return getString(R.string.titleMap);
                 case 1:
-                    return "2";
+                    return getString(R.string.titleFriends);
                 case 2:
-                    return "3";
+                    return getString(R.string.titleStatus);
             }
             return null;
         }
     }
 
-    /**
-     * A dummy fragment representing a section of the app, but that simply
-     * displays dummy text.
-     */
-    public static class DummySectionFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
+    public static class MapFragment extends SupportMapFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
 
-        public DummySectionFragment() {
+//      @Override
+//      public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//              Bundle savedInstanceState) {
+//          View rootView = inflater.inflate(R.layout.fragment_activity_main_dummy, container, false);
+//          TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
+//          dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
+//          return rootView;
+//      }
+//  
+  }
+    
+    
+    public static class FriendsFragment extends Fragment {
+        int mNum;
+
+        static FriendsFragment newInstance() {
+            FriendsFragment f = new FriendsFragment();
+//            // Supply num input as an argument.
+//            Bundle args = new Bundle();
+//            args.putInt("num", num);
+//            f.setArguments(args);
+
+            return f;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mNum = getArguments() != null ? getArguments().getInt("num") : 1;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_activity_main_dummy, container, false);
-            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+            View v = inflater.inflate(R.layout.fragment_friends, container, false);
+            return v;
         }
     }
+
+
+    public static class StatusFragment extends Fragment {
+        int mNum;
+
+        static StatusFragment newInstance() {
+            StatusFragment f = new StatusFragment();
+            return f;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.fragment_status, container, false);
+            return v;
+        }
+    }
+
 
 }

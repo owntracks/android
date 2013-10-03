@@ -24,6 +24,7 @@ import java.util.Date;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.ActivityMain;
+import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.BackgroundPublishReceiver;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;

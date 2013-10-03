@@ -5,8 +5,11 @@
     <string name="action_settings">Settings</string>
    
     <string name="titleActivityPreferences">"Settings"</string>
-      <string name="titleActivityStatus">""Status"</string>
-    
+      <string name="titleActivityStatus">"Status"</string>
+          <string name="titleMap">"Map"</string>
+          <string name="titleFriends">"Friends"</string>
+          <string name="titleStatus">"Status"</string>
+            
     <string name="preferencesServerTitle">"Broker"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesBrokerClientId">"Client ID"</string>
