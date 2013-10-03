@@ -8,25 +8,93 @@
 package st.alr.mqttitude;
 
 public final class R {
+    public static final class array {
+        public static final int connect_options_security=0x7f040000;
+        public static final int qos=0x7f040001;
+        public static final int qos_readable=0x7f040002;
+    }
     public static final class attr {
     }
+    public static final class color {
+        public static final int background=0x7f060003;
+        public static final int border=0x7f060004;
+        public static final int darkGrey=0x7f060002;
+        public static final int lightGrey=0x7f060000;
+        public static final int mediumGrey=0x7f060001;
+    }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int ab_bottom_solid=0x7f020000;
+        public static final int card=0x7f020001;
+        public static final int ic_icon=0x7f020002;
+        public static final int ic_launcher=0x7f020003;
+        public static final int ic_notification=0x7f020004;
+        public static final int ic_overflow=0x7f020005;
+        public static final int ic_share=0x7f020006;
+        public static final int ic_upload=0x7f020007;
     }
     public static final class string {
+        public static final int action_settings=0x7f030001;
         public static final int app_name=0x7f030000;
+        public static final int cancel=0x7f030032;
+        public static final int connectivityConnected=0x7f030029;
+        public static final int connectivityConnecting=0x7f030028;
+        public static final int connectivityDisconnected=0x7f03002b;
+        public static final int connectivityDisconnectedDataDisabled=0x7f03002d;
+        public static final int connectivityDisconnectedUserDisconnect=0x7f03002c;
+        public static final int connectivityDisconnecting=0x7f03002a;
+        public static final int currentLocation=0x7f03002f;
+        public static final int error=0x7f030033;
+        public static final int na=0x7f03002e;
+        public static final int preferencesActivity=0x7f03001e;
+        public static final int preferencesBackgroundUpdatesInterval=0x7f03001f;
+        public static final int preferencesBackgroundUpdatesIntervalSummary=0x7f030020;
+        public static final int preferencesBackgroundUpdatesSummary=0x7f030022;
+        public static final int preferencesBackroundUpdates=0x7f030021;
+        public static final int preferencesBrokerClientId=0x7f030006;
+        public static final int preferencesInfo=0x7f030023;
+        public static final int preferencesLicensesDismiss=0x7f03000c;
+        public static final int preferencesLicensesSummary=0x7f03000b;
+        public static final int preferencesLicensesTitle=0x7f03000a;
+        public static final int preferencesMailSummary=0x7f030027;
+        public static final int preferencesMailTitle=0x7f030026;
+        public static final int preferencesNotification=0x7f03000d;
+        public static final int preferencesNotificationGeocoderSummary=0x7f030014;
+        public static final int preferencesNotificationGeocoderTitle=0x7f030015;
+        public static final int preferencesNotificationLocationSummary=0x7f030012;
+        public static final int preferencesNotificationLocationTitle=0x7f030013;
+        public static final int preferencesNotificationSummary=0x7f030010;
+        public static final int preferencesNotificationTickerOnPublishSummary=0x7f03000e;
+        public static final int preferencesNotificationTickerOnPublishTitle=0x7f03000f;
+        public static final int preferencesNotificationTitle=0x7f030011;
+        public static final int preferencesQOS=0x7f03001c;
+        public static final int preferencesQOSSummary=0x7f03001d;
+        public static final int preferencesRepositorySummary=0x7f030025;
+        public static final int preferencesRepositoryTitle=0x7f030024;
+        public static final int preferencesRetain=0x7f03001a;
+        public static final int preferencesRetainSummary=0x7f03001b;
+        public static final int preferencesServerAddress=0x7f030005;
+        public static final int preferencesServerCancel=0x7f030008;
+        public static final int preferencesServerConnect=0x7f030009;
+        public static final int preferencesServerPort=0x7f030007;
+        public static final int preferencesServerTitle=0x7f030004;
+        public static final int preferencesTopic=0x7f030018;
+        public static final int preferencesTopicSettings=0x7f030017;
+        public static final int preferencesTopicSummary=0x7f030019;
+        public static final int preferencesVersionTitle=0x7f030016;
+        public static final int save=0x7f030031;
+        public static final int shareLocation=0x7f030030;
+        public static final int stateIdle=0x7f03003a;
+        public static final int stateLocatingFail=0x7f030037;
+        public static final int stateNotopic=0x7f030035;
+        public static final int statePublishTimeout=0x7f030036;
+        public static final int statePublished=0x7f030034;
+        public static final int statePublishing=0x7f030038;
+        public static final int stateWaiting=0x7f030039;
+        public static final int titleActivityPreferences=0x7f030002;
+        public static final int titleActivityStatus=0x7f030003;
     }
     public static final class style {
         /** 
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    
-
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        
-
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     
@@ -38,10 +106,21 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f040000;
-        /**  Application theme. 
- All customizations that are NOT specific to a particular API-level can go here. 
-         */
-        public static final int AppTheme=0x7f040001;
+        public static final int AppBaseTheme=0x7f05000f;
+        public static final int AppTheme=0x7f050000;
+        public static final int AppTheme_ActionBar=0x7f050001;
+        public static final int AppTheme_ActionBar_Overflow=0x7f050002;
+        public static final int AppTheme_ActionBar_Text=0x7f050003;
+        public static final int actionBar=0x7f050004;
+        public static final int card=0x7f05000d;
+        public static final int cardButton=0x7f05000e;
+        public static final int listItem=0x7f05000a;
+        public static final int listItemSubtitle=0x7f05000c;
+        public static final int listItemTitle=0x7f05000b;
+        public static final int seperator=0x7f050005;
+        public static final int seperatorH=0x7f050006;
+        public static final int seperatorV=0x7f050007;
+        public static final int subtitle=0x7f050009;
+        public static final int title=0x7f050008;
     }
 }
