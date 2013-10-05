@@ -678,26 +678,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             return;            
         }
         
-        
-        Double lat;
-        Double lon;
-        Float acc;
-        Long tst;
-        Double alt;
-        
-        try {lat = json.getDouble("lat"); } catch(Exception e) { lat = (double) 0; };
-        try {lon = json.getDouble("lon");} catch(Exception e) { lon = (double) 0; };
-        try {acc = Float.parseFloat(json.getString("acc")); } catch(Exception e) { acc = (float) 0; };
-        try {tst = Long.parseLong(json.getString("tst")); } catch(Exception e) { tst = (long) 0; };
-        try {alt = json.getDouble("alt"); } catch(Exception e) { alt = (double) 0; };
-
-        Location l = new Location("sub-provided");            
-        l.setLatitude(lat);
-        l.setLongitude(lon);
-        l.setAccuracy(acc);
-        l.setTime(tst);
-        l.setAltitude(alt);
-        
+        GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
         EventBus.getDefault().postSticky(new Events.ContactLocationUpdated(l, topic));
     }
 

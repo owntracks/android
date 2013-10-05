@@ -1,26 +1,38 @@
 package st.alr.mqttitude;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBindable;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Friend;
+import st.alr.mqttitude.support.FriendMapAdapter;
 import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -32,11 +44,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -53,6 +71,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     ViewPager mViewPager;
     ServiceApplication serviceApplication;
     ServiceConnection serviceApplicationConnection;
+    private static Map<String,Friend> friends = new HashMap<String,Friend>();
 
     
     
@@ -117,6 +136,10 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                             .setText(mSectionsPagerAdapter.getPageTitle(j))
                             .setTabListener(this));
         }
+        
+        
+        parseContacts();
+        
     }
 
     @Override
@@ -134,11 +157,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             startActivity(intent1);
             return true;
         } else if (itemId == R.id.menu_publish) {           
-            if(ServiceApplication.getServiceLocator() != null)
-                ServiceApplication.getServiceLocator().publishLastKnownLocation();
+            if(serviceApplication.getServiceLocator() != null)
+                serviceApplication.getServiceLocator().publishLastKnownLocation();
             return true;
         } else if (itemId == R.id.menu_share) {
-            if(ServiceApplication.getServiceLocator() != null)
+            if(serviceApplication.getServiceLocator() != null)
                 this.share(null);
             return true;
         } else {
@@ -148,7 +171,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     
     
     public void share(View view) {
-        GeocodableLocation l = ServiceApplication.getServiceLocator().getLastKnownLocation();
+        GeocodableLocation l = serviceApplication.getServiceLocator().getLastKnownLocation();
         if(l == null) {
             //TODO: signal to user
             return;            
@@ -233,11 +256,18 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public void onStart() {
         super.onStart();
         EventBus.getDefault().registerSticky(this);
+        if(serviceApplication != null)
+            serviceApplication.getServiceLocator().enableForegroundMode();
+
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        
+        if(serviceApplication != null)
+            serviceApplication.getServiceLocator().enableBackgroundMode();
+
         super.onStop();
     }
 
@@ -271,7 +301,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         private void onHandlerMessage(Message msg) {
             switch (msg.what) {
                 case ReverseGeocodingTask.GEOCODER_RESULT:
-                    Log.v(this.toString(), "Geocoder result_ " + ((GeocodableLocation) msg.obj).getGeocoder());
                    // locationPrimary.setText(((GeocodableLocation) msg.obj).getGeocoder());
                     break;
                 case ReverseGeocodingTask.GEOCODER_NORESULT:
@@ -371,8 +400,16 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     
     
     public static class FriendsFragment extends Fragment {
-        int mNum;
+        private TextView locatorCurLatLon;
+        private TextView locatorCurAccuracy;
+        private TextView locatorCurLatLonTime;
 
+        private TextView locatorLastPubLatLon;
+        private TextView locatorLastPubAccuracy;
+        private TextView locatorLastPubLatLonTime;
+        ListView friendsListView;
+        FriendMapAdapter adapter;
+        
         static FriendsFragment newInstance() {
             FriendsFragment f = new FriendsFragment();
 //            // Supply num input as an argument.
@@ -386,15 +423,160 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            mNum = getArguments() != null ? getArguments().getInt("num") : 1;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
+
+            friendsListView = (ListView) v.findViewById(R.id.friendsListView);
+            adapter = new FriendMapAdapter(getActivity(), friends);
+            friendsListView.setAdapter(adapter);
+            
+            locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
+            locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
+            locatorCurLatLonTime = (TextView) v.findViewById(R.id.locatorCurLatLonTime);
+
+            locatorLastPubLatLon = (TextView) v.findViewById(R.id.locatorLastPubLatLon);
+            locatorLastPubAccuracy = (TextView) v.findViewById(R.id.locatorLastPubAccuracy);
+            locatorLastPubLatLonTime = (TextView) v.findViewById(R.id.locatorLastPubLatLonTime);
+            
             return v;
         }
+        
+        public void onEventMainThread(Events.ContactLocationUpdated e) {
+            Friend f = friends.get(e.getTopic());
+            
+            
+            
+            if(f == null) {
+                f = new Friend();
+                f.setMqqtUsername(e.getTopic());   
+                f.setLocation(e.getGeocodableLocation());
+
+                adapter.addItem(e.getTopic(), f);
+            } else {
+                f.setLocation(e.getGeocodableLocation());
+                adapter.notifyDataSetChanged();                
+            }
+            
+            Log.v(this.toString(), friends.toString());            
+        }
+
+private class FriendsListAdapter extends ArrayAdapter<Friend>  {
+
+    public FriendsListAdapter(Context context, int id) {
+        super(context, id);
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public int getCount() {
+        Log.v(this.toString(), "Size: " + friends.size());
+        return friends.size();
+    }
+
+    @Override
+    public Friend getItem(int arg0) {
+        return (Friend) friends.values().toArray()[arg0];
+    }
+
+    @Override
+    public long getItemId(int arg0) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getItemViewType(int arg0) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
+            TextView textView = (TextView) rowView.findViewById(android.R.id.text1);
+            textView.setText(((Friend)getItem(position)).getName());
+            TextView textView2 = (TextView) rowView.findViewById(android.R.id.text2);
+            if( ((Friend)getItem(position)).getLocation() != null)
+                textView2.setText(((Friend)getItem(position)).getLocation().toString());
+            else
+                textView2.setText("n/a");
+            
+            return rowView;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver arg0) {
+        
+    }
+
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver arg0) {
+        
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int arg0) {
+        return false;
+    }
+    
+}
+        
+        
+        @Override
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().registerSticky(this);
+        }
+
+        @Override
+        public void onStop() {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+        
+
+        public void onEventMainThread(Events.LocationUpdated e) {
+            locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
+            locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()+"m");
+            locatorCurLatLonTime.setText(ServiceApplication.getInstance().formatDate(e.getDate()));
+        }
+
+        
+        
+        public void onEventMainThread(Events.PublishSuccessfull e) {
+            if(e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
+                GeocodableLocation l = (GeocodableLocation)e.getExtra();
+                locatorLastPubLatLon.setText(l.toLatLonString());
+                locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy()+"m");
+                locatorLastPubLatLonTime.setText(ServiceApplication.getInstance().formatDate(e.getDate()));            
+            }
+        }
+
     }
 
 
@@ -484,6 +666,106 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
 
     }
+    
+    public void parseContacts(){
+        //new friends user ids by using android contacts, 
+        //TODO: put in fn
+        ContentResolver cr = getContentResolver();
+
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+//                Log.v(this.toString(), "name: " + name);
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    //Query IM details
+                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+                    String[] imWhereParams = new String[]{id, 
+                        ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
+                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, 
+                            null, imWhere, imWhereParams, null); 
+                    imCur.moveToPosition(-1);
+                    
+                    while(imCur.moveToNext()) {
+                    //if (imCur.moveToFirst()) { 
+                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+                        String imType;
+                        imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
+                        
+                        String label = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
+                        
+//                        Log.v(this.toString(), "imType: " + imType);
+//                        Log.v(this.toString(), "imName: " + imName);
+//                        Log.v(this.toString(), "label: " + label);
+
+                        if(label == null)
+                            continue;
+
+                        if(imType.equalsIgnoreCase("3")){
+
+                            //TODO: CHange hard coded string
+                            if(label.equalsIgnoreCase("MQTTITUDE")){
+
+                                //Events.NewPeerAdded msg = new Events.NewPeerAdded(imName);
+                                //EventBus.getDefault().post(msg);
+
+                                //create a friend object
+                                Friend friend = new Friend();
+                                Log.v(this.toString(), "New friend created: " + imName + ", " + name + ", " + imType);
+                                
+                                friend.setMqqtUsername(imName);
+                                friend.setName(name);
+
+//                                friend.setMarkerImage(createCustomMarker(friends.size()-1,1.0f));
+//                                friend.setStaleMarkerImage(createCustomMarker(friends.size()-1,0.5f));
+
+                                friends.put(imName, friend);
+                              //  break;
+
+
+                            }
+                        }
+                    } 
+                    imCur.close();
+
+                }
+            }
+        }   
+    
+    }
+
+    
+    
+    /*
+     * We use this to generate markers for each of the different peers/friends
+     * we can use a solid colour for each then alter the apha for historical markers
+     */
+    private BitmapDescriptor createCustomMarker(int colour, float alpha){
+        
+        
+        
+        float[] hsv = new float[3]; 
+        
+        hsv[0] = (colour * 50) % 360; //mod 365 so we get variation
+        hsv[1] = 1;
+        hsv[2] = alpha;
+        
+        
+        Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas();
+        c.setBitmap(bm);
+                
+        Paint p = new Paint();
+        p.setColor(Color.HSVToColor(hsv));
+        
+        
+        c.drawCircle(20, 20, 10, p);
+        return BitmapDescriptorFactory.fromBitmap(bm);
+        
+    }
+
 
 
 }

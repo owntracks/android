@@ -240,7 +240,8 @@ public class ServiceApplication extends ServiceBindable {
         if (time != 0)
             notificationBuilder.setWhen(lastPublishedLocationTime.getTime());
 
-        notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
+        startForeground(Defaults.NOTIFCATION_ID, notificationBuilder.build());
+    //    notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
@@ -314,11 +315,11 @@ public class ServiceApplication extends ServiceBindable {
         return locatorClass;
     }
     
-    public static ServiceLocator getServiceLocator() {
+    public ServiceLocator getServiceLocator() {
         return serviceLocator;        
     }
     
-    public static ServiceMqtt getServiceMqtt() {
+    public ServiceMqtt getServiceMqtt() {
         return serviceMqtt;
     }
 

@@ -108,9 +108,9 @@ public class ServiceLocatorFused extends ServiceLocator implements
         Log.v(TAG, "setupForegroundLocationRequest. Interval: " + 0.5);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1 * MINUTES_TO_MILISECONDS);
+        mLocationRequest.setInterval(10*1000);
         mLocationRequest.setFastestInterval(500);
-        mLocationRequest.setSmallestDisplacement(100);
+        mLocationRequest.setSmallestDisplacement(5);
     }
 
     @Override

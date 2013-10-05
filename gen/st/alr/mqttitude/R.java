@@ -33,21 +33,22 @@ public final class R {
         public static final int ic_upload=0x7f020007;
     }
     public static final class id {
-        public static final int brokerClientId=0x7f0a000f;
+        public static final int brokerClientId=0x7f0a0010;
         public static final int brokerError=0x7f0a0009;
-        public static final int brokerHost=0x7f0a000b;
-        public static final int brokerPassword=0x7f0a0013;
-        public static final int brokerPort=0x7f0a000d;
-        public static final int brokerSecurity=0x7f0a0015;
-        public static final int brokerSecurityNoneOptions=0x7f0a0019;
-        public static final int brokerSecuritySSLCaCrtPath=0x7f0a0018;
-        public static final int brokerSecuritySSLOptions=0x7f0a0016;
+        public static final int brokerHost=0x7f0a000c;
+        public static final int brokerPassword=0x7f0a0014;
+        public static final int brokerPort=0x7f0a000e;
+        public static final int brokerSecurity=0x7f0a0016;
+        public static final int brokerSecurityNoneOptions=0x7f0a001a;
+        public static final int brokerSecuritySSLCaCrtPath=0x7f0a0019;
+        public static final int brokerSecuritySSLOptions=0x7f0a0017;
         public static final int brokerStatus=0x7f0a0008;
-        public static final int brokerUsername=0x7f0a0011;
-        public static final int bugsnagHeader=0x7f0a001f;
-        public static final int bugsnagLicense=0x7f0a0020;
-        public static final int eventbusHeader=0x7f0a001b;
-        public static final int eventbusLicense=0x7f0a001c;
+        public static final int brokerUsername=0x7f0a0012;
+        public static final int bugsnagHeader=0x7f0a0020;
+        public static final int bugsnagLicense=0x7f0a0021;
+        public static final int eventbusHeader=0x7f0a001c;
+        public static final int eventbusLicense=0x7f0a001d;
+        public static final int friendsListView=0x7f0a000a;
         public static final int locatorCurAccuracy=0x7f0a0003;
         public static final int locatorCurLatLon=0x7f0a0002;
         public static final int locatorCurLatLonTime=0x7f0a0004;
@@ -55,20 +56,20 @@ public final class R {
         public static final int locatorLastPubLatLon=0x7f0a0005;
         public static final int locatorLastPubLatLonTime=0x7f0a0007;
         public static final int locatorStatus=0x7f0a0001;
-        public static final int menu_publish=0x7f0a0021;
-        public static final int menu_settings=0x7f0a0023;
-        public static final int menu_share=0x7f0a0022;
+        public static final int menu_publish=0x7f0a0022;
+        public static final int menu_settings=0x7f0a0024;
+        public static final int menu_share=0x7f0a0023;
         public static final int pager=0x7f0a0000;
-        public static final int pahoHeader=0x7f0a001d;
-        public static final int pahoLicense=0x7f0a001e;
-        public static final int scrollView1=0x7f0a001a;
-        public static final int textView1=0x7f0a000a;
-        public static final int textView2=0x7f0a000c;
-        public static final int textView3=0x7f0a0010;
-        public static final int textView4=0x7f0a0012;
-        public static final int textView5=0x7f0a0014;
-        public static final int textView6=0x7f0a0017;
-        public static final int textView8=0x7f0a000e;
+        public static final int pahoHeader=0x7f0a001e;
+        public static final int pahoLicense=0x7f0a001f;
+        public static final int scrollView1=0x7f0a001b;
+        public static final int textView1=0x7f0a000b;
+        public static final int textView2=0x7f0a000d;
+        public static final int textView3=0x7f0a0011;
+        public static final int textView4=0x7f0a0013;
+        public static final int textView5=0x7f0a0015;
+        public static final int textView6=0x7f0a0018;
+        public static final int textView8=0x7f0a000f;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -77,6 +78,7 @@ public final class R {
         public static final int fragment_status=0x7f030003;
         public static final int preferences_broker=0x7f030004;
         public static final int preferences_licenses=0x7f030005;
+        public static final int two_line_row_layout=0x7f030006;
     }
     public static final class menu {
         public static final int activity_main=0x7f090000;
