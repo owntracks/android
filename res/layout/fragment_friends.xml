@@ -3,6 +3,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Current location" />
+
+            <TextView
+                android:id="@+id/locatorCurLatLon"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        <TextView
+                android:id="@+id/locatorCurAccuracy"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                                    <TextView
+                android:id="@+id/locatorCurLatLonTime"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        
+        </LinearLayout>
+
+        <LinearLayout style="@style/listItem" >
+
+            <TextView
+                style="@style/listItemTitle"
+                android:text="Last publish location" />
+
+            <TextView
+                android:id="@+id/locatorLastPubLatLon"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+
+                        <TextView
+                android:id="@+id/locatorLastPubAccuracy"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+            
+                                    <TextView
+                android:id="@+id/locatorLastPubLatLonTime"
+                style="@style/listItemSubtitle"
+                android:text="@string/na" />
+                        
+            </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/friendsListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+    </ListView>
 
 </LinearLayout>

@@ -7,7 +7,7 @@
     <string name="titleActivityPreferences">"Settings"</string>
       <string name="titleActivityStatus">"Status"</string>
           <string name="titleMap">"Map"</string>
-          <string name="titleFriends">"Friends"</string>
+          <string name="titleFriends">"Locations"</string>
           <string name="titleStatus">"Status"</string>
             
     <string name="preferencesServerTitle">"Broker"</string>

@@ -40,6 +40,11 @@ public class Friend {
         return location;
     }
 
+    
+    public void setLocation(GeocodableLocation location) {
+        this.location = location;
+    }
+
     public BitmapDescriptor getMarkerImage() {
         return markerImage;
     }
@@ -58,6 +63,13 @@ public class Friend {
     public void setColor(Color color) {
         this.color = color;
     }
+    public String toString() {
+        if(getName() != null)
+            return name;
+        else 
+            return mqqtUsername;
+    }
+    
     
     
     
