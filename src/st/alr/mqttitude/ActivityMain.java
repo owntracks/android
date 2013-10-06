@@ -1,5 +1,6 @@
 package st.alr.mqttitude;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,17 +18,20 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -51,8 +55,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -137,7 +143,10 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                             .setTabListener(this));
         }
         
-        
+        try {
+            MapsInitializer.initialize(this);
+        } catch (GooglePlayServicesNotAvailableException e) {
+        }
         parseContacts();
         
     }
@@ -275,6 +284,117 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
     }
     
+    public void parseContacts(){
+        //new friends user ids by using android contacts, 
+        //TODO: put in fn
+        ContentResolver cr = getContentResolver();
+
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+//                Log.v(this.toString(), "name: " + name);
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    //Query IM details
+                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+                    String[] imWhereParams = new String[]{id, 
+                        ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
+                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, 
+                            null, imWhere, imWhereParams, null); 
+                    imCur.moveToPosition(-1);
+                    
+                    while(imCur.moveToNext()) {
+                    //if (imCur.moveToFirst()) { 
+                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+                        String imType;
+                        imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
+                        
+                        String label = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
+                        
+//                        Log.v(this.toString(), "imType: " + imType);
+//                        Log.v(this.toString(), "imName: " + imName);
+//                        Log.v(this.toString(), "label: " + label);
+
+                        if(label == null)
+                            continue;
+
+                        if(imType.equalsIgnoreCase("3")){
+
+                            //TODO: CHange hard coded string
+                            if(label.equalsIgnoreCase("MQTTITUDE")){
+
+                                //Events.NewPeerAdded msg = new Events.NewPeerAdded(imName);
+                                //EventBus.getDefault().post(msg);
+
+                                //create a friend object
+                                Friend friend = new Friend();
+                                Log.v(this.toString(), "New friend created: " + imName + ", " + name + ", " + imType);
+                                
+                                friend.setMqqtUsername(imName);
+                                friend.setName(name);
+
+
+                                friend.setUserImage(loadContactPhoto(getContentResolver(), Long.parseLong(id)));
+                                
+//                                friend.setMarkerImage(createCustomMarker(friends.size()-1,1.0f));
+//                                friend.setStaleMarkerImage(createCustomMarker(friends.size()-1,0.5f));
+
+                                
+                                friends.put(imName, friend);
+                              //  break;
+
+
+                            }
+                        }
+                    } 
+                    imCur.close();
+
+                }
+            }
+        }   
+    
+    }
+    
+    public static Bitmap loadContactPhoto(ContentResolver cr, long  id) {
+        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
+        if (input == null) {
+            return null;
+        }
+        return BitmapFactory.decodeStream(input);
+    }
+
+
+    
+    
+    /*
+     * We use this to generate markers for each of the different peers/friends
+     * we can use a solid colour for each then alter the apha for historical markers
+     */
+    private BitmapDescriptor createCustomMarker(int colour, float alpha){
+        
+        float[] hsv = new float[3]; 
+        
+        hsv[0] = (colour * 50) % 360; //mod 365 so we get variation
+        hsv[1] = 1;
+        hsv[2] = alpha;
+        
+        
+        Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas();
+        c.setBitmap(bm);
+                
+        Paint p = new Paint();
+        p.setColor(Color.HSVToColor(hsv));
+        
+        
+        c.drawCircle(20, 20, 10, p);
+        return BitmapDescriptorFactory.fromBitmap(bm);
+        
+    }
+    
     public static class MapFragment extends SupportMapFragment {
         
         public static MapFragment newInstance() {
@@ -326,6 +446,27 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         public void onEventMainThread(Events.LocationUpdated e) {
             setLocation(e.getGeocodableLocation());
         }
+        
+        public void onEventMainThread(Events.ContactLocationUpdated e) {
+            Friend f = friends.get(e.getTopic());
+            
+            
+            
+            if(f == null) {
+                f = new Friend();
+                f.setMqqtUsername(e.getTopic());   
+                f.setLocation(e.getGeocodableLocation());
+                
+                //TODO: refresh adapter of list
+            } else {
+                f.setLocation(e.getGeocodableLocation());
+                //TODO: refresh adapter of list
+            }
+
+            LatLng ln = new LatLng(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude());
+            Marker m = getMap().addMarker(new MarkerOptions().position(ln).icon(f.getUserImageDescriptor()).title(f.getName()).flat(true));
+        }
+
 
         public void centerMap(double lat, double lon) {
             centerMap(new LatLng(lat, lon));
@@ -336,6 +477,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             getMap().moveCamera(center);
             getMap().animateCamera(zoom);
         }
+        
+        
         
         public void setLocation(GeocodableLocation location) {
             Location l = location.getLocation();
@@ -384,16 +527,20 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
            // showLocationAvailable();
         }
+        
+        
 
         
-//      @Override
-//      public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//              Bundle savedInstanceState) {
-//          View rootView = inflater.inflate(R.layout.fragment_activity_main_dummy, container, false);
-//          TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-//          dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-//          return rootView;
-//      }
+      @Override
+      public View onCreateView(LayoutInflater inflater, ViewGroup container,
+              Bundle savedInstanceState) {
+          View v = super.onCreateView(inflater, container, savedInstanceState);
+          
+          getMap().setIndoorEnabled(true);
+          //getMap().setMyLocationEnabled(true);
+          
+          return v;
+      }
 //  
   }
     
@@ -461,90 +608,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 adapter.notifyDataSetChanged();                
             }
             
-            Log.v(this.toString(), friends.toString());            
         }
 
-private class FriendsListAdapter extends ArrayAdapter<Friend>  {
 
-    public FriendsListAdapter(Context context, int id) {
-        super(context, id);
-        // TODO Auto-generated constructor stub
-    }
-
-    @Override
-    public int getCount() {
-        Log.v(this.toString(), "Size: " + friends.size());
-        return friends.size();
-    }
-
-    @Override
-    public Friend getItem(int arg0) {
-        return (Friend) friends.values().toArray()[arg0];
-    }
-
-    @Override
-    public long getItemId(int arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int getItemViewType(int arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
-            TextView textView = (TextView) rowView.findViewById(android.R.id.text1);
-            textView.setText(((Friend)getItem(position)).getName());
-            TextView textView2 = (TextView) rowView.findViewById(android.R.id.text2);
-            if( ((Friend)getItem(position)).getLocation() != null)
-                textView2.setText(((Friend)getItem(position)).getLocation().toString());
-            else
-                textView2.setText("n/a");
-            
-            return rowView;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return 1;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return false;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public void registerDataSetObserver(DataSetObserver arg0) {
-        
-    }
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver arg0) {
-        
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled(int arg0) {
-        return false;
-    }
-    
-}
         
         
         @Override
@@ -667,104 +733,7 @@ private class FriendsListAdapter extends ArrayAdapter<Friend>  {
 
     }
     
-    public void parseContacts(){
-        //new friends user ids by using android contacts, 
-        //TODO: put in fn
-        ContentResolver cr = getContentResolver();
 
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-//                Log.v(this.toString(), "name: " + name);
-                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    //Query IM details
-                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
-                    String[] imWhereParams = new String[]{id, 
-                        ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
-                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, 
-                            null, imWhere, imWhereParams, null); 
-                    imCur.moveToPosition(-1);
-                    
-                    while(imCur.moveToNext()) {
-                    //if (imCur.moveToFirst()) { 
-                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
-                        String imType;
-                        imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
-                        
-                        String label = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
-                        
-//                        Log.v(this.toString(), "imType: " + imType);
-//                        Log.v(this.toString(), "imName: " + imName);
-//                        Log.v(this.toString(), "label: " + label);
-
-                        if(label == null)
-                            continue;
-
-                        if(imType.equalsIgnoreCase("3")){
-
-                            //TODO: CHange hard coded string
-                            if(label.equalsIgnoreCase("MQTTITUDE")){
-
-                                //Events.NewPeerAdded msg = new Events.NewPeerAdded(imName);
-                                //EventBus.getDefault().post(msg);
-
-                                //create a friend object
-                                Friend friend = new Friend();
-                                Log.v(this.toString(), "New friend created: " + imName + ", " + name + ", " + imType);
-                                
-                                friend.setMqqtUsername(imName);
-                                friend.setName(name);
-
-//                                friend.setMarkerImage(createCustomMarker(friends.size()-1,1.0f));
-//                                friend.setStaleMarkerImage(createCustomMarker(friends.size()-1,0.5f));
-
-                                friends.put(imName, friend);
-                              //  break;
-
-
-                            }
-                        }
-                    } 
-                    imCur.close();
-
-                }
-            }
-        }   
-    
-    }
-
-    
-    
-    /*
-     * We use this to generate markers for each of the different peers/friends
-     * we can use a solid colour for each then alter the apha for historical markers
-     */
-    private BitmapDescriptor createCustomMarker(int colour, float alpha){
-        
-        
-        
-        float[] hsv = new float[3]; 
-        
-        hsv[0] = (colour * 50) % 360; //mod 365 so we get variation
-        hsv[1] = 1;
-        hsv[2] = alpha;
-        
-        
-        Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas();
-        c.setBitmap(bm);
-                
-        Paint p = new Paint();
-        p.setColor(Color.HSVToColor(hsv));
-        
-        
-        c.drawCircle(20, 20, 10, p);
-        return BitmapDescriptorFactory.fromBitmap(bm);
-        
-    }
 
 
 

@@ -1,3 +1,4 @@
+
 package st.alr.mqttitude.support;
 
 import java.util.HashMap;
@@ -10,53 +11,55 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FriendMapAdapter extends MapAdapter<String, Friend> {
 
-	public FriendMapAdapter(Context context, Map<String, Friend> map) {
-	    super(context, new HashMap<String, Friend>(map));
-	}
+    public FriendMapAdapter(Context context, Map<String, Friend> map) {
+        super(context, new HashMap<String, Friend>(map));
+    }
 
-	static class ViewHolder {
-		public TextView title;
-	      public TextView subtitle;
+    static class ViewHolder {
+        public TextView title;
+        public TextView subtitle;
+        public ImageView image;
 
-	}
+    }
 
-	public void setMap(Map<String, Friend> map) {
-	    this.map = map;
-	}
-	
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		View rowView = convertView;
-		ViewHolder holder;
+    public void setMap(Map<String, Friend> map) {
+        this.map = map;
+    }
 
-		if (rowView == null) {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			rowView = inflater.inflate(R.layout.two_line_row_layout, null);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View rowView = convertView;
+        ViewHolder holder;
 
-			holder = new ViewHolder();
-			holder.title = (TextView) rowView.findViewById(android.R.id.text1);
-	        holder.subtitle = (TextView) rowView.findViewById(android.R.id.text2);
+        if (rowView == null) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            rowView = inflater.inflate(R.layout.friend_list_item, null);
 
-			rowView.setTag(holder);
-		} else {
-			holder = (ViewHolder) rowView.getTag();
-		}
-        Log.v(this.toString(), holder.title.toString());
-		Log.v(this.toString(), map.toString());
-        
-		holder.title.setText(((Friend) getItem(position)).toString());
-		if(((Friend)getItem(position)).getLocation() != null)
-		    holder.subtitle.setText(((Friend) getItem(position)).getLocation().toLatLonString());
-		else 
-		    holder.subtitle.setText("n/a");
-		return rowView;
+            holder = new ViewHolder();
+            holder.title = (TextView) rowView.findViewById(R.id.title);
+            holder.subtitle = (TextView) rowView.findViewById(R.id.subtitle);
+            holder.image = (ImageView) rowView.findViewById(R.id.image);
+            rowView.setTag(holder);
+        } else {
+            holder = (ViewHolder) rowView.getTag();
+        }
+        Friend f = (Friend) getItem(position);
 
-	}
+        holder.title.setText(f.toString());
+        if (f.getLocation() != null)
+            holder.subtitle.setText(f.getLocation().toLatLonString());
+        else
+            holder.subtitle.setText("n/a");
 
+        holder.image.setImageBitmap(f.getUserImage());
+        return rowView;
 
+    }
 
 }
