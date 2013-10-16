@@ -13,7 +13,6 @@
         <EditTextPreference
             android:defaultValue="/mqttitude"
             android:dialogTitle="Topic"
-            android:hint="/mqttitude"
             android:key="topic"
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
@@ -31,7 +30,13 @@
             android:key="retain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-        <CheckBoxPreference
+
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="activitySettings"
+        android:title="@string/preferencesNotification" >
+        
+                <CheckBoxPreference
             android:defaultValue="false"
             android:key="backgroundUpdates"
             android:summary="@string/preferencesBackgroundUpdatesSummary"
@@ -46,10 +51,7 @@
             android:key="backgroundUpdatesInterval"
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:key="activitySettings"
-        android:title="@string/preferencesNotification" >
+        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="notificationEnabled"
@@ -76,6 +78,13 @@
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
         
+          <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="advancedMode"
+            android:summary="@string/preferencesAdvancedModeSummary"
+            android:title="@string/preferencesAdvancedModeTitle" />
+          
+          
         </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"

@@ -10,8 +10,8 @@ import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBindable;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.Friend;
-import st.alr.mqttitude.support.FriendMapAdapter;
+import st.alr.mqttitude.support.Contact;
+import st.alr.mqttitude.support.ContactAdapter;
 import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.ActionBar;
@@ -77,7 +77,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     ViewPager mViewPager;
     ServiceApplication serviceApplication;
     ServiceConnection serviceApplicationConnection;
-    private static Map<String,Friend> friends = new HashMap<String,Friend>();
+
+    private static Map<String,Contact> contacts = new HashMap<String,Contact>();
+    static ContactAdapter contactsAdapter;
 
     
     
@@ -147,21 +149,28 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             MapsInitializer.initialize(this);
         } catch (GooglePlayServicesNotAvailableException e) {
         }
-        parseContacts();
-        
+
+        contactsAdapter = new ContactAdapter(this, contacts);
+        parseContacts();        
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_main, menu);
+        Log.v(this.toString(), "here");
+
         return true;
     }
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.v(this.toString(), "here");
+
         int itemId = item.getItemId();
-        if (itemId == R.id.menu_settings) {
+        Log.v(this.toString(), itemId + " " + R.id.menu_preferences);
+        if (itemId == R.id.menu_preferences) {
+            Log.v(this.toString(), "here");
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
@@ -280,17 +289,27 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         super.onStop();
     }
 
+    
     public void onEventMainThread(Events.ContactLocationUpdated e) {
         Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
+
+        Contact f = contacts.get(e.getTopic());
+        
+        if(f == null) {
+            f = new Contact();
+            f.setTopic(e.getTopic());   
+            f.setLocation(e.getGeocodableLocation());
+
+        }
+        
+        contactsAdapter.addItem(e.getTopic(), f); // automatically fires notifyDatasetChanged to reload with new contact or update position
     }
+
     
     public void parseContacts(){
-        //new friends user ids by using android contacts, 
-        //TODO: put in fn
         ContentResolver cr = getContentResolver();
 
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         if (cur.getCount() > 0) {
             while (cur.moveToNext()) {
                 String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
@@ -299,10 +318,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                     //Query IM details
                     String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
-                    String[] imWhereParams = new String[]{id, 
-                        ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
-                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, 
-                            null, imWhere, imWhereParams, null); 
+                    String[] imWhereParams = new String[]{id,  ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
+                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null); 
                     imCur.moveToPosition(-1);
                     
                     while(imCur.moveToNext()) {
@@ -317,36 +334,19 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 //                        Log.v(this.toString(), "imName: " + imName);
 //                        Log.v(this.toString(), "label: " + label);
 
-                        if(label == null)
-                            continue;
-
-                        if(imType.equalsIgnoreCase("3")){
-
-                            //TODO: CHange hard coded string
-                            if(label.equalsIgnoreCase("MQTTITUDE")){
-
-                                //Events.NewPeerAdded msg = new Events.NewPeerAdded(imName);
-                                //EventBus.getDefault().post(msg);
+                        // Check IM attributes with type "Custom" and case-insensitive name "Mqttitude" 
+                        if(imType.equalsIgnoreCase("3") &&label != null && label.equalsIgnoreCase("MQTTITUDE")){
 
                                 //create a friend object
-                                Friend friend = new Friend();
-                                Log.v(this.toString(), "New friend created: " + imName + ", " + name + ", " + imType);
+                                Contact contact = new Contact();
+                                contact.setTopic(imName);
+                                contact.setName(name);
+                                contact.setUserImage(loadContactPhoto(getContentResolver(), Long.parseLong(id)));
                                 
-                                friend.setMqqtUsername(imName);
-                                friend.setName(name);
-
-
-                                friend.setUserImage(loadContactPhoto(getContentResolver(), Long.parseLong(id)));
+                                contacts.put(imName, contact);
                                 
-//                                friend.setMarkerImage(createCustomMarker(friends.size()-1,1.0f));
-//                                friend.setStaleMarkerImage(createCustomMarker(friends.size()-1,0.5f));
-
-                                
-                                friends.put(imName, friend);
-                              //  break;
-
-
-                            }
+                                Log.v(this.toString(), "New contact created from contacts: " + imName + ", " + name + ", " + imType);
+                                EventBus.getDefault().post(new Events.ContactAdded(contact));
                         }
                     } 
                     imCur.close();
@@ -448,13 +448,13 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
         
         public void onEventMainThread(Events.ContactLocationUpdated e) {
-            Friend f = friends.get(e.getTopic());
+            Contact f = contacts.get(e.getTopic());
             
             
             
             if(f == null) {
-                f = new Friend();
-                f.setMqqtUsername(e.getTopic());   
+                f = new Contact();
+                f.setTopic(e.getTopic());   
                 f.setLocation(e.getGeocodableLocation());
                 
                 //TODO: refresh adapter of list
@@ -499,7 +499,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 mCircle.remove();
 
             
-            mMarker = getMap().addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+         //   mMarker = getMap().addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             
             centerMap(latlong);
 
@@ -555,7 +555,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         private TextView locatorLastPubAccuracy;
         private TextView locatorLastPubLatLonTime;
         ListView friendsListView;
-        FriendMapAdapter adapter;
         
         static FriendsFragment newInstance() {
             FriendsFragment f = new FriendsFragment();
@@ -578,8 +577,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
 
             friendsListView = (ListView) v.findViewById(R.id.friendsListView);
-            adapter = new FriendMapAdapter(getActivity(), friends);
-            friendsListView.setAdapter(adapter);
+            friendsListView.setAdapter(contactsAdapter);
             
             locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
             locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
@@ -592,23 +590,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             return v;
         }
         
-        public void onEventMainThread(Events.ContactLocationUpdated e) {
-            Friend f = friends.get(e.getTopic());
-            
-            
-            
-            if(f == null) {
-                f = new Friend();
-                f.setMqqtUsername(e.getTopic());   
-                f.setLocation(e.getGeocodableLocation());
-
-                adapter.addItem(e.getTopic(), f);
-            } else {
-                f.setLocation(e.getGeocodableLocation());
-                adapter.notifyDataSetChanged();                
-            }
-            
-        }
 
 
         

@@ -16,7 +16,7 @@
          />
        	
     <item
-        android:id="@+id/menu_settings"
+        android:id="@+id/menu_preferences"
         android:orderInCategory="100"
         android:title="Preferences"/>
 

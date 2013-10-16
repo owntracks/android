@@ -50,6 +50,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
@@ -199,10 +200,10 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
                     Defaults.VALUE_BROKER_PORT);
             String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp"
                     : "ssl";
-            String cid = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_CLIENT_ID, "");
+            String cid = ActivityPreferences.getDeviceName(true);
             
             mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + brokerPort,
-                    cid.equals("") ? getDefaultClientId() : cid , null);
+                    cid.equals("") ? cid : cid , null);
             mqttClient.setCallback(this);
 
         } catch (MqttException e)
@@ -263,16 +264,33 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             changeState(Defaults.State.ServiceMqtt.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
 
+ 
+            switch (ActivityPreferences.getBrokerAuthType()) {
+                case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:
+                    
+                    break;
+
+                case Defaults.VALUE_BROKER_AUTH_USERUSERNAME:
+                    options.setPassword(sharedPreferences.getString(
+                                Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
+
+                    options.setUserName(ActivityPreferences.getUserUsername());
+
+                    break;
+
+                case Defaults.VALUE_BROKER_AUTH_BROKERUSERNAME:
+                    options.setPassword(sharedPreferences.getString(
+                            Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
+
+                    options.setUserName(ActivityPreferences.getBrokerUsername(true));
+
+                    break;
+}
+            
+            
             if (getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
                 options.setSocketFactory(this.getSSLSocketFactory());
 
-            if (!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").equals(""))
-                options.setPassword(sharedPreferences.getString(
-                        Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
-
-            if (!sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "").equals(""))
-                options.setUserName(sharedPreferences.getString(
-                        Defaults.SETTINGS_KEY_BROKER_USERNAME, ""));
 
             //setWill(options);
             options.setKeepAliveInterval(keepAliveSeconds);
@@ -325,11 +343,10 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         scheduleNextPing();
         
         try {
+            //TODO: make configurable
             mqttClient.subscribe(Defaults.SETTINGS_KEY_TOPIC_SUBSCRIBE);
-            //mqttClient.subscribe(Defaults.SETTINGS_KEY_TOPIC_SUBSCRIBE_MANUAL);
             
         } catch (MqttException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -470,16 +487,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         return instance;
     }
 
-    public static String getDefaultClientId()
-    {
-            String mqttClientId = ServiceApplication.getAndroidId();
-
-            // MQTT specification doesn't allow client IDs longer than 23 chars
-            if (mqttClientId.length() > 22)
-                mqttClientId = mqttClientId.substring(0, 22);
-
-        return mqttClientId;
-    }
 
 
     @Override
