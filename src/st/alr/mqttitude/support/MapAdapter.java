@@ -3,6 +3,7 @@ package st.alr.mqttitude.support;
 import java.util.Map;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.BaseAdapter;
 
 public abstract class MapAdapter<K, T> extends BaseAdapter {
@@ -15,33 +16,34 @@ public abstract class MapAdapter<K, T> extends BaseAdapter {
 	}
 
 	@SuppressWarnings("unchecked")
-    public void addItem(K k, T object) {
+    public synchronized void addItem(K k, T object) {
 		this.map.put(k, object);
 		this.notifyDataSetChanged();
+		Log.v(this.toString(), "addItem - notifyDataSetChanged ");
 	}
 	
-	public void removeItem(T object) { 
+	public synchronized void removeItem(T object) { 
 		this.map.remove(object.toString());
 		this.notifyDataSetChanged();
 	}
 	
-	public void clearItems() {
+	public synchronized void clearItems() {
 		this.map.clear();
 		this.notifyDataSetChanged();
 	}
 	
 	@Override
-	public int getCount() {
+	public synchronized int getCount() {
 		return this.map.size();
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public synchronized Object getItem(int position) {
 		return this.map.values().toArray()[position];
 	}
 
 	@Override
-	public long getItemId(int position) {
+	public synchronized long getItemId(int position) {
 		return 0;
 	}
 }

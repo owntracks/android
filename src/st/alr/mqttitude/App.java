@@ -2,6 +2,7 @@ package st.alr.mqttitude;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.bugsnag.android.Bugsnag;
 
@@ -21,5 +22,4 @@ public class App extends Application {
     public static Context getContext() {
         return instance;
     }
-
 }

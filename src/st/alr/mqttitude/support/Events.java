@@ -6,6 +6,7 @@ import java.util.Date;
 import android.location.Location;
 
 public class Events {
+
     public static abstract class E {
         Date date;
         public E() {
@@ -16,6 +17,7 @@ public class Events {
         } 
        
     }
+    
     
     public static class PublishSuccessfull extends E{
         Object extra;
@@ -28,7 +30,7 @@ public class Events {
         }
     }
     
-    public static class LocationUpdated  extends E{
+    public static class LocationUpdated extends E{
         GeocodableLocation l; 
         
         public LocationUpdated(Location l) {
@@ -43,6 +45,19 @@ public class Events {
             return l;
         }
 
+    }
+
+    
+    public static class ContactAdded extends E {
+        Contact contact; 
+        public ContactAdded(Contact f) {
+            super(); 
+            this.contact = f;
+        }
+        public Contact getContact() {
+            return contact;
+        }
+        
     }
 
     public static class ContactLocationUpdated  extends E{

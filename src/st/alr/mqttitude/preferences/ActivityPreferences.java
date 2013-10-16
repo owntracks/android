@@ -10,16 +10,20 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceMqtt;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -30,8 +34,73 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference version;
     private static Preference repo;
     private static Preference mail;
+    
+    private static Preference advanced;
+    private static PreferenceScreen topicScreen;
+    private static EditTextPreference topic;
+
+    
     static String ver;
 
+    public static boolean isAdvancedModeEnabled(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("advancedMode", false);
+    }
+    
+    public static String getAndroidId() {
+        
+        String id = ServiceApplication.getAndroidId();
+
+        // MQTT specification doesn't allow client IDs longer than 23 chars
+        if (id.length() > 22)
+            id = id.substring(0, 22);
+        
+        return id;
+    }
+    
+    public static String getUserUsername(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_USERNAME, "");
+
+    }
+
+    public static int getBrokerAuthType(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERUSERNAME);
+
+    }
+
+    public static String getBrokerUsername(boolean userUsernameFallback)
+    {
+        String username = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "");
+        if(username.equals("") && userUsernameFallback) 
+            username = getUserUsername();
+        return username;        
+    }
+    
+    
+    public static String getDeviceName(boolean androidIdFallback)
+    {
+        String name = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_DEVICE_NAME, "");
+        if(name.equals("") && androidIdFallback) 
+            name = getAndroidId();
+        return name;        
+    }
+    
+    public static String getTopicFallback(){
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+        String deviceName = getDeviceName(true);
+        String userUsername = getUserUsername();
+        
+        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC, userUsername, deviceName);
+    }
+    
+    public static String getTopic(boolean defaultFallback){
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+        String topic = p.getString(Defaults.SETTINGS_KEY_TOPIC, "");
+        if(topic.equals("") && defaultFallback)
+            topic = getTopicFallback();
+
+        return topic;        
+      }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +130,9 @@ public class ActivityPreferences extends PreferenceActivity {
         version = findPreference("versionReadOnly");
         serverPreference = findPreference("brokerPreference");
         backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
+        topicScreen = (PreferenceScreen) findPreference("topicSettings");
+        topic = (EditTextPreference) findPreference("topic");
+
         onSetupCommon(this);
     }
 
@@ -78,9 +150,12 @@ public class ActivityPreferences extends PreferenceActivity {
         serverPreference = f.findPreference("brokerPreference");
         backgroundUpdatesIntervall = f
                 .findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
+        topicScreen = (PreferenceScreen) f.findPreference("topicSettings");
+        topic = (EditTextPreference) f.findPreference(Defaults.SETTINGS_KEY_TOPIC);
+
         onSetupCommon(f.getActivity());
     }
-
+    
     private static void onSetupCommon(final Activity a) {
         PackageManager pm = a.getPackageManager();
         try {
@@ -89,6 +164,7 @@ public class ActivityPreferences extends PreferenceActivity {
             ver = a.getString(R.string.na);
         }
 
+        
         backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 Log.v(this.toString(), newValue.toString());
@@ -133,6 +209,9 @@ public class ActivityPreferences extends PreferenceActivity {
                 });
 
         setServerPreferenceSummary();
+        //TODO: set hint when device name changes
+        Log.v("prefs", "Topic fallback: " + getTopicFallback());
+        topic.getEditText().setHint(getTopicFallback());
 
     }
 

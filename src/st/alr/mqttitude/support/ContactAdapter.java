@@ -14,10 +14,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FriendMapAdapter extends MapAdapter<String, Friend> {
+public class ContactAdapter extends MapAdapter<String, Contact> {
 
-    public FriendMapAdapter(Context context, Map<String, Friend> map) {
-        super(context, new HashMap<String, Friend>(map));
+    public ContactAdapter(Context context, Map<String, Contact> map) {
+        super(context, new HashMap<String, Contact>(map));
     }
 
     static class ViewHolder {
@@ -27,7 +27,7 @@ public class FriendMapAdapter extends MapAdapter<String, Friend> {
 
     }
 
-    public void setMap(Map<String, Friend> map) {
+    public void setMap(Map<String, Contact> map) {
         this.map = map;
     }
 
@@ -49,7 +49,7 @@ public class FriendMapAdapter extends MapAdapter<String, Friend> {
         } else {
             holder = (ViewHolder) rowView.getTag();
         }
-        Friend f = (Friend) getItem(position);
+        Contact f = (Contact) getItem(position);
 
         holder.title.setText(f.toString());
         if (f.getLocation() != null)
