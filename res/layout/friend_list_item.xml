@@ -21,13 +21,15 @@
     android:layout_toRightOf="@+id/image"
     android:paddingLeft="8dp"
         android:paddingTop="4dp"
-    
+	android:textColor="@color/darkGrey"    
     android:text="name"
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:textStyle="bold" />
 
 <TextView
     android:id="@+id/subtitle"
+	android:textColor="@color/darkGrey"    
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignBottom="@+id/image"
