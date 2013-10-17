@@ -9,9 +9,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class Contact {
 
@@ -19,12 +22,32 @@ public class Contact {
     private String name;
     private String topic;
     private GeocodableLocation location;
-    private Color color;
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
     private static Bitmap defaultUserImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.ic_launcher), userImageHeightScale, userImageHeightScale, true) ;    
     private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage);  
+    private Marker marker;
+ 
 
+    public Contact(String topic) {
+        this.topic = topic;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
+    }
+
+    public Marker getMarker(){
+        return marker;
+    }
+
+    public void updateMarkerPosition(){
+        if(marker != null && location.getLatLng() != null)
+            marker.setPosition(location.getLatLng());
+        else
+            Log.e(this.toString(), "update of marker position requested, but no marker set");
+    }
+    
     public int getUid() {
         return uid;
     }
@@ -40,19 +63,12 @@ public class Contact {
     public GeocodableLocation getLocation() {
         return location;
     }
-
     
     public void setLocation(GeocodableLocation location) {
         this.location = location;
     }
 
-    public Color getColor() {
-        return color;
-    }
-    public void setColor(Color color) {
-        this.color = color;
-    }
-    public String toString() {
+  public String toString() {
         if(getName() != null)
             return name;
         else 
@@ -76,6 +92,10 @@ public class Contact {
     
     public static float convertDpToPixel(float dp){
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
+    }
+
+    public String getTopic() {
+        return topic;
     }
 
     

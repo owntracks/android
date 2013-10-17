@@ -5,12 +5,15 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import android.location.Location;
 import android.util.Log;
 
 public class GeocodableLocation extends Location  implements Serializable{
     String geocoder; 
-        
+    LatLng latlng;    
+    
     public GeocodableLocation(Location location){
         this(location, null);
     }
@@ -21,6 +24,8 @@ public class GeocodableLocation extends Location  implements Serializable{
     public GeocodableLocation(Location location, String geocoder){
         super(location);
         this.geocoder = geocoder;
+        if(location != null)
+            this.latlng = new LatLng(location.getLatitude(), location.getLongitude());
     }
     
     public JSONObject toJsonObject(){
@@ -80,6 +85,16 @@ public class GeocodableLocation extends Location  implements Serializable{
     public Location getLocation() {
         return this; // compatibility fix
     }
+    
+    public void setLatitude(double latitude){
+        super.setLatitude(latitude);
+        this.latlng = new LatLng(latitude, getLongitude());
+    }
+    public void setLongitude(double longitude){
+        super.setLongitude(longitude);
+        this.latlng = new LatLng(getLatitude(),longitude);
+
+    }
 
     public void setGeocoder(String geocoder) {
         this.geocoder = geocoder;
@@ -93,6 +108,9 @@ public class GeocodableLocation extends Location  implements Serializable{
     }
     public String toLatLonString(){
         return getLatitude() + " : " + getLongitude();
+    }
+    public LatLng getLatLng() {
+        return latlng;
     }
     
     

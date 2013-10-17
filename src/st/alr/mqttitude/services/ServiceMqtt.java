@@ -295,6 +295,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             //setWill(options);
             options.setKeepAliveInterval(keepAliveSeconds);
             options.setConnectionTimeout(10);
+            options.setCleanSession(false);
 
             mqttClient.connect(options);
 
@@ -670,6 +671,8 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         scheduleNextPing();
+        Log.v(this.toString(), "Received message: " + topic + " : " + message.getPayload().toString());
+
         String msg = new String(message.getPayload());
         String type; 
         JSONObject json = new JSONObject(msg);
@@ -684,6 +687,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             Log.d(this.toString(), "Ignoring message of type " + type);
             return;            
         }
+        
         
         GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
         EventBus.getDefault().postSticky(new Events.ContactLocationUpdated(l, topic));

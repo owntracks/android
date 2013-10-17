@@ -36,6 +36,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.CalendarContract.Instances;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -48,6 +49,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
@@ -60,6 +63,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -73,13 +77,11 @@ import de.greenrobot.event.EventBus;
 public class ActivityMain extends FragmentActivity implements ActionBar.TabListener {
 
 
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    ViewPager mViewPager;
+    PagerAdapter pagerAdapter;
+    static ViewPager viewPager;
     ServiceApplication serviceApplication;
     ServiceConnection serviceApplicationConnection;
 
-    private static Map<String,Contact> contacts = new HashMap<String,Contact>();
-    static ContactAdapter contactsAdapter;
 
     
     
@@ -117,16 +119,16 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(pagerAdapter);
 
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 actionBar.setSelectedNavigationItem(position);
@@ -134,14 +136,14 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         });
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (int j = 0; j < mSectionsPagerAdapter.getCount(); j++) {
+        for (int j = 0; j < pagerAdapter.getCount(); j++) {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
             // the TabListener interface, as the callback (listener) for when
             // this tab is selected.
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(j))
+                            .setText(pagerAdapter.getPageTitle(j))
                             .setTabListener(this));
         }
         
@@ -150,7 +152,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         } catch (GooglePlayServicesNotAvailableException e) {
         }
 
-        contactsAdapter = new ContactAdapter(this, contacts);
         parseContacts();        
     }
 
@@ -212,7 +213,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
+        viewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -227,26 +228,24 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
+    public class PagerAdapter extends FragmentPagerAdapter {
+        public static final int MAP_FRAGMENT = 0;
+        public static final int CONTACT_FRAGMENT = 1;
+        public static final int STATUS_FRAGMENT = 2;
+        
+        public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0:
-//                    Bundle args = new Bundle();
-//                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-//                    fragment.setArguments(args);
-//                    return fragment;
-
-                    return new MapFragment();
-                case 1:
-                    return FriendsFragment.newInstance();
+                case MAP_FRAGMENT:
+                    return MapFragment.getInstance();
+                case CONTACT_FRAGMENT:
+                    return FriendsFragment.getInstance();
                 default:
-                    return new StatusFragment();
+                    return StatusFragment.getInstance();
             }
         }
 
@@ -293,67 +292,77 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public void onEventMainThread(Events.ContactLocationUpdated e) {
         Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->" + e.getGeocodableLocation().toString() + " @ " + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
 
-        Contact f = contacts.get(e.getTopic());
-        
-        if(f == null) {
-            f = new Contact();
-            f.setTopic(e.getTopic());   
-            f.setLocation(e.getGeocodableLocation());
-
-        }
-        
-        contactsAdapter.addItem(e.getTopic(), f); // automatically fires notifyDatasetChanged to reload with new contact or update position
+        Contact c = updateContact(e.getTopic(), e.getGeocodableLocation());
+        MapFragment m = (MapFragment)pagerAdapter.getItem(PagerAdapter.MAP_FRAGMENT);
+        m.updateContactLocation(c);
     }
 
+    private Contact updateContact(String topic, GeocodableLocation location) {
+        Contact c = App.getContactsAdapter().get(topic);
+
+        if(c == null) {
+            Log.v(this.toString(), "Allocating new contact for " + topic);
+            c = new Contact(topic);
+        }
+        
+        c.setLocation(location);
+        App.getContactsAdapter().addItem(topic, c);
+        
+        
+        return c;
+    }
+    
     
     public void parseContacts(){
-        ContentResolver cr = getContentResolver();
-
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-//                Log.v(this.toString(), "name: " + name);
-                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    //Query IM details
-                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
-                    String[] imWhereParams = new String[]{id,  ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
-                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null); 
-                    imCur.moveToPosition(-1);
-                    
-                    while(imCur.moveToNext()) {
-                    //if (imCur.moveToFirst()) { 
-                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
-                        String imType;
-                        imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
-                        
-                        String label = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
-                        
-//                        Log.v(this.toString(), "imType: " + imType);
-//                        Log.v(this.toString(), "imName: " + imName);
-//                        Log.v(this.toString(), "label: " + label);
-
-                        // Check IM attributes with type "Custom" and case-insensitive name "Mqttitude" 
-                        if(imType.equalsIgnoreCase("3") &&label != null && label.equalsIgnoreCase("MQTTITUDE")){
-
-                                //create a friend object
-                                Contact contact = new Contact();
-                                contact.setTopic(imName);
-                                contact.setName(name);
-                                contact.setUserImage(loadContactPhoto(getContentResolver(), Long.parseLong(id)));
-                                
-                                contacts.put(imName, contact);
-                                
-                                Log.v(this.toString(), "New contact created from contacts: " + imName + ", " + name + ", " + imType);
-                                EventBus.getDefault().post(new Events.ContactAdded(contact));
-                        }
-                    } 
-                    imCur.close();
-
-                }
-            }
-        }   
+        
+        
+//        ContentResolver cr = getContentResolver();
+//
+//        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+//        if (cur.getCount() > 0) {
+//            while (cur.moveToNext()) {
+//                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+//                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+////                Log.v(this.toString(), "name: " + name);
+//                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+//                    //Query IM details
+//                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+//                    String[] imWhereParams = new String[]{id,  ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE}; 
+//                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null); 
+//                    imCur.moveToPosition(-1);
+//                    
+//                    while(imCur.moveToNext()) {
+//                    //if (imCur.moveToFirst()) { 
+//                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+//                        String imType;
+//                        imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
+//                        
+//                        String label = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
+//                        
+////                        Log.v(this.toString(), "imType: " + imType);
+////                        Log.v(this.toString(), "imName: " + imName);
+////                        Log.v(this.toString(), "label: " + label);
+//
+//                        // Check IM attributes with type "Custom" and case-insensitive name "Mqttitude" 
+//                        if(imType.equalsIgnoreCase("3") &&label != null && label.equalsIgnoreCase("MQTTITUDE")){
+//
+//                                //create a friend object
+//                                Contact contact = new Contact();
+//                                contact.setTopic(imName);
+//                                contact.setName(name);
+//                                contact.setUserImage(loadContactPhoto(getContentResolver(), Long.parseLong(id)));
+//                                
+//                                App.getContactsAdapter().addItem(imName, contact);
+//                                
+//                                Log.v(this.toString(), "New contact created from contacts: " + imName + ", " + name + ", " + imType);
+//                                EventBus.getDefault().post(new Events.ContactAdded(contact));
+//                        }
+//                    } 
+//                    imCur.close();
+//
+//                }
+//            }
+//        }   
     
     }
     
@@ -394,19 +403,37 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         return BitmapDescriptorFactory.fromBitmap(bm);
         
     }
-    
+        
     public static class MapFragment extends SupportMapFragment {
+        String currentlyTracking;
+        private static MapFragment instance;
+        private Handler handler;
+        
         
         public static MapFragment newInstance() {
             MapFragment f = new MapFragment();
             return f;
         }
-
-
-        private Handler handler;
-        private Marker mMarker;
-        private Circle mCircle;
         
+        public static MapFragment getInstance() {
+            if(instance == null)
+                instance = new MapFragment();
+                        
+            return instance;
+        }
+        
+        @Override
+        public void onStart() {
+            super.onStart();
+            for(Contact c : App.getContacts().values())
+                updateContactLocation(c);
+            if(currentlyTracking != null)
+                focus(App.getContactsAdapter().get(currentlyTracking));
+        }
+
+
+
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             handler = new Handler() {
@@ -414,7 +441,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                     onHandlerMessage(msg);
                 }
             };
-
             super.onCreate(savedInstanceState);
         }
 
@@ -430,42 +456,42 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             }
         }   
 
-        @Override
-        public void onStart() {
-            super.onStart();
-            EventBus.getDefault().registerSticky(this);
-        }
-
-        @Override
-        public void onStop() {
-            EventBus.getDefault().unregister(this);
-            super.onStop();
-        }
-
-        
-        public void onEventMainThread(Events.LocationUpdated e) {
-            setLocation(e.getGeocodableLocation());
-        }
-        
-        public void onEventMainThread(Events.ContactLocationUpdated e) {
-            Contact f = contacts.get(e.getTopic());
+        public void updateContactLocation(Contact c){
             
-            
-            
-            if(f == null) {
-                f = new Contact();
-                f.setTopic(e.getTopic());   
-                f.setLocation(e.getGeocodableLocation());
-                
-                //TODO: refresh adapter of list
+            if(c.getMarker() != null){
+                Log.v(this.toString(), "updating marker position of " + c.getTopic());
+                c.updateMarkerPosition();
             } else {
-                f.setLocation(e.getGeocodableLocation());
-                //TODO: refresh adapter of list
-            }
+                Log.v(this.toString(), "creating marker for " + c.getTopic());
 
-            LatLng ln = new LatLng(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude());
-            Marker m = getMap().addMarker(new MarkerOptions().position(ln).icon(f.getUserImageDescriptor()).title(f.getName()).flat(true));
+                c.setMarker(getMap().addMarker(new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getUserImageDescriptor())));
+            }
         }
+        
+        
+//        public void onEventMainThread(Events.LocationUpdated e) {
+//            setLocation(e.getGeocodableLocation());
+//        }
+        
+//        public void onEventMainThread(Events.ContactLocationUpdated e) {
+//            Contact f = App.getContacts().get(e.getTopic());
+//            
+//            
+//            
+//            if(f == null) {
+//                f = new Contact();
+//                f.setTopic(e.getTopic());   
+//                f.setLocation(e.getGeocodableLocation());
+//                
+//                //TODO: refresh adapter of list
+//            } else {
+//                f.setLocation(e.getGeocodableLocation());
+//                //TODO: refresh adapter of list
+//            }
+//
+//            LatLng ln = new LatLng(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude());
+//            Marker m = getMap().addMarker(new MarkerOptions().position(ln).icon(f.getUserImageDescriptor()).title(f.getName()).flat(true));
+//        }
 
 
         public void centerMap(double lat, double lon) {
@@ -473,9 +499,10 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
         public void centerMap(LatLng latlon) {
             CameraUpdate center = CameraUpdateFactory.newLatLng(latlon);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-            getMap().moveCamera(center);
-            getMap().animateCamera(zoom);
+            //CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+            getMap().animateCamera(center);
+            
+            //getMap().animateCamera(zoom);
         }
         
         
@@ -492,22 +519,22 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
            
             LatLng latlong = new LatLng(l.getLatitude(), l.getLongitude());
 
-            if (mMarker != null)
-                mMarker.remove();
+//            if (mMarker != null)
+//                mMarker.remove();
 
-            if (mCircle != null)
-                mCircle.remove();
+//            if (mCircle != null)
+//                mCircle.remove();
 
             
          //   mMarker = getMap().addMarker(new MarkerOptions().position(latlong).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             
-            centerMap(latlong);
+//            centerMap(latlong);
 
             
-             if(l.getAccuracy() >= 50) {
-                     mCircle = getMap().addCircle(new
-                     CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0xff1082ac).fillColor(0x1c15bffe).strokeWidth(3));
-             }
+//             if(l.getAccuracy() >= 50) {
+//                     mCircle = getMap().addCircle(new
+//                     CircleOptions().center(latlong).radius(l.getAccuracy()).strokeColor(0xff1082ac).fillColor(0x1c15bffe).strokeWidth(3));
+//             }
 
 
             if(location.getGeocoder() != null) {
@@ -537,67 +564,51 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
           View v = super.onCreateView(inflater, container, savedInstanceState);
           
           getMap().setIndoorEnabled(true);
+          getMap().setMyLocationEnabled(true);
+
+          UiSettings s = getMap().getUiSettings();
+          s.setCompassEnabled(false);
+          s.setMyLocationButtonEnabled(true);
+          s.setTiltGesturesEnabled(false);
+          s.setCompassEnabled(false);
+          s.setRotateGesturesEnabled(false);
+          s.setZoomControlsEnabled(true);
+          
+          
+          
           //getMap().setMyLocationEnabled(true);
           
           return v;
       }
 //  
+
+      
+      
+    public void focus(Contact c) {
+        currentlyTracking = c.getTopic();
+        centerMap(c.getLocation().getLatLng());
+    }
   }
     
     
     
     public static class FriendsFragment extends Fragment {
-        private TextView locatorCurLatLon;
-        private TextView locatorCurAccuracy;
-        private TextView locatorCurLatLonTime;
-
-        private TextView locatorLastPubLatLon;
-        private TextView locatorLastPubAccuracy;
-        private TextView locatorLastPubLatLonTime;
         ListView friendsListView;
+        private static FriendsFragment instance;
         
-        static FriendsFragment newInstance() {
-            FriendsFragment f = new FriendsFragment();
-//            // Supply num input as an argument.
-//            Bundle args = new Bundle();
-//            args.putInt("num", num);
-//            f.setArguments(args);
-
-            return f;
+        public static FriendsFragment getInstance() {
+            if(instance == null)
+                instance = new FriendsFragment();
+                        
+            return instance;
         }
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.fragment_friends, container, false);
-
-            friendsListView = (ListView) v.findViewById(R.id.friendsListView);
-            friendsListView.setAdapter(contactsAdapter);
-            
-            locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
-            locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
-            locatorCurLatLonTime = (TextView) v.findViewById(R.id.locatorCurLatLonTime);
-
-            locatorLastPubLatLon = (TextView) v.findViewById(R.id.locatorLastPubLatLon);
-            locatorLastPubAccuracy = (TextView) v.findViewById(R.id.locatorLastPubAccuracy);
-            locatorLastPubLatLonTime = (TextView) v.findViewById(R.id.locatorLastPubLatLonTime);
-            
-            return v;
-        }
-        
-
-
-        
-        
         @Override
         public void onStart() {
             super.onStart();
-            EventBus.getDefault().registerSticky(this);
+            // Reload the list with data that might have arrived while the activity was stopped
+            ((ContactAdapter)friendsListView.getAdapter()).notifyDataSetChanged();
         }
 
         @Override
@@ -605,25 +616,30 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             EventBus.getDefault().unregister(this);
             super.onStop();
         }
-        
 
-        public void onEventMainThread(Events.LocationUpdated e) {
-            locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
-            locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()+"m");
-            locatorCurLatLonTime.setText(ServiceApplication.getInstance().formatDate(e.getDate()));
+        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
         }
 
-        
-        
-        public void onEventMainThread(Events.PublishSuccessfull e) {
-            if(e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
-                GeocodableLocation l = (GeocodableLocation)e.getExtra();
-                locatorLastPubLatLon.setText(l.toLatLonString());
-                locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy()+"m");
-                locatorLastPubLatLonTime.setText(ServiceApplication.getInstance().formatDate(e.getDate()));            
-            }
-        }
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.fragment_friends, container, false);
 
+            friendsListView = (ListView) v.findViewById(R.id.friendsListView);
+            friendsListView.setAdapter(App.getContactsAdapter());
+            friendsListView.setOnItemClickListener(new OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MapFragment.getInstance().focus((Contact) App.getContactsAdapter().getItem(position));
+                    viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+                                    }
+            });
+            
+            return v;
+        }
     }
 
 
@@ -632,18 +648,21 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         private TextView locatorCurLatLon;
         private TextView locatorCurAccuracy;
         private TextView locatorCurLatLonTime;
-
         private TextView locatorLastPubLatLon;
         private TextView locatorLastPubAccuracy;
         private TextView locatorLastPubLatLonTime;
-
         private TextView brokerStatus;
         private TextView brokerError;
 
-        static StatusFragment newInstance() {
-            StatusFragment f = new StatusFragment();
-            return f;
+        private static StatusFragment instance;
+        
+        public static StatusFragment getInstance() {
+            if(instance == null)
+                instance = new StatusFragment();
+                        
+            return instance;
         }
+        
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
