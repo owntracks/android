@@ -55,6 +55,7 @@ public class Defaults {
     public static final int VALUE_BROKER_AUTH_ANONYMOUS = 0;
     public static final int VALUE_BROKER_AUTH_USERUSERNAME = 1;
     public static final int VALUE_BROKER_AUTH_BROKERUSERNAME = 2;
+    public static final String SETTINGS_KEY_TRACKING = "tracking";
 
 
 

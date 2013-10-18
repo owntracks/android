@@ -57,9 +57,19 @@ public class ActivityPreferences extends PreferenceActivity {
         return id;
     }
     
+    public static String getTrackingUsername(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
+    }
+    
+    public static void setTrackingUsername(String topic){
+        Log.v("ActivityPreferences", "Now tracking " + topic);
+        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic);
+    }
+
+
+    
     public static String getUserUsername(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_USERNAME, "");
-
     }
 
     public static int getBrokerAuthType(){
