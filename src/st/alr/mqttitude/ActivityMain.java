@@ -38,6 +38,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.provider.CalendarContract.Instances;
+import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -154,7 +155,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         } catch (GooglePlayServicesNotAvailableException e) {
         }
 
-        parseContacts();
+   //    parseContacts();
     }
 
     @Override
@@ -304,6 +305,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         if (c == null) {
             Log.v(this.toString(), "Allocating new contact for " + topic);
             c = new Contact(topic);
+            Log.v(this.toString(), "looking for contact picture");
+            findContactData(c);
         }
 
         c.setLocation(location);
@@ -312,8 +315,27 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         return c;
     }
 
+    public void findContactData(Contact c){
+        
+                
+                String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ?";
+                String[] imWhereParams = new String[] {"Mqttitude", c.getTopic() };
+                Cursor imCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
+                
+                while (imCur.moveToNext()) {
+                    Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));                    
+                    Log.v(this.toString(), "found matching contact with id "+ cId + " to be associated with topic " + imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
+                    c.setUserImage(loadContactPhoto(getContentResolver(), cId));
+                    c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
+                }
+                imCur.close();
+                Log.v(this.toString(), "search finished");
+                
+    }
+    
     public void parseContacts() {
 
+        Log.v(this.toString(), "Parsing contacts for marker images");
         ContentResolver cr = getContentResolver();
 
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
@@ -323,38 +345,28 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 String name = cur.getString(cur
                         .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 // Log.v(this.toString(), "name: " + name);
-                if (Integer.parseInt(cur.getString(cur
-                        .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+//                if (Integer.parseInt(cur.getString(cur
+//                        .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                     // Query IM details
-                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND "
-                            + ContactsContract.Data.MIMETYPE + " = ?";
-                    String[] imWhereParams = new String[] {
-                            id, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE
-                    };
-                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere,
-                            imWhereParams, null);
+                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+                    String[] imWhereParams = new String[] { id, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE };
+                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
                     imCur.moveToPosition(-1);
 
                     while (imCur.moveToNext()) {
                         // if (imCur.moveToFirst()) {
-                        String imName = imCur.getString(imCur
-                                .getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
-                        String imType;
-                        imType = imCur.getString(imCur
-                                .getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
+                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+                        String imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));         
+                        String imProtocolType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
 
-                        String label = imCur
-                                .getString(imCur
-                                        .getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
-
-                        // Log.v(this.toString(), "imType: " + imType);
-                        // Log.v(this.toString(), "imName: " + imName);
-                        // Log.v(this.toString(), "label: " + label);
+                         Log.v(this.toString(), "imType: " + imType);
+                         Log.v(this.toString(), "imName: " + imName);
+                         Log.v(this.toString(), "imProtocolType: " + imProtocolType);
 
                         // Check IM attributes with type "Custom" and
                         // case-insensitive name "Mqttitude"
-                        if (imType.equalsIgnoreCase("3") && label != null
-                                && label.equalsIgnoreCase("MQTTITUDE")) {
+                        if (imType.equalsIgnoreCase("3") && imProtocolType != null
+                                && imProtocolType.equalsIgnoreCase("MQTTITUDE")) {
 
                             // create a friend object
                             Contact contact = new Contact(imName);
@@ -372,13 +384,16 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                     imCur.close();
 
                 }
-            }
+//            }
         }
+
+        Log.v(this.toString(), "Parsing contacts completed");
 
     }
 
     public static Bitmap loadContactPhoto(ContentResolver cr, long id) {
         Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
+        Log.v("loadContactPhoto", "using URI " + uri);
         InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
         if (input == null) {
             return null;
@@ -589,8 +604,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    MapFragment.getInstance().focus(
-                            (Contact) App.getContactsAdapter().getItem(position));
+                    Contact c = (Contact) App.getContactsAdapter().getItem(position); 
+                    if(c == null || c.getLocation() == null)
+                        return;
+                    
+                    MapFragment.getInstance().focus(c);
                     viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
                 }
             });
