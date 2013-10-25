@@ -100,16 +100,16 @@ public class ServiceLocatorFused extends ServiceLocator implements
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         mLocationRequest.setInterval(getUpdateIntervallInMiliseconds());
-        mLocationRequest.setFastestInterval(500);
+        mLocationRequest.setFastestInterval(0);
         mLocationRequest.setSmallestDisplacement(500);
     }
 
     private void setupForegroundLocationRequest() {
-        Log.v(TAG, "setupForegroundLocationRequest. Interval: " + 0.5);
+        Log.v(TAG, "setupForegroundLocationRequest. Interval: " + 10);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(10*1000);
-        mLocationRequest.setFastestInterval(500);
+        mLocationRequest.setFastestInterval(0);
         mLocationRequest.setSmallestDisplacement(5);
     }
 
