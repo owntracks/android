@@ -3,16 +3,14 @@ package st.alr.mqttitude;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBindable;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Contact;
 import st.alr.mqttitude.support.ContactAdapter;
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.ActionBar;
@@ -24,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -37,8 +34,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.CalendarContract.Instances;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -53,25 +48,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.greenrobot.event.EventBus;
@@ -426,7 +415,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     }
 
-    public static class MapFragment extends SupportMapFragment {
+    public static class MapFragment extends Fragment {
         private static MapFragment instance;
         private Handler handler;
 
@@ -445,12 +434,88 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onStart() {
             super.onStart();
+        }
+        
+//        
+//        public void onResume() {
+//            super.onResume();
+//            for (Contact c : App.getContacts().values())
+//                updateContactLocation(c);
+//
+//            focus(getCurrentlyTrackedContact());
+//
+//        
+//        }
+
+
+        private MapView mMapView;
+        private GoogleMap googleMap;
+        
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+                Bundle savedInstanceState) {
+            // inflat and return the layout
+            View v = inflater.inflate(R.layout.fragment_map, container, false);
+            mMapView = (MapView) v.findViewById(R.id.mapView);
+            mMapView.onCreate(savedInstanceState);
+            mMapView.onResume();//needed to get the map to display immediately
+            
+            try {
+                MapsInitializer.initialize(getActivity());
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
+            
+            googleMap = mMapView.getMap();
+            
+            googleMap.setIndoorEnabled(true);
+            googleMap.setMyLocationEnabled(true);
+
+            UiSettings s = googleMap.getUiSettings();
+            s.setCompassEnabled(false);
+            s.setMyLocationButtonEnabled(true);
+            s.setTiltGesturesEnabled(false);
+            s.setCompassEnabled(false);
+            s.setRotateGesturesEnabled(false);
+            s.setZoomControlsEnabled(false);
+
+            
+            //Perform any camera updates here
+            
+            return v;
+        }
+        
+        @Override
+        public void onResume() {
+            super.onResume();
+            mMapView.onResume();
             for (Contact c : App.getContacts().values())
                 updateContactLocation(c);
 
             focus(getCurrentlyTrackedContact());
+
+        }
+        
+        @Override
+        public void onPause() {
+            super.onPause();
+            mMapView.onPause();
+        }
+        
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            mMapView.onDestroy();
+        }
+        
+        @Override
+        public void onLowMemory() {
+            super.onLowMemory();
+            mMapView.onLowMemory();
         }
 
+        
+        
         public Contact getCurrentlyTrackedContact() {
             return App.getContactsAdapter().get(ActivityPreferences.getTrackingUsername());
         }
@@ -486,10 +551,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 c.updateMarkerPosition();
             } else {
                 Log.v(this.toString(), "creating marker for " + c.getTopic());
-                c.setMarker(getMap().addMarker(
+                c.setMarker(googleMap.addMarker(
                         new MarkerOptions().position(c.getLocation().getLatLng()).icon(
                                 c.getUserImageDescriptor())));
             }
+
 
             if (c == getCurrentlyTrackedContact())
                 focus(c);
@@ -497,27 +563,31 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
         public void centerMap(LatLng latlon) {
             CameraUpdate center = CameraUpdateFactory.newLatLng(latlon);
-            getMap().animateCamera(center);
+            googleMap.animateCamera(center);
         }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View v = super.onCreateView(inflater, container, savedInstanceState);
-
-            getMap().setIndoorEnabled(true);
-            getMap().setMyLocationEnabled(true);
-
-            UiSettings s = getMap().getUiSettings();
-            s.setCompassEnabled(false);
-            s.setMyLocationButtonEnabled(true);
-            s.setTiltGesturesEnabled(false);
-            s.setCompassEnabled(false);
-            s.setRotateGesturesEnabled(false);
-            s.setZoomControlsEnabled(true);
-
-            return v;
-        }
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                Bundle savedInstanceState) {
+//            
+//            
+//            View v = super.onCreateView(inflater, container, savedInstanceState);
+//
+//            getMap().setIndoorEnabled(true);
+//            getMap().setMyLocationEnabled(true);
+//
+//            UiSettings s = getMap().getUiSettings();
+//            s.setCompassEnabled(false);
+//            s.setMyLocationButtonEnabled(true);
+//            s.setTiltGesturesEnabled(false);
+//            s.setCompassEnabled(false);
+//            s.setRotateGesturesEnabled(false);
+//            s.setZoomControlsEnabled(true);
+//
+//            
+//               
+//            return v;
+//        }
 
         public void focus(Contact c) {
             if (c == null)
