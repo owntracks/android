@@ -30,7 +30,12 @@
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Mqttitude</item>
         <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
         <item name="android:actionBarTabTextStyle">@style/Widget.TabWidget</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Mqttitude</item>
         <item name="android:windowBackground">@color/background</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_mqttitude</item>
     </style>
 
     <color name="pressed_mqttitude">#CC2581A5</color>
