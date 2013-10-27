@@ -1,5 +1,6 @@
 package st.alr.mqttitude.support;
 
+import java.util.Collection;
 import java.util.Map;
 
 import android.content.Context;
@@ -37,6 +38,11 @@ public abstract class MapAdapter<K, T> extends BaseAdapter {
 		return this.map.size();
 	}
 
+    public Collection<T>  getValues() {
+        return this.map.values();
+    }
+
+	
 	@Override
 	public synchronized Object getItem(int position) {
 		return this.map.values().toArray()[position];

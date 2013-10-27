@@ -16,22 +16,7 @@ import st.alr.mqttitude.support.Defaults;
 
 public class App extends Application {
     private static App instance;
-    private static Map<String,Contact> contacts = new HashMap<String,Contact>();
-    static ContactAdapter contactsAdapter;
 
-    
-    
-    public static Map<String, Contact> getContacts() {
-        return contacts;
-    }
-
-    public static void setContacts(Map<String, Contact> contacts) {
-        App.contacts = contacts;
-    }
-
-    public static ContactAdapter getContactsAdapter() {
-        return contactsAdapter;
-    }
 
     @Override
     public void onCreate() {
@@ -40,7 +25,6 @@ public class App extends Application {
         Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);
         Bugsnag.setNotifyReleaseStages("production", "testing");
         
-        contactsAdapter = new ContactAdapter(this, contacts);
 
     }
 
