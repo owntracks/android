@@ -239,7 +239,8 @@ containing a value of this type.
         public static final int spinner_ab_focused_mqttitude=0x7f020038;
         public static final int spinner_ab_pressed_mqttitude=0x7f020039;
         public static final int spinner_background_ab_mqttitude=0x7f02003a;
-        public static final int tab_selected_mqttitude=0x7f02003b;
+        public static final int tab_indicator_ab_mqttitude=0x7f02003b;
+        public static final int tab_selected_mqttitude=0x7f02003c;
     }
     public static final class id {
         public static final int brokerAuth=0x7f060021;
@@ -481,9 +482,10 @@ containing a value of this type.
         public static final int titleStatus=0x7f07001f;
     }
     public static final class style {
-        public static final int ActionBar_Solid_Mqttitude=0x7f0a0003;
-        public static final int ActionBar_Transparent_Mqttitude=0x7f0a0004;
-        public static final int ActionButton_CloseMode_Mqttitude=0x7f0a0009;
+        public static final int ActionBar_Solid_Mqttitude=0x7f0a0004;
+        public static final int ActionBar_Transparent_Mqttitude=0x7f0a0005;
+        public static final int ActionBarTabStyle_Mqttitude=0x7f0a0001;
+        public static final int ActionButton_CloseMode_Mqttitude=0x7f0a000a;
         /** 
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
@@ -496,32 +498,32 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f0a001a;
-        public static final int AppTheme_ActionBar_Overflow=0x7f0a000b;
-        public static final int AppTheme_ActionBar_Text=0x7f0a000c;
-        public static final int DropDownListView_Mqttitude=0x7f0a0006;
-        public static final int DropDownNav_Mqttitude=0x7f0a0007;
-        public static final int PopupMenu_Mqttitude=0x7f0a0005;
-        public static final int ProgressBar_Mqttitude=0x7f0a0008;
-        public static final int TextAppearance_Widget_TabWidget=0x7f0a0002;
+        public static final int AppBaseTheme=0x7f0a001b;
+        public static final int AppTheme_ActionBar_Overflow=0x7f0a000c;
+        public static final int AppTheme_ActionBar_Text=0x7f0a000d;
+        public static final int DropDownListView_Mqttitude=0x7f0a0007;
+        public static final int DropDownNav_Mqttitude=0x7f0a0008;
+        public static final int PopupMenu_Mqttitude=0x7f0a0006;
+        public static final int ProgressBar_Mqttitude=0x7f0a0009;
+        public static final int TextAppearance_Widget_TabWidget=0x7f0a0003;
         public static final int Theme_Mqttitude=0x7f0a0000;
         /**  this style is only referenced in a Light.DarkActionBar based theme 
          */
-        public static final int Theme_Mqttitude_Widget=0x7f0a000a;
-        public static final int Widget_TabWidget=0x7f0a0001;
-        public static final int card=0x7f0a0015;
-        public static final int card_content=0x7f0a0017;
-        public static final int card_header_summary=0x7f0a0019;
-        public static final int card_header_title=0x7f0a0018;
-        public static final int card_title=0x7f0a0016;
-        public static final int listItem=0x7f0a0012;
-        public static final int listItemSubtitle=0x7f0a0014;
-        public static final int listItemTitle=0x7f0a0013;
-        public static final int seperator=0x7f0a000d;
-        public static final int seperatorH=0x7f0a000e;
-        public static final int seperatorV=0x7f0a000f;
-        public static final int subtitle=0x7f0a0011;
-        public static final int title=0x7f0a0010;
+        public static final int Theme_Mqttitude_Widget=0x7f0a000b;
+        public static final int Widget_TabWidget=0x7f0a0002;
+        public static final int card=0x7f0a0016;
+        public static final int card_content=0x7f0a0018;
+        public static final int card_header_summary=0x7f0a001a;
+        public static final int card_header_title=0x7f0a0019;
+        public static final int card_title=0x7f0a0017;
+        public static final int listItem=0x7f0a0013;
+        public static final int listItemSubtitle=0x7f0a0015;
+        public static final int listItemTitle=0x7f0a0014;
+        public static final int seperator=0x7f0a000e;
+        public static final int seperatorH=0x7f0a000f;
+        public static final int seperatorV=0x7f0a0010;
+        public static final int subtitle=0x7f0a0012;
+        public static final int title=0x7f0a0011;
     }
     public static final class xml {
         public static final int preferences=0x7f040000;
