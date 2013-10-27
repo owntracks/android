@@ -1,4 +1,5 @@
-<!-- File created by the Android Action Bar Style Generator
+<!--
+ File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
      Copyright (C) 2012 readyState Software Ltd
@@ -18,7 +19,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    
     <style name="Theme.Mqttitude" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarItemBackground">@drawable/selectable_background_mqttitude</item>
         <item name="android:popupMenuStyle">@style/PopupMenu.Mqttitude</item>
@@ -28,36 +28,33 @@
         <item name="android:actionModeBackground">@drawable/cab_background_top_mqttitude</item>
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_mqttitude</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Mqttitude</item>
-                <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
-         <item name="android:actionBarTabTextStyle">@style/Widget.TabWidget</item>
-		  <item name="android:windowBackground">@color/background</item>
-         
+        <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
+        <item name="android:actionBarTabTextStyle">@style/Widget.TabWidget</item>
+        <item name="android:windowBackground">@color/background</item>
     </style>
+
     <color name="pressed_mqttitude">#CC2581A5</color>
-    
+
     <style name="Widget.TabWidget" parent="@android:style/Widget.TabWidget">
         <item name="android:textAppearance">@style/TextAppearance.Widget.TabWidget</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>
-</style>  
+    </style>
 
+    <style name="TextAppearance.Widget.TabWidget" parent="@android:style/TextAppearance.Widget.TabWidget">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/darkGrey</item>
+    </style>
 
-<style name="TextAppearance.Widget.TabWidget" parent="@android:style/TextAppearance.Widget.TabWidget">
-    <item name="android:textSize">12sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:textAllCaps">true</item>
-    <item name="android:textColor">@color/darkGrey</item>
-</style>     
-    
-    
     <style name="ActionBar.Solid.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
         <item name="android:background">@drawable/ab_bottom_solid_mqttitude</item>
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_mqttitude</item>
         <item name="android:backgroundSplit">@drawable/ab_bottom_solid_mqttitude</item>
         <item name="android:progressBarStyle">@style/ProgressBar.Mqttitude</item>
-                <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
         <item name="android:icon">@drawable/ic_icon</item>
-        
     </style>
 
     <style name="ActionBar.Transparent.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionBar">
@@ -66,24 +63,23 @@
     </style>
 
     <style name="PopupMenu.Mqttitude" parent="@android:style/Widget.Holo.Light.ListPopupWindow">
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_mqttitude</item>	
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_mqttitude</item>
     </style>
 
     <style name="DropDownListView.Mqttitude" parent="@android:style/Widget.Holo.Light.ListView.DropDown">
         <item name="android:listSelector">@drawable/selectable_background_mqttitude</item>
     </style>
 
-
     <style name="DropDownNav.Mqttitude" parent="@android:style/Widget.Holo.Light.Spinner">
         <item name="android:background">@drawable/spinner_background_ab_mqttitude</item>
         <item name="android:popupBackground">@drawable/menu_dropdown_panel_mqttitude</item>
         <item name="android:dropDownSelector">@drawable/selectable_background_mqttitude</item>
     </style>
-    
+
     <style name="ProgressBar.Mqttitude" parent="@android:style/Widget.Holo.Light.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_mqttitude</item>
     </style>
-    
+
     <style name="ActionButton.CloseMode.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionButton.CloseMode">
         <item name="android:background">@drawable/btn_cab_done_mqttitude</item>
     </style>
@@ -93,9 +89,6 @@
         <item name="android:popupMenuStyle">@style/PopupMenu.Mqttitude</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Mqttitude</item>
     </style>
-    
-    
-    
 
     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_overflow</item>
@@ -110,7 +103,6 @@
     <color name="darkGrey">#505050</color>
     <color name="background">#e5e5e5</color>
     <color name="border">#acacac</color>
-
 
     <style name="seperator">
         <item name="android:background">@color/lightGrey</item>
@@ -169,20 +161,16 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_title</item>
-        <item name="android:layout_alignParentLeft">true</item>
-        <item name="android:layout_toLeftOf">@android:id/button1</item>
         <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="card_content">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_content</item>
-        <item name="android:layout_below">@+id/titleFrame</item>
-        <item name="android:layout_toRightOf">@android:id/icon</item>
-        <item name="android:layout_marginLeft">@dimen/card_title_margin_left</item>
     </style>
-    
+
     <style name="card_header_title">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -190,11 +178,12 @@
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:singleLine">true</item>
     </style>
+
     <style name="card_header_summary">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">15sp</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
-    
+
 </resources>

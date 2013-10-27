@@ -3,16 +3,23 @@ package st.alr.mqttitude.services;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.Settings.Secure;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -20,13 +27,21 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.ActivityMain;
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.ActivityMain.MapFragment;
+import st.alr.mqttitude.ActivityMain.PagerAdapter;
 import st.alr.mqttitude.support.BackgroundPublishReceiver;
+import st.alr.mqttitude.support.Contact;
+import st.alr.mqttitude.support.ContactAdapter;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
@@ -45,7 +60,8 @@ public class ServiceApplication extends ServiceBindable {
     private SimpleDateFormat dateFormater;
     private Handler handler;
     private final String TAG  = "ServiceApplication";
-
+    private static Map<String,Contact> contacts;
+    static ContactAdapter contactsAdapter;
     
     private static ServiceLocator serviceLocator;
     private static ServiceMqtt serviceMqtt;
@@ -55,6 +71,7 @@ public class ServiceApplication extends ServiceBindable {
     public void onCreate(){
         super.onCreate();
         instance = this;
+        contactsAdapter = new ContactAdapter(this, new HashMap<String,Contact>()); 
     }
     
     @Override
@@ -152,8 +169,7 @@ public class ServiceApplication extends ServiceBindable {
      */
     private void handleNotification() {
         Log.v(this.toString(), "handleNotification()");
-        notificationManager.cancel(Defaults.NOTIFCATION_ID);
-
+        stopForeground(true);
         if (notificationEnabled())
             createNotification();
     }
@@ -164,6 +180,7 @@ public class ServiceApplication extends ServiceBindable {
     }
 
     private void createNotification() {
+        Log.v(this.toString(), "createNotification");
 
         Intent resultIntent = new Intent(this, ActivityMain.class);
         resultIntent.setAction("android.intent.action.MAIN");
@@ -241,7 +258,7 @@ public class ServiceApplication extends ServiceBindable {
             notificationBuilder.setWhen(lastPublishedLocationTime.getTime());
 
         startForeground(Defaults.NOTIFCATION_ID, notificationBuilder.build());
-    //    notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
+       //notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
@@ -325,5 +342,82 @@ public class ServiceApplication extends ServiceBindable {
 
     public static String getAndroidId() {
         return Secure.getString(instance.getContentResolver(), Secure.ANDROID_ID);
-    }    
+    }
+    
+    
+    private Contact updateContact(String topic, GeocodableLocation location) {
+        Contact c = contactsAdapter.get(topic);
+
+        if (c == null) {
+            Log.v(this.toString(), "Allocating new contact for " + topic);
+            c = new Contact(topic);
+            Log.v(this.toString(), "looking for contact picture");
+            findContactData(c);
+        }
+
+        c.setLocation(location);
+        // Automatically fires onDatasetChanged of contacts adapter to update depending listViews
+        contactsAdapter.addItem(topic, c);
+
+        return c;
+    }
+
+    public void findContactData(Contact c){
+        
+        
+        String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ?";
+        String[] imWhereParams = new String[] {"Mqttitude", c.getTopic() };
+        Cursor imCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
+        
+        while (imCur.moveToNext()) {
+            Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));                    
+            Log.v(this.toString(), "found matching contact with id "+ cId + " to be associated with topic " + imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
+            c.setUserImage(loadContactPhoto(getContentResolver(), cId));
+            c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
+        }
+        imCur.close();
+        Log.v(this.toString(), "search finished");
+        
+}
+    
+    public static Bitmap loadContactPhoto(ContentResolver cr, long id) {
+        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
+        Log.v("loadContactPhoto", "using URI " + uri);
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
+        if (input == null) {
+            return null;
+        }
+        return BitmapFactory.decodeStream(input);
+    }
+
+
+    
+
+
+    
+    
+    public static Map<String, Contact> getContacts() {
+        return contacts;
+    }
+
+
+    public static ContactAdapter getContactsAdapter() {
+        return contactsAdapter;
+    }
+    public void onEventMainThread(Events.ContactLocationUpdated e) {
+        Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->"
+                + e.getGeocodableLocation().toString() + " @ "
+                + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
+
+        // Updates a contact or allocates a new one
+        Contact c = updateContact(e.getTopic(), e.getGeocodableLocation());
+
+        
+        
+        // Fires a new event with the now updated or created contact to which fragments can react
+        EventBus.getDefault().post(new Events.ContactUpdated(c));       
+        
+    }
+
+    
 }

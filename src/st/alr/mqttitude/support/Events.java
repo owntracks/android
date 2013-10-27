@@ -7,6 +7,8 @@ import android.location.Location;
 
 public class Events {
 
+ 
+
     public static abstract class E {
         Date date;
         public E() {
@@ -81,6 +83,18 @@ public class Events {
             return l;
         }
     }
+    
+    public static class ContactUpdated extends E{
+        private Contact c; 
+        public ContactUpdated(Contact c) {
+            this.c = c;             
+        }
+        public Contact getContact() {
+            return c;
+        }
+               
+    }
+
 
     
     public static class StateChanged {

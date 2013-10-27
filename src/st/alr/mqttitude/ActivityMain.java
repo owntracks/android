@@ -3,6 +3,8 @@ package st.alr.mqttitude;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
@@ -30,6 +32,7 @@ import android.graphics.Paint;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -46,8 +49,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -55,12 +60,17 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.greenrobot.event.EventBus;
@@ -71,7 +81,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     static ViewPager viewPager;
     ServiceApplication serviceApplication;
     ServiceConnection serviceApplicationConnection;
-
+    
     @Override
     protected void onDestroy() {
         unbindService(serviceApplicationConnection);
@@ -262,7 +272,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().registerSticky(this);
+        //EventBus.getDefault().registerSticky(this);
         if (serviceApplication != null)
             serviceApplication.getServiceLocator().enableForegroundMode();
 
@@ -270,7 +280,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     public void onStop() {
-        EventBus.getDefault().unregister(this);
+       // EventBus.getDefault().unregister(this);
 
         if (serviceApplication != null)
             serviceApplication.getServiceLocator().enableBackgroundMode();
@@ -278,146 +288,15 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         super.onStop();
     }
 
-    public void onEventMainThread(Events.ContactLocationUpdated e) {
-        Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->"
-                + e.getGeocodableLocation().toString() + " @ "
-                + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
-
-        Contact c = updateContact(e.getTopic(), e.getGeocodableLocation());
-        MapFragment m = (MapFragment) pagerAdapter.getItem(PagerAdapter.MAP_FRAGMENT);
-        m.updateContactLocation(c);
-    }
-
-    private Contact updateContact(String topic, GeocodableLocation location) {
-        Contact c = App.getContactsAdapter().get(topic);
-
-        if (c == null) {
-            Log.v(this.toString(), "Allocating new contact for " + topic);
-            c = new Contact(topic);
-            Log.v(this.toString(), "looking for contact picture");
-            findContactData(c);
-        }
-
-        c.setLocation(location);
-        App.getContactsAdapter().addItem(topic, c);
-
-        return c;
-    }
-
-    public void findContactData(Contact c){
-        
-                
-                String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ?";
-                String[] imWhereParams = new String[] {"Mqttitude", c.getTopic() };
-                Cursor imCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
-                
-                while (imCur.moveToNext()) {
-                    Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));                    
-                    Log.v(this.toString(), "found matching contact with id "+ cId + " to be associated with topic " + imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
-                    c.setUserImage(loadContactPhoto(getContentResolver(), cId));
-                    c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
-                }
-                imCur.close();
-                Log.v(this.toString(), "search finished");
-                
-    }
     
-    public void parseContacts() {
 
-        Log.v(this.toString(), "Parsing contacts for marker images");
-        ContentResolver cr = getContentResolver();
 
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur
-                        .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                // Log.v(this.toString(), "name: " + name);
-//                if (Integer.parseInt(cur.getString(cur
-//                        .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    // Query IM details
-                    String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
-                    String[] imWhereParams = new String[] { id, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE };
-                    Cursor imCur = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
-                    imCur.moveToPosition(-1);
-
-                    while (imCur.moveToNext()) {
-                        // if (imCur.moveToFirst()) {
-                        String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
-                        String imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));         
-                        String imProtocolType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL));
-
-                         Log.v(this.toString(), "imType: " + imType);
-                         Log.v(this.toString(), "imName: " + imName);
-                         Log.v(this.toString(), "imProtocolType: " + imProtocolType);
-
-                        // Check IM attributes with type "Custom" and
-                        // case-insensitive name "Mqttitude"
-                        if (imType.equalsIgnoreCase("3") && imProtocolType != null
-                                && imProtocolType.equalsIgnoreCase("MQTTITUDE")) {
-
-                            // create a friend object
-                            Contact contact = new Contact(imName);
-                            contact.setName(name);
-                            contact.setUserImage(loadContactPhoto(getContentResolver(),
-                                    Long.parseLong(id)));
-
-                            App.getContactsAdapter().addItem(imName, contact);
-
-                            Log.v(this.toString(), "New contact created from contacts: " + imName
-                                    + ", " + name + ", " + imType);
-                            EventBus.getDefault().post(new Events.ContactAdded(contact));
-                        }
-                    }
-                    imCur.close();
-
-                }
-//            }
-        }
-
-        Log.v(this.toString(), "Parsing contacts completed");
-
-    }
-
-    public static Bitmap loadContactPhoto(ContentResolver cr, long id) {
-        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
-        Log.v("loadContactPhoto", "using URI " + uri);
-        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
-        if (input == null) {
-            return null;
-        }
-        return BitmapFactory.decodeStream(input);
-    }
-
-    /*
-     * We use this to generate markers for each of the different peers/friends
-     * we can use a solid colour for each then alter the apha for historical
-     * markers
-     */
-    private BitmapDescriptor createCustomMarker(int colour, float alpha) {
-
-        float[] hsv = new float[3];
-
-        hsv[0] = (colour * 50) % 360; // mod 365 so we get variation
-        hsv[1] = 1;
-        hsv[2] = alpha;
-
-        Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas();
-        c.setBitmap(bm);
-
-        Paint p = new Paint();
-        p.setColor(Color.HSVToColor(hsv));
-
-        c.drawCircle(20, 20, 10, p);
-        return BitmapDescriptorFactory.fromBitmap(bm);
-
-    }
+    
 
     public static class MapFragment extends Fragment {
         private static MapFragment instance;
         private Handler handler;
+        private Map<Marker, Contact> markerToContacts;
 
         public static MapFragment newInstance() {
             MapFragment f = new MapFragment();
@@ -434,28 +313,23 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onStart() {
             super.onStart();
+            EventBus.getDefault().register(this);
         }
         
-//        
-//        public void onResume() {
-//            super.onResume();
-//            for (Contact c : App.getContacts().values())
-//                updateContactLocation(c);
-//
-//            focus(getCurrentlyTrackedContact());
-//
-//        
-//        }
-
-
         private MapView mMapView;
         private GoogleMap googleMap;
+        private LinearLayout selectedContactDetails;
+        private TextView selectedContactName;
+        private TextView selectedContactLocation;
         
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, 
                 Bundle savedInstanceState) {
             // inflat and return the layout
             View v = inflater.inflate(R.layout.fragment_map, container, false);
+            
+            markerToContacts = new HashMap<Marker, Contact>();
+            
             mMapView = (MapView) v.findViewById(R.id.mapView);
             mMapView.onCreate(savedInstanceState);
             mMapView.onResume();//needed to get the map to display immediately
@@ -480,6 +354,55 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             s.setZoomControlsEnabled(false);
 
             
+            selectedContactDetails = (LinearLayout )v.findViewById(R.id.selectedContactDetails);
+            selectedContactName =(TextView )v.findViewById(R.id.selectedContactName);
+            selectedContactLocation = (TextView )v.findViewById(R.id.selectedContactLocation);
+            selectedContactDetails.setVisibility(View.GONE);
+            
+
+//            mMapView.getMap().setOnCameraChangeListener(new OnCameraChangeListener() {
+//                
+//                @Override
+//                public void onCameraChange(CameraPosition arg0) {
+//                    if(getCurrentlyTrackedContact()== null && selectedContactDetails != null) {
+//                        selectedContactDetails.setVisibility(View.GONE);
+//                        return;
+//                    }
+//                    Log.v("onCameraChange", "trackedContact: " + getCurrentlyTrackedContact().getMarker().getPosition());
+//                    Log.v("onCameraChange", "target: " + arg0.target);
+//
+//                    if(!arg0.target.equals(getCurrentlyTrackedContact().getMarker().getPosition())) {
+//                        selectedContactDetails.setVisibility(View.GONE);
+//                    }                    
+//                }
+//            });
+            mMapView.getMap().setOnMarkerClickListener(new OnMarkerClickListener() {
+                
+                @Override
+                public boolean onMarkerClick(Marker m) {
+                    Contact c = markerToContacts.get(m);
+                    Log.v(this.toString(), "Focused contact for: " + c.getTopic());
+                    
+                    if(c != null) {
+                        
+                        
+                        focus(c);
+                        return true;
+                    } 
+                    
+                    return false;
+                 }
+            });
+            
+            mMapView.getMap().setOnMapClickListener(new OnMapClickListener() {
+                
+                @Override
+                public void onMapClick(LatLng arg0) {
+                    selectedContactDetails.setVisibility(View.GONE);
+                    
+                }
+            });
+            
             //Perform any camera updates here
             
             return v;
@@ -489,7 +412,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         public void onResume() {
             super.onResume();
             mMapView.onResume();
-            for (Contact c : App.getContacts().values())
+            Log.v(this.toString(), "Adding all existing contact markers to map");
+            for (Contact c : ServiceApplication.getContactsAdapter().getValues())
                 updateContactLocation(c);
 
             focus(getCurrentlyTrackedContact());
@@ -498,26 +422,32 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         
         @Override
         public void onPause() {
-            super.onPause();
             mMapView.onPause();
+            super.onPause();
         }
         
         @Override
         public void onDestroy() {
-            super.onDestroy();
             mMapView.onDestroy();
+            super.onDestroy();
         }
         
         @Override
         public void onLowMemory() {
-            super.onLowMemory();
             mMapView.onLowMemory();
+            super.onLowMemory();
         }
 
         
         
         public Contact getCurrentlyTrackedContact() {
-            return App.getContactsAdapter().get(ActivityPreferences.getTrackingUsername());
+            Contact c = ServiceApplication.getContactsAdapter().get(ActivityPreferences.getTrackingUsername());   
+            if(c != null)
+                Log.v(this.toString(), "getCurrentlyTrackedContact == " + c.getTopic());
+            else 
+                Log.v(this.toString(), "getCurrentlyTrackedContact == null" );
+
+            return c;
         }
 
         @Override
@@ -543,6 +473,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
             }
         }
+        
+        public void onEventMainThread(Events.ContactUpdated e) {
+            updateContactLocation(e.getContact());
+        }
+
 
         public void updateContactLocation(Contact c) {
 
@@ -551,9 +486,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 c.updateMarkerPosition();
             } else {
                 Log.v(this.toString(), "creating marker for " + c.getTopic());
-                c.setMarker(googleMap.addMarker(
+                Marker m = googleMap.addMarker(
                         new MarkerOptions().position(c.getLocation().getLatLng()).icon(
-                                c.getUserImageDescriptor())));
+                                c.getUserImageDescriptor()));
+                markerToContacts.put(m, c);
+                c.setMarker(m);
             }
 
 
@@ -589,12 +526,23 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 //            return v;
 //        }
 
+
+        @Override
+        public void onStop() {
+           EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+        
         public void focus(Contact c) {
             if (c == null)
                 return;
 
             ActivityPreferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
+            selectedContactName.setText(c.toString());
+            selectedContactLocation.setText(c.getLocation().getGeocoder());
+            selectedContactDetails.setVisibility(View.VISIBLE);
+
         }
 
         public void setLocation(GeocodableLocation location) {
@@ -635,6 +583,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     public static class FriendsFragment extends Fragment {
         ListView friendsListView;
+        TextView currentLocation;
+        
         private static FriendsFragment instance;
 
         public static FriendsFragment getInstance() {
@@ -649,9 +599,15 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             super.onStart();
             // Reload the list with data that might have arrived while the
             // activity was stopped
-            ((ContactAdapter) friendsListView.getAdapter()).notifyDataSetChanged();
+            EventBus.getDefault().register(this);
+            ServiceApplication.getContactsAdapter().notifyDataSetChanged();
         }
 
+        public void onEventMainThread(Events.LocationUpdated e) {
+            currentLocation.setText(e.getGeocodableLocation().toString());
+        }
+
+        
         @Override
         public void onStop() {
             EventBus.getDefault().unregister(this);
@@ -667,14 +623,15 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
-
-            friendsListView = (ListView) v.findViewById(R.id.friendsListView);
-            friendsListView.setAdapter(App.getContactsAdapter());
+            currentLocation = (TextView)v.findViewById(R.id.currentLocation);
+            
+            friendsListView = (ListView) v.findViewById(R.id.friendsListView);                                   
+            friendsListView.setAdapter(ServiceApplication.getContactsAdapter());
             friendsListView.setOnItemClickListener(new OnItemClickListener() {
-
+                
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Contact c = (Contact) App.getContactsAdapter().getItem(position); 
+                    Contact c = (Contact) ServiceApplication.getContactsAdapter().getItem(position); 
                     if(c == null || c.getLocation() == null)
                         return;
                     
