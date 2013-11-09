@@ -58,12 +58,13 @@ public class ActivityPreferences extends PreferenceActivity {
     }
     
     public static String getTrackingUsername(){
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
+        String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
+        return t;
     }
     
     public static void setTrackingUsername(String topic){
         Log.v("ActivityPreferences", "Now tracking " + topic);
-        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic);
+        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic).apply();
     }
 
 

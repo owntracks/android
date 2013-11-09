@@ -52,8 +52,10 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -318,7 +320,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         
         private MapView mMapView;
         private GoogleMap googleMap;
-        private LinearLayout selectedContactDetails;
+        private RelativeLayout selectedContactDetails;
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         
@@ -354,7 +356,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             s.setZoomControlsEnabled(false);
 
             
-            selectedContactDetails = (LinearLayout )v.findViewById(R.id.selectedContactDetails);
+            selectedContactDetails = (RelativeLayout )v.findViewById(R.id.selectedContactDetails);
             selectedContactName =(TextView )v.findViewById(R.id.selectedContactName);
             selectedContactLocation = (TextView )v.findViewById(R.id.selectedContactLocation);
             selectedContactDetails.setVisibility(View.GONE);
@@ -413,7 +415,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             super.onResume();
             mMapView.onResume();
             Log.v(this.toString(), "Adding all existing contact markers to map");
-            for (Contact c : ServiceApplication.getContactsAdapter().getValues())
+            for (Contact c : ServiceApplication.getContacts().values())
                 updateContactLocation(c);
 
             focus(getCurrentlyTrackedContact());
@@ -441,7 +443,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         
         
         public Contact getCurrentlyTrackedContact() {
-            Contact c = ServiceApplication.getContactsAdapter().get(ActivityPreferences.getTrackingUsername());   
+            Contact c = ServiceApplication.getContacts().get(ActivityPreferences.getTrackingUsername());   
             if(c != null)
                 Log.v(this.toString(), "getCurrentlyTrackedContact == " + c.getTopic());
             else 
@@ -540,7 +542,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             ActivityPreferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
             selectedContactName.setText(c.toString());
-            selectedContactLocation.setText(c.getLocation().getGeocoder());
+            selectedContactLocation.setText(c.getLocation().toString());
             selectedContactDetails.setVisibility(View.VISIBLE);
 
         }
@@ -582,8 +584,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     }
 
     public static class FriendsFragment extends Fragment {
-        ListView friendsListView;
-        TextView currentLocation;
+        LinearLayout friendsListView;
         
         private static FriendsFragment instance;
 
@@ -597,22 +598,44 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onStart() {
             super.onStart();
-            // Reload the list with data that might have arrived while the
-            // activity was stopped
             EventBus.getDefault().register(this);
-            ServiceApplication.getContactsAdapter().notifyDataSetChanged();
         }
 
-        public void onEventMainThread(Events.LocationUpdated e) {
-            currentLocation.setText(e.getGeocodableLocation().toString());
-        }
-
-        
         @Override
         public void onStop() {
             EventBus.getDefault().unregister(this);
             super.onStop();
         }
+
+
+        
+        public void onEventMainThread(Events.ContactUpdated e) {
+            updateContactView(e.getContact());
+        }
+
+        public void updateContactView(Contact c){
+            
+            View v = friendsListView.findViewWithTag(c.getTopic()); 
+            if(v == null) {
+            
+                if (c.getView() != null) {
+                    Log.v(this.toString(), "updating view of " + c.getTopic());
+                } else {
+                    Log.v(this.toString(), "creating view for " + c.getTopic());
+                    v = getActivity().getLayoutInflater().inflate(R.layout.friend_list_item, null, false);
+                    c.setView(v);
+
+                }
+                v.setTag(c.getTopic());
+                friendsListView.addView(c.getView());
+                
+            }
+            ((TextView) v.findViewById(R.id.title)).setText(c.toString());
+            ((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation().toString());
+            ((ImageView) v.findViewById(R.id.image)).setImageBitmap(c.getUserImage());
+
+        }
+        
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -620,29 +643,47 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
 
         @Override
+        public void onResume() {
+            super.onResume();
+            Log.v(this.toString(), "Adding all existing contact views to list");
+            for (Contact c : ServiceApplication.getContacts().values())
+                updateContactView(c);
+
+        }
+
+        
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
-            currentLocation = (TextView)v.findViewById(R.id.currentLocation);
             
-            friendsListView = (ListView) v.findViewById(R.id.friendsListView);                                   
-            friendsListView.setAdapter(ServiceApplication.getContactsAdapter());
-            friendsListView.setOnItemClickListener(new OnItemClickListener() {
-                
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Contact c = (Contact) ServiceApplication.getContactsAdapter().getItem(position); 
-                    if(c == null || c.getLocation() == null)
-                        return;
-                    
-                    MapFragment.getInstance().focus(c);
-                    viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
-                }
-            });
+            friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
+            
+                   
+            for (Contact c : ServiceApplication.getContacts().values())
+                updateContactView(c);
 
+            
+            
+//            friendsListView.setAdapter(ServiceApplication.getContactsAdapter());
+//            friendsListView.setOnItemClickListener(new OnItemClickListener() {
+//                
+//                @Override
+//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    Contact c = (Contact) ServiceApplication.getContactsAdapter().getItem(position); 
+//                    if(c == null || c.getLocation() == null)
+//                        return;
+//                    
+//                    MapFragment.getInstance().focus(c);
+//                    viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+//                }
+//            });
+//
             return v;
         }
     }
+    
+    
 
     public static class StatusFragment extends Fragment {
         private TextView locatorStatus;

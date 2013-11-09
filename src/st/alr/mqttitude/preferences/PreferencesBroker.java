@@ -267,6 +267,7 @@ public class PreferencesBroker extends DialogPreference {
                 editor.putString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, password.getText().toString());
                 editor.putString(Defaults.SETTINGS_KEY_BROKER_DEVICE_NAME, deviceName.getText().toString());
                 editor.putInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, brokerSecurity.getSelectedItemPosition());
+                editor.putInt(Defaults.SETTINGS_KEY_BROKER_AUTH, brokerAuth.getSelectedItemPosition());
                 editor.putString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, brokerSecuritySSLCaCrtPath.getText().toString());
                 
 

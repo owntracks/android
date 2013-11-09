@@ -61,7 +61,6 @@ public class ServiceApplication extends ServiceBindable {
     private Handler handler;
     private final String TAG  = "ServiceApplication";
     private static Map<String,Contact> contacts;
-    static ContactAdapter contactsAdapter;
     
     private static ServiceLocator serviceLocator;
     private static ServiceMqtt serviceMqtt;
@@ -71,7 +70,7 @@ public class ServiceApplication extends ServiceBindable {
     public void onCreate(){
         super.onCreate();
         instance = this;
-        contactsAdapter = new ContactAdapter(this, new HashMap<String,Contact>()); 
+        contacts = new HashMap<String,Contact>();
     }
     
     @Override
@@ -346,7 +345,8 @@ public class ServiceApplication extends ServiceBindable {
     
     
     private Contact updateContact(String topic, GeocodableLocation location) {
-        Contact c = contactsAdapter.get(topic);
+        Contact c = contacts.get(topic);
+        //Contact c = contactsAdapter.get(topic);
 
         if (c == null) {
             Log.v(this.toString(), "Allocating new contact for " + topic);
@@ -357,8 +357,9 @@ public class ServiceApplication extends ServiceBindable {
 
         c.setLocation(location);
         // Automatically fires onDatasetChanged of contacts adapter to update depending listViews
-        contactsAdapter.addItem(topic, c);
-
+        //contactsAdapter.addItem(topic, c);
+        contacts.put(topic, c);
+            
         return c;
     }
 
@@ -401,9 +402,6 @@ public class ServiceApplication extends ServiceBindable {
     }
 
 
-    public static ContactAdapter getContactsAdapter() {
-        return contactsAdapter;
-    }
     public void onEventMainThread(Events.ContactLocationUpdated e) {
         Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->"
                 + e.getGeocodableLocation().toString() + " @ "

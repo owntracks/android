@@ -64,6 +64,8 @@ public class ContactAdapter extends MapAdapter<String, Contact> {
 
     public Contact get(String topic) {
         Log.v(this.toString(), "Contacts: " + map);
+        Log.v(this.toString(), "Request to return: " + topic);
+
         return map.get(topic);
     }
 
