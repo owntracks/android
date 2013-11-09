@@ -7,29 +7,42 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
->
+        android:layout_height="match_parent" >
     </com.google.android.gms.maps.MapView>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/selectedContactDetails"
         style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical" >
+        android:layout_alignParentBottom="true" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:cropToPadding="false"
+            android:padding="0dp"
+            android:src="@drawable/ic_launcher" />
 
         <TextView
             android:id="@+id/selectedContactName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/imageView1"
+            android:layout_toRightOf="@+id/imageView1"
             android:text="Name" />
-                <TextView
+
+        <TextView
             android:id="@+id/selectedContactLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView1"
+            android:layout_alignLeft="@+id/selectedContactName"
             android:text="Location" />
-        
-    </LinearLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>

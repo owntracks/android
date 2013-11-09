@@ -1,37 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/currentLocationHeader"
-        style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <TextView
-            style="@style/card_title"
+        <LinearLayout
+            android:id="@+id/currentLocationHeader"
+            style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Current location" />
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/currentLocation"
-            style="@style/card_content"
+            <TextView
+                style="@style/card_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Current location" />
+
+            <TextView
+                android:id="@+id/currentLocation"
+                style="@style/card_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/na" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/friendsListView"
+            style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/na" />
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:padding="8dp" >
+        </LinearLayout>
     </LinearLayout>
 
-    <ListView
-        android:layout_marginTop="0dp"
-        android:id="@+id/friendsListView"
-        style="@style/card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
-    </ListView>
-
-</LinearLayout>
+</ScrollView>
