@@ -25,7 +25,7 @@ public class Contact {
     private GeocodableLocation location;
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
-    private static Bitmap defaultUserImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.ic_launcher), userImageHeightScale, userImageHeightScale, true) ;    
+    private static Bitmap defaultUserImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true) ;    
     private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage);  
     private Marker marker;
     private View view;
@@ -76,6 +76,7 @@ public class Contact {
     
     public void setLocation(GeocodableLocation location) {
         this.location = location;
+        location.setTag(this.topic);// to find according contact once geocoder resolving returns
     }
 
   public String toString() {

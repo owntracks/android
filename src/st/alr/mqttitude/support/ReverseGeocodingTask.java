@@ -39,7 +39,7 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
                 List<Address> addresses = geocoder.getFromLocation(l.getLocation().getLatitude(), l.getLocation().getLongitude(), 1);
                 Log.v(this.toString(), "Geocoder result: " + addresses.get(0).getAddressLine(0));
                 if (addresses != null && addresses.size() > 0) {            
-                    l.setGeocoder(addresses.get(0).getAddressLine(0));
+                    l.setGeocoder(addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
                     r = GEOCODER_RESULT;
                 }
             } catch (IOException e) {

@@ -12,8 +12,8 @@
     <dimen name="card_thumbnail">56dp</dimen>
     <dimen name="card_thumbnail_margin">5dp</dimen>
     <dimen name="card_title_margin_left">5dp</dimen>
-    <dimen name="card_title">18sp</dimen>
-    <dimen name="card_content">17sp</dimen>
+    <dimen name="card_title">17sp</dimen>
+    <dimen name="card_content">13sp</dimen>
     <dimen name="card_shadow">3dp</dimen>
 
     <dimen name="card_header">21sp</dimen>
