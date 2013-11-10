@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.opengl.Matrix;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +27,13 @@ public class Contact {
     private GeocodableLocation location;
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
+
     private static Bitmap defaultUserImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true) ;    
-    private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage);  
+    private static Bitmap markerBackground = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.markerbg), (int)convertDpToPixel(57), (int)convertDpToPixel(62), true) ;    
+
+    private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage); 
+    private static BitmapDescriptor defaultUserMarkerDescriptor  = BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, defaultUserImage));  
+
     private Marker marker;
     private View view;
  
@@ -108,8 +115,42 @@ public class Contact {
     public String getTopic() {
         return topic;
     }
-
     
+    public BitmapDescriptor getMarkerImageDescriptor(){
+        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, getUserImage())) : defaultUserMarkerDescriptor;
+    }
+
+
+
+    public static Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom 
+        Bitmap cs = null; 
+
+        int width, height = 0; 
+
+          width = c.getWidth();
+          height = c.getHeight(); 
+
+        cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
+
+        Canvas comboImage = new Canvas(cs); 
+
+        comboImage.drawBitmap(c, 0f, 0f, null); 
+        comboImage.drawBitmap(s, 8f, 8f, null); 
+
+        // this is an extra bit I added, just incase you want to save the new image somewhere and then return the location 
+        /*String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png"; 
+
+        OutputStream os = null; 
+        try { 
+          os = new FileOutputStream(loc + tmpImg); 
+          cs.compress(CompressFormat.PNG, 100, os); 
+        } catch(IOException e) { 
+          Log.e("combineImages", "problem combining images", e); 
+        }*/ 
+
+        return cs; 
+      } 
+
     
     
 }

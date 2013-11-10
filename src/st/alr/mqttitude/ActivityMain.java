@@ -499,8 +499,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             }
             
                 Marker m = googleMap.addMarker(
-                        new MarkerOptions().position(c.getLocation().getLatLng()).icon(
-                                c.getUserImageDescriptor()));
+                        new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()
+));
                 
                 markerToContacts.put(m.getId(), c);
                 

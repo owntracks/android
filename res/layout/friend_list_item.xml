@@ -26,7 +26,7 @@
     android:layout_toRightOf="@+id/image"
     android:gravity="top"
     android:paddingLeft="0dp"
-    android:paddingTop="4dp"
+    android:paddingTop="3dp"
     android:text="name" />
 
 <TextView
@@ -39,7 +39,7 @@
     android:layout_alignStart="@id/title"
     android:gravity="bottom"
     android:lineSpacingExtra="-2dp"
-    android:paddingBottom="4dp"
+    android:paddingBottom="3dp"
     android:paddingLeft="0dp"
     android:scrollHorizontally="false"
     android:text="location" />
