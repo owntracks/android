@@ -178,8 +178,15 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     }
     
     public int getUpdateIntervall() {
-        return Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
+        int ui;
+        try{
+           ui = Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
                 Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL));
+        } catch (Exception e) {
+            ui = 30;
+        }
+           
+           return ui;
     }
 
     public int getUpdateIntervallInMiliseconds() {

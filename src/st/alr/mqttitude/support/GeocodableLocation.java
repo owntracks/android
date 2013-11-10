@@ -12,8 +12,16 @@ import android.util.Log;
 
 public class GeocodableLocation extends Location  implements Serializable{
     String geocoder; 
-    LatLng latlng;    
+    LatLng latlng;   
+    String tag; 
     
+    
+    public String getTag() {
+        return tag;
+    }
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
     public GeocodableLocation(Location location){
         this(location, null);
     }

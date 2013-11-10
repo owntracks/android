@@ -48,6 +48,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
@@ -320,9 +321,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         
         private MapView mMapView;
         private GoogleMap googleMap;
-        private RelativeLayout selectedContactDetails;
+        private LinearLayout selectedContactDetails;
         private TextView selectedContactName;
         private TextView selectedContactLocation;
+        private ImageView selectedContactImage;
+        private float currentZoomLevel = 5.0f;
         
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, 
@@ -356,11 +359,13 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             s.setZoomControlsEnabled(false);
 
             
-            selectedContactDetails = (RelativeLayout )v.findViewById(R.id.selectedContactDetails);
-            selectedContactName =(TextView )v.findViewById(R.id.selectedContactName);
-            selectedContactLocation = (TextView )v.findViewById(R.id.selectedContactLocation);
+            selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
+            selectedContactName =(TextView )v.findViewById(R.id.title);
+            selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
+            selectedContactImage = (ImageView )v.findViewById(R.id.image);
             selectedContactDetails.setVisibility(View.GONE);
             
+
 
 //            mMapView.getMap().setOnCameraChangeListener(new OnCameraChangeListener() {
 //                
@@ -500,8 +505,12 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 focus(c);
         }
 
-        public void centerMap(LatLng latlon) {
-            CameraUpdate center = CameraUpdateFactory.newLatLng(latlon);
+        public void centerMap(LatLng l) {
+            centerMap(l, 15.0f);
+        }
+        
+        public void centerMap(LatLng latlon, float f) {
+            CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latlon, f);
             googleMap.animateCamera(center);
         }
 
@@ -535,7 +544,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             super.onStop();
         }
         
-        public void focus(Contact c) {
+        public void focus(final Contact c) {
             if (c == null)
                 return;
 
@@ -543,8 +552,19 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             centerMap(c.getLocation().getLatLng());
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
-            selectedContactDetails.setVisibility(View.VISIBLE);
+            selectedContactImage.setImageBitmap(c.getUserImage());
 
+            selectedContactDetails.setVisibility(View.VISIBLE);
+            selectedContactDetails.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    
+                    centerMap(c.getLocation().getLatLng());
+                }
+            });
+            
+            
         }
 
         public void setLocation(GeocodableLocation location) {
@@ -585,6 +605,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     public static class FriendsFragment extends Fragment {
         LinearLayout friendsListView;
+
+        private Handler handler;
         
         private static FriendsFragment instance;
 
@@ -609,6 +631,20 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
 
         
+        private void onHandlerMessage(Message msg) {
+            switch (msg.what) {
+                case ReverseGeocodingTask.GEOCODER_RESULT:
+                    GeocodableLocation l = (GeocodableLocation) msg.obj;
+                    Log.v(this.toString(), "looking for view with tag " + l.getTag());
+                    TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);
+                    
+                    tv.setText(l.toString());
+                    
+
+                    break;
+            }
+        }
+
         public void onEventMainThread(Events.ContactUpdated e) {
             updateContactView(e.getContact());
         }
@@ -620,18 +656,40 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             
                 if (c.getView() != null) {
                     Log.v(this.toString(), "updating view of " + c.getTopic());
+                    v = c.getView();
                 } else {
                     Log.v(this.toString(), "creating view for " + c.getTopic());
                     v = getActivity().getLayoutInflater().inflate(R.layout.friend_list_item, null, false);
                     c.setView(v);
+                    v.setOnClickListener(new OnClickListener() {
+                        
+                        @Override
+                        public void onClick(View v) {
+                          Contact c = (Contact) ServiceApplication.getContacts().get(v.getTag()); 
+                          if(c == null || c.getLocation() == null)
+                              return;
+                          
+                          MapFragment.getInstance().focus(c);
+                          viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+
+                        }
+                    });
 
                 }
+                Log.v(this.toString(), "C" + c);
+                Log.v(this.toString(), "V" + v);
+                
                 v.setTag(c.getTopic());
                 friendsListView.addView(c.getView());
                 
             }
             ((TextView) v.findViewById(R.id.title)).setText(c.toString());
+            
             ((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation().toString());
+            (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
+                    c.getLocation()
+                });
+
             ((ImageView) v.findViewById(R.id.image)).setImageBitmap(c.getUserImage());
 
         }
@@ -640,6 +698,13 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    onHandlerMessage(msg);
+                }
+            };
+
         }
 
         @Override
