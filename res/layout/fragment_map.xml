@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
+        android:background="@drawable/white_border_top"
         android:orientation="vertical" >
 
         <include layout="@layout/friend_list_item" />
