@@ -68,6 +68,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -93,8 +94,18 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        
+     // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
+        // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
+        if (savedInstanceState != null) 
+        {
+           savedInstanceState.remove ("android:support:fragments");
+        } 
         super.onCreate(savedInstanceState);
-
+        
+        
+        
+        
         Intent i = new Intent(this, ServiceApplication.class);
         startService(i);
         serviceApplicationConnection = new ServiceConnection() {
@@ -164,8 +175,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        Log.v(this.toString(), "here");
-
         return true;
     }
 
@@ -176,7 +185,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         int itemId = item.getItemId();
         Log.v(this.toString(), itemId + " " + R.id.menu_preferences);
         if (itemId == R.id.menu_preferences) {
-            Log.v(this.toString(), "here");
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
@@ -299,17 +307,14 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public static class MapFragment extends Fragment {
         private static MapFragment instance;
         private Handler handler;
-        private Map<Marker, Contact> markerToContacts;
+        private Map<String, Contact> markerToContacts;
 
-        public static MapFragment newInstance() {
-            MapFragment f = new MapFragment();
-            return f;
-        }
 
         public static MapFragment getInstance() {
-            if (instance == null)
+            if (instance == null) {
+                Log.e("MapFragment", "creating new map fragment");
                 instance = new MapFragment();
-
+            }
             return instance;
         }
 
@@ -325,74 +330,41 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
-        private float currentZoomLevel = 5.0f;
         
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-                Bundle savedInstanceState) {
-            // inflat and return the layout
-            View v = inflater.inflate(R.layout.fragment_map, container, false);
-            
-            markerToContacts = new HashMap<Marker, Contact>();
-            
-            mMapView = (MapView) v.findViewById(R.id.mapView);
-            mMapView.onCreate(savedInstanceState);
-            mMapView.onResume();//needed to get the map to display immediately
-            
-            try {
-                MapsInitializer.initialize(getActivity());
-            } catch (GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
+        public void onActivityCreated(Bundle savedInstanceState) {
+         super.onActivityCreated(savedInstanceState);
+        }
+
+        private void setUpMapIfNeeded(View v, Bundle savedInstanceState) {
+
+            // Do a null check to confirm that we have not already instantiated the map.
+            if (googleMap == null) {
+                // Try to obtain the map from the SupportMapFragment.
+                Log.v(this.toString(), "Recreating map");
+
             }
-            
-            googleMap = mMapView.getMap();
-            
+        }
+        private void setUpMap() {
             googleMap.setIndoorEnabled(true);
             googleMap.setMyLocationEnabled(true);
 
             UiSettings s = googleMap.getUiSettings();
             s.setCompassEnabled(false);
-            s.setMyLocationButtonEnabled(true);
+            s.setMyLocationButtonEnabled(false);
             s.setTiltGesturesEnabled(false);
             s.setCompassEnabled(false);
             s.setRotateGesturesEnabled(false);
             s.setZoomControlsEnabled(false);
-
             
-            selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
-            selectedContactName =(TextView )v.findViewById(R.id.title);
-            selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
-            selectedContactImage = (ImageView )v.findViewById(R.id.image);
-            selectedContactDetails.setVisibility(View.GONE);
-            
-
-
-//            mMapView.getMap().setOnCameraChangeListener(new OnCameraChangeListener() {
-//                
-//                @Override
-//                public void onCameraChange(CameraPosition arg0) {
-//                    if(getCurrentlyTrackedContact()== null && selectedContactDetails != null) {
-//                        selectedContactDetails.setVisibility(View.GONE);
-//                        return;
-//                    }
-//                    Log.v("onCameraChange", "trackedContact: " + getCurrentlyTrackedContact().getMarker().getPosition());
-//                    Log.v("onCameraChange", "target: " + arg0.target);
-//
-//                    if(!arg0.target.equals(getCurrentlyTrackedContact().getMarker().getPosition())) {
-//                        selectedContactDetails.setVisibility(View.GONE);
-//                    }                    
-//                }
-//            });
             mMapView.getMap().setOnMarkerClickListener(new OnMarkerClickListener() {
                 
                 @Override
                 public boolean onMarkerClick(Marker m) {
-                    Contact c = markerToContacts.get(m);
+                    Contact c = markerToContacts.get(m.getId());
                     Log.v(this.toString(), "Focused contact for: " + c.getTopic());
                     
                     if(c != null) {
-                        
-                        
                         focus(c);
                         return true;
                     } 
@@ -409,9 +381,44 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                     
                 }
             });
+
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+                Bundle savedInstanceState) {
             
-            //Perform any camera updates here
+            View v = inflater.inflate(R.layout.fragment_map, container, false);
             
+
+            
+            markerToContacts = new HashMap<String, Contact>();
+            
+            selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
+            selectedContactName =(TextView )v.findViewById(R.id.title);
+            selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
+            selectedContactImage = (ImageView )v.findViewById(R.id.image);
+            selectedContactDetails.setVisibility(View.GONE);
+            
+
+            
+            mMapView = (MapView) v.findViewById(R.id.mapView);
+            mMapView.onCreate(savedInstanceState);
+            mMapView.onResume();//needed to get the map to display immediately
+            googleMap = mMapView.getMap();  
+            
+            
+            // Check if we were successful in obtaining the map.
+            if (mMapView != null) {
+                try {
+                    MapsInitializer.initialize(getActivity());
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+
+                setUpMap();
+            }
+                        
             return v;
         }
         
@@ -444,8 +451,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             mMapView.onLowMemory();
             super.onLowMemory();
         }
-
-        
         
         public Contact getCurrentlyTrackedContact() {
             Contact c = ServiceApplication.getContacts().get(ActivityPreferences.getTrackingUsername());   
@@ -490,15 +495,17 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
             if (c.getMarker() != null) {
                 Log.v(this.toString(), "updating marker position of " + c.getTopic());
-                c.updateMarkerPosition();
-            } else {
-                Log.v(this.toString(), "creating marker for " + c.getTopic());
+                c.getMarker().remove();
+            }
+            
                 Marker m = googleMap.addMarker(
                         new MarkerOptions().position(c.getLocation().getLatLng()).icon(
                                 c.getUserImageDescriptor()));
-                markerToContacts.put(m, c);
+                
+                markerToContacts.put(m.getId(), c);
+                
                 c.setMarker(m);
-            }
+            
 
 
             if (c == getCurrentlyTrackedContact())
@@ -510,8 +517,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
         
         public void centerMap(LatLng latlon, float f) {
+            Log.v(this.toString(), "centering map at " + latlon.toString());
             CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latlon, f);
-            googleMap.animateCamera(center);
+            mMapView.getMap().animateCamera(center);
         }
 
 //        @Override
@@ -545,11 +553,17 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         }
         
         public void focus(final Contact c) {
-            if (c == null)
-                return;
+            Log.v(this.toString(), "map fragment focussing " +c);
 
+            if (c == null) {
+                Log.v(this.toString(), "no contact, abandon ship!");
+                
+                return;
+            }
             ActivityPreferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
+            Log.v(this.toString(), "map fragment focussing " +c.getTopic());
+
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
             selectedContactImage.setImageBitmap(c.getUserImage());
@@ -620,6 +634,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onStart() {
             super.onStart();
+            
             EventBus.getDefault().register(this);
         }
 
@@ -657,6 +672,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 if (c.getView() != null) {
                     Log.v(this.toString(), "updating view of " + c.getTopic());
                     v = c.getView();
+                    ((ViewGroup)v.getParent()).removeView(v); // remove from old view first to allow it to be added to the new view again
+
                 } else {
                     Log.v(this.toString(), "creating view for " + c.getTopic());
                     v = getActivity().getLayoutInflater().inflate(R.layout.friend_list_item, null, false);
@@ -666,9 +683,13 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                         @Override
                         public void onClick(View v) {
                           Contact c = (Contact) ServiceApplication.getContacts().get(v.getTag()); 
-                          if(c == null || c.getLocation() == null)
+                          Log.v(this.toString(), "Focusing " + c);
+                          if(c == null || c.getLocation() == null) {
+                              Log.v(this.toString(), "No contact or no location ");
+
                               return;
                           
+                          }
                           MapFragment.getInstance().focus(c);
                           viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
 

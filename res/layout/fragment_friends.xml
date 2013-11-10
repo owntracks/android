@@ -39,8 +39,7 @@
             android:orientation="vertical"
             android:paddingLeft="8dp"
             android:paddingRight="8dp" 
-            android:paddingTop="0dp"
-            android:paddingBottom="20dp">
+            android:paddingTop="16dp">
         </LinearLayout>
     </LinearLayout>
 
