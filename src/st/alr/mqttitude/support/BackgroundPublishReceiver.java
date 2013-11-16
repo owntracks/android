@@ -1,11 +1,10 @@
 package st.alr.mqttitude.support;
 
+import st.alr.mqttitude.services.ServiceLocator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
-import st.alr.mqttitude.services.ServiceLocator;
 
 public class BackgroundPublishReceiver extends BroadcastReceiver {
     

@@ -1,35 +1,6 @@
 
 package st.alr.mqttitude.services;
 
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +19,16 @@ import java.util.LinkedList;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import de.greenrobot.event.EventBus;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.MqttTopic;
+import org.json.JSONObject;
+
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
@@ -56,6 +36,24 @@ import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.MqttPublish;
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import de.greenrobot.event.EventBus;
 
 public class ServiceMqtt extends ServiceBindable implements MqttCallback
 {

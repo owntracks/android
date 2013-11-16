@@ -168,16 +168,13 @@
         <item name="android:textSize">@dimen/card_title</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">#585757</item>
-        
-        <item name="android:fontFamily">"sans-serif"</item>
     </style>
 
     <style name="card_content">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_content</item>
-                <item name="android:textColor">#969696</item>
-                        <item name="android:fontFamily">"sans-serif"</item>
+        <item name="android:textColor">#969696</item>
                 
         
         

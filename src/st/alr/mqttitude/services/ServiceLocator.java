@@ -1,6 +1,12 @@
 
 package st.alr.mqttitude.services;
 
+import java.util.Date;
+
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
+import st.alr.mqttitude.support.MqttPublish;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +16,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import java.util.Date;
-
 import de.greenrobot.event.EventBus;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
-import st.alr.mqttitude.support.MqttPublish;
 
 public abstract class ServiceLocator extends ServiceBindable implements MqttPublish {
     protected SharedPreferences sharedPreferences;

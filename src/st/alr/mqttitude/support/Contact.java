@@ -2,22 +2,14 @@ package st.alr.mqttitude.support;
 
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceApplication;
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.NinePatchDrawable;
-import android.opengl.Matrix;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 public class Contact {
@@ -87,7 +79,8 @@ public class Contact {
         location.setTag(this.topic);// to find according contact once geocoder resolving returns
     }
 
-  public String toString() {
+  @Override
+public String toString() {
         if(getName() != null)
             return name;
         else 
