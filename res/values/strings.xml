@@ -16,6 +16,8 @@
     <string name="preferencesBrokerUsername">"Username (Broker authentication)"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     
+    <string name="preferencesBrokerAuth">"Authentication"</string>
+    
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
     <string name="preferencesBrokerClientId">"Client ID"</string>
@@ -82,7 +84,7 @@
     
    	<string-array name="connect_options_auth">
         <item>Anonymous</item>
-        <item>Username</item>
+        <item>Username / Password</item>
         <item>Custom</item>
     </string-array>
     

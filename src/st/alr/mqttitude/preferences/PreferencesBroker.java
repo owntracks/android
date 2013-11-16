@@ -143,9 +143,10 @@ public class PreferencesBroker extends DialogPreference {
         //handlePort();       
         handleBrokerSecurity();
         handleBrokerAuth();
-        handleUserUsername();        
+        handleUserUsername();       
+        handleBrokerUsername();        
         handleCaCrt();        
-        
+       
         showHideAdvanced();
         
         
@@ -157,7 +158,7 @@ public class PreferencesBroker extends DialogPreference {
         
         
         
-        TextWatcher hostPortWatcher = new TextWatcher() {
+        TextWatcher hostWatcher = new TextWatcher() {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -170,13 +171,11 @@ public class PreferencesBroker extends DialogPreference {
             @Override
             public void afterTextChanged(Editable s) {
                 handleHost();
-                //handlePort();
                 conditionalyEnableConnectButton();
             }
         };
         
-        host.addTextChangedListener(hostPortWatcher);
-        //port.addTextChangedListener(hostPortWatcher);
+        host.addTextChangedListener(hostWatcher);
 
         brokerSecurity.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -212,6 +211,16 @@ public class PreferencesBroker extends DialogPreference {
             @Override
             public void afterTextChanged(Editable s) {
                 handleUserUsername();                
+            }
+        });
+        brokerUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                handleBrokerUsername();                
             }
         });
 
@@ -329,6 +338,10 @@ public class PreferencesBroker extends DialogPreference {
         handleState(RequireablePreferences.USER_USERNAME, !userUsername.getText().toString().equals(""));
     }
     
+    private void handleBrokerUsername() {
+        handleState(RequireablePreferences.BROKER_USERNAME, !brokerUsername.getText().toString().equals(""));        
+    }
+
     private void conditionalyEnableConnectButton() {
         View v = getDialog().findViewById(android.R.id.button1);
         if (v == null)
