@@ -56,7 +56,7 @@ public class PreferencesBroker extends DialogPreference {
     private enum RequireablePreferences { USER_USERNAME, DEVICE_USERNAME, BROKER_HOST, BROKER_PORT, BROKER_USERNAME, BROKER_PASSWORD, CACRT};
     
     Set<RequireablePreferences> okPreferences = Collections.synchronizedSet(EnumSet.noneOf(RequireablePreferences.class));
-    Set<RequireablePreferences> requiredPreferences = Collections.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST, RequireablePreferences.BROKER_PORT));
+    Set<RequireablePreferences> requiredPreferences = Collections.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST));
 
     public PreferencesBroker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -140,7 +140,7 @@ public class PreferencesBroker extends DialogPreference {
         super.showDialog(state);
 
         handleHost();
-        handlePort();       
+        //handlePort();       
         handleBrokerSecurity();
         handleBrokerAuth();
         handleUserUsername();        
@@ -170,13 +170,13 @@ public class PreferencesBroker extends DialogPreference {
             @Override
             public void afterTextChanged(Editable s) {
                 handleHost();
-                handlePort();
+                //handlePort();
                 conditionalyEnableConnectButton();
             }
         };
         
         host.addTextChangedListener(hostPortWatcher);
-        port.addTextChangedListener(hostPortWatcher);
+        //port.addTextChangedListener(hostPortWatcher);
 
         brokerSecurity.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -230,6 +230,7 @@ public class PreferencesBroker extends DialogPreference {
             case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:
                 brokerUsernameWrapper.setVisibility(View.GONE);
                 brokerPasswordWrapper.setVisibility(View.GONE);
+                               
                 requiredPreferences.remove(RequireablePreferences.BROKER_USERNAME);
                 requiredPreferences.remove(RequireablePreferences.USER_USERNAME);
                 break;
@@ -314,14 +315,14 @@ public class PreferencesBroker extends DialogPreference {
         }
     }
 
-    private void handlePort() {
-        try {            
-            Integer p = Integer.parseInt(port.getText().toString());
-            handleState(RequireablePreferences.BROKER_PORT, (p > 0) && (p <= 65535));
-        } catch (Exception e) {
-            handleState(RequireablePreferences.BROKER_PORT, false);
-        }
-    }
+//    private void handlePort() {
+//        try {            
+//            Integer p = Integer.parseInt(port.getText().toString());
+//            handleState(RequireablePreferences.BROKER_PORT, (p > 0) && (p <= 65535));
+//        } catch (Exception e) {
+//            handleState(RequireablePreferences.BROKER_PORT, false);
+//        }
+//    }
     
     // Check if we can assemble a topic if we need to
     private void handleUserUsername() {
