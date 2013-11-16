@@ -11,7 +11,7 @@
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
         <EditTextPreference
-            android:defaultValue="/mqttitude"
+            android:defaultValue=""
             android:dialogTitle="Topic"
             android:key="topic"
             android:summary="@string/preferencesTopicSummary"

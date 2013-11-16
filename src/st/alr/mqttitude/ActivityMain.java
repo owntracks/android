@@ -697,6 +697,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onResume() {
             super.onResume();
+            
+            
             Log.v(this.toString(), "Adding all existing contact views to list");
             for (Contact c : ServiceApplication.getContacts().values())
                 updateContactView(c);

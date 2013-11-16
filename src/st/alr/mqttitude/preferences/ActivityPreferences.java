@@ -219,9 +219,39 @@ public class ActivityPreferences extends PreferenceActivity {
                     }
                 });
 
+        
         setServerPreferenceSummary();
         //TODO: set hint when device name changes
-        Log.v("prefs", "Topic fallback: " + getTopicFallback());
+        
+        
+        backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Log.v(this.toString(), newValue.toString());
+                if (newValue.toString().equals("0")) {
+                    SharedPreferences.Editor editor = PreferenceManager
+                            .getDefaultSharedPreferences(a).edit();
+                    editor.putString(preference.getKey(), "1");
+                    editor.commit();
+                    return false;
+                }
+                return true;
+            }
+        });
+        
+        
+        OnPreferenceChangeListener topicListener = new OnPreferenceChangeListener() {
+            
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if(preference.equals(Defaults.SETTINGS_KEY_USER_USERNAME) || preference.equals(Defaults.SETTINGS_KEY_USER_USERNAME)) {
+                    topic.getEditText().setHint(getTopicFallback());                      
+                }
+                return true;
+            }
+        };
+        
+                Log.v("prefs", "Topic fallback: " + getTopicFallback());
         topic.getEditText().setHint(getTopicFallback());
 
     }
