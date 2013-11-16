@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.NinePatchDrawable;
 import android.opengl.Matrix;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -152,5 +153,14 @@ public class Contact {
       } 
 
     
-    
+//    public static Bitmap get_ninepatch(int id,int x, int y, Context context){
+//        // id is a resource id for a valid ninepatch
+//        NinePatchDrawable bg =  (NinePatchDrawable) ServiceApplication.getInstance().getResources().getDrawable(id);
+//        if (bg != null) {
+//          bg.setBounds(0, 0, getWidth(), getHeight());
+//          bg.draw(canvas);
+//          }
+//
+//    }
+
 }
