@@ -105,7 +105,6 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         payload.append(", \"lon\": ").append("\"").append(l.getLongitude()).append("\"");
         payload.append(", \"tst\": ").append("\"").append((int)(d.getTime()/1000)).append("\"");
         payload.append(", \"acc\": ").append("\"").append(Math.round(l.getLocation().getAccuracy() * 100) / 100.0d).append("m").append("\"");
-        payload.append(", \"alt\": ").append("\"").append(l.getLocation().getAltitude()).append("\"");
         payload.append("}");
 
         ServiceMqtt.getInstance().publish(
