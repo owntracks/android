@@ -9,8 +9,8 @@
         android:required="true" />
 
     <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
 
     <permission
         android:name="st.alr.mqttitude.permission.MAPS_RECEIVE"

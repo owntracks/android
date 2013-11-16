@@ -1,8 +1,6 @@
 
 package st.alr.mqttitude;
 
-import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +8,6 @@ import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBindable;
 import st.alr.mqttitude.support.Contact;
-import st.alr.mqttitude.support.ContactAdapter;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
@@ -18,26 +15,15 @@ import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -50,29 +36,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -306,7 +282,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     public static class MapFragment extends Fragment {
         private static MapFragment instance;
-        private Handler handler;
+        private static Handler handler;
         private Map<String, Contact> markerToContacts;
 
 
@@ -336,15 +312,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
          super.onActivityCreated(savedInstanceState);
         }
 
-        private void setUpMapIfNeeded(View v, Bundle savedInstanceState) {
-
-            // Do a null check to confirm that we have not already instantiated the map.
-            if (googleMap == null) {
-                // Try to obtain the map from the SupportMapFragment.
-                Log.v(this.toString(), "Recreating map");
-
-            }
-        }
         private void setUpMap() {
             googleMap.setIndoorEnabled(true);
             googleMap.setMyLocationEnabled(true);
@@ -465,6 +432,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public void onCreate(Bundle savedInstanceState) {
             handler = new Handler() {
+                @Override
                 public void handleMessage(Message msg) {
                     onHandlerMessage(msg);
                 }
@@ -591,8 +559,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 return;
             }
 
-            LatLng latlong = new LatLng(l.getLatitude(), l.getLongitude());
-
             if (location.getGeocoder() != null) {
                 Log.v(this.toString(), "Reusing geocoder");
                 // locationPrimary.setText(location.getGeocoder());
@@ -620,7 +586,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public static class FriendsFragment extends Fragment {
         LinearLayout friendsListView;
 
-        private Handler handler;
+        private static Handler handler;
         
         private static FriendsFragment instance;
 
@@ -682,7 +648,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                         
                         @Override
                         public void onClick(View v) {
-                          Contact c = (Contact) ServiceApplication.getContacts().get(v.getTag()); 
+                          Contact c = ServiceApplication.getContacts().get(v.getTag()); 
                           Log.v(this.toString(), "Focusing " + c);
                           if(c == null || c.getLocation() == null) {
                               Log.v(this.toString(), "No contact or no location ");

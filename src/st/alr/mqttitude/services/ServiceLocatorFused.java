@@ -1,6 +1,10 @@
 
 package st.alr.mqttitude.services;
 
+import java.util.Date;
+
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,11 +15,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import java.util.Date;
-
 import de.greenrobot.event.EventBus;
-import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
 
 public class ServiceLocatorFused extends ServiceLocator implements
         GooglePlayServicesClient.ConnectionCallbacks,

@@ -1,5 +1,19 @@
 package st.alr.mqttitude.services;
 
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import st.alr.mqttitude.ActivityMain;
+import st.alr.mqttitude.R;
+import st.alr.mqttitude.support.BackgroundPublishReceiver;
+import st.alr.mqttitude.support.Contact;
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.GeocodableLocation;
+import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -9,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -27,25 +40,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import de.greenrobot.event.EventBus;
-import st.alr.mqttitude.ActivityMain;
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
-import st.alr.mqttitude.ActivityMain.MapFragment;
-import st.alr.mqttitude.ActivityMain.PagerAdapter;
-import st.alr.mqttitude.support.BackgroundPublishReceiver;
-import st.alr.mqttitude.support.Contact;
-import st.alr.mqttitude.support.ContactAdapter;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
-import st.alr.mqttitude.support.ReverseGeocodingTask;
 
 public class ServiceApplication extends ServiceBindable {
     private static SharedPreferences sharedPreferences;

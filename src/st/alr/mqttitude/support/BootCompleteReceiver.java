@@ -1,12 +1,11 @@
 
 package st.alr.mqttitude.support;
 
+import st.alr.mqttitude.services.ServiceApplication;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
-
-import st.alr.mqttitude.services.ServiceApplication;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
 

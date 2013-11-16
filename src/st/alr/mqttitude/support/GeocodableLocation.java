@@ -5,10 +5,10 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.location.Location;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class GeocodableLocation extends Location  implements Serializable{
     String geocoder; 
@@ -94,10 +94,12 @@ public class GeocodableLocation extends Location  implements Serializable{
         return this; // compatibility fix
     }
     
+    @Override
     public void setLatitude(double latitude){
         super.setLatitude(latitude);
         this.latlng = new LatLng(latitude, getLongitude());
     }
+    @Override
     public void setLongitude(double longitude){
         super.setLongitude(longitude);
         this.latlng = new LatLng(getLatitude(),longitude);
@@ -108,6 +110,7 @@ public class GeocodableLocation extends Location  implements Serializable{
         this.geocoder = geocoder;
     }
 
+    @Override
     public String toString() {
         if(geocoder != null)
             return geocoder;

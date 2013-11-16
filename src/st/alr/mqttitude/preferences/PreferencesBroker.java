@@ -2,18 +2,17 @@
 package st.alr.mqttitude.preferences;
 
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
+import st.alr.mqttitude.R;
+import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.support.Defaults;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.DialogPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,10 +24,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-
-import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceMqtt;
-import st.alr.mqttitude.support.Defaults;
 
 public class PreferencesBroker extends DialogPreference {
     private Context context;
@@ -210,8 +205,11 @@ public class PreferencesBroker extends DialogPreference {
         });
         
         userUsername.addTextChangedListener(new TextWatcher() {
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
             public void afterTextChanged(Editable s) {
                 handleUserUsername();                
             }

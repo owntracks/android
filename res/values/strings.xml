@@ -14,7 +14,7 @@
     <string name="preferencesUserUsername">"Username"</string>
     <string name="preferencesDeviceName">"Device Name"</string>
     <string name="preferencesBrokerUsername">"Username (Broker authentication)"</string>
-        <string name="preferencesConnectionSecurity">"Connection security"</string>
+    <string name="preferencesConnectionSecurity">"Connection security"</string>
     
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password"</string>

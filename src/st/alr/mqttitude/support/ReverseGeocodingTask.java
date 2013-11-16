@@ -1,5 +1,9 @@
 package st.alr.mqttitude.support;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -7,10 +11,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 // AsyncTask encapsulating the reverse-geocoding API
 public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
@@ -30,7 +30,7 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
     protected Void doInBackground(GeocodableLocation... params) {
         Log.v(this.toString(), "Doing reverse Geocoder lookup of location");
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-        GeocodableLocation l = (GeocodableLocation)params[0];
+        GeocodableLocation l = params[0];
         int r = GEOCODER_NORESULT;
         
         // Return right away if there is already geocoder information available

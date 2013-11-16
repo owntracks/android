@@ -1,6 +1,12 @@
 
 package st.alr.mqttitude.preferences;
 
+import st.alr.mqttitude.App;
+import st.alr.mqttitude.R;
+import st.alr.mqttitude.services.ServiceApplication;
+import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,14 +25,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-
 import de.greenrobot.event.EventBus;
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceApplication;
-import st.alr.mqttitude.services.ServiceMqtt;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
 
 public class ActivityPreferences extends PreferenceActivity {
     private static Preference serverPreference;
@@ -177,6 +176,7 @@ public class ActivityPreferences extends PreferenceActivity {
 
         
         backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 Log.v(this.toString(), newValue.toString());
                 if (newValue.toString().equals("0")) {

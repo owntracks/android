@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import st.alr.mqttitude.R;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
