@@ -11,6 +11,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -40,6 +41,7 @@ public class ActivityPreferences extends PreferenceActivity {
 
     
     static String ver;
+    private static OnSharedPreferenceChangeListener pubTopicListener;
 
     public static boolean isAdvancedModeEnabled(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("advancedMode", false);
@@ -60,6 +62,11 @@ public class ActivityPreferences extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_HOST, "");
     }
 
+    public static boolean areContactsEnabled(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
+    }
+    
+    
     
     public static String getTrackingUsername(){
         String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
@@ -99,19 +106,29 @@ public class ActivityPreferences extends PreferenceActivity {
         return name;        
     }
     
-    public static String getTopicFallback(){
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+    public static String getSubTopic(boolean defaultTopicFallback) {
+        String topic = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TOPIC_SUB, "");
+        if(topic.equals("") && defaultTopicFallback) 
+            topic = getSubTopicFallback();
+        return topic;        
+    }
+
+    public static String getSubTopicFallback() {
+        return Defaults.VALUE_TOPIC_SUB;
+    }
+    
+    public static String getPubTopicFallback(){
         String deviceName = getDeviceName(true);
         String userUsername = getUsername();
         
-        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC, userUsername, deviceName);
+        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC_PUB, userUsername, deviceName);
     }
     
-    public static String getTopic(boolean defaultFallback){
+    public static String getPubTopic(boolean defaultFallback){
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-        String topic = p.getString(Defaults.SETTINGS_KEY_TOPIC, "");
+        String topic = p.getString(Defaults.SETTINGS_KEY_TOPIC_PUB, "");
         if(topic.equals("") && defaultFallback)
-            topic = getTopicFallback();
+            topic = getPubTopicFallback();
 
         return topic;        
       }
@@ -166,7 +183,7 @@ public class ActivityPreferences extends PreferenceActivity {
         backgroundUpdatesIntervall = f
                 .findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
         topicScreen = (PreferenceScreen) f.findPreference("topicSettings");
-        topic = (EditTextPreference) f.findPreference(Defaults.SETTINGS_KEY_TOPIC);
+        topic = (EditTextPreference) f.findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
 
         onSetupCommon(f.getActivity());
     }
@@ -245,22 +262,24 @@ public class ActivityPreferences extends PreferenceActivity {
         });
         
         
-        OnPreferenceChangeListener topicListener = new OnPreferenceChangeListener() {
-            
+        pubTopicListener = new OnSharedPreferenceChangeListener() {
+
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if(preference.equals(Defaults.SETTINGS_KEY_USER_NAME) || preference.equals(Defaults.SETTINGS_KEY_USER_NAME)) {
-                    topic.getEditText().setHint(getTopicFallback());                      
-                }
-                return true;
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if(key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
+                    setPubTopicHint(topic);
             }
         };
+        PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(pubTopicListener);
         
-        Log.v("prefs", "Topic fallback: " + getTopicFallback());
-        topic.getEditText().setHint(getTopicFallback());
-
+        setPubTopicHint(topic);
     }
 
+    private static void setPubTopicHint(EditTextPreference e){
+        e.getEditText().setHint(getPubTopicFallback());
+
+    }
+    
     @Override
     public void onStart() {
         super.onStart();
@@ -287,6 +306,8 @@ public class ActivityPreferences extends PreferenceActivity {
 
     @Override
     protected void onDestroy() {
+        if(pubTopicListener != null)
+            PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(pubTopicListener);
         super.onDestroy();
     }
 
@@ -306,5 +327,6 @@ public class ActivityPreferences extends PreferenceActivity {
     public boolean onIsMultiPane() {
         return false;
     }
+
 
 }

@@ -309,8 +309,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
                 .append("\"");
         payload.append("}");
 
-        m.setWill(mqttClient.getTopic(sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC,
-                Defaults.VALUE_TOPIC)), payload.toString().getBytes(), 0, false);
+        m.setWill(mqttClient.getTopic(ActivityPreferences.getPubTopic(true)), payload.toString().getBytes(), 0, false);
 
     }
 
@@ -334,8 +333,9 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         scheduleNextPing();
         
         try {
-            //TODO: make configurable
-            mqttClient.subscribe(Defaults.SETTINGS_KEY_TOPIC_SUBSCRIBE);
+
+            if(ActivityPreferences.areContactsEnabled())
+                mqttClient.subscribe(ActivityPreferences.getSubTopic(true));
             
         } catch (MqttException e) {
             e.printStackTrace();
