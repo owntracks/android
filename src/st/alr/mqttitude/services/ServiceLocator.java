@@ -98,6 +98,11 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
             return;
         }
 
+        if(ServiceMqtt.getInstance() == null) {
+            Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
+            return;
+        }
+        
         payload.append("{");
         payload.append("\"_type\": ").append("\"").append("location").append("\"");
         payload.append(", \"lat\": ").append("\"").append(l.getLatitude()).append("\"");
@@ -181,7 +186,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
            ui = Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
                 Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL));
         } catch (Exception e) {
-            ui = 30;
+            ui = Integer.parseInt(Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL);
         }
            
            return ui;

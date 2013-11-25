@@ -5,6 +5,8 @@ import java.util.Date;
 
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +24,6 @@ public class ServiceLocatorFused extends ServiceLocator implements
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private LocationClient mLocationClient;
     private LocationRequest mLocationRequest;
-    private final int MINUTES_TO_MILISECONDS = 60 * 1000;
     private boolean ready = false;
     private boolean foreground = false;
     private final String TAG = "ServiceLocatorFused";
@@ -111,7 +112,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(10*1000);
         mLocationRequest.setFastestInterval(0);
-        mLocationRequest.setSmallestDisplacement(5);
+        mLocationRequest.setSmallestDisplacement(50);
     }
 
     @Override
@@ -134,13 +135,32 @@ public class ServiceLocatorFused extends ServiceLocator implements
             return;
         }
 
-        if (foreground || areBackgroundUpdatesEnabled())
-            mLocationClient.requestLocationUpdates(mLocationRequest, this);
-        else
-            Log.d(TAG,
-                    "Location updates are disabled (not in foreground or background updates disabled)");
+        if (foreground || areBackgroundUpdatesEnabled()) {
+//            if(foreground) {
+//                mLocationClient.requestLocationUpdates(mLocationRequest, this);
+//            }else{
+                Intent i = new Intent(this, ServiceLocatorFused.class);
+                PendingIntent p = PendingIntent.getService(this, 1, i, 0);                
+                mLocationClient.requestLocationUpdates(mLocationRequest, p);
+//            }
+        } else {
+            Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
+        }
     }
-
+    
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int r = super.onStartCommand(intent, flags, startId);
+        
+        Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
+        if(location !=null)
+         onLocationChanged(location);             
+        
+        
+        return r;        
+    }
+    
     private void setupLocationRequest() {
         disableLocationUpdates();
 
