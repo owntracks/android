@@ -31,7 +31,7 @@
         android:title="@string/preferencesContactSettings" >
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="contactsEnabled"
+            android:key="subEnabled"
             android:summary="@string/preferencesContactsEnabledSummary"
             android:title="@string/preferencesContactsEnabledTitle" />
     </PreferenceScreen>
@@ -94,7 +94,7 @@
         <EditTextPreference
             android:defaultValue=""
             android:dialogTitle="@string/preferencesContactsTopic"
-            android:key="contactsTopic"
+            android:key="subTopic"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
     </PreferenceScreen>

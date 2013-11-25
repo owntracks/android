@@ -86,7 +86,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         StringBuilder payload = new StringBuilder();
         Date d = new Date();
         GeocodableLocation l = getLastKnownLocation();
-        String topic = ActivityPreferences.getTopic(true);
+        String topic = ActivityPreferences.getPubTopic(true);
 
         if (topic == null) {
             changeState(Defaults.State.ServiceLocator.NOTOPIC);
