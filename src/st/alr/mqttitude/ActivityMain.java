@@ -41,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -59,52 +60,28 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     PagerAdapter pagerAdapter;
     static ViewPager viewPager;
-    ServiceApplication serviceApplication;
-    ServiceConnection serviceApplicationConnection;
+    //ServiceConnection serviceApplicationConnection;
     
-    @Override
-    protected void onDestroy() {
-        unbindService(serviceApplicationConnection);
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        unbindService(serviceApplicationConnection);
+//        super.onDestroy();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         
-     // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
+        // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
         // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
         if (savedInstanceState != null) 
         {
            savedInstanceState.remove ("android:support:fragments");
         } 
         super.onCreate(savedInstanceState);
-        
-        
-        
-        
-        Intent i = new Intent(this, ServiceApplication.class);
-        startService(i);
-        serviceApplicationConnection = new ServiceConnection() {
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                serviceApplication = null;
-            }
-
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.v(this.toString(), "application service bound");
-                serviceApplication = (ServiceApplication) ((ServiceBindable.ServiceBinder) service)
-                        .getService();
-            }
-
-        };
-
-        bindService(new Intent(this, ServiceApplication.class), serviceApplicationConnection,
-                Context.BIND_AUTO_CREATE);
+                
 
         setContentView(R.layout.activity_main);
-
+        
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -127,24 +104,14 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             }
         });
 
-        // For each of the sections in the app, add a tab to the action bar.
         for (int j = 0; j < pagerAdapter.getCount(); j++) {
-            // Create a tab with text corresponding to the page title defined by
-            // the adapter. Also specify this Activity object, which implements
-            // the TabListener interface, as the callback (listener) for when
-            // this tab is selected.
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(pagerAdapter.getPageTitle(j))
-                            .setTabListener(this));
+            actionBar.addTab(actionBar.newTab().setText(pagerAdapter.getPageTitle(j)).setTabListener(this));
         }
 
         try {
             MapsInitializer.initialize(this);
-        } catch (GooglePlayServicesNotAvailableException e) {
-        }
+        } catch (GooglePlayServicesNotAvailableException e) {}
 
-   //    parseContacts();
     }
 
     @Override
@@ -156,20 +123,17 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.v(this.toString(), "here");
-
         int itemId = item.getItemId();
-        Log.v(this.toString(), itemId + " " + R.id.menu_preferences);
         if (itemId == R.id.menu_preferences) {
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
         } else if (itemId == R.id.menu_publish) {
-            if (serviceApplication.getServiceLocator() != null)
-                serviceApplication.getServiceLocator().publishLastKnownLocation();
+            if (ServiceApplication.getInstance().getServiceLocator() != null)
+                ServiceApplication.getInstance().getServiceLocator().publishLastKnownLocation();
             return true;
         } else if (itemId == R.id.menu_share) {
-            if (serviceApplication.getServiceLocator() != null)
+            if (ServiceApplication.getInstance().getServiceLocator() != null)
                 this.share(null);
             return true;
         } else {
@@ -178,7 +142,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     }
 
     public void share(View view) {
-        GeocodableLocation l = serviceApplication.getServiceLocator().getLastKnownLocation();
+        GeocodableLocation l = ServiceApplication.getInstance().getServiceLocator().getLastKnownLocation();
         if (l == null) {
             // TODO: signal to user
             return;
@@ -259,25 +223,25 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     @Override
     public void onStart() {
         super.onStart();
-        //EventBus.getDefault().registerSticky(this);
-        if (serviceApplication != null)
-            serviceApplication.getServiceLocator().enableForegroundMode();
+        if (ServiceApplication.getInstance() != null)
+            ServiceApplication.getInstance().enableForegroundMode();
 
     }
 
     @Override
     public void onStop() {
-       // EventBus.getDefault().unregister(this);
-
-        if (serviceApplication != null)
-            serviceApplication.getServiceLocator().enableBackgroundMode();
+        if (ServiceApplication.getInstance() != null)
+            ServiceApplication.getInstance().enableBackgroundMode();
 
         super.onStop();
     }
 
     
 
-
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
     
 
     public static class MapFragment extends Fragment {

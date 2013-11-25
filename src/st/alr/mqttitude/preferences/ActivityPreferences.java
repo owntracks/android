@@ -55,6 +55,11 @@ public class ActivityPreferences extends PreferenceActivity {
         
         return id;
     }
+
+    public static String getServerAdress(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_HOST, "");
+    }
+
     
     public static String getTrackingUsername(){
         String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
@@ -68,27 +73,27 @@ public class ActivityPreferences extends PreferenceActivity {
 
 
     
-    public static String getUserUsername(){
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_USERNAME, "");
+    public static String getUsername(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_NAME, "");
     }
 
     public static int getBrokerAuthType(){
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERUSERNAME);
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERNAME);
 
     }
 
-    public static String getBrokerUsername(boolean userUsernameFallback)
-    {
-        String username = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "");
-        if(username.equals("") && userUsernameFallback) 
-            username = getUserUsername();
-        return username;        
-    }
-    
+//    public static String getBrokerUsername(boolean userUsernameFallback)
+//    {
+//        String username = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "");
+//        if(username.equals("") && userUsernameFallback) 
+//            username = getUserUsername();
+//        return username;        
+//    }
+//    
     
     public static String getDeviceName(boolean androidIdFallback)
     {
-        String name = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_DEVICE_NAME, "");
+        String name = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_DEVICE_NAME, "");
         if(name.equals("") && androidIdFallback) 
             name = getAndroidId();
         return name;        
@@ -97,7 +102,7 @@ public class ActivityPreferences extends PreferenceActivity {
     public static String getTopicFallback(){
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         String deviceName = getDeviceName(true);
-        String userUsername = getUserUsername();
+        String userUsername = getUsername();
         
         return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC, userUsername, deviceName);
     }
@@ -244,14 +249,14 @@ public class ActivityPreferences extends PreferenceActivity {
             
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if(preference.equals(Defaults.SETTINGS_KEY_USER_USERNAME) || preference.equals(Defaults.SETTINGS_KEY_USER_USERNAME)) {
+                if(preference.equals(Defaults.SETTINGS_KEY_USER_NAME) || preference.equals(Defaults.SETTINGS_KEY_USER_NAME)) {
                     topic.getEditText().setHint(getTopicFallback());                      
                 }
                 return true;
             }
         };
         
-                Log.v("prefs", "Topic fallback: " + getTopicFallback());
+        Log.v("prefs", "Topic fallback: " + getTopicFallback());
         topic.getEditText().setHint(getTopicFallback());
 
     }

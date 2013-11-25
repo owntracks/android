@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import st.alr.mqttitude.ActivityMain;
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.support.BackgroundPublishReceiver;
 import st.alr.mqttitude.support.Contact;
@@ -54,7 +55,6 @@ public class ServiceApplication extends ServiceBindable {
     private boolean even = false;
     private SimpleDateFormat dateFormater;
     private Handler handler;
-    private final String TAG  = "ServiceApplication";
     private static Map<String,Contact> contacts;
     
     private static ServiceLocator serviceLocator;
@@ -64,18 +64,16 @@ public class ServiceApplication extends ServiceBindable {
     @Override
     public void onCreate(){
         super.onCreate();
-        instance = this;
-        contacts = new HashMap<String,Contact>();
     }
     
     @Override
     protected void onStartOnce() {
         
-        Log.v(this.toString(), "MQTTITUDE STARTING");
-        instance = this;
+        Log.v(this.toString(), "ServiceApplication starting");
         
-        int resp = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
- 
+        instance = this;
+
+        contacts = new HashMap<String,Contact>();
 
         handler = new Handler() {
             @Override
@@ -86,23 +84,11 @@ public class ServiceApplication extends ServiceBindable {
 
         EventBus.getDefault().registerSticky(this);
 
-        if (resp == ConnectionResult.SUCCESS) {
-            Log.v(this.toString(), "Play  services version: "
-                    + GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
-            locatorClass = ServiceLocatorFused.class;
-        } else {
-            // TODO: implement fallback locator
-            Log.e(this.toString(),
-                    "play services not available and no other locator implemented yet ");
-            locatorClass = ServiceLocatorFused.class;
-        }
 
 
-        this.dateFormater = new SimpleDateFormat("y/M/d H:m:s",
-                getResources().getConfiguration().locale);
+        this.dateFormater = new SimpleDateFormat("y/M/d H:m:s", getResources().getConfiguration().locale);
 
-        notificationManager = (NotificationManager) getSystemService(
-                Context.NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationBuilder = new NotificationCompat.Builder (this);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -119,7 +105,6 @@ public class ServiceApplication extends ServiceBindable {
 
         ServiceConnection mqttConnection = new ServiceConnection() {
             
-
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 serviceMqtt = null;                
@@ -147,7 +132,7 @@ public class ServiceApplication extends ServiceBindable {
             }
         };
         
-        bindService(new Intent(this, getServiceLocatorClass()), locatorConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, ServiceLocatorFused.class), locatorConnection, Context.BIND_AUTO_CREATE);
 
         updateTicker("MQTTitude service started");
         
@@ -182,14 +167,6 @@ public class ServiceApplication extends ServiceBindable {
 
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        // android.support.v4.app.TaskStackBuilder stackBuilder =
-        // android.support.v4.app.TaskStackBuilder
-        // .create(this);
-        // stackBuilder.addParentStack(ActivityMain.class);
-        // stackBuilder.addNextIntent(resultIntent);
-        // PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
-        // Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        //
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -202,7 +179,7 @@ public class ServiceApplication extends ServiceBindable {
 
         notificationBuilder.addAction(
                 R.drawable.ic_upload,
-                "Publish",
+                "Publish location",
                 pIntent);
 
         updateNotification();
@@ -322,9 +299,6 @@ public class ServiceApplication extends ServiceBindable {
         return instance;
     }
     
-    public static Class<?> getServiceLocatorClass() {
-        return locatorClass;
-    }
     
     public ServiceLocator getServiceLocator() {
         return serviceLocator;        
@@ -412,5 +386,13 @@ public class ServiceApplication extends ServiceBindable {
         
     }
 
+    public void enableForegroundMode() {
+            getServiceLocator().enableForegroundMode();
+    }
+
+    public void enableBackgroundMode() {
+            getServiceLocator().enableBackgroundMode();
+    }
+    
     
 }

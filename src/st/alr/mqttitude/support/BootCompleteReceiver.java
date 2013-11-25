@@ -19,6 +19,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
             Intent i = new Intent(context, ServiceApplication.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.putExtra("autostart", true);
             context.startService(i);
         }
 
