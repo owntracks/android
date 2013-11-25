@@ -10,29 +10,7 @@
     <PreferenceScreen
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
-        
-
-        <EditTextPreference
-            android:defaultValue=""
-            android:dialogTitle="Topic"
-            android:key="topic"
-            android:summary="@string/preferencesTopicSummary"
-            android:title="@string/preferencesTopic" />
-
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/qos_readable"
-            android:entryValues="@array/qos"
-            android:key="qos"
-            android:summary="@string/preferencesQOSSummary"
-            android:title="@string/preferencesQOS" />
-
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="retain"
-            android:summary="@string/preferencesRetainSummary"
-            android:title="@string/preferencesRetain" />
-                <CheckBoxPreference
             android:defaultValue="false"
             android:key="backgroundUpdates"
             android:summary="@string/preferencesBackgroundUpdatesSummary"
@@ -49,10 +27,17 @@
             android:title="@string/preferencesBackgroundUpdatesInterval" />
     </PreferenceScreen>
     <PreferenceScreen
+        android:key="contactSettings"
+        android:title="@string/preferencesContactSettings" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="contactsEnabled"
+            android:summary="@string/preferencesContactsEnabledSummary"
+            android:title="@string/preferencesContactsEnabledTitle" />
+    </PreferenceScreen>
+    <PreferenceScreen
         android:key="activitySettings"
         android:title="@string/preferencesNotification" >
-
-
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="notificationEnabled"
@@ -75,11 +60,43 @@
             android:key="notificationTickerOnPublishEnabled"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="advanced"
+        android:title="@string/preferencesAdvancedTitle" >
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="advancedMode"
-            android:summary="@string/preferencesAdvancedModeSummary"
-            android:title="@string/preferencesAdvancedModeTitle" />
+            android:summary="@string/preferencesAdvancedConnectionSummary"
+            android:title="@string/preferencesAdvancedConnectionTitle" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogTitle="@string/preferencesTopic"
+            android:key="topic"
+            android:summary="@string/preferencesTopicSummary"
+            android:title="@string/preferencesTopic" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/qos_readable"
+            android:entryValues="@array/qos"
+            android:key="qos"
+            android:summary="@string/preferencesQOSSummary"
+            android:title="@string/preferencesQOS" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="retain"
+            android:summary="@string/preferencesRetainSummary"
+            android:title="@string/preferencesRetain" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogTitle="@string/preferencesContactsTopic"
+            android:key="contactsTopic"
+            android:summary="@string/preferencesContactsTopicSummary"
+            android:title="@string/preferencesContactsTopic" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
