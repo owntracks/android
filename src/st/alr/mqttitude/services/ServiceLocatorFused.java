@@ -42,6 +42,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
             mLocationClient.connect();        
     }
+
     
     @Override
     public GeocodableLocation getLastKnownLocation() {

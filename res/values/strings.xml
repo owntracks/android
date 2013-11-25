@@ -11,13 +11,10 @@
     <string name="preferencesServerTitle">"Connection"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
-    <string name="preferencesUserUsername">"Username"</string>
-    <string name="preferencesDeviceName">"Device Name"</string>
-    <string name="preferencesBrokerUsername">"Username (Broker authentication)"</string>
+    <string name="preferencesUserUsername">"User-Name"</string>
+    <string name="preferencesDeviceName">"Device-Name"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
-    
     <string name="preferencesBrokerAuth">"Authentication"</string>
-    
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
     <string name="preferencesBrokerClientId">"Client ID"</string>
@@ -67,7 +64,6 @@
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
     <string name="error">"Error"</string>
-    
     <string name="statePublished">"Location published"</string>
     <string name="stateNotopic">"Error: No topic set"</string>
     <string name="statePublishTimeout">"Error: Publish timeout"</string>
@@ -75,19 +71,22 @@
     <string name="statePublishing">"Publishing"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
+    <string name="next">Next</string>
+    <string name="prev">Previous</string>
+    <string name="finish">Submit order</string>
+    <string name="submit_confirm_message">Place the order with the deli? You will receive an email
+        confirmation.</string>
+    <string name="submit_confirm_button">Place order</string>
 
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
         <item>TLS (Custom Certificate)</item>
     </string-array>
-    
-   	<string-array name="connect_options_auth">
+    <string-array name="connect_options_auth">
         <item>Anonymous</item>
         <item>Username / Password</item>
-        <item>Custom</item>
     </string-array>
-    
     <string-array name="qos">
         <item>0</item>
         <item>1</item>
@@ -98,5 +97,9 @@
         <item>"1"</item>
         <item>"2"</item>
     </string-array>
+
+    <string name="title_activity_activity_launcher">ActivityLauncher</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_activity_wizzard">Wizzard</string>
 
 </resources>

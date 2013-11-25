@@ -264,25 +264,17 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
  
             switch (ActivityPreferences.getBrokerAuthType()) {
-                case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:
-                    
+                case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:                    
                     break;
 
-                case Defaults.VALUE_BROKER_AUTH_USERUSERNAME:
+                default:
                     options.setPassword(sharedPreferences.getString(
                                 Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
 
-                    options.setUserName(ActivityPreferences.getUserUsername());
+                    options.setUserName(ActivityPreferences.getUsername());
 
                     break;
 
-                case Defaults.VALUE_BROKER_AUTH_BROKERUSERNAME:
-                    options.setPassword(sharedPreferences.getString(
-                            Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
-
-                    options.setUserName(ActivityPreferences.getBrokerUsername(true));
-
-                    break;
 }
             
             
@@ -576,6 +568,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         try
         {
             p.publishing();
+            Log.v(this.toString(), "publishing " + p +" to " + p.getTopic());
             mqttClient.getTopic(p.getTopic()).publish(p);
             p.publishSuccessfull();
         } catch (MqttException e)

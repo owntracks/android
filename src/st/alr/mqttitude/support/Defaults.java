@@ -11,10 +11,9 @@ public class Defaults {
 
     public static final String SETTINGS_KEY_BROKER_HOST = "brokerHost";
     public static final String SETTINGS_KEY_BROKER_PORT = "brokerPort";    
-    public static final String SETTINGS_KEY_BROKER_DEVICE_NAME = "deviceName";
+    public static final String SETTINGS_KEY_DEVICE_NAME = "deviceName";
     public static final String SETTINGS_KEY_BROKER_PASSWORD = "brokerPassword";
-    public static final String SETTINGS_KEY_BROKER_USERNAME = "brokerUsername";
-    public static final String SETTINGS_KEY_USER_USERNAME = "userUsername";
+    public static final String SETTINGS_KEY_USER_NAME = "userUsername";
     public static final String SETTINGS_KEY_BROKER_AUTH = "brokerAuth";
 
     public static final String SETTINGS_KEY_BROKER_SECURITY = "brokerSecurity";
@@ -53,8 +52,7 @@ public class Defaults {
     public static final String SETTINGS_KEY_TOPIC_SUBSCRIBE = "mqttitude/+/+";
     
     public static final int VALUE_BROKER_AUTH_ANONYMOUS = 0;
-    public static final int VALUE_BROKER_AUTH_USERUSERNAME = 1;
-    public static final int VALUE_BROKER_AUTH_BROKERUSERNAME = 2;
+    public static final int VALUE_BROKER_AUTH_USERNAME = 1;
     public static final String SETTINGS_KEY_TRACKING = "tracking";
 
 

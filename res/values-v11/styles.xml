@@ -7,5 +7,12 @@
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
         <!-- API 11 theme customizations can go here. -->
     </style>
+    
+        <style name="ButtonBar" parent="@android:style/Holo.Light.ButtonBar.AlertDialog"></style>
+
+    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:textColor">@android:color/primary_text_light</item>
+    </style>
+    
 
 </resources>
