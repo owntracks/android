@@ -67,7 +67,7 @@ public abstract class ServiceBindable extends Service {
             started = true;
             onStartOnce();
         }
-        
+                        
         return Service.START_STICKY;
     }
 

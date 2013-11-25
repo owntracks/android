@@ -29,7 +29,7 @@ public class Defaults {
     
     public static final String VALUE_BROKER_HOST = "192.168.8.2";
     public static final String VALUE_BROKER_PORT = "8883";
-    public static final String VALUE_BACKGROUND_UPDATES_INTERVAL = "30";
+    public static final String VALUE_BACKGROUND_UPDATES_INTERVAL = "15";
     public static final boolean VALUE_BACKGROUND_UPDATES = false;
 
     public static final int VALUE_BROKER_SECURITY_NONE = 0;
