@@ -23,7 +23,7 @@
     <string name="preferencesLicensesTitle">"Licenses"</string>
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
     <string name="preferencesLicensesDismiss">"Dismiss"</string>
-    <string name="preferencesNotification">Behaviour</string>
+    <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful publishes</string>
     <string name="preferencesNotificationTickerOnPublishTitle">Ticker on publish</string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
@@ -32,21 +32,23 @@
     <string name="preferencesNotificationLocationTitle">"Last published location"</string>
     <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
     <string name="preferencesNotificationGeocoderTitle">"Geocoder"</string>
-    <string name="preferencesAdvancedModeSummary">"Show preferences for advanced users"</string>
-    <string name="preferencesAdvancedModeTitle">"Advanced preferences"</string>
+    <string name="preferencesAdvancedConnectionSummary">"Show advanced connection preferences"</string>
+    <string name="preferencesAdvancedConnectionTitle">"Advanced connection preferences"</string>
+        <string name="preferencesAdvancedTitle">"Advanced"</string>
+    
     <string name="preferencesVersionTitle">"Version"</string>
     <string name="preferencesTopicSettings">"Reporting"</string>
-    <string name="preferencesTopic">"Topic"</string>
+    <string name="preferencesTopic">"Publish topic"</string>
     <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
-    <string name="preferencesRetain">"Retain"</string>
+    <string name="preferencesRetain">"Publish retained"</string>
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
-    <string name="preferencesQOS">"Quality of Service"</string>
+    <string name="preferencesQOS">"Publish QOS"</string>
     <string name="preferencesQOSSummary">"QOS for publishes"</string>
     <string name="preferencesActivity">"Background activity"</string>
-    <string name="preferencesBackgroundUpdatesInterval">Publish interval</string>
-    <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic publishes</string>
-    <string name="preferencesBackroundUpdates">Automatic publishes</string>
-    <string name="preferencesBackgroundUpdatesSummary">Publish locations automatically</string>
+    <string name="preferencesBackgroundUpdatesInterval">Reporting interval</string>
+    <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic reporting</string>
+    <string name="preferencesBackroundUpdates">Automatic location reporting</string>
+    <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepositoryTitle">Repository</string>
     <string name="preferencesRepositorySummary">Explore the code at Github</string>
@@ -73,10 +75,14 @@
     <string name="stateIdle">"Idle"</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
-    <string name="finish">Submit order</string>
-    <string name="submit_confirm_message">Place the order with the deli? You will receive an email
-        confirmation.</string>
-    <string name="submit_confirm_button">Place order</string>
+    <string name="finish">tbd</string>
+    <string name="submit_confirm_message">tbd</string>
+    <string name="submit_confirm_button">tbd</string>
+    <string name="preferencesContactSettings">Contacts</string>
+    <string name="preferencesContactsEnabledTitle">Contact locations</string>
+    <string name="preferencesContactsEnabledSummary">Show contact locations</string>
+    <string name="preferencesContactsTopic">Subscribe topic</string>
+    <string name="preferencesContactsTopicSummary">Topic for contact location updates</string>
 
     <string-array name="connect_options_security">
         <item>None</item>
@@ -99,7 +105,6 @@
     </string-array>
 
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_activity_wizzard">Wizzard</string>
 
 </resources>
