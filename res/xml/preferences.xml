@@ -10,6 +10,8 @@
     <PreferenceScreen
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
+        
+
         <EditTextPreference
             android:defaultValue=""
             android:dialogTitle="Topic"
@@ -26,16 +28,10 @@
             android:title="@string/preferencesQOS" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="retain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:key="activitySettings"
-        android:title="@string/preferencesNotification" >
-        
                 <CheckBoxPreference
             android:defaultValue="false"
             android:key="backgroundUpdates"
@@ -51,7 +47,12 @@
             android:key="backgroundUpdatesInterval"
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
-        
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="activitySettings"
+        android:title="@string/preferencesNotification" >
+
+
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="notificationEnabled"
@@ -60,59 +61,48 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:dependency="notificationEnabled"
-            
             android:key="notificationLocation"
             android:summary="@string/preferencesNotificationLocationSummary"
             android:title="@string/preferencesNotificationLocationTitle" />
-        
         <CheckBoxPreference
             android:defaultValue="false"
             android:dependency="notificationLocation"
             android:key="notificationGeocoder"
             android:summary="@string/preferencesNotificationGeocoderSummary"
             android:title="@string/preferencesNotificationGeocoderTitle" />
-          
-          <CheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="notificationTickerOnPublishEnabled"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
-        
-          <CheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="advancedMode"
             android:summary="@string/preferencesAdvancedModeSummary"
             android:title="@string/preferencesAdvancedModeTitle" />
-          
-          
-        </PreferenceScreen>
+    </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
-
         <Preference
             android:key="mail"
-            android:title="@string/preferencesMailTitle" 
-           android:summary="@string/preferencesMailSummary"/>
-        
+            android:summary="@string/preferencesMailSummary"
+            android:title="@string/preferencesMailTitle" />
         <Preference
             android:key="repo"
-            android:title="@string/preferencesRepositoryTitle" 
-            android:summary="@string/preferencesRepositorySummary"/>
-        
-        
-        
+            android:summary="@string/preferencesRepositorySummary"
+            android:title="@string/preferencesRepositoryTitle" />
+
         <st.alr.mqttitude.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"
             android:negativeButtonText=""
             android:positiveButtonText="@string/preferencesLicensesDismiss"
             android:summary="@string/preferencesLicensesSummary"
             android:title="@string/preferencesLicensesTitle" />
-        
+
         <Preference
             android:key="versionReadOnly"
             android:title="@string/preferencesVersionTitle" />
-        
-        </PreferenceScreen>
+    </PreferenceScreen>
 
 </PreferenceScreen>

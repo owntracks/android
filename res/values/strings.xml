@@ -35,7 +35,7 @@
     <string name="preferencesAdvancedModeSummary">"Show preferences for advanced users"</string>
     <string name="preferencesAdvancedModeTitle">"Advanced preferences"</string>
     <string name="preferencesVersionTitle">"Version"</string>
-    <string name="preferencesTopicSettings">"Topic"</string>
+    <string name="preferencesTopicSettings">"Reporting"</string>
     <string name="preferencesTopic">"Topic"</string>
     <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
     <string name="preferencesRetain">"Retain"</string>
