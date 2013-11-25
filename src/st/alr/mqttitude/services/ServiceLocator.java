@@ -3,6 +3,7 @@ package st.alr.mqttitude.services;
 
 import java.util.Date;
 
+import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
@@ -85,9 +86,8 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         StringBuilder payload = new StringBuilder();
         Date d = new Date();
         GeocodableLocation l = getLastKnownLocation();
-        String topic = sharedPreferences.getString(Defaults.SETTINGS_KEY_TOPIC, Defaults.VALUE_TOPIC);
+        String topic = ActivityPreferences.getTopic(true);
 
-           
         if (topic == null) {
             changeState(Defaults.State.ServiceLocator.NOTOPIC);
             return;
