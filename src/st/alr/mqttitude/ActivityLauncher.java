@@ -95,14 +95,10 @@ public class ActivityLauncher extends FragmentActivity{
     
     
     private void checkSettings() {
-        boolean needsUserUsername = ActivityPreferences.getTopic(false).equals("");        
-        Log.v(this.toString(), "Preflight check: needsUserUsername: " + needsUserUsername);
-        
-        // Until setup wizzward works
-        //        settingsOK = (ActivityPreferences.getServerAdress().equals("") ||           (needsUserUsername ? ActivityPreferences.getUserUsername().equals("") : true) );
 
-        
+        // check if username, devicename and host is set. 
 
+        // until the wizzard works
         settingsOK = true;
         if(!settingsOK)
             startActivityWizzard();
