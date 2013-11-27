@@ -40,7 +40,7 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
                 if (addresses != null && addresses.size() > 0) {            
                     
                     if(addresses.get(0).getLocality() != null)                    
-                        l.setGeocoder(addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
+                        l.setGeocoder(addresses.get(0).getLocality());
                     else                         
                         l.setGeocoder(addresses.get(0).getCountryName());
                     

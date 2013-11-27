@@ -74,6 +74,12 @@ public class GeocodableLocation extends Location  implements Serializable{
         try {lon = json.getDouble("lon");} catch(Exception e) { lon = (double) 0; };
         try {acc = Float.parseFloat(json.getString("acc")); } catch(Exception e) { acc = (float) 0; };
         try {tst = Long.parseLong(json.getString("tst")); } catch(Exception e) { tst = (long) 0; };
+        try {
+            Log.v("geo", "acc: " + json.getString("acc"));
+        } catch (JSONException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         try {alt = json.getDouble("alt"); } catch(Exception e) { alt = (double) 0; };
 
         GeocodableLocation l = new GeocodableLocation("mqttitude-deserialized");                    

@@ -105,11 +105,13 @@
     </style>
 
     <color name="lightGrey">#c8c8c8</color>
-    <color name="mediumGrey">#acacac</color>
-    <color name="darkGrey">#505050</color>
-    <color name="background">#e5e5e5</color>
+    <color name="mediumGrey">#aaaaaa</color>
+    <color name="darkGrey">#353535</color>
+    <color name="background">#ededed</color>
     <color name="border">#acacac</color>
 
+    
+    
     <style name="seperator">
         <item name="android:background">@color/lightGrey</item>
         <item name="android:visibility">visible</item>
@@ -135,12 +137,12 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="listItem">
+    <style name="cardInner">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingTop">@dimen/card_inner_vertical_spacing_half</item>
+        <item name="android:paddingBottom">@dimen/card_inner_vertical_spacing_half</item>
     </style>
 
     <style name="listItemTitle">
@@ -161,6 +163,10 @@
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:background">@drawable/card</item>
+        <item name="android:paddingLeft">@dimen/card_padding_vertical</item>
+        <item name="android:paddingRight">@dimen/card_padding_vertical</item>        
+		<item name="android:paddingTop">@dimen/card_inner_vertical_spacing_half</item>
+        <item name="android:paddingBottom">@dimen/card_inner_vertical_spacing_half</item>        
     </style>
 
     <style name="card_title">
@@ -168,14 +174,14 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_title</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">#585757</item>
+        <item name="android:textColor">@color/darkGrey</item>
     </style>
 
     <style name="card_content">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_content</item>
-        <item name="android:textColor">#969696</item>
+        <item name="android:textColor">@color/lightGrey</item>
     </style>
 
     

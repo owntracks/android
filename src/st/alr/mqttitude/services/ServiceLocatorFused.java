@@ -153,10 +153,11 @@ public class ServiceLocatorFused extends ServiceLocator implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         int r = super.onStartCommand(intent, flags, startId);
         
-        Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
-        if(location !=null)
-         onLocationChanged(location);             
-        
+        if(intent != null) {
+            Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
+            if(location !=null)
+             onLocationChanged(location);             
+        }
         
         return r;        
     }

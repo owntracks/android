@@ -5,15 +5,23 @@
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- API 14 theme customizations can go here. -->
-    </style>
-    
-    <style name="card_title">        
-        <item name="android:fontFamily">"sans-serif"</item>
+    <style name="card_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/card_title</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:fontFamily">"sans-serif-light"</item>
     </style>
 
     <style name="card_content">
-        <item name="android:fontFamily">"sans-serif"</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/card_content</item>
+        <item name="android:textColor">@color/lightGrey</item>
+        <item name="android:fontFamily">"sans-serif-light"</item>
     </style>
+    
+    
+
 </resources>

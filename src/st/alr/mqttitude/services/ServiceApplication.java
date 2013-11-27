@@ -86,7 +86,7 @@ public class ServiceApplication extends ServiceBindable {
 
 
 
-        this.dateFormater = new SimpleDateFormat("y/M/d H:m:s", getResources().getConfiguration().locale);
+        this.dateFormater = new SimpleDateFormat("H:m:s", getResources().getConfiguration().locale);
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationBuilder = new NotificationCompat.Builder (this);
