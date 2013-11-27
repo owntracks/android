@@ -24,5 +24,7 @@
     <dimen name="card_header_button_margin_left">10dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-
+	<dimen name="card_inner_vertical_spacing_half">4dp</dimen>
+	<dimen name="card_inner_vertical_spacing_full">8dp</dimen>
+	<dimen name="card_padding_vertical">8dp</dimen>
 </resources>

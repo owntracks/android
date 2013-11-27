@@ -1,6 +1,7 @@
 
 package st.alr.mqttitude;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.data.e;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -270,6 +272,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
+        private TextView selectedContactTime;
+        private TextView selectedContactAccuracy;
         
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
@@ -328,10 +332,12 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
             selectedContactName =(TextView )v.findViewById(R.id.title);
             selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
+            selectedContactTime = (TextView )v.findViewById(R.id.time);
+            selectedContactAccuracy = (TextView )v.findViewById(R.id.acc);
             selectedContactImage = (ImageView )v.findViewById(R.id.image);
+
             selectedContactDetails.setVisibility(View.GONE);
             
-
             
             mMapView = (MapView) v.findViewById(R.id.mapView);
             mMapView.onCreate(savedInstanceState);
@@ -498,6 +504,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
+            selectedContactTime.setText(ServiceApplication.getInstance().formatDate(new Date(c.getLocation().getTime()*1000)));
+            selectedContactAccuracy.setText("±" + c.getLocation().getAccuracy());
+            
             selectedContactImage.setImageBitmap(c.getUserImage());
 
             selectedContactDetails.setVisibility(View.VISIBLE);
@@ -549,7 +558,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     public static class FriendsFragment extends Fragment {
         LinearLayout friendsListView;
-
+        TextView currentLoc;
+        TextView currentAcc;
+        TextView currentTime;       
+        GeocodableLocation currentLocation;
+        
         private static Handler handler;
         
         private static FriendsFragment instance;
@@ -574,28 +587,39 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             super.onStop();
         }
 
+        public void onEventMainThread(Events.LocationUpdated e) {
+            updateCurrentLocation(e.getGeocodableLocation(), true);
+        }
+        
 
+        public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
+            currentLocation = l;
+        
+            // Current location changes often, don't waste resources to resolve the geocoder
+            currentLoc.setText(l.toLatLonString());
+            currentAcc.setText("±" + l.getLocation().getAccuracy() + "m"); // Todo: add imperial unit support
+            currentTime.setText(ServiceApplication.getInstance().formatDate(new Date(l.getTime())));
+        }
+
+        
         
         private void onHandlerMessage(Message msg) {
             switch (msg.what) {
                 case ReverseGeocodingTask.GEOCODER_RESULT:
                     GeocodableLocation l = (GeocodableLocation) msg.obj;
                     Log.v(this.toString(), "looking for view with tag " + l.getTag());
-                    TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);
-                    
+                    TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);                    
                     tv.setText(l.toString());
                     
-
                     break;
             }
         }
 
-        public void onEventMainThread(Events.ContactUpdated e) {
+        public void onEventMainThread(Events.ContactUpdated e) {            
             updateContactView(e.getContact());
         }
 
         public void updateContactView(Contact c){
-            
             View v = friendsListView.findViewWithTag(c.getTopic()); 
             if(v == null) {
             
@@ -637,6 +661,9 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             ((TextView) v.findViewById(R.id.title)).setText(c.toString());
             
             ((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation().toString());
+            ((TextView) v.findViewById(R.id.acc)).setText("±" + c.getLocation().getAccuracy());
+            ((TextView) v.findViewById(R.id.time)).setText(ServiceApplication.getInstance().formatDate(new Date(c.getLocation().getTime()*1000)));
+
             (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
                     c.getLocation()
                 });
@@ -676,12 +703,14 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
             
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
-            
+            currentAcc = (TextView) v.findViewById(R.id.currentAccuracy);  
+            currentLoc = (TextView) v.findViewById(R.id.currentLocation);  
+            currentTime = (TextView) v.findViewById(R.id.currentTime);  
+
                    
             for (Contact c : ServiceApplication.getContacts().values())
                 updateContactView(c);
 
-            
             
 //            friendsListView.setAdapter(ServiceApplication.getContactsAdapter());
 //            friendsListView.setOnItemClickListener(new OnItemClickListener() {

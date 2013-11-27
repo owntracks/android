@@ -28,7 +28,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/na" />
-        </LinearLayout>
+
+            <TextView
+                android:id="@+id/currentAccuracy"
+                style="@style/card_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0" />
+                        <TextView
+                android:id="@+id/currentTime"
+                style="@style/card_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/na" />
+            
+            </LinearLayout>
 
         <LinearLayout
             android:id="@+id/friendsListView"
@@ -37,9 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp" 
-            android:paddingTop="16dp">
+>
         </LinearLayout>
     </LinearLayout>
 
