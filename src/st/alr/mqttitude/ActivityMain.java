@@ -656,7 +656,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 
                 v.setTag(c.getTopic());
                 friendsListView.addView(c.getView());
-                
+                friendsListView.setVisibility(View.VISIBLE);
             }
             ((TextView) v.findViewById(R.id.title)).setText(c.toString());
             
