@@ -20,7 +20,7 @@
                 style="@style/card_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Current location" />
+                android:text="@string/currentLocation" />
 
             <TextView
                 android:id="@+id/currentLocation"
@@ -51,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
+            android:visibility="gone"
 >
         </LinearLayout>
     </LinearLayout>
