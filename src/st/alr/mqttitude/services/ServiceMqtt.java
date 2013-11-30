@@ -200,8 +200,8 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
                     : "ssl";
             String cid = ActivityPreferences.getDeviceName(true);
             
-            mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + brokerPort,
-                    cid.equals("") ? cid : cid , null);
+            mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + (brokerPort.equals("") ? Defaults.VALUE_BROKER_PORT : brokerPort),
+                    cid , null);
             mqttClient.setCallback(this);
 
         } catch (MqttException e)
