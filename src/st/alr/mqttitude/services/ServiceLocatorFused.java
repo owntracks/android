@@ -28,6 +28,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private boolean foreground = false;
     private final String TAG = "ServiceLocatorFused";
     private GeocodableLocation lastKnownLocation;
+    private PendingIntent locationIntent;
     
     @Override
     public void onCreate() {
@@ -122,8 +123,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
     }
 
     private void disableLocationUpdates() {
-        if (ready && mLocationRequest != null) {
-            mLocationClient.removeLocationUpdates(this);
+        if (ready && mLocationRequest != null && locationIntent!=null) {
+            mLocationClient.removeLocationUpdates(locationIntent);
             mLocationRequest = null;
         }
     }
@@ -140,8 +141,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
 //                mLocationClient.requestLocationUpdates(mLocationRequest, this);
 //            }else{
                 Intent i = new Intent(this, ServiceLocatorFused.class);
-                PendingIntent p = PendingIntent.getService(this, 1, i, 0);                
-                mLocationClient.requestLocationUpdates(mLocationRequest, p);
+                locationIntent = PendingIntent.getService(this, 1, i, 0);                
+                mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
 //            }
         } else {
             Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
