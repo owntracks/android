@@ -333,16 +333,19 @@ public class ServiceApplication extends ServiceBindable {
     }
 
     public void findContactData(Contact c){
+        Log.v(this.toString(), "Finding contact data for " + c.getTopic());
         
-        
-        String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ?";
+        String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? COLLATE NOCASE AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ? COLLATE NOCASE";
         String[] imWhereParams = new String[] {"Mqttitude", c.getTopic() };
         Cursor imCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
         
+        Log.v(this.toString(), "imcur:  " + imCur);
+        imCur.move(-1);
         while (imCur.moveToNext()) {
             Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));                    
             Log.v(this.toString(), "found matching contact with id "+ cId + " to be associated with topic " + imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
             c.setUserImage(loadContactPhoto(getContentResolver(), cId));
+            Log.v(this.toString(), "Display Name: " + imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
             c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
         }
         imCur.close();

@@ -88,7 +88,8 @@ public String toString() {
     }
 
     public void setUserImage(Bitmap image) {
-         this.userImage = Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true);
+         if(image != null)
+             this.userImage = Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true);
     }
     
     public Bitmap getUserImage() {

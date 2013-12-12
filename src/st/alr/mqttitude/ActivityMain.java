@@ -180,8 +180,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
      * one of the sections/tabs/pages.
      */
     public class PagerAdapter extends FragmentPagerAdapter {
-        public static final int MAP_FRAGMENT = 0;
-        public static final int CONTACT_FRAGMENT = 1;
+        public static final int CONTACT_FRAGMENT = 0;
+        public static final int MAP_FRAGMENT = 1;
         public static final int STATUS_FRAGMENT = 2;
 
         public PagerAdapter(FragmentManager fm) {
@@ -191,32 +191,33 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case MAP_FRAGMENT:
-                    return MapFragment.getInstance();
                 case CONTACT_FRAGMENT:
                     return FriendsFragment.getInstance();
                 default:
-                    return StatusFragment.getInstance();
+                    return MapFragment.getInstance();
+//                default:
+//                    return StatusFragment.getInstance();
             }
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.titleMap);
-                case 1:
                     return getString(R.string.titleFriends);
-                case 2:
-                    return getString(R.string.titleStatus);
+
+                case 1:
+                    return getString(R.string.titleMap);
+//                case 2:
+//                    return getString(R.string.titleStatus);
             }
-            return null;
+            return "BUGBUGBUG";
         }
     }
 
