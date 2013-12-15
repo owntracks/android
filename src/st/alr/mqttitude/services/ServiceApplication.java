@@ -371,7 +371,7 @@ public class ServiceApplication extends ServiceBindable {
     }
 
     public static String getAndroidId() {
-        return Secure.getString(instance.getContentResolver(), Secure.ANDROID_ID);
+        return Secure.getString(App.getContext().getContentResolver(), Secure.ANDROID_ID);
     }
     
     
