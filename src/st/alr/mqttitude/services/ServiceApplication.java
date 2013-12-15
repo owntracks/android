@@ -25,6 +25,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,6 +37,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.Settings.Secure;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -56,7 +60,8 @@ public class ServiceApplication extends ServiceBindable {
     private SimpleDateFormat dateFormater;
     private Handler handler;
     private static Map<String,Contact> contacts;
-    
+    private int mContactCount;
+
     private static ServiceLocator serviceLocator;
     private static ServiceMqtt serviceMqtt;
 
@@ -134,9 +139,66 @@ public class ServiceApplication extends ServiceBindable {
         
         bindService(new Intent(this, ServiceLocatorFused.class), locatorConnection, Context.BIND_AUTO_CREATE);
 
-        updateTicker("MQTTitude service started");
+        
+        mContactCount = getContactCount();
+        getApplicationContext().getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, mObserver);
+
+        if(isDebugBuild())
+            updateTicker("MQTTitude service started");
         
     }
+    
+
+    private int getContactCount() {
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(
+                    ContactsContract.Contacts.CONTENT_URI, null, null, null,
+                    null);
+            if (cursor != null) {
+                return cursor.getCount();
+            } else {
+                return 0;
+            }
+        } catch (Exception ignore) {
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return 0;
+    }
+
+
+    private ContentObserver mObserver = new ContentObserver(new Handler()) {
+
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+
+            final int currentCount = getContactCount();
+            if (currentCount < mContactCount) {
+                Log.v(this.toString(), "Contact deleted");
+            } else if (currentCount == mContactCount) {
+                Log.v(this.toString(), "Contact updated");
+                for (Contact c : contacts.values()) {
+                    if( updateContactData(c));
+                        EventBus.getDefault().post(new Events.ContactUpdated(c));
+                }
+            } else {
+                Log.v(this.toString(), "Contact added");
+                for (Contact c : contacts.values()) {
+                    if( updateContactData(c));
+                        EventBus.getDefault().post(new Events.ContactUpdated(c));
+                }
+
+            }
+                        mContactCount = currentCount;
+        }
+
+    };
+
 
        
     public String formatDate(Date d) {
@@ -321,7 +383,7 @@ public class ServiceApplication extends ServiceBindable {
             Log.v(this.toString(), "Allocating new contact for " + topic);
             c = new Contact(topic);
             Log.v(this.toString(), "looking for contact picture");
-            findContactData(c);
+            updateContactData(c);
         }
 
         c.setLocation(location);
@@ -332,9 +394,15 @@ public class ServiceApplication extends ServiceBindable {
         return c;
     }
 
-    public void findContactData(Contact c){
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getContentResolver().unregisterContentObserver(mObserver);
+    }
+
+    public boolean updateContactData(Contact c){
         Log.v(this.toString(), "Finding contact data for " + c.getTopic());
-        
+        boolean ret = false;
         String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL + " = ? COLLATE NOCASE AND " + ContactsContract.CommonDataKinds.Im.DATA + " = ? COLLATE NOCASE";
         String[] imWhereParams = new String[] {"Mqttitude", c.getTopic() };
         Cursor imCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
@@ -347,10 +415,11 @@ public class ServiceApplication extends ServiceBindable {
             c.setUserImage(loadContactPhoto(getContentResolver(), cId));
             Log.v(this.toString(), "Display Name: " + imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
             c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
+            ret = true;
         }
         imCur.close();
         Log.v(this.toString(), "search finished");
-        
+        return ret;
 }
     
     public static Bitmap loadContactPhoto(ContentResolver cr, long id) {

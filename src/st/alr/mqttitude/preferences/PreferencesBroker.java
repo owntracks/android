@@ -235,10 +235,12 @@ public class PreferencesBroker extends DialogPreference {
         switch (brokerAuth.getSelectedItemPosition()) {
             case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:
                 brokerPasswordWrapper.setVisibility(View.GONE);
+
                 break;
                 default:
                 // We do not require a passwort as it might be empty (stupid but possible)
                 brokerPasswordWrapper.setVisibility(View.VISIBLE);
+
                 break;
 
         }        

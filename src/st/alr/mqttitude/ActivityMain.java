@@ -407,6 +407,8 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 }
             };
             super.onCreate(savedInstanceState);
+            
+
         }
 
         private void onHandlerMessage(Message msg) {
