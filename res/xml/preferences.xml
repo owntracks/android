@@ -95,6 +95,7 @@
             android:defaultValue=""
             android:dialogTitle="@string/preferencesContactsTopic"
             android:key="subTopic"
+            android:hint="mqttitude/+/+"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
     </PreferenceScreen>
