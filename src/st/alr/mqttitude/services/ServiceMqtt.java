@@ -508,12 +508,12 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
     }
     
-    public static String getStateAsString(){
-        return Defaults.State.toString(state);
+    public static String getStateAsString(Context c){
+        return Defaults.State.toString(state, c);
     }
     
-    public static String stateAsString(Defaults.State.ServiceLocator state) {
-        return Defaults.State.toString(state);
+    public static String stateAsString(Defaults.State.ServiceLocator state, Context c) {
+        return Defaults.State.toString(state, c);
     }
 
     private void deferPublish(final DeferredPublishable p) {

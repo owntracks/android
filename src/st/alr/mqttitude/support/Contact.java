@@ -1,10 +1,16 @@
 package st.alr.mqttitude.support;
 
+import java.io.InputStream;
+
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 
@@ -156,5 +162,17 @@ public String toString() {
 //          }
 //
 //    }
+    public static Bitmap resolveImage(ContentResolver cr, long id) {
+        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
+        Log.v("loadContactPhoto", "using URI " + uri);
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
+        if (input == null) {
+            return null;
+        }
+        return BitmapFactory.decodeStream(input);
+    }
+    
+
+
 
 }

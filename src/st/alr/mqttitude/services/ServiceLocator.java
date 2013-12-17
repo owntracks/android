@@ -130,12 +130,12 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     public static Defaults.State.ServiceLocator getState() {
         return state;
     }
-    public static String getStateAsString(){
-        return stateAsString(getState());
+    public static String getStateAsString(Context c){
+        return stateAsString(getState(), c);
     }
     
-    public static String stateAsString(Defaults.State.ServiceLocator state) {
-        return Defaults.State.toString(state);
+    public static String stateAsString(Defaults.State.ServiceLocator state, Context c) {
+        return Defaults.State.toString(state, c);
     }
 
     private void changeState(Defaults.State.ServiceLocator newState) {

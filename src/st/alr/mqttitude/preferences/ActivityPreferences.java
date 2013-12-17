@@ -9,6 +9,7 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -34,9 +35,6 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference version;
     private static Preference repo;
     private static Preference mail;
-    
-    private static Preference advanced;
-    private static PreferenceScreen topicScreen;
     private static EditTextPreference topic;
 
     
@@ -49,7 +47,7 @@ public class ActivityPreferences extends PreferenceActivity {
     
     public static String getAndroidId() {
         
-        String id = ServiceApplication.getAndroidId();
+        String id = App.getAndroidId();
 
         // MQTT specification doesn't allow client IDs longer than 23 chars
         if (id.length() > 22)
@@ -139,142 +137,39 @@ public class ActivityPreferences extends PreferenceActivity {
 
         // Thanks Google for not providing a support version of the
         // PreferenceFragment for older API versions
-        if (supportsFragment())
+//        if (supportsFragment())
             onCreatePreferenceFragment();
-        else
-            onCreatePreferenceActivity();
+//        else
+//            onCreatePreferenceActivity();
     }
 
     private boolean supportsFragment() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
 
-    @SuppressWarnings("deprecation")
-    private void onCreatePreferenceActivity() {
-        addPreferencesFromResource(R.xml.preferences);
-        onSetupPreferenceActivity();
-    }
+//    @SuppressWarnings("deprecation")
+//    private void onCreatePreferenceActivity() {
+//        addPreferencesFromResource(R.xml.preferences);
+//        onSetupPreferenceActivity();
+//    }
+//
+//    @SuppressWarnings("deprecation")
+//    private void onSetupPreferenceActivity() {
+//        repo = findPreference("repo");
+//        mail = findPreference("mail");
+//        version = findPreference("versionReadOnly");
+//        serverPreference = findPreference("brokerPreference");
+//        backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
+//        topicScreen = (PreferenceScreen) findPreference("topicSettings");
+//        topic = (EditTextPreference) findPreference("topic");
+//
+//        onSetupCommon(this);
+//    }
 
-    @SuppressWarnings("deprecation")
-    private void onSetupPreferenceActivity() {
-        repo = findPreference("repo");
-        mail = findPreference("mail");
-        version = findPreference("versionReadOnly");
-        serverPreference = findPreference("brokerPreference");
-        backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-        topicScreen = (PreferenceScreen) findPreference("topicSettings");
-        topic = (EditTextPreference) findPreference("topic");
-
-        onSetupCommon(this);
-    }
-
-    @TargetApi(11)
     private void onCreatePreferenceFragment() {
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new CustomPreferencesFragment()).commit();
-    }
-
-    @TargetApi(11)
-    private static void onSetupPreferenceFragment(PreferenceFragment f) {
-        repo = f.findPreference("repo");
-        mail = f.findPreference("mail");
-        version = f.findPreference("versionReadOnly");
-        serverPreference = f.findPreference("brokerPreference");
-        backgroundUpdatesIntervall = f
-                .findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-        topicScreen = (PreferenceScreen) f.findPreference("topicSettings");
-        topic = (EditTextPreference) f.findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
-
-        onSetupCommon(f.getActivity());
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new CustomPreferencesFragment()).commit();
     }
     
-    private static void onSetupCommon(final Activity a) {
-        PackageManager pm = a.getPackageManager();
-        try {
-            ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
-        } catch (NameNotFoundException e) {
-            ver = a.getString(R.string.na);
-        }
-
-        
-        backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Log.v(this.toString(), newValue.toString());
-                if (newValue.toString().equals("0")) {
-                    SharedPreferences.Editor editor = PreferenceManager
-                            .getDefaultSharedPreferences(a).edit();
-                    editor.putString(preference.getKey(), "1");
-                    editor.commit();
-                    return false;
-                }
-                return true;
-            }
-        });
-
-        version.setSummary(ver);
-
-        repo.setOnPreferenceClickListener(
-                new OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(Defaults.VALUE_REPO_URL));
-                        a.startActivity(intent);
-                        return false;
-                    }
-                });
-
-        mail.setOnPreferenceClickListener(
-                new OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setType("message/rfc822");
-
-                        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
-                            Defaults.VALUE_ISSUES_MAIL
-                        });
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
-                        a.startActivity(Intent.createChooser(intent, "Send Email"));
-                        return false;
-                    }
-                });
-
-        
-        setServerPreferenceSummary();
-        //TODO: set hint when device name changes
-        
-        
-        backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Log.v(this.toString(), newValue.toString());
-                if (newValue.toString().equals("0")) {
-                    SharedPreferences.Editor editor = PreferenceManager
-                            .getDefaultSharedPreferences(a).edit();
-                    editor.putString(preference.getKey(), "1");
-                    editor.commit();
-                    return false;
-                }
-                return true;
-            }
-        });
-        
-        
-        pubTopicListener = new OnSharedPreferenceChangeListener() {
-
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
-                    setPubTopicHint(topic);
-            }
-        };
-        PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(pubTopicListener);
-        
-        setPubTopicHint(topic);
-    }
-
     private static void setPubTopicHint(EditTextPreference e){
         e.getEditText().setHint(getPubTopicFallback());
 
@@ -299,8 +194,99 @@ public class ActivityPreferences extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-            onSetupPreferenceFragment(this);
 
+            final Activity a = getActivity();
+            PackageManager pm = a.getPackageManager();
+
+            repo = findPreference("repo");
+            mail = findPreference("mail");
+            version = findPreference("versionReadOnly");
+            serverPreference = findPreference("brokerPreference");
+            backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
+            topic = (EditTextPreference)  findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
+
+            
+            try {
+                ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
+            } catch (NameNotFoundException e) {
+                ver = a.getString(R.string.na);
+            }
+
+            
+            backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Log.v(this.toString(), newValue.toString());
+                    if (newValue.toString().equals("0")) {
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(a).edit();
+                        editor.putString(preference.getKey(), "1");
+                        editor.commit();
+                        return false;
+                    }
+                    return true;
+                }
+            });
+
+            version.setSummary(ver);
+
+            repo.setOnPreferenceClickListener(
+                    new OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(Defaults.VALUE_REPO_URL));
+                            a.startActivity(intent);
+                            return false;
+                        }
+                    });
+
+            mail.setOnPreferenceClickListener(
+                    new OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            intent.setType("message/rfc822");
+
+                            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
+                                Defaults.VALUE_ISSUES_MAIL
+                            });
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
+                            a.startActivity(Intent.createChooser(intent, "Send Email"));
+                            return false;
+                        }
+                    });
+
+            //TODO: set hint when device name changes
+            setServerPreferenceSummary(getActivity());
+            
+            
+            backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Log.v(this.toString(), newValue.toString());
+                    if (newValue.toString().equals("0")) {
+                        SharedPreferences.Editor editor = PreferenceManager
+                                .getDefaultSharedPreferences(a).edit();
+                        editor.putString(preference.getKey(), "1");
+                        editor.commit();
+                        return false;
+                    }
+                    return true;
+                }
+            });
+            
+            
+            pubTopicListener = new OnSharedPreferenceChangeListener() {
+
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    if(key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
+                        setPubTopicHint(topic);
+                }
+            };
+            PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(pubTopicListener);
+            
+            setPubTopicHint(topic);
         }
     }
 
@@ -312,18 +298,15 @@ public class ActivityPreferences extends PreferenceActivity {
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceMqtt event) {
-        setServerPreferenceSummary();
+        setServerPreferenceSummary(this);
     }
 
-    private static void setServerPreferenceSummary() {
-        serverPreference.setSummary(ServiceMqtt.getStateAsString());
+    private static void setServerPreferenceSummary(Context c) {
+        serverPreference.setSummary(ServiceMqtt.getStateAsString(c));
     }
 
     
-    
-
-
-    @Override
+        @Override
     public boolean onIsMultiPane() {
         return false;
     }

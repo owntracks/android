@@ -1,5 +1,7 @@
 package st.alr.mqttitude.support;
 
+import android.content.Context;
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceApplication;
 
@@ -62,7 +64,7 @@ public class Defaults {
         public static enum ServiceMqtt {
             INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
         }
-        public static String toString(ServiceMqtt state) {
+        public static String toString(ServiceMqtt state, Context c) {
             int id; 
             switch (state) {
                 case CONNECTED:
@@ -87,13 +89,13 @@ public class Defaults {
                     id = R.string.connectivityDisconnected;
                     
             }
-            return ServiceApplication.getInstance().getString(id);
+            return c.getString(id);
         }
         
         public static enum ServiceLocator {
             INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION}
         
-            public static String toString(st.alr.mqttitude.support.Defaults.State.ServiceLocator state) {
+            public static String toString(st.alr.mqttitude.support.Defaults.State.ServiceLocator state, Context c) {
                 int id; 
                 switch (state) {
                     case PUBLISHING:
@@ -115,7 +117,7 @@ public class Defaults {
                         id = R.string.stateIdle;
                 }
                 
-                return ServiceApplication.getInstance().getString(id);
+                return c.getString(id);
             };
         
     }

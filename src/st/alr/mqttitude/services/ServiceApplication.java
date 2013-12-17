@@ -57,9 +57,7 @@ public class ServiceApplication extends ServiceBindable {
     private Date lastPublishedLocationTime;
     private static ServiceApplication instance;
     private boolean even = false;
-    private SimpleDateFormat dateFormater;
     private Handler handler;
-    private static Map<String,Contact> contacts;
     private int mContactCount;
 
     private static ServiceLocator serviceLocator;
@@ -78,7 +76,6 @@ public class ServiceApplication extends ServiceBindable {
         
         instance = this;
 
-        contacts = new HashMap<String,Contact>();
 
         handler = new Handler() {
             @Override
@@ -91,7 +88,6 @@ public class ServiceApplication extends ServiceBindable {
 
 
 
-        this.dateFormater = new SimpleDateFormat("H:m:s", getResources().getConfiguration().locale);
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationBuilder = new NotificationCompat.Builder (this);
@@ -143,7 +139,7 @@ public class ServiceApplication extends ServiceBindable {
         mContactCount = getContactCount();
         getApplicationContext().getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, mObserver);
 
-        if(isDebugBuild())
+        if(App.isDebugBuild())
             updateTicker("MQTTitude service started");
         
     }
@@ -182,13 +178,13 @@ public class ServiceApplication extends ServiceBindable {
                 Log.v(this.toString(), "Contact deleted");
             } else if (currentCount == mContactCount) {
                 Log.v(this.toString(), "Contact updated");
-                for (Contact c : contacts.values()) {
+                for (Contact c : App.getContacts().values()) {
                     if( updateContactData(c));
                         EventBus.getDefault().post(new Events.ContactUpdated(c));
                 }
             } else {
                 Log.v(this.toString(), "Contact added");
-                for (Contact c : contacts.values()) {
+                for (Contact c : App.getContacts().values()) {
                     if( updateContactData(c));
                         EventBus.getDefault().post(new Events.ContactUpdated(c));
                 }
@@ -201,9 +197,6 @@ public class ServiceApplication extends ServiceBindable {
 
 
        
-    public String formatDate(Date d) {
-        return dateFormater.format(d);
-    }
 
     /**
      * @category NOTIFICATION HANDLING
@@ -280,7 +273,7 @@ public class ServiceApplication extends ServiceBindable {
             title = getString(R.string.app_name);
         }
 
-        subtitle = ServiceLocator.getStateAsString() + " | " + ServiceMqtt.getStateAsString();
+        subtitle = ServiceLocator.getStateAsString(this) + " | " + ServiceMqtt.getStateAsString(this);
 
         notificationBuilder.setContentTitle(title);
         notificationBuilder
@@ -311,12 +304,8 @@ public class ServiceApplication extends ServiceBindable {
     }
 
     private void geocoderAvailableForLocation(GeocodableLocation l) {
-        if (l == lastPublishedLocation) {
-            Log.v(this.toString(), "Geocoder now available for lastPublishedLocation");
+        if (l == lastPublishedLocation)
             updateNotification();
-        } else {
-            Log.v(this.toString(), "Geocoder now available for an old location");
-        }
     }
 
     public void onEvent(Events.PublishSuccessfull e) {
@@ -342,26 +331,10 @@ public class ServiceApplication extends ServiceBindable {
         }
     }
     
-    
-
-    public void onEvent(Events.LocationUpdated e) {
-        if (e.getGeocodableLocation() == null)
-            return;
-
-        Log.v(this.toString(), "LocationUpdated: " + e.getGeocodableLocation().getLatitude() + ":"
-                + e.getGeocodableLocation().getLongitude());
-        
-    }
-
-    public boolean isDebugBuild() {
-        return 0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE);
-    }
-
     public static ServiceApplication getInstance() {
         return instance;
     }
-    
-    
+        
     public ServiceLocator getServiceLocator() {
         return serviceLocator;        
     }
@@ -370,29 +343,8 @@ public class ServiceApplication extends ServiceBindable {
         return serviceMqtt;
     }
 
-    public static String getAndroidId() {
-        return Secure.getString(App.getContext().getContentResolver(), Secure.ANDROID_ID);
-    }
     
     
-    private Contact updateContact(String topic, GeocodableLocation location) {
-        Contact c = contacts.get(topic);
-        //Contact c = contactsAdapter.get(topic);
-
-        if (c == null) {
-            Log.v(this.toString(), "Allocating new contact for " + topic);
-            c = new Contact(topic);
-            Log.v(this.toString(), "looking for contact picture");
-            updateContactData(c);
-        }
-
-        c.setLocation(location);
-        // Automatically fires onDatasetChanged of contacts adapter to update depending listViews
-        //contactsAdapter.addItem(topic, c);
-        contacts.put(topic, c);
-            
-        return c;
-    }
 
     @Override
     public void onDestroy() {
@@ -412,7 +364,7 @@ public class ServiceApplication extends ServiceBindable {
         while (imCur.moveToNext()) {
             Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));                    
             Log.v(this.toString(), "found matching contact with id "+ cId + " to be associated with topic " + imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
-            c.setUserImage(loadContactPhoto(getContentResolver(), cId));
+            c.setUserImage(Contact.resolveImage(getContentResolver(), cId));
             Log.v(this.toString(), "Display Name: " + imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
             c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));               
             ret = true;
@@ -420,28 +372,11 @@ public class ServiceApplication extends ServiceBindable {
         imCur.close();
         Log.v(this.toString(), "search finished");
         return ret;
-}
-    
-    public static Bitmap loadContactPhoto(ContentResolver cr, long id) {
-        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
-        Log.v("loadContactPhoto", "using URI " + uri);
-        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
-        if (input == null) {
-            return null;
-        }
-        return BitmapFactory.decodeStream(input);
     }
-
-
-    
-
-
-    
-    
+        
     public static Map<String, Contact> getContacts() {
-        return contacts;
+        return App.getContacts();
     }
-
 
     public void onEventMainThread(Events.ContactLocationUpdated e) {
         Log.v(this.toString(), "Contact location updated: " + e.getTopic() + " ->"
@@ -449,15 +384,29 @@ public class ServiceApplication extends ServiceBindable {
                 + new Date(e.getGeocodableLocation().getLocation().getTime() * 1000));
 
         // Updates a contact or allocates a new one
-        Contact c = updateContact(e.getTopic(), e.getGeocodableLocation());
-
-        
+        Contact c = updateOrInitContact(e.getTopic(), e.getGeocodableLocation());
         
         // Fires a new event with the now updated or created contact to which fragments can react
         EventBus.getDefault().post(new Events.ContactUpdated(c));       
         
     }
 
+    private Contact updateOrInitContact(String topic, GeocodableLocation location) {
+        Contact c = App.getContacts().get(topic);
+
+        if (c == null) {
+            Log.v(this.toString(), "Allocating new contact for " + topic);
+            c = new Contact(topic);
+            updateContactData(c);
+        }
+
+        c.setLocation(location);
+        
+        // Automatically fires onDatasetChanged of contacts adapter to update depending listViews
+        App.getContacts().put(topic, c);            
+        return c;
+    }
+    
     public void enableForegroundMode() {
             getServiceLocator().enableForegroundMode();
     }
