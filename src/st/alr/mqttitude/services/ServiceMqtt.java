@@ -521,7 +521,8 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
             @Override
             public void run() {
-                deferredPublishables.remove(p);
+                if(deferredPublishables != null && deferredPublishables.contains(p))
+                    deferredPublishables.remove(p);
                 if(!p.isPublishing())//might happen that the publish is in progress while the timeout occurs.
                     p.publishFailed();
             }
