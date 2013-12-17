@@ -253,7 +253,6 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
         public static MapFragment getInstance() {
             if (instance == null) {
-                Log.e("MapFragment", "creating new map fragment");
                 instance = new MapFragment();
             }
             return instance;
@@ -505,7 +504,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
-            selectedContactTime.setText(ServiceApplication.getInstance().formatDate(new Date(c.getLocation().getTime()*1000)));
+            selectedContactTime.setText(App.formatDate(new Date(c.getLocation().getTime()*1000)));
             selectedContactAccuracy.setText("±" + c.getLocation().getAccuracy());
             
             selectedContactImage.setImageBitmap(c.getUserImage());
@@ -599,20 +598,16 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             // Current location changes often, don't waste resources to resolve the geocoder
             currentLoc.setText(l.toLatLonString());
             currentAcc.setText("±" + l.getLocation().getAccuracy() + "m"); // Todo: add imperial unit support
-            currentTime.setText(ServiceApplication.getInstance().formatDate(new Date(l.getTime())));
+            currentTime.setText(App.formatDate(new Date(l.getTime())));
         }
 
         
         
         private void onHandlerMessage(Message msg) {
-            switch (msg.what) {
-                case ReverseGeocodingTask.GEOCODER_RESULT:
-                    GeocodableLocation l = (GeocodableLocation) msg.obj;
-                    Log.v(this.toString(), "looking for view with tag " + l.getTag());
-                    TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);                    
-                    tv.setText(l.toString());
-                    
-                    break;
+            if (msg.what == ReverseGeocodingTask.GEOCODER_RESULT) {
+                GeocodableLocation l = (GeocodableLocation) msg.obj;
+                TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);                    
+                tv.setText(l.toString());
             }
         }
 
@@ -651,10 +646,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                         }
                     });
 
-                }
-                Log.v(this.toString(), "C" + c);
-                Log.v(this.toString(), "V" + v);
-                
+                }                
                 v.setTag(c.getTopic());
                 friendsListView.addView(c.getView());
                 friendsListView.setVisibility(View.VISIBLE);
@@ -663,7 +655,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             
             ((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation().toString());
             ((TextView) v.findViewById(R.id.acc)).setText("±" + c.getLocation().getAccuracy());
-            ((TextView) v.findViewById(R.id.time)).setText(ServiceApplication.getInstance().formatDate(new Date(c.getLocation().getTime()*1000)));
+            ((TextView) v.findViewById(R.id.time)).setText(App.formatDate(new Date(c.getLocation().getTime()*1000)));
 
             (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
                     c.getLocation()
@@ -794,7 +786,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
             locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
             locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()
                     + "m");
-            locatorCurLatLonTime.setText(ServiceApplication.getInstance().formatDate(e.getDate()));
+            locatorCurLatLonTime.setText(App.formatDate(e.getDate()));
         }
 
         public void onEventMainThread(Events.PublishSuccessfull e) {
@@ -802,17 +794,17 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 GeocodableLocation l = (GeocodableLocation) e.getExtra();
                 locatorLastPubLatLon.setText(l.toLatLonString());
                 locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy() + "m");
-                locatorLastPubLatLonTime.setText(ServiceApplication.getInstance().formatDate(
+                locatorLastPubLatLonTime.setText(App.formatDate(
                         e.getDate()));
             }
         }
 
         public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
-            locatorStatus.setText(Defaults.State.toString(e.getState()));
+            locatorStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
         }
 
         public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
-            brokerStatus.setText(Defaults.State.toString(e.getState()));
+            brokerStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
             if (e.getExtra() != null && e.getExtra() instanceof Exception
                     && e.getExtra().getClass() != null) {
                 brokerError.setText(((Exception) e.getExtra()).getCause().getLocalizedMessage());
