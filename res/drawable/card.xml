@@ -6,17 +6,16 @@
 		<shape android:shape="rectangle"
 			android:dither="true">
 			<corners android:radius="2dp"/>
-			<solid android:color="#c5c5c5" />
+			<solid android:color="@color/card_shadow" />
 
 		</shape>
 	</item>
 	
 	
 		<item android:bottom="1dp">
-	    <!-- bottom shadow -->
 		<shape android:shape="rectangle"
 			android:dither="true">
-			<solid android:color="#e6e6e6" />
+			<solid android:color="@color/card_shadow" />
 
 		</shape>
 	</item>
