@@ -14,14 +14,25 @@
             style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+ >
 
             <TextView
+                style="@style/card_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/currentLocation"
+                                android:layout_marginBottom="16dp"
+                 />
+
+            
+                        <TextView
                 style="@style/card_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/currentLocation" />
-
+                android:text="Location" />
+            
+                        
             <TextView
                 android:id="@+id/currentLocation"
                 style="@style/card_content"
@@ -34,13 +45,25 @@
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="0" />
-                        <TextView
+                android:text="0" 
+                                                android:layout_marginBottom="16dp"
+                />
+             
+            <TextView
+                style="@style/card_title"
+                
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Last report" />
+            
+             <TextView
                 android:id="@+id/currentTime"
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/na" />
+                android:text="@string/na"
+                                                android:layout_marginBottom="16dp"
+                 />
             
             </LinearLayout>
 
@@ -53,6 +76,14 @@
             android:orientation="vertical"
             android:visibility="gone"
 >
+                         <TextView
+                style="@style/card_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Contacts" 
+                                                android:layout_marginBottom="16dp"
+                />
+            
         </LinearLayout>
     </LinearLayout>
 

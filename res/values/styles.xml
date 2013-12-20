@@ -105,9 +105,15 @@
     </style>
 
     <color name="lightGrey">#c8c8c8</color>
-    <color name="mediumGrey">#aaaaaa</color>
-    <color name="darkGrey">#353535</color>
-    <color name="background">#ededed</color>
+    <color name="mediumGrey">#858585</color>
+    <color name="darkGrey">#585552</color>
+    <color name="background">#efefef</color>
+    <color name="background_header">#f7f7f7</color>
+    
+        <color name="card_shadow">#d9d9d9</color>
+    	<color name="divider">#efefef</color>
+    
+    
     <color name="border">#acacac</color>
 
     
@@ -163,10 +169,12 @@
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:background">@drawable/card</item>
-        <item name="android:paddingLeft">@dimen/card_padding_vertical</item>
-        <item name="android:paddingRight">@dimen/card_padding_vertical</item>        
-		<item name="android:paddingTop">@dimen/card_inner_vertical_spacing_half</item>
-        <item name="android:paddingBottom">@dimen/card_inner_vertical_spacing_half</item>        
+        <item name="android:paddingLeft">1dp</item>
+        <item name="android:paddingRight">1dp</item>
+                <item name="android:paddingBottom">1dp</item>
+                
+        <item name="android:paddingTop">0dp</item>
+        
     </style>
 
     <style name="card_title">

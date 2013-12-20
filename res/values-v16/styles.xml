@@ -1,25 +1,46 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme for API 16+. This theme completely replaces
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
+    
+    <style name="card_header">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:fontFamily">"sans-serif-light"</item>
+        <item name="android:paddingTop">18dp</item>
+       	<item name="android:paddingBottom">18dp</item>     
+       	<item name="android:paddingLeft">16dp</item>                          
+   
+       	<item name="android:background">@color/background_header</item>
+        
+    </style>
+    
     <style name="card_title">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_title</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/darkGrey</item>
-        <item name="android:fontFamily">"sans-serif-light"</item>
+        <item name="android:textColor">@color/mediumGrey</item>
+        <item name="android:fontFamily">"sans-serif"</item>
+        <item name="android:textStyle">bold</item>
+               	<item name="android:paddingLeft">16dp</item>                          
+               	
     </style>
 
     <style name="card_content">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_content</item>
-        <item name="android:textColor">@color/lightGrey</item>
+        <item name="android:textColor">@color/mediumGrey</item>
         <item name="android:fontFamily">"sans-serif-light"</item>
+               	<item name="android:paddingLeft">16dp</item>                          
+        
     </style>
     
     
