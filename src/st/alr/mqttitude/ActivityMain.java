@@ -1,6 +1,7 @@
 
 package st.alr.mqttitude;
 
+import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,8 @@ import st.alr.mqttitude.support.Contact;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
+import st.alr.mqttitude.support.StaticHandler;
+import st.alr.mqttitude.support.StaticHandlerInterface;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -261,23 +264,7 @@ public class ActivityMain extends FragmentActivity {
 
     public static class MapFragment extends Fragment {
         private static MapFragment instance;
-        private static Handler handler;
-        private Map<String, Contact> markerToContacts;
-
-
-        public static MapFragment getInstance() {
-            if (instance == null) {
-                instance = new MapFragment();
-            }
-            return instance;
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            EventBus.getDefault().register(this);
-        }
-        
+        private GeocodableLocation currentLocation;
         private MapView mMapView;
         private GoogleMap googleMap;
         private LinearLayout selectedContactDetails;
@@ -286,101 +273,39 @@ public class ActivityMain extends FragmentActivity {
         private ImageView selectedContactImage;
         private TextView selectedContactTime;
         private TextView selectedContactAccuracy;
+        private Map<String, Contact> markerToContacts;
+
+        public static MapFragment getInstance() {
+            if (instance == null) {
+                instance = new MapFragment();
+            }
+            return instance;
+        }
+        
+
         
         @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-         super.onActivityCreated(savedInstanceState);
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().registerSticky(this);
         }
-
-        private void setUpMap() {
-            googleMap.setIndoorEnabled(true);
-            googleMap.setMyLocationEnabled(true);
-
-            UiSettings s = googleMap.getUiSettings();
-            s.setCompassEnabled(false);
-            s.setMyLocationButtonEnabled(false);
-            s.setTiltGesturesEnabled(false);
-            s.setCompassEnabled(false);
-            s.setRotateGesturesEnabled(false);
-            s.setZoomControlsEnabled(false);
-            
-            mMapView.getMap().setOnMarkerClickListener(new OnMarkerClickListener() {
-                
-                @Override
-                public boolean onMarkerClick(Marker m) {
-                    Contact c = markerToContacts.get(m.getId());
-                    Log.v(this.toString(), "Focused contact for: " + c.getTopic());
-                    
-                    if(c != null) {
-                        focus(c);
-                        return true;
-                    } 
-                    
-                    return false;
-                 }
-            });
-            
-            mMapView.getMap().setOnMapClickListener(new OnMapClickListener() {
-                
-                @Override
-                public void onMapClick(LatLng arg0) {
-                    selectedContactDetails.setVisibility(View.GONE);
-                    
-                }
-            });
-
-        }
-
+        
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-                Bundle savedInstanceState) {
-            
-            View v = inflater.inflate(R.layout.fragment_map, container, false);
-            
-
-            
-            markerToContacts = new HashMap<String, Contact>();
-            
-            selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
-            selectedContactName =(TextView )v.findViewById(R.id.title);
-            selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
-            selectedContactTime = (TextView )v.findViewById(R.id.time);
-            selectedContactAccuracy = (TextView )v.findViewById(R.id.acc);
-            selectedContactImage = (ImageView )v.findViewById(R.id.image);
-
-            selectedContactDetails.setVisibility(View.GONE);
-            
-            
-            mMapView = (MapView) v.findViewById(R.id.mapView);
-            mMapView.onCreate(savedInstanceState);
-            mMapView.onResume();//needed to get the map to display immediately
-            googleMap = mMapView.getMap();  
-            
-            
-            // Check if we were successful in obtaining the map.
-            if (mMapView != null) {
-                try {
-                    MapsInitializer.initialize(getActivity());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-
-                setUpMap();
-            }
-                        
-            return v;
+        public void onStop() {
+           EventBus.getDefault().unregister(this);
+            super.onStop();
         }
         
         @Override
         public void onResume() {
             super.onResume();
             mMapView.onResume();
-            Log.v(this.toString(), "Adding all existing contact markers to map");
+
+            // Initial population of the map with all exisiting contacts
             for (Contact c : ServiceApplication.getContacts().values())
                 updateContactLocation(c);
 
-            focus(getCurrentlyTrackedContact());
-
+            focusCurrentlyTrackedContact();
         }
         
         @Override
@@ -400,69 +325,76 @@ public class ActivityMain extends FragmentActivity {
             mMapView.onLowMemory();
             super.onLowMemory();
         }
-        
-        public Contact getCurrentlyTrackedContact() {
-            Contact c = ServiceApplication.getContacts().get(ActivityPreferences.getTrackingUsername());   
-            if(c != null)
-                Log.v(this.toString(), "getCurrentlyTrackedContact == " + c.getTopic());
-            else 
-                Log.v(this.toString(), "getCurrentlyTrackedContact == null" );
-
-            return c;
-        }
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    onHandlerMessage(msg);
-                }
-            };
-            super.onCreate(savedInstanceState);
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+                Bundle savedInstanceState) {
             
-
-        }
-
-        private void onHandlerMessage(Message msg) {
-            switch (msg.what) {
-                case ReverseGeocodingTask.GEOCODER_RESULT:
-                    // locationPrimary.setText(((GeocodableLocation)
-                    // msg.obj).getGeocoder());
-                    break;
-                case ReverseGeocodingTask.GEOCODER_NORESULT:
-                    // locationPrimary.setText(((GeocodableLocation)
-                    // msg.obj).toLatLonString());
-                    break;
-
+            View v = inflater.inflate(R.layout.fragment_map, container, false);
+            
+            markerToContacts = new HashMap<String, Contact>();
+            selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
+            selectedContactName =(TextView )v.findViewById(R.id.title);
+            selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
+            selectedContactTime = (TextView )v.findViewById(R.id.time);
+            selectedContactAccuracy = (TextView )v.findViewById(R.id.acc);
+            selectedContactImage = (ImageView )v.findViewById(R.id.image);
+            selectedContactDetails.setVisibility(View.GONE);
+            
+            mMapView = (MapView) v.findViewById(R.id.mapView);
+            mMapView.onCreate(savedInstanceState);
+            mMapView.onResume(); //needed to get the map to display immediately
+            googleMap = mMapView.getMap();  
+            
+            // Check if we were successful in obtaining the map.
+            if (mMapView != null) {
+                try {
+                    MapsInitializer.initialize(getActivity());
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace(); // TODO: Catch not available PlayServices
+                }
+                
+                setUpMap();
             }
+                        
+            return v;
         }
         
-        public void onEventMainThread(Events.ContactUpdated e) {
-            updateContactLocation(e.getContact());
-        }
+        private void setUpMap() {
+            googleMap.setIndoorEnabled(true);
+            googleMap.setMyLocationEnabled(true);
 
-
-        public void updateContactLocation(Contact c) {
-
-            if (c.getMarker() != null) {
-                Log.v(this.toString(), "updating marker position of " + c.getTopic());
-                c.getMarker().remove();
-            }
+            UiSettings s = googleMap.getUiSettings();
+            s.setCompassEnabled(false);
+            s.setMyLocationButtonEnabled(false);
+            s.setTiltGesturesEnabled(false);
+            s.setCompassEnabled(false);
+            s.setRotateGesturesEnabled(false);
+            s.setZoomControlsEnabled(false);
             
-                Marker m = googleMap.addMarker(
-                        new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()
-));
+            mMapView.getMap().setOnMarkerClickListener(new OnMarkerClickListener() {
                 
-                markerToContacts.put(m.getId(), c);
-                
-                c.setMarker(m);
+                @Override
+                public boolean onMarkerClick(Marker m) {
+                    Contact c = markerToContacts.get(m.getId());
+                    
+                    if(c != null)
+                        focus(c);
+                    
+                    return false;
+                 }
+            });
             
-
-
-            if (c == getCurrentlyTrackedContact())
-                focus(c);
+            mMapView.getMap().setOnMapClickListener(new OnMapClickListener() {
+                
+                @Override
+                public void onMapClick(LatLng arg0) {
+                    selectedContactDetails.setVisibility(View.GONE);
+                    
+                }
+            });
         }
+        
 
         public void centerMap(LatLng l) {
             centerMap(l, 15.0f);
@@ -473,45 +405,40 @@ public class ActivityMain extends FragmentActivity {
             CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latlon, f);
             mMapView.getMap().animateCamera(center);
         }
+        
+        public void updateContactLocation(Contact c) {
+            if (c.getMarker() != null) {
+                c.getMarker().remove();
+            }
+            
+            Marker m = googleMap.addMarker(new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()));            
+            markerToContacts.put(m.getId(), c);            
+            c.setMarker(m);
 
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                Bundle savedInstanceState) {
-//            
-//            
-//            View v = super.onCreateView(inflater, container, savedInstanceState);
-//
-//            getMap().setIndoorEnabled(true);
-//            getMap().setMyLocationEnabled(true);
-//
-//            UiSettings s = getMap().getUiSettings();
-//            s.setCompassEnabled(false);
-//            s.setMyLocationButtonEnabled(true);
-//            s.setTiltGesturesEnabled(false);
-//            s.setCompassEnabled(false);
-//            s.setRotateGesturesEnabled(false);
-//            s.setZoomControlsEnabled(true);
-//
-//            
-//               
-//            return v;
-//        }
+            if (c == getCurrentlyTrackedContact())
+                focus(c);
+        }
 
 
-        @Override
-        public void onStop() {
-           EventBus.getDefault().unregister(this);
-            super.onStop();
+
+        public void focusCurrentLocation() {
+            selectedContactDetails.setVisibility(View.GONE);
+            ActivityPreferences.setTrackingUsername("+CURRENTDEVICELOCATION+");
+            centerMap(currentLocation.getLatLng());
+        }
+
+        public void focusCurrentlyTrackedContact(){
+            focus(getCurrentlyTrackedContact());
         }
         
         public void focus(final Contact c) {
             Log.v(this.toString(), "map fragment focussing " +c);
 
             if (c == null) {
-                Log.v(this.toString(), "no contact, abandon ship!");
-                
+                Log.v(this.toString(), "no contact, abandon ship!");                
                 return;
             }
+            
             ActivityPreferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
             Log.v(this.toString(), "map fragment focussing " +c.getTopic());
@@ -524,60 +451,48 @@ public class ActivityMain extends FragmentActivity {
             selectedContactImage.setImageBitmap(c.getUserImage());
 
             selectedContactDetails.setVisibility(View.VISIBLE);
-            selectedContactDetails.setOnClickListener(new OnClickListener() {
-                
+            selectedContactDetails.setOnClickListener(new OnClickListener() {                
                 @Override
-                public void onClick(View v) {
-                    
+                public void onClick(View v) {                    
                     centerMap(c.getLocation().getLatLng());
                 }
             });
-            
-            
         }
 
-        public void setLocation(GeocodableLocation location) {
-            Location l = location.getLocation();
-            Log.v(this.toString(), "Setting location");
-
-            if (l == null) {
-                Log.v(this.toString(), "location not available");
-                // showLocationUnavailable();
-                return;
-            }
-
-            if (location.getGeocoder() != null) {
-                Log.v(this.toString(), "Reusing geocoder");
-                // locationPrimary.setText(location.getGeocoder());
-            } else {
-                // Start async geocoder lookup and display latlon until geocoder
-                // reeturns something
-                if (Geocoder.isPresent()) {
-                    Log.v(this.toString(), "Requesting geocoder");
-                    (new ReverseGeocodingTask(getActivity(), handler))
-                            .execute(new GeocodableLocation[] {
-                                location
-                            });
-
-                } else {
-                    // locationPrimary.setText(location.toLatLonString());
-                }
-            }
-            // locationMeta.setText(App.getInstance().formatDate(new Date()));
-
-            // showLocationAvailable();
+        public void onEventMainThread(Events.ContactUpdated e) {
+            updateContactLocation(e.getContact());
         }
 
+        
+        public void onEventMainThread(Events.LocationUpdated e) {
+            currentLocation = e.getGeocodableLocation();
+
+            if(ActivityPreferences.getTrackingUsername().equals("+CURRENTDEVICELOCATION+"))
+                focusCurrentLocation();
+        }
+        
+        public Contact getCurrentlyTrackedContact() {
+            Contact c = ServiceApplication.getContacts().get(ActivityPreferences.getTrackingUsername());   
+            if(c != null)
+                Log.v(this.toString(), "getCurrentlyTrackedContact == " + c.getTopic());
+            else 
+                Log.v(this.toString(), "getCurrentlyTrackedContact == null || tracking current location" );
+
+            return c;
+        }
+        
+        public boolean hasCurrentLocation(){
+            return currentLocation != null;
+        }
     }
 
     @SuppressLint("NewApi")
-    public static class FriendsFragment extends Fragment {
+    public static class FriendsFragment extends Fragment implements StaticHandlerInterface{
         LinearLayout friendsListView;
         TextView currentLoc;
         TextView currentAcc;
         TextView currentTime;       
         GeocodableLocation currentLocation;
-        
         private static Handler handler;
         
         private static FriendsFragment instance;
@@ -588,11 +503,16 @@ public class ActivityMain extends FragmentActivity {
 
             return instance;
         }
-
+        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);          
+            handler = new StaticHandler(this);
+        }
+        
         @Override
         public void onStart() {
             super.onStart();
-            
             EventBus.getDefault().register(this);
         }
 
@@ -600,6 +520,46 @@ public class ActivityMain extends FragmentActivity {
         public void onStop() {
             EventBus.getDefault().unregister(this);
             super.onStop();
+        }
+
+
+        @Override
+        public void onResume() {
+            super.onResume();
+                        
+            for (Contact c : ServiceApplication.getContacts().values())
+                updateContactView(c);
+        }
+
+        
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.fragment_friends, container, false);
+            
+            friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
+            currentAcc = (TextView) v.findViewById(R.id.currentAccuracy);  
+            currentLoc = (TextView) v.findViewById(R.id.currentLocation);  
+            currentTime = (TextView) v.findViewById(R.id.currentTime);  
+            LinearLayout thisdevice = (LinearLayout) v.findViewById(R.id.thisdevice);
+            thisdevice.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                  MapFragment f = MapFragment.getInstance();
+                  if(f.hasCurrentLocation()) {
+                      Log.v(this.toString(), "Focusing the current location");
+                      f.focusCurrentLocation();
+                      viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+                  } else {
+                      Log.v(this.toString(), "No current location available");
+                  }
+                }
+            });
+
+            for (Contact c : ServiceApplication.getContacts().values())
+                updateContactView(c);
+
+            return v;
         }
 
         public void onEventMainThread(Events.LocationUpdated e) {
@@ -612,14 +572,14 @@ public class ActivityMain extends FragmentActivity {
         
             // Current location changes often, don't waste resources to resolve the geocoder
             currentLoc.setText(l.toLatLonString());
-            currentAcc.setText("±" + l.getLocation().getAccuracy() + "m"); // Todo: add imperial unit support
+            currentAcc.setText("±" + l.getLocation().getAccuracy() );
             currentTime.setText(App.formatDate(new Date(l.getTime())));
         }
 
         
         
-        private void onHandlerMessage(Message msg) {
-            if (msg.what == ReverseGeocodingTask.GEOCODER_RESULT) {
+        public void handleHandlerMessage(Message msg) {
+            if (msg.what == ReverseGeocodingTask.GEOCODER_RESULT && msg.obj != null) {
                 GeocodableLocation l = (GeocodableLocation) msg.obj;
                 TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);                    
                 tv.setText(l.toString());
@@ -687,153 +647,102 @@ public class ActivityMain extends FragmentActivity {
         }
         
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    onHandlerMessage(msg);
-                }
-            };
 
-        }
+    }
+    
+    
 
-        @Override
-        public void onResume() {
-            super.onResume();
-            
-            
-            Log.v(this.toString(), "Adding all existing contact views to list");
-            for (Contact c : ServiceApplication.getContacts().values())
-                updateContactView(c);
-
-        }
-
-        
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.fragment_friends, container, false);
-            
-            friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
-            currentAcc = (TextView) v.findViewById(R.id.currentAccuracy);  
-            currentLoc = (TextView) v.findViewById(R.id.currentLocation);  
-            currentTime = (TextView) v.findViewById(R.id.currentTime);  
-
-                   
-            for (Contact c : ServiceApplication.getContacts().values())
-                updateContactView(c);
-
-            
-//            friendsListView.setAdapter(ServiceApplication.getContactsAdapter());
-//            friendsListView.setOnItemClickListener(new OnItemClickListener() {
-//                
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    Contact c = (Contact) ServiceApplication.getContactsAdapter().getItem(position); 
-//                    if(c == null || c.getLocation() == null)
-//                        return;
-//                    
-//                    MapFragment.getInstance().focus(c);
-//                    viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
-//                }
-//            });
+//    public static class StatusFragment extends Fragment {
+//        private TextView locatorStatus;
+//        private TextView locatorCurLatLon;
+//        private TextView locatorCurAccuracy;
+//        private TextView locatorCurLatLonTime;
+//        private TextView locatorLastPubLatLon;
+//        private TextView locatorLastPubAccuracy;
+//        private TextView locatorLastPubLatLonTime;
+//        private TextView brokerStatus;
+//        private TextView brokerError;
 //
-            return v;
-        }
-    }
-    
-    
-
-    public static class StatusFragment extends Fragment {
-        private TextView locatorStatus;
-        private TextView locatorCurLatLon;
-        private TextView locatorCurAccuracy;
-        private TextView locatorCurLatLonTime;
-        private TextView locatorLastPubLatLon;
-        private TextView locatorLastPubAccuracy;
-        private TextView locatorLastPubLatLonTime;
-        private TextView brokerStatus;
-        private TextView brokerError;
-
-        private static StatusFragment instance;
-
-        public static StatusFragment getInstance() {
-            if (instance == null)
-                instance = new StatusFragment();
-
-            return instance;
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            EventBus.getDefault().registerSticky(this);
-        }
-
-        @Override
-        public void onStop() {
-            EventBus.getDefault().unregister(this);
-            super.onStop();
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.fragment_status, container, false);
-            locatorStatus = (TextView) v.findViewById(R.id.locatorStatus);
-            locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
-            locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
-            locatorCurLatLonTime = (TextView) v.findViewById(R.id.locatorCurLatLonTime);
-
-            locatorLastPubLatLon = (TextView) v.findViewById(R.id.locatorLastPubLatLon);
-            locatorLastPubAccuracy = (TextView) v.findViewById(R.id.locatorLastPubAccuracy);
-            locatorLastPubLatLonTime = (TextView) v.findViewById(R.id.locatorLastPubLatLonTime);
-
-            brokerStatus = (TextView) v.findViewById(R.id.brokerStatus);
-            brokerError = (TextView) v.findViewById(R.id.brokerError);
-
-            return v;
-        }
-
-        public void onEventMainThread(Events.LocationUpdated e) {
-            locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
-            locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()
-                    + "m");
-            locatorCurLatLonTime.setText(App.formatDate(e.getDate()));
-        }
-
-        public void onEventMainThread(Events.PublishSuccessfull e) {
-            if (e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
-                GeocodableLocation l = (GeocodableLocation) e.getExtra();
-                locatorLastPubLatLon.setText(l.toLatLonString());
-                locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy() + "m");
-                locatorLastPubLatLonTime.setText(App.formatDate(
-                        e.getDate()));
-            }
-        }
-
-        public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
-            locatorStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
-        }
-
-        public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
-            brokerStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
-            if (e.getExtra() != null && e.getExtra() instanceof Exception
-                    && e.getExtra().getClass() != null) {
-                brokerError.setText(((Exception) e.getExtra()).getCause().getLocalizedMessage());
-            } else {
-                brokerError.setText(getString(R.string.na));
-            }
-        }
-
-    }
+//        private static StatusFragment instance;
+//
+//        public static StatusFragment getInstance() {
+//            if (instance == null)
+//                instance = new StatusFragment();
+//
+//            return instance;
+//        }
+//
+//        @Override
+//        public void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//
+//        }
+//
+//        @Override
+//        public void onStart() {
+//            super.onStart();
+//            Log.v(this.toString(), "registering");
+//
+//            EventBus.getDefault().registerSticky(this);
+//        }
+//
+//        @Override
+//        public void onStop() {
+//            Log.v(this.toString(), "unregistering");
+//            EventBus.getDefault().unregister(this);
+//            super.onStop();
+//        }
+//
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                Bundle savedInstanceState) {
+//            View v = inflater.inflate(R.layout.fragment_status, container, false);
+//            locatorStatus = (TextView) v.findViewById(R.id.locatorStatus);
+//            locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
+//            locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
+//            locatorCurLatLonTime = (TextView) v.findViewById(R.id.locatorCurLatLonTime);
+//
+//            locatorLastPubLatLon = (TextView) v.findViewById(R.id.locatorLastPubLatLon);
+//            locatorLastPubAccuracy = (TextView) v.findViewById(R.id.locatorLastPubAccuracy);
+//            locatorLastPubLatLonTime = (TextView) v.findViewById(R.id.locatorLastPubLatLonTime);
+//
+//            brokerStatus = (TextView) v.findViewById(R.id.brokerStatus);
+//            brokerError = (TextView) v.findViewById(R.id.brokerError);
+//
+//            return v;
+//        }
+//
+//        public void onEventMainThread(Events.LocationUpdated e) {
+//            locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
+//            locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()
+//                    + "m");
+//            locatorCurLatLonTime.setText(App.formatDate(e.getDate()));
+//        }
+//
+//        public void onEventMainThread(Events.PublishSuccessfull e) {
+//            if (e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
+//                GeocodableLocation l = (GeocodableLocation) e.getExtra();
+//                locatorLastPubLatLon.setText(l.toLatLonString());
+//                locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy() + "m");
+//                locatorLastPubLatLonTime.setText(App.formatDate(
+//                        e.getDate()));
+//            }
+//        }
+//
+//        public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
+//            locatorStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
+//        }
+//
+//        public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
+//            brokerStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
+//            if (e.getExtra() != null && e.getExtra() instanceof Exception
+//                    && e.getExtra().getClass() != null) {
+//                brokerError.setText(((Exception) e.getExtra()).getCause().getLocalizedMessage());
+//            } else {
+//                brokerError.setText(getString(R.string.na));
+//            }
+//        }
+//
+//    }
 
 }
