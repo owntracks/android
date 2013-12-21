@@ -25,7 +25,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        this.dateFormater = new SimpleDateFormat("H:m:s", getResources().getConfiguration().locale);
+        this.dateFormater = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
         this.contacts = new HashMap<String,Contact>();
 
         Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);

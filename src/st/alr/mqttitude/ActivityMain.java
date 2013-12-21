@@ -13,6 +13,7 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
@@ -30,6 +31,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.transition.ChangeBounds;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,7 +63,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityMain extends FragmentActivity implements ActionBar.TabListener {
+public class ActivityMain extends FragmentActivity {
 
     PagerAdapter pagerAdapter;
     static ViewPager viewPager;
@@ -86,7 +91,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the app.
@@ -99,22 +104,32 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+//        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                actionBar.setSelectedNavigationItem(position);
+//            }
+//        });
 
-        for (int j = 0; j < pagerAdapter.getCount(); j++) {
-            actionBar.addTab(actionBar.newTab().setText(pagerAdapter.getPageTitle(j)).setTabListener(this));
-        }
+//        for (int j = 0; j < pagerAdapter.getCount(); j++) {
+//            actionBar.addTab(actionBar.newTab().setText(pagerAdapter.getPageTitle(j)).setTabListener(this));
+//        }
 
         try {
             MapsInitializer.initialize(this);
         } catch (GooglePlayServicesNotAvailableException e) {}
 
     }
+    
+    @Override
+    public void onBackPressed() {
+        if(viewPager.getCurrentItem() == PagerAdapter.MAP_FRAGMENT)
+            viewPager.setCurrentItem(PagerAdapter.CONTACT_FRAGMENT);
+        else 
+            super.onBackPressed();
+           
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -162,18 +177,18 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        viewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+//    @Override
+//    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//        viewPager.setCurrentItem(tab.getPosition());
+//    }
+//
+//    @Override
+//    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//    }
+//
+//    @Override
+//    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -182,12 +197,11 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
     public class PagerAdapter extends FragmentPagerAdapter {
         public static final int CONTACT_FRAGMENT = 0;
         public static final int MAP_FRAGMENT = 1;
-        public static final int STATUS_FRAGMENT = 2;
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
-
+        
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -556,6 +570,7 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
 
     }
 
+    @SuppressLint("NewApi")
     public static class FriendsFragment extends Fragment {
         LinearLayout friendsListView;
         TextView currentLoc;
@@ -649,7 +664,13 @@ public class ActivityMain extends FragmentActivity implements ActionBar.TabListe
                 }                
                 v.setTag(c.getTopic());
                 friendsListView.addView(c.getView());
-                friendsListView.setVisibility(View.VISIBLE);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT){
+                    Transition t = new android.transition.Fade();
+                    TransitionManager.beginDelayedTransition(friendsListView, t);
+
+                }
+                    friendsListView.setVisibility(View.VISIBLE);
+                    
             }
             ((TextView) v.findViewById(R.id.title)).setText(c.toString());
             

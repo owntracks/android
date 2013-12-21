@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="card_outer_padding_firstlast">8dp</dimen>
-    <dimen name="card_outer_padding_top">2dp</dimen>
-    <dimen name="card_outer_padding_bottom">1dp</dimen>
-    <dimen name="card_outer_padding_horizontal">8dp</dimen>
-    <dimen name="card_inner_padding_vertical">8dp</dimen>
-    <dimen name="card_inner_padding_left">10dp</dimen>
-    <dimen name="card_inner_padding_right">5dp</dimen>
     <dimen name="card_thumbnail">56dp</dimen>
     <dimen name="card_thumbnail_margin">5dp</dimen>
     <dimen name="card_header">20sp</dimen>
     <dimen name="card_title">17sp</dimen>
     <dimen name="card_content">17sp</dimen>
     <dimen name="card_shadow">3dp</dimen>
-    <dimen name="card_subheader">15sp</dimen>
-    <dimen name="card_header_padding_top">20dp</dimen>
-    <dimen name="card_header_padding_horizontal">20dp</dimen>
-    <dimen name="card_header_button_text">13sp</dimen>
-    <dimen name="card_header_button_padding_side">8dp</dimen>
-    <dimen name="card_header_button_padding_top">5dp</dimen>
-    <dimen name="card_header_button_margin_left">10dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-	<dimen name="card_inner_vertical_spacing_half">4dp</dimen>
-	<dimen name="card_inner_vertical_spacing_full">8dp</dimen>
-	<dimen name="card_padding_vertical">8dp</dimen>
+		
+			
+    
+    
+   	<dimen name="default_horizontal_spacing_half">8dp</dimen>
+	<dimen name="default_vertical_spacing_half">@dimen/default_horizontal_spacing_half</dimen>
+    
+	<dimen name="default_horizontal_spacing">16dp</dimen>
+	<dimen name="default_vertical_spacing">@dimen/default_horizontal_spacing</dimen>
+	
 </resources>
