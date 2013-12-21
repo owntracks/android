@@ -10,7 +10,7 @@
         android:orientation="vertical" >
 
         <LinearLayout
-            android:id="@+id/currentLocationHeader"
+            android:id="@+id/thisdevice"
             style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
