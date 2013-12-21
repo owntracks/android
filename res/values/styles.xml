@@ -32,6 +32,7 @@
         <item name="android:actionBarTabTextStyle">@style/Widget.TabWidget</item>
         <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Mqttitude</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="ActionBarTabStyle.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
@@ -105,7 +106,7 @@
     </style>
 
     <color name="lightGrey">#c8c8c8</color>
-    <color name="mediumGrey">#858585</color>
+    <color name="mediumGrey">#525151</color>
     <color name="darkGrey">#585552</color>
     <color name="background">#efefef</color>
     <color name="background_header">#f7f7f7</color>
@@ -147,8 +148,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:paddingTop">@dimen/card_inner_vertical_spacing_half</item>
-        <item name="android:paddingBottom">@dimen/card_inner_vertical_spacing_half</item>
+        <item name="android:paddingTop">@dimen/default_vertical_spacing_half</item>
+        <item name="android:paddingBottom">@dimen/default_vertical_spacing_half</item>
     </style>
 
     <style name="listItemTitle">

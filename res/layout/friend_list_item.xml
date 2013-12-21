@@ -1,64 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
-    android:orientation="vertical"
     style="@style/cardInner"
->
+    android:orientation="vertical" >
 
-<ImageView
-    android:id="@+id/image"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true"
-    android:layout_marginRight="@dimen/card_padding_vertical"
-    android:src="@drawable/noimage" />
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/default_horizontal_spacing"
+        android:src="@drawable/noimage" />
 
-<TextView
-    android:id="@+id/title"
-    style="@style/card_title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignTop="@+id/image"
-    android:layout_toRightOf="@+id/image"
-    android:gravity="top"
-    android:text="name" />
+    <TextView
+        android:id="@+id/title"
+        style="@style/card_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:gravity="top"
+        android:text="name" />
 
-<TextView
-    android:id="@+id/subtitle"
-    style="@style/card_content"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentRight="true"
-    android:layout_alignStart="@id/title"
-    android:layout_below="@+id/title"
-    android:gravity="bottom"
-    android:scrollHorizontally="false"
-    android:text="location" />
+    <TextView
+        android:id="@+id/subtitle"
+        style="@style/card_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignStart="@id/title"
+        android:layout_below="@+id/title"
+        android:gravity="bottom"
+        android:scrollHorizontally="false"
+        android:text="location" />
 
-<TextView
-    android:id="@+id/acc"
-    style="@style/card_content"
-    android:layout_width="50dp"
-    android:layout_height="wrap_content"
-    android:layout_alignParentRight="true"
-    android:layout_alignStart="@id/title"
-    android:layout_below="@+id/title"
-    android:gravity="bottom|right"
-    android:scrollHorizontally="false"
-    android:text="" />
+    <TextView
+        android:id="@+id/acc"
+        style="@style/card_content"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignStart="@id/title"
+        android:layout_below="@+id/title"
+        android:gravity="bottom|right"
+        android:scrollHorizontally="false"
+        android:text=""
+          android:visibility="gone" />
 
-<TextView
-    android:id="@+id/time"
-    style="@style/card_content"
-    android:layout_width="50dp"
-    android:layout_height="wrap_content"
-    android:layout_alignBottom="@+id/title"
-    android:layout_alignParentRight="true"
-    android:layout_alignStart="@id/title"
-    android:gravity="bottom|right"
-    android:scrollHorizontally="false"
-    android:text="" />
+    <TextView
+        android:id="@+id/time"
+        style="@style/card_content"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/title"
+        android:layout_alignParentRight="true"
+        android:layout_alignStart="@id/title"
+        android:gravity="bottom|right"
+        android:scrollHorizontally="false"
+        android:text="" 
+        android:visibility="gone"/>
 
 </RelativeLayout>
-

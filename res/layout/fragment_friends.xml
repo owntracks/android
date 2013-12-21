@@ -2,8 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-    
+    android:orientation="vertical" >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,30 +14,27 @@
             style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
- >
+            android:orientation="vertical" >
 
             <TextView
                 style="@style/card_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/currentLocation"
-                                android:layout_marginBottom="16dp"
-                 />
+                android:layout_marginBottom="@dimen/default_vertical_spacing"
+                android:text="@string/currentLocation" />
 
-            
-                        <TextView
+            <TextView
                 style="@style/card_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Location" />
-            
-                        
+
             <TextView
                 android:id="@+id/currentLocation"
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                   android:layout_marginBottom="@dimen/default_vertical_spacing"
                 android:text="@string/na" />
 
             <TextView
@@ -45,27 +42,23 @@
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="0" 
-                                                android:layout_marginBottom="16dp"
-                />
-             
+android:visibility="gone"                android:layout_marginBottom="@dimen/default_vertical_spacing"
+                android:text="0" />
+
             <TextView
                 style="@style/card_title"
-                
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Last report" />
-            
-             <TextView
+
+            <TextView
                 android:id="@+id/currentTime"
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
-                                                android:layout_marginBottom="16dp"
-                 />
-            
-            </LinearLayout>
+                android:layout_marginBottom="@dimen/default_vertical_spacing"
+                android:text="@string/na" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/friendsListView"
@@ -74,16 +67,15 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
-            android:visibility="gone"
->
-                         <TextView
+            android:paddingBottom="@dimen/default_vertical_spacing"
+            android:visibility="gone" >
+
+            <TextView
                 style="@style/card_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contacts" 
-                                                android:layout_marginBottom="16dp"
-                />
-            
+                android:layout_marginBottom="@dimen/default_vertical_spacing"
+                android:text="Contacts" />
         </LinearLayout>
     </LinearLayout>
 

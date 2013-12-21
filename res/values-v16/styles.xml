@@ -17,7 +17,7 @@
        	<item name="android:paddingBottom">18dp</item>     
        	<item name="android:paddingLeft">16dp</item>                          
    
-       	<item name="android:background">@color/background_header</item>
+       	<item name="android:background">@drawable/grey_border_bottom</item>
         
     </style>
     

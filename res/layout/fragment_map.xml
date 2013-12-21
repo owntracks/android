@@ -17,10 +17,10 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/white_border_top"
         android:orientation="vertical" 
-        android:paddingLeft="@dimen/card_padding_vertical"
-        android:paddingRight="@dimen/card_padding_vertical"
-        android:paddingTop="@dimen/card_inner_vertical_spacing_full"
-        android:paddingBottom="@dimen/card_inner_vertical_spacing_full">
+        android:paddingLeft="0dp"
+        android:paddingRight="@dimen/default_horizontal_spacing"
+        android:paddingTop="@dimen/default_vertical_spacing_half"
+        android:paddingBottom="@dimen/default_vertical_spacing_half">
         
         <include layout="@layout/friend_list_item" />
     </LinearLayout>

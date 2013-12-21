@@ -7,10 +7,15 @@ import st.alr.mqttitude.R;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -29,11 +34,11 @@ public class Contact {
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
 
-    private static Bitmap defaultUserImage = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true) ;    
-    private static Bitmap markerBackground = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.markerbg), (int)convertDpToPixel(57), (int)convertDpToPixel(62), true) ;    
+    private static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true)) ;    
+    //private static Bitmap markerBackground = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.markerbg), (int)convertDpToPixel(57), (int)convertDpToPixel(62), true) ;    
 
     private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage); 
-    private static BitmapDescriptor defaultUserMarkerDescriptor  = BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, defaultUserImage));  
+   // private static BitmapDescriptor defaultUserMarkerDescriptor  = BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, defaultUserImage));  
 
     private Marker marker;
     private View view;
@@ -97,7 +102,7 @@ public String toString() {
 
     public void setUserImage(Bitmap image) {
          if(image != null)
-             this.userImage = Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true);
+             this.userImage = getRoundedShape(Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true));
     }
     
     public Bitmap getUserImage() {
@@ -120,39 +125,39 @@ public String toString() {
     }
     
     public BitmapDescriptor getMarkerImageDescriptor(){
-        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, getUserImage())) : defaultUserMarkerDescriptor;
+        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(getUserImage()) : defaultUserImageDescriptor;
     }
 
 
 
-    public static Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom 
-        Bitmap cs = null; 
-
-        int width, height = 0; 
-
-          width = c.getWidth();
-          height = c.getHeight(); 
-
-        cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
-
-        Canvas comboImage = new Canvas(cs); 
-
-        comboImage.drawBitmap(c, 0f, 0f, null); 
-        comboImage.drawBitmap(s, 8f, 8f, null); 
-
-        // this is an extra bit I added, just incase you want to save the new image somewhere and then return the location 
-        /*String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png"; 
-
-        OutputStream os = null; 
-        try { 
-          os = new FileOutputStream(loc + tmpImg); 
-          cs.compress(CompressFormat.PNG, 100, os); 
-        } catch(IOException e) { 
-          Log.e("combineImages", "problem combining images", e); 
-        }*/ 
-
-        return cs; 
-      } 
+//    public static Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom 
+//        Bitmap cs = null; 
+//
+//        int width, height = 0; 
+//
+//          width = c.getWidth();
+//          height = c.getHeight(); 
+//
+//        cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
+//
+//        Canvas comboImage = new Canvas(cs); 
+//
+//        comboImage.drawBitmap(c, 0f, 0f, null); 
+//        comboImage.drawBitmap(s, 8f, 8f, null); 
+//
+//        // this is an extra bit I added, just incase you want to save the new image somewhere and then return the location 
+//        /*String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png"; 
+//
+//        OutputStream os = null; 
+//        try { 
+//          os = new FileOutputStream(loc + tmpImg); 
+//          cs.compress(CompressFormat.PNG, 100, os); 
+//        } catch(IOException e) { 
+//          Log.e("combineImages", "problem combining images", e); 
+//        }*/ 
+//
+//        return cs; 
+//      } 
 
     
 //    public static Bitmap get_ninepatch(int id,int x, int y, Context context){
@@ -174,30 +179,53 @@ public String toString() {
         return BitmapFactory.decodeStream(input);
     }
     
-    public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
-        // TODO Auto-generated method stub
-         int targetWidth = 50;
-         int targetHeight = 50;
-         Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
-                               targetHeight,Bitmap.Config.ARGB_8888);
+//    public static Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+//        // TODO Auto-generated method stub
+//         int targetWidth = 50;
+//         int targetHeight = 50;
+//         Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
+//                               targetHeight,Bitmap.Config.ARGB_8888);
+//
+//         Canvas canvas = new Canvas(targetBitmap);
+//         Path path = new Path();
+//         path.addCircle(((float) targetWidth - 1) / 2,
+//         ((float) targetHeight - 1) / 2,
+//         (Math.min(((float) targetWidth), 
+//                   ((float) targetHeight)) / 2),
+//             Path.Direction.CCW);
+//
+//         canvas.clipPath(path);
+//         Bitmap sourceBitmap = scaleBitmapImage;
+//         canvas.drawBitmap(sourceBitmap, 
+//                                   new Rect(0, 0, sourceBitmap.getWidth(),
+//         sourceBitmap.getHeight()), 
+//                                   new Rect(0, 0, targetWidth,
+//         targetHeight), null);
+//         return targetBitmap;
+//        }
 
-         Canvas canvas = new Canvas(targetBitmap);
-         Path path = new Path();
-         path.addCircle(((float) targetWidth - 1) / 2,
-         ((float) targetHeight - 1) / 2,
-         (Math.min(((float) targetWidth), 
-                   ((float) targetHeight)) / 2),
-             Path.Direction.CCW);
-
-         canvas.clipPath(path);
-         Bitmap sourceBitmap = scaleBitmapImage;
-         canvas.drawBitmap(sourceBitmap, 
-                                   new Rect(0, 0, sourceBitmap.getWidth(),
-         sourceBitmap.getHeight()), 
-                                   new Rect(0, 0, targetWidth,
-         targetHeight), null);
-         return targetBitmap;
-        }
+    
+    public static Bitmap getRoundedShape(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+            bitmap.getHeight(), Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+     
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = bitmap.getWidth();
+     
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+     
+        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+     
+        return output;
+      }
 
 
 
