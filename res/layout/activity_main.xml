@@ -9,6 +9,7 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
+    android:id="@+id/main"
     tools:context=".ActivityMain" >
 
      <android.support.v4.view.ViewPager

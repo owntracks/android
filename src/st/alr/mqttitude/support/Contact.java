@@ -6,6 +6,7 @@ import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -34,7 +35,7 @@ public class Contact {
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
 
-    private static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true)) ;    
+    public static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true)) ;    
     //private static Bitmap markerBackground = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.markerbg), (int)convertDpToPixel(57), (int)convertDpToPixel(62), true) ;    
 
     private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage); 
@@ -178,6 +179,8 @@ public String toString() {
         }
         return BitmapFactory.decodeStream(input);
     }
+    
+
     
 //    public static Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
 //        // TODO Auto-generated method stub

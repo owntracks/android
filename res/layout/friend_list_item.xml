@@ -11,17 +11,19 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/default_horizontal_spacing"
+        android:onClick="contactImageClicked"
         android:src="@drawable/noimage" />
 
     <TextView
         android:id="@+id/title"
         style="@style/card_title"
+        android:layout_marginTop="1dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/image"
         android:layout_toRightOf="@+id/image"
         android:gravity="top"
-        android:text="name" />
+        android:text="You" />
 
     <TextView
         android:id="@+id/subtitle"

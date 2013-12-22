@@ -11,37 +11,6 @@
         android:paddingTop="@dimen/default_vertical_spacing" >
 
         <LinearLayout
-            android:id="@+id/thisdevice"
-            style="@style/card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/default_vertical_spacing_half"
-             >
-
-            <TextView
-                style="@style/card_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/default_vertical_spacing_half"
-                android:text="Current" />
-
-            <include
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                layout="@layout/friend_list_item" />
-
-        </LinearLayout>
-
-        <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <LinearLayout
-            android:id="@+id/thisdevice"
             style="@style/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,18 +37,24 @@
                 android:layout_marginBottom="@dimen/default_vertical_spacing"
                 android:text="@string/na" />
 
+                        <TextView
+                style="@style/card_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accuracy" />
+            
+                        
             <TextView
                 android:id="@+id/currentAccuracy"
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-android:visibility="gone"                android:layout_marginBottom="@dimen/default_vertical_spacing"
+              android:layout_marginBottom="@dimen/default_vertical_spacing"
                 android:text="0" />
 
             <TextView
                 style="@style/card_title"
                 android:layout_width="match_parent"
-                android:visibility="gone" 
                 android:layout_height="wrap_content"
                 android:text="Last report" />
 
@@ -88,35 +63,10 @@ android:visibility="gone"                android:layout_marginBottom="@dimen/def
                 style="@style/card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"  
                 android:layout_marginBottom="@dimen/default_vertical_spacing"
                 android:text="@string/na" />
         </LinearLayout>
-        -->
-
-        <LinearLayout
-            android:id="@+id/friendsListView"
-            style="@style/card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/default_vertical_spacing_half"
-            android:visibility="gone" >
-
-            <TextView
-                style="@style/card_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/default_vertical_spacing_half"
-                android:text="Reported" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-        </LinearLayout>
+        
     </LinearLayout>
 
 </ScrollView>
