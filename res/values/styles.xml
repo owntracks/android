@@ -106,7 +106,7 @@
     </style>
 
     <color name="lightGrey">#c8c8c8</color>
-    <color name="mediumGrey">#525151</color>
+    <color name="mediumGrey">#696868</color>
     <color name="darkGrey">#585552</color>
     <color name="background">#efefef</color>
     <color name="background_header">#f7f7f7</color>
@@ -174,7 +174,7 @@
         <item name="android:paddingRight">1dp</item>
                 <item name="android:paddingBottom">1dp</item>
                 
-        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingTop">1dp</item>
         
     </style>
 

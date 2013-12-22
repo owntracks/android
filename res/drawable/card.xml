@@ -23,7 +23,7 @@
 	
 	
 	
-	<item android:bottom="1dp" android:left="1dp" android:right="1dp">
+	<item android:bottom="1dp" android:left="1dp" android:right="1dp" android:top="1dp">
 		<shape android:shape="rectangle"
 			android:dither="true">
 
@@ -31,10 +31,6 @@
 
 			<solid android:color="@android:color/white" />
 
-			<padding android:bottom="8dp"
-				android:left="8dp"
-				android:right="8dp"
-				android:top="8dp" />
 		</shape>
 	</item>	
 </layer-list>

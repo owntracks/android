@@ -2,6 +2,8 @@
 package st.alr.mqttitude;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,12 +25,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -126,8 +131,8 @@ public class ActivityMain extends FragmentActivity {
     
     @Override
     public void onBackPressed() {
-        if(viewPager.getCurrentItem() == PagerAdapter.MAP_FRAGMENT)
-            viewPager.setCurrentItem(PagerAdapter.CONTACT_FRAGMENT);
+        if(viewPager.getCurrentItem() != PagerAdapter.CONTACT_FRAGMENT)
+            viewPager.setCurrentItem(PagerAdapter.CONTACT_FRAGMENT, viewPager.getCurrentItem() == PagerAdapter.MAP_FRAGMENT); // animate if map fragment. 
         else 
             super.onBackPressed();
            
@@ -200,26 +205,23 @@ public class ActivityMain extends FragmentActivity {
     public class PagerAdapter extends FragmentPagerAdapter {
         public static final int CONTACT_FRAGMENT = 0;
         public static final int MAP_FRAGMENT = 1;
-
         public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
         
+
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case CONTACT_FRAGMENT:
-                    return FriendsFragment.getInstance();
-                default:
+                case MAP_FRAGMENT:
                     return MapFragment.getInstance();
-//                default:
-//                    return StatusFragment.getInstance();
+                default:
+                    return FriendsFragment.getInstance();
             }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 2;
         }
 
@@ -261,7 +263,21 @@ public class ActivityMain extends FragmentActivity {
         super.onResume();
     }
     
+    public void contactImageClicked(View v) {
+        String topic = (String) ((View) v.getParent()).getTag();
+        
+        
+        
+        Bundle args = new Bundle();
+        args.putString("topic", topic);
+        DetailsFragment f = DetailsFragment.getInstance(args);
+        getSupportFragmentManager().beginTransaction().replace(R.id.pager, f).commit();
+        //        pagerAdapter.setItemArguments(PagerAdapter.DETAILS_FRAGMENT, args); // The pager adapter cannot directly pass arugments to the new fragment. Thus we store it temporary to pass it in the getItem method
+//        viewPager.setCurrentItem(PagerAdapter.DETAILS_FRAGMENT,false);
 
+    }
+    Bundle fragmentBundle;
+    
     public static class MapFragment extends Fragment {
         private static MapFragment instance;
         private GeocodableLocation currentLocation;
@@ -422,13 +438,20 @@ public class ActivityMain extends FragmentActivity {
 
 
         public void focusCurrentLocation() {
+            if(currentLocation == null)
+                return;
             selectedContactDetails.setVisibility(View.GONE);
-            ActivityPreferences.setTrackingUsername("+CURRENTDEVICELOCATION+");
+            ActivityPreferences.setTrackingUsername(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
             centerMap(currentLocation.getLatLng());
         }
 
         public void focusCurrentlyTrackedContact(){
-            focus(getCurrentlyTrackedContact());
+            Contact c = getCurrentlyTrackedContact();
+            
+            if(c != null)
+                focus(getCurrentlyTrackedContact()); 
+            else if (isTrackingCurrentLocation())
+                focusCurrentLocation();            
         }
         
         public void focus(final Contact c) {
@@ -467,7 +490,7 @@ public class ActivityMain extends FragmentActivity {
         public void onEventMainThread(Events.LocationUpdated e) {
             currentLocation = e.getGeocodableLocation();
 
-            if(ActivityPreferences.getTrackingUsername().equals("+CURRENTDEVICELOCATION+"))
+            if(isTrackingCurrentLocation())
                 focusCurrentLocation();
         }
         
@@ -484,14 +507,21 @@ public class ActivityMain extends FragmentActivity {
         public boolean hasCurrentLocation(){
             return currentLocation != null;
         }
+        
+        public boolean isTrackingCurrentLocation(){
+            return ActivityPreferences.getTrackingUsername().equals(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
+        }
+
     }
 
     @SuppressLint("NewApi")
     public static class FriendsFragment extends Fragment implements StaticHandlerInterface{
         LinearLayout friendsListView;
+        TextView currentLocTitle;
         TextView currentLoc;
-        TextView currentAcc;
-        TextView currentTime;       
+
+//        TextView currentAcc;
+//        TextView currentTime;       
         GeocodableLocation currentLocation;
         private static Handler handler;
         
@@ -537,10 +567,14 @@ public class ActivityMain extends FragmentActivity {
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
             
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
-            currentAcc = (TextView) v.findViewById(R.id.currentAccuracy);  
-            currentLoc = (TextView) v.findViewById(R.id.currentLocation);  
-            currentTime = (TextView) v.findViewById(R.id.currentTime);  
             LinearLayout thisdevice = (LinearLayout) v.findViewById(R.id.thisdevice);
+            ImageView owner = (ImageView) thisdevice.findViewById(R.id.image); 
+            owner.setImageBitmap(Contact.defaultUserImage);
+
+            currentLocTitle = (TextView) thisdevice.findViewById(R.id.title);  
+            currentLoc = (TextView) thisdevice.findViewById(R.id.subtitle);  
+            
+            
             thisdevice.setOnClickListener(new OnClickListener() {
                 
                 @Override
@@ -553,6 +587,15 @@ public class ActivityMain extends FragmentActivity {
                   } else {
                       Log.v(this.toString(), "No current location available");
                   }
+                }
+            });
+            
+            owner.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    Log.v(this.toString(), "Owner clicked");
+
                 }
             });
 
@@ -572,8 +615,8 @@ public class ActivityMain extends FragmentActivity {
         
             // Current location changes often, don't waste resources to resolve the geocoder
             currentLoc.setText(l.toLatLonString());
-            currentAcc.setText("±" + l.getLocation().getAccuracy() );
-            currentTime.setText(App.formatDate(new Date(l.getTime())));
+//            currentAcc.setText("±" + l.getLocation().getAccuracy() );
+//            currentTime.setText(App.formatDate(new Date(l.getTime())));
         }
 
         
@@ -590,7 +633,7 @@ public class ActivityMain extends FragmentActivity {
             updateContactView(e.getContact());
         }
 
-        public void updateContactView(Contact c){
+        public void updateContactView(final Contact c){
             View v = friendsListView.findViewWithTag(c.getTopic()); 
             if(v == null) {
             
@@ -620,6 +663,16 @@ public class ActivityMain extends FragmentActivity {
 
                         }
                     });
+                    
+//                    ((ImageView)v.findViewById(R.id.image)).setOnClickListener(new OnClickListener() {
+//                        
+//                        @Override
+//                        public void onClick(View v) {
+//                            Log.v(this.toString(), "clicked info for" + c.getTopic());
+//
+//                        }
+//                    });
+
 
                 }                
                 v.setTag(c.getTopic());
@@ -745,4 +798,72 @@ public class ActivityMain extends FragmentActivity {
 //
 //    }
 
+    
+    public static class DetailsFragment extends Fragment {
+        Contact contact;
+        LinearLayout friendsListView;
+        TextView currentLocTitle;
+        TextView currentLoc;
+        
+        
+//        TextView currentAcc;
+//        TextView currentTime;       
+        GeocodableLocation currentLocation;
+
+        public static DetailsFragment getInstance(Bundle b) {
+            DetailsFragment instance = new DetailsFragment();
+            instance.setArguments(b);
+            return instance;
+        }
+        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);     
+            
+            Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
+                        
+            contact = App.getContacts().get(b.getString("topic"));            
+            Log.v(this.toString(), "created fragment for "+ contact.getTopic() );
+        }
+        
+        @Override
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().register(this);
+        }
+
+        @Override
+        public void onStop() {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+
+
+        @Override
+        public void onResume() {
+            super.onResume();
+        }
+
+        
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.fragment_details, container, false);
+            
+            return v;
+        }
+
+        public void onEventMainThread(Events.LocationUpdated e) {
+
+        }
+        
+        
+        public void onSaveInstanceState(Bundle b) {
+            super.onSaveInstanceState(b);
+            b.putString("topic", contact.getTopic());
+          }
+
+   }
+    
+    
+    
 }

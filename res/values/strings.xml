@@ -61,7 +61,7 @@
     <string name="connectivityDisconnectedUserDisconnect">"Disconnected: By user"</string>
     <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
     <string name="na">Not available</string>
-    <string name="currentLocation">This device</string>
+    <string name="currentLocation">Current</string>
     <string name="shareLocation">Share location"</string>
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>

@@ -227,6 +227,5 @@ public class ActivityLauncher extends FragmentActivity{
             unbindService(serviceApplicationConnection);
         super.onDestroy();
     }
-
 }
 
