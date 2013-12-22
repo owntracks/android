@@ -62,7 +62,6 @@ public abstract class ServiceBindable extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(this.TAG, "onStartCommand");
         if(!started) {
             started = true;
             // Called when the service is started for the first time. Shields from multiple calls of startService(...) to invoke the code multiple times

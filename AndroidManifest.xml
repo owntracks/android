@@ -50,12 +50,13 @@
             android:exported="false" >
         </service>
 
-        <receiver
+        <!--
+             <receiver
             android:name="st.alr.mqttitude.support.BackgroundPublishReceiver"
             android:enabled="true" >
             <action android:name="st.alr.mqttitude.UPDATE" />
         </receiver>
-
+        -->
         <activity
             android:name="st.alr.mqttitude.ActivityLauncher"
             android:configChanges="orientation|keyboardHidden"
@@ -71,6 +72,18 @@
         <activity
             android:name="st.alr.mqttitude.ActivityWizzard"
             android:label="@string/title_activity_activity_wizzard" >
+        </activity>
+        <activity
+            android:name="st.alr.mqttitude.testListActivity"
+            android:label="@string/title_test_list" >
+        </activity>
+        <activity
+            android:name="st.alr.mqttitude.testDetailActivity"
+            android:label="@string/title_test_detail"
+            android:parentActivityName=".testListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".testListActivity" />
         </activity>
     </application>
 

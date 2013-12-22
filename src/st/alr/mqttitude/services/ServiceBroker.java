@@ -91,22 +91,27 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         pubThread.start();
         pubHandler = new Handler(pubThread.getLooper());
 
+        doStart();
+
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        doStart(intent, startId);
+        //doStart();
         return 0;
     }
 
-    private void doStart(final Intent intent, final int startId) {
-        // init();
+    private void doStart() {
+        doStart(false);
+    }
+    
+    private void doStart(final boolean force) {
 
         Thread thread1 = new Thread() {
             @Override
             public void run() {
-                handleStart(intent, startId);
+                handleStart(force);
                 if (this == workerThread) // Clean up worker thread
                     workerThread = null;
             }
@@ -121,12 +126,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         thread1.start();
     }
 
-    void handleStart(Intent intent, int startId) {
+    void handleStart(boolean force) {
         Log.v(this.toString(), "handleStart");
 
  
-        // Respect user's wish to stay disconnected. Overwrite with startId == -1 to reconnect manually afterwards
-        if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT) && startId != -1) {
+        // Respect user's wish to stay disconnected. Overwrite with force = true to reconnect manually afterwards
+        if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT) && force) {
             Log.d(this.toString(), "handleStart: respecting user disconnect ");
 
             return;
@@ -414,7 +419,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
     public void reconnect() {
         disconnect(true);
-        doStart(null, -1);
+        doStart(true);
     }
 
 
@@ -560,7 +565,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             Log.d(this.toString(), "pub deferred");
             
             deferPublish(p);
-            doStart(null, 1);
+            doStart();
             return;
         }
 
@@ -700,7 +705,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
             if (isOnline(true) && !isConnected() && !isConnecting()) {
                 Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart(null, -1)");
-                doStart(null, 1);
+                doStart();
             
             }
             wl.release();
@@ -715,7 +720,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
             if (isOnline(true) && !isConnected() && !isConnecting()) {
                 Log.v(this.toString(), "ping: isOnline()=" + isOnline(true)  + ", isConnected()=" + isConnected());
-                doStart(null, -1);
+                doStart();
             } else if (!isOnline(true)) {
                 Log.d(this.toString(), "ping: Waiting for network to come online again");
             } else {            
@@ -741,7 +746,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
                     // reconnect
                     Log.w(this.toString(), "onReceive: MqttException=" + e);
-                    doStart(null, -1);
+                    doStart();
                 }
             }
             scheduleNextPing();

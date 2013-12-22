@@ -3,6 +3,7 @@ package st.alr.mqttitude.services;
 
 import java.util.Date;
 
+import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
 import android.app.PendingIntent;
@@ -29,16 +30,16 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private final String TAG = "ServiceLocatorFused";
     private GeocodableLocation lastKnownLocation;
     private PendingIntent locationIntent;
-    
+
     public void onCreate(ServiceProxy p) {
         super.onCreate(p);
         Log.v(this.toString(), "onCreate");
 
         setupLocationRequest();
         mLocationClient = new LocationClient(context, this, this);
-        
+
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
-            mLocationClient.connect();        
+            mLocationClient.connect();
 
     }
 
@@ -51,7 +52,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
     public void onLocationChanged(Location arg0) {
         Log.v(TAG, "ServiceLocatorFused onLocationChanged");
         this.lastKnownLocation = new GeocodableLocation(arg0);
-        
+
         EventBus.getDefault().postSticky(new Events.LocationUpdated(this.lastKnownLocation));
 
         if (shouldPublishLocation()) {
@@ -107,7 +108,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
         Log.v(TAG, "setupForegroundLocationRequest. Interval: " + 10);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10*1000);
+        mLocationRequest.setInterval(10 * 1000);
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setSmallestDisplacement(50);
     }
@@ -119,7 +120,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
     }
 
     private void disableLocationUpdates() {
-        if (ready && mLocationRequest != null && locationIntent!=null) {
+        if (ready && mLocationRequest != null && locationIntent != null) {
             mLocationClient.removeLocationUpdates(locationIntent);
             mLocationRequest = null;
         }
@@ -133,30 +134,42 @@ public class ServiceLocatorFused extends ServiceLocator implements
         }
 
         if (foreground || areBackgroundUpdatesEnabled()) {
-//            if(foreground) {
-//                mLocationClient.requestLocationUpdates(mLocationRequest, this);
-//            }else{
-                Intent i = new Intent(context, ServiceProxy.class);
-                locationIntent = PendingIntent.getService(context, 1, i, 0);                
-                mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
-//            }
+            // if(foreground) {
+            // mLocationClient.requestLocationUpdates(mLocationRequest, this);
+            // }else{
+
+            Intent i = new Intent(context, ServiceProxy.class);
+            i.setAction(ServiceProxy.SERVICE_LOCATOR);
+            i.putExtra("foo", "bar");
+            locationIntent = PendingIntent.getService(context, 1, i, 0);
+            locationIntent = ServiceProxy.getPendingIntentForService(context,
+                    ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
+
+            mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
+
+            // }
         } else {
             Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
         }
     }
-    
-    
+
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {    
-        if(intent != null) {
-            Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
-            if(location !=null)
-             onLocationChanged(location);             
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.getAction() != null) {            
+            if (intent.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
+                publishLastKnownLocation();
+            } else if (intent.getAction().equals(Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
+                Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
+
+                if (location != null) 
+                    onLocationChanged(location);
+            }
+
         }
-        
-        return 0;        
+
+        return 0;
     }
-    
+
     private void setupLocationRequest() {
         disableLocationUpdates();
 
@@ -186,7 +199,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
     @Override
     public void onDestroy() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
