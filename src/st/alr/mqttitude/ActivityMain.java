@@ -1,46 +1,31 @@
 
 package st.alr.mqttitude;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
-import st.alr.mqttitude.services.ServiceBindable;
+import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Contact;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.GeocodableLocation;
+import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
-import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
-import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.transition.ChangeBounds;
-import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -55,8 +40,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.data.e;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -75,16 +58,17 @@ public class ActivityMain extends FragmentActivity {
 
     PagerAdapter pagerAdapter;
     static ViewPager viewPager;
-    //ServiceConnection serviceApplicationConnection;
+//    ServiceConnection serviceConnection;
     
 //    @Override
 //    protected void onDestroy() {
-//        unbindService(serviceApplicationConnection);
+//        unbindService(serviceConnection);
 //        super.onDestroy();
 //    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startService(new Intent(this, ServiceProxy.class));
         
         // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
         // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
@@ -101,27 +85,9 @@ public class ActivityMain extends FragmentActivity {
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the app.
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
-
-        // When swiping between different sections, select the corresponding
-        // tab. We can also use ActionBar.Tab#select() to do this if we have
-        // a reference to the Tab.
-//        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                actionBar.setSelectedNavigationItem(position);
-//            }
-//        });
-
-//        for (int j = 0; j < pagerAdapter.getCount(); j++) {
-//            actionBar.addTab(actionBar.newTab().setText(pagerAdapter.getPageTitle(j)).setTabListener(this));
-//        }
 
         try {
             MapsInitializer.initialize(this);
@@ -154,11 +120,9 @@ public class ActivityMain extends FragmentActivity {
             startActivity(intent1);
             return true;
         } else if (itemId == R.id.menu_publish) {
-            if (ServiceApplication.getInstance().getServiceLocator() != null)
-                ServiceApplication.getInstance().getServiceLocator().publishLastKnownLocation();
-            return true;
+                ServiceProxy.getServiceLocator().publishLastKnownLocation();
+                return true;
         } else if (itemId == R.id.menu_share) {
-            if (ServiceApplication.getInstance().getServiceLocator() != null)
                 this.share(null);
             return true;
         } else {
@@ -167,7 +131,7 @@ public class ActivityMain extends FragmentActivity {
     }
 
     public void share(View view) {
-        GeocodableLocation l = ServiceApplication.getInstance().getServiceLocator().getLastKnownLocation();
+        GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
         if (l == null) {
             // TODO: signal to user
             return;
@@ -243,15 +207,13 @@ public class ActivityMain extends FragmentActivity {
     @Override
     public void onStart() {
         super.onStart();
-        if (ServiceApplication.getInstance() != null)
-            ServiceApplication.getInstance().enableForegroundMode();
+            ServiceProxy.getServiceLocator().enableForegroundMode();
 
     }
 
     @Override
     public void onStop() {
-        if (ServiceApplication.getInstance() != null)
-            ServiceApplication.getInstance().enableBackgroundMode();
+            ServiceProxy.getServiceLocator().enableBackgroundMode();
 
         super.onStop();
     }

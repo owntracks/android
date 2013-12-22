@@ -6,7 +6,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.services.ServiceBroker;
+import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -273,7 +274,7 @@ public class PreferencesBroker extends DialogPreference {
                     
                     @Override
                     public void run() {
-                        ServiceMqtt.getInstance().reconnect();                        
+                        ServiceProxy.getServiceBroker().reconnect();                        
                     }
                 };
                 new Thread( r ).start();
@@ -284,7 +285,7 @@ public class PreferencesBroker extends DialogPreference {
                     
                     @Override
                     public void run() {
-                        ServiceMqtt.getInstance().disconnect(true);
+                        ServiceProxy.getServiceBroker().disconnect(true);
                         
                     }
                 };
@@ -349,8 +350,8 @@ public class PreferencesBroker extends DialogPreference {
         if (v == null)
             return;
 
-        if (ServiceMqtt.getState() == Defaults.State.ServiceMqtt.CONNECTING
-                || ServiceMqtt.getState() == Defaults.State.ServiceMqtt.CONNECTED) {
+        if (ServiceBroker.getState() == Defaults.State.ServiceBroker.CONNECTING
+                || ServiceBroker.getState() == Defaults.State.ServiceBroker.CONNECTED) {
             v.setEnabled(true);
         } else {
             v.setEnabled(false);

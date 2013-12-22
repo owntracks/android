@@ -19,13 +19,17 @@ public class Events {
         } 
        
     }
-    
+    public static class Dummy extends E{
+        public Dummy() {
+        }
+    }
+
     
     public static class PublishSuccessfull extends E{
         Object extra;
         public PublishSuccessfull(Object extra) {
+            super();
             this.extra = extra;
-            this.date = new Date();
         }
         public Object getExtra() {
             return extra;
@@ -36,6 +40,7 @@ public class Events {
         GeocodableLocation l; 
         
         public LocationUpdated(Location l) {
+            super();
             this.l = new GeocodableLocation(l);
         }
 
@@ -87,6 +92,7 @@ public class Events {
     public static class ContactUpdated extends E{
         private Contact c; 
         public ContactUpdated(Contact c) {
+            super();
             this.c = c;             
         }
         public Contact getContact() {
@@ -98,19 +104,20 @@ public class Events {
 
     
     public static class StateChanged {
-        public static class ServiceMqtt extends E{
-            private Defaults.State.ServiceMqtt state;
+        public static class ServiceBroker extends E{
+            private Defaults.State.ServiceBroker state;
             private Object extra;
             
-            public ServiceMqtt(Defaults.State.ServiceMqtt state) {
+            public ServiceBroker(Defaults.State.ServiceBroker state) {
                this(state, null);
             }
             
-            public ServiceMqtt(Defaults.State.ServiceMqtt state, Object extra) {
+            public ServiceBroker(Defaults.State.ServiceBroker state, Object extra) {
+                super();
                 this.state = state;
                 this.extra = extra;
             }
-            public Defaults.State.ServiceMqtt getState() {
+            public Defaults.State.ServiceBroker getState() {
                 return this.state;
             }
             public Object getExtra() {

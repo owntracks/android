@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.services.ServiceProxy;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
@@ -35,10 +36,10 @@ public class Contact {
     private Bitmap userImage;
     private static final int userImageHeightScale = (int) convertDpToPixel(48);
 
-    public static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true)) ;    
+    public static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy.getInstance().getResources(), R.drawable.noimage), userImageHeightScale, userImageHeightScale, true)) ;    
     //private static Bitmap markerBackground = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.markerbg), (int)convertDpToPixel(57), (int)convertDpToPixel(62), true) ;    
 
-    private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage); 
+   // private static BitmapDescriptor defaultUserImageDescriptor  = BitmapDescriptorFactory.fromBitmap(defaultUserImage); 
    // private static BitmapDescriptor defaultUserMarkerDescriptor  = BitmapDescriptorFactory.fromBitmap(combineImages(markerBackground, defaultUserImage));  
 
     private Marker marker;
@@ -111,7 +112,7 @@ public String toString() {
     }
     
     public BitmapDescriptor getUserImageDescriptor() {
-        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(getUserImage()) : defaultUserImageDescriptor;
+        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(getUserImage()) : BitmapDescriptorFactory.fromBitmap(defaultUserImage);
     }
     public void setTopic(String topic) {
         this.topic = topic;
@@ -126,7 +127,7 @@ public String toString() {
     }
     
     public BitmapDescriptor getMarkerImageDescriptor(){
-        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(getUserImage()) : defaultUserImageDescriptor;
+        return this.userImage != null? BitmapDescriptorFactory.fromBitmap(getUserImage()) : BitmapDescriptorFactory.fromBitmap(defaultUserImage);
     }
 
 
