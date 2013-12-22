@@ -55,16 +55,16 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
-public class ServiceMqtt extends ServiceBindable implements MqttCallback
+public class ServiceBroker implements MqttCallback, ProxyableService
 {
 
 
-    private static State.ServiceMqtt state = State.ServiceMqtt.INITIAL;
+    private static State.ServiceBroker state = State.ServiceBroker.INITIAL;
     
     private short keepAliveSeconds;
     private MqttClient mqttClient;
     private SharedPreferences sharedPreferences;
-    private static ServiceMqtt instance;
+    private static ServiceBroker instance;
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
     private Thread workerThread;
     private LinkedList<DeferredPublishable> deferredPublishables;
@@ -74,19 +74,18 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
     private BroadcastReceiver netConnReceiver;
     private BroadcastReceiver pingSender;
-
+    private ServiceProxy context;
+    
     @Override
-    public void onCreate()
+    public void onCreate(ServiceProxy p)
     {
-        super.onCreate();
-        instance = this;
+        context = p;
         workerThread = null;
         error = null;
-        changeState(Defaults.State.ServiceMqtt.INITIAL);
+        changeState(Defaults.State.ServiceBroker.INITIAL);
         keepAliveSeconds = 15 * 60;
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         deferredPublishables = new LinkedList<DeferredPublishable>();
-        EventBus.getDefault().register(this);
         
         pubThread = new HandlerThread("MQTTPUBTHREAD");
         pubThread.start();
@@ -98,7 +97,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         doStart(intent, startId);
-        return super.onStartCommand(intent, flags, startId);
+        return 0;
     }
 
     private void doStart(final Intent intent, final int startId) {
@@ -127,7 +126,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
  
         // Respect user's wish to stay disconnected. Overwrite with startId == -1 to reconnect manually afterwards
-        if ((state == Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT) && startId != -1) {
+        if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT) && startId != -1) {
             Log.d(this.toString(), "handleStart: respecting user disconnect ");
 
             return;
@@ -141,7 +140,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // Respect user's wish to not use data
         if (!isBackgroundDataEnabled()) {
             Log.e(this.toString(), "handleStart: !isBackgroundDataEnabled");
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_DATADISABLED);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
             return;
         }
 
@@ -161,7 +160,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             else
             {
                 Log.e(this.toString(), "handleStart: !isOnline");
-                changeState(Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET);
+                changeState(Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET);
             }
         } else {
             Log.d(this.toString(), "handleStart: already connected");
@@ -171,11 +170,11 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     
     private boolean isDisconnected(){
         Log.v(this.toString(), "disconnect check: " + state);
-        return state == Defaults.State.ServiceMqtt.INITIAL 
-                || state == Defaults.State.ServiceMqtt.DISCONNECTED 
-                || state == Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT 
-                || state == Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET 
-                || state == Defaults.State.ServiceMqtt.DISCONNECTED_ERROR;
+        return state == Defaults.State.ServiceBroker.INITIAL 
+                || state == Defaults.State.ServiceBroker.DISCONNECTED 
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT 
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET 
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR;
     }
 
     
@@ -208,7 +207,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         {
             // something went wrong!
             mqttClient = null;
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED);
         }
     }
 
@@ -259,7 +258,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
         try
         {
-            changeState(Defaults.State.ServiceMqtt.CONNECTING);
+            changeState(Defaults.State.ServiceBroker.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
 
  
@@ -290,7 +289,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             mqttClient.connect(options);
 
             Log.d(this.toString(), "No error during connect");
-            changeState(Defaults.State.ServiceMqtt.CONNECTED);
+            changeState(Defaults.State.ServiceBroker.CONNECTED);
 
             return true;
 
@@ -321,13 +320,13 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // Establish observer to monitor wifi and radio connectivity 
         if (netConnReceiver == null) {
             netConnReceiver = new NetworkConnectionIntentReceiver();
-            registerReceiver(netConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            context.registerReceiver(netConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
 
         // Establish ping sender
         if (pingSender == null) {
             pingSender = new PingSender();
-            registerReceiver(pingSender, new IntentFilter(Defaults.INTENT_ACTION_PUBLICH_PING));
+            context.registerReceiver(pingSender, new IntentFilter(Defaults.INTENT_ACTION_PUBLICH_PING));
         }
         
         scheduleNextPing();
@@ -351,19 +350,19 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             return;
         
         if (fromUser)
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_USERDISCONNECT);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT);
 
         try
         {
             if (netConnReceiver != null)
             {
-                unregisterReceiver(netConnReceiver);
+                context.unregisterReceiver(netConnReceiver);
                 netConnReceiver = null;
             }
 
             if (pingSender != null)
             {
-                unregisterReceiver(pingSender);
+                context.unregisterReceiver(pingSender);
                 pingSender = null;
             }
         } catch (Exception eee)
@@ -397,17 +396,17 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // we protect against the phone switching off while we're doing this
         // by requesting a wake lock - we request the minimum possible wake
         // lock - just enough to keep the CPU running until we've finished
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
         WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
         wl.acquire();
 
         if (!isOnline(true))
         {
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED_WAITINGFORINTERNET);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET);
         }
         else
         {
-            changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED);
             scheduleNextPing();
         }
         wl.release();
@@ -419,30 +418,30 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     }
 
 
-    public void onEvent(Events.StateChanged.ServiceMqtt event) {
-        if (event.getState() == Defaults.State.ServiceMqtt.CONNECTED)
+    public void onEvent(Events.StateChanged.ServiceBroker event) {
+        if (event.getState() == Defaults.State.ServiceBroker.CONNECTED)
             publishDeferrables();
     }
 
     private void changeState(Exception e) {
         error = e; 
-        changeState(Defaults.State.ServiceMqtt.DISCONNECTED_ERROR, e);
+        changeState(Defaults.State.ServiceBroker.DISCONNECTED_ERROR, e);
     }
 
-    private void changeState(Defaults.State.ServiceMqtt newState) {
+    private void changeState(Defaults.State.ServiceBroker newState) {
         changeState(newState, null);
     }
 
     
-    private void changeState(Defaults.State.ServiceMqtt newState, Exception e) {
+    private void changeState(Defaults.State.ServiceBroker newState, Exception e) {
         Log.d(this.toString(), "ServiceMqtt state changed to: " + newState);
         state = newState;
-        EventBus.getDefault().postSticky(new Events.StateChanged.ServiceMqtt(newState, e));
+        EventBus.getDefault().postSticky(new Events.StateChanged.ServiceBroker(newState, e));
     }
 
     private boolean isOnline(boolean shouldCheckIfOnWifi)
     {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(ServiceProxy.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         return netInfo != null
@@ -455,8 +454,8 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         return ((mqttClient != null) && (mqttClient.isConnected() == true));
     }
     
-    public static boolean isErrorState(Defaults.State.ServiceMqtt state) {
-        return state == Defaults.State.ServiceMqtt.DISCONNECTED_ERROR;
+    public static boolean isErrorState(Defaults.State.ServiceBroker state) {
+        return state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR;
     }
     
     public boolean hasError(){
@@ -464,7 +463,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     }
 
     public boolean isConnecting() {
-        return (mqttClient != null) && state == Defaults.State.ServiceMqtt.CONNECTING;
+        return (mqttClient != null) && state == Defaults.State.ServiceBroker.CONNECTING;
     }
 
     private boolean isBackgroundDataEnabled() {
@@ -474,7 +473,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     /**
      * @category MISC
      */
-    public static ServiceMqtt getInstance() {
+    public static ServiceBroker getInstance() {
         return instance;
     }
 
@@ -486,15 +485,14 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         // disconnect immediately
         disconnect(false);
 
-        changeState(Defaults.State.ServiceMqtt.DISCONNECTED);
+        changeState(Defaults.State.ServiceBroker.DISCONNECTED);
 
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferencesChangedListener);
 
-        super.onDestroy();
     }
 
 
-    public static Defaults.State.ServiceMqtt getState() {
+    public static Defaults.State.ServiceBroker getState() {
         return state;
     }
     
@@ -504,7 +502,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         if(getInstance() != null && getInstance().hasError() && e.getCause() != null)
             return "Error: " + e.getCause().getLocalizedMessage();
         else
-            return "Error: " + getInstance().getString(R.string.na);
+            return "Error: " + getInstance().context.getString(R.string.na);
 
     }
     
@@ -686,9 +684,6 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {}
-
-    @Override
-    protected void onStartOnce() {}
     
     
     private class NetworkConnectionIntentReceiver extends BroadcastReceiver
@@ -699,7 +694,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
         public void onReceive(Context ctx, Intent intent)
         {
             Log.v(this.toString(), "NetworkConnectionIntentReceiver: onReceive");
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
             WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTTitude");
             wl.acquire();
 
@@ -755,13 +750,13 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
     
     private void scheduleNextPing()
     {
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(
                 Defaults.INTENT_ACTION_PUBLICH_PING), PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar wakeUpTime = Calendar.getInstance();
         wakeUpTime.add(Calendar.SECOND, keepAliveSeconds);
 
-        AlarmManager aMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
+        AlarmManager aMgr = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
         aMgr.set(AlarmManager.RTC_WAKEUP, wakeUpTime.getTimeInMillis(), pendingIntent);
     }
 
@@ -788,6 +783,7 @@ public class ServiceMqtt extends ServiceBindable implements MqttCallback
             throw new MqttException(e);
         }
     }
+    public void onEvent(Events.Dummy e) {}
 
 
 }

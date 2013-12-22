@@ -4,7 +4,7 @@ package st.alr.mqttitude.preferences;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceApplication;
-import st.alr.mqttitude.services.ServiceMqtt;
+import st.alr.mqttitude.services.ServiceBroker;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import android.annotation.TargetApi;
@@ -297,12 +297,12 @@ public class ActivityPreferences extends PreferenceActivity {
         super.onDestroy();
     }
 
-    public void onEventMainThread(Events.StateChanged.ServiceMqtt event) {
+    public void onEventMainThread(Events.StateChanged.ServiceBroker event) {
         setServerPreferenceSummary(this);
     }
 
     private static void setServerPreferenceSummary(Context c) {
-        serverPreference.setSummary(ServiceMqtt.getStateAsString(c));
+        serverPreference.setSummary(ServiceBroker.getStateAsString(c));
     }
 
     

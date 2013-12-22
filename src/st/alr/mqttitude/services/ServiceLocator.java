@@ -19,25 +19,22 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
-public abstract class ServiceLocator extends ServiceBindable implements MqttPublish {
+public abstract class ServiceLocator implements ProxyableService, MqttPublish {
     protected SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
     protected Date lastPublish;
     private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
     private final String TAG = "ServiceLocator";
-    protected ServiceMqtt serviceMqtt;
-    private ServiceConnection mqttConnection;
     private static ServiceLocator instance;
+    protected ServiceProxy context;
     
-    @Override
-    public void onCreate()
+    public void onCreate(ServiceProxy p)
     {
-        super.onCreate();
-        Log.v(this.TAG, "onCreate");
 
         instance = this;
-        this.started = false;        
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        context = p;
+        
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -47,24 +44,8 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
             }
         };
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
-        
-        mqttConnection = new ServiceConnection() {
-            
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                serviceMqtt = null;                
-            }
-            
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.v(this.toString(), "bound");
-
-                serviceMqtt = (ServiceMqtt) ((ServiceBindable.ServiceBinder)service).getService();                
-            }
-        };
-         
-        bindService(new Intent(this, ServiceMqtt.class), mqttConnection, Context.BIND_AUTO_CREATE);
-        
+       
+                 
     }
 
     abstract public GeocodableLocation getLastKnownLocation();
@@ -98,7 +79,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
             return;
         }
 
-        if(ServiceMqtt.getInstance() == null) {
+        if(ServiceProxy.getServiceBroker() == null) {
             Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
             return;
         }
@@ -111,7 +92,7 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
         payload.append(", \"acc\": ").append("\"").append(Math.round(l.getLocation().getAccuracy() * 100) / 100.0d).append("\"");
         payload.append("}");
 
-        ServiceMqtt.getInstance().publish(
+        ServiceProxy.getServiceBroker().publish(
                 topic,
                 payload.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
@@ -195,4 +176,6 @@ public abstract class ServiceLocator extends ServiceBindable implements MqttPubl
     public int getUpdateIntervallInMiliseconds() {
         return getUpdateIntervall() * 60 * 1000;
     }
+    
+    public void onEvent(Events.Dummy e) {}
 }

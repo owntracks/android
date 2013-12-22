@@ -62,10 +62,10 @@ public class Defaults {
 
 
     public static class State {
-        public static enum ServiceMqtt {
+        public static enum ServiceBroker {
             INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
         }
-        public static String toString(ServiceMqtt state, Context c) {
+        public static String toString(ServiceBroker state, Context c) {
             int id; 
             switch (state) {
                 case CONNECTED:

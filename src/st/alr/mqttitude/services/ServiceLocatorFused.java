@@ -30,22 +30,18 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private GeocodableLocation lastKnownLocation;
     private PendingIntent locationIntent;
     
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public void onCreate(ServiceProxy p) {
+        super.onCreate(p);
         Log.v(this.toString(), "onCreate");
 
         setupLocationRequest();
-        mLocationClient = new LocationClient(this, this, this);
-    }
-
-    @Override
-    public void onStartOnce(){
+        mLocationClient = new LocationClient(context, this, this);
+        
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
             mLocationClient.connect();        
+
     }
 
-    
     @Override
     public GeocodableLocation getLastKnownLocation() {
         return lastKnownLocation;
@@ -140,8 +136,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
 //            if(foreground) {
 //                mLocationClient.requestLocationUpdates(mLocationRequest, this);
 //            }else{
-                Intent i = new Intent(this, ServiceLocatorFused.class);
-                locationIntent = PendingIntent.getService(this, 1, i, 0);                
+                Intent i = new Intent(context, ServiceProxy.class);
+                locationIntent = PendingIntent.getService(context, 1, i, 0);                
                 mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
 //            }
         } else {
@@ -151,16 +147,14 @@ public class ServiceLocatorFused extends ServiceLocator implements
     
     
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        int r = super.onStartCommand(intent, flags, startId);
-        
+    public int onStartCommand(Intent intent, int flags, int startId) {    
         if(intent != null) {
             Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
             if(location !=null)
              onLocationChanged(location);             
         }
         
-        return r;        
+        return 0;        
     }
     
     private void setupLocationRequest() {
@@ -187,6 +181,12 @@ public class ServiceLocatorFused extends ServiceLocator implements
 
         setupLocationRequest();
         requestLocationUpdates();
+    }
+
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -4,6 +4,7 @@ package st.alr.mqttitude;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBindable;
+import st.alr.mqttitude.services.ServiceProxy;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -185,7 +186,7 @@ public class ActivityLauncher extends FragmentActivity{
 
     private void launchChecksComplete() {
         Log.v(this.toString(), "Launch checks complete. Starting application service");
-        Intent i = new Intent(this, ServiceApplication.class);
+        Intent i = new Intent(this, ServiceProxy.class);
         startService(i);
         serviceApplicationConnection = new ServiceConnection() {
 
@@ -201,7 +202,7 @@ public class ActivityLauncher extends FragmentActivity{
             }
         };
 
-        bindService(new Intent(this, ServiceApplication.class), serviceApplicationConnection, Context.BIND_AUTO_CREATE);
+        bindService(i, serviceApplicationConnection, Context.BIND_AUTO_CREATE);
     }
     
     public void startActivityMain(){
