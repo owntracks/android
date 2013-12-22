@@ -650,10 +650,31 @@ public class ServiceApplication implements ProxyableService {
 
         notificationBuilder.setContentIntent(resultPendingIntent);
 
-        Intent intent = new Intent(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
-        intent.setClass(context, BackgroundPublishReceiver.class);
+//        Intent intent = new Intent(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+//        intent.setClass(context, BackgroundPublishReceiver.class);
 
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+//        Intent i = new Intent(context, ServiceProxy.class);
+//        i.setAction(ServiceProxy.SERVICE_LOCATOR);
+//        i.putExtra("action", Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+        
+//        locationIntent = PendingIntent.getService(context, 1, i, 0);                
+//        mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
+//
+//        
+//        
+        
+//        Intent i = new Intent().setClass(context, ServiceProxy.class);
+//
+//        //Intent i = new Intent(context, ServiceProxy.class);
+//        i.setAction(ServiceProxy.SERVICE_LOCATOR);
+//        i.putExtra("action", Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN);
+//        i.putExtra("foo", "baz");
+//
+       // PendingIntent pIntent = PendingIntent.getService(context, 99, i, 0);                
+        PendingIntent pIntent = ServiceProxy.getPendingIntentForService(context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
+//        
+//        PendingIntent.getService(context, requestCode, intent, flags)
+//        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, i, 0);
 
         notificationBuilder.addAction(
                 R.drawable.ic_upload,

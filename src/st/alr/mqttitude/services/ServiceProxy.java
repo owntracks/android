@@ -1,17 +1,23 @@
 package st.alr.mqttitude.services;
 
 import java.util.HashMap;
+
+import st.alr.mqttitude.support.Defaults;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
 
 public class ServiceProxy extends ServiceBindable {
-    public static final Integer SERVICE_APP = 1;
-    public static final Integer SERVICE_LOCATOR = 2;
-    public static final Integer SERVICE_BROKER = 3;
+    public static final String SERVICE_APP = "1:App";
+    public static final String SERVICE_LOCATOR = "2:Loc";
+    public static final String SERVICE_BROKER = "3:Brk";
     private static ServiceProxy instance;
-    private static HashMap<Integer, ProxyableService> services = new HashMap<Integer, ProxyableService>();
+    private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
+    private static int intentCounter = 0;
     
     @Override
     public void onCreate(){
@@ -44,37 +50,35 @@ public class ServiceProxy extends ServiceBindable {
 
     }
     
+
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Invokes onStartOnce(...) the fist time to initialize the service         
-        int r = super.onStartCommand(intent, flags, startId); 
-        
-        Log.e(this.toString(), "onStartCommand");
+        int r = super.onStartCommand(intent, flags, startId);         // Invokes onStartOnce(...) the fist time to initialize the service         
 
-        
-        if(intent != null)
-            Log.e(this.toString(), "onStartCommand with intent" + intent.toString());
-            for (ProxyableService p : services.values())
-                p.onStartCommand(intent, flags, startId);
-        
+        ProxyableService s = getServiceForIntent(intent);
+        if(s != null)
+            s.onStartCommand(intent, flags, startId);
+    
         return r;        
     }
         
-    public static ProxyableService getService(Integer id){
+    public static ProxyableService getService(String id){
         return services.get(id);
     }
     
-    private ProxyableService instantiateService(Integer id){
+    private ProxyableService instantiateService(String id){
         ProxyableService p = services.get(id);
         if(p != null)
             return p;
         
                 
-        if(id == SERVICE_APP)
+        if(id.equals(SERVICE_APP))
             p = new ServiceApplication();
-        else if(id == SERVICE_BROKER)
+        else if(id.equals(SERVICE_BROKER))
             p = new ServiceBroker();
-        else if(id == SERVICE_LOCATOR)
+        else if(id.equals(SERVICE_LOCATOR))
             p = new ServiceLocatorFused();
              
 
@@ -93,5 +97,25 @@ public class ServiceProxy extends ServiceBindable {
     }
     public static ServiceBroker getServiceBroker() {
         return (ServiceBroker) getService(SERVICE_BROKER);
+    }
+    
+    public static ProxyableService getServiceForIntent(Intent i) {
+        if (i != null && i.getStringExtra("srvID") != null) {
+            return getService(i.getStringExtra("srvID"));
+        } else {
+            return null;
+        }
+        
+    }
+    public static PendingIntent getPendingIntentForService(Context c, String targetServiceId, String action, Bundle extras) {
+        Intent i = new Intent().setClass(c, ServiceProxy.class);
+        i.setAction(action);
+
+        if(extras != null)
+            i.putExtras(extras); 
+        i.putExtra("srvID", targetServiceId);
+        
+        return PendingIntent.getService(c, intentCounter++, i, PendingIntent.FLAG_UPDATE_CURRENT);                
+        
     }
 }

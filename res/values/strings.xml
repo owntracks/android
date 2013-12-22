@@ -34,8 +34,7 @@
     <string name="preferencesNotificationGeocoderTitle">"Geocoder"</string>
     <string name="preferencesAdvancedConnectionSummary">"Show advanced connection preferences"</string>
     <string name="preferencesAdvancedConnectionTitle">"Advanced connection preferences"</string>
-        <string name="preferencesAdvancedTitle">"Advanced"</string>
-    
+    <string name="preferencesAdvancedTitle">"Advanced"</string>
     <string name="preferencesVersionTitle">"Version"</string>
     <string name="preferencesTopicSettings">"Reporting"</string>
     <string name="preferencesTopic">"Publish topic"</string>
@@ -106,5 +105,7 @@
 
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
     <string name="title_activity_activity_wizzard">Wizzard</string>
+    <string name="title_test_list">tests</string>
+    <string name="title_test_detail">test Detail</string>
 
 </resources>
