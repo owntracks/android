@@ -1,6 +1,7 @@
 
 package st.alr.mqttitude;
 
+import java.lang.reflect.Array;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +24,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentTransaction;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -56,8 +56,8 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends FragmentActivity {
 
-    PagerAdapter pagerAdapter;
-    static ViewPager viewPager;
+//    PagerAdapter pagerAdapter;
+//    static ViewPager viewPager;
 //    ServiceConnection serviceConnection;
     
 //    @Override
@@ -65,11 +65,11 @@ public class ActivityMain extends FragmentActivity {
 //        unbindService(serviceConnection);
 //        super.onDestroy();
 //    }
-
+    static FragmentManager fragmentManager;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
-        
         // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
         // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
         if (savedInstanceState != null) 
@@ -80,14 +80,9 @@ public class ActivityMain extends FragmentActivity {
                 
 
         setContentView(R.layout.activity_main);
+        fragmentManager = new FragmentManager();
+        fragmentManager.showFragment(FragmentManager.CONTACT_FRAGMENT, this);
         
-        // Set up the action bar.
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(pagerAdapter);
 
         try {
             MapsInitializer.initialize(this);
@@ -95,19 +90,83 @@ public class ActivityMain extends FragmentActivity {
 
     }
     
+    public static class FragmentManager{
+        public static final int CONTACT_FRAGMENT = 1;
+        public static final int MAP_FRAGMENT = 2;
+        public static final int DETAIL_FRAGMENT = 3;
+        
+        private final int COUNT = 3;
+        public Fragment[] fragments;
+        private int current; 
+
+        public FragmentManager() {
+            current = 0;
+            fragments = new Fragment[COUNT];
+        }
+        public Fragment getCurrentFragment(){
+            return getFragment(getCurrentFragmentId());
+        }
+        public int getCurrentFragmentId(){
+            return current;
+        }
+        public Fragment showFragment(int id, FragmentActivity activity) {
+          Log.v(this.toString(), "Showing fragment with id " + id);
+
+            Fragment f = activity.getSupportFragmentManager().findFragmentByTag("fragment_"+id);
+            Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("fragment_"+current);
+            FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+
+            if(prev != null && prev.isVisible())
+                ft.hide(prev);
+            
+            if(f!= null && f.isAdded()) {
+                ft.show(f);                
+            } else {
+                f=getFragment(id);
+                ft.add(R.id.main, f, "fragment_"+id);            
+            }
+
+            ft.commit();
+            activity.getSupportFragmentManager().executePendingTransactions();
+
+            current = id;
+
+            return f;
+        }
+        
+        public Fragment getFragment(int id) {
+            Fragment f = fragments[id];
+            
+            if(f == null) {
+                if(id == CONTACT_FRAGMENT)
+                    f = FriendsFragment.getInstance();
+                else if (id == MAP_FRAGMENT)
+                    f = MapFragment.getInstance();
+                else if (id == DETAIL_FRAGMENT)
+                    f = MapFragment.getInstance();
+
+                fragments[id] = f;
+            }
+                        
+            return f;
+                            
+        }
+     
+    }
+    
+    
     @Override
     public void onBackPressed() {
-        if(viewPager.getCurrentItem() != PagerAdapter.CONTACT_FRAGMENT)
-            viewPager.setCurrentItem(PagerAdapter.CONTACT_FRAGMENT, viewPager.getCurrentItem() == PagerAdapter.MAP_FRAGMENT); // animate if map fragment. 
-        else 
+        if(fragmentManager.getCurrentFragmentId() == FragmentManager.CONTACT_FRAGMENT)
             super.onBackPressed();
-           
+        else
+            fragmentManager.showFragment(FragmentManager.CONTACT_FRAGMENT, this);           
     }
 
 
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
@@ -147,61 +206,6 @@ public class ActivityMain extends FragmentActivity {
         startActivity(Intent.createChooser(sendIntent,
                 getResources().getText(R.string.shareLocation)));
 
-    }
-
-//    @Override
-//    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-//        viewPager.setCurrentItem(tab.getPosition());
-//    }
-//
-//    @Override
-//    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-//    }
-//
-//    @Override
-//    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-//    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class PagerAdapter extends FragmentPagerAdapter {
-        public static final int CONTACT_FRAGMENT = 0;
-        public static final int MAP_FRAGMENT = 1;
-        public PagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-        
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case MAP_FRAGMENT:
-                    return MapFragment.getInstance();
-                default:
-                    return FriendsFragment.getInstance();
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getString(R.string.titleFriends);
-
-                case 1:
-                    return getString(R.string.titleMap);
-//                case 2:
-//                    return getString(R.string.titleStatus);
-            }
-            return "BUGBUGBUG";
-        }
     }
 
     @Override
@@ -309,7 +313,8 @@ public class ActivityMain extends FragmentActivity {
                 Bundle savedInstanceState) {
             
             View v = inflater.inflate(R.layout.fragment_map, container, false);
-            
+            System.out.println("map fragment inflated");
+
             markerToContacts = new HashMap<String, Contact>();
             selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
             selectedContactName =(TextView )v.findViewById(R.id.title);
@@ -417,7 +422,7 @@ public class ActivityMain extends FragmentActivity {
         }
         
         public void focus(final Contact c) {
-            Log.v(this.toString(), "map fragment focussing " +c);
+            Log.v(this.toString(), "focussing " +c.getTopic());
 
             if (c == null) {
                 Log.v(this.toString(), "no contact, abandon ship!");                
@@ -426,7 +431,6 @@ public class ActivityMain extends FragmentActivity {
             
             ActivityPreferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
-            Log.v(this.toString(), "map fragment focussing " +c.getTopic());
 
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
@@ -545,7 +549,8 @@ public class ActivityMain extends FragmentActivity {
                   if(f.hasCurrentLocation()) {
                       Log.v(this.toString(), "Focusing the current location");
                       f.focusCurrentLocation();
-                      viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+                      //viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+                      
                   } else {
                       Log.v(this.toString(), "No current location available");
                   }
@@ -583,6 +588,7 @@ public class ActivityMain extends FragmentActivity {
 
         
         
+        @Override
         public void handleHandlerMessage(Message msg) {
             if (msg.what == ReverseGeocodingTask.GEOCODER_RESULT && msg.obj != null) {
                 GeocodableLocation l = (GeocodableLocation) msg.obj;
@@ -620,8 +626,12 @@ public class ActivityMain extends FragmentActivity {
                               return;
                           
                           }
-                          MapFragment.getInstance().focus(c);
-                          viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
+                          
+                          fragmentManager.showFragment(FragmentManager.MAP_FRAGMENT, getActivity());
+                          ((MapFragment) fragmentManager.getCurrentFragment()).focus(c);
+                          
+                          //contactToMap();
+                          //viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
 
                         }
                     });
@@ -819,6 +829,7 @@ public class ActivityMain extends FragmentActivity {
         }
         
         
+        @Override
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
             b.putString("topic", contact.getTopic());

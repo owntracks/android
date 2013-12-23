@@ -134,20 +134,11 @@ public class ServiceLocatorFused extends ServiceLocator implements
         }
 
         if (foreground || areBackgroundUpdatesEnabled()) {
-            // if(foreground) {
-            // mLocationClient.requestLocationUpdates(mLocationRequest, this);
-            // }else{
-
-            Intent i = new Intent(context, ServiceProxy.class);
-            i.setAction(ServiceProxy.SERVICE_LOCATOR);
-            i.putExtra("foo", "bar");
-            locationIntent = PendingIntent.getService(context, 1, i, 0);
             locationIntent = ServiceProxy.getPendingIntentForService(context,
                     ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
 
             mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
 
-            // }
         } else {
             Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
         }
