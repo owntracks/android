@@ -29,14 +29,13 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private boolean foreground = false;
     private final String TAG = "ServiceLocatorFused";
     private GeocodableLocation lastKnownLocation;
-    private PendingIntent locationIntent;
+//    private PendingIntent locationIntent;
 
     public void onCreate(ServiceProxy p) {
         super.onCreate(p);
         Log.v(this.toString(), "onCreate");
-
-        setupLocationRequest();
         mLocationClient = new LocationClient(context, this, this);
+
 
         if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
             mLocationClient.connect();
@@ -84,6 +83,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
         ready = true;
 
         Log.v(TAG, "ServiceLocatorFused connected");
+        setupLocationRequest();
         requestLocationUpdates();
     }
 
@@ -120,9 +120,10 @@ public class ServiceLocatorFused extends ServiceLocator implements
     }
 
     private void disableLocationUpdates() {
-        if (ready && mLocationRequest != null && locationIntent != null) {
-            mLocationClient.removeLocationUpdates(locationIntent);
-            mLocationRequest = null;
+        Log.v(this.toString(), "Disabling updates");
+        if (mLocationClient != null) {
+            mLocationClient.removeLocationUpdates(ServiceProxy.getPendingIntentForService(context,
+                    ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null, 0));
         }
     }
 
@@ -134,10 +135,11 @@ public class ServiceLocatorFused extends ServiceLocator implements
         }
 
         if (foreground || areBackgroundUpdatesEnabled()) {
-            locationIntent = ServiceProxy.getPendingIntentForService(context,
-                    ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
+//            locationIntent = ServiceProxy.getPendingIntentForService(context,
+//                    ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
 
-            mLocationClient.requestLocationUpdates(mLocationRequest, locationIntent);
+            mLocationClient.requestLocationUpdates(mLocationRequest, ServiceProxy.getPendingIntentForService(context,
+                    ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null));
 
         } else {
             Log.d(TAG, "Location updates are disabled (not in foreground or background updates disabled)");
@@ -189,8 +191,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
-
+        Log.v(this.toString(), "onDestroy. Disabling location updates");
+        disableLocationUpdates();
     }
 
 }

@@ -108,6 +108,9 @@ public class ServiceProxy extends ServiceBindable {
         
     }
     public static PendingIntent getPendingIntentForService(Context c, String targetServiceId, String action, Bundle extras) {
+        return getPendingIntentForService(c, targetServiceId, action, extras, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+    public static PendingIntent getPendingIntentForService(Context c, String targetServiceId, String action, Bundle extras, int flags) {
         Intent i = new Intent().setClass(c, ServiceProxy.class);
         i.setAction(action);
 
@@ -115,7 +118,7 @@ public class ServiceProxy extends ServiceBindable {
             i.putExtras(extras); 
         i.putExtra("srvID", targetServiceId);
         
-        return PendingIntent.getService(c, intentCounter++, i, PendingIntent.FLAG_UPDATE_CURRENT);                
+        return PendingIntent.getService(c, 0, i, flags);                
         
     }
 }
