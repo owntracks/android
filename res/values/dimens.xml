@@ -3,13 +3,10 @@
 
     <dimen name="card_thumbnail">56dp</dimen>
     <dimen name="card_thumbnail_margin">5dp</dimen>
-    <dimen name="card_header">20sp</dimen>
-    <dimen name="card_title">17sp</dimen>
-    <dimen name="card_content">17sp</dimen>
-    <dimen name="card_shadow">3dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-		
+    <dimen name="card_header">25sp</dimen>
+    <dimen name="card_title">18sp</dimen>
+    <dimen name="card_content">18sp</dimen>
+ 		
 			
     
     

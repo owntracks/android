@@ -69,19 +69,22 @@ public class ActivityMain extends FragmentActivity {
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        
         startService(new Intent(this, ServiceProxy.class));
-        // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
-        // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
+        int fragmentId = FragmentManager.CONTACT_FRAGMENT;
         if (savedInstanceState != null) 
         {
+            // delete previously stored fragments after orientation change (see http://stackoverflow.com/a/13996054/899155). 
+            // Without this, two map fragments would exists after rotating the device, of which the visible one would not receive updates. 
            savedInstanceState.remove ("android:support:fragments");
+           fragmentId = savedInstanceState.getInt("currentFragment");          
         } 
         super.onCreate(savedInstanceState);
                 
-
         setContentView(R.layout.activity_main);
         fragmentManager = new FragmentManager();
-        fragmentManager.showFragment(FragmentManager.CONTACT_FRAGMENT, this);
+        Log.v(this.toString(), "fragmentId" +fragmentId );
+        fragmentManager.showFragment(fragmentId, this);
         
 
         try {
@@ -101,7 +104,7 @@ public class ActivityMain extends FragmentActivity {
 
         public FragmentManager() {
             current = 0;
-            fragments = new Fragment[COUNT];
+            fragments = new Fragment[COUNT+1];
         }
         public Fragment getCurrentFragment(){
             return getFragment(getCurrentFragmentId());
@@ -112,8 +115,8 @@ public class ActivityMain extends FragmentActivity {
         public Fragment showFragment(int id, FragmentActivity activity) {
           Log.v(this.toString(), "Showing fragment with id " + id);
 
-            Fragment f = activity.getSupportFragmentManager().findFragmentByTag("fragment_"+id);
-            Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("fragment_"+current);
+            Fragment f = activity.getSupportFragmentManager().findFragmentByTag("f:"+id);
+            Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("f:"+current);
             FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
 
             if(prev != null && prev.isVisible())
@@ -123,7 +126,7 @@ public class ActivityMain extends FragmentActivity {
                 ft.show(f);                
             } else {
                 f=getFragment(id);
-                ft.add(R.id.main, f, "fragment_"+id);            
+                ft.add(R.id.main, f, "f:"+id);                            
             }
 
             ft.commit();
@@ -143,7 +146,7 @@ public class ActivityMain extends FragmentActivity {
                 else if (id == MAP_FRAGMENT)
                     f = MapFragment.getInstance();
                 else if (id == DETAIL_FRAGMENT)
-                    f = MapFragment.getInstance();
+                    f = DetailsFragment.getInstance();
 
                 fragments[id] = f;
             }
@@ -229,17 +232,18 @@ public class ActivityMain extends FragmentActivity {
         super.onResume();
     }
     
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt("currentFragment", fragmentManager.getCurrentFragmentId());
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     public void contactImageClicked(View v) {
-        String topic = (String) ((View) v.getParent()).getTag();
-        
-        
-        
-        Bundle args = new Bundle();
-        args.putString("topic", topic);
-        DetailsFragment f = DetailsFragment.getInstance(args);
-        getSupportFragmentManager().beginTransaction().replace(R.id.pager, f).commit();
-        //        pagerAdapter.setItemArguments(PagerAdapter.DETAILS_FRAGMENT, args); // The pager adapter cannot directly pass arugments to the new fragment. Thus we store it temporary to pass it in the getItem method
-//        viewPager.setCurrentItem(PagerAdapter.DETAILS_FRAGMENT,false);
+        View parent = (View) v.getParent();
+        String topic = (String) parent.getTag();
+        Log.v(this.toString(), "topic " + topic);
+        DetailsFragment f = (DetailsFragment) fragmentManager.showFragment(FragmentManager.DETAIL_FRAGMENT, this);
+        f.show(App.getContacts().get(topic));
 
     }
     Bundle fragmentBundle;
@@ -253,8 +257,6 @@ public class ActivityMain extends FragmentActivity {
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
-        private TextView selectedContactTime;
-        private TextView selectedContactAccuracy;
         private Map<String, Contact> markerToContacts;
 
         public static MapFragment getInstance() {
@@ -319,8 +321,6 @@ public class ActivityMain extends FragmentActivity {
             selectedContactDetails = (LinearLayout )v.findViewById(R.id.contactDetails);
             selectedContactName =(TextView )v.findViewById(R.id.title);
             selectedContactLocation = (TextView )v.findViewById(R.id.subtitle);
-            selectedContactTime = (TextView )v.findViewById(R.id.time);
-            selectedContactAccuracy = (TextView )v.findViewById(R.id.acc);
             selectedContactImage = (ImageView )v.findViewById(R.id.image);
             selectedContactDetails.setVisibility(View.GONE);
             
@@ -434,11 +434,10 @@ public class ActivityMain extends FragmentActivity {
 
             selectedContactName.setText(c.toString());
             selectedContactLocation.setText(c.getLocation().toString());
-            selectedContactTime.setText(App.formatDate(new Date(c.getLocation().getTime()*1000)));
-            selectedContactAccuracy.setText("±" + c.getLocation().getAccuracy());
             
             selectedContactImage.setImageBitmap(c.getUserImage());
 
+            selectedContactImage.setTag(c.getTopic());
             selectedContactDetails.setVisibility(View.VISIBLE);
             selectedContactDetails.setOnClickListener(new OnClickListener() {                
                 @Override
@@ -606,12 +605,9 @@ public class ActivityMain extends FragmentActivity {
             if(v == null) {
             
                 if (c.getView() != null) {
-                    Log.v(this.toString(), "updating view of " + c.getTopic());
                     v = c.getView();
                     ((ViewGroup)v.getParent()).removeView(v); // remove from old view first to allow it to be added to the new view again
-
                 } else {
-                    Log.v(this.toString(), "creating view for " + c.getTopic());
                     v = getActivity().getLayoutInflater().inflate(R.layout.friend_list_item, null, false);
                     c.setView(v);
                     v.setOnClickListener(new OnClickListener() {
@@ -629,162 +625,44 @@ public class ActivityMain extends FragmentActivity {
                           
                           fragmentManager.showFragment(FragmentManager.MAP_FRAGMENT, getActivity());
                           ((MapFragment) fragmentManager.getCurrentFragment()).focus(c);
-                          
-                          //contactToMap();
-                          //viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
 
                         }
                     });
-                    
-//                    ((ImageView)v.findViewById(R.id.image)).setOnClickListener(new OnClickListener() {
-//                        
-//                        @Override
-//                        public void onClick(View v) {
-//                            Log.v(this.toString(), "clicked info for" + c.getTopic());
-//
-//                        }
-//                    });
 
 
                 }                
                 v.setTag(c.getTopic());
                 friendsListView.addView(c.getView());
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT){
-                    Transition t = new android.transition.Fade();
-                    TransitionManager.beginDelayedTransition(friendsListView, t);
-
-                }
-                    friendsListView.setVisibility(View.VISIBLE);
+                friendsListView.setVisibility(View.VISIBLE);
                     
             }
-            ((TextView) v.findViewById(R.id.title)).setText(c.toString());
             
+            ((TextView) v.findViewById(R.id.title)).setText(c.toString());            
             ((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation().toString());
-            ((TextView) v.findViewById(R.id.acc)).setText("±" + c.getLocation().getAccuracy());
-            ((TextView) v.findViewById(R.id.time)).setText(App.formatDate(new Date(c.getLocation().getTime()*1000)));
+            ImageView img = ((ImageView) v.findViewById(R.id.image));
+            img.setImageBitmap(c.getUserImage());
 
-            (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
-                    c.getLocation()
-                });
+            (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] { c.getLocation() });
 
-            ((ImageView) v.findViewById(R.id.image)).setImageBitmap(c.getUserImage());
+            
 
         }
         
 
 
     }
-    
-    
-
-//    public static class StatusFragment extends Fragment {
-//        private TextView locatorStatus;
-//        private TextView locatorCurLatLon;
-//        private TextView locatorCurAccuracy;
-//        private TextView locatorCurLatLonTime;
-//        private TextView locatorLastPubLatLon;
-//        private TextView locatorLastPubAccuracy;
-//        private TextView locatorLastPubLatLonTime;
-//        private TextView brokerStatus;
-//        private TextView brokerError;
-//
-//        private static StatusFragment instance;
-//
-//        public static StatusFragment getInstance() {
-//            if (instance == null)
-//                instance = new StatusFragment();
-//
-//            return instance;
-//        }
-//
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//
-//        }
-//
-//        @Override
-//        public void onStart() {
-//            super.onStart();
-//            Log.v(this.toString(), "registering");
-//
-//            EventBus.getDefault().registerSticky(this);
-//        }
-//
-//        @Override
-//        public void onStop() {
-//            Log.v(this.toString(), "unregistering");
-//            EventBus.getDefault().unregister(this);
-//            super.onStop();
-//        }
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                Bundle savedInstanceState) {
-//            View v = inflater.inflate(R.layout.fragment_status, container, false);
-//            locatorStatus = (TextView) v.findViewById(R.id.locatorStatus);
-//            locatorCurLatLon = (TextView) v.findViewById(R.id.locatorCurLatLon);
-//            locatorCurAccuracy = (TextView) v.findViewById(R.id.locatorCurAccuracy);
-//            locatorCurLatLonTime = (TextView) v.findViewById(R.id.locatorCurLatLonTime);
-//
-//            locatorLastPubLatLon = (TextView) v.findViewById(R.id.locatorLastPubLatLon);
-//            locatorLastPubAccuracy = (TextView) v.findViewById(R.id.locatorLastPubAccuracy);
-//            locatorLastPubLatLonTime = (TextView) v.findViewById(R.id.locatorLastPubLatLonTime);
-//
-//            brokerStatus = (TextView) v.findViewById(R.id.brokerStatus);
-//            brokerError = (TextView) v.findViewById(R.id.brokerError);
-//
-//            return v;
-//        }
-//
-//        public void onEventMainThread(Events.LocationUpdated e) {
-//            locatorCurLatLon.setText(e.getGeocodableLocation().toLatLonString());
-//            locatorCurAccuracy.setText("±" + e.getGeocodableLocation().getLocation().getAccuracy()
-//                    + "m");
-//            locatorCurLatLonTime.setText(App.formatDate(e.getDate()));
-//        }
-//
-//        public void onEventMainThread(Events.PublishSuccessfull e) {
-//            if (e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
-//                GeocodableLocation l = (GeocodableLocation) e.getExtra();
-//                locatorLastPubLatLon.setText(l.toLatLonString());
-//                locatorLastPubAccuracy.setText("±" + l.getLocation().getAccuracy() + "m");
-//                locatorLastPubLatLonTime.setText(App.formatDate(
-//                        e.getDate()));
-//            }
-//        }
-//
-//        public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
-//            locatorStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
-//        }
-//
-//        public void onEventMainThread(Events.StateChanged.ServiceMqtt e) {
-//            brokerStatus.setText(Defaults.State.toString(e.getState(), getActivity()));
-//            if (e.getExtra() != null && e.getExtra() instanceof Exception
-//                    && e.getExtra().getClass() != null) {
-//                brokerError.setText(((Exception) e.getExtra()).getCause().getLocalizedMessage());
-//            } else {
-//                brokerError.setText(getString(R.string.na));
-//            }
-//        }
-//
-//    }
-
+        
     
     public static class DetailsFragment extends Fragment {
         Contact contact;
-        LinearLayout friendsListView;
-        TextView currentLocTitle;
-        TextView currentLoc;
         
-        
-//        TextView currentAcc;
-//        TextView currentTime;       
-        GeocodableLocation currentLocation;
+        TextView location;
+        TextView accuracy;
+        TextView time;
 
-        public static DetailsFragment getInstance(Bundle b) {
+
+        public static DetailsFragment getInstance() {
             DetailsFragment instance = new DetailsFragment();
-            instance.setArguments(b);
             return instance;
         }
         
@@ -792,10 +670,6 @@ public class ActivityMain extends FragmentActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);     
             
-            Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
-                        
-            contact = App.getContacts().get(b.getString("topic"));            
-            Log.v(this.toString(), "created fragment for "+ contact.getTopic() );
         }
         
         @Override
@@ -815,19 +689,35 @@ public class ActivityMain extends FragmentActivity {
         public void onResume() {
             super.onResume();
         }
+        
+        public void show(Contact c){
+            contact = c;
+            location.setText(c.getLocation().toString());
+            accuracy.setText(""+c.getLocation().getAccuracy());
+            time.setText(App.formatDate(new Date(c.getLocation().getTime())));
+
+
+        }
 
         
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_details, container, false);
+            location = (TextView) v.findViewById(R.id.location);
+            accuracy = (TextView) v.findViewById(R.id.accuracy);
+            time = (TextView) v.findViewById(R.id.time);
             
-            return v;
+            if(savedInstanceState != null)
+                show(App.getContacts().get(savedInstanceState.getString("topic")));
+
+                return v;
         }
 
-        public void onEventMainThread(Events.LocationUpdated e) {
-
+        public void onEventMainThread(Events.ContactUpdated e) {            
+            if(e.getContact() == contact)
+                show(e.getContact());
         }
-        
+            
         
         @Override
         public void onSaveInstanceState(Bundle b) {

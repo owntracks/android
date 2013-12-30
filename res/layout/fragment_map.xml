@@ -15,7 +15,7 @@
 		android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/white_border_top"
+        android:background="@drawable/grey_border_top"
         android:orientation="vertical" 
         android:paddingLeft="0dp"
         android:paddingRight="@dimen/default_horizontal_spacing"

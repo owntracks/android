@@ -5,32 +5,28 @@
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
-    
+
     <style name="card_header">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">@dimen/card_header</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/darkGrey</item>
         <item name="android:fontFamily">"sans-serif-light"</item>
-        <item name="android:paddingTop">18dp</item>
-       	<item name="android:paddingBottom">18dp</item>     
-       	<item name="android:paddingLeft">16dp</item>                          
-   
-       	<item name="android:background">@drawable/grey_border_bottom</item>
-        
+        <item name="android:paddingTop">@dimen/default_vertical_spacing</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
     </style>
-    
+
     <style name="card_title">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_title</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/mediumGrey</item>
+        <item name="android:textColor">@color/darkGrey</item>
         <item name="android:fontFamily">"sans-serif"</item>
         <item name="android:textStyle">bold</item>
-               	<item name="android:paddingLeft">16dp</item>                          
-               	
+        <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
     </style>
 
     <style name="card_content">
@@ -39,10 +35,7 @@
         <item name="android:textSize">@dimen/card_content</item>
         <item name="android:textColor">@color/darkGrey</item>
         <item name="android:fontFamily">"sans-serif-light"</item>
-               	<item name="android:paddingLeft">16dp</item>                          
-        
+        <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
     </style>
-    
-    
 
 </resources>

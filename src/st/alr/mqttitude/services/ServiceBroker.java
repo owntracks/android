@@ -127,11 +127,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     }
 
     void handleStart(boolean force) {
-        Log.v(this.toString(), "handleStart");
+        Log.v(this.toString(), "handleStart. force: " + force);
 
  
         // Respect user's wish to stay disconnected. Overwrite with force = true to reconnect manually afterwards
-        if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT) && force) {
+        if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT) && !force) {
             Log.d(this.toString(), "handleStart: respecting user disconnect ");
 
             return;
@@ -349,13 +349,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     
     public void disconnect(boolean fromUser)
     {
-        Log.v(this.toString(), "disconnect");
+        Log.v(this.toString(), "disconnect. from user: " + fromUser);
         
         if(isConnecting()) // throws MqttException.REASON_CODE_CONNECT_IN_PROGRESS when disconnecting while connect is in progress. 
             return;
         
-        if (fromUser)
-            changeState(Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT);
 
         try
         {
@@ -378,8 +376,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         
         try
         {
-            if (isConnected())
-                mqttClient.disconnect();
+            if (isConnected()) {
+                Log.v(this.toString(), "Disconnecting");
+                mqttClient.disconnect(0);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -389,6 +389,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService
                 workerThread.interrupt();
             }
 
+            if (fromUser)
+                changeState(Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT);
+            else
+                changeState(Defaults.State.ServiceBroker.DISCONNECTED);
         }
     }
 
@@ -418,7 +422,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     }
 
     public void reconnect() {
-        disconnect(true);
+        disconnect(false);
         doStart(true);
     }
 
