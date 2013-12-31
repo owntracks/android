@@ -678,7 +678,7 @@ public class ServiceApplication implements ProxyableService {
 
         notificationBuilder.addAction(
                 R.drawable.ic_upload,
-                "Publish location",
+                context.getString(R.string.publish) ,
                 pIntent);
 
         updateNotification();

@@ -181,9 +181,9 @@ public class ActivityMain extends FragmentActivity {
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
-        } else if (itemId == R.id.menu_publish) {
-                ServiceProxy.getServiceLocator().publishLastKnownLocation();
-                return true;
+//        } else if (itemId == R.id.menu_publish) {
+//                ServiceProxy.getServiceLocator().publishLastKnownLocation();
+//                return true;
         } else if (itemId == R.id.menu_share) {
                 this.share(null);
             return true;
@@ -533,14 +533,11 @@ public class ActivityMain extends FragmentActivity {
             
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);  
             LinearLayout thisdevice = (LinearLayout) v.findViewById(R.id.thisdevice);
-            ImageView owner = (ImageView) thisdevice.findViewById(R.id.image); 
-            owner.setImageBitmap(Contact.defaultUserImage);
 
-            currentLocTitle = (TextView) thisdevice.findViewById(R.id.title);  
-            currentLoc = (TextView) thisdevice.findViewById(R.id.subtitle);  
+            currentLoc = (TextView) thisdevice.findViewById(R.id.currentLocation);  
             
             
-            thisdevice.setOnClickListener(new OnClickListener() {
+            currentLoc.setOnClickListener(new OnClickListener() {
                 
                 @Override
                 public void onClick(View v) {
@@ -556,14 +553,6 @@ public class ActivityMain extends FragmentActivity {
                 }
             });
             
-            owner.setOnClickListener(new OnClickListener() {
-                
-                @Override
-                public void onClick(View v) {
-                    Log.v(this.toString(), "Owner clicked");
-
-                }
-            });
 
             for (Contact c : ServiceApplication.getContacts().values())
                 updateContactView(c);
@@ -580,7 +569,11 @@ public class ActivityMain extends FragmentActivity {
             currentLocation = l;
         
             // Current location changes often, don't waste resources to resolve the geocoder
-            currentLoc.setText(l.toLatLonString());
+            currentLoc.setText(l.toString());
+            
+            if(l.getGeocoder() == null && resolveGeocoder)
+                (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] { l });
+
 //            currentAcc.setText("±" + l.getLocation().getAccuracy() );
 //            currentTime.setText(App.formatDate(new Date(l.getTime())));
         }
@@ -589,10 +582,20 @@ public class ActivityMain extends FragmentActivity {
         
         @Override
         public void handleHandlerMessage(Message msg) {
+            
             if (msg.what == ReverseGeocodingTask.GEOCODER_RESULT && msg.obj != null) {
+                if((GeocodableLocation) msg.obj == currentLocation) {
+                    updateCurrentLocation((GeocodableLocation) msg.obj, false);
+                }               else {
                 GeocodableLocation l = (GeocodableLocation) msg.obj;
+                Log.v("", "loc: " + l);
+                Log.v("", "friendsListView: " + friendsListView);
+                Log.v("", "l.getTag(): " + l.getTag());
+                Log.v("", "l.getTag(): " + l.getTag());
+
                 TextView tv = (TextView)friendsListView.findViewWithTag(l.getTag()).findViewById(R.id.subtitle);                    
                 tv.setText(l.toString());
+                }
             }
         }
 

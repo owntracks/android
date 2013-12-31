@@ -21,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/image"
         android:layout_toRightOf="@+id/image"
-        android:gravity="top"
         android:text="You" />
 
     <TextView
@@ -32,7 +31,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignStart="@id/title"
         android:layout_below="@+id/title"
-        android:gravity="bottom"
+        android:paddingTop="-5dp"
         android:scrollHorizontally="false"
         android:text="@string/na" />
 

@@ -17,19 +17,50 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/default_vertical_spacing_half" >
+            android:paddingBottom="2dp"
+            android:paddingLeft="1dp"
+            android:paddingRight="1dp"
+            android:paddingTop="1dp" >
 
-            <TextView
-                style="@style/card_header"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/default_vertical_spacing_half"
-                android:text="Current" />
+                android:orientation="horizontal" >
 
-            <include
-                android:layout_width="wrap_content"
+             
+
+                <Button
+                    
+                    android:id="@+id/currentLocation"
+                    style="@style/card_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="0dp"
+                    android:paddingLeft="@dimen/default_horizontal_spacing"
+                    android:paddingTop="0dp"
+                    android:text="@string/na" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                layout="@layout/friend_list_item" />
+                android:background="@drawable/grey_border_top"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/default_vertical_spacing_half"
+                android:paddingTop="@dimen/default_vertical_spacing_half" >
+
+                <Button
+                    android:drawableLeft="@drawable/ic_upload"
+                        android:drawablePadding="@dimen/default_horizontal_spacing_half"
+                    
+                    style="@style/card_button"
+                    android:layout_marginLeft="@dimen/default_horizontal_spacing"
+                    android:layout_marginRight="@dimen/default_horizontal_spacing"
+                    android:text="@string/publish" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -40,19 +71,8 @@
             android:layout_marginTop="0dp"
             android:orientation="vertical"
             android:paddingBottom="@dimen/default_vertical_spacing_half"
+            android:paddingTop="@dimen/default_vertical_spacing_half"
             android:visibility="gone" >
-
-            <TextView
-                style="@style/card_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/default_vertical_spacing_half"
-                android:text="Reported" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
         </LinearLayout>
     </LinearLayout>
 

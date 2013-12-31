@@ -7,14 +7,10 @@
     -->
 
     <style name="card_header">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/card_header</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/darkGrey</item>
         <item name="android:fontFamily">"sans-serif-light"</item>
-        <item name="android:paddingTop">@dimen/default_vertical_spacing</item>
-        <item name="android:paddingBottom">0dp</item>
         <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
     </style>
 
@@ -27,6 +23,24 @@
         <item name="android:fontFamily">"sans-serif"</item>
         <item name="android:textStyle">bold</item>
         <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
+    </style>
+
+    <style name="card_button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/card_title</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:fontFamily">"sans-serif"</item>
+        <item name="android:textStyle">normal</item>
+
+        <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
+        <item name="android:paddingRight">@dimen/default_horizontal_spacing</item>
+        <item name="android:paddingLeft">@dimen/default_horizontal_spacing</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/button_green</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="card_content">

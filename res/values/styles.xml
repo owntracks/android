@@ -57,17 +57,18 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <color name="lightGrey">#c8c8c8</color>
     <color name="mediumGrey">#696868</color>
-    <color name="darkGrey">#606060</color>
+    <color name="darkGrey">#3f4246</color>
     <color name="background">#efefef</color>
-    <color name="background_header">#f7f7f7</color>
+    <color name="card_aside">#f9fafa</color>
     <color name="card_shadow">#d9d9d9</color>
-    <color name="divider">#efefef</color>
-    <color name="border">#acacac</color>
+    <color name="seperator">#d9d9d9</color>
+    <color name="border">#d9d9d9</color>
 
+    
+    
     <style name="seperator">
-        <item name="android:background">@color/lightGrey</item>
+        <item name="android:background">@color/seperator</item>
         <item name="android:visibility">visible</item>
     </style>
 
@@ -117,10 +118,6 @@
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:background">@drawable/card</item>
-        <item name="android:paddingLeft">0dp</item>
-        <item name="android:paddingRight">0dp</item>
-        <item name="android:paddingBottom">1dp</item>
-        <item name="android:paddingTop">0dp</item>
     </style>
 
     <style name="card_title">
@@ -138,20 +135,7 @@
         <item name="android:textColor">@color/darkGrey</item>
     </style>
 
-    <style name="card_header_title">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">21sp</item>
-        <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
-    <style name="card_header_summary">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:layout_gravity">center_vertical</item>
-    </style>
+    
 
 
 </resources>
