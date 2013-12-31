@@ -1,36 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-		
-	<item>
-	    <!-- bottom shadow -->
-		<shape android:shape="rectangle"
-			android:dither="true">
-			<corners android:radius="2dp"/>
-			<solid android:color="@color/card_shadow" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+   <!-- android:bottom="-2dp" hides border,  -1dp shows 1do border, 0dp shows 2dp border   -->
+    <item
+        android:bottom="0dp"
+        android:left="-1dp"
+        android:right="-1dp"
+        android:top="-1dp">
+        <shape android:shape="rectangle" >
+            <!-- Border color -->
+            <stroke
+                android:width="2dp"
+                android:color="@color/card_shadow" />
 
-		</shape>
-	</item>
-	
-	
-		<item android:bottom="2dp">
-		<shape android:shape="rectangle"
-			android:dither="true">
-			<solid android:color="@color/card_shadow" />
+            	<!--  Background color -->
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
 
-		</shape>
-	</item>
-	
-	
-	
-	
-	<item android:bottom="2dp" android:left="0dp" android:right="0dp" android:top="0dp">
-		<shape android:shape="rectangle"
-			android:dither="true">
-
-			<corners android:radius="2dp" />
-
-			<solid android:color="@android:color/white" />
-
-		</shape>
-	</item>	
 </layer-list>

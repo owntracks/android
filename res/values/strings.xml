@@ -82,7 +82,7 @@
     <string name="preferencesContactsEnabledSummary">Show contact locations</string>
     <string name="preferencesContactsTopic">Subscribe topic</string>
     <string name="preferencesContactsTopicSummary">Topic for contact location updates</string>
-
+<string name="publish">Report</string>
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
