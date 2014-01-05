@@ -30,6 +30,8 @@
              
 
                 <Button
+                                        android:drawableLeft="@drawable/ic_mylocation"
+                        android:drawablePadding="@dimen/default_horizontal_spacing_half"
                     
                     android:id="@+id/currentLocation"
                     style="@style/card_header"
@@ -44,6 +46,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/grey_border_top"

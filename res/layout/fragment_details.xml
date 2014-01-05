@@ -8,20 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="@dimen/default_vertical_spacing" >
+        android:paddingTop="@dimen/default_vertical_spacing_half" >
 
         <LinearLayout
             style="@style/card"
+            android:paddingTop="@dimen/default_horizontal_spacing_half"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-
-            <TextView
-                style="@style/card_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/default_vertical_spacing"
-                android:text="@string/currentLocation" />
 
             <TextView
                 style="@style/card_title"

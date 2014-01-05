@@ -3,6 +3,7 @@ package st.alr.mqttitude;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import st.alr.mqttitude.preferences.ActivityPreferences;
@@ -76,7 +77,7 @@ public class ActivityMain extends FragmentActivity {
         fragmentHandler = new FragmentHandler(getSupportFragmentManager());
         Log.v(this.toString(), "Instantiated new fragment handler" + fragmentHandler);
         Log.v(this.toString(), "fragmentId" + fragmentId);
-        fragmentHandler.showFragment(fragmentId, null);
+        fragmentHandler.forward(fragmentId, null);
         try {
             MapsInitializer.initialize(this);
         } catch (GooglePlayServicesNotAvailableException e) {
@@ -114,23 +115,21 @@ public class ActivityMain extends FragmentActivity {
         public Fragment showFragment(int id, Bundle extras) {
             Log.v(this.toString(), "using fragmentManager" + fragmentManager);
 
-            Fragment f = getFragment(id, null);  //fragmentManager.findFragmentByTag("f:" + id);
-            Fragment prev = getFragment(current, null); //fragmentManager.findFragmentByTag("f:" + current);
+            Fragment f = getFragment(id, null);
+            Fragment prev = getFragment(current, null); 
             FragmentTransaction ft = fragmentManager.beginTransaction();
 
             handleFragmentArguments(id, extras);
             
             if (prev != null && prev.isAdded() && prev.isVisible()) {
                 ft.hide(prev);
-                Log.v(this.toString(), "hiding previous fragment");
+                Log.v(this.toString(), "hiding fragment");
             }
             
             if (f.isAdded()) {
                 Log.v(this.toString(), "showing fragment " + f);
-                //f.setArguments((id, extras));
                 ft.show(f);
             } else {
-                //f = getFragment(id, handleFragmentArguments(id, extras)); // Sets extras as arguments directly
                 Log.v(this.toString(), "adding fragment " + f);
                 ft.add(R.id.main, f, "f:" + id);
             }
@@ -143,6 +142,27 @@ public class ActivityMain extends FragmentActivity {
 
             return f;
         }
+        
+        // Shows the previous fragment
+        public Fragment back(){
+            HeadlessFragment.getInstance().popBackStack();
+            
+            return showFragment(HeadlessFragment.getInstance().getBackStackHead(), null);
+        }
+        
+        
+        public Fragment forward(Integer id, Bundle extras) {
+            if(HeadlessFragment.getInstance().getBackStackHead()!=id)
+                HeadlessFragment.getInstance().pushBackStack(id);
+            
+            return showFragment(id, extras);
+        }
+        public boolean atRoot(){
+            return HeadlessFragment.getInstance().getBackStackSize() == 1;
+        }
+        
+        
+
 
         
         private Bundle handleFragmentArguments(int id, Bundle extras) {
@@ -192,10 +212,10 @@ public class ActivityMain extends FragmentActivity {
 
     @Override
     public void onBackPressed() {
-        if (fragmentHandler.getCurrentFragmentId() == FragmentHandler.CONTACT_FRAGMENT)
+        if (fragmentHandler.atRoot())
             super.onBackPressed();
         else
-            fragmentHandler.showFragment(FragmentHandler.CONTACT_FRAGMENT, null);
+            fragmentHandler.back();
     }
 
     @Override
@@ -278,8 +298,7 @@ public class ActivityMain extends FragmentActivity {
         Log.v(this.toString(), "topic " + topic);
         Bundle b = new Bundle();
         b.putString("topic", topic);
-        DetailsFragment f = (DetailsFragment) fragmentHandler.showFragment(
-                FragmentHandler.DETAIL_FRAGMENT, b);
+        fragmentHandler.forward(FragmentHandler.DETAIL_FRAGMENT, b);
 
     }
 
@@ -352,7 +371,6 @@ public class ActivityMain extends FragmentActivity {
                 Bundle savedInstanceState) {
 
             View v = inflater.inflate(R.layout.fragment_map, container, false);
-            System.out.println("map fragment inflated");
             markerToContacts = new HashMap<String, Contact>();
             selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
             selectedContactName = (TextView) v.findViewById(R.id.title);
@@ -465,11 +483,12 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void focusCurrentLocation() {
-            if (currentLocation == null)
+            GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+            if (l == null)
                 return;
             selectedContactDetails.setVisibility(View.GONE);
             ActivityPreferences.setTrackingUsername(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
-            centerMap(currentLocation.getLatLng());
+            centerMap(l.getLatLng());
         }
 
         public void focusCurrentlyTrackedContact() {
@@ -512,8 +531,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void onEventMainThread(Events.LocationUpdated e) {
-            currentLocation = e.getGeocodableLocation();
-            Log.v(this.toString(), "location updated");
+            Log.v(this.toString(), "my location updated");
             if (isTrackingCurrentLocation())
                 focusCurrentLocation();
         }
@@ -568,7 +586,7 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onStart() {
             super.onStart();
-            EventBus.getDefault().register(this);
+            EventBus.getDefault().registerSticky(this);
         }
 
         @Override
@@ -600,13 +618,10 @@ public class ActivityMain extends FragmentActivity {
 
                 @Override
                 public void onClick(View v) {
-                    MapFragment f = (MapFragment) fragmentHandler.getFragment(FragmentHandler.MAP_FRAGMENT, null);
-//                    MapFragment f = MapFragment.getInstance(null);
-                    if (f.hasCurrentLocation()) {
-                        fragmentHandler.showFragment(FragmentHandler.MAP_FRAGMENT, null);
+                    if (ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
                         Log.v(this.toString(), "Focusing the current location");
+                        MapFragment f = (MapFragment) fragmentHandler.forward(FragmentHandler.MAP_FRAGMENT, null);
                         f.focusCurrentLocation();
-                        // viewPager.setCurrentItem(PagerAdapter.MAP_FRAGMENT);
 
                     } else {
                         Log.v(this.toString(), "No current location available");
@@ -700,7 +715,7 @@ public class ActivityMain extends FragmentActivity {
 
                             }
                             Log.v(this.toString(), "request for fragmenthandler fragment handler" + fragmentHandler);
-                            fragmentHandler.showFragment(FragmentHandler.MAP_FRAGMENT, null);
+                            fragmentHandler.forward(FragmentHandler.MAP_FRAGMENT, null);
                             ((MapFragment) fragmentHandler.getCurrentFragment(null)).focus(c);
 
                         }
@@ -804,7 +819,7 @@ public class ActivityMain extends FragmentActivity {
     public static class HeadlessFragment extends Fragment {
         static HeadlessFragment instance;
         private static HashMap<Integer, Bundle> store = new HashMap<Integer, Bundle>();
-        
+        private static LinkedList<Integer> backStack = new LinkedList<Integer>();
         public static HeadlessFragment getInstance() {
             if(instance == null) {
                 instance = new HeadlessFragment();
@@ -852,6 +867,22 @@ public class ActivityMain extends FragmentActivity {
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
         }
+        
+        public Integer pushBackStack(Integer id) {
+            backStack.addLast(id);
+            return id;
+        }
+        public Integer getBackStackHead() {
+            
+            return getBackStackSize() > 0 ? backStack.getLast() : -1;
+        }
 
+        public Integer popBackStack() {
+            return backStack.removeLast();
+        }
+        public Integer getBackStackSize(){
+            return backStack.size();
+        }
+        
     }
 }
