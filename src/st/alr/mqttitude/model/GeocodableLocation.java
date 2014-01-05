@@ -1,6 +1,7 @@
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +15,7 @@ public class GeocodableLocation extends Location  implements Serializable{
     String geocoder; 
     LatLng latlng;   
     String tag; 
-    
+    Date date;
     
     public String getTag() {
         return tag;
@@ -33,7 +34,7 @@ public class GeocodableLocation extends Location  implements Serializable{
         super(location);
         this.geocoder = geocoder;
         if(location != null)
-            this.latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            this.latlng = new LatLng(location.getLatitude(), location.getLongitude());        
     }
     
     public JSONObject toJsonObject(){
@@ -130,6 +131,9 @@ public class GeocodableLocation extends Location  implements Serializable{
         return latlng;
     }
     
+    public Date getDate(){
+        return  new Date(getLocation().getTime()*1000);
+    }
     
     
 }

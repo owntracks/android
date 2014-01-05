@@ -79,7 +79,7 @@ public class ServiceProxy extends ServiceBindable {
         else if(id.equals(SERVICE_BROKER))
             p = new ServiceBroker();
         else if(id.equals(SERVICE_LOCATOR))
-            p = new ServiceLocatorFused();
+            p = new ServiceLocator();
              
 
         services.put(id, p);
@@ -92,8 +92,8 @@ public class ServiceProxy extends ServiceBindable {
     public static ServiceApplication getServiceApplication() {
         return (ServiceApplication) getService(SERVICE_APP);
     }
-    public static ServiceLocatorFused getServiceLocator() {
-        return (ServiceLocatorFused) getService(SERVICE_LOCATOR);
+    public static ServiceLocator getServiceLocator() {
+        return (ServiceLocator) getService(SERVICE_LOCATOR);
     }
     public static ServiceBroker getServiceBroker() {
         return (ServiceBroker) getService(SERVICE_BROKER);

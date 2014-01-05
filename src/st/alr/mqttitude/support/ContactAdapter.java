@@ -4,7 +4,9 @@ package st.alr.mqttitude.support;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.model.Contact;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;

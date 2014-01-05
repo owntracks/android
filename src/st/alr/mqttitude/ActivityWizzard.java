@@ -47,7 +47,7 @@ public class ActivityWizzard extends FragmentActivity implements
         setContentView(R.layout.activity_wizzard);
 
         if (savedInstanceState != null) {
-            mWizardModel.load(savedInstanceState.getBundle("model"));
+            mWizardModel.load(savedInstanceState.getBundle("st.alr.mqttitude.model"));
         }
 
         mWizardModel.registerListener(this);
@@ -166,7 +166,7 @@ public class ActivityWizzard extends FragmentActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle("model", mWizardModel.save());
+        outState.putBundle("st.alr.mqttitude.model", mWizardModel.save());
     }
 
     @Override

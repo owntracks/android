@@ -4,6 +4,7 @@ package st.alr.mqttitude.services;
 import java.util.Date;
 import java.util.Map;
 
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -11,12 +12,11 @@ import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.ActivityMain;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.ActivityLauncher.ErrorDialogFragment;
-import st.alr.mqttitude.support.Contact;
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.support.BackgroundPublishReceiver;
+import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.R.bool;
 import android.app.Dialog;
@@ -135,14 +135,12 @@ public class ServiceApplication implements ProxyableService {
 
         if (c == null) {
             Log.v(this.toString(), "Allocating new contact for " + topic);
-            c = new st.alr.mqttitude.support.Contact(topic);
+            c = new st.alr.mqttitude.model.Contact(topic);
             updateContactData(c);
         }
 
         c.setLocation(location);
 
-        // Automatically fires onDatasetChanged of contacts adapter to update
-        // depending listViews
         App.getContacts().put(topic, c);
         return c;
     }
@@ -297,7 +295,7 @@ public class ServiceApplication implements ProxyableService {
             title = context.getString(R.string.app_name);
         }
 
-        subtitle = ServiceLocator.getStateAsString(context) + " | "
+        subtitle = ServiceProxy.getServiceLocator().getStateAsString(context) + " | "
                 + ServiceBroker.getStateAsString(context);
 
         notificationBuilder.setContentTitle(title);
