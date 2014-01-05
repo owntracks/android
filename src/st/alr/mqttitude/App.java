@@ -5,7 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import st.alr.mqttitude.support.Contact;
+
+import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.support.Defaults;
 import android.app.Application;
 import android.content.Context;

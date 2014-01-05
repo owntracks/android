@@ -1,7 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
- 
-        />
+       	<item
+        android:id="@+id/menu_report"
+        android:orderInCategory="1"
+        android:title="@string/publish"
+        android:icon="@drawable/ic_upload"
+        android:showAsAction="ifRoom"
+        
+         />
+    
        	<item
         android:id="@+id/menu_share"
         android:orderInCategory="3"

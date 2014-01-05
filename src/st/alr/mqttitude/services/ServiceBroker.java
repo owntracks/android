@@ -30,11 +30,11 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.json.JSONObject;
 
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.MqttPublish;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;

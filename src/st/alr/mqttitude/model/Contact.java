@@ -1,4 +1,4 @@
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.model;
 
 import java.io.InputStream;
 

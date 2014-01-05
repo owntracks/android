@@ -10,6 +10,7 @@
         android:orientation="vertical"
         android:paddingTop="@dimen/default_vertical_spacing" >
 
+        
         <LinearLayout
             android:id="@+id/thisdevice"
             style="@style/card"

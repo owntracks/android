@@ -3,6 +3,10 @@ package st.alr.mqttitude.support;
 
 import java.util.Date;
 
+import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.model.GeocodableLocation;
+
+
 import android.location.Location;
 
 public class Events {

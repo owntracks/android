@@ -3,24 +3,34 @@ package st.alr.mqttitude;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
+
+import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
-import st.alr.mqttitude.support.Contact;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.GeocodableLocation;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
 import android.annotation.SuppressLint;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderOperation.Builder;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +46,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
@@ -54,19 +65,20 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends FragmentActivity {
     static FragmentHandler fragmentHandler;
+    private static final int CONTACT_PICKER_RESULT = 1001;  
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         startService(new Intent(this, ServiceProxy.class));
-        int fragmentId = FragmentHandler.CONTACT_FRAGMENT;
+        int fragmentId = FriendsFragment.ID;
         if (savedInstanceState != null)
         {
             // delete previously stored fragments after orientation change (see
             // http://stackoverflow.com/a/13996054/899155).
             // Without this, two map fragments would exists after rotating the
             // device, of which the visible one would not receive updates.
-             savedInstanceState.remove ("android:support:fragments");
+            savedInstanceState.remove("android:support:fragments");
             fragmentId = savedInstanceState.getInt("currentFragment");
         }
         super.onCreate(savedInstanceState);
@@ -86,16 +98,12 @@ public class ActivityMain extends FragmentActivity {
     }
 
     public static class FragmentHandler {
-        public static final int CONTACT_FRAGMENT = 1;
-        public static final int MAP_FRAGMENT = 2;
-        public static final int DETAIL_FRAGMENT = 3;
-
         private final int COUNT = 3;
         private Fragment[] fragments;
         private int current;
         private FragmentManager fragmentManager;
         private HeadlessFragment store;
-        
+
         public FragmentHandler(FragmentManager fm) {
             Log.v(this.toString(), "Instantiating new fragmenthandler");
             store = HeadlessFragment.getInstance();
@@ -116,16 +124,16 @@ public class ActivityMain extends FragmentActivity {
             Log.v(this.toString(), "using fragmentManager" + fragmentManager);
 
             Fragment f = getFragment(id, null);
-            Fragment prev = getFragment(current, null); 
+            Fragment prev = getFragment(current, null);
             FragmentTransaction ft = fragmentManager.beginTransaction();
 
             handleFragmentArguments(id, extras);
-            
+
             if (prev != null && prev.isAdded() && prev.isVisible()) {
                 ft.hide(prev);
                 Log.v(this.toString(), "hiding fragment");
             }
-            
+
             if (f.isAdded()) {
                 Log.v(this.toString(), "showing fragment " + f);
                 ft.show(f);
@@ -133,7 +141,6 @@ public class ActivityMain extends FragmentActivity {
                 Log.v(this.toString(), "adding fragment " + f);
                 ft.add(R.id.main, f, "f:" + id);
             }
-            
 
             ft.commit();
             fragmentManager.executePendingTransactions();
@@ -142,72 +149,70 @@ public class ActivityMain extends FragmentActivity {
 
             return f;
         }
-        
+
         // Shows the previous fragment
-        public Fragment back(){
+        public Fragment back() {
             HeadlessFragment.getInstance().popBackStack();
-            
+
             return showFragment(HeadlessFragment.getInstance().getBackStackHead(), null);
         }
-        
-        
+
         public Fragment forward(Integer id, Bundle extras) {
-            if(HeadlessFragment.getInstance().getBackStackHead()!=id)
+            if (HeadlessFragment.getInstance().getBackStackHead() != id)
                 HeadlessFragment.getInstance().pushBackStack(id);
-            
+
             return showFragment(id, extras);
         }
-        public boolean atRoot(){
+
+        public boolean atRoot() {
             return HeadlessFragment.getInstance().getBackStackSize() == 1;
         }
-        
-        
 
-
-        
         private Bundle handleFragmentArguments(int id, Bundle extras) {
             Bundle oldExtras = store.getBundle(id);
-            if(extras != null) { // overwrite old extras
+            if (extras != null) { // overwrite old extras
                 store.setBundle(id, extras);
                 return extras;
-            } else if (extras == null && oldExtras != null) { // return previously  set extras
-                return oldExtras;                
+            } else if (extras == null && oldExtras != null) { // return
+                                                              // previously set
+                                                              // extras
+                return oldExtras;
             } else {
-                return null; 
-            }                
+                return null;
+            }
         }
 
         public Fragment getFragment(int id, Bundle extras) {
-            Fragment f = fragments[id];                    
-                              
+            Fragment f = fragments[id];
+
             if (f == null) {
-                if (id == CONTACT_FRAGMENT)
+                if (id == FriendsFragment.ID)
                     f = FriendsFragment.getInstance(extras);
-                else if (id == MAP_FRAGMENT)
+                else if (id == MapFragment.ID)
                     f = MapFragment.getInstance(extras);
-                else if (id == DETAIL_FRAGMENT)
+                else if (id == DetailsFragment.ID)
                     f = DetailsFragment.getInstance(extras);
 
                 fragments[id] = f;
             }
-            
+
             return f;
 
         }
 
-        public void removeAll(){
+        public void removeAll() {
             Log.v(this.toString(), "Removing all fragments");
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            
+
             for (int i = 0; i < fragments.length; i++)
-                if(fragments[i] != null) {
+                if (fragments[i] != null) {
                     Log.v(this.toString(), "Removing fragment " + fragments[i]);
                     ft.hide(fragments[i]).remove(fragments[i]);
                 }
             ft.commitAllowingStateLoss();
             fragmentManager.executePendingTransactions();
         }
-        
+
     }
 
     @Override
@@ -231,9 +236,9 @@ public class ActivityMain extends FragmentActivity {
             Intent intent1 = new Intent(this, ActivityPreferences.class);
             startActivity(intent1);
             return true;
-            // } else if (itemId == R.id.menu_publish) {
-            // ServiceProxy.getServiceLocator().publishLastKnownLocation();
-            // return true;
+        } else if (itemId == R.id.menu_report) {
+            ServiceProxy.getServiceLocator().publishLastKnownLocation();
+            return true;
         } else if (itemId == R.id.menu_share) {
             this.share(null);
             return true;
@@ -241,11 +246,17 @@ public class ActivityMain extends FragmentActivity {
             return super.onOptionsItemSelected(item);
         }
     }
+    
+
+    
+
 
     public void share(View view) {
         GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
         if (l == null) {
-            // TODO: signal to user
+            // TODO: Externalize string
+            Toast.makeText(this, "No current location to share is available", Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -279,9 +290,9 @@ public class ActivityMain extends FragmentActivity {
     public void onResume() {
         super.onResume();
     }
-    
+
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         fragmentHandler.removeAll();
         super.onDestroy();
     }
@@ -298,14 +309,15 @@ public class ActivityMain extends FragmentActivity {
         Log.v(this.toString(), "topic " + topic);
         Bundle b = new Bundle();
         b.putString("topic", topic);
-        fragmentHandler.forward(FragmentHandler.DETAIL_FRAGMENT, b);
+        fragmentHandler.forward(DetailsFragment.ID, b);
 
     }
 
     Bundle fragmentBundle;
 
     public static class MapFragment extends Fragment {
-//        private static MapFragment instance;
+        // private static MapFragment instance;
+        public static final int ID = 2;
         private GeocodableLocation currentLocation;
         private MapView mMapView;
         private GoogleMap googleMap;
@@ -317,10 +329,10 @@ public class ActivityMain extends FragmentActivity {
         private Map<String, Contact> markerToContacts;
 
         public static MapFragment getInstance(Bundle extras) {
-//            if (instance == null) {
-                MapFragment instance = new MapFragment();
-                instance.setArguments(extras);
-//            }
+            // if (instance == null) {
+            MapFragment instance = new MapFragment();
+            instance.setArguments(extras);
+            // }
             return instance;
         }
 
@@ -388,8 +400,11 @@ public class ActivityMain extends FragmentActivity {
                 try {
                     MapsInitializer.initialize(getActivity());
                 } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace(); // TODO: Catch not available
-                                         // PlayServices
+                    // This shouldn't happen as we check things beforehand.
+                    // If it does anyway, the launcher activity will take care
+                    // of it by displaying handling dialogues
+                    startActivity(new Intent(getActivity(), ActivityLauncher.class));
+                    return null;
                 }
 
                 setUpMap();
@@ -397,32 +412,25 @@ public class ActivityMain extends FragmentActivity {
 
             return v;
         }
+
         public void onHiddenChanged(boolean hidden) {
             super.onHiddenChanged(hidden);
-            if(hidden)
+            if (hidden)
                 onHide();
             else
                 onShow();
             super.onHiddenChanged(hidden);
         }
-        
-        
+
         private void onShow() {
             Log.v(this.toString(), "onShow");
-            
+
         }
- 
-       private void onHide() {
+
+        private void onHide() {
             Log.v(this.toString(), "onHide");
         }
- 
-//       @Override
-//       public void onSaveInstanceState(Bundle b) {
-//           super.onSaveInstanceState(b);
-//           b.putString("topic", contact.getTopic());
-//           HeadlessFragment.getInstance().setBundle(FragmentHandler.DETAIL_FRAGMENT, b);
-//       }
-       
+
         private void setUpMap() {
             googleMap.setIndoorEnabled(true);
             googleMap.setMyLocationEnabled(true);
@@ -561,19 +569,20 @@ public class ActivityMain extends FragmentActivity {
 
     @SuppressLint("NewApi")
     public static class FriendsFragment extends Fragment implements StaticHandlerInterface {
+        public static final int ID = 1;
         private LinearLayout friendsListView;
         private Button currentLoc;
         private Button report;
 
         private static Handler handler;
 
-       // private static FriendsFragment instance;
+        // private static FriendsFragment instance;
 
         public static FriendsFragment getInstance(Bundle extras) {
-            //if (instance == null) {
-            FriendsFragment  instance = new FriendsFragment();
-                instance.setArguments(extras);
-         //   }
+            // if (instance == null) {
+            FriendsFragment instance = new FriendsFragment();
+            instance.setArguments(extras);
+            // }
             return instance;
         }
 
@@ -611,7 +620,6 @@ public class ActivityMain extends FragmentActivity {
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);
             LinearLayout thisdevice = (LinearLayout) v.findViewById(R.id.thisdevice);
 
-            
             currentLoc = (Button) thisdevice.findViewById(R.id.currentLocation);
 
             currentLoc.setOnClickListener(new OnClickListener() {
@@ -620,7 +628,7 @@ public class ActivityMain extends FragmentActivity {
                 public void onClick(View v) {
                     if (ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
                         Log.v(this.toString(), "Focusing the current location");
-                        MapFragment f = (MapFragment) fragmentHandler.forward(FragmentHandler.MAP_FRAGMENT, null);
+                        MapFragment f = (MapFragment) fragmentHandler.forward(MapFragment.ID, null);
                         f.focusCurrentLocation();
 
                     } else {
@@ -628,14 +636,14 @@ public class ActivityMain extends FragmentActivity {
                     }
                 }
             });
-            
+
             report = (Button) thisdevice.findViewById(R.id.report);
             report.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
                     ServiceProxy.getServiceLocator().publishLastKnownLocation();
-                    
+
                 }
             });
 
@@ -659,7 +667,7 @@ public class ActivityMain extends FragmentActivity {
                 l.setTag("++MYLOCATION++");
                 (new ReverseGeocodingTask(getActivity(), handler))
                         .execute(new GeocodableLocation[] {
-                            l
+                                l
                         });
             }
         }
@@ -675,7 +683,7 @@ public class ActivityMain extends FragmentActivity {
 
                     TextView tv = (TextView) friendsListView.findViewWithTag(l.getTag())
                             .findViewById(R.id.subtitle);
-                    if(tv != null)
+                    if (tv != null)
                         tv.setText(l.toString());
                 }
             }
@@ -687,7 +695,7 @@ public class ActivityMain extends FragmentActivity {
 
         public void updateContactView(final Contact c) {
             View v = friendsListView.findViewWithTag(c.getTopic());
-           
+
             if (v == null) {
 
                 if (c.getView() != null) {
@@ -714,8 +722,9 @@ public class ActivityMain extends FragmentActivity {
                                 return;
 
                             }
-                            Log.v(this.toString(), "request for fragmenthandler fragment handler" + fragmentHandler);
-                            fragmentHandler.forward(FragmentHandler.MAP_FRAGMENT, null);
+                            Log.v(this.toString(), "request for fragmenthandler fragment handler"
+                                    + fragmentHandler);
+                            fragmentHandler.forward(MapFragment.ID, null);
                             ((MapFragment) fragmentHandler.getCurrentFragment(null)).focus(c);
 
                         }
@@ -734,7 +743,7 @@ public class ActivityMain extends FragmentActivity {
             img.setImageBitmap(c.getUserImage());
 
             (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
-                c.getLocation()
+                    c.getLocation()
             });
 
         }
@@ -742,14 +751,18 @@ public class ActivityMain extends FragmentActivity {
     }
 
     public static class DetailsFragment extends Fragment {
+        public static final int ID = 3;
         Contact contact;
+        TextView name;
+        TextView topic;
         TextView location;
         TextView accuracy;
         TextView time;
+        Button assignContact;
 
         public static DetailsFragment getInstance(Bundle extras) {
-                DetailsFragment instance = new DetailsFragment();
-              instance.setArguments(extras);
+            DetailsFragment instance = new DetailsFragment();
+            instance.setArguments(extras);
             return instance;
         }
 
@@ -776,27 +789,84 @@ public class ActivityMain extends FragmentActivity {
             super.onResume();
         }
 
-        public void show(Contact c) {
-
+        public void show(final Contact c) {
             contact = c;
+            name.setText(c.getName());
+            topic.setText(c.getTopic());
             location.setText(c.getLocation().toString());
             accuracy.setText("" + c.getLocation().getAccuracy());
-            time.setText(App.formatDate(new Date(c.getLocation().getTime())));
-            Log.v(this.toString(), "showing details of " + contact);
+            time.setText(App.formatDate(c.getLocation().getDate()));
+
+            assignContact.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,  
+                            Contacts.CONTENT_URI);  
+                    startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);  
+
+                }
+            });
 
         }
 
+        // Called when contact is picked
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            
+            Log.v(this.toString(), "onActivityResult requestCode " + requestCode + " resultCode " + resultCode);
+            switch (requestCode) {
+                case CONTACT_PICKER_RESULT:
+                    if(resultCode == RESULT_OK) {
+                        assignContact(data);
+                    }
+                        
+                    break;
+
+                default:
+                    break;
+            }
+        }  
+        
+        private void assignContact(Intent intent){
+            
+            Log.v(this.toString(), "Assign contact to with topic " + contact.getTopic());
+
+          
+            Uri result = intent.getData();  
+            String contactId = result.getLastPathSegment();
+            Log.v(this.toString(), "Got a result: " + result.toString() + " contactId " +contactId);  
+
+            
+            ContentValues values = new ContentValues();
+            values.put(Data.RAW_CONTACT_ID, contactId);
+            values.put(Data.MIMETYPE, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE);
+            values.put(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, "Mqttitude");
+            values.put(ContactsContract.CommonDataKinds.Im.DATA, contact.getTopic());
+            values.put(ContactsContract.CommonDataKinds.Im.PROTOCOL,ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL);
+            Uri dataUri = getActivity().getContentResolver().insert(ContactsContract.Data.CONTENT_URI, values);
+            
+        }
+
+        
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            Bundle extras = HeadlessFragment.getInstance().getBundle(FragmentHandler.DETAIL_FRAGMENT);
-            
+
+            Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
+
             View v = inflater.inflate(R.layout.fragment_details, container, false);
+            name = (TextView) v.findViewById(R.id.name);
+            topic = (TextView) v.findViewById(R.id.topic);
             location = (TextView) v.findViewById(R.id.location);
             accuracy = (TextView) v.findViewById(R.id.accuracy);
             time = (TextView) v.findViewById(R.id.time);
 
+            assignContact = (Button) v.findViewById(R.id.assignContact);
+
             show(App.getContacts().get(extras.get("topic")));
+
             return v;
         }
 
@@ -809,19 +879,18 @@ public class ActivityMain extends FragmentActivity {
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
             b.putString("topic", contact.getTopic());
-            HeadlessFragment.getInstance().setBundle(FragmentHandler.DETAIL_FRAGMENT, b);
+            HeadlessFragment.getInstance().setBundle(DetailsFragment.ID, b);
         }
 
     }
 
-    
-    
     public static class HeadlessFragment extends Fragment {
         static HeadlessFragment instance;
         private static HashMap<Integer, Bundle> store = new HashMap<Integer, Bundle>();
         private static LinkedList<Integer> backStack = new LinkedList<Integer>();
+
         public static HeadlessFragment getInstance() {
-            if(instance == null) {
+            if (instance == null) {
                 instance = new HeadlessFragment();
             }
             return instance;
@@ -833,13 +902,13 @@ public class ActivityMain extends FragmentActivity {
             setRetainInstance(true);
 
         }
-        
+
         public void setBundle(Integer id, Bundle b) {
-           store.put(id, b);
+            store.put(id, b);
         }
-        
+
         public Bundle getBundle(Integer id) {
-           return store.get(id);
+            return store.get(id);
         }
 
         @Override
@@ -857,32 +926,34 @@ public class ActivityMain extends FragmentActivity {
             super.onResume();
         }
 
-
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-                return null;
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            return null;
         }
 
         @Override
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
         }
-        
+
         public Integer pushBackStack(Integer id) {
             backStack.addLast(id);
             return id;
         }
+
         public Integer getBackStackHead() {
-            
+
             return getBackStackSize() > 0 ? backStack.getLast() : -1;
         }
 
         public Integer popBackStack() {
             return backStack.removeLast();
         }
-        public Integer getBackStackSize(){
+
+        public Integer getBackStackSize() {
             return backStack.size();
         }
-        
+
     }
 }
