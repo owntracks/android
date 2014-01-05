@@ -4,6 +4,7 @@ package st.alr.mqttitude.services;
 import java.util.Date;
 
 import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.model.Report;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -31,7 +32,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     
     private SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
-    private Defaults.State.ServiceLocator state;
+    private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
     private ServiceProxy context;
 
     private LocationClient mLocationClient;
@@ -47,7 +48,6 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     public void onCreate(ServiceProxy p) {
        
-        state = Defaults.State.ServiceLocator.INITIAL;
 
                 context = p;
         
@@ -239,17 +239,11 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
         
-        payload.append("{");
-        payload.append("\"_type\": ").append("\"").append("location").append("\"");
-        payload.append(", \"lat\": ").append("\"").append(l.getLatitude()).append("\"");
-        payload.append(", \"lon\": ").append("\"").append(l.getLongitude()).append("\"");
-        payload.append(", \"tst\": ").append("\"").append((int)(d.getTime()/1000)).append("\"");
-        payload.append(", \"acc\": ").append("\"").append(Math.round(l.getLocation().getAccuracy() * 100) / 100.0d).append("\"");
-        payload.append("}");
 
+        Report r = new Report(l);
         ServiceProxy.getServiceBroker().publish(
                 topic,
-                payload.toString(),
+                r.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
                 Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
                 , 20, this, l);
@@ -262,10 +256,10 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra));       
     }
 
-    public Defaults.State.ServiceLocator getState() {
+    public static Defaults.State.ServiceLocator getState() {
         return state;
     }
-    public String getStateAsString(Context c){
+    public static String getStateAsString(Context c){
         return stateAsString(getState(), c);
     }
     
@@ -322,4 +316,5 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         return getUpdateIntervall() * 60 * 1000;
     }
         
+    public void onEvent(Object event){}
 }

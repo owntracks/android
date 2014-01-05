@@ -10,7 +10,10 @@ import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.support.Defaults;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
+import android.os.BatteryManager;
 import android.provider.Settings.Secure;
 
 import com.bugsnag.android.Bugsnag;
@@ -55,4 +58,10 @@ public class App extends Application {
         return Secure.getString(instance.getContentResolver(), Secure.ANDROID_ID);
     }
 
+    public static int getBatteryLevel() {
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getContext().registerReceiver(null, ifilter);
+        return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+    }
+    
 }

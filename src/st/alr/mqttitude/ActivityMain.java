@@ -829,6 +829,7 @@ public class ActivityMain extends FragmentActivity {
             }
         }  
         
+        // This code is experimental and doesn't work yet
         private void assignContact(Intent intent){
             
             Log.v(this.toString(), "Assign contact to with topic " + contact.getTopic());

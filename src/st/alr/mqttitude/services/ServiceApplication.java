@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -98,34 +99,44 @@ public class ServiceApplication implements ProxyableService {
     public boolean updateContactData(Contact c) {
         Log.v(this.toString(), "Finding contact data for " + c.getTopic());
         boolean ret = false;
-        String imWhere = ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL
-                + " = ? COLLATE NOCASE AND " + ContactsContract.CommonDataKinds.Im.DATA
-                + " = ? COLLATE NOCASE";
+        
+        //Reset relevant information
+        c.setName(null);
+        c.setUserImage(Contact.defaultUserImage);
+        
+        String imWhere = "("+ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL
+                + " = ? COLLATE NOCASE) AND (" + ContactsContract.CommonDataKinds.Im.DATA
+                + " = ? COLLATE NOCASE)";
         String[] imWhereParams = new String[] {
                 "Mqttitude", c.getTopic()
         };
-        Cursor imCur = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null,
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null,
                 imWhere, imWhereParams, null);
 
-        Log.v(this.toString(), "imcur:  " + imCur);
-        imCur.move(-1);
-        while (imCur.moveToNext()) {
-            Long cId = imCur.getLong(imCur.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-            Log.v(this.toString(),
-                    "found matching contact with id "
-                            + cId
-                            + " to be associated with topic "
-                            + imCur.getString(imCur
-                                    .getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
-            c.setUserImage(Contact.resolveImage(context.getContentResolver(), cId));
-            Log.v(this.toString(),
-                    "Display Name: "
-                            + imCur.getString(imCur
-                                    .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
-            c.setName(imCur.getString(imCur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+        Log.v(this.toString(), "cursor entries " + cursor.getCount());
+        cursor.move(-1);
+        while (cursor.moveToNext()) {
+            Long cId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+            Log.v(this.toString(), "found matching raw contact id " + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im._ID))+" with contact id " + cId + " to be associated with topic "
+                            + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
+            
+            String[] colNames =  cursor.getColumnNames();            
+            for (int i = 0; i < colNames.length; i++) {
+                Log.v(this.toString(), "Row: "+ i + " " + colNames[i] + " => " + cursor.getString(i));
+            }
+            
+            
+            Bitmap image = Contact.resolveImage(context.getContentResolver(), cId); 
+            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            
+            Log.v(this.toString(), "Display Name: " + displayName + ", image: " + image);
+            c.setName(displayName);
+            c.setUserImage(image);
+
             ret = true;
+//            break;
         }
-        imCur.close();
+        cursor.close();
         Log.v(this.toString(), "search finished");
         return ret;
     }
@@ -185,24 +196,13 @@ public class ServiceApplication implements ProxyableService {
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
 
-            final int currentCount = getContactCount();
-            if (currentCount < mContactCount) {
-                Log.v(this.toString(), "Contact deleted");
-            } else if (currentCount == mContactCount) {
-                Log.v(this.toString(), "Contact updated");
+            final int currentCount = getContactCount();            
+            
+            if (currentCount != mContactCount) {
                 for (Contact c : App.getContacts().values()) {
-                    if (updateContactData(c))
-                        ;
+                    updateContactData(c);
                     EventBus.getDefault().post(new Events.ContactUpdated(c));
                 }
-            } else {
-                Log.v(this.toString(), "Contact added");
-                for (Contact c : App.getContacts().values()) {
-                    if (updateContactData(c))
-                        ;
-                    EventBus.getDefault().post(new Events.ContactUpdated(c));
-                }
-
             }
             mContactCount = currentCount;
         }
@@ -295,7 +295,7 @@ public class ServiceApplication implements ProxyableService {
             title = context.getString(R.string.app_name);
         }
 
-        subtitle = ServiceProxy.getServiceLocator().getStateAsString(context) + " | "
+        subtitle = ServiceLocator.getStateAsString(context) + " | "
                 + ServiceBroker.getStateAsString(context);
 
         notificationBuilder.setContentTitle(title);

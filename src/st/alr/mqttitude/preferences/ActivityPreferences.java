@@ -59,6 +59,9 @@ public class ActivityPreferences extends PreferenceActivity {
     public static String getServerAdress(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_HOST, "");
     }
+    public static boolean includeBattery(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_INCLUE_BATTERY, false);
+    }
 
     public static boolean areContactsEnabled(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
