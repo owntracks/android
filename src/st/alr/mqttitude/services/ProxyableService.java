@@ -1,6 +1,5 @@
 package st.alr.mqttitude.services;
 
-import android.content.Context;
 import android.content.Intent;
 
 public interface ProxyableService {

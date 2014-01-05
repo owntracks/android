@@ -98,6 +98,13 @@
             android:hint="mqttitude/+/+"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
+               <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="autostartOnBoot"
+            android:title="Start on Boot"
+            android:summary="Start the service when the device boots" />
+        
+        
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"

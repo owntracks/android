@@ -52,6 +52,7 @@
                 android:paddingTop="@dimen/default_vertical_spacing_half" >
 
                 <Button
+                    android:id="@+id/report"
                     android:drawableLeft="@drawable/ic_upload"
                         android:drawablePadding="@dimen/default_horizontal_spacing_half"
                     

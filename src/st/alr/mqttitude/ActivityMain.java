@@ -294,6 +294,7 @@ public class ActivityMain extends FragmentActivity {
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
+        private String selectedContact;
         private Map<String, Contact> markerToContacts;
 
         public static MapFragment getInstance(Bundle extras) {
@@ -378,7 +379,32 @@ public class ActivityMain extends FragmentActivity {
 
             return v;
         }
-
+        public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            if(hidden)
+                onHide();
+            else
+                onShow();
+            super.onHiddenChanged(hidden);
+        }
+        
+        
+        private void onShow() {
+            Log.v(this.toString(), "onShow");
+            
+        }
+ 
+       private void onHide() {
+            Log.v(this.toString(), "onHide");
+        }
+ 
+//       @Override
+//       public void onSaveInstanceState(Bundle b) {
+//           super.onSaveInstanceState(b);
+//           b.putString("topic", contact.getTopic());
+//           HeadlessFragment.getInstance().setBundle(FragmentHandler.DETAIL_FRAGMENT, b);
+//       }
+       
         private void setUpMap() {
             googleMap.setIndoorEnabled(true);
             googleMap.setMyLocationEnabled(true);
@@ -487,7 +513,7 @@ public class ActivityMain extends FragmentActivity {
 
         public void onEventMainThread(Events.LocationUpdated e) {
             currentLocation = e.getGeocodableLocation();
-
+            Log.v(this.toString(), "location updated");
             if (isTrackingCurrentLocation())
                 focusCurrentLocation();
         }
@@ -519,6 +545,7 @@ public class ActivityMain extends FragmentActivity {
     public static class FriendsFragment extends Fragment implements StaticHandlerInterface {
         private LinearLayout friendsListView;
         private Button currentLoc;
+        private Button report;
 
         private static Handler handler;
 
@@ -566,13 +593,15 @@ public class ActivityMain extends FragmentActivity {
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);
             LinearLayout thisdevice = (LinearLayout) v.findViewById(R.id.thisdevice);
 
+            
             currentLoc = (Button) thisdevice.findViewById(R.id.currentLocation);
 
             currentLoc.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    MapFragment f = MapFragment.getInstance(null);
+                    MapFragment f = (MapFragment) fragmentHandler.getFragment(FragmentHandler.MAP_FRAGMENT, null);
+//                    MapFragment f = MapFragment.getInstance(null);
                     if (f.hasCurrentLocation()) {
                         fragmentHandler.showFragment(FragmentHandler.MAP_FRAGMENT, null);
                         Log.v(this.toString(), "Focusing the current location");
@@ -582,6 +611,16 @@ public class ActivityMain extends FragmentActivity {
                     } else {
                         Log.v(this.toString(), "No current location available");
                     }
+                }
+            });
+            
+            report = (Button) thisdevice.findViewById(R.id.report);
+            report.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    ServiceProxy.getServiceLocator().publishLastKnownLocation();
+                    
                 }
             });
 
