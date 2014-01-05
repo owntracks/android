@@ -37,7 +37,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
         mLocationClient = new LocationClient(context, this, this);
 
 
-        if (!mLocationClient.isConnected() && !mLocationClient.isConnecting())
+        if (!mLocationClient.isConnected() && !mLocationClient.isConnecting() && ServiceApplication.checkPlayServices())
             mLocationClient.connect();
 
     }
@@ -90,9 +90,8 @@ public class ServiceLocatorFused extends ServiceLocator implements
     @Override
     public void onDisconnected() {
         ready = false;
-
+        ServiceApplication.checkPlayServices(); // show error notification if play services were disabled
         Log.v(TAG, "ServiceLocatorFused disconnected");
-        disableLocationUpdates();
     }
 
     private void setupBackgroundLocationRequest() {
@@ -130,7 +129,7 @@ public class ServiceLocatorFused extends ServiceLocator implements
     private void requestLocationUpdates() {
         if (!ready) {
             Log.e(TAG,
-                    "requestLocationUpdates but not connected. Updates will be requested again once connected");
+                    "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;
         }
 
@@ -164,6 +163,9 @@ public class ServiceLocatorFused extends ServiceLocator implements
     }
 
     private void setupLocationRequest() {
+        if(!ready)
+            return;
+        
         disableLocationUpdates();
 
         if (foreground)
@@ -194,5 +196,5 @@ public class ServiceLocatorFused extends ServiceLocator implements
         Log.v(this.toString(), "onDestroy. Disabling location updates");
         disableLocationUpdates();
     }
-
+    
 }

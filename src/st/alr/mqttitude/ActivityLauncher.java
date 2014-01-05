@@ -84,13 +84,16 @@ public class ActivityLauncher extends FragmentActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v(this.toString(), "onResume");
+
         checkPlayServices();
-        checkSettings();
+        
+        if(playServicesOk)
+            checkSettings();
+        
         
         if(playServicesOk && settingsOK)
             launchChecksComplete();
-        else
-            showQuitError();
     }
     
     
@@ -104,24 +107,26 @@ public class ActivityLauncher extends FragmentActivity{
         if(!settingsOK)
             startActivityWizzard();
         
-        Log.v(this.toString(), "Preflight check passed: " + settingsOK);
     }
 
     private void checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
-        if (ConnectionResult.SUCCESS == resultCode) {
+        if (ServiceApplication.checkPlayServices()) {
             Log.d("Location Updates", "Google Play services is available.");
             playServicesOk  = true;
             
         } else {
-            Log.e("Location Updates", "Google Play services not available.");
+            playServicesOk = false;
+            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+            Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
 
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 
                 Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
     
                 if (errorDialog != null) {
+                    Log.v(this.toString(), "Showing error recovery dialog");
                     ErrorDialogFragment errorFragment = new ErrorDialogFragment();
                     errorFragment.setDialog(errorDialog);
                      
@@ -129,7 +134,6 @@ public class ActivityLauncher extends FragmentActivity{
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.add(errorFragment, "playServicesErrorFragmentEnable");
                     transaction.commitAllowingStateLoss();  
-    
                 }
             } else {
                 showQuitError();
@@ -159,11 +163,11 @@ public class ActivityLauncher extends FragmentActivity{
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        Log.v(this.toString(), "onActivityResult");
+        Log.v(this.toString(), "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
       if(requestCode==CONNECTION_FAILURE_RESOLUTION_REQUEST) {
-        if (resultCode == RESULT_CANCELED) {
-          Toast.makeText(this, "Google Play Services must be installed.", Toast.LENGTH_SHORT).show();
-          quitApplication();
+        if (resultCode != RESULT_OK) {
+            Toast.makeText(this, "Google Play Services must be installed.", Toast.LENGTH_SHORT).show();
+            checkPlayServices();
         } else {
             Log.v(this.toString(), "Play services activated successfully");
         }
