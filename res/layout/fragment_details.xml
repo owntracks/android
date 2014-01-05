@@ -93,6 +93,7 @@
                 android:layout_marginBottom="@dimen/default_vertical_spacing"
                 android:layout_marginTop="@dimen/default_vertical_spacing_half"
                 android:layout_marginLeft="@dimen/default_horizontal_spacing"
+                android:visibility="gone"
 
                 android:text="Assign contact" />
         </LinearLayout>
