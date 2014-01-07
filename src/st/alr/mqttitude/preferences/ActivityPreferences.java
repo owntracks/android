@@ -67,6 +67,9 @@ public class ActivityPreferences extends PreferenceActivity {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
     }
     
+    public static boolean isContactLinkCloudStorageEnabled(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE, false);
+    }
     
     
     public static String getTrackingUsername(){

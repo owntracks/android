@@ -62,6 +62,7 @@ public class Defaults {
     public static final String SETTINGS_KEY_TOPIC_SUB = "subTopic";
     public static final String CURRENT_LOCATION_TRACKING_IDENTIFIER = "+CURRENTDEVICELOCATION+";
     public static final String SETTINGS_KEY_INCLUE_BATTERY = "includeBattery";
+    public static final String SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE = "contactsLinkCloudStorageEnabled";
 
 
     public static class State {
