@@ -49,9 +49,10 @@
             android:defaultValue="false"
             android:dependency="subEnabled"
             android:key="contactsLinkCloudStorageEnabled"
-            android:summary="use remote contacts"
-            android:title="remote contacts" />
-        
+            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
+            android:title="@string/contactsLinkCloudStorageEnabledTitle" />
+                
+                
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"
@@ -119,8 +120,9 @@
                <CheckBoxPreference
             android:defaultValue="false"
             android:key="autostartOnBoot"
-            android:title="Start on Boot"
-            android:summary="Start the service when the device boots" />
+                        android:summary="@string/preferencesAutostartSummary"
+            android:title="@string/preferencesAutostartTitle" />
+            
         
         
     </PreferenceScreen>
