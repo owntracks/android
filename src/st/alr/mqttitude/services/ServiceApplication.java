@@ -2,6 +2,7 @@
 package st.alr.mqttitude.services;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -13,8 +14,14 @@ import st.alr.mqttitude.ActivityMain;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.ActivityLauncher.ErrorDialogFragment;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.db.ContactLink;
+import st.alr.mqttitude.db.ContactLinkDao;
+import st.alr.mqttitude.db.DaoMaster;
+import st.alr.mqttitude.db.DaoMaster.DevOpenHelper;
+import st.alr.mqttitude.db.DaoSession;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
@@ -27,11 +34,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -50,10 +59,26 @@ public class ServiceApplication implements ProxyableService {
     private int mContactCount;
     private ServiceProxy context;
 
+    private SQLiteDatabase db;
+    private DevOpenHelper helper;
+    private DaoSession daoSession;
+    private DaoMaster daoMaster;
+    private ContactLinkDao contactLinkDao;
+
+    
     @Override
     public void onCreate(ServiceProxy context) {
         this.context = context;
         checkPlayServices();
+        
+        helper = new DaoMaster.DevOpenHelper(context, "mqttitude-db", null);
+        db = helper.getWritableDatabase();
+        daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+        contactLinkDao = daoSession.getContactLinkDao();
+        
+        
+        
         
         notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -66,6 +91,8 @@ public class ServiceApplication implements ProxyableService {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
                 if (key.equals(Defaults.SETTINGS_KEY_NOTIFICATION_ENABLED))
                     handleNotification();
+                else if (key.equals(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE))
+                    updateAllContacts();
             }
         };
 
@@ -78,11 +105,17 @@ public class ServiceApplication implements ProxyableService {
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
         handleNotification();
-
+        
         mContactCount = getContactCount();
         context.getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
                 true, mObserver);
+        
+        
 
+    }
+
+    public ContactLinkDao getContactLinkDao() {
+        return contactLinkDao;
     }
 
     @Override
@@ -96,74 +129,26 @@ public class ServiceApplication implements ProxyableService {
         return 0;
     }
 
-    public boolean updateContactData(Contact c) {
-        Log.v(this.toString(), "Finding contact data for " + c.getTopic());
-        boolean ret = false;
-        
-        //Reset relevant information
-        c.setName(null);
-        c.setUserImage(Contact.defaultUserImage);
-        
-        String imWhere = "("+ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL
-                + " = ? COLLATE NOCASE) AND (" + ContactsContract.CommonDataKinds.Im.DATA
-                + " = ? COLLATE NOCASE)";
-        String[] imWhereParams = new String[] {
-                "Mqttitude", c.getTopic()
-        };
-        Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null,
-                imWhere, imWhereParams, null);
-
-        Log.v(this.toString(), "cursor entries " + cursor.getCount());
-        cursor.move(-1);
-        while (cursor.moveToNext()) {
-            Long cId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-            Log.v(this.toString(), "found matching raw contact id " + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im._ID))+" with contact id " + cId + " to be associated with topic "
-                            + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
-            
-            String[] colNames =  cursor.getColumnNames();            
-            for (int i = 0; i < colNames.length; i++) {
-                Log.v(this.toString(), "Row: "+ i + " " + colNames[i] + " => " + cursor.getString(i));
-            }
-            
-            
-            Bitmap image = Contact.resolveImage(context.getContentResolver(), cId); 
-            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            
-            Log.v(this.toString(), "Display Name: " + displayName + ", image: " + image);
-            c.setName(displayName);
-            c.setUserImage(image);
-
-            ret = true;
-//            break;
-        }
-        cursor.close();
-        Log.v(this.toString(), "search finished");
-        return ret;
-    }
-
-    private Contact updateOrInitContact(String topic, GeocodableLocation location) {
-        Contact c = App.getContacts().get(topic);
-
-        if (c == null) {
-            Log.v(this.toString(), "Allocating new contact for " + topic);
-            c = new st.alr.mqttitude.model.Contact(topic);
-            updateContactData(c);
-        }
-
-        c.setLocation(location);
-
-        App.getContacts().put(topic, c);
-        return c;
-    }
-
+   
     public static Map<String, Contact> getContacts() {
         return App.getContacts();
     }
 
     public void onEvent(Events.ContactLocationUpdated e) {
         // Updates a contact or allocates a new one
-        Contact c = updateOrInitContact(e.getTopic(), e.getGeocodableLocation());
 
+        Contact c = App.getContacts().get(e.getTopic());
+
+        if (c == null) {
+            Log.v(this.toString(), "Allocating new contact for " + e.getTopic());
+            c = new st.alr.mqttitude.model.Contact(e.getTopic());
+            updateContact(c);
+        }
+
+        c.setLocation(e.getGeocodableLocation());
+
+        App.getContacts().put(e.getTopic(), c);
+        
         // Fires a new event with the now updated or created contact to which
         // fragments can react
         EventBus.getDefault().post(new Events.ContactUpdated(c));
@@ -197,12 +182,9 @@ public class ServiceApplication implements ProxyableService {
             super.onChange(selfChange);
 
             final int currentCount = getContactCount();            
-            
+            // We can only track the contact count so we cannot determine which contact was added, removed or updated. Thus we have to update all
             if (currentCount != mContactCount) {
-                for (Contact c : App.getContacts().values()) {
-                    updateContactData(c);
-                    EventBus.getDefault().post(new Events.ContactUpdated(c));
-                }
+                updateAllContacts();
             }
             mContactCount = currentCount;
         }
@@ -364,5 +346,103 @@ public class ServiceApplication implements ProxyableService {
         return playServicesAvailable;
 
     }
+    
+    public void updateAllContacts() {
+        for (Contact c : App.getContacts().values()) {
+            updateContact(c);
+            EventBus.getDefault().post(new Events.ContactUpdated(c));
+        }
+    }
+
+    
+    /* Resolves username and image either from a locally saved mapping or from synced cloud contacts. If no mapping is found, no mame is set and the default image is assumed*/
+    void updateContact(Contact c) {
+
+        long contactId = getContactId(c);        
+        boolean found = false;
+
+        if(contactId <= 0) {
+            Log.v(this.toString(), "contactId could not be resolved for " + c.getTopic() );
+            setContactImageAndName(c, null, null);
+            return;
+        } else {
+            Log.v(this.toString(), "contactId for " + c.getTopic() + " was resolved to " + contactId);
+        }
+        
+        Cursor cursor = context.getContentResolver().query(CommonDataKinds.Phone.CONTENT_URI, null, CommonDataKinds.Phone.CONTACT_ID +" = ?", new String[]{contactId+""}, null);
+        while (cursor.moveToNext()) 
+        {            
+            Bitmap image = Contact.resolveImage(context.getContentResolver(), contactId); 
+            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            
+            Log.v(this.toString(), "Resolved display Name: " + displayName + ", image: " + image + " for topic " + c.getTopic());
+            c.setName(displayName);
+            c.setUserImage(image);
+            found = true;
+            break;
+        } 
+
+        if(!found)
+            setContactImageAndName(c, null, null);
+
+        cursor.close();
+
+    }
+    void setContactImageAndName(Contact c, Bitmap image, String name) {
+        c.setName(name);
+        c.setUserImage(image);
+    }
+    
+    private long getContactId(Contact c) {
+        if(ActivityPreferences.isContactLinkCloudStorageEnabled())
+            return getContactIdFromCloud(c);
+        else
+            return getContactIdFromLocalStorage(c);            
+    }
+  
+    public long getContactIdFromLocalStorage(Contact c) {
+        ContactLink cl = contactLinkDao.load(c.getTopic());
+       
+        return cl != null ? cl.getContactId() : 0; 
+    }
+        
+    public long getContactIdFromCloud(Contact c) {        
+        Long cId = (long) 0;
+        String imWhere = "("+ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL
+                + " = ? COLLATE NOCASE) AND (" + ContactsContract.CommonDataKinds.Im.DATA
+                + " = ? COLLATE NOCASE)";
+        String[] imWhereParams = new String[] {
+                "Mqttitude", c.getTopic()
+        };
+        
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null,
+                imWhere, imWhereParams, null);
+
+        cursor.move(-1);
+        while (cursor.moveToNext()) {
+            cId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+            Log.v(this.toString(), "found matching raw contact id " + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im._ID))+" with contact id " + cId + " to be associated with topic "
+                            + cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
+            break;
+        }
+        cursor.close();
+        return cId;
+    }
+
+    public void linkContact(Contact c, long contactId) {
+        if(ActivityPreferences.isContactLinkCloudStorageEnabled()) {
+            Log.e(this.toString(), "Saving a ContactLink to the cloud is not yet supported");
+            return;            
+        }
+        Log.v(this.toString(), "Creating ContactLink from " + c.getTopic() + " to contactId " + contactId);
+
+        ContactLink cl = new ContactLink(c.getTopic(), contactId);
+        contactLinkDao.insertOrReplace(cl);        
+        
+        updateContact(c); 
+        EventBus.getDefault().post(new Events.ContactUpdated(c));
+    }
+    
+    
 
 }

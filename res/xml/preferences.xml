@@ -44,6 +44,14 @@
             android:key="subEnabled"
             android:summary="@string/preferencesContactsEnabledSummary"
             android:title="@string/preferencesContactsEnabledTitle" />
+        
+                <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="subEnabled"
+            android:key="contactsLinkCloudStorageEnabled"
+            android:summary="use remote contacts"
+            android:title="remote contacts" />
+        
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"

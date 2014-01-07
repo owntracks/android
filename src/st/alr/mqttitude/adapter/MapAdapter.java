@@ -1,4 +1,4 @@
-package st.alr.mqttitude.support;
+package st.alr.mqttitude.adapter;
 
 import java.util.Collection;
 import java.util.Map;

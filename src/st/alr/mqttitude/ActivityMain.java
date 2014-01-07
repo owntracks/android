@@ -24,10 +24,13 @@ import android.content.ContentProviderOperation;
 import android.content.ContentProviderOperation.Builder;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
@@ -759,6 +762,7 @@ public class ActivityMain extends FragmentActivity {
         TextView accuracy;
         TextView time;
         Button assignContact;
+        private OnSharedPreferenceChangeListener preferencesChangedListener;
 
         public static DetailsFragment getInstance(Bundle extras) {
             DetailsFragment instance = new DetailsFragment();
@@ -770,26 +774,55 @@ public class ActivityMain extends FragmentActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-        }
+            
+            preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
+                    if (key.equals(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE))
+                        showHideAssignContactButton();
+                }
+            };
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(preferencesChangedListener);
 
+            
+        }
+        
         @Override
         public void onStart() {
             super.onStart();
             EventBus.getDefault().register(this);
         }
 
+        void showHideAssignContactButton(){
+            if(!ActivityPreferences.isContactLinkCloudStorageEnabled())
+                assignContact.setVisibility(View.VISIBLE);
+            else
+                assignContact.setVisibility(View.GONE);
+        }
+        
+        @Override
+        public void onDestroy() {
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(preferencesChangedListener);
+
+            super.onDestroy();
+        }
+        
         @Override
         public void onStop() {
             EventBus.getDefault().unregister(this);
+            Log.v(this.toString(), "unsubscribed");
             super.onStop();
         }
 
         @Override
         public void onResume() {
             super.onResume();
+            Log.v(this.toString(), "subscribed");
+
         }
 
         public void show(final Contact c) {
+            Log.v(this.toString(), "show for " + c.getName());
             contact = c;
             name.setText(c.getName());
             topic.setText(c.getTopic());
@@ -819,7 +852,11 @@ public class ActivityMain extends FragmentActivity {
             switch (requestCode) {
                 case CONTACT_PICKER_RESULT:
                     if(resultCode == RESULT_OK) {
+                        Log.v(this.toString(), "assigning");
+
                         assignContact(data);
+                        Log.v(this.toString(), "assigned");
+
                     }
                         
                     break;
@@ -838,19 +875,18 @@ public class ActivityMain extends FragmentActivity {
             Uri result = intent.getData();  
             String contactId = result.getLastPathSegment();
             Log.v(this.toString(), "Got a result: " + result.toString() + " contactId " +contactId);  
-
-            
-            ContentValues values = new ContentValues();
-            values.put(Data.RAW_CONTACT_ID, contactId);
-            values.put(Data.MIMETYPE, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE);
-            values.put(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, "Mqttitude");
-            values.put(ContactsContract.CommonDataKinds.Im.DATA, contact.getTopic());
-            values.put(ContactsContract.CommonDataKinds.Im.PROTOCOL,ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL);
-            Uri dataUri = getActivity().getContentResolver().insert(ContactsContract.Data.CONTENT_URI, values);
-            
+            ServiceProxy.getServiceApplication().linkContact(contact, Long.parseLong(contactId));
+          
+        }
+        public void onHiddenChanged(boolean hidden) {
+            if(!hidden) {
+                Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
+                show(App.getContacts().get(extras.get("topic")));           
+            }
         }
 
-        
+
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
@@ -865,13 +901,17 @@ public class ActivityMain extends FragmentActivity {
             time = (TextView) v.findViewById(R.id.time);
 
             assignContact = (Button) v.findViewById(R.id.assignContact);
-
+            showHideAssignContactButton();
+            
             show(App.getContacts().get(extras.get("topic")));
 
+            
+            
             return v;
         }
 
         public void onEventMainThread(Events.ContactUpdated e) {
+            Log.v(this.toString(), "contactUpdated");
             if (e.getContact() == contact)
                 show(e.getContact());
         }

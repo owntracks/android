@@ -103,8 +103,7 @@ public String toString() {
     }
 
     public void setUserImage(Bitmap image) {
-         if(image != null)
-             this.userImage = getRoundedShape(Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true));
+         this.userImage = image != null ? getRoundedShape(Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true)) : null;
     }
     
     public Bitmap getUserImage() {
