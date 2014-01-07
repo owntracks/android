@@ -306,15 +306,6 @@ public class ActivityMain extends FragmentActivity {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    public void contactImageClicked(View v) {
-        View parent = (View) v.getParent();
-        String topic = (String) parent.getTag();
-        Log.v(this.toString(), "topic " + topic);
-        Bundle b = new Bundle();
-        b.putString("topic", topic);
-        fragmentHandler.forward(DetailsFragment.ID, b);
-
-    }
 
     Bundle fragmentBundle;
 
@@ -391,8 +382,11 @@ public class ActivityMain extends FragmentActivity {
             selectedContactName = (TextView) v.findViewById(R.id.title);
             selectedContactLocation = (TextView) v.findViewById(R.id.subtitle);
             selectedContactImage = (ImageView) v.findViewById(R.id.image);
+            
             selectedContactDetails.setVisibility(View.GONE);
 
+            
+            
             mMapView = (MapView) v.findViewById(R.id.mapView);
             mMapView.onCreate(savedInstanceState);
             mMapView.onResume(); // needed to get the map to display immediately
@@ -528,6 +522,16 @@ public class ActivityMain extends FragmentActivity {
             selectedContactImage.setImageBitmap(c.getUserImage());
 
             selectedContactImage.setTag(c.getTopic());
+            selectedContactImage.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    Bundle b = new Bundle();
+                    b.putString("topic", c.getTopic());
+                    fragmentHandler.forward(DetailsFragment.ID, b);
+                }
+            });
+
             selectedContactDetails.setVisibility(View.VISIBLE);
             selectedContactDetails.setOnClickListener(new OnClickListener() {
                 @Override
@@ -730,8 +734,20 @@ public class ActivityMain extends FragmentActivity {
                             fragmentHandler.forward(MapFragment.ID, null);
                             ((MapFragment) fragmentHandler.getCurrentFragment(null)).focus(c);
 
+                            
                         }
                     });
+                    
+                    v.findViewById(R.id.image).setOnClickListener(new OnClickListener() {
+                        
+                        @Override
+                        public void onClick(View v) {
+                            Bundle b = new Bundle();
+                            b.putString("topic", c.getTopic());
+                            fragmentHandler.forward(DetailsFragment.ID, b);
+                        }
+                    });
+
 
                 }
                 v.setTag(c.getTopic());
@@ -878,14 +894,6 @@ public class ActivityMain extends FragmentActivity {
             ServiceProxy.getServiceApplication().linkContact(contact, Long.parseLong(contactId));
           
         }
-        public void onHiddenChanged(boolean hidden) {
-            if(!hidden) {
-                Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
-                show(App.getContacts().get(extras.get("topic")));           
-            }
-        }
-
-
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
