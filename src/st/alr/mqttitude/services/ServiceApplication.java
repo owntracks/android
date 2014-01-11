@@ -440,7 +440,7 @@ public class ServiceApplication implements ProxyableService {
         contactLinkDao.insertOrReplace(cl);        
         
         updateContact(c); 
-        EventBus.getDefault().post(new Events.ContactUpdated(c));
+        EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
     }
     
     
