@@ -618,6 +618,21 @@ public class ActivityMain extends FragmentActivity {
             for (Contact c : ServiceApplication.getContacts().values())
                 updateContactView(c);
         }
+        
+        public void onHiddenChanged(boolean hidden) {
+            if(hidden)
+                onHide();
+            else
+                onShow();
+        }        
+
+        private void onShow() {
+            
+        }
+
+        private void onHide() {
+
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -806,7 +821,8 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onStart() {
             super.onStart();
-            EventBus.getDefault().register(this);
+            EventBus.getDefault().registerSticky(this);
+            Log.v(this.toString(), "subscribed");
         }
 
         void showHideAssignContactButton(){
@@ -833,18 +849,27 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onResume() {
             super.onResume();
-            Log.v(this.toString(), "subscribed");
 
         }
+        
+        public void onHiddenChanged(boolean hidden) {
+            if(hidden)
+                onHide();
+            else
+                onShow();
+        }
+        
 
-        public void show(final Contact c) {
-            Log.v(this.toString(), "show for " + c.getName());
-            contact = c;
-            name.setText(c.getName());
-            topic.setText(c.getTopic());
-            location.setText(c.getLocation().toString());
-            accuracy.setText("" + c.getLocation().getAccuracy());
-            time.setText(App.formatDate(c.getLocation().getDate()));
+        private void onShow() {
+            Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
+            contact = App.getContacts().get(extras.get("topic"));
+            Log.v(this.toString(), "show for " + contact.getName());
+
+            name.setText(contact.getName());
+            topic.setText(contact.getTopic());
+            location.setText(contact.getLocation().toString());
+            accuracy.setText("" + contact.getLocation().getAccuracy());
+            time.setText(App.formatDate(contact.getLocation().getDate()));
 
             assignContact.setOnClickListener(new OnClickListener() {
 
@@ -856,9 +881,13 @@ public class ActivityMain extends FragmentActivity {
 
                 }
             });
+        }
+
+        private void onHide() {
 
         }
 
+        
         // Called when contact is picked
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -882,12 +911,10 @@ public class ActivityMain extends FragmentActivity {
             }
         }  
         
-        // This code is experimental and doesn't work yet
-        private void assignContact(Intent intent){
-            
+
+        private void assignContact(Intent intent){            
             Log.v(this.toString(), "Assign contact to with topic " + contact.getTopic());
 
-          
             Uri result = intent.getData();  
             String contactId = result.getLastPathSegment();
             Log.v(this.toString(), "Got a result: " + result.toString() + " contactId " +contactId);  
@@ -899,7 +926,6 @@ public class ActivityMain extends FragmentActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
 
-            Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
 
             View v = inflater.inflate(R.layout.fragment_details, container, false);
             name = (TextView) v.findViewById(R.id.name);
@@ -907,12 +933,11 @@ public class ActivityMain extends FragmentActivity {
             location = (TextView) v.findViewById(R.id.location);
             accuracy = (TextView) v.findViewById(R.id.accuracy);
             time = (TextView) v.findViewById(R.id.time);
-
             assignContact = (Button) v.findViewById(R.id.assignContact);
             showHideAssignContactButton();
             
-            show(App.getContacts().get(extras.get("topic")));
-
+            
+            onShow();
             
             
             return v;
@@ -921,9 +946,10 @@ public class ActivityMain extends FragmentActivity {
         public void onEventMainThread(Events.ContactUpdated e) {
             Log.v(this.toString(), "contactUpdated");
             if (e.getContact() == contact)
-                show(e.getContact());
+                onShow();
         }
 
+        
         @Override
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
