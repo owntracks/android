@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.db.WaypointDao.Properties;
@@ -87,6 +88,26 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     public GeocodableLocation getLastKnownLocation() {
         return lastKnownLocation;
     }
+    
+    public void onFenceTransition(Intent intent) {
+        int transitionType = LocationClient.getGeofenceTransition(intent);
+        
+        // Test that a valid transition was reported
+        if ( (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)  || (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) ) {
+            List <Geofence> triggerList = LocationClient.getTriggeringGeofences(intent);
+
+            for (int i = 0; i < triggerList.size(); i++) {
+               
+                Waypoint w = waypointDao.queryBuilder().where(Properties.GeofenceId.eq(triggerList.get(i).getRequestId())).limit(1).unique();
+
+                Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
+                
+                if(w != null)
+                    publishGeofenceTransitionEvent(w, transitionType);
+            }
+        }          
+    }
+    
 
     @Override
     public void onLocationChanged(Location arg0) {
@@ -189,35 +210,13 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
                 if (location != null) 
                     onLocationChanged(location);
+                
             } else if (intent.getAction().equals(Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
-                Log.v(this.toString(), "FENCE TRANSITION");
-                Log.v(this.toString(), intent.getExtras()+"");
-                
-                
-                int transitionType =
-                        LocationClient.getGeofenceTransition(intent);
-                // Test that a valid transition was reported
-                if (
-                    (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
-                     ||
-                    (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
-                   ) {
-                    List <Geofence> triggerList =
-                            LocationClient.getTriggeringGeofences(intent);
-
-
-                    for (int i = 0; i < triggerList.size(); i++) {
-                        // Store the Id of each geofence
-                        Log.v(this.toString(), "Geofence triggered: " + triggerList.get(i).getRequestId());
-                        
-                        Waypoint w = waypointDao.queryBuilder().where(Properties.GeofenceId.eq(triggerList.get(i).getRequestId())).limit(1).unique();
-                        Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
-                    }
-                }
-
+                Log.v(this.toString(), "Geofence transition occured");
+                onFenceTransition(intent);
                 
             } else {
-                Log.v(this.toString(), "got bogus intent");
+                Log.v(this.toString(), "Received unknown intent");
             }
         }
 
@@ -255,41 +254,55 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         Log.v(this.toString(), "onDestroy. Disabling location updates");
         disableLocationUpdates();
     }
- 
-
-
+    
+    public void publishGeofenceTransitionEvent(Waypoint w, int transition) {
+        Report r = new Report(getLastKnownLocation());
+        r.setTransition(transition);
+        r.setWaypoint(w);
+        publish(r);
+        
+    }
     
     public void publishLastKnownLocation() {
-        lastPublish = new Date();
-
-        StringBuilder payload = new StringBuilder();
-        Date d = new Date();
-        GeocodableLocation l = getLastKnownLocation();
-        String topic = ActivityPreferences.getPubTopic(true);
-
-        if (topic == null) {
-            changeState(Defaults.State.ServiceLocator.NOTOPIC);
-            return;
-        }
+        publish(null);
+    }
+    
+    public void publish(Report r) {
+        lastPublish = new Date();        
         
-        if (l == null) {
-            changeState(Defaults.State.ServiceLocator.NOLOCATION);
-            return;
-        }
-
+        // Safety checks
         if(ServiceProxy.getServiceBroker() == null) {
             Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
             return;
         }
         
+        if (r == null && getLastKnownLocation() == null) {
+            changeState(Defaults.State.ServiceLocator.NOLOCATION);
+            return;
+        }
+        
+        String topic = ActivityPreferences.getPubTopic(true);
+        if (topic == null) {
+            changeState(Defaults.State.ServiceLocator.NOTOPIC);
+            return;
+        }
+        
+        Report report; 
+        if(r == null)
+            report = new Report(getLastKnownLocation());
+        else
+            report = r;
+        
+                                  
+        if(ActivityPreferences.includeBattery())
+            report.setBattery(App.getBatteryLevel());
 
-        Report r = new Report(l);
         ServiceProxy.getServiceBroker().publish(
                 topic,
-                r.toString(),
+                report.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
                 Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
-                , 20, this, l);
+                , 20, this, report.getLocation());
 
     }
 
@@ -364,26 +377,41 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
     
     public void onEvent(Events.WaypointAdded e) {
-        Log.v(this.toString(), "adding geofence");
 
-        if(e.getWaypoint().getRadius() == null || e.getWaypoint().getRadius() == 0)
+        if(!isWaypointWithGeofence(e.getWaypoint()))
             return;
+        
+        Log.v(this.toString(), "adding geofence");
         
         loadWaypoints();
         setupGeofences();
     }
     
     public void onEvent(Events.WaypointUpdated e) {
-        Log.v(this.toString(), "updating geofence");
+        
+        if(!isWaypointWithGeofence(e.getWaypoint()))
+            return;
 
+        Log.v(this.toString(), "updating geofence");
+        
         removeGeofence(e.getWaypoint());                
         loadWaypoints();
         setupGeofences();
     }
+
+    
+    private boolean isWaypointWithGeofence(Waypoint w) {
+        return w.getRadius() != null && w.getRadius() > 0;
+    }
     
     public void onEvent(Events.WaypointRemoved e) {
+        if(!isWaypointWithGeofence(e.getWaypoint()))
+            return;
+        
         Log.v(this.toString(), "removing geofence");
 
+        
+        
         removeGeofence(e.getWaypoint());
         loadWaypoints();
         setupGeofences();
@@ -397,7 +425,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         
         
         for (Waypoint w : waypoints) {
-            if(w.getRadius() == null || w.getRadius() == 0)
+            if(!isWaypointWithGeofence(w))
                 continue;
             
             if(w.getGeofenceId() == null) {

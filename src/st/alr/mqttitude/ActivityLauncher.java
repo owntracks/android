@@ -100,8 +100,6 @@ public class ActivityLauncher extends FragmentActivity{
     
     private void checkSettings() {
 
-        // check if username, devicename and host is set. 
-
         // until the wizzard works
         settingsOK = true;
         if(!settingsOK)
@@ -213,7 +211,7 @@ public class ActivityLauncher extends FragmentActivity{
     }
     
     public void startActivityWizzard(){
-        startActivityFromClass(ActivityWizzard.class);                   
+        //startActivityFromClass(ActivityWizzard.class);                   
     }
     
     public void startActivityFromClass(Class<?> c) {
