@@ -24,12 +24,12 @@
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
     <string name="preferencesLicensesDismiss">"Dismiss"</string>
     <string name="preferencesNotification">Notifications</string>
-    <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful publishes</string>
-    <string name="preferencesNotificationTickerOnPublishTitle">Ticker on publish</string>
+    <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
+    <string name="preferencesNotificationTickerOnPublishTitle">Ticker on report</string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationTitle">"Notification"</string>
-    <string name="preferencesNotificationLocationSummary">"Display last published location and time"</string>
-    <string name="preferencesNotificationLocationTitle">"Last published location"</string>
+    <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
+    <string name="preferencesNotificationLocationTitle">"Last reported location"</string>
     <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
     <string name="preferencesNotificationGeocoderTitle">"Geocoder"</string>
     <string name="preferencesAdvancedConnectionSummary">"Show advanced connection preferences"</string>
@@ -65,11 +65,11 @@
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
     <string name="error">"Error"</string>
-    <string name="statePublished">"Location published"</string>
+    <string name="statePublished">"Location reported"</string>
     <string name="stateNotopic">"Error: No topic set"</string>
-    <string name="statePublishTimeout">"Error: Publish timeout"</string>
+    <string name="statePublishTimeout">"Error: Timeout"</string>
     <string name="stateLocatingFail">"Error: Unable to acquire location"</string>
-    <string name="statePublishing">"Publishing"</string>
+    <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
     <string name="next">Next</string>
@@ -103,7 +103,7 @@
 <string name="waypointEdit">Edit waypoint</string>
 <string name="waypointAdd">Add waypoint</string>
 
-<string name="actionModeOneSelected">item selected</string>
+<string name="actionModeOneSelected">1 item selected</string>
 <string name="actionModeMoreSelected">items selected</string>
 
     <string-array name="connect_options_security">

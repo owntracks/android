@@ -26,8 +26,13 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
@@ -35,6 +40,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,8 +58,11 @@ public class ActivityWaypoints extends FragmentActivity {
 
         listAdapter = new WaypointAdapter(this);
         
-        listView = (ListView) findViewById(R.id.waypoints);
+        listView = (ListView) findViewById(R.id.waypoints);        
+        listView.addHeaderView(getLayoutInflater().inflate(R.layout.listview_header, null));
+        listView.addFooterView(getLayoutInflater().inflate(R.layout.listview_footer, null));
         listView.setAdapter(listAdapter);
+
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(multiChoiceListener);
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -68,6 +77,7 @@ public class ActivityWaypoints extends FragmentActivity {
         });
      }
     
+
 
     
     @Override
@@ -85,20 +95,19 @@ public class ActivityWaypoints extends FragmentActivity {
     
     
     protected void remove(SparseBooleanArray sba) {
+        int offset = 0;
         for (int i = 0; i < sba.size(); i++) {
-            if (sba.get(i)) {
-                listAdapter.remove(listAdapter.getItem(i));
+            Log.v(this.toString(), "removing");
+
+            if (sba.valueAt(i)) {
+                Log.v(this.toString(), "removing waypoing");
+                listAdapter.remove(listAdapter.getItem(i-offset));
+                offset+=1; // correct offset of next item that will be removed
             }
         }
         
-        //listAdapter.remove(sba);
-        save();
     }
     
-    private void save() {
-    }
-    
-
     public WaypointAdapter getListAdapter() {
         return listAdapter;
     }
@@ -137,7 +146,7 @@ public class ActivityWaypoints extends FragmentActivity {
                     mode.setTitle(getResources().getString(R.string.actionModeOneSelected));
                     break;
                 default:
-                    mode.setTitle(checkedCount + getResources().getString(R.string.actionModeMoreSelected));
+                    mode.setTitle(checkedCount + " " + getResources().getString(R.string.actionModeMoreSelected));
                     break;
             }
         }
@@ -146,6 +155,7 @@ public class ActivityWaypoints extends FragmentActivity {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.discard:
+                    Log.v(this.toString(), "discard");
                     remove(listView.getCheckedItemPositions());
                     mode.finish();
                     return true;

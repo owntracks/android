@@ -27,7 +27,8 @@ public class WaypointAdapter extends BaseAdapter {
         super();
         this.context = c;
         this.dao = ServiceProxy.getServiceApplication().getWaypointDao();
-        this.list = new ArrayList<Waypoint>(dao.loadAll());               
+        this.list = new ArrayList<Waypoint>(dao.loadAll());    
+        notifyDataSetChanged();
     }
     
     static class ViewHolder {

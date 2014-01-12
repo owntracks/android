@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/image"
         android:layout_toRightOf="@+id/image"
-        android:text="You" />
+        android:text="@string/na" />
 
     <TextView
         android:id="@+id/subtitle"

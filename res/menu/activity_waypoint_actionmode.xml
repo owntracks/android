@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/discard"
-        android:icon="@drawable/ic_action_discard"
+        android:icon="@drawable/ic_discard"
         android:orderInCategory="99"
         android:showAsAction="ifRoom"
         android:title="">

@@ -26,7 +26,6 @@ public class ServiceProxy extends ServiceBindable {
     
     @Override
     protected void onStartOnce() {        
-        Log.v(this.toString(), "ServiceApplication starting");
         instantiateService(SERVICE_APP);
         instantiateService(SERVICE_BROKER);
         instantiateService(SERVICE_LOCATOR);

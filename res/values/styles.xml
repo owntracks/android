@@ -21,13 +21,20 @@
 
     <style name="Theme.Mqttitude" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Mqttitude</item>
-       <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item> 
+        <item name="android:actionModeStyle">@style/ActionBar.Solid.Mqttitude.Actionmode</item>
+        <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
         <item name="android:actionBarTabTextStyle">@style/Widget.TabWidget</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
+                        <item name="android:actionModeCloseDrawable">@drawable/ic_accept</item>
+        
+        <!--
+             <item name="android:actionModeCloseDrawable">@drawable/ic_cab_done_holo_dark</item>
+        <item name="android:actionModeCloseButtonStyle">@style/Widget.Sherlock.ActionButton.CloseMode</item>
+        -->
     </style>
 
-    <color name="pressed_mqttitude">#CC2581A5</color>
+    <color name="pressed">#FFE4E4E4</color>
 
     <style name="Widget.TabWidget" parent="@android:style/Widget.TabWidget">
         <item name="android:textAppearance">@style/TextAppearance.Widget.TabWidget</item>
@@ -43,16 +50,24 @@
     </style>
 
     <style name="ActionBar.Solid.Mqttitude" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:actionModeBackground">@drawable/ab_solid</item>
+        
         <item name="android:background">@drawable/ab_solid</item>
         <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
         <item name="android:icon">@drawable/ic_icon</item>
         <item name="android:displayOptions">showHome</item>
     </style>
 
+    <style name="ActionBar.Solid.Mqttitude.Actionmode" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@drawable/ab_solid</item>
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
+        
+    </style>
 
-     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
+    <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_overflow</item>
     </style>
+
     <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
@@ -65,8 +80,6 @@
     <color name="seperator">#d9d9d9</color>
     <color name="border">#d9d9d9</color>
 
-    
-    
     <style name="seperator">
         <item name="android:background">@color/seperator</item>
         <item name="android:visibility">visible</item>
@@ -134,8 +147,5 @@
         <item name="android:textSize">@dimen/card_content</item>
         <item name="android:textColor">@color/darkGrey</item>
     </style>
-
-    
-
 
 </resources>

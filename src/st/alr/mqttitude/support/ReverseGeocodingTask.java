@@ -30,7 +30,6 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
 
     @Override
     protected Void doInBackground(GeocodableLocation... params) {
-        Log.v(this.toString(), "Doing reverse Geocoder lookup of location");
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
         GeocodableLocation l = params[0];
         int r = GEOCODER_NORESULT;
@@ -49,11 +48,9 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
                     r = GEOCODER_RESULT;
                 }
             } catch (IOException e) {
-                Log.v(this.toString(), "Geocoder returned no result");
                 r = GEOCODER_NORESULT;
             }
         } else {
-            Log.v(this.toString(), "Geocoder already has result: " + l.getGeocoder());
             r = GEOCODER_RESULT;
         }
        Message.obtain(mHandler, r, l).sendToTarget();

@@ -17,7 +17,6 @@ public abstract class ServiceBindable extends Service {
     public void onCreate()
     {
         super.onCreate();
-        Log.v(this.TAG, "onCreate");
         binder = new ServiceBinder(this);
     }
     
@@ -25,7 +24,6 @@ public abstract class ServiceBindable extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v(this.TAG, "onBind");
         if(!started) {
             started = true;
             onStartOnce();

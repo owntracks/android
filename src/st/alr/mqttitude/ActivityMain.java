@@ -87,11 +87,8 @@ public class ActivityMain extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Log.v(this.toString(), "getSupportFragmentManager is" + getSupportFragmentManager());
 
         fragmentHandler = new FragmentHandler(getSupportFragmentManager());
-        Log.v(this.toString(), "Instantiated new fragment handler" + fragmentHandler);
-        Log.v(this.toString(), "fragmentId" + fragmentId);
         fragmentHandler.forward(fragmentId, null);
         try {
             MapsInitializer.initialize(this);
@@ -108,7 +105,6 @@ public class ActivityMain extends FragmentActivity {
         private HeadlessFragment store;
 
         public FragmentHandler(FragmentManager fm) {
-            Log.v(this.toString(), "Instantiating new fragmenthandler");
             store = HeadlessFragment.getInstance();
             fragmentManager = fm;
             current = 0;
@@ -124,7 +120,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public Fragment showFragment(int id, Bundle extras) {
-            Log.v(this.toString(), "using fragmentManager" + fragmentManager);
+            //Log.v(this.toString(), "using fragmentManager" + fragmentManager);
 
             Fragment f = getFragment(id, null);
             Fragment prev = getFragment(current, null);
@@ -134,14 +130,14 @@ public class ActivityMain extends FragmentActivity {
 
             if (prev != null && prev.isAdded() && prev.isVisible()) {
                 ft.hide(prev);
-                Log.v(this.toString(), "hiding fragment");
+                //Log.v(this.toString(), "hiding fragment");
             }
 
             if (f.isAdded()) {
-                Log.v(this.toString(), "showing fragment " + f);
+                //Log.v(this.toString(), "showing fragment " + f);
                 ft.show(f);
             } else {
-                Log.v(this.toString(), "adding fragment " + f);
+                //Log.v(this.toString(), "adding fragment " + f);
                 ft.add(R.id.main, f, "f:" + id);
             }
 
