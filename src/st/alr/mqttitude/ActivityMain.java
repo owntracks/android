@@ -240,7 +240,10 @@ public class ActivityMain extends FragmentActivity {
             startActivity(intent1);
             return true;
         } else if (itemId == R.id.menu_report) {
-            ServiceProxy.getServiceLocator().publishLastKnownLocation();
+            if(ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
+                Toast.makeText(this, "No current location is available", Toast.LENGTH_SHORT).show();
+            else            
+                ServiceProxy.getServiceLocator().publishLastKnownLocation();
             return true;
         } else if (itemId == R.id.menu_share) {
             this.share(null);
@@ -657,6 +660,7 @@ public class ActivityMain extends FragmentActivity {
                         f.focusCurrentLocation();
 
                     } else {
+                        Toast.makeText(getActivity(), "No current location is available", Toast.LENGTH_SHORT).show();
                         Log.v(this.toString(), "No current location available");
                     }
                 }
