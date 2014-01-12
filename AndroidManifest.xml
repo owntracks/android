@@ -2,14 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="st.alr.mqttitude"
     android:versionCode="0405"
-    android:versionName="0.4.05" >
+    android:versionName="0.4.05	" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="11"
         android:targetSdkVersion="19" />
 
     <permission
