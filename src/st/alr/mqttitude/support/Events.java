@@ -3,6 +3,7 @@ package st.alr.mqttitude.support;
 
 import java.util.Date;
 
+import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 
@@ -13,6 +14,43 @@ public class Events {
 
  
 
+    public static class WaypointUpdated extends E{
+        Waypoint w;
+        
+        public WaypointUpdated(Waypoint w) {
+            super();
+            this.w = w;
+        }
+        public Waypoint getWaypoint() {
+            return w;
+        }
+
+    }
+
+    public static class WaypointAdded extends E{
+        Waypoint w;
+        public WaypointAdded(Waypoint w) {
+            super();
+            this.w = w;
+        }
+        public Waypoint getWaypoint() {
+            return w;
+        }
+
+    }
+    public static class WaypointRemoved extends E{
+        Waypoint w;
+        public WaypointRemoved(Waypoint w) {
+            super();
+            this.w = w;
+        }
+        public Waypoint getWaypoint() {
+            return w;
+        }
+
+    }
+
+    
     public static abstract class E {
         Date date;
         public E() {

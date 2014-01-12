@@ -74,7 +74,7 @@ public class ActivityMain extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         startService(new Intent(this, ServiceProxy.class));
-        int fragmentId = FriendsFragment.ID;
+        int fragmentId = ContactsFragment.ID;
         if (savedInstanceState != null)
         {
             // delete previously stored fragments after orientation change (see
@@ -189,8 +189,8 @@ public class ActivityMain extends FragmentActivity {
             Fragment f = fragments[id];
 
             if (f == null) {
-                if (id == FriendsFragment.ID)
-                    f = FriendsFragment.getInstance(extras);
+                if (id == ContactsFragment.ID)
+                    f = ContactsFragment.getInstance(extras);
                 else if (id == MapFragment.ID)
                     f = MapFragment.getInstance(extras);
                 else if (id == DetailsFragment.ID)
@@ -244,6 +244,10 @@ public class ActivityMain extends FragmentActivity {
             return true;
         } else if (itemId == R.id.menu_share) {
             this.share(null);
+            return true;
+        } else if (itemId == R.id.menu_waypoints) {
+            Intent intent1 = new Intent(this, ActivityWaypoints.class);
+            startActivity(intent1);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -574,8 +578,7 @@ public class ActivityMain extends FragmentActivity {
 
     }
 
-    @SuppressLint("NewApi")
-    public static class FriendsFragment extends Fragment implements StaticHandlerInterface {
+    public static class ContactsFragment extends Fragment implements StaticHandlerInterface {
         public static final int ID = 1;
         private LinearLayout friendsListView;
         private Button currentLoc;
@@ -585,9 +588,9 @@ public class ActivityMain extends FragmentActivity {
 
         // private static FriendsFragment instance;
 
-        public static FriendsFragment getInstance(Bundle extras) {
+        public static ContactsFragment getInstance(Bundle extras) {
             // if (instance == null) {
-            FriendsFragment instance = new FriendsFragment();
+            ContactsFragment instance = new ContactsFragment();
             instance.setArguments(extras);
             // }
             return instance;
@@ -729,7 +732,7 @@ public class ActivityMain extends FragmentActivity {
                                                                // the new view
                                                                // again
                 } else {
-                    v = getActivity().getLayoutInflater().inflate(R.layout.friend_list_item, null,
+                    v = getActivity().getLayoutInflater().inflate(R.layout.row_contact, null,
                             false);
                     c.setView(v);
                     v.setOnClickListener(new OnClickListener() {

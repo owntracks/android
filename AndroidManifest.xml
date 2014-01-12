@@ -46,7 +46,12 @@
             android:configChanges="orientation"
             android:label="Preferences" >
         </activity>
-
+        <activity
+            android:name="st.alr.mqttitude.ActivityWaypoints"
+            android:configChanges="orientation"
+            android:label="Waypoints" >
+        </activity>
+        
         <service
             android:name="st.alr.mqttitude.services.ServiceProxy"
             android:exported="false" >
@@ -75,18 +80,7 @@
             android:name="st.alr.mqttitude.ActivityWizzard"
             android:label="@string/title_activity_activity_wizzard" >
         </activity>
-        <activity
-            android:name="st.alr.mqttitude.testListActivity"
-            android:label="@string/title_test_list" >
-        </activity>
-        <activity
-            android:name="st.alr.mqttitude.testDetailActivity"
-            android:label="@string/title_test_detail"
-            android:parentActivityName=".testListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".testListActivity" />
-        </activity>
+
 
         <receiver android:name="st.alr.mqttitude.support.BootCompleteReceiver"         android:enabled="true"
         android:exported="true"

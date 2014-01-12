@@ -19,6 +19,7 @@ import st.alr.mqttitude.db.ContactLinkDao;
 import st.alr.mqttitude.db.DaoMaster;
 import st.alr.mqttitude.db.DaoMaster.DevOpenHelper;
 import st.alr.mqttitude.db.DaoSession;
+import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
@@ -64,6 +65,7 @@ public class ServiceApplication implements ProxyableService {
     private DaoSession daoSession;
     private DaoMaster daoMaster;
     private ContactLinkDao contactLinkDao;
+    private WaypointDao waypointDao;
 
     
     @Override
@@ -76,6 +78,7 @@ public class ServiceApplication implements ProxyableService {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         contactLinkDao = daoSession.getContactLinkDao();
+        waypointDao = daoSession.getWaypointDao();
         
         
         
@@ -112,6 +115,10 @@ public class ServiceApplication implements ProxyableService {
         
         
 
+    }
+
+    public WaypointDao getWaypointDao() {
+        return waypointDao;
     }
 
     public ContactLinkDao getContactLinkDao() {
