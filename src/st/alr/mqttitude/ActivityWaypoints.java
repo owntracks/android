@@ -70,7 +70,7 @@ public class ActivityWaypoints extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 
-                AddDialog addDialog = AddDialog.newInstance(position);
+                AddDialog addDialog = AddDialog.newInstance(position-1);
                 getFragmentManager().beginTransaction().add(addDialog, "addDialog").commit();
 
             }
