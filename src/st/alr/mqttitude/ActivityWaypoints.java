@@ -75,6 +75,9 @@ public class ActivityWaypoints extends FragmentActivity {
 
             }
         });
+        if(listAdapter.getCount() == 0) 
+            listView.setVisibility(View.GONE);
+        
      }
     
 
@@ -87,6 +90,10 @@ public class ActivityWaypoints extends FragmentActivity {
     
     protected void add(Waypoint w){
         listAdapter.add(w);
+         
+        if(listView.getVisibility() == View.GONE)
+            listView.setVisibility(View.VISIBLE);
+
     }
     
     protected void update(Waypoint w){
@@ -94,18 +101,66 @@ public class ActivityWaypoints extends FragmentActivity {
     }
     
     
-    protected void remove(SparseBooleanArray sba) {
-        int offset = 0;
-        for (int i = 0; i < sba.size(); i++) {
-            Log.v(this.toString(), "removing");
+    protected void remove() {
+        final SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 
-            if (sba.valueAt(i)) {
-                Log.v(this.toString(), "removing waypoing");
-                listAdapter.remove(listAdapter.getItem(i-offset));
-                offset+=1; // correct offset of next item that will be removed
+        if (checkedItems != null) {
+            final int checkedItemsCount = checkedItems.size();
+
+            // Lets get the position of the view to scroll to before the first checked 
+            // item to restore scroll position
+            //          
+            int topPosition = checkedItems.keyAt(0) - 1;            
+
+            listView.setAdapter(null);
+            for (int i = checkedItemsCount - 1; i >= 0 ; i--) {
+                // This tells us the item position we are looking at
+                // --
+                final int position = checkedItems.keyAt(i);
+
+                // This tells us the item status at the above position
+                // --
+                final boolean isChecked = checkedItems.valueAt(i);
+                if (isChecked) {
+                    listAdapter.remove(listAdapter.getItem(position-1));
+
+                }               
             }
+            listView.setAdapter(listAdapter);
+            listAdapter.notifyDataSetChanged();
+            //if topPosition is -1 then item zero is positioned by default.
+            //listView.setSelection(topPosition);
         }
+
         
+//        
+//        
+//        SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
+//
+//        Log.v(this.toString(), "sba size " +checkedItemPositions.size());
+//
+//        Log.v(this.toString(), "count "  + listAdapter.getCount());
+//
+//        for (int i=1;i<=listAdapter.getCount();i++){
+//            Log.v(this.toString(), "i " + i);
+//            if (checkedItemPositions.get(i-1)==true)
+//            {
+//                Log.v(this.toString(), "removing index "  + (i-1));
+//                listAdapter.remove(listAdapter.getItem(i-1));
+//
+//            } 
+//
+//        }
+//        for (Integer i = 0; i < listAdapter.getCount(); i++) {
+//
+//            if (sba.valueAt(i)) {
+//                Log.v(this.toString(), "removing " + i);
+//
+//                listAdapter.remove(listAdapter.getItem(i));
+//            }
+//        }
+        if(listAdapter.getCount() == 0) 
+            listView.setVisibility(View.GONE);
     }
     
     public WaypointAdapter getListAdapter() {
@@ -156,7 +211,7 @@ public class ActivityWaypoints extends FragmentActivity {
             switch (item.getItemId()) {
                 case R.id.discard:
                     Log.v(this.toString(), "discard");
-                    remove(listView.getCheckedItemPositions());
+                    remove();
                     mode.finish();
                     return true;
                 default:
