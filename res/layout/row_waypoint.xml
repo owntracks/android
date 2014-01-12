@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="@string/na" />
-
+        android:text="description" />
     <TextView
         android:id="@+id/location"
         style="@style/card_content"
@@ -24,6 +23,20 @@
         android:layout_below="@+id/description"
         android:paddingTop="-5dp"
         android:scrollHorizontally="false"
-        android:text="@string/na" />
+        android:text="location" />
     
+    <TextView
+        android:id="@+id/meta"
+        style="@style/card_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignStart="@id/description"
+        android:layout_below="@+id/location"
+        android:paddingTop="-5dp"
+        android:scrollHorizontally="false"
+        android:text="meta" />
+    
+    
+
 </RelativeLayout>
