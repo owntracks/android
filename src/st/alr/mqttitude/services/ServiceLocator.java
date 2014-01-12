@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
+import st.alr.mqttitude.db.WaypointDao.Properties;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.model.Report;
 import st.alr.mqttitude.preferences.ActivityPreferences;
@@ -208,6 +209,9 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                     for (int i = 0; i < triggerList.size(); i++) {
                         // Store the Id of each geofence
                         Log.v(this.toString(), "Geofence triggered: " + triggerList.get(i).getRequestId());
+                        
+                        Waypoint w = waypointDao.queryBuilder().where(Properties.GeofenceId.eq(triggerList.get(i).getRequestId())).limit(1).unique();
+                        Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
                     }
                 }
 
@@ -441,7 +445,11 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     private void removeGeofence(Waypoint w) {
         ArrayList<String> l = new ArrayList<String>();
         l.add(w.getGeofenceId());
-        removeGeofences(l);        
+        removeGeofences(l);      
+
+        w.setGeofenceId(null);
+        waypointDao.update(w);
+
     }
     
     private void removeGeofences(List<String> ids) {
@@ -457,6 +465,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 Log.v(this.toString(), "geofence "+ arg1[i] +" added");
 
             }
+            Toast.makeText(context, "Geofences added",Toast.LENGTH_SHORT).show();
+
         } else {
             Toast.makeText(context, "Unable to add Geofence",Toast.LENGTH_SHORT).show();
             Log.v(this.toString(), "geofence adding failed");        }
@@ -476,7 +486,9 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     @Override
     public void onRemoveGeofencesByRequestIdsResult(int arg0, String[] arg1) {
         if (LocationStatusCodes.SUCCESS == arg0) {
-            Log.v(this.toString(), "geofences "+ arg1 +"removed");
+            for (int i = 0; i < arg1.length; i++) {
+                Log.v(this.toString(), "geofence "+ arg1[i] +" removed");
+            }
         } else {
             Log.v(this.toString(), "geofence removing failed");        }
         

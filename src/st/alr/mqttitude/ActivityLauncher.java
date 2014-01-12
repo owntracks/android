@@ -84,7 +84,7 @@ public class ActivityLauncher extends FragmentActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v(this.toString(), "onResume");
+        //Log.v(this.toString(), "onResume");
 
         checkPlayServices();
         
@@ -112,7 +112,6 @@ public class ActivityLauncher extends FragmentActivity{
     private void checkPlayServices() {
 
         if (ServiceApplication.checkPlayServices()) {
-            Log.d("Location Updates", "Google Play services is available.");
             playServicesOk  = true;
             
         } else {
@@ -126,7 +125,7 @@ public class ActivityLauncher extends FragmentActivity{
                 Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
     
                 if (errorDialog != null) {
-                    Log.v(this.toString(), "Showing error recovery dialog");
+//                    Log.v(this.toString(), "Showing error recovery dialog");
                     ErrorDialogFragment errorFragment = new ErrorDialogFragment();
                     errorFragment.setDialog(errorDialog);
                      
