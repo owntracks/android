@@ -225,6 +225,10 @@ public class ActivityMain extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
+        if(!App.isDebugBuild()) {
+            MenuItem item = menu.findItem(R.id.menu_waypoints);
+            item.setVisible(false);
+        }
         return true;
     }
 

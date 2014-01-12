@@ -3,6 +3,7 @@ package st.alr.mqttitude.support;
 import android.content.Context;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.services.ServiceApplication;
 
 public class Defaults {
@@ -65,7 +66,26 @@ public class Defaults {
     public static final String SETTINGS_KEY_INCLUE_BATTERY = "includeBattery";
     public static final String SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE = "contactsLinkCloudStorageEnabled";
 
-
+    public static class TransitionType {
+        public static String toString(int type, Context c) {
+            int id; 
+            switch (type) {
+                case 0:
+                    id = R.string.transitionEnter;
+                    break;
+                case 1:
+                    id = R.string.transitionLeave;
+                    break;                    
+                case 2:
+                    id = R.string.transitionBoth;
+                    break;
+                default: 
+                    id = R.string.transitionEnter;
+            }
+            return c.getString(id);
+        }
+    }
+    
     public static class State {
         public static enum ServiceBroker {
             INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR

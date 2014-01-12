@@ -8,6 +8,7 @@ import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import android.app.Activity;
 import android.content.Context;
@@ -34,9 +35,8 @@ public class WaypointAdapter extends BaseAdapter {
     static class ViewHolder {
         
         public TextView description;
-        public TextView transitionType;
         public TextView location;
-        public TextView radius;
+        public TextView meta;
 
       }
 
@@ -64,7 +64,7 @@ public class WaypointAdapter extends BaseAdapter {
           rowView = inflater.inflate(R.layout.row_waypoint, null);
           ViewHolder viewHolder = new ViewHolder();
           viewHolder.description = (TextView) rowView.findViewById(R.id.description);
-        //  viewHolder.transitionType = (TextView) rowView.findViewById(R.id.transitionType);
+          viewHolder.meta = (TextView) rowView.findViewById(R.id.meta);
           viewHolder.location = (TextView) rowView.findViewById(R.id.location);
 
           rowView.setTag(viewHolder);
@@ -74,8 +74,16 @@ public class WaypointAdapter extends BaseAdapter {
         
         ViewHolder holder = (ViewHolder) rowView.getTag();
         holder.description.setText(w.getDescription());
-       // holder.transitionType.setText(w.getTransitionType());
         holder.location.setText(w.getLatitude() + ":" + w.getLongitude());
+        
+        if(w.getRadius() != null && w.getRadius() > 0) {
+            holder.meta.setText(context.getString(R.string.reportOn) + " " + Defaults.TransitionType.toString(w.getTransitionType(), context));
+            holder.meta.setVisibility(View.VISIBLE);
+        } else {
+            holder.meta.setVisibility(View.GONE);
+        }
+        
+        
         //holder.radius.setText(w.getRadius().toString());
 
         return rowView;
