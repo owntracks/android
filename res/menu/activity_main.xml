@@ -1,29 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-       	<item
+    <item
         android:id="@+id/menu_report"
-        android:orderInCategory="1"
-        android:title="@string/publish"
         android:icon="@drawable/ic_upload"
+        android:orderInCategory="1"
         android:showAsAction="ifRoom"
-        
-         />
-    
-       	<item
+        android:title="@string/publish"/>
+    <item
         android:id="@+id/menu_share"
-        android:orderInCategory="3"
-        android:title="Share"
         android:icon="@drawable/ic_share"
+        android:orderInCategory="3"
         android:showAsAction="never"
-        
-         />
-       	
+        android:title="Share"/>
+    <item
+        android:id="@+id/menu_waypoints"
+        android:orderInCategory="4"
+        android:showAsAction="never"
+        android:title="Waypoints"/>
     <item
         android:id="@+id/menu_preferences"
         android:orderInCategory="100"
         android:title="Preferences"/>
 
 </menu>
-
-
-

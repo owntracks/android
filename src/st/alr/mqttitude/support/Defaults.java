@@ -52,6 +52,7 @@ public class Defaults {
     public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "st.alr.mqttitude.intent.PUB_LASTKNOWN";
     public static final String INTENT_ACTION_PUBLICH_PING = "st.alr.mqttitude.intent.PUB_PING";
     public static final String INTENT_ACTION_LOCATION_CHANGED = "st.alr.mqttitude.intent.LOCATION_CHANGED";
+    public static final String INTENT_ACTION_FENCE_TRANSITION = "st.alr.mqttitude.intent.FENCE_TRANSITION";
 
     public static final String VALUE_TOPIC_SUB = "mqttitude/+/+";
     
@@ -67,7 +68,7 @@ public class Defaults {
 
     public static class State {
         public static enum ServiceBroker {
-            INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED_WAITINGFORINTERNET, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
+            INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
         }
         public static String toString(ServiceBroker state, Context c) {
             int id; 

@@ -150,12 +150,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         }
 
         // Don't do anything unless we're disconnected
+
         if (isDisconnected())
         {
             Log.v(this.toString(), "handleStart: !isConnected");
             // Check if there is a data connection
-            if (isOnline(true))
+            if (isOnline())
             {
+                Log.v(this.toString(), "handleStart: isOnline");
+
                 if (connect())
                 {
                     Log.v(this.toString(), "handleStart: connect sucessfull");
@@ -165,10 +168,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             else
             {
                 Log.e(this.toString(), "handleStart: !isOnline");
-                changeState(Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET);
+                changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
             }
         } else {
-            Log.d(this.toString(), "handleStart: already connected");
+            Log.d(this.toString(), "handleStart: isConnected");
 
         }
     }
@@ -177,8 +180,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         Log.v(this.toString(), "disconnect check: " + state);
         return state == Defaults.State.ServiceBroker.INITIAL 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED 
-                || state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT 
-                || state == Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET 
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT  
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR;
     }
 
@@ -409,9 +412,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
         wl.acquire();
 
-        if (!isOnline(true))
+        if (!isOnline())
         {
-            changeState(Defaults.State.ServiceBroker.DISCONNECTED_WAITINGFORINTERNET);
+            changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
         }
         else
         {
@@ -448,7 +451,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         EventBus.getDefault().postSticky(new Events.StateChanged.ServiceBroker(newState, e));
     }
 
-    private boolean isOnline(boolean shouldCheckIfOnWifi)
+    private boolean isOnline()
     {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(ServiceProxy.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -476,7 +479,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     }
 
     private boolean isBackgroundDataEnabled() {
-        return isOnline(false);
+        return isOnline();
     }
 
     /**
@@ -565,7 +568,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         }
         
         
-        if (!isOnline(false) || !isConnected()) {
+        if (!isOnline() || !isConnected()) {
             Log.d(this.toString(), "pub deferred");
             
             deferPublish(p);
@@ -707,8 +710,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTTitude");
             wl.acquire();
 
-            if (isOnline(true) && !isConnected() && !isConnecting()) {
-                Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart(null, -1)");
+            if (isOnline() && !isConnected() && !isConnecting()) {
+                Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart");
                 doStart();
             
             }
@@ -722,10 +725,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         public void onReceive(Context context, Intent intent)
         {
 
-            if (isOnline(true) && !isConnected() && !isConnecting()) {
-                Log.v(this.toString(), "ping: isOnline()=" + isOnline(true)  + ", isConnected()=" + isConnected());
+            if (isOnline() && !isConnected() && !isConnecting()) {
+                Log.v(this.toString(), "ping: isOnline()=" + isOnline()  + ", isConnected()=" + isConnected());
                 doStart();
-            } else if (!isOnline(true)) {
+            } else if (!isOnline()) {
                 Log.d(this.toString(), "ping: Waiting for network to come online again");
             } else {            
                 try

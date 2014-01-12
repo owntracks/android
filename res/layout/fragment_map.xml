@@ -22,7 +22,7 @@
         android:paddingTop="@dimen/default_vertical_spacing_half"
         android:paddingBottom="@dimen/default_vertical_spacing_half">
         
-        <include layout="@layout/friend_list_item" />
+        <include layout="@layout/row_contact" />
     </LinearLayout>
 
 </RelativeLayout>

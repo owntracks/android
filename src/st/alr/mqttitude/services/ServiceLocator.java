@@ -1,14 +1,20 @@
 
 package st.alr.mqttitude.services;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
+import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.model.Report;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,19 +22,23 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationStatusCodes;
 
 import de.greenrobot.event.EventBus;
 
 public class ServiceLocator implements ProxyableService, MqttPublish, 
         GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
+        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener,  LocationClient.OnRemoveGeofencesResultListener,  LocationClient.OnAddGeofencesResultListener {
     
     private SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
@@ -42,14 +52,16 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     private GeocodableLocation lastKnownLocation;
     private Date lastPublish;
-    
-
+    private List<Waypoint> waypoints;
+    private WaypointDao waypointDao;
     
 
     public void onCreate(ServiceProxy p) {
        
 
                 context = p;
+                waypointDao = ServiceProxy.getServiceApplication().getWaypointDao();
+                loadWaypoints();
         
                 this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -109,6 +121,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         Log.v(this.toString(), "Connected");
         setupLocationRequest();
         requestLocationUpdates();
+        
+        setupGeofences();
     }
 
     @Override
@@ -174,8 +188,33 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
                 if (location != null) 
                     onLocationChanged(location);
-            }
+            } else if (intent.getAction().equals(Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
+                Log.v(this.toString(), "FENCE TRANSITION");
+                Log.v(this.toString(), intent.getExtras()+"");
+                
+                
+                int transitionType =
+                        LocationClient.getGeofenceTransition(intent);
+                // Test that a valid transition was reported
+                if (
+                    (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
+                     ||
+                    (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
+                   ) {
+                    List <Geofence> triggerList =
+                            LocationClient.getTriggeringGeofences(intent);
 
+
+                    for (int i = 0; i < triggerList.size(); i++) {
+                        // Store the Id of each geofence
+                        Log.v(this.toString(), "Geofence triggered: " + triggerList.get(i).getRequestId());
+                    }
+                }
+
+                
+            } else {
+                Log.v(this.toString(), "got bogus intent");
+            }
         }
 
         return 0;
@@ -316,5 +355,130 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         return getUpdateIntervall() * 60 * 1000;
     }
         
+    public void loadWaypoints() {
+        this.waypoints = waypointDao.loadAll();
+    }
+    
+    public void onEvent(Events.WaypointAdded e) {
+        Log.v(this.toString(), "adding geofence");
+
+        if(e.getWaypoint().getRadius() == null || e.getWaypoint().getRadius() == 0)
+            return;
+        
+        loadWaypoints();
+        setupGeofences();
+    }
+    
+    public void onEvent(Events.WaypointUpdated e) {
+        Log.v(this.toString(), "updating geofence");
+
+        removeGeofence(e.getWaypoint());                
+        loadWaypoints();
+        setupGeofences();
+    }
+    
+    public void onEvent(Events.WaypointRemoved e) {
+        Log.v(this.toString(), "removing geofence");
+
+        removeGeofence(e.getWaypoint());
+        loadWaypoints();
+        setupGeofences();
+    }
+    
+    private void setupGeofences() {
+        if(!ready)
+            return;
+        List<Geofence> fences = new ArrayList<Geofence>();
+
+        
+        
+        for (Waypoint w : waypoints) {
+            if(w.getRadius() == null || w.getRadius() == 0)
+                continue;
+            
+            if(w.getGeofenceId() == null) {
+                w.setGeofenceId(UUID.randomUUID().toString());
+                waypointDao.update(w);
+            } 
+            
+            int transitionType;
+            switch (w.getTransitionType()) {
+                case 0: 
+                    transitionType = Geofence.GEOFENCE_TRANSITION_ENTER;
+                    break;
+                case 1:
+                    transitionType = Geofence.GEOFENCE_TRANSITION_EXIT;
+                    break;
+                case 2: 
+                    transitionType = Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_ENTER;
+                    break; 
+                default: 
+                    transitionType = Geofence.GEOFENCE_TRANSITION_ENTER;
+            }
+            Log.v(this.toString() , "id " + w.getGeofenceId());
+            Geofence geofence = new Geofence.Builder()
+                    .setRequestId(w.getGeofenceId())
+                    .setTransitionTypes(transitionType)
+                    .setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius()).setExpirationDuration(Geofence.NEVER_EXPIRE).build();            
+            
+            fences.add(geofence);            
+        }
+        
+        if(fences.size() == 0) {
+            Log.v(this.toString(), "no geofences to add");
+            return;
+        }
+        
+        Log.v(this.toString(), "adding geofences");
+        mLocationClient.addGeofences(fences, ServiceProxy.getPendingIntentForService(context,
+                ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_FENCE_TRANSITION, null), this);
+
+
+                        
+        
+    }
+    
+    private void removeGeofence(Waypoint w) {
+        ArrayList<String> l = new ArrayList<String>();
+        l.add(w.getGeofenceId());
+        removeGeofences(l);        
+    }
+    
+    private void removeGeofences(List<String> ids) {
+        mLocationClient.removeGeofences(ids, this);
+    }
+    
     public void onEvent(Object event){}
+
+    @Override
+    public void onAddGeofencesResult(int arg0, String[] arg1) {
+        if (LocationStatusCodes.SUCCESS == arg0) {
+            for (int i = 0; i < arg1.length; i++) {
+                Log.v(this.toString(), "geofence "+ arg1[i] +" added");
+
+            }
+        } else {
+            Toast.makeText(context, "Unable to add Geofence",Toast.LENGTH_SHORT).show();
+            Log.v(this.toString(), "geofence adding failed");        }
+        
+        
+    }
+
+    @Override
+    public void onRemoveGeofencesByPendingIntentResult(int arg0, PendingIntent arg1) {
+        if (LocationStatusCodes.SUCCESS == arg0) {
+            Log.v(this.toString(), "geofence removed");
+        } else {
+            Log.v(this.toString(), "geofence removing failed");        }
+
+    }
+
+    @Override
+    public void onRemoveGeofencesByRequestIdsResult(int arg0, String[] arg1) {
+        if (LocationStatusCodes.SUCCESS == arg0) {
+            Log.v(this.toString(), "geofences "+ arg1 +"removed");
+        } else {
+            Log.v(this.toString(), "geofence removing failed");        }
+        
+    }
 }

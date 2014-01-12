@@ -92,6 +92,19 @@
 <string name="preferencesAutostartSummary">Automatically start on device boot</string>
 <string name="preferencesAutostartTitle">Autostart</string>
 
+<string name="description">Description</string>
+<string name="latitude">Latitude</string>
+<string name="longitude">Longitude</string>
+<string name="radius">Radius</string>
+<string name="transitionType">Transition</string>
+<string name="notification">Notification</string>
+<string name="notificationTitle">Notification title</string>
+
+<string name="waypointEdit">Edit waypoint</string>
+<string name="waypointAdd">Add waypoint</string>
+
+<string name="actionModeOneSelected">item selected</string>
+<string name="actionModeMoreSelected">items selected</string>
 
     <string-array name="connect_options_security">
         <item>None</item>
@@ -113,6 +126,13 @@
         <item>"2"</item>
     </string-array>
 
+    <string-array name="transitionType_readable">
+        <item>"Enter"</item>
+        <item>"Leave"</item>
+        <item>"Both"</item>        
+    </string-array>
+    
+    
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
     <string name="title_activity_activity_wizzard">Wizzard</string>
     <string name="title_test_list">tests</string>
