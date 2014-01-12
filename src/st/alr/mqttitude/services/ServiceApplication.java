@@ -42,6 +42,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
+import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -376,18 +377,21 @@ public class ServiceApplication implements ProxyableService {
             Log.v(this.toString(), "contactId for " + c.getTopic() + " was resolved to " + contactId);
         }
         
-        Cursor cursor = context.getContentResolver().query(CommonDataKinds.Phone.CONTENT_URI, null, CommonDataKinds.Phone.CONTACT_ID +" = ?", new String[]{contactId+""}, null);
-        while (cursor.moveToNext()) 
-        {            
-            Bitmap image = Contact.resolveImage(context.getContentResolver(), contactId); 
-            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            
-            Log.v(this.toString(), "Resolved display Name: " + displayName + ", image: " + image + " for topic " + c.getTopic());
-            c.setName(displayName);
-            c.setUserImage(image);
-            found = true;
-            break;
-        } 
+        Cursor cursor = context.getContentResolver().query(RawContacts.CONTENT_URI, null, ContactsContract.Data.CONTACT_ID +" = ?", new String[]{contactId+""}, null);
+        if(!cursor.isAfterLast()) {
+
+            while (cursor.moveToNext()) 
+            {            
+                Bitmap image = Contact.resolveImage(context.getContentResolver(), contactId); 
+                String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                
+                Log.v(this.toString(), "Resolved display Name: " + displayName + ", image: " + image + " for topic " + c.getTopic());
+                c.setName(displayName);
+                c.setUserImage(image);
+                found = true;
+                break;
+            } 
+        }
 
         if(!found)
             setContactImageAndName(c, null, null);

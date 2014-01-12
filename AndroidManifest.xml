@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="st.alr.mqttitude"
-    android:versionCode="0405"
-    android:versionName="0.4.05	" >
+    android:versionCode="0406"
+    android:versionName="0.4.06	" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -23,10 +23,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- To locate the device -->
     <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- To prevent the device from sleeping while hanlding MQTT traffic -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Mqttitude with IM name set to the topic)-->
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />    <!-- To save contact links -->
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
-    
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Mqttitude with IM name set to the topic) -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- To save contact links -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
+
     <application
         android:name="st.alr.mqttitude.App"
         android:allowBackup="true"
@@ -51,19 +51,12 @@
             android:configChanges="orientation"
             android:label="Waypoints" >
         </activity>
-        
+
         <service
             android:name="st.alr.mqttitude.services.ServiceProxy"
             android:exported="false" >
         </service>
 
-        <!--
-             <receiver
-            android:name="st.alr.mqttitude.support.BackgroundPublishReceiver"
-            android:enabled="true" >
-            <action android:name="st.alr.mqttitude.UPDATE" />
-        </receiver>
-        -->
         <activity
             android:name="st.alr.mqttitude.ActivityLauncher"
             android:configChanges="orientation|keyboardHidden"
@@ -76,15 +69,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="st.alr.mqttitude.ActivityWizzard"
-            android:label="@string/title_activity_activity_wizzard" >
-        </activity>
 
-
-        <receiver android:name="st.alr.mqttitude.support.BootCompleteReceiver"         android:enabled="true"
-        android:exported="true"
-            >
+        <receiver
+            android:name="st.alr.mqttitude.support.BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

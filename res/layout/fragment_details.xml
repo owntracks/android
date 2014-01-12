@@ -5,99 +5,91 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/default_vertical_spacing_half" >
+        android:layout_marginTop="@dimen/default_vertical_spacing"
+        android:orientation="vertical" >
 
-        <LinearLayout
-            style="@style/card"
+        <TextView
+            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:layout_marginTop="@dimen/default_vertical_spacing_half"
+            android:text="Name" />
 
-            <TextView
-                style="@style/card_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_vertical_spacing_half"
-                android:text="Name" />
+        <TextView
+            android:id="@+id/name"
+            style="@style/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
 
-            <TextView
-                android:id="@+id/name"
-                style="@style/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/na" />
+        <TextView
+            style="@style/card_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_vertical_spacing_half"
+            android:text="Topic" />
 
-            <TextView
-                style="@style/card_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_vertical_spacing_half"
-                android:text="Topic" />
+        <TextView
+            android:id="@+id/topic"
+            style="@style/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
 
-            <TextView
-                android:id="@+id/topic"
-                style="@style/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/na" />
+        <TextView
+            style="@style/card_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_vertical_spacing_half"
+            android:text="Location" />
 
-            <TextView
-                style="@style/card_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_vertical_spacing_half"
-                android:text="Location" />
+        <TextView
+            android:id="@+id/location"
+            style="@style/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/na" />
 
-            <TextView
-                android:id="@+id/location"
-                style="@style/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/na" />
+        <TextView
+            style="@style/card_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_vertical_spacing_half"
+            android:text="Accuracy" />
 
-            <TextView
-                style="@style/card_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_vertical_spacing_half"
-                android:text="Accuracy" />
+        <TextView
+            android:id="@+id/accuracy"
+            style="@style/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0" />
 
-            <TextView
-                android:id="@+id/accuracy"
-                style="@style/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="0" />
+        <TextView
+            style="@style/card_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_vertical_spacing_half"
+            android:text="Last report" />
 
-            <TextView
-                style="@style/card_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_vertical_spacing_half"
-                android:text="Last report" />
+        <TextView
+            android:id="@+id/time"
+            style="@style/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_vertical_spacing"
+            android:text="@string/na" />
 
-            <TextView
-                android:id="@+id/time"
-                style="@style/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/na"
-                                android:layout_marginBottom="@dimen/default_vertical_spacing"
-                 />
-
-            <Button
-                android:id="@+id/assignContact"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/default_horizontal_spacing"
-                android:visibility="gone"
-                android:layout_marginBottom="@dimen/default_vertical_spacing"
-
-                android:text="Assign contact" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/assignContact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_vertical_spacing"
+            android:layout_marginLeft="@dimen/default_horizontal_spacing"
+            android:text="Assign contact"
+            android:visibility="gone" />
     </LinearLayout>
 
 </ScrollView>

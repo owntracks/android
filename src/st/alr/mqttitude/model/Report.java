@@ -1,27 +1,41 @@
 package st.alr.mqttitude.model;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationClient;
+
 import st.alr.mqttitude.App;
+import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.preferences.ActivityPreferences;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 
 public class Report {
     GeocodableLocation location;
-    int event;
-    public static final int EVENT_NONE = 0;
-    public static final int EVENT_ENTER = 1;
-    public static final int EVENT_LEAVE = 2;
+    Waypoint waypoint;
+    int transition;
+    int battery;
+    
     
     public Report(GeocodableLocation l){
-        this(l, EVENT_NONE);
-    }
-    
-    public Report(GeocodableLocation l, int event){
         this.location = l;
-        this.event = event;
+        transition = -1;
+        battery = -1;
+        waypoint = null;
     }
    
+
+    public void setWaypoint(Waypoint waypoint) {
+        this.waypoint = waypoint;
+    }
+
+
+    public void setTransition(int transition) {
+        this.transition = transition;
+    }
+
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
 
     public String toString(){
         StringBuilder builder = new StringBuilder();
@@ -33,12 +47,37 @@ public class Report {
         builder.append(", \"tst\": ").append("\"").append((int)(location.getTime()/1000)).append("\"");
         builder.append(", \"acc\": ").append("\"").append(Math.round(location.getLocation().getAccuracy() * 100) / 100.0d).append("\"");
 
-        if(ActivityPreferences.includeBattery())
-            builder.append(", \"batt\": ").append("\"").append(App.getBatteryLevel()).append("\"");
+        if(battery != -1)
+            builder.append(", \"batt\": ").append("\"").append(battery).append("\"");
 
+        if(this.waypoint != null && ( 0 <= transition && transition  <= 1)  ) {
+            builder.append(", \"desc\": ").append("\"").append(this.waypoint.getDescription()).append("\"");
+            builder.append(", \"event\": ").append("\"").append(transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave" ).append("\"");            
+        }
+        
         return builder.append("}").toString();
         
             
+    }
+
+
+    public GeocodableLocation getLocation() {
+        return location;
+    }
+
+
+    public Waypoint getWaypoint() {
+        return waypoint;
+    }
+
+
+    public int getTransition() {
+        return transition;
+    }
+
+
+    public int getBattery() {
+        return battery;
     }
 
 }
