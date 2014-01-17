@@ -176,7 +176,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     private void disableLocationUpdates() {
         Log.v(this.toString(), "Disabling updates");
-        if (mLocationClient != null) {
+        if (mLocationClient != null && mLocationClient.isConnected()) {
             mLocationClient.removeLocationUpdates(ServiceProxy.getPendingIntentForService(context,
                     ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null, 0));
         }
