@@ -2,6 +2,7 @@
 package st.alr.mqttitude.services;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -356,7 +357,8 @@ public class ServiceApplication implements ProxyableService {
     }
     
     public void updateAllContacts() {
-        for (Contact c : App.getContacts().values()) {
+        for (Iterator<Contact> it = App.getContacts().values().iterator(); it.hasNext();) {
+            Contact c = it.next();
             updateContact(c);
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
