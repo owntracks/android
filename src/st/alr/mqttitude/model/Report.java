@@ -49,8 +49,8 @@ public class Report {
 
         if(battery != -1)
             builder.append(", \"batt\": ").append("\"").append(battery).append("\"");
-
-        if(this.waypoint != null && ( 0 <= transition && transition  <= 1)  ) {
+        
+        if(this.waypoint != null &&  ( transition == Geofence.GEOFENCE_TRANSITION_EXIT || transition == Geofence.GEOFENCE_TRANSITION_ENTER)  ) {
             builder.append(", \"desc\": ").append("\"").append(this.waypoint.getDescription()).append("\"");
             builder.append(", \"event\": ").append("\"").append(transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave" ).append("\"");            
         }
