@@ -710,6 +710,9 @@ public class ActivityMain extends FragmentActivity {
                 } else {
                     GeocodableLocation l = (GeocodableLocation) msg.obj;
 
+                    if(l.getTag() == null)
+                        return;
+                    
                     TextView tv = (TextView) friendsListView.findViewWithTag(l.getTag())
                             .findViewById(R.id.subtitle);
                     if (tv != null)
