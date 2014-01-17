@@ -256,9 +256,23 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
     
     public void publishGeofenceTransitionEvent(Waypoint w, int transition) {
+        
         Report r = new Report(getLastKnownLocation());
         r.setTransition(transition);
         r.setWaypoint(w);
+        
+        if(App.isDebugBuild()) {
+         if(transition == Geofence.GEOFENCE_TRANSITION_ENTER)
+            Toast.makeText(context, "Entering Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
+         else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+             Toast.makeText(context, "Leaving Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
+            
+         }else {
+             Toast.makeText(context, "B0rked Geofence transition ("+transition +")", Toast.LENGTH_SHORT).show();             
+         }
+         
+        }
+        
         publish(r);
         
     }
