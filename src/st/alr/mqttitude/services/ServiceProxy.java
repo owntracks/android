@@ -64,7 +64,8 @@ public class ServiceProxy extends ServiceBindable {
     }
         
     public static ProxyableService getService(String id){
-        return services.get(id);
+            
+        return instance.instantiateService(id);
     }
     
     private ProxyableService instantiateService(String id){
