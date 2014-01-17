@@ -118,6 +118,10 @@ public class ActivityMain extends FragmentActivity {
         public int getCurrentFragmentId() {
             return current;
         }
+        
+        public int getRootFragmentId() {
+            return ContactsFragment.ID;
+        }
 
         public Fragment showFragment(int id, Bundle extras) {
             //Log.v(this.toString(), "using fragmentManager" + fragmentManager);
@@ -153,11 +157,13 @@ public class ActivityMain extends FragmentActivity {
         public Fragment back() {
             HeadlessFragment.getInstance().popBackStack();
 
-            return showFragment(HeadlessFragment.getInstance().getBackStackHead(), null);
+            
+            
+            return showFragment(HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()), null);
         }
 
         public Fragment forward(Integer id, Bundle extras) {
-            if (HeadlessFragment.getInstance().getBackStackHead() != id)
+            if (HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()) != id)
                 HeadlessFragment.getInstance().pushBackStack(id);
 
             return showFragment(id, extras);
@@ -871,7 +877,11 @@ public class ActivityMain extends FragmentActivity {
         
 
         private void onShow() {
-            Bundle extras = HeadlessFragment.getInstance().getBundle(DetailsFragment.ID);
+            Bundle extras = HeadlessFragment.getInstance().getBundle(ID);
+            if(extras == null) 
+                fragmentHandler.back();
+            
+            
             contact = App.getContacts().get(extras.get("topic"));
             Log.v(this.toString(), "show for " + contact.getName());
 
@@ -1027,9 +1037,9 @@ public class ActivityMain extends FragmentActivity {
             return id;
         }
 
-        public Integer getBackStackHead() {
+        public Integer getBackStackHead(Integer rootId) {
 
-            return getBackStackSize() > 0 ? backStack.getLast() : -1;
+            return getBackStackSize() > 0 ? backStack.getLast() : rootId;
         }
 
         public Integer popBackStack() {
