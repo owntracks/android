@@ -1,10 +1,15 @@
 
 package st.alr.mqttitude;
 
+import java.util.Date;
+
+import com.google.android.gms.location.Geofence;
+
 import st.alr.mqttitude.adapter.WaypointAdapter;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.ReverseGeocodingTask;
 import de.greenrobot.event.EventBus;
 
 import android.annotation.TargetApi;
@@ -93,7 +98,8 @@ public class ActivityWaypoints extends FragmentActivity {
          
         if(listView.getVisibility() == View.GONE)
             listView.setVisibility(View.VISIBLE);
-
+        
+        
     }
     
     protected void update(Waypoint w){
@@ -245,7 +251,7 @@ public class ActivityWaypoints extends FragmentActivity {
         CheckBox notification;
         TextView notificationTitle;
         Button useCurrent;
-        
+        CheckBox share;
         Waypoint w;
         
         
@@ -255,13 +261,29 @@ public class ActivityWaypoints extends FragmentActivity {
             longitude.setText(w.getLongitude().toString());
             if(w.getRadius() != null)
                 radius.setText(w.getRadius().toString());
-            transitionType.setSelection(w.getTransitionType());
+            
+            
+            Log.v(this.toString(), "w.getTransitionType() " +w.getTransitionType() );
+            switch (w.getTransitionType()) {
+                case Geofence.GEOFENCE_TRANSITION_ENTER:
+                    transitionType.setSelection(0);
+                    break;
+                case Geofence.GEOFENCE_TRANSITION_EXIT:
+                    transitionType.setSelection(1);
+                    break;
+                 default:
+                     transitionType.setSelection(2);
+                    break;
+            }
+
+            
             notification.setChecked(w.getNotification());
             notification.setText(w.getNotificationTitle());                
+            
+            share.setChecked(w.getShared() != null && w.getShared() == true);
         }
         
         private View getContentView() {
-            Log.v(this.toString(), "getContentView");
             View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_waypoint, null);
 
             description = (TextView) view.findViewById(R.id.description);
@@ -272,7 +294,8 @@ public class ActivityWaypoints extends FragmentActivity {
             notification =(CheckBox) view.findViewById(R.id.notification) ;
             notificationTitle = (TextView) view.findViewById(R.id.notificationTitle);
             useCurrent = (Button) view.findViewById(R.id.useCurrent);
-            
+            share = (CheckBox) view.findViewById(R.id.share);
+
             if(w != null)
                 show(w);
             
@@ -387,13 +410,27 @@ public class ActivityWaypoints extends FragmentActivity {
                             w.setRadius(Float.parseFloat(radius.getText().toString()));
                             } catch (NumberFormatException e) {}
                             
-                            w.setTransitionType(transitionType.getSelectedItemPosition());
+                            switch (transitionType.getSelectedItemPosition()) {
+                                case 0:
+                                    w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);
+                                    break;
+                                case 1:
+                                    w.setTransitionType(Geofence.GEOFENCE_TRANSITION_EXIT);                                    
+                                    break;
+                                 default:
+                                     w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+                                    break;
+                            }
+                            
+                            w.setShared(share.isChecked());
                             
                             if(update)
                                 ((ActivityWaypoints) getActivity()).update(w);
-                            else 
+                            else {
+                                w.setDate(new Date());
                                 ((ActivityWaypoints) getActivity()).add(w);
-
+                            }
+                            
                             dismiss();
                         }
                     });

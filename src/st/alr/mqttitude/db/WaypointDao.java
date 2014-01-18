@@ -32,6 +32,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Notification = new Property(6, Boolean.class, "notification", false, "NOTIFICATION");
         public final static Property TransitionType = new Property(7, Integer.class, "transitionType", false, "TRANSITION_TYPE");
         public final static Property NotificationTitle = new Property(8, String.class, "notificationTitle", false, "NOTIFICATION_TITLE");
+        public final static Property Shared = new Property(9, Boolean.class, "shared", false, "SHARED");
+        public final static Property Date = new Property(10, java.util.Date.class, "date", false, "DATE");
     };
 
 
@@ -55,7 +57,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
                 "'GEOFENCE_ID' TEXT," + // 5: geofenceId
                 "'NOTIFICATION' INTEGER," + // 6: notification
                 "'TRANSITION_TYPE' INTEGER," + // 7: transitionType
-                "'NOTIFICATION_TITLE' TEXT);"); // 8: notificationTitle
+                "'NOTIFICATION_TITLE' TEXT," + // 8: notificationTitle
+                "'SHARED' INTEGER," + // 9: shared
+                "'DATE' INTEGER);"); // 10: date
     }
 
     /** Drops the underlying database table. */
@@ -113,6 +117,16 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         if (notificationTitle != null) {
             stmt.bindString(9, notificationTitle);
         }
+ 
+        Boolean shared = entity.getShared();
+        if (shared != null) {
+            stmt.bindLong(10, shared ? 1l: 0l);
+        }
+ 
+        java.util.Date date = entity.getDate();
+        if (date != null) {
+            stmt.bindLong(11, date.getTime());
+        }
     }
 
     /** @inheritdoc */
@@ -133,7 +147,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // geofenceId
             cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0, // notification
             cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // transitionType
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // notificationTitle
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // notificationTitle
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // shared
+            cursor.isNull(offset + 10) ? null : new java.util.Date(cursor.getLong(offset + 10)) // date
         );
         return entity;
     }
@@ -150,6 +166,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         entity.setNotification(cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0);
         entity.setTransitionType(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
         entity.setNotificationTitle(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setShared(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
+        entity.setDate(cursor.isNull(offset + 10) ? null : new java.util.Date(cursor.getLong(offset + 10)));
      }
     
     /** @inheritdoc */

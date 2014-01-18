@@ -39,7 +39,8 @@ public class Defaults {
     public static final int VALUE_BROKER_SECURITY_SSL = 1;
     public static final int VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT = 2;
     public static final boolean VALUE_NOTIFICATION_ENABLED = true;
-    public static final String VALUE_TOPIC_PUB = "mqttitude/%s/%s";
+    public static final String VALUE_TOPIC_PUB_BASE = "mqttitude/%s/%s";
+    public static final String VALUE_TOPIC_WAYPOINTS_PART = "/waypoints";
 
 
 

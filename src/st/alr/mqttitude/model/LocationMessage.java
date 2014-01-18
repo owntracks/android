@@ -7,14 +7,14 @@ import st.alr.mqttitude.App;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 
-public class Report {
+public class LocationMessage {
     GeocodableLocation location;
     Waypoint waypoint;
     int transition;
     int battery;
     
     
-    public Report(GeocodableLocation l){
+    public LocationMessage(GeocodableLocation l){
         this.location = l;
         transition = -1;
         battery = -1;

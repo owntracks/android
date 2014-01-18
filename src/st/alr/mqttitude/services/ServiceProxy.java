@@ -17,7 +17,6 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_BROKER = "3:Brk";
     private static ServiceProxy instance;
     private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
-    private static int intentCounter = 0;
     
     @Override
     public void onCreate(){
@@ -64,8 +63,8 @@ public class ServiceProxy extends ServiceBindable {
     }
         
     public static ProxyableService getService(String id){
-            
-        return instance.instantiateService(id);
+        return services.get(id);
+//        return instance.instantiateService(id);
     }
     
     private ProxyableService instantiateService(String id){
