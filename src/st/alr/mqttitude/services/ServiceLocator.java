@@ -11,7 +11,8 @@ import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.db.WaypointDao.Properties;
 import st.alr.mqttitude.model.GeocodableLocation;
-import st.alr.mqttitude.model.Report;
+import st.alr.mqttitude.model.LocationMessage;
+import st.alr.mqttitude.model.WaypointMessage;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -257,7 +258,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     
     public void publishGeofenceTransitionEvent(Waypoint w, int transition) {
         
-        Report r = new Report(getLastKnownLocation());
+        LocationMessage r = new LocationMessage(getLastKnownLocation());
         r.setTransition(transition);
         r.setWaypoint(w);
         
@@ -273,15 +274,38 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
          
         }
         
-        publish(r);
+        if(w.getShared() != null && w.getShared() == true)
+            publishWaypointMessage(new WaypointMessage(w));
+        
+        publishLocationMessage(r);
         
     }
     
     public void publishLastKnownLocation() {
-        publish(null);
+        publishLocationMessage(null);
     }
     
-    public void publish(Report r) {
+    public void publishWaypointMessage(WaypointMessage r) {
+        if(ServiceProxy.getServiceBroker() == null) {
+            Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
+            return;
+        }
+        
+        String topic = ActivityPreferences.getPubTopic(true);
+        if (topic == null) {
+            changeState(Defaults.State.ServiceLocator.NOTOPIC);
+            return;
+        }
+
+        ServiceProxy.getServiceBroker().publish(
+                topic+Defaults.VALUE_TOPIC_WAYPOINTS_PART,
+                r.toString(),
+                false,
+                0
+                , 20, this, null);
+    }
+    
+    public void publishLocationMessage(LocationMessage r) {
         lastPublish = new Date();        
         
         // Safety checks
@@ -301,9 +325,9 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
         
-        Report report; 
+        LocationMessage report; 
         if(r == null)
-            report = new Report(getLastKnownLocation());
+            report = new LocationMessage(getLastKnownLocation());
         else
             report = r;
         
@@ -322,6 +346,9 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     @Override
     public void publishSuccessfull(Object extra) {
+        if(extra == null)
+            return;
+                    
         changeState(Defaults.State.ServiceLocator.INITIAL);
         EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra));       
     }
@@ -391,6 +418,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
     
     public void onEvent(Events.WaypointAdded e) {
+        if(e.getWaypoint().getShared())
+            publishWaypointMessage(new WaypointMessage(e.getWaypoint()));
 
         if(!isWaypointWithGeofence(e.getWaypoint()))
             return;
@@ -398,10 +427,14 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         Log.v(this.toString(), "adding geofence");
         
         loadWaypoints();
-        setupGeofences();
+        setupGeofences(); 
     }
     
     public void onEvent(Events.WaypointUpdated e) {
+        
+        if(e.getWaypoint().getShared())
+            publishWaypointMessage(new WaypointMessage(e.getWaypoint()));
+ 
         
         if(!isWaypointWithGeofence(e.getWaypoint()))
             return;

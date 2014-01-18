@@ -93,6 +93,7 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="radius">Radius</string>
+    <string name="share">Share</string>    
     <string name="transitionType">Transition</string>
     <string name="notification">Notification</string>
     <string name="notificationTitle">Notification title</string>

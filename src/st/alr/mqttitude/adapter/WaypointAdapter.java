@@ -3,6 +3,8 @@ package st.alr.mqttitude.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.location.Geofence;
+
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WaypointAdapter extends BaseAdapter {
@@ -37,6 +40,9 @@ public class WaypointAdapter extends BaseAdapter {
         public TextView description;
         public TextView location;
         public TextView meta;
+        public ImageView enter;
+        public ImageView leave;
+
 
       }
 
@@ -66,6 +72,8 @@ public class WaypointAdapter extends BaseAdapter {
           viewHolder.description = (TextView) rowView.findViewById(R.id.description);
           viewHolder.meta = (TextView) rowView.findViewById(R.id.meta);
           viewHolder.location = (TextView) rowView.findViewById(R.id.location);
+          viewHolder.enter = (ImageView) rowView.findViewById(R.id.enter);
+          viewHolder.leave = (ImageView) rowView.findViewById(R.id.leave);
 
           rowView.setTag(viewHolder);
         }
@@ -78,10 +86,22 @@ public class WaypointAdapter extends BaseAdapter {
         
         if(w.getRadius() != null && w.getRadius() > 0) {
             holder.meta.setText(context.getString(R.string.reportOn) + " " + Defaults.TransitionType.toString(w.getTransitionType(), context));
-            holder.meta.setVisibility(View.VISIBLE);
+
+            if((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_ENTER) != 0)
+                holder.enter.setVisibility(View.VISIBLE);
+            else
+                holder.enter.setVisibility(View.GONE);
+
+            
+            if((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_EXIT) != 0)
+                holder.leave.setVisibility(View.VISIBLE);
+            else
+                holder.leave.setVisibility(View.GONE);
+
         } else {
-            holder.meta.setVisibility(View.GONE);
-        }
+            holder.enter.setVisibility(View.GONE);
+            holder.leave.setVisibility(View.GONE);
+            }
         
         
         //holder.radius.setText(w.getRadius().toString());

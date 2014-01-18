@@ -15,6 +15,8 @@ public class Waypoint {
     private Boolean notification;
     private Integer transitionType;
     private String notificationTitle;
+    private Boolean shared;
+    private java.util.Date date;
 
     public Waypoint() {
     }
@@ -23,7 +25,7 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, Double latitude, Double longitude, Float radius, String geofenceId, Boolean notification, Integer transitionType, String notificationTitle) {
+    public Waypoint(Long id, String description, Double latitude, Double longitude, Float radius, String geofenceId, Boolean notification, Integer transitionType, String notificationTitle, Boolean shared, java.util.Date date) {
         this.id = id;
         this.description = description;
         this.latitude = latitude;
@@ -33,6 +35,8 @@ public class Waypoint {
         this.notification = notification;
         this.transitionType = transitionType;
         this.notificationTitle = notificationTitle;
+        this.shared = shared;
+        this.date = date;
     }
 
     public Long getId() {
@@ -105,6 +109,22 @@ public class Waypoint {
 
     public void setNotificationTitle(String notificationTitle) {
         this.notificationTitle = notificationTitle;
+    }
+
+    public Boolean getShared() {
+        return shared;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
+    }
+
+    public java.util.Date getDate() {
+        return date;
+    }
+
+    public void setDate(java.util.Date date) {
+        this.date = date;
     }
 
 }

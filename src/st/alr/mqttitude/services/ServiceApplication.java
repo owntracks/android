@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
 import com.google.android.gms.common.ConnectionResult;
@@ -81,8 +82,6 @@ public class ServiceApplication implements ProxyableService {
         daoSession = daoMaster.newSession();
         contactLinkDao = daoSession.getContactLinkDao();
         waypointDao = daoSession.getWaypointDao();
-        
-        
         
         
         notificationManager = (NotificationManager) context
@@ -357,11 +356,16 @@ public class ServiceApplication implements ProxyableService {
     }
     
     public void updateAllContacts() {
-        for (Iterator<Contact> it = App.getContacts().values().iterator(); it.hasNext();) {
-            Contact c = it.next();
-            updateContact(c);
+        Iterator<Entry<String, Contact>> it = App.getContacts().entrySet().iterator();
+        while (it.hasNext())
+        {
+            Entry<String, Contact> item = it.next();
+
+            Contact c = item.getValue();
+           updateContact(c);
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
+
     }
 
     

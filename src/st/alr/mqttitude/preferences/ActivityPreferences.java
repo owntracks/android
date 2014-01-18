@@ -62,7 +62,6 @@ public class ActivityPreferences extends PreferenceActivity {
     public static boolean includeBattery(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_INCLUE_BATTERY, false);
     }
-
     public static boolean areContactsEnabled(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
     }
@@ -125,7 +124,7 @@ public class ActivityPreferences extends PreferenceActivity {
         String deviceName = getDeviceName(true);
         String userUsername = getUsername();
         
-        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC_PUB, userUsername, deviceName);
+        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC_PUB_BASE, userUsername, deviceName);
     }
     
     public static String getPubTopic(boolean defaultFallback){
