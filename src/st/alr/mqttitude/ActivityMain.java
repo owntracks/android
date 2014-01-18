@@ -155,6 +155,7 @@ public class ActivityMain extends FragmentActivity {
 
         // Shows the previous fragment
         public Fragment back() {
+            
             HeadlessFragment.getInstance().popBackStack();
 
             
@@ -170,7 +171,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public boolean atRoot() {
-            return HeadlessFragment.getInstance().getBackStackSize() == 1;
+            return HeadlessFragment.getInstance().getBackStackSize() <= 1;
         }
 
         private Bundle handleFragmentArguments(int id, Bundle extras) {
@@ -1039,6 +1040,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public Integer popBackStack() {
+            
             return backStack.removeLast();
         }
 
