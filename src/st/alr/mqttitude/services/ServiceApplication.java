@@ -322,6 +322,15 @@ public class ServiceApplication implements ProxyableService {
             updateNotification();
     }
 
+    public void onEvent(Events.WaypointTransition e) {
+
+
+//            if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_GEOFENCE_TRANSITION, Defaults.VALUE_TICKER_ON_PUBLISH))
+//                updateTicker(context.getString(R.string.statePublished));
+//
+//        }
+    }
+    
     public void onEvent(Events.PublishSuccessfull e) {
         Log.v(this.toString(), "Publish successful");
         if (e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {

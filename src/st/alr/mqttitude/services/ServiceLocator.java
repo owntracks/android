@@ -3,6 +3,7 @@ package st.alr.mqttitude.services;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,8 +104,11 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
                 Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
                 
-                if(w != null)
+                if(w != null) {
+                    EventBus.getDefault().postSticky(new Events.WaypointTransition(w, transitionType));
+                   
                     publishGeofenceTransitionEvent(w, transitionType);
+                }
             }
         }          
     }
@@ -118,7 +122,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         EventBus.getDefault().postSticky(new Events.LocationUpdated(this.lastKnownLocation));
 
         if (shouldPublishLocation())
-            publishLastKnownLocation();        
+            publishLocationMessage();        
     }
 
     private boolean shouldPublishLocation() {
@@ -142,10 +146,19 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         ready = true;
 
         Log.v(this.toString(), "Connected");
-        setupLocationRequest();
-        requestLocationUpdates();
         
-        setupGeofences();
+        initLocationRequest();
+        initGeofences();
+    }
+
+    private void initGeofences() {
+        removeGeofences();
+        requestGeofences();        
+    }
+
+    private void initLocationRequest() {
+        setupLocationRequest();
+        requestLocationUpdates();        
     }
 
     @Override
@@ -205,7 +218,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {            
             if (intent.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
-                publishLastKnownLocation();
+                publishLocationMessage();
             } else if (intent.getAction().equals(Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
                 Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
 
@@ -256,38 +269,36 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         disableLocationUpdates();
     }
     
-    public void publishGeofenceTransitionEvent(Waypoint w, int transition) {
+    private void publishGeofenceTransitionEvent(Waypoint w, int transition) {
         
         LocationMessage r = new LocationMessage(getLastKnownLocation());
         r.setTransition(transition);
         r.setWaypoint(w);
         
-        if(App.isDebugBuild()) {
-         if(transition == Geofence.GEOFENCE_TRANSITION_ENTER)
-            Toast.makeText(context, "Entering Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
-         else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-             Toast.makeText(context, "Leaving Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
+        if(transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            if(App.isDebugBuild())
+                Toast.makeText(context, "Entering Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
+            
+            
+        } else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            if(App.isDebugBuild()) 
+                Toast.makeText(context, "Leaving Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
             
          }else {
-             Toast.makeText(context, "B0rked Geofence transition ("+transition +")", Toast.LENGTH_SHORT).show();             
+            if(App.isDebugBuild()) {
+                Toast.makeText(context, "B0rked Geofence transition ("+transition +")", Toast.LENGTH_SHORT).show();             
          }
          
         }
         
-        if(w.getShared() != null && w.getShared() == true)
-            publishWaypointMessage(new WaypointMessage(w));
         
         publishLocationMessage(r);
         
     }
     
-    public void publishLastKnownLocation() {
-        publishLocationMessage(null);
-    }
-    
-    public void publishWaypointMessage(WaypointMessage r) {
+    private void publishWaypointMessage(WaypointMessage r) {
         if(ServiceProxy.getServiceBroker() == null) {
-            Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
+            Log.e(this.toString(), "publishWaypointMessage but ServiceMqtt not ready");
             return;
         }
         
@@ -305,12 +316,16 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 , 20, this, null);
     }
     
-    public void publishLocationMessage(LocationMessage r) {
+    public void publishLocationMessage() {
+        publishLocationMessage(null);
+    }
+    
+    private void publishLocationMessage(LocationMessage r) {
         lastPublish = new Date();        
         
         // Safety checks
         if(ServiceProxy.getServiceBroker() == null) {
-            Log.e(this.toString(), "publishLastKnownLocation but ServiceMqtt not ready");
+            Log.e(this.toString(), "publishLocationMessage but ServiceMqtt not ready");
             return;
         }
         
@@ -370,9 +385,6 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         state = newState;
     }
 
-    
-
-
     @Override
     public void publishFailed(Object extra) {
         changeState(Defaults.State.ServiceLocator.PUBLISHING_TIMEOUT);
@@ -413,91 +425,59 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         return getUpdateIntervall() * 60 * 1000;
     }
         
-    public void loadWaypoints() {
-        this.waypoints = waypointDao.loadAll();
-    }
     
     public void onEvent(Events.WaypointAdded e) {
-        if(e.getWaypoint().getShared())
-            publishWaypointMessage(new WaypointMessage(e.getWaypoint()));
-
-        if(!isWaypointWithGeofence(e.getWaypoint()))
-            return;
-        
-        Log.v(this.toString(), "adding geofence");
-        
-        loadWaypoints();
-        setupGeofences(); 
+        handleWaypoint(e.getWaypoint(), false, false); 
     }
     
+
     public void onEvent(Events.WaypointUpdated e) {
-        
-        if(e.getWaypoint().getShared())
-            publishWaypointMessage(new WaypointMessage(e.getWaypoint()));
- 
-        
-        if(!isWaypointWithGeofence(e.getWaypoint()))
-            return;
-
-        Log.v(this.toString(), "updating geofence");
-        
-        removeGeofence(e.getWaypoint());                
-        loadWaypoints();
-        setupGeofences();
+        handleWaypoint(e.getWaypoint(), true, false);
     }
 
-    
-    private boolean isWaypointWithGeofence(Waypoint w) {
-        return w.getRadius() != null && w.getRadius() > 0;
-    }
-    
     public void onEvent(Events.WaypointRemoved e) {
-        if(!isWaypointWithGeofence(e.getWaypoint()))
-            return;
-        
-        Log.v(this.toString(), "removing geofence");
+        handleWaypoint(e.getWaypoint(), false, true);
+    }
 
+    
+    private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
+        if(w.getShared())
+            publishWaypointMessage(new WaypointMessage(w));
+
+        if(!isWaypointWithValidGeofence(w))
+            return;        
+
+        if(update || remove)
+            removeGeofence(w);                
         
-        
-        removeGeofence(e.getWaypoint());
-        loadWaypoints();
-        setupGeofences();
+        if(!remove) {
+            requestGeofences();
+        }
     }
     
-    private void setupGeofences() {
+    private void requestGeofences() {
         if(!ready)
             return;
+
+        loadWaypoints();
+
         List<Geofence> fences = new ArrayList<Geofence>();
 
-        
-        
         for (Waypoint w : waypoints) {
-            if(!isWaypointWithGeofence(w))
+            if(!isWaypointWithValidGeofence(w))
                 continue;
             
+            // if id is null, waypoint is not added yet
             if(w.getGeofenceId() == null) {
                 w.setGeofenceId(UUID.randomUUID().toString());
                 waypointDao.update(w);
-            } 
-            
-            int transitionType;
-            switch (w.getTransitionType()) {
-                case 0: 
-                    transitionType = Geofence.GEOFENCE_TRANSITION_ENTER;
-                    break;
-                case 1:
-                    transitionType = Geofence.GEOFENCE_TRANSITION_EXIT;
-                    break;
-                case 2: 
-                    transitionType = Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_ENTER;
-                    break; 
-                default: 
-                    transitionType = Geofence.GEOFENCE_TRANSITION_ENTER;
+            } else {
+                continue;
             }
-            Log.v(this.toString() , "id " + w.getGeofenceId());
+            
             Geofence geofence = new Geofence.Builder()
                     .setRequestId(w.getGeofenceId())
-                    .setTransitionTypes(transitionType)
+                    .setTransitionTypes(w.getTransitionType())
                     .setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius()).setExpirationDuration(Geofence.NEVER_EXPIRE).build();            
             
             fences.add(geofence);            
@@ -508,31 +488,57 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
         
-        Log.v(this.toString(), "adding geofences");
+        Log.v(this.toString(), "Adding" + fences.size() + " geofences");
         mLocationClient.addGeofences(fences, ServiceProxy.getPendingIntentForService(context,
                 ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_FENCE_TRANSITION, null), this);
-
-
-                        
         
     }
     
     private void removeGeofence(Waypoint w) {
-        ArrayList<String> l = new ArrayList<String>();
-        l.add(w.getGeofenceId());
-        removeGeofences(l);      
+        List<Waypoint> l = new LinkedList<Waypoint>();
+        l.add(w);
+        removeGeofencesByWaypoint(l);        
+    }
 
-        w.setGeofenceId(null);
-        waypointDao.update(w);
-
+    private void removeGeofences() {
+        removeGeofencesByWaypoint(null);
     }
     
-    private void removeGeofences(List<String> ids) {
+    private void removeGeofencesByWaypoint(List<Waypoint> list) {
+        ArrayList<String> l = new ArrayList<String>();
+        
+        // Either removes waypoints from the provided list or all waypoints
+        for(Waypoint w : list == null ? loadWaypoints() : list)
+        {
+            if(w.getGeofenceId() == null)
+                continue; 
+            
+            l.add(w.getGeofenceId());
+            w.setGeofenceId(null);        
+            waypointDao.update(w);
+        }
+        removeGeofencesById(l);      
+    }
+    
+    private void removeGeofencesById(List<String> ids) {
         mLocationClient.removeGeofences(ids, this);
     }
     
+    
     public void onEvent(Object event){}
 
+    private List<Waypoint> loadWaypoints() {
+        return this.waypoints = waypointDao.loadAll();
+    }
+
+    
+    private boolean isWaypointWithValidGeofence(Waypoint w) {
+        return w.getRadius() != null && w.getRadius() > 0 && w.getLatitude() != null && w.getLongitude() != null;
+    }
+    
+    
+    
+    
     @Override
     public void onAddGeofencesResult(int arg0, String[] arg1) {
         if (LocationStatusCodes.SUCCESS == arg0) {
@@ -540,10 +546,12 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 Log.v(this.toString(), "geofence "+ arg1[i] +" added");
 
             }
-            Toast.makeText(context, "Geofences added",Toast.LENGTH_SHORT).show();
+            if(App.isDebugBuild())
+                Toast.makeText(context, "Geofences added",Toast.LENGTH_SHORT).show();
 
         } else {
-            Toast.makeText(context, "Unable to add Geofence",Toast.LENGTH_SHORT).show();
+            if(App.isDebugBuild())
+                Toast.makeText(context, "Unable to add Geofence",Toast.LENGTH_SHORT).show();
             Log.v(this.toString(), "geofence adding failed");        }
         
         
