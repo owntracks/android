@@ -26,6 +26,8 @@
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
     <string name="preferencesNotificationTickerOnPublishTitle">Ticker on report</string>
+    <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
+    <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Ticker on waypoint </string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationTitle">"Notification"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
@@ -93,7 +95,7 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="radius">Radius</string>
-    <string name="share">Share</string>    
+    <string name="share">Share</string>
     <string name="transitionType">Transition</string>
     <string name="notification">Notification</string>
     <string name="notificationTitle">Notification title</string>
@@ -126,12 +128,13 @@
         <item>@string/transitionLeave</item>
         <item>@string/transitionBoth</item>
     </string-array>
-    
+
     <string name="reportOn">Report on</string>
-    
     <string name="transitionEnter">Enter</string>
     <string name="transitionLeave">Leave</string>
     <string name="transitionBoth">Enter and Leave</string>
+    <string name="transitionEntering">Entering</string>
+    <string name="transitionLeaving">Leaving</string>
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
     <string name="title_activity_activity_wizzard">Wizzard</string>
     <string name="title_test_list">tests</string>

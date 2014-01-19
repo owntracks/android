@@ -79,6 +79,14 @@
             android:key="notificationTickerOnPublishEnabled"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="tickerOnWaypointTransitionEnabled"
+            android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
+            android:title="@string/preferencesNotificationTickerOnWaypointTransitionTitle" />
+        
+        
     </PreferenceScreen>
     <PreferenceScreen
         android:key="advanced"

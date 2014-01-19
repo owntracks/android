@@ -63,6 +63,9 @@ public class Defaults {
     public static final String SETTINGS_KEY_TRACKING = "tracking";
     public static final String SETTINGS_KEY_CONTACTS = "subEnabled";
     public static final String SETTINGS_KEY_TOPIC_SUB = "subTopic";
+    public static final String SETTINGS_KEY_TICKER_ON_GEOFENCE_TRANSITION = "tickerOnWaypointTransitionEnabled";
+    
+    
     public static final String CURRENT_LOCATION_TRACKING_IDENTIFIER = "+CURRENTDEVICELOCATION+";
     public static final String SETTINGS_KEY_INCLUE_BATTERY = "includeBattery";
     public static final String SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE = "contactsLinkCloudStorageEnabled";

@@ -12,6 +12,7 @@ public class LocationMessage {
     Waypoint waypoint;
     int transition;
     int battery;
+    boolean supressesTicker; 
     
     
     public LocationMessage(GeocodableLocation l){
@@ -19,8 +20,19 @@ public class LocationMessage {
         transition = -1;
         battery = -1;
         waypoint = null;
+        supressesTicker = false;
     }
    
+
+    public boolean doesSupressTicker() {
+        return supressesTicker;
+    }
+
+
+    public void setSupressesTicker(boolean supressesTicker) {
+        this.supressesTicker = supressesTicker;
+    }
+
 
     public void setWaypoint(Waypoint waypoint) {
         this.waypoint = waypoint;
