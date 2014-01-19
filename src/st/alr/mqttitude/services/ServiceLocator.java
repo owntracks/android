@@ -301,7 +301,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 topic+Defaults.VALUE_TOPIC_WAYPOINTS_PART,
                 r.toString(),
                 false,
-                0
+                Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
                 , 20, this, null);
     }
     
