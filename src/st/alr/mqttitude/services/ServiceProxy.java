@@ -17,6 +17,7 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_BROKER = "3:Brk";
     private static ServiceProxy instance;
     private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
+    private static int intentCounter;
     
     @Override
     public void onCreate(){
@@ -117,7 +118,7 @@ public class ServiceProxy extends ServiceBindable {
             i.putExtras(extras); 
         i.putExtra("srvID", targetServiceId);
         
-        return PendingIntent.getService(c, 0, i, flags);                
+        return PendingIntent.getService(c, ++intentCounter, i, flags);                
         
     }
 }

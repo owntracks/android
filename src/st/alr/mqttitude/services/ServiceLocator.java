@@ -26,9 +26,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract.CommonDataKinds.Event;
+import android.text.format.Time;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -270,27 +269,18 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
     
     private void publishGeofenceTransitionEvent(Waypoint w, int transition) {
+        GeocodableLocation l = new GeocodableLocation("Waypoint");
+        l.setLatitude(w.getLatitude());
+        l.setLongitude(w.getLongitude());
+        l.setAccuracy(w.getRadius());
+        l.setTime(new Date().getTime());
         
-        LocationMessage r = new LocationMessage(getLastKnownLocation());
+        LocationMessage r = new LocationMessage(l);
+        
+        
         r.setTransition(transition);
         r.setWaypoint(w);
-        
-        if(transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            if(App.isDebugBuild())
-                Toast.makeText(context, "Entering Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
-            
-            
-        } else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            if(App.isDebugBuild()) 
-                Toast.makeText(context, "Leaving Geofence " + w.getDescription(), Toast.LENGTH_SHORT).show();
-            
-         }else {
-            if(App.isDebugBuild()) {
-                Toast.makeText(context, "B0rked Geofence transition ("+transition +")", Toast.LENGTH_SHORT).show();             
-         }
-         
-        }
-        
+        r.setSupressesTicker(true);
         
         publishLocationMessage(r);
         
@@ -355,7 +345,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 report.toString(),
                 sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
                 Integer.parseInt(sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
-                , 20, this, report.getLocation());
+                , 20, this, report);
 
     }
 
@@ -512,7 +502,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         {
             if(w.getGeofenceId() == null)
                 continue; 
-            
+            Log.v(this.toString(), "adding " + w.getGeofenceId() + " for removal");
             l.add(w.getGeofenceId());
             w.setGeofenceId(null);        
             waypointDao.update(w);
@@ -546,13 +536,10 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 Log.v(this.toString(), "geofence "+ arg1[i] +" added");
 
             }
-            if(App.isDebugBuild())
-                Toast.makeText(context, "Geofences added",Toast.LENGTH_SHORT).show();
 
         } else {
-            if(App.isDebugBuild())
-                Toast.makeText(context, "Unable to add Geofence",Toast.LENGTH_SHORT).show();
-            Log.v(this.toString(), "geofence adding failed");        }
+            Log.v(this.toString(), "geofence adding failed");        
+        }
         
         
     }

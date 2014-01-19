@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.Geofence;
 
 import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.ActivityMain;
@@ -24,6 +25,7 @@ import st.alr.mqttitude.db.DaoSession;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -253,6 +255,7 @@ public class ServiceApplication implements ProxyableService {
     }
 
     public void updateTicker(String text) {
+        Log.v(this.toString(), "Updating ticker with " + text);
         notificationBuilder.setTicker(text + ((even = even ? false : true) ? " " : ""));
         notificationBuilder.setSmallIcon(R.drawable.ic_notification);
         notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
@@ -323,32 +326,34 @@ public class ServiceApplication implements ProxyableService {
     }
 
     public void onEvent(Events.WaypointTransition e) {
+        if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_GEOFENCE_TRANSITION, Defaults.VALUE_TICKER_ON_PUBLISH)) {
+            if (e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
+                updateTicker(context.getString(R.string.transitionEntering) + " " +e.getWaypoint().getDescription());
+            else                 
+                updateTicker(context.getString(R.string.transitionLeaving)+ " " + e.getWaypoint().getDescription());
 
 
-//            if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_GEOFENCE_TRANSITION, Defaults.VALUE_TICKER_ON_PUBLISH))
-//                updateTicker(context.getString(R.string.statePublished));
-//
-//        }
+        }
     }
     
     public void onEvent(Events.PublishSuccessfull e) {
         Log.v(this.toString(), "Publish successful");
-        if (e.getExtra() != null && e.getExtra() instanceof GeocodableLocation) {
-            GeocodableLocation l = (GeocodableLocation) e.getExtra();
+        if (e.getExtra() != null && e.getExtra() instanceof LocationMessage) {
+            LocationMessage l = (LocationMessage) e.getExtra();
 
-            this.lastPublishedLocation = l;
-            this.lastPublishedLocationTime = e.getDate();
+            this.lastPublishedLocation = l.getLocation();
+            this.lastPublishedLocationTime = l.getLocation().getDate();
 
             if (sharedPreferences.getBoolean("notificationGeocoder", false)
-                    && l.getGeocoder() == null)
+                    && l.getLocation().getGeocoder() == null)
                 (new ReverseGeocodingTask(context, handler)).execute(new GeocodableLocation[] {
-                        l
+                        l.getLocation()
                 });
 
             updateNotification();
 
             if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH,
-                    Defaults.VALUE_TICKER_ON_PUBLISH))
+                    Defaults.VALUE_TICKER_ON_PUBLISH) && !l.doesSupressTicker())
                 updateTicker(context.getString(R.string.statePublished));
 
         }
