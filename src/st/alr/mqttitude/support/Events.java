@@ -27,6 +27,24 @@ public class Events {
 
     }
 
+    public static class WaypointTransition extends E{
+        Waypoint w;
+        int transition; 
+        
+        public WaypointTransition(Waypoint w, int transition) {
+            super();
+            this.w = w;
+            this.transition = transition;
+        }
+        public Waypoint getWaypoint() {
+            return w;
+        }
+        
+        public int getTransition(){
+            return transition; 
+        }
+
+    }
     public static class WaypointAdded extends E{
         Waypoint w;
         public WaypointAdded(Waypoint w) {

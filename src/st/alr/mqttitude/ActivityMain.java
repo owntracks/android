@@ -246,7 +246,7 @@ public class ActivityMain extends FragmentActivity {
             if(ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
                 Toast.makeText(this, "No current location is available", Toast.LENGTH_SHORT).show();
             else            
-                ServiceProxy.getServiceLocator().publishLastKnownLocation();
+                ServiceProxy.getServiceLocator().publishLocationMessage();
             return true;
         } else if (itemId == R.id.menu_share) {
             this.share(null);
@@ -674,7 +674,7 @@ public class ActivityMain extends FragmentActivity {
 
                 @Override
                 public void onClick(View v) {
-                    ServiceProxy.getServiceLocator().publishLastKnownLocation();
+                    ServiceProxy.getServiceLocator().publishLocationMessage();
 
                 }
             });
@@ -713,7 +713,7 @@ public class ActivityMain extends FragmentActivity {
                 } else {
                     GeocodableLocation l = (GeocodableLocation) msg.obj;
 
-                    if(l.getTag() == null)
+                    if(l.getTag() == null || friendsListView == null)
                         return;
                     
                     TextView tv = (TextView) friendsListView.findViewWithTag(l.getTag())
