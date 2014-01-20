@@ -20,15 +20,19 @@ import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderOperation.Builder;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -74,6 +78,8 @@ public class ActivityMain extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         startService(new Intent(this, ServiceProxy.class));
+
+        
         int fragmentId = ContactsFragment.ID;
         if (savedInstanceState != null)
         {
@@ -96,6 +102,25 @@ public class ActivityMain extends FragmentActivity {
         }
 
     }
+    
+    protected ServiceConnection serviceConnection = new ServiceConnection() {
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) 
+            {
+                Log.v(this.toString(), "Service disconnected");
+                isConnected = false;
+            }
+
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                isConnected = true;
+                Log.v(this.toString(), "Service connected");
+                ServiceProxy.getServiceLocator().enableForegroundMode();                
+            }
+    };
+    private boolean isConnected;
+
 
     public static class FragmentHandler {
         private final int COUNT = 3;
@@ -288,14 +313,16 @@ public class ActivityMain extends FragmentActivity {
     @Override
     public void onStart() {
         super.onStart();
-        ServiceProxy.getServiceLocator().enableForegroundMode();
+        bindService(new Intent(this, ServiceProxy.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
     }
 
     @Override
     public void onStop() {
-        ServiceProxy.getServiceLocator().enableBackgroundMode();
-
+        if(isConnected)
+            ServiceProxy.getServiceLocator().enableBackgroundMode();
+        if(serviceConnection != null)
+            unbindService(serviceConnection);
         super.onStop();
     }
 
