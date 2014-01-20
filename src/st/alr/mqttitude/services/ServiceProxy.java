@@ -118,7 +118,7 @@ public class ServiceProxy extends ServiceBindable {
             i.putExtras(extras); 
         i.putExtra("srvID", targetServiceId);
         
-        return PendingIntent.getService(c, ++intentCounter, i, flags);                
+        return PendingIntent.getService(c, 0, i, flags);                
         
     }
 }
