@@ -1,5 +1,7 @@
 package st.alr.mqttitude.model;
 
+import java.util.concurrent.TimeUnit;
+
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
@@ -56,7 +58,7 @@ public class LocationMessage {
         builder.append("\"_type\": ").append("\"").append("location").append("\"");
         builder.append(", \"lat\": ").append("\"").append(location.getLatitude()).append("\"");
         builder.append(", \"lon\": ").append("\"").append(location.getLongitude()).append("\"");
-        builder.append(", \"tst\": ").append("\"").append((int)(location.getTime()/1000)).append("\"");
+        builder.append(", \"tst\": ").append("\"").append((int)(TimeUnit.MILLISECONDS.toSeconds(location.getTime()))).append("\"");
         builder.append(", \"acc\": ").append("\"").append(Math.round(location.getLocation().getAccuracy() * 100) / 100.0d).append("\"");
 
         if(battery != -1)

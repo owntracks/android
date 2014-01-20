@@ -2,6 +2,7 @@ package st.alr.mqttitude.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class GeocodableLocation extends Location  implements Serializable{
+public class GeocodableLocation extends Location {
     String geocoder; 
     LatLng latlng;   
     String tag; 
@@ -37,23 +38,6 @@ public class GeocodableLocation extends Location  implements Serializable{
             this.latlng = new LatLng(location.getLatitude(), location.getLongitude());        
     }
     
-    public JSONObject toJsonObject(){
-        JSONObject o = new JSONObject();
-        try {
-        o.put("_type", "location");
-        o.put("lat", getLatitude());
-        o.put("lon", getLongitude());
-        o.put("tst", getTime());
-        o.put("acc", getAccuracy());
-        o.put("alt", getAltitude());
-        o.put("vac", 0);
-        o.put("dir", getBearing());
-        o.put("vel", getSpeed());
-        } catch (JSONException e) {
-            return o;
-        }
-        return o;
-    }
 
     public static GeocodableLocation fromJsonObject(JSONObject json){
         Double lat;
@@ -74,7 +58,7 @@ public class GeocodableLocation extends Location  implements Serializable{
         try {lat = json.getDouble("lat"); } catch(Exception e) { lat = (double) 0; };
         try {lon = json.getDouble("lon");} catch(Exception e) { lon = (double) 0; };
         try {acc = Float.parseFloat(json.getString("acc")); } catch(Exception e) { acc = (float) 0; };
-        try {tst = Long.parseLong(json.getString("tst")); } catch(Exception e) { tst = (long) 0; };
+        try {tst = TimeUnit.SECONDS.toMillis(Long.parseLong(json.getString("tst"))); ; } catch(Exception e) { tst = (long) 0; };
         try {
             Log.v("geo", "acc: " + json.getString("acc"));
         } catch (JSONException e1) {
@@ -132,7 +116,7 @@ public class GeocodableLocation extends Location  implements Serializable{
     }
     
     public Date getDate(){
-        return  new Date(getLocation().getTime()*1000);
+        return  new Date(getLocation().getTime());
     }
     
     

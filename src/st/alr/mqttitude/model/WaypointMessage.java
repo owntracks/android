@@ -1,5 +1,7 @@
 package st.alr.mqttitude.model;
 
+import java.util.concurrent.TimeUnit;
+
 import st.alr.mqttitude.db.Waypoint;
 
 public class WaypointMessage {
@@ -17,8 +19,8 @@ public class WaypointMessage {
         builder.append(", \"desc\": ").append("\"").append(waypoint.getDescription()).append("\"");
         builder.append(", \"lat\": ").append("\"").append(waypoint.getLatitude()).append("\"");
         builder.append(", \"lon\": ").append("\"").append(waypoint.getLongitude()).append("\"");
-        builder.append(", \"tst\": ").append("\"").append((int)(waypoint.getDate().getTime()/1000)).append("\"");
-        builder.append(", \"rad\": ").append("\"").append(waypoint.getRadius()).append("\"");
+        builder.append(", \"tst\": ").append("\"").append((int)(TimeUnit.MILLISECONDS.toSeconds(waypoint.getDate().getTime()))).append("\"");
+        builder.append(", \"rad\": ").append("\"").append(waypoint.getRadius() != null ? waypoint.getRadius() : 0).append("\"");
         
         return builder.append("}").toString();
         

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.db.Waypoint;
@@ -54,7 +55,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     private boolean foreground = false;
 
     private GeocodableLocation lastKnownLocation;
-    private Date lastPublish;
+    private long lastPublish;
     private List<Waypoint> waypoints;
     private WaypointDao waypointDao;
     
@@ -63,6 +64,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
        
 
                 context = p;
+                lastPublish = 0;
                 waypointDao = ServiceProxy.getServiceApplication().getWaypointDao();
                 loadWaypoints();
         
@@ -126,10 +128,10 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     private boolean shouldPublishLocation() {
         Date now = new Date();
-        if (lastPublish == null)
+        if (lastPublish == 0)
             return true;
 
-        if (now.getTime() - lastPublish.getTime() > getUpdateIntervallInMiliseconds())
+        if (System.currentTimeMillis() - lastPublish > getUpdateIntervallInMiliseconds())
             return true;
 
         return false;
@@ -177,7 +179,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     private void setupForegroundLocationRequest() {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10 * 1000);
+        mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setSmallestDisplacement(50);
     }
@@ -273,8 +275,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         l.setLatitude(w.getLatitude());
         l.setLongitude(w.getLongitude());
         l.setAccuracy(w.getRadius());
-        l.getLocation().setTime(new Date().getTime()/1000);
-     //   l.setTime(new Date().getTime());
+        l.getLocation().setTime(System.currentTimeMillis());
         
         LocationMessage r = new LocationMessage(l);
         
@@ -312,7 +313,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
     
     private void publishLocationMessage(LocationMessage r) {
-        lastPublish = new Date();        
+        lastPublish = System.currentTimeMillis();        
         
         // Safety checks
         if(ServiceProxy.getServiceBroker() == null) {
@@ -391,7 +392,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         changeState(Defaults.State.ServiceLocator.PUBLISHING_WAITING);
     }
 
-    public Date getLastPublishDate() {
+    public long getLastPublishDate() {
         return lastPublish;
     }
 
@@ -412,8 +413,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
            return ui;
     }
 
-    public int getUpdateIntervallInMiliseconds() {
-        return getUpdateIntervall() * 60 * 1000;
+    public long getUpdateIntervallInMiliseconds() {
+        return TimeUnit.MINUTES.toMillis(getUpdateIntervall());
     }
         
     
@@ -474,7 +475,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             fences.add(geofence);            
         }
         
-        if(fences.size() == 0) {
+        if(fences.isEmpty()) {
             Log.v(this.toString(), "no geofences to add");
             return;
         }
