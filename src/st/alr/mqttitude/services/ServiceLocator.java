@@ -432,7 +432,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
     
     private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
-        if(w.getShared())
+        if(!remove && w.getShared())
             publishWaypointMessage(new WaypointMessage(w));
 
         if(!isWaypointWithValidGeofence(w))
