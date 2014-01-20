@@ -508,10 +508,14 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             w.setGeofenceId(null);        
             waypointDao.update(w);
         }
+        
         removeGeofencesById(l);      
     }
     
     private void removeGeofencesById(List<String> ids) {
+        if(ids.isEmpty())
+            return;
+        
         mLocationClient.removeGeofences(ids, this);
     }
     
