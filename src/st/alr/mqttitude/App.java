@@ -29,7 +29,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        this.dateFormater = new SimpleDateFormat("yy/MM/d HH:mm:ss", getResources().getConfiguration().locale);
+        this.dateFormater = new SimpleDateFormat("yyyy-MM-d HH:mm:ss", getResources().getConfiguration().locale);
         this.contacts = new HashMap<String,Contact>();
 
         Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);
