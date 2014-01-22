@@ -77,13 +77,20 @@ public class ActivityPreferences extends PreferenceActivity {
         String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
         return t;
     }
-    
     public static int getBackgroundDislacement(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt("backgroundDisplacement", 500);
     }
     public static long getBackgroundInterval(){
         return TimeUnit.MINUTES.toMillis(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getLong("backgroundInterval", 30));
     }
+    
+
+    public static void setTrackingUsername(String topic){
+        Log.v("ActivityPreferences", "Now tracking " + topic);
+        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic).apply();
+    }
+
+
     
     public static String getUsername(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_NAME, "");
