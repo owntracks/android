@@ -1,6 +1,8 @@
 
 package st.alr.mqttitude.preferences;
 
+import java.util.concurrent.TimeUnit;
+
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceApplication;
@@ -76,12 +78,12 @@ public class ActivityPreferences extends PreferenceActivity {
         return t;
     }
     
-    public static void setTrackingUsername(String topic){
-        Log.v("ActivityPreferences", "Now tracking " + topic);
-        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic).apply();
+    public static int getBackgroundDislacement(){
+        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt("backgroundDisplacement", 500);
     }
-
-
+    public static long getBackgroundInterval(){
+        return TimeUnit.MINUTES.toMillis(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getLong("backgroundInterval", 30));
+    }
     
     public static String getUsername(){
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_NAME, "");

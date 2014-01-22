@@ -171,10 +171,11 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     private void setupBackgroundLocationRequest() {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        mLocationRequest.setInterval(getUpdateIntervallInMiliseconds());
+        mLocationRequest.setInterval(ActivityPreferences.getBackgroundInterval());
         mLocationRequest.setFastestInterval(0);
-        mLocationRequest.setSmallestDisplacement(500);
+        mLocationRequest.setSmallestDisplacement(ActivityPreferences.getBackgroundDislacement());
     }
+    
 
     private void setupForegroundLocationRequest() {
         mLocationRequest = LocationRequest.create();
@@ -255,6 +256,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         foreground = true;
         setupLocationRequest();
         requestLocationUpdates();
+//        removeGeofences();  
+//        initGeofences();
     }
 
     public void enableBackgroundMode() {
@@ -262,6 +265,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         foreground = false;
         setupLocationRequest();
         requestLocationUpdates();
+//        removeGeofences();
+//        initGeofences();
     }
 
     @Override
