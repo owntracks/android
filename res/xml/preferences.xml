@@ -134,21 +134,23 @@
          
         <EditTextPreference
             android:defaultValue="500"
-            android:dialogTitle="Background displacement"
             android:hint="500"
             android:inputType="number"
             android:key="backgroundDisplacement"
             android:summary="Minimal distance (m) between location changes"
+                        android:dialogTitle="Background displacement"
+           
             android:title="Background displacement" />
         
                 
         <EditTextPreference
             android:defaultValue="30"
-            android:dialogTitle="Background displacement"
             android:hint="30"
             android:inputType="number"
             android:key="backgroundInterval"
             android:summary="Interval (m) between location changes"
+                        android:dialogTitle="Background interval"
+            
             android:title="Background interval" />
         
     </PreferenceScreen>
