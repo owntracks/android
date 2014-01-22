@@ -174,6 +174,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         mLocationRequest.setInterval(ActivityPreferences.getBackgroundInterval());
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setSmallestDisplacement(ActivityPreferences.getBackgroundDislacement());
+    
+        Log.v(this.toString(), "Setup backgroundLocationRequest with interval="+ActivityPreferences.getBackgroundInterval()+"ms="+TimeUnit.MILLISECONDS.toMinutes(ActivityPreferences.getBackgroundInterval())+"min , smallestDisplacement="+ActivityPreferences.getBackgroundDislacement()+"m");
     }
     
 
