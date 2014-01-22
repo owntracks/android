@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 
 import st.alr.mqttitude.model.Contact;
@@ -189,6 +190,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public Fragment forward(Integer id, Bundle extras) {
+            Log.v(this.toString(), "back stack head before forward: " + HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()));
             if (HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()) != id)
                 HeadlessFragment.getInstance().pushBackStack(id);
 
@@ -706,8 +708,9 @@ public class ActivityMain extends FragmentActivity {
                 }
             });
 
-            for (Contact c : ServiceApplication.getContacts().values())
-                updateContactView(c);
+            Iterator<Contact> it = App.getContacts().values().iterator();
+            while (it.hasNext()) 
+                updateContactView(it.next());
 
             return v;
         }
@@ -1067,7 +1070,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public Integer popBackStack() {
-            
+            Log.v(this.toString(), "Back stack before pop: " + backStack);
             return backStack.removeLast();
         }
 
