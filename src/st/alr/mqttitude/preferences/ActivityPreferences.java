@@ -78,10 +78,19 @@ public class ActivityPreferences extends PreferenceActivity {
         return t;
     }
     public static int getBackgroundDislacement(){
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt("backgroundDisplacement", 500);
+        try {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundDisplacement", "500"));
+        } catch (Exception e) {
+            return 500;
+        }
     }
     public static long getBackgroundInterval(){
-        return TimeUnit.MINUTES.toMillis(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getLong("backgroundInterval", 30));
+        try {
+        return TimeUnit.MINUTES.toMillis(Long.parseLong(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundInterval", "30")));
+        } catch (Exception e) {
+            return 30;
+        }
+
     }
     
 

@@ -321,8 +321,10 @@ public class ActivityMain extends FragmentActivity {
 
     @Override
     public void onStop() {
+        
         if(isConnected)
             ServiceProxy.getServiceLocator().enableBackgroundMode();
+
         if(serviceConnection != null)
             unbindService(serviceConnection);
         super.onStop();
@@ -646,6 +648,7 @@ public class ActivityMain extends FragmentActivity {
 
         @Override
         public void onStop() {
+            handler.removeCallbacksAndMessages(null);
             EventBus.getDefault().unregister(this);
             super.onStop();
         }
