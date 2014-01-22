@@ -387,8 +387,9 @@ public class ActivityMain extends FragmentActivity {
             mMapView.onResume();
 
             // Initial population of the map with all exisiting contacts
-            for (Contact c : ServiceApplication.getContacts().values())
-                updateContactLocation(c);
+            Iterator<Contact> it = App.getContacts().values().iterator();
+            while (it.hasNext()) 
+                updateContactLocation(it.next());
 
             focusCurrentlyTrackedContact();
         }
