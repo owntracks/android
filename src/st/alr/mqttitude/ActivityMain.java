@@ -20,11 +20,7 @@ import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderOperation.Builder;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -36,12 +32,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.Data;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -72,7 +65,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends FragmentActivity {
-    static FragmentHandler fragmentHandler;
     private static final int CONTACT_PICKER_RESULT = 1001;  
 
     @Override
@@ -80,27 +72,20 @@ public class ActivityMain extends FragmentActivity {
 
         startService(new Intent(this, ServiceProxy.class));
 
-        
-        int fragmentId = ContactsFragment.ID;
+        // delete previously stored fragments after orientation change
         if (savedInstanceState != null)
-        {
-            // delete previously stored fragments after orientation change (see
-            // http://stackoverflow.com/a/13996054/899155).
-            // Without this, two map fragments would exists after rotating the
-            // device, of which the visible one would not receive updates.
             savedInstanceState.remove("android:support:fragments");
-            fragmentId = savedInstanceState.getInt("currentFragment");
-        }
-        super.onCreate(savedInstanceState);
 
+        super.onCreate(savedInstanceState);
+        
         setContentView(R.layout.activity_main);
 
-        fragmentHandler = new FragmentHandler(getSupportFragmentManager());
-        fragmentHandler.forward(fragmentId, null);
+        FragmentHandler.getInstance().init(this, ContactsFragment.class);
+        FragmentHandler.getInstance().showCurrentOrRoot(this);      
+        
         try {
             MapsInitializer.initialize(this);
-        } catch (GooglePlayServicesNotAvailableException e) {
-        }
+        } catch (GooglePlayServicesNotAvailableException e) {}
 
     }
     
@@ -123,137 +108,190 @@ public class ActivityMain extends FragmentActivity {
     private boolean isConnected;
 
 
-    public static class FragmentHandler {
-        private final int COUNT = 3;
-        private Fragment[] fragments;
-        private int current;
-        private FragmentManager fragmentManager;
-        private HeadlessFragment store;
+    public static class FragmentHandler extends Fragment {
+        private Class<?> current;
+        private Class<?> root;
 
-        public FragmentHandler(FragmentManager fm) {
-            store = HeadlessFragment.getInstance();
-            fragmentManager = fm;
-            current = 0;
-            fragments = new Fragment[COUNT + 1];
+        static FragmentHandler instance;
+        
+        private static HashMap<Class<?>, Bundle> store = new HashMap<Class<?>, Bundle>();
+        private static HashMap<Class<?>, Fragment> fragments = new HashMap<Class<?>, Fragment>();
+        
+        private static LinkedList<Class<?>> backStack = new LinkedList<Class<?>>();
+
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
         }
 
+        public static FragmentHandler getInstance() {
+            if (instance == null)
+                instance = new FragmentHandler();
+            return instance;
+        }
+
+        
         public Fragment getCurrentFragment(Bundle extras) {
-            return getFragment(getCurrentFragmentId(), extras);
+            handleFragmentArguments(getCurrentFragmentClass(), extras);
+            return getFragment(getCurrentFragmentClass());
         }
 
-        public int getCurrentFragmentId() {
+        public Class<?> getCurrentFragmentClass() {
             return current;
         }
         
-        public int getRootFragmentId() {
-            return ContactsFragment.ID;
+        public void setRoot(Class<?> c) {
+            root = c;
         }
 
-        public Fragment showFragment(int id, Bundle extras) {
-            //Log.v(this.toString(), "using fragmentManager" + fragmentManager);
+        public Class<?> getRoot() {
+            return root;
+        }
+        
+        public boolean atRoot() {
+            return getBackStackSize() == 0; 
+        }
 
-            Fragment f = getFragment(id, null);
-            Fragment prev = getFragment(current, null);
-            FragmentTransaction ft = fragmentManager.beginTransaction();
 
-            handleFragmentArguments(id, extras);
+        
+        public Fragment showFragment(Class<?> c, Bundle extras, FragmentActivity fa) {
+            Fragment f = getFragment(c);
+            Fragment prev = getFragment(current);
+            
+            handleFragmentArguments(c, extras);
+            FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
 
             if (prev != null && prev.isAdded() && prev.isVisible()) {
+                Log.v(this.toString(), "hiding " + prev);
                 ft.hide(prev);
-                //Log.v(this.toString(), "hiding fragment");
             }
-
             if (f.isAdded()) {
-                //Log.v(this.toString(), "showing fragment " + f);
                 ft.show(f);
-            } else {
-                //Log.v(this.toString(), "adding fragment " + f);
-                ft.add(R.id.main, f, "f:" + id);
+                Log.v(this.toString(), "showed " + f);
+            }  else{
+                ft.add(R.id.main, f, "f:tag:"+c.getName());
+                Log.v(this.toString(), "added " + f);
             }
 
-            ft.commit();
-            fragmentManager.executePendingTransactions();
-
-            current = id;
+            ft.commitAllowingStateLoss();
+            fa.getSupportFragmentManager().executePendingTransactions();
+            current = c;
 
             return f;
         }
 
         // Shows the previous fragment
-        public Fragment back() {
-            
-            HeadlessFragment.getInstance().popBackStack();
-
-            
-            
-            return showFragment(HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()), null);
+        public Fragment back(FragmentActivity fa) {
+            return showFragment(popBackStack(), null, fa);
         }
 
-        public Fragment forward(Integer id, Bundle extras) {
-            Log.v(this.toString(), "back stack head before forward: " + HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()));
-            if (HeadlessFragment.getInstance().getBackStackHead(getRootFragmentId()) != id)
-                HeadlessFragment.getInstance().pushBackStack(id);
-
-            return showFragment(id, extras);
+        public Fragment forward(Class<?> c, Bundle extras, FragmentActivity fa) {
+            pushBackStack(current);            
+            return showFragment(c, extras, fa);
+        }
+        
+        public void init(FragmentActivity a, Class<?> c) {
+            this.root = c;
         }
 
-        public boolean atRoot() {
-            return HeadlessFragment.getInstance().getBackStackSize() <= 1;
+        public void showCurrentOrRoot(FragmentActivity fa){
+            if(current != null)
+                showFragment(current, null, fa);
+            else
+                showFragment(getRoot(), null, fa);
+            
         }
-
-        private Bundle handleFragmentArguments(int id, Bundle extras) {
-            Bundle oldExtras = store.getBundle(id);
-            if (extras != null) { // overwrite old extras
-                store.setBundle(id, extras);
+        
+        private Bundle handleFragmentArguments(Class<?> c, Bundle extras) {
+            Bundle oldExtras = getBundle(c);
+            
+            // overwrite old extras
+            if (extras != null) {                              
+                setBundle(c, extras);
                 return extras;
-            } else if (extras == null && oldExtras != null) { // return
-                                                              // previously set
-                                                              // extras
+                
+            // return previously set extras
+            } else if (extras == null && oldExtras != null) { 
                 return oldExtras;
             } else {
                 return null;
             }
         }
 
-        public Fragment getFragment(int id, Bundle extras) {
-            Fragment f = fragments[id];
-
+        public Fragment getFragment(Class<?> c) {
+            if(c == null)
+                return null;
+            
+            Object f = fragments.get(c);
+            
             if (f == null) {
-                if (id == ContactsFragment.ID)
-                    f = ContactsFragment.getInstance(extras);
-                else if (id == MapFragment.ID)
-                    f = MapFragment.getInstance(extras);
-                else if (id == DetailsFragment.ID)
-                    f = DetailsFragment.getInstance(extras);
-
-                fragments[id] = f;
-            }
-
-            return f;
-
-        }
-
-        public void removeAll() {
-            Log.v(this.toString(), "Removing all fragments");
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-
-            for (int i = 0; i < fragments.length; i++)
-                if (fragments[i] != null) {
-                    Log.v(this.toString(), "Removing fragment " + fragments[i]);
-                    ft.hide(fragments[i]).remove(fragments[i]);
+                try {
+                    f = c.newInstance();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-            ft.commitAllowingStateLoss();
-            fragmentManager.executePendingTransactions();
+                fragments.put(c, (Fragment) f);
+            }
+                
+            return (Fragment) f;
+
         }
+
+        public void removeAll(FragmentActivity fa) {
+            Log.v(this.toString(), "Removing all fragments");
+            FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
+
+            Iterator<Fragment> iterator = fragments.values().iterator();
+            while(iterator.hasNext()) {
+                Fragment f = iterator.next();
+                ft.remove(f);
+
+            }
+            
+            ft.commitAllowingStateLoss();
+            fa.getSupportFragmentManager().executePendingTransactions();
+        }
+        
+
+        public void setBundle(Class<?> c, Bundle b) {
+            store.put(c, b);
+        }
+
+        public Bundle getBundle(Class<?> c) {
+            return store.get(c);
+        }
+        
+        
+
+        public void pushBackStack(Class<?> c) {
+            Log.v(this.toString(), "Back stack before push: " + backStack);
+            backStack.addLast(c);
+            Log.v(this.toString(), "Back stack after push: " + backStack);
+        }
+
+
+        public Class<?> popBackStack() {
+            Log.v(this.toString(), "Back stack before pop: " + backStack);           
+            return backStack.removeLast();            
+        }
+
+        public Integer getBackStackSize() {
+            return backStack.size();
+        }
+
 
     }
 
     @Override
     public void onBackPressed() {
-        if (fragmentHandler.atRoot())
+        if (FragmentHandler.getInstance().atRoot())
             super.onBackPressed();
         else
-            fragmentHandler.back();
+            FragmentHandler.getInstance().back(this);
     }
 
     @Override
@@ -295,21 +333,15 @@ public class ActivityMain extends FragmentActivity {
         GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
         if (l == null) {
             // TODO: Externalize string
-            Toast.makeText(this, "No current location to share is available", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "No current location to share is available", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(
-                Intent.EXTRA_TEXT,
-                "http://maps.google.com/?q=" + Double.toString(l.getLatitude()) + ","
-                        + Double.toString(l.getLongitude()));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "http://maps.google.com/?q=" + Double.toString(l.getLatitude()) + "," + Double.toString(l.getLongitude()));
         sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent,
-                getResources().getText(R.string.shareLocation)));
-
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.shareLocation)));
     }
 
     @Override
@@ -337,13 +369,12 @@ public class ActivityMain extends FragmentActivity {
 
     @Override
     public void onDestroy() {
-        fragmentHandler.removeAll();
+        FragmentHandler.getInstance().removeAll(this);
         super.onDestroy();
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putInt("currentFragment", fragmentHandler.getCurrentFragmentId());
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -360,14 +391,11 @@ public class ActivityMain extends FragmentActivity {
         private TextView selectedContactName;
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
-        private String selectedContact;
         private Map<String, Contact> markerToContacts;
-
+        
         public static MapFragment getInstance(Bundle extras) {
-            // if (instance == null) {
             MapFragment instance = new MapFragment();
             instance.setArguments(extras);
-            // }
             return instance;
         }
 
@@ -417,7 +445,8 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-
+            Log.v(this.toString(), "onCreateView");
+            
             View v = inflater.inflate(R.layout.fragment_map, container, false);
             markerToContacts = new HashMap<String, Contact>();
             selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
@@ -462,17 +491,14 @@ public class ActivityMain extends FragmentActivity {
         }
 
         private void onShow() {
-            Log.v(this.toString(), "onShow");
 
         }
 
         private void onHide() {
-            Log.v(this.toString(), "onHide");
         }
 
         private void setUpMap() {
             googleMap.setIndoorEnabled(true);
-            googleMap.setMyLocationEnabled(true);
 
             UiSettings s = googleMap.getUiSettings();
             s.setCompassEnabled(false);
@@ -569,8 +595,8 @@ public class ActivityMain extends FragmentActivity {
                 @Override
                 public void onClick(View v) {
                     Bundle b = new Bundle();
-                    b.putString("topic", c.getTopic());
-                    fragmentHandler.forward(DetailsFragment.ID, b);
+                    b.putString(DetailsFragment.KEY_TOPIC, c.getTopic());
+                    FragmentHandler.getInstance().forward(DetailsFragment.class, b, getActivity());
                 }
             });
 
@@ -610,14 +636,12 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public boolean isTrackingCurrentLocation() {
-            return ActivityPreferences.getTrackingUsername().equals(
-                    Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
+            return ActivityPreferences.getTrackingUsername().equals(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
         }
 
     }
 
     public static class ContactsFragment extends Fragment implements StaticHandlerInterface {
-        public static final int ID = 1;
         private LinearLayout friendsListView;
         private Button currentLoc;
         private Button report;
@@ -626,11 +650,8 @@ public class ActivityMain extends FragmentActivity {
 
         // private static FriendsFragment instance;
 
-        public static ContactsFragment getInstance(Bundle extras) {
-            // if (instance == null) {
+        public static ContactsFragment getInstance() {
             ContactsFragment instance = new ContactsFragment();
-            instance.setArguments(extras);
-            // }
             return instance;
         }
 
@@ -679,6 +700,8 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
+            Log.v(this.toString(), "onCreateView");
+            
             View v = inflater.inflate(R.layout.fragment_friends, container, false);
 
             friendsListView = (LinearLayout) v.findViewById(R.id.friendsListView);
@@ -692,7 +715,7 @@ public class ActivityMain extends FragmentActivity {
                 public void onClick(View v) {
                     if (ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
                         Log.v(this.toString(), "Focusing the current location");
-                        MapFragment f = (MapFragment) fragmentHandler.forward(MapFragment.ID, null);
+                        MapFragment f = (MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, getActivity());
                         f.focusCurrentLocation();
 
                     } else {
@@ -784,17 +807,10 @@ public class ActivityMain extends FragmentActivity {
                         @Override
                         public void onClick(View v) {
                             Contact c = ServiceApplication.getContacts().get(v.getTag());
-                            Log.v(this.toString(), "Focusing " + c);
-                            if (c == null || c.getLocation() == null) {
-                                Log.v(this.toString(), "No contact or no location ");
-
+                            if (c == null || c.getLocation() == null)
                                 return;
-
-                            }
-                            Log.v(this.toString(), "request for fragmenthandler fragment handler"
-                                    + fragmentHandler);
-                            fragmentHandler.forward(MapFragment.ID, null);
-                            ((MapFragment) fragmentHandler.getCurrentFragment(null)).focus(c);
+                            
+                            ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, getActivity())).focus(c);
 
                             
                         }
@@ -805,8 +821,8 @@ public class ActivityMain extends FragmentActivity {
                         @Override
                         public void onClick(View v) {
                             Bundle b = new Bundle();
-                            b.putString("topic", c.getTopic());
-                            fragmentHandler.forward(DetailsFragment.ID, b);
+                            b.putString(DetailsFragment.KEY_TOPIC, c.getTopic());
+                            FragmentHandler.getInstance().forward(DetailsFragment.class, b, getActivity());
                         }
                     });
 
@@ -832,7 +848,9 @@ public class ActivityMain extends FragmentActivity {
     }
 
     public static class DetailsFragment extends Fragment {
-        public static final int ID = 3;
+        public static final String KEY_TOPIC = "TOPIC";
+       
+
         Contact contact;
         TextView name;
         TextView topic;
@@ -842,9 +860,8 @@ public class ActivityMain extends FragmentActivity {
         Button assignContact;
         private OnSharedPreferenceChangeListener preferencesChangedListener;
 
-        public static DetailsFragment getInstance(Bundle extras) {
+        public static DetailsFragment getInstance() {
             DetailsFragment instance = new DetailsFragment();
-            instance.setArguments(extras);
             return instance;
         }
 
@@ -869,7 +886,6 @@ public class ActivityMain extends FragmentActivity {
         public void onStart() {
             super.onStart();
             EventBus.getDefault().registerSticky(this);
-            Log.v(this.toString(), "subscribed");
         }
 
         void showHideAssignContactButton(){
@@ -889,7 +905,6 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onStop() {
             EventBus.getDefault().unregister(this);
-            Log.v(this.toString(), "unsubscribed");
             super.onStop();
         }
 
@@ -908,13 +923,9 @@ public class ActivityMain extends FragmentActivity {
         
 
         private void onShow() {
-            Bundle extras = HeadlessFragment.getInstance().getBundle(ID);
-            if(extras == null) 
-                fragmentHandler.back();
-            
-            
-            contact = App.getContacts().get(extras.get("topic"));
-            Log.v(this.toString(), "show for " + contact.getName());
+            Bundle extras = FragmentHandler.getInstance().getBundle(this.getClass());
+                        
+            contact = App.getContacts().get(extras.get(KEY_TOPIC));
 
             name.setText(contact.getName());
             topic.setText(contact.getTopic());
@@ -926,10 +937,7 @@ public class ActivityMain extends FragmentActivity {
 
                 @Override
                 public void onClick(View v) {
-                    Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,  
-                            Contacts.CONTENT_URI);  
-                    startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);  
-
+                    startActivityForResult(new Intent(Intent.ACTION_PICK,  Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);  
                 }
             });
         }
@@ -976,7 +984,7 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-
+            Log.v(this.toString(), "onCreateView");
 
             View v = inflater.inflate(R.layout.fragment_details, container, false);
             name = (TextView) v.findViewById(R.id.name);
@@ -995,7 +1003,6 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void onEventMainThread(Events.ContactUpdated e) {
-            Log.v(this.toString(), "contactUpdated");
             if (e.getContact() == contact)
                 onShow();
         }
@@ -1004,82 +1011,8 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
-            b.putString("topic", contact.getTopic());
-            HeadlessFragment.getInstance().setBundle(DetailsFragment.ID, b);
-        }
-
-    }
-
-    public static class HeadlessFragment extends Fragment {
-        static HeadlessFragment instance;
-        private static HashMap<Integer, Bundle> store = new HashMap<Integer, Bundle>();
-        private static LinkedList<Integer> backStack = new LinkedList<Integer>();
-
-        public static HeadlessFragment getInstance() {
-            if (instance == null) {
-                instance = new HeadlessFragment();
-            }
-            return instance;
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setRetainInstance(true);
-
-        }
-
-        public void setBundle(Integer id, Bundle b) {
-            store.put(id, b);
-        }
-
-        public Bundle getBundle(Integer id) {
-            return store.get(id);
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            return null;
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle b) {
-            super.onSaveInstanceState(b);
-        }
-
-        public Integer pushBackStack(Integer id) {
-            backStack.addLast(id);
-            return id;
-        }
-
-        public Integer getBackStackHead(Integer rootId) {
-
-            return getBackStackSize() > 0 ? backStack.getLast() : rootId;
-        }
-
-        public Integer popBackStack() {
-            Log.v(this.toString(), "Back stack before pop: " + backStack);
-            return backStack.removeLast();
-        }
-
-        public Integer getBackStackSize() {
-            return backStack.size();
+            b.putString(KEY_TOPIC, contact.getTopic());
+            FragmentHandler.getInstance().setBundle(getClass(), b);
         }
 
     }
