@@ -173,7 +173,7 @@
     <string name="keyNotificationLocationEnabled">notificationLocation</string>        
     <string name="keyNotificationTickerPublish">notificationTickerOnPublishEnabled</string>
     <string name="keyNotificationTickerGeofence">tickerOnWaypointTransitionEnabled</string>
-    <string name="keyTrackingUsername">notificationTickerOnPublishEnabled</string>
+    <string name="keyTrackingUsername">trackingUsername</string>
     <string name="keySubEnabled">subEnabled</string>
     <string name="keySubTopic">subTopic</string>
     <string name="keyContactsLinkCloudStorageEnabled">contactsLinkCloudStorageEnabled</string>
