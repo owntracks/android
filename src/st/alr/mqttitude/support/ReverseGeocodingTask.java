@@ -1,3 +1,4 @@
+
 package st.alr.mqttitude.support;
 
 import java.io.IOException;
@@ -5,18 +6,16 @@ import java.util.List;
 import java.util.Locale;
 
 import st.alr.mqttitude.model.GeocodableLocation;
-
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 // AsyncTask encapsulating the reverse-geocoding API
 public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
-    
+
     Context mContext;
     Handler mHandler;
     public static final int GEOCODER_RESULT = 3452;
@@ -24,27 +23,27 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
 
     public ReverseGeocodingTask(Context context, Handler handler) {
         super();
-        mContext = context;
-        mHandler = handler;
+        this.mContext = context;
+        this.mHandler = handler;
     }
 
     @Override
     protected Void doInBackground(GeocodableLocation... params) {
-        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(this.mContext, Locale.getDefault());
         GeocodableLocation l = params[0];
         int r = GEOCODER_NORESULT;
-        
+
         // Return right away if there is already geocoder information available
-        if(l.getGeocoder() == null) {             
+        if (l.getGeocoder() == null) {
             try {
                 List<Address> addresses = geocoder.getFromLocation(l.getLocation().getLatitude(), l.getLocation().getLongitude(), 1);
-                if (addresses != null && addresses.size() > 0) {            
-                    
-                    if(addresses.get(0).getLocality() != null)                    
+                if ((addresses != null) && (addresses.size() > 0)) {
+
+                    if (addresses.get(0).getLocality() != null)
                         l.setGeocoder(addresses.get(0).getLocality());
-                    else                         
+                    else
                         l.setGeocoder(addresses.get(0).getCountryName());
-                    
+
                     r = GEOCODER_RESULT;
                 }
             } catch (IOException e) {
@@ -53,10 +52,9 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
         } else {
             r = GEOCODER_RESULT;
         }
-       Message.obtain(mHandler, r, l).sendToTarget();
+        Message.obtain(this.mHandler, r, l).sendToTarget();
 
-       return null;
+        return null;
     }
-    
 
 }

@@ -1,7 +1,6 @@
 
 package st.alr.mqttitude.support;
 
-import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,8 +16,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
         if ((intent.getAction() != null)
                 && (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
-                && (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-                        "autostartOnBoot", false)))
+                && (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autostartOnBoot", false)))
         {
             Log.v(this.toString(), "Autostarting app");
             Intent i = new Intent(context, ServiceProxy.class);
