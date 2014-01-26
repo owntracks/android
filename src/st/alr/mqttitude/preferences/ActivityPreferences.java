@@ -1,13 +1,11 @@
 
 package st.alr.mqttitude.preferences;
 
-import java.util.concurrent.TimeUnit;
-
-import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceBroker;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Preferences;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -34,123 +32,15 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference version;
     private static Preference repo;
     private static Preference mail;
+    private static Preference twitter;
+    private static Preference donate;
+
     private static EditTextPreference topic;
 
     static String ver;
     private static OnSharedPreferenceChangeListener pubTopicListener;
 
-    public static boolean isAdvancedModeEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("advancedMode", false);
-    }
 
-    public static String getAndroidId() {
-
-        String id = App.getAndroidId();
-
-        // MQTT specification doesn't allow client IDs longer than 23 chars
-        if (id.length() > 22)
-            id = id.substring(0, 22);
-
-        return id;
-    }
-
-    public static String getServerAdress() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_HOST, "");
-    }
-
-    public static boolean includeBattery() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_INCLUE_BATTERY, false);
-    }
-
-    public static boolean areContactsEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
-    }
-
-    public static boolean isContactLinkCloudStorageEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE, false);
-    }
-
-    public static String getTrackingUsername() {
-        String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
-        return t;
-    }
-
-    public static int getBackgroundDislacement() {
-        try {
-            return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundDisplacement", "500"));
-        } catch (Exception e) {
-            return 500;
-        }
-    }
-
-    public static long getBackgroundInterval() {
-        try {
-            return TimeUnit.MINUTES.toMillis(Long.parseLong(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundInterval", "30")));
-        } catch (Exception e) {
-            return 30;
-        }
-
-    }
-
-    public static void setTrackingUsername(String topic) {
-        Log.v("ActivityPreferences", "Now tracking " + topic);
-        PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic).apply();
-    }
-
-    public static String getUsername() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_NAME, "");
-    }
-
-    public static int getBrokerAuthType() {
-        return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERNAME);
-
-    }
-
-    // public static String getBrokerUsername(boolean userUsernameFallback)
-    // {
-    // String username =
-    // PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME,
-    // "");
-    // if(username.equals("") && userUsernameFallback)
-    // username = getUserUsername();
-    // return username;
-    // }
-    //
-
-    public static String getDeviceName(boolean androidIdFallback)
-    {
-        String name = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_DEVICE_NAME, "");
-        if (name.equals("") && androidIdFallback)
-            name = getAndroidId();
-        return name;
-    }
-
-    public static String getSubTopic(boolean defaultTopicFallback) {
-        String topic = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TOPIC_SUB, "");
-        if (topic.equals("") && defaultTopicFallback)
-            topic = getSubTopicFallback();
-        return topic;
-    }
-
-    public static String getSubTopicFallback() {
-        return Defaults.VALUE_TOPIC_SUB;
-    }
-
-    public static String getPubTopicFallback() {
-        String deviceName = getDeviceName(true);
-        String userUsername = getUsername();
-
-        return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC_PUB_BASE, userUsername, deviceName);
-    }
-
-    public static String getPubTopic(boolean defaultFallback) {
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-        String topic = p.getString(Defaults.SETTINGS_KEY_TOPIC_PUB, "");
-        if (topic.equals("") && defaultFallback)
-            topic = getPubTopicFallback();
-
-        return topic;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +54,7 @@ public class ActivityPreferences extends PreferenceActivity {
     }
 
     private static void setPubTopicHint(EditTextPreference e) {
-        e.getEditText().setHint(getPubTopicFallback());
+        e.getEditText().setHint(Preferences.getPubTopicFallback());
 
     }
 
@@ -193,10 +83,12 @@ public class ActivityPreferences extends PreferenceActivity {
 
             repo = findPreference("repo");
             mail = findPreference("mail");
+            twitter = findPreference("twitter");
             version = findPreference("versionReadOnly");
+            donate = findPreference("donate");
             serverPreference = findPreference("brokerPreference");
-            backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-            topic = (EditTextPreference) findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
+            backgroundUpdatesIntervall = findPreference(Preferences.getKey(R.string.keyPubAutoInterval));
+            topic = (EditTextPreference) findPreference(Preferences.getKey(R.string.keyPubTopic));
 
             try {
                 ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
@@ -247,6 +139,29 @@ public class ActivityPreferences extends PreferenceActivity {
                         }
                     });
 
+
+            twitter.setOnPreferenceClickListener(
+                    new OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(Defaults.VALUE_TWITTER_URL));
+                            a.startActivity(intent);
+                            return false;
+                        }
+                    });
+            
+            
+            donate.setOnPreferenceClickListener(
+                    new OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("bitcoin:" + Defaults.BITCOIN_ADDRESS));
+                            a.startActivity(intent);
+                            return false;
+                        }
+                    });
             // TODO: set hint when device name changes
             setServerPreferenceSummary(getActivity());
 
@@ -269,7 +184,7 @@ public class ActivityPreferences extends PreferenceActivity {
 
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    if (key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
+                    if (key.equals(Preferences.getKey(R.string.keyBrokerUsername)))
                         setPubTopicHint(topic);
                 }
             };

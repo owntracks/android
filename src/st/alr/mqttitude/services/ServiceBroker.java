@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -36,6 +37,7 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
+import st.alr.mqttitude.support.Preferences;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -191,24 +193,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService
      */
     private void init()
     {
-        Log.v(this.toString(), "initMqttClient");
-
         if (mqttClient != null) {
             return;
         }
 
         try
         {
-            String brokerAddress = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_HOST,
-                    Defaults.VALUE_BROKER_HOST);
-            String brokerPort = sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_PORT,
-                    Defaults.VALUE_BROKER_PORT);
-            String prefix = getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp"
-                    : "ssl";
-            String cid = ActivityPreferences.getDeviceName(true);
+            String prefix = Preferences.getBrokerSecurityType() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp" : "ssl";
+            String cid = Preferences.getDeviceName(true);
             
-            mqttClient = new MqttClient(prefix + "://" + brokerAddress + ":" + (brokerPort.equals("") ? Defaults.VALUE_BROKER_PORT : brokerPort),
-                    cid , null);
+            Log.v(this.toString(), "broker port: " + Preferences.getBrokerPort());
+            mqttClient = new MqttClient(prefix + "://" + Preferences.getBrokerHost() + ":" + Preferences.getBrokerPort(), cid , null);
             mqttClient.setCallback(this);
 
         } catch (MqttException e)
@@ -218,19 +213,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             changeState(Defaults.State.ServiceBroker.DISCONNECTED);
         }
     }
-
-    private int getBrokerSecurityMode() {
-        return sharedPreferences.getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY,
-                Defaults.VALUE_BROKER_SECURITY_NONE);
-    }
-
     //
     private javax.net.ssl.SSLSocketFactory getSSLSocketFactory() throws CertificateException,
             KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-        InputStream caInput = new BufferedInputStream(new FileInputStream(
-                sharedPreferences.getString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, "")));
+        InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getBrokerSslCaPath()));
         java.security.cert.Certificate ca;
         try {
             ca = cf.generateCertificate(caInput);
@@ -258,8 +245,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
     private boolean connect()
     {
-        workerThread = Thread.currentThread(); // We connect, so we're the
-                                               // worker thread
+        workerThread = Thread.currentThread(); // We connect, so we're the worker thread
         Log.v(this.toString(), "connect");
         error = null; // clear previous error on connect
         init();
@@ -268,24 +254,23 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         {
             changeState(Defaults.State.ServiceBroker.CONNECTING);
             MqttConnectOptions options = new MqttConnectOptions();
-
- 
-            switch (ActivityPreferences.getBrokerAuthType()) {
+            setWill(options);
+            
+            switch (Preferences.getBrokerAuthType()) {
                 case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:                    
                     break;
 
                 default:
-                    options.setPassword(sharedPreferences.getString(
-                                Defaults.SETTINGS_KEY_BROKER_PASSWORD, "").toCharArray());
+                    options.setPassword(Preferences.getBrokerPassword().toCharArray());
 
-                    options.setUserName(ActivityPreferences.getUsername());
+                    options.setUserName(Preferences.getBrokerUsername());
 
                     break;
 
 }
             
             
-            if (getBrokerSecurityMode() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
+            if (Preferences.getBrokerSecurityType() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
                 options.setSocketFactory(this.getSSLSocketFactory());
 
 
@@ -312,11 +297,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         StringBuffer payload = new StringBuffer();
         payload.append("{");
         payload.append("\"type\": ").append("\"").append("_lwt").append("\"");
-        payload.append(", \"tst\": ").append("\"").append((int) (new Date().getTime() / 1000))
+        payload.append(", \"tst\": ").append("\"").append((int) (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
                 .append("\"");
         payload.append("}");
 
-        m.setWill(mqttClient.getTopic(ActivityPreferences.getPubTopic(true)), payload.toString().getBytes(), 0, false);
+        m.setWill(mqttClient.getTopic(Preferences.getPubTopic(true)), payload.toString().getBytes(), 0, false);
 
     }
 
@@ -341,8 +326,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService
         
         try {
 
-            if(ActivityPreferences.areContactsEnabled())
-                mqttClient.subscribe(ActivityPreferences.getSubTopic(true));
+            if(Preferences.isSubEnabled())
+                mqttClient.subscribe(Preferences.getSubTopic(true));
             
         } catch (MqttException e) {
             e.printStackTrace();

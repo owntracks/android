@@ -9,6 +9,7 @@ import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceBroker;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Preferences;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -90,7 +91,7 @@ public class PreferencesBroker extends DialogPreference {
     }
 
     private void showHideAdvanced() {
-        int visibility = ActivityPreferences.isAdvancedModeEnabled() ? View.VISIBLE : View.GONE;
+        int visibility = Preferences.isAdvancedModeEnabled() ? View.VISIBLE : View.GONE;
 
         for (View v : new View[] {
                 this.securityWrapper, this.brokerAuthWrapper
@@ -101,22 +102,21 @@ public class PreferencesBroker extends DialogPreference {
 
     @Override
     protected void onBindDialogView(View view) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-        this.host.setText(prefs.getString(Defaults.SETTINGS_KEY_BROKER_HOST, ""));
-        this.port.setText(prefs.getString(Defaults.SETTINGS_KEY_BROKER_PORT, ""));
+        this.host.setText(Preferences.getBrokerHost());
+        this.port.setText(Preferences.getBrokerPort());
         this.port.setHint(Defaults.VALUE_BROKER_PORT);
 
-        userName.setText(ActivityPreferences.getUsername());
+        userName.setText(Preferences.getBrokerUsername());
 
-        this.deviceName.setHint(ActivityPreferences.getAndroidId());
-        this.deviceName.setText(ActivityPreferences.getDeviceName(false));
+        this.deviceName.setHint(Preferences.getAndroidId());
+        this.deviceName.setText(Preferences.getDeviceName(false));
 
-        this.password.setText(prefs.getString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, ""));
+        this.password.setText(Preferences.getBrokerPassword());
 
-        this.brokerAuth.setSelection(PreferenceManager.getDefaultSharedPreferences(this.context).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERNAME));
+        this.brokerAuth.setSelection(Preferences.getBrokerAuthType());
 
-        this.brokerSecurity.setSelection(PreferenceManager.getDefaultSharedPreferences(this.context).getInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, Defaults.VALUE_BROKER_SECURITY_SSL));
-        this.brokerSecuritySSLCaCrtPath.setText(prefs.getString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, ""));
+        this.brokerSecurity.setSelection(Preferences.getBrokerSecurityType());
+        this.brokerSecuritySSLCaCrtPath.setText(Preferences.getBrokerSslCaPath());
 
     }
 
@@ -250,21 +250,15 @@ public class PreferencesBroker extends DialogPreference {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE: // Clicked connect
 
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-                SharedPreferences.Editor editor = prefs.edit();
-
-                editor.putString(Defaults.SETTINGS_KEY_BROKER_HOST, this.host.getText().toString());
-                editor.putString(Defaults.SETTINGS_KEY_BROKER_PORT, this.port.getText().toString());
-                editor.putString(Defaults.SETTINGS_KEY_USER_NAME, userName.getText().toString());
-                editor.putString(Defaults.SETTINGS_KEY_BROKER_PASSWORD, this.password.getText().toString());
-                editor.putString(Defaults.SETTINGS_KEY_DEVICE_NAME, this.deviceName.getText().toString());
-                editor.putInt(Defaults.SETTINGS_KEY_BROKER_SECURITY, this.brokerSecurity.getSelectedItemPosition());
-                editor.putInt(Defaults.SETTINGS_KEY_BROKER_AUTH, this.brokerAuth.getSelectedItemPosition());
-                editor.putString(Defaults.SETTINGS_KEY_BROKER_SECURITY_SSL_CA_PATH, this.brokerSecuritySSLCaCrtPath.getText().toString());
-
-                editor.apply()
-
-                ;
+                Preferences.setString(R.string.keyBrokerHost, this.host.getText().toString());
+                Preferences.setString(R.string.keyBrokerPort, this.port.getText().toString());
+                Preferences.setString(R.string.keyBrokerUsername, userName.getText().toString());
+                Preferences.setString(R.string.keyBrokerPassword, this.password.getText().toString());
+                Preferences.setString(R.string.keyDeviceName, this.deviceName.getText().toString());
+                Preferences.setInt(R.string.keyBrokerAuth, this.brokerAuth.getSelectedItemPosition());
+                Preferences.setInt(R.string.keyBrokerSecurity, this.brokerSecurity.getSelectedItemPosition());
+                Preferences.setString(R.string.keyBrokerSecuritySslCaPath, this.brokerSecuritySSLCaCrtPath.getText().toString());
+                
                 Runnable r = new Runnable() {
 
                     @Override

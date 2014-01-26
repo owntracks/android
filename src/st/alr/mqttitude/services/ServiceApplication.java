@@ -21,6 +21,7 @@ import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -87,9 +88,9 @@ public class ServiceApplication implements ProxyableService {
         this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                if (key.equals(Defaults.SETTINGS_KEY_NOTIFICATION_ENABLED))
+                if (key.equals(Preferences.getKey(R.string.keyNotificationEnabled)))
                     handleNotification();
-                else if (key.equals(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE))
+                else if (key.equals(Preferences.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
                     updateAllContacts();
             }
         };
@@ -197,14 +198,9 @@ public class ServiceApplication implements ProxyableService {
     private void handleNotification() {
         Log.v(this.toString(), "handleNotification()");
         this.context.stopForeground(true);
-        if (notificationEnabled() || !playServicesAvailable)
+        if (Preferences.isNotificationEnabled() || !playServicesAvailable)
             createNotification();
 
-    }
-
-    private boolean notificationEnabled() {
-        return sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_NOTIFICATION_ENABLED,
-                Defaults.VALUE_NOTIFICATION_ENABLED);
     }
 
     private void createNotification() {
@@ -252,12 +248,12 @@ public class ServiceApplication implements ProxyableService {
 
         // if the notification is not enabled, the ticker will create an empty
         // one that we get rid of
-        if (!notificationEnabled())
+        if (!Preferences.isNotificationEnabled())
             this.notificationManager.cancel(Defaults.NOTIFCATION_ID);
     }
 
     public void updateNotification() {
-        if (!notificationEnabled() || !playServicesAvailable)
+        if (!Preferences.isNotificationEnabled() || !playServicesAvailable)
             return;
 
         String title = null;
@@ -265,11 +261,10 @@ public class ServiceApplication implements ProxyableService {
         long time = 0;
 
         if ((this.lastPublishedLocation != null)
-                && sharedPreferences.getBoolean("notificationLocation", true)) {
+                &&  Preferences.isNotificationLocationEnabled()) {
             time = this.lastPublishedLocationTime.getTime();
 
-            if ((this.lastPublishedLocation.getGeocoder() != null)
-                    && sharedPreferences.getBoolean("notificationGeocoder", false)) {
+            if ((this.lastPublishedLocation.getGeocoder() != null) && Preferences.isNotificationGeocoderEnabled()) {
                 title = this.lastPublishedLocation.toString();
             } else {
                 title = this.lastPublishedLocation.toLatLonString();
@@ -316,7 +311,7 @@ public class ServiceApplication implements ProxyableService {
     }
 
     public void onEvent(Events.WaypointTransition e) {
-        if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_GEOFENCE_TRANSITION, Defaults.VALUE_TICKER_ON_PUBLISH)) {
+        if (Preferences.notificationOnGeofenceTransition()) {
             if (e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
                 updateTicker(this.context.getString(R.string.transitionEntering) + " " + e.getWaypoint().getDescription());
             else
@@ -333,16 +328,14 @@ public class ServiceApplication implements ProxyableService {
             this.lastPublishedLocation = l.getLocation();
             this.lastPublishedLocationTime = l.getLocation().getDate();
 
-            if (sharedPreferences.getBoolean("notificationGeocoder", false)
-                    && (l.getLocation().getGeocoder() == null))
+            if ( Preferences.isNotificationGeocoderEnabled() && (l.getLocation().getGeocoder() == null))
                 (new ReverseGeocodingTask(this.context, this.handler)).execute(new GeocodableLocation[] {
                         l.getLocation()
                 });
 
             updateNotification();
 
-            if (sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_TICKER_ON_PUBLISH,
-                    Defaults.VALUE_TICKER_ON_PUBLISH) && !l.doesSupressTicker())
+            if (Preferences.notificationTickerOnPublish() && !l.doesSupressTicker())
                 updateTicker(this.context.getString(R.string.statePublished));
 
         }
@@ -420,7 +413,7 @@ public class ServiceApplication implements ProxyableService {
     }
 
     private long getContactId(Contact c) {
-        if (ActivityPreferences.isContactLinkCloudStorageEnabled())
+        if (Preferences.isContactLinkCloudStorageEnabled())
             return getContactIdFromCloud(c);
         else
             return getContactIdFromLocalStorage(c);
@@ -456,7 +449,7 @@ public class ServiceApplication implements ProxyableService {
     }
 
     public void linkContact(Contact c, long contactId) {
-        if (ActivityPreferences.isContactLinkCloudStorageEnabled()) {
+        if (Preferences.isContactLinkCloudStorageEnabled()) {
             Log.e(this.toString(), "Saving a ContactLink to the cloud is not yet supported");
             return;
         }
