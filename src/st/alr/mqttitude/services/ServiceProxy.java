@@ -13,6 +13,7 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_APP = "1:App";
     public static final String SERVICE_LOCATOR = "2:Loc";
     public static final String SERVICE_BROKER = "3:Brk";
+    public static final String KEY_SERVICE_ID = "srvID";
     private static ServiceProxy instance;
     private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
 
@@ -46,11 +47,7 @@ public class ServiceProxy extends ServiceBindable {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int r = super.onStartCommand(intent, flags, startId); // Invokes
-                                                              // onStartOnce(...)
-                                                              // the fist time
-                                                              // to initialize
-                                                              // the service
+        int r = super.onStartCommand(intent, flags, startId); // Invokes onStartOnce(...) the fist time to initialize the service
 
         ProxyableService s = getServiceForIntent(intent);
         if (s != null)
@@ -61,7 +58,6 @@ public class ServiceProxy extends ServiceBindable {
 
     public static ProxyableService getService(String id) {
         return services.get(id);
-        // return instance.instantiateService(id);
     }
 
     private ProxyableService instantiateService(String id) {
@@ -96,12 +92,11 @@ public class ServiceProxy extends ServiceBindable {
     }
 
     public static ProxyableService getServiceForIntent(Intent i) {
-        if ((i != null) && (i.getStringExtra("srvID") != null)) {
-            return getService(i.getStringExtra("srvID"));
-        } else {
+        if ((i != null) && (i.getStringExtra(KEY_SERVICE_ID) != null))
+            return getService(i.getStringExtra(KEY_SERVICE_ID));
+        else
             return null;
-        }
-
+        
     }
 
     public static PendingIntent getPendingIntentForService(Context c, String targetServiceId, String action, Bundle extras) {
@@ -114,7 +109,7 @@ public class ServiceProxy extends ServiceBindable {
 
         if (extras != null)
             i.putExtras(extras);
-        i.putExtra("srvID", targetServiceId);
+        i.putExtra(KEY_SERVICE_ID, targetServiceId);
 
         return PendingIntent.getService(c, 0, i, flags);
 
