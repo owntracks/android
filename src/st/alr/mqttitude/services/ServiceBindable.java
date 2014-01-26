@@ -1,3 +1,4 @@
+
 package st.alr.mqttitude.services;
 
 import java.lang.ref.WeakReference;
@@ -6,66 +7,67 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 public abstract class ServiceBindable extends Service {
     protected boolean started;
     protected ServiceBinder binder;
-    private final String TAG  = "ServiceBindable";
-    
+
     @Override
     public void onCreate()
     {
         super.onCreate();
-        binder = new ServiceBinder(this);
+        this.binder = new ServiceBinder(this);
     }
-    
+
     abstract protected void onStartOnce();
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(!started) {
-            started = true;
+        if (!this.started) {
+            this.started = true;
             onStartOnce();
         }
-        return binder;
+        return this.binder;
     }
-    
-    
+
     public class ServiceBinder extends Binder
     {
         private WeakReference<ServiceBindable> mService;
 
         public ServiceBinder(ServiceBindable serviceBindable) {
-            mService = new WeakReference<ServiceBindable>(serviceBindable);
+            this.mService = new WeakReference<ServiceBindable>(serviceBindable);
         }
 
         public ServiceBindable getService() {
-            return mService.get();
+            return this.mService.get();
         }
+
         public void close() {
-            mService = null;
+            this.mService = null;
         }
     }
+
     @Override
     public void onDestroy()
     {
 
-        if (binder != null) {
-            binder.close();
-            binder = null;
+        if (this.binder != null) {
+            this.binder.close();
+            this.binder = null;
         }
         super.onDestroy();
     }
-    
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!started) {
-            started = true;
-            // Called when the service is started for the first time. Shields from multiple calls of startService(...) to invoke the code multiple times
+        if (!this.started) {
+            this.started = true;
+            // Called when the service is started for the first time. Shields
+            // from multiple calls of startService(...) to invoke the code
+            // multiple times
             onStartOnce();
         }
-                        
+
         return Service.START_STICKY;
     }
 
