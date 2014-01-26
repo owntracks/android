@@ -7,7 +7,6 @@ import android.content.Context;
 public class Defaults {
 
     public static final int NOTIFCATION_ID = 1338;
-    public static final String UPDATE_INTEND_ID = "st.alr.mqttitude.UPDATE";
 
     public static final String SETTINGS_KEY_BROKER_HOST = "brokerHost";
     public static final String SETTINGS_KEY_BROKER_PORT = "brokerPort";
