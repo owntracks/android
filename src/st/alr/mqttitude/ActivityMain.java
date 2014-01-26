@@ -47,7 +47,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
@@ -309,7 +308,7 @@ public class ActivityMain extends FragmentActivity {
             return true;
         } else if (itemId == R.id.menu_report) {
             if(ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
-                Toast.makeText(this, "No current location is available", Toast.LENGTH_SHORT).show();
+                App.showLocationNotAvailableToast();
             else            
                 ServiceProxy.getServiceLocator().publishLocationMessage();
             return true;
@@ -333,7 +332,7 @@ public class ActivityMain extends FragmentActivity {
         GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
         if (l == null) {
             // TODO: Externalize string
-            Toast.makeText(this, "No current location to share is available", Toast.LENGTH_SHORT).show();
+            App.showLocationNotAvailableToast();
             return;
         }
 
@@ -717,10 +716,8 @@ public class ActivityMain extends FragmentActivity {
                         Log.v(this.toString(), "Focusing the current location");
                         MapFragment f = (MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, getActivity());
                         f.focusCurrentLocation();
-
                     } else {
-                        Toast.makeText(getActivity(), "No current location is available", Toast.LENGTH_SHORT).show();
-                        Log.v(this.toString(), "No current location available");
+                        App.showLocationNotAvailableToast();
                     }
                 }
             });

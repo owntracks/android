@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.os.BatteryManager;
 import android.provider.Settings.Secure;
+import android.widget.Toast;
 
 import com.bugsnag.android.Bugsnag;
 
@@ -62,6 +63,11 @@ public class App extends Application {
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryStatus = getContext().registerReceiver(null, ifilter);
         return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+    }
+
+
+    public static void showLocationNotAvailableToast() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();        
     }
     
 }

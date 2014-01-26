@@ -103,7 +103,9 @@
     <string name="waypointAdd">Add waypoint</string>
     <string name="actionModeOneSelected">1 item selected</string>
     <string name="actionModeMoreSelected">items selected</string>
-
+	<string name="currentLocationNotAvailable">The current location is not available</string>
+    
+    
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
