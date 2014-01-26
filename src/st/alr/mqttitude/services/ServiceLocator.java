@@ -89,7 +89,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
 
     public GeocodableLocation getLastKnownLocation() {
-        if(mLocationClient != null)
+        if(mLocationClient != null && mLocationClient.isConnected())
             return new GeocodableLocation(mLocationClient.getLastLocation());
         
         return lastKnownLocation;
