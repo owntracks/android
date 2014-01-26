@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceBroker;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -18,7 +17,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -27,7 +25,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
@@ -39,165 +36,138 @@ public class ActivityPreferences extends PreferenceActivity {
     private static Preference mail;
     private static EditTextPreference topic;
 
-    
     static String ver;
     private static OnSharedPreferenceChangeListener pubTopicListener;
 
-    public static boolean isAdvancedModeEnabled(){
+    public static boolean isAdvancedModeEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("advancedMode", false);
     }
-    
+
     public static String getAndroidId() {
-        
+
         String id = App.getAndroidId();
 
         // MQTT specification doesn't allow client IDs longer than 23 chars
         if (id.length() > 22)
             id = id.substring(0, 22);
-        
+
         return id;
     }
 
-    public static String getServerAdress(){
+    public static String getServerAdress() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_HOST, "");
     }
-    public static boolean includeBattery(){
+
+    public static boolean includeBattery() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_INCLUE_BATTERY, false);
     }
-    public static boolean areContactsEnabled(){
+
+    public static boolean areContactsEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS, true);
     }
-    
-    public static boolean isContactLinkCloudStorageEnabled(){
+
+    public static boolean isContactLinkCloudStorageEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE, false);
     }
-    
-    
-    public static String getTrackingUsername(){
+
+    public static String getTrackingUsername() {
         String t = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TRACKING, "");
         return t;
     }
-    public static int getBackgroundDislacement(){
+
+    public static int getBackgroundDislacement() {
         try {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundDisplacement", "500"));
+            return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundDisplacement", "500"));
         } catch (Exception e) {
             return 500;
         }
     }
-    public static long getBackgroundInterval(){
+
+    public static long getBackgroundInterval() {
         try {
-        return TimeUnit.MINUTES.toMillis(Long.parseLong(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundInterval", "30")));
+            return TimeUnit.MINUTES.toMillis(Long.parseLong(PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("backgroundInterval", "30")));
         } catch (Exception e) {
             return 30;
         }
 
     }
-    
 
-    public static void setTrackingUsername(String topic){
+    public static void setTrackingUsername(String topic) {
         Log.v("ActivityPreferences", "Now tracking " + topic);
         PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(Defaults.SETTINGS_KEY_TRACKING, topic).apply();
     }
 
-
-    
-    public static String getUsername(){
+    public static String getUsername() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_USER_NAME, "");
     }
 
-    public static int getBrokerAuthType(){
+    public static int getBrokerAuthType() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext()).getInt(Defaults.SETTINGS_KEY_BROKER_AUTH, Defaults.VALUE_BROKER_AUTH_USERNAME);
 
     }
 
-//    public static String getBrokerUsername(boolean userUsernameFallback)
-//    {
-//        String username = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME, "");
-//        if(username.equals("") && userUsernameFallback) 
-//            username = getUserUsername();
-//        return username;        
-//    }
-//    
-    
+    // public static String getBrokerUsername(boolean userUsernameFallback)
+    // {
+    // String username =
+    // PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_BROKER_USERNAME,
+    // "");
+    // if(username.equals("") && userUsernameFallback)
+    // username = getUserUsername();
+    // return username;
+    // }
+    //
+
     public static String getDeviceName(boolean androidIdFallback)
     {
         String name = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_DEVICE_NAME, "");
-        if(name.equals("") && androidIdFallback) 
+        if (name.equals("") && androidIdFallback)
             name = getAndroidId();
-        return name;        
+        return name;
     }
-    
+
     public static String getSubTopic(boolean defaultTopicFallback) {
         String topic = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString(Defaults.SETTINGS_KEY_TOPIC_SUB, "");
-        if(topic.equals("") && defaultTopicFallback) 
+        if (topic.equals("") && defaultTopicFallback)
             topic = getSubTopicFallback();
-        return topic;        
+        return topic;
     }
 
     public static String getSubTopicFallback() {
         return Defaults.VALUE_TOPIC_SUB;
     }
-    
-    public static String getPubTopicFallback(){
+
+    public static String getPubTopicFallback() {
         String deviceName = getDeviceName(true);
         String userUsername = getUsername();
-        
+
         return deviceName.equals("") || userUsername.equals("") ? "" : String.format(Defaults.VALUE_TOPIC_PUB_BASE, userUsername, deviceName);
     }
-    
-    public static String getPubTopic(boolean defaultFallback){
+
+    public static String getPubTopic(boolean defaultFallback) {
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         String topic = p.getString(Defaults.SETTINGS_KEY_TOPIC_PUB, "");
-        if(topic.equals("") && defaultFallback)
+        if (topic.equals("") && defaultFallback)
             topic = getPubTopicFallback();
 
-        return topic;        
-      }
-    
+        return topic;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Thanks Google for not providing a support version of the
-        // PreferenceFragment for older API versions
-//        if (supportsFragment())
-            onCreatePreferenceFragment();
-//        else
-//            onCreatePreferenceActivity();
+        onCreatePreferenceFragment();
     }
-
-    private boolean supportsFragment() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
-    }
-
-//    @SuppressWarnings("deprecation")
-//    private void onCreatePreferenceActivity() {
-//        addPreferencesFromResource(R.xml.preferences);
-//        onSetupPreferenceActivity();
-//    }
-//
-//    @SuppressWarnings("deprecation")
-//    private void onSetupPreferenceActivity() {
-//        repo = findPreference("repo");
-//        mail = findPreference("mail");
-//        version = findPreference("versionReadOnly");
-//        serverPreference = findPreference("brokerPreference");
-//        backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-//        topicScreen = (PreferenceScreen) findPreference("topicSettings");
-//        topic = (EditTextPreference) findPreference("topic");
-//
-//        onSetupCommon(this);
-//    }
 
     private void onCreatePreferenceFragment() {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new CustomPreferencesFragment()).commit();
     }
-    
-    private static void setPubTopicHint(EditTextPreference e){
+
+    private static void setPubTopicHint(EditTextPreference e) {
         e.getEditText().setHint(getPubTopicFallback());
 
     }
-    
+
     @Override
     public void onStart() {
         super.onStart();
@@ -226,16 +196,14 @@ public class ActivityPreferences extends PreferenceActivity {
             version = findPreference("versionReadOnly");
             serverPreference = findPreference("brokerPreference");
             backgroundUpdatesIntervall = findPreference(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL);
-            topic = (EditTextPreference)  findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
+            topic = (EditTextPreference) findPreference(Defaults.SETTINGS_KEY_TOPIC_PUB);
 
-            
             try {
                 ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
             } catch (NameNotFoundException e) {
                 ver = a.getString(R.string.na);
             }
 
-            
             backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -271,7 +239,7 @@ public class ActivityPreferences extends PreferenceActivity {
                             intent.setType("message/rfc822");
 
                             intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
-                                Defaults.VALUE_ISSUES_MAIL
+                                    Defaults.VALUE_ISSUES_MAIL
                             });
                             intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
                             a.startActivity(Intent.createChooser(intent, "Send Email"));
@@ -279,10 +247,9 @@ public class ActivityPreferences extends PreferenceActivity {
                         }
                     });
 
-            //TODO: set hint when device name changes
+            // TODO: set hint when device name changes
             setServerPreferenceSummary(getActivity());
-            
-            
+
             backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -297,25 +264,24 @@ public class ActivityPreferences extends PreferenceActivity {
                     return true;
                 }
             });
-            
-            
+
             pubTopicListener = new OnSharedPreferenceChangeListener() {
 
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    if(key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
+                    if (key.equals(Defaults.SETTINGS_KEY_USER_NAME) || key.equals(Defaults.SETTINGS_KEY_USER_NAME))
                         setPubTopicHint(topic);
                 }
             };
             PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(pubTopicListener);
-            
+
             setPubTopicHint(topic);
         }
     }
 
     @Override
     protected void onDestroy() {
-        if(pubTopicListener != null)
+        if (pubTopicListener != null)
             PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(pubTopicListener);
         super.onDestroy();
     }
@@ -328,11 +294,9 @@ public class ActivityPreferences extends PreferenceActivity {
         serverPreference.setSummary(ServiceBroker.getStateAsString(c));
     }
 
-    
-        @Override
+    @Override
     public boolean onIsMultiPane() {
         return false;
     }
-
 
 }

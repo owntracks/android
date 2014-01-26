@@ -1,11 +1,8 @@
+
 package st.alr.mqttitude.adapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import com.google.android.gms.location.Geofence;
-
-import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
@@ -13,8 +10,6 @@ import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,40 +17,42 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.Geofence;
+
+import de.greenrobot.event.EventBus;
+
 public class WaypointAdapter extends BaseAdapter {
     private WaypointDao dao;
     private Activity context;
     private ArrayList<Waypoint> list;
-    
+
     public WaypointAdapter(Activity c) {
         super();
         this.context = c;
         this.dao = ServiceProxy.getServiceApplication().getWaypointDao();
-        this.list = new ArrayList<Waypoint>(dao.loadAll());    
+        this.list = new ArrayList<Waypoint>(this.dao.loadAll());
         notifyDataSetChanged();
     }
-    
+
     static class ViewHolder {
-        
+
         public TextView description;
         public TextView location;
         public TextView meta;
         public ImageView enter;
         public ImageView leave;
 
+    }
 
-      }
-
-    
     @Override
     public int getCount() {
-        return list.size();
+        return this.list.size();
     }
 
     @Override
     public Waypoint getItem(int position) {
-        return list.get(position);
-        }
+        return this.list.get(position);
+    }
 
     @Override
     public long getItemId(int position) {
@@ -66,34 +63,33 @@ public class WaypointAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View rowView = convertView;
         if (rowView == null) {
-          LayoutInflater inflater = context.getLayoutInflater();
-          rowView = inflater.inflate(R.layout.row_waypoint, null);
-          ViewHolder viewHolder = new ViewHolder();
-          viewHolder.description = (TextView) rowView.findViewById(R.id.description);
-          viewHolder.meta = (TextView) rowView.findViewById(R.id.meta);
-          viewHolder.location = (TextView) rowView.findViewById(R.id.location);
-          viewHolder.enter = (ImageView) rowView.findViewById(R.id.enter);
-          viewHolder.leave = (ImageView) rowView.findViewById(R.id.leave);
+            LayoutInflater inflater = this.context.getLayoutInflater();
+            rowView = inflater.inflate(R.layout.row_waypoint, null);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.description = (TextView) rowView.findViewById(R.id.description);
+            viewHolder.meta = (TextView) rowView.findViewById(R.id.meta);
+            viewHolder.location = (TextView) rowView.findViewById(R.id.location);
+            viewHolder.enter = (ImageView) rowView.findViewById(R.id.enter);
+            viewHolder.leave = (ImageView) rowView.findViewById(R.id.leave);
 
-          rowView.setTag(viewHolder);
+            rowView.setTag(viewHolder);
         }
 
         Waypoint w = getItem(position);
-        
+
         ViewHolder holder = (ViewHolder) rowView.getTag();
         holder.description.setText(w.getDescription());
         holder.location.setText(w.getLatitude() + ":" + w.getLongitude());
-        
-        if(w.getRadius() != null && w.getRadius() > 0) {
-            holder.meta.setText(context.getString(R.string.reportOn) + " " + Defaults.TransitionType.toString(w.getTransitionType(), context));
 
-            if((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_ENTER) != 0)
+        if ((w.getRadius() != null) && (w.getRadius() > 0)) {
+            holder.meta.setText(this.context.getString(R.string.reportOn) + " " + Defaults.TransitionType.toString(w.getTransitionType(), this.context));
+
+            if ((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_ENTER) != 0)
                 holder.enter.setVisibility(View.VISIBLE);
             else
                 holder.enter.setVisibility(View.GONE);
 
-            
-            if((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_EXIT) != 0)
+            if ((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_EXIT) != 0)
                 holder.leave.setVisibility(View.VISIBLE);
             else
                 holder.leave.setVisibility(View.GONE);
@@ -101,32 +97,31 @@ public class WaypointAdapter extends BaseAdapter {
         } else {
             holder.enter.setVisibility(View.GONE);
             holder.leave.setVisibility(View.GONE);
-            }
-        
-        
-        //holder.radius.setText(w.getRadius().toString());
+        }
+
+        // holder.radius.setText(w.getRadius().toString());
 
         return rowView;
 
     }
-    
+
     public void update(Waypoint w) {
-        dao.update(w);
-        this.list = new ArrayList<Waypoint>(dao.loadAll());
+        this.dao.update(w);
+        this.list = new ArrayList<Waypoint>(this.dao.loadAll());
         notifyDataSetChanged();
         EventBus.getDefault().post(new Events.WaypointUpdated(w));
     }
 
     public void add(Waypoint w) {
-        dao.insert(w);       
-        this.list = new ArrayList<Waypoint>(dao.loadAll());
+        this.dao.insert(w);
+        this.list = new ArrayList<Waypoint>(this.dao.loadAll());
         notifyDataSetChanged();
         EventBus.getDefault().post(new Events.WaypointAdded(w));
     }
 
     public void remove(Waypoint w) {
-        dao.delete(w);
-        this.list = new ArrayList<Waypoint>(dao.loadAll());
+        this.dao.delete(w);
+        this.list = new ArrayList<Waypoint>(this.dao.loadAll());
         notifyDataSetChanged();
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
     }
