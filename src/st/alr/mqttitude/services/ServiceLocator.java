@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import st.alr.mqttitude.App;
+import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.db.WaypointDao.Properties;
@@ -18,6 +19,7 @@ import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.MqttPublish;
+import st.alr.mqttitude.support.Preferences;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -70,7 +72,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                if (key.equals(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES) || key.equals(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL))
+                if (key.equals(Preferences.getKey(R.string.keyPubAutoEnabled)) || key.equals(Preferences.getKey(R.string.keyPubAutoInterval)))
                     handlePreferences();
             }
         };
@@ -127,7 +129,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         if (this.lastPublish == 0)
             return true;
 
-        if ((System.currentTimeMillis() - this.lastPublish) > getUpdateIntervallInMiliseconds())
+        if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(Preferences.getPubAutoInterval()))
             return true;
 
         return false;
@@ -168,11 +170,9 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     private void setupBackgroundLocationRequest() {
         this.mLocationRequest = LocationRequest.create();
         this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        this.mLocationRequest.setInterval(ActivityPreferences.getBackgroundInterval());
+        this.mLocationRequest.setInterval(Preferences.getLocatorBackgroundInterval());
         this.mLocationRequest.setFastestInterval(0);
-        this.mLocationRequest.setSmallestDisplacement(ActivityPreferences.getBackgroundDislacement());
-
-        Log.v(this.toString(), "Setup backgroundLocationRequest with interval=" + ActivityPreferences.getBackgroundInterval() + "ms=" + TimeUnit.MILLISECONDS.toMinutes(ActivityPreferences.getBackgroundInterval()) + "min , smallestDisplacement=" + ActivityPreferences.getBackgroundDislacement() + "m");
+        this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorBackgroundDislacement());
     }
 
     private void setupForegroundLocationRequest() {
@@ -202,11 +202,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
 
-        if (this.foreground || areBackgroundUpdatesEnabled()) {
-            // locationIntent = ServiceProxy.getPendingIntentForService(context,
-            // ServiceProxy.SERVICE_LOCATOR,
-            // Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
-
+        if (this.foreground || Preferences.isPubAutoEnabled()) {
             this.mLocationClient.requestLocationUpdates(this.mLocationRequest, ServiceProxy.getPendingIntentForService(this.context,
                     ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null));
 
@@ -297,7 +293,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
 
-        String topic = ActivityPreferences.getPubTopic(true);
+        String topic = Preferences.getPubTopic(true);
         if (topic == null) {
             changeState(Defaults.State.ServiceLocator.NOTOPIC);
             return;
@@ -307,7 +303,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
                 topic + Defaults.VALUE_TOPIC_WAYPOINTS_PART,
                 r.toString(),
                 false,
-                Integer.parseInt(this.sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
+                Preferences.getPubQos()
                 , 20, this, null);
     }
 
@@ -329,7 +325,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
             return;
         }
 
-        String topic = ActivityPreferences.getPubTopic(true);
+        String topic = Preferences.getPubTopic(true);
         if (topic == null) {
             changeState(Defaults.State.ServiceLocator.NOTOPIC);
             return;
@@ -341,14 +337,14 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         else
             report = r;
 
-        if (ActivityPreferences.includeBattery())
+        if (Preferences.includeBattery())
             report.setBattery(App.getBatteryLevel());
 
         ServiceProxy.getServiceBroker().publish(
                 topic,
                 report.toString(),
-                this.sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_RETAIN, Defaults.VALUE_RETAIN),
-                Integer.parseInt(this.sharedPreferences.getString(Defaults.SETTINGS_KEY_QOS, Defaults.VALUE_QOS))
+                Preferences.getPubRetain(),
+                Preferences.getPubQos()
                 , 20, this, report);
 
     }
@@ -399,26 +395,17 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         return this.lastPublish;
     }
 
-    public boolean areBackgroundUpdatesEnabled() {
-        return this.sharedPreferences.getBoolean(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES,
-                Defaults.VALUE_BACKGROUND_UPDATES);
-    }
-
-    public int getUpdateIntervall() {
-        int ui;
-        try {
-            ui = Integer.parseInt(this.sharedPreferences.getString(Defaults.SETTINGS_KEY_BACKGROUND_UPDATES_INTERVAL,
-                    Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL));
-        } catch (Exception e) {
-            ui = Integer.parseInt(Defaults.VALUE_BACKGROUND_UPDATES_INTERVAL);
-        }
-
-        return ui;
-    }
-
-    public long getUpdateIntervallInMiliseconds() {
-        return TimeUnit.MINUTES.toMillis(getUpdateIntervall());
-    }
+//    public boolean areBackgroundUpdatesEnabled() {
+//        return Preferences.getBackgroundPub();
+//    }
+//
+//    public int getUpdateIntervall() {
+//        
+//    }
+//
+//    public long getUpdateIntervallInMiliseconds() {
+//        return TimeUnit.MINUTES.toMillis(getUpdateIntervall());
+//    }
 
     public void onEvent(Events.WaypointAdded e) {
         handleWaypoint(e.getWaypoint(), false, false);

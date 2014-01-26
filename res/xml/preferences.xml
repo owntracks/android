@@ -12,95 +12,70 @@
         android:title="@string/preferencesTopicSettings" >
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="backgroundUpdates"
+            android:key="@string/keyPubAutoEnabled"
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
         <EditTextPreference
             android:defaultValue="30"
-            android:dependency="backgroundUpdates"
+            android:dependency="@string/keyPubAutoEnabled"
             android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
             android:hint="30"
             android:inputType="number"
-            android:key="backgroundUpdatesInterval"
+            android:key="@string/keyPubAutoInterval"
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
-        
-                <CheckBoxPreference
+
+        <CheckBoxPreference
             android:defaultValue="false"
-            android:key="includeBattery"
+            android:key="@string/keyPubIncludeBattery"
             android:summary="@string/preferencesIncludeBatterySummary"
             android:title="@string/preferencesIncludeBatteryTitle" />
-        
-        
-        
-        
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:key="contactSettings"
-        android:title="@string/preferencesContactSettings" >
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="subEnabled"
-            android:summary="@string/preferencesContactsEnabledSummary"
-            android:title="@string/preferencesContactsEnabledTitle" />
-        
-                <CheckBoxPreference
-            android:defaultValue="false"
-            android:dependency="subEnabled"
-            android:key="contactsLinkCloudStorageEnabled"
-            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
-            android:title="@string/contactsLinkCloudStorageEnabledTitle" />
-                
-                
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"
         android:title="@string/preferencesNotification" >
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="notificationEnabled"
+            android:key="@string/keyNotificationEnabled"
             android:summary="@string/preferencesNotificationSummary"
             android:title="@string/preferencesNotificationTitle" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:dependency="notificationEnabled"
-            android:key="notificationLocation"
+            android:dependency="@string/keyNotificationEnabled"
+            android:key="@string/keyNotificationTickerPublish"
             android:summary="@string/preferencesNotificationLocationSummary"
             android:title="@string/preferencesNotificationLocationTitle" />
         <CheckBoxPreference
             android:defaultValue="false"
-            android:dependency="notificationLocation"
-            android:key="notificationGeocoder"
+            android:dependency="@string/keyNotificationEnabled"
+            android:key="@string/keyNotificationGeocoderEnabled"
             android:summary="@string/preferencesNotificationGeocoderSummary"
             android:title="@string/preferencesNotificationGeocoderTitle" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="notificationTickerOnPublishEnabled"
+            android:key="@string/keyNotificationTickerPublish"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublishTitle" />
-        
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="tickerOnWaypointTransitionEnabled"
+            android:key="@string/keyNotificationTickerGeofence"
             android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
             android:title="@string/preferencesNotificationTickerOnWaypointTransitionTitle" />
-        
-        
     </PreferenceScreen>
     <PreferenceScreen
         android:key="advanced"
         android:title="@string/preferencesAdvancedTitle" >
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="advancedMode"
+            android:key="@string/keyAdvancedConnectionPreferencesEnabled"
             android:summary="@string/preferencesAdvancedConnectionSummary"
             android:title="@string/preferencesAdvancedConnectionTitle" />
 
         <EditTextPreference
             android:defaultValue=""
             android:dialogTitle="@string/preferencesTopic"
-            android:key="topic"
+            android:key="@string/keyPubTopic"
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
@@ -108,51 +83,60 @@
             android:defaultValue="0"
             android:entries="@array/qos_readable"
             android:entryValues="@array/qos"
-            android:key="qos"
+            android:key="@string/keyPubQos"
             android:summary="@string/preferencesQOSSummary"
             android:title="@string/preferencesQOS" />
 
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="retain"
+            android:key="@string/keyPubRetain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/keySubEnabled"
+            android:summary="@string/preferencesContactsEnabledSummary"
+            android:title="@string/preferencesContactsEnabledTitle" />
+        
         <EditTextPreference
-            android:defaultValue=""
+            android:dependency="@string/keySubEnabled"
+            android:defaultValue="mqttitude/+/+"
             android:dialogTitle="@string/preferencesContactsTopic"
-            android:key="subTopic"
             android:hint="mqttitude/+/+"
+            android:key="@string/keySubTopic"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
-               <CheckBoxPreference
+        
+        <CheckBoxPreference
             android:defaultValue="false"
-            android:key="autostartOnBoot"
-                        android:summary="@string/preferencesAutostartSummary"
+            android:dependency="@string/keySubEnabled"
+            android:key="@string/keyContactsLinkCloudStorageEnabled"
+            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
+            android:title="@string/contactsLinkCloudStorageEnabledTitle" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/keyAutostartOnBootEnabled"
+            android:summary="@string/preferencesAutostartSummary"
             android:title="@string/preferencesAutostartTitle" />
-            
-         
+
         <EditTextPreference
             android:defaultValue="500"
+            android:dialogTitle="@string/preferencesLocatorBackgroundDisplacement"
             android:hint="500"
             android:inputType="number"
-            android:key="backgroundDisplacement"
-            android:summary="Minimal distance (m) between location changes"
-                        android:dialogTitle="Background displacement"
-           
-            android:title="Background displacement" />
-        
-                
+            android:key="@string/keyLocatorBackgroundDisplacement"
+            android:summary="@string/preferencesLocatorBackgroundDisplacementSummary"
+            android:title="@string/preferencesLocatorBackgroundDisplacement" />
         <EditTextPreference
             android:defaultValue="30"
+            android:dialogTitle="@string/preferencesLocatorBackgroundInterval"
             android:hint="30"
             android:inputType="number"
-            android:key="backgroundInterval"
-            android:summary="Interval (m) between location changes"
-                        android:dialogTitle="Background interval"
-            
-            android:title="Background interval" />
-        
+            android:key="@string/keyLocatorBackgroundInterval"
+            android:summary="@string/preferencesLocatorBackgroundIntervalSummary"
+            android:title="@string/preferencesLocatorBackgroundInterval" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
@@ -164,8 +148,18 @@
         <Preference
             android:key="repo"
             android:summary="@string/preferencesRepositorySummary"
-            android:title="@string/preferencesRepositoryTitle" />
+            android:title="@string/preferencesRepository" />
 
+                <Preference
+            android:key="twitter"
+            android:summary="@string/preferencesTwitterSummary"
+            android:title="@string/preferencesTwitter" />
+        
+                        <Preference
+            android:key="donate"
+            android:summary="@string/preferencesDonateSummary"
+            android:title="@string/preferencesDonate" />
+                
         <st.alr.mqttitude.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"
             android:negativeButtonText=""
@@ -176,8 +170,6 @@
         <Preference
             android:key="versionReadOnly"
             android:title="@string/preferencesVersionTitle" />
-        
-       
     </PreferenceScreen>
 
 </PreferenceScreen>

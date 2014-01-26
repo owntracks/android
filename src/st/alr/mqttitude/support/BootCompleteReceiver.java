@@ -15,8 +15,8 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         Log.v(this.toString(), "BootCompleteReceiver received intent");
 
         if ((intent.getAction() != null)
-                && (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
-                && (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autostartOnBoot", false)))
+                && (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) && 
+                Preferences.isAutostartOnBootEnabled())
         {
             Log.v(this.toString(), "Autostarting app");
             Intent i = new Intent(context, ServiceProxy.class);

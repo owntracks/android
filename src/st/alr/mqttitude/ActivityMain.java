@@ -13,6 +13,7 @@ import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
@@ -314,7 +315,7 @@ public class ActivityMain extends FragmentActivity {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, "http://maps.google.com/?q=" + Double.toString(l.getLatitude()) + "," + Double.toString(l.getLongitude()));
         sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.shareLocation)));
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.shareLocation)));
     }
 
     @Override
@@ -362,7 +363,8 @@ public class ActivityMain extends FragmentActivity {
         private TextView selectedContactLocation;
         private ImageView selectedContactImage;
         private Map<String, Contact> markerToContacts;
-
+        private static final String KEY_TRACKING_CURRENT_DEVICE = "+CURRENTDEVICELOCATION+";
+        
         public static MapFragment getInstance(Bundle extras) {
             MapFragment instance = new MapFragment();
             instance.setArguments(extras);
@@ -529,7 +531,7 @@ public class ActivityMain extends FragmentActivity {
             if (l == null)
                 return;
             this.selectedContactDetails.setVisibility(View.GONE);
-            ActivityPreferences.setTrackingUsername(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
+            Preferences.setTrackingUsername(KEY_TRACKING_CURRENT_DEVICE);
             centerMap(l.getLatLng());
         }
 
@@ -549,7 +551,7 @@ public class ActivityMain extends FragmentActivity {
                 return;
             }
 
-            ActivityPreferences.setTrackingUsername(c.getTopic());
+            Preferences.setTrackingUsername(c.getTopic());
             centerMap(c.getLocation().getLatLng());
 
             this.selectedContactName.setText(c.toString());
@@ -587,7 +589,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public Contact getCurrentlyTrackedContact() {
-            return ServiceApplication.getContacts().get(ActivityPreferences.getTrackingUsername());
+            return ServiceApplication.getContacts().get(Preferences.getTrackingUsername());
         }
 
         public boolean hasCurrentLocation() {
@@ -595,7 +597,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public boolean isTrackingCurrentLocation() {
-            return ActivityPreferences.getTrackingUsername().equals(Defaults.CURRENT_LOCATION_TRACKING_IDENTIFIER);
+            return Preferences.getTrackingUsername().equals(KEY_TRACKING_CURRENT_DEVICE);
         }
 
     }
@@ -815,7 +817,7 @@ public class ActivityMain extends FragmentActivity {
             this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                    if (key.equals(Defaults.SETTINGS_KEY_CONTACTS_LINK_CLOUD_STORAGE))
+                    if (key.equals(Preferences.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
                         showHideAssignContactButton();
                 }
             };
@@ -830,7 +832,7 @@ public class ActivityMain extends FragmentActivity {
         }
 
         void showHideAssignContactButton() {
-            if (!ActivityPreferences.isContactLinkCloudStorageEnabled())
+            if (!Preferences.isContactLinkCloudStorageEnabled())
                 this.assignContact.setVisibility(View.VISIBLE);
             else
                 this.assignContact.setVisibility(View.GONE);
