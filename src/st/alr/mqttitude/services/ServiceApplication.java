@@ -2,6 +2,7 @@
 package st.alr.mqttitude.services;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -131,11 +132,11 @@ public class ServiceApplication implements ProxyableService {
         return 0;
     }
 
-    public static ConcurrentHashMap<String, Contact> getContacts() {
+    public static HashMap<String, Contact> getContacts() {
         return App.getContacts();
     }
 
-    public void onEvent(Events.ContactLocationUpdated e) {
+    public void onEventMainThread(Events.ContactLocationUpdated e) {
         // Updates a contact or allocates a new one
 
         Contact c = App.getContacts().get(e.getTopic());

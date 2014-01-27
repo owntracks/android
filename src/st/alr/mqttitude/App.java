@@ -24,7 +24,7 @@ import com.bugsnag.android.Bugsnag;
 public class App extends Application {
     private static App instance;
     private SimpleDateFormat dateFormater;
-    private ConcurrentHashMap<String,Contact> contacts;
+    private HashMap<String,Contact> contacts;
 
 
     @Override
@@ -32,7 +32,7 @@ public class App extends Application {
         super.onCreate();
         instance = this;
         this.dateFormater = new SimpleDateFormat("yyyy-MM-d HH:mm:ss", getResources().getConfiguration().locale);
-        this.contacts = new ConcurrentHashMap<String,Contact>();
+        this.contacts = new HashMap<String,Contact>();
 
         Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);
         Bugsnag.setNotifyReleaseStages("production", "testing");
@@ -44,7 +44,7 @@ public class App extends Application {
     public static Context getContext() {
         return instance;
     }
-    public static ConcurrentHashMap<String, Contact> getContacts() {
+    public static HashMap<String, Contact> getContacts() {
         return instance.contacts;
     }
 
