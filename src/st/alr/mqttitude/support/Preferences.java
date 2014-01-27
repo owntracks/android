@@ -69,7 +69,7 @@ public class Preferences {
         return getString(R.string.keyTrackingUsername, "");
     }
 
-    public static int getLocatorBackgroundDislacement() {
+    public static int getLocatorBackgroundDisplacement() {
         try {
             return Integer.parseInt(getString(R.string.keyLocatorBackgroundDisplacement, "500"));
         } catch (Exception e) {
@@ -144,7 +144,7 @@ public class Preferences {
     }
 
     public static int getBrokerSecurityType() {
-        return getInt(R.string.keyBrokerAuth, Defaults.VALUE_BROKER_SECURITY_SSL);
+        return getInt(R.string.keyBrokerSecurity, Defaults.VALUE_BROKER_SECURITY_SSL);
     }
 
     public static String getBrokerSslCaPath() {

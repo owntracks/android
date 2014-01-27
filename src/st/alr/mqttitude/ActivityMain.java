@@ -637,8 +637,9 @@ public class ActivityMain extends FragmentActivity {
         public void onResume() {
             super.onResume();
 
-            for (Contact c : ServiceApplication.getContacts().values())
-                updateContactView(c);
+            Iterator<Contact> it = ServiceApplication.getContacts().values().iterator();
+            while(it.hasNext());
+                updateContactView(it.next());
         }
 
         @Override
