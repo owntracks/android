@@ -296,7 +296,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     private void setWill(MqttConnectOptions m) {
         StringBuffer payload = new StringBuffer();
         payload.append("{");
-        payload.append("\"type\": ").append("\"").append("_lwt").append("\"");
+        payload.append("\"_type\": ").append("\"").append("lwt").append("\"");
         payload.append(", \"tst\": ").append("\"").append((int) (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
                 .append("\"");
         payload.append("}");

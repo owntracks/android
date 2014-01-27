@@ -86,8 +86,8 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
 
     public GeocodableLocation getLastKnownLocation() {
-        if ((this.mLocationClient != null) && this.mLocationClient.isConnected())
-            return new GeocodableLocation(this.mLocationClient.getLastLocation());
+        if ((this.mLocationClient != null) && this.mLocationClient.isConnected() && this.mLocationClient.getLastLocation() != null) 
+            this.lastKnownLocation = new GeocodableLocation(this.mLocationClient.getLastLocation());
 
         return this.lastKnownLocation;
     }
@@ -172,7 +172,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         this.mLocationRequest.setInterval(Preferences.getLocatorBackgroundInterval());
         this.mLocationRequest.setFastestInterval(0);
-        this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorBackgroundDislacement());
+        this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorBackgroundDisplacement());
     }
 
     private void setupForegroundLocationRequest() {
