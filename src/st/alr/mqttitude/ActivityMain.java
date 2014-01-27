@@ -2,16 +2,16 @@
 package st.alr.mqttitude;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
+import st.alr.mqttitude.services.ServiceLocator;
 import st.alr.mqttitude.services.ServiceProxy;
-import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
@@ -111,7 +111,7 @@ public class ActivityMain extends FragmentActivity {
         static FragmentHandler instance;
 
         private static HashMap<Class<?>, Bundle> store = new HashMap<Class<?>, Bundle>();
-        private static HashMap<Class<?>, Fragment> fragments = new HashMap<Class<?>, Fragment>();
+        private static ConcurrentHashMap<Class<?>, Fragment> fragments = new ConcurrentHashMap<Class<?>, Fragment>();
 
         private static LinkedList<Class<?>> backStack = new LinkedList<Class<?>>();
 
@@ -232,12 +232,8 @@ public class ActivityMain extends FragmentActivity {
         public void removeAll(FragmentActivity fa) {
             FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
 
-            Iterator<Fragment> iterator = fragments.values().iterator();
-            while (iterator.hasNext()) {
-                Fragment f = iterator.next();
+            for(Fragment f : fragments.values())
                 ft.remove(f);
-
-            }
 
             ft.commitAllowingStateLoss();
             fa.getSupportFragmentManager().executePendingTransactions();
@@ -388,10 +384,8 @@ public class ActivityMain extends FragmentActivity {
             super.onResume();
             this.mMapView.onResume();
 
-            // Initial population of the map with all exisiting contacts
-            Iterator<Contact> it = App.getContacts().values().iterator();
-            while (it.hasNext())
-                updateContactLocation(it.next());
+            for(Contact c : App.getContacts().values()) 
+                updateContactLocation(c);
 
             focusCurrentlyTrackedContact();
         }
@@ -636,10 +630,12 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onResume() {
             super.onResume();
+            
+            for(Contact c : App.getContacts().values())
+                updateContactView(c);
 
-            Iterator<Contact> it = ServiceApplication.getContacts().values().iterator();
-            while(it.hasNext());
-                updateContactView(it.next());
+            updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
+
         }
 
         @Override
@@ -690,9 +686,8 @@ public class ActivityMain extends FragmentActivity {
                 }
             });
 
-            Iterator<Contact> it = App.getContacts().values().iterator();
-            while (it.hasNext())
-                updateContactView(it.next());
+            for(Contact c : App.getContacts().values())
+                updateContactView(c);
 
             return v;
         }
@@ -702,7 +697,9 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
-
+            if(l == null)
+                return;
+            
             // Current location changes often, don't waste resources to resolve
             // the geocoder
             this.currentLoc.setText(l.toString());
