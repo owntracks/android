@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
@@ -130,7 +131,7 @@ public class ServiceApplication implements ProxyableService {
         return 0;
     }
 
-    public static Map<String, Contact> getContacts() {
+    public static ConcurrentHashMap<String, Contact> getContacts() {
         return App.getContacts();
     }
 

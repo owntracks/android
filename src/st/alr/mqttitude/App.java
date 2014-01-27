@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 import st.alr.mqttitude.model.Contact;
@@ -23,7 +24,7 @@ import com.bugsnag.android.Bugsnag;
 public class App extends Application {
     private static App instance;
     private SimpleDateFormat dateFormater;
-    private Map<String,Contact> contacts;
+    private ConcurrentHashMap<String,Contact> contacts;
 
 
     @Override
@@ -31,7 +32,7 @@ public class App extends Application {
         super.onCreate();
         instance = this;
         this.dateFormater = new SimpleDateFormat("yyyy-MM-d HH:mm:ss", getResources().getConfiguration().locale);
-        this.contacts = new HashMap<String,Contact>();
+        this.contacts = new ConcurrentHashMap<String,Contact>();
 
         Bugsnag.register(this, Defaults.BUGSNAG_API_KEY);
         Bugsnag.setNotifyReleaseStages("production", "testing");
@@ -43,7 +44,7 @@ public class App extends Application {
     public static Context getContext() {
         return instance;
     }
-    public static Map<String, Contact> getContacts() {
+    public static ConcurrentHashMap<String, Contact> getContacts() {
         return instance.contacts;
     }
 
