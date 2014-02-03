@@ -79,6 +79,7 @@ public class Preferences {
 
     public static long getLocatorBackgroundInterval() {
         try {
+            return getString(R.string.myUrl)
             return TimeUnit.MINUTES.toMillis(Long.parseLong(getString(R.string.keyLocatorBackgroundInterval, "30")));
         } catch (Exception e) {
             return 30;

@@ -5,11 +5,6 @@ import st.alr.mqttitude.R;
 import android.content.Context;
 
 public class Defaults {
-    public static final String VALUE_TOPIC_PUB_BASE = "mqttitude/%s/%s";
-    public static final String VALUE_TOPIC_WAYPOINTS_PART = "/waypoints";
-    public static final String VALUE_TOPIC_SUB = "mqttitude/+/+";
-
-
     public static final String BUGSNAG_API_KEY = "f3302f4853372edcdd12dfcc102a3578";
     public static final String VALUE_REPO_URL = "http://github.com/binarybucks/mqttitude";
     public static final String VALUE_ISSUES_MAIL = "issues@mqttitude.org";
@@ -24,19 +19,24 @@ public class Defaults {
     public static final int NOTIFCATION_ID = 1338;
 
     // TODO: Move to Preferences
+    public static final String VALUE_TOPIC_PUB_BASE = "mqttitude/%s/%s";
+    public static final String VALUE_TOPIC_WAYPOINTS_PART = "/waypoints";
+    public static final String VALUE_TOPIC_SUB = "mqttitude/+/+";
     public static final String VALUE_BROKER_HOST = "192.168.8.2";
     public static final String VALUE_BROKER_PORT = "8883";
     public static final String VALUE_BACKGROUND_UPDATES_INTERVAL = "15";
-    public static final boolean VALUE_BACKGROUND_UPDATES = false;
+    public static final String VALUE_QOS = "0";
+
     public static final int VALUE_BROKER_SECURITY_NONE = 0;
     public static final int VALUE_BROKER_SECURITY_SSL = 1;
     public static final int VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT = 2;
-    public static final boolean VALUE_NOTIFICATION_ENABLED = true;
-    public static final boolean VALUE_RETAIN = false;
-    public static final String VALUE_QOS = "0";
-    public static final boolean VALUE_TICKER_ON_PUBLISH = true;
     public static final int VALUE_BROKER_AUTH_ANONYMOUS = 0;
     public static final int VALUE_BROKER_AUTH_USERNAME = 1;
+
+    public static final boolean VALUE_BACKGROUND_UPDATES = false;
+    public static final boolean VALUE_NOTIFICATION_ENABLED = true;
+    public static final boolean VALUE_RETAIN = true;
+    public static final boolean VALUE_TICKER_ON_PUBLISH = true;
 
 
 

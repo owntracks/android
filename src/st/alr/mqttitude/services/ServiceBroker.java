@@ -151,6 +151,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             return;
         }
 
+        
+        
         // Don't do anything unless we're disconnected
 
         if (isDisconnected())
@@ -179,12 +181,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     }
     
     private boolean isDisconnected(){
-        Log.v(this.toString(), "disconnect check: " + state);
+        
+        
+        Log.v(this.toString(), "disconnect check: " + state + ", mqttClient.isConnected() == " + mqttClient.isConnected());
         return state == Defaults.State.ServiceBroker.INITIAL 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT  
                 || state == Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED 
-                || state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR;
+                || state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR
+                
+                //  In some cases the internal state may diverge from the mqtt client state. 
+                || !isConnected();
     }
 
     
