@@ -678,7 +678,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             return;            
         }
         if(!type.equals("location")) {
-            Log.d(this.toString(), "Ignoring message of type " + type);
+            Log.d(this.toString(), "Ignoring message of type: " + type);
             return;            
         }
         
