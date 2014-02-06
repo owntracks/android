@@ -183,7 +183,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
     private boolean isDisconnected(){
         
         
-        Log.v(this.toString(), "disconnect check: " + state + ", mqttClient.isConnected() == " + mqttClient.isConnected());
+        Log.v(this.toString(), "disconnect check: " + state + ", mqttClient.isConnected() == " + isConnected());
         return state == Defaults.State.ServiceBroker.INITIAL 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED 
                 || state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT  
@@ -668,9 +668,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
         String msg = new String(message.getPayload());
         String type; 
-        JSONObject json = new JSONObject(msg);
+        JSONObject json;
         
         try {
+            json = new JSONObject(msg);
             type = json.getString("_type");
         } catch (Exception e) {
             Log.e(this.toString(), "Received invalid message: " + msg);
