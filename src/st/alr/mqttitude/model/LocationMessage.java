@@ -13,13 +13,15 @@ public class LocationMessage {
     int transition;
     int battery;
     boolean supressesTicker;
-
+    boolean isShared;
+    
     public LocationMessage(GeocodableLocation l) {
         this.location = l;
         this.transition = -1;
         this.battery = -1;
         this.waypoint = null;
         this.supressesTicker = false;
+        this.isShared = false;
     }
 
     public boolean doesSupressTicker() {
@@ -38,10 +40,15 @@ public class LocationMessage {
         this.transition = transition;
     }
 
+    
     public void setBattery(int battery) {
         this.battery = battery;
     }
 
+    public void setShared(boolean isShared) {
+        this.isShared = isShared;
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -57,7 +64,8 @@ public class LocationMessage {
             builder.append(", \"batt\": ").append("\"").append(this.battery).append("\"");
 
         if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
-            builder.append(", \"desc\": ").append("\"").append(this.waypoint.getDescription()).append("\"");
+            if(isShared)
+                builder.append(", \"desc\": ").append("\"").append(this.waypoint.getDescription()).append("\"");
             builder.append(", \"event\": ").append("\"").append(this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave").append("\"");
         }
 
