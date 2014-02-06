@@ -28,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 public class PreferencesBroker extends DialogPreference {
-    private Context context;
     private EditText host;
     private EditText port;
     private EditText password;
@@ -56,7 +55,6 @@ public class PreferencesBroker extends DialogPreference {
 
     public PreferencesBroker(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
 
         setDialogLayoutResource(R.layout.preferences_broker);
     }

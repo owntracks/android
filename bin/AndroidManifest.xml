@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="st.alr.mqttitude"
+    android:versionCode="0416"
+    android:versionName="0.4.16	" >
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="19" />
+
+    <permission
+        android:name="st.alr.mqttitude.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- To access the network -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To handle connectivity changes and reconnect -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- For Google Maps caching -->
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" /> <!-- To access Google Play Services -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- To locate the device -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- To locate the device -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- To prevent the device from sleeping while hanlding MQTT traffic -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Mqttitude with IM name set to the topic) -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- To save contact links -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
+
+    <application
+        android:name="st.alr.mqttitude.App"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Mqttitude" >
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDL80DnlIzyG5GNcMoy9yX7uuWEJcCvW7c" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name="st.alr.mqttitude.ActivityMain"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="st.alr.mqttitude.preferences.ActivityPreferences"
+            android:configChanges="orientation"
+            android:label="Preferences" >
+        </activity>
+        <activity
+            android:name="st.alr.mqttitude.ActivityWaypoints"
+            android:configChanges="orientation"
+            android:label="Waypoints" >
+        </activity>
+
+        <service
+            android:name="st.alr.mqttitude.services.ServiceProxy"
+            android:exported="false" >
+        </service>
+
+        <activity
+            android:name="st.alr.mqttitude.ActivityLauncher"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="st.alr.mqttitude.support.BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
