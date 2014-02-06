@@ -5,7 +5,6 @@ import st.alr.mqttitude.services.ServiceProxy;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class BootCompleteReceiver extends BroadcastReceiver {

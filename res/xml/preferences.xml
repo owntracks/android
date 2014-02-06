@@ -171,5 +171,5 @@
             android:key="versionReadOnly"
             android:title="@string/preferencesVersionTitle" />
     </PreferenceScreen>
-
+    
 </PreferenceScreen>

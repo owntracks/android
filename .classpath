@@ -3,11 +3,11 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/bugsnag-android-2.0.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/eventbus-2.1.0-beta-1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/paho.jar"/>
-	<classpathentry kind="lib" path="libs/greendao-1.3.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/greendao-1.3.7.jar"/>
 	<classpathentry exported="true" kind="src" path="/google-play-services_lib"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="src"/>
