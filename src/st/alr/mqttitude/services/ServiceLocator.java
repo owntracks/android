@@ -276,13 +276,13 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         l.setLongitude(w.getLongitude());
         l.setAccuracy(w.getRadius());
         l.getLocation().setTime(System.currentTimeMillis());
-
+        
         LocationMessage r = new LocationMessage(l);
 
         r.setTransition(transition);
         r.setWaypoint(w);
         r.setSupressesTicker(true);
-
+        
         publishLocationMessage(r);
 
     }
