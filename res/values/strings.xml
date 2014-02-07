@@ -56,13 +56,13 @@
     <string name="preferencesLocatorBackgroundIntervalSummary">Minutes between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
-    <string name="preferencesRepositorySummary">github.com/binarybucks/mqttitude</string>
+    <string name="preferencesRepositorySummary">https://github.com/owntracks/android</string>
     <string name="preferencesTwitter">Twitter</string>
-    <string name="preferencesTwitterSummary">twitter.com/mqttitude</string>
+    <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesDonate">Donate Bitcoins</string>
     <string name="preferencesDonateSummary">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
     <string name="preferencesMailTitle">Mail</string>
-    <string name="preferencesMailSummary">issues@mqttitude.org</string>
+    <string name="preferencesMailSummary">issues@owntracks.org</string>
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
     <string name="connectivityDisconnecting">"Disconnecting"</string>
