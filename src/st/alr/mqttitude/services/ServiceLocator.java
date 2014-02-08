@@ -300,7 +300,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
         }
 
         ServiceProxy.getServiceBroker().publish(
-                topic + Defaults.VALUE_TOPIC_WAYPOINTS_PART,
+                topic + Preferences.getWaypointPubTopicPart(),
                 r.toString(),
                 false,
                 Preferences.getPubQos()

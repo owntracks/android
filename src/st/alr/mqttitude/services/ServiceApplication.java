@@ -248,6 +248,9 @@ public class ServiceApplication implements ProxyableService {
         notificationBuilder.setSmallIcon(R.drawable.ic_notification);
         this.notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
 
+        notificationBuilder.setTicker(null);
+        this.notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
+        
         // if the notification is not enabled, the ticker will create an empty
         // one that we get rid of
         if (!Preferences.isNotificationEnabled())
