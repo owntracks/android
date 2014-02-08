@@ -117,7 +117,7 @@ public class ActivityPreferences extends PreferenceActivity {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse(Defaults.VALUE_REPO_URL));
+                            intent.setData(Uri.parse(Preferences.getRepoUrl()));
                             a.startActivity(intent);
                             return false;
                         }
@@ -130,10 +130,9 @@ public class ActivityPreferences extends PreferenceActivity {
                             Intent intent = new Intent(Intent.ACTION_SEND);
                             intent.setType("message/rfc822");
 
-                            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
-                                    Defaults.VALUE_ISSUES_MAIL
+                            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {Preferences.getIssuesMail()
                             });
-                            intent.putExtra(Intent.EXTRA_SUBJECT, "MQTTitude (Version: " + ver + ")");
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "OwnTracks (Version: " + ver + ")");
                             a.startActivity(Intent.createChooser(intent, "Send Email"));
                             return false;
                         }
@@ -145,7 +144,7 @@ public class ActivityPreferences extends PreferenceActivity {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse(Defaults.VALUE_TWITTER_URL));
+                            intent.setData(Uri.parse(Preferences.getTwitterUrl()));
                             a.startActivity(intent);
                             return false;
                         }
@@ -157,11 +156,12 @@ public class ActivityPreferences extends PreferenceActivity {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("bitcoin:" + Defaults.BITCOIN_ADDRESS));
+                            intent.setData(Uri.parse("bitcoin:" + Preferences.getBitcoinAddress()));
                             a.startActivity(intent);
                             return false;
                         }
                     });
+            
             // TODO: set hint when device name changes
             setServerPreferenceSummary(getActivity());
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="valBrokerSecurityTypeNone">0</integer>
+    <integer name="valBrokerSecurityTypeTls">1</integer>
+    <integer name="valBrokerSecurityTypeTlsCustom">2</integer>
+    <integer name="valBrokerAuthTypeAnonymous">0</integer>
+    <integer name="valBrokerAuthTypeUsernamePw">1</integer>
+
+</resources>

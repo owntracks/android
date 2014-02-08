@@ -148,6 +148,8 @@
     <string name="title_activity_activity_wizzard">Wizzard</string>
     <string name="title_test_list">tests</string>
     <string name="title_test_detail">test Detail</string>
+    
+    
     <string name="keyDeviceName">deviceName</string>
     <string name="keyBrokerHost">brokerHost</string>
     <string name="keyBrokerPort">brokerPort</string>
@@ -175,5 +177,21 @@
     <string name="keyAutostartOnBootEnabled">autostartOnBoot</string>
     <string name="keyLocatorBackgroundDisplacement">backgroundDisplacement</string>
     <string name="keyLocatorBackgroundInterval">backgroundInterval</string>
-
+    <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
+    <string name="valPubTopicWaypointsPart">/waypoints</string>
+    <string name="valSubTopic">owntracks/+/+</string>
+    <string name="valBrokerHost">127.0.0.1</string>
+    <string name="valBrokerPort">8883</string>
+    <string name="valPubAutoInterval">15</string>
+    <string name="valPubQos">0</string>
+        <string name="valLocatorBackgroundDisplacement">500</string>
+        <string name="valLocatorBackgroundInterval">30</string>
+            <string name="valEmpty">""</string>
+        
+    <string name="valBugsnagApiKey">d7074409bf76697384a454b611917336</string>
+    <string name="valRepoUrl">https://github.com/owntracks</string>
+    <string name="valIssuesMail">issues@owntracks.org</string>
+    <string name="valTwitterUrl">https://twitter.com/owntracks</string>
+    <string name="valBitcoinAddress">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
+    
 </resources>

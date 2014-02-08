@@ -206,7 +206,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService
 
         try
         {
-            String prefix = Preferences.getBrokerSecurityType() == Defaults.VALUE_BROKER_SECURITY_NONE ? "tcp" : "ssl";
+            String prefix = Preferences.getBrokerSecurityType() == context.getResources().getInteger(R.integer.valBrokerSecurityTypeNone) ? "tcp" : "ssl";
             String cid = Preferences.getDeviceName(true);
             
             Log.v(this.toString(), "broker port: " + Preferences.getBrokerPort());
@@ -263,21 +263,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             MqttConnectOptions options = new MqttConnectOptions();
             setWill(options);
             
-            switch (Preferences.getBrokerAuthType()) {
-                case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:                    
-                    break;
-
-                default:
+            if (Preferences.getBrokerAuthType() != context.getResources().getInteger(R.integer.valBrokerSecurityTypeNone)) {                    
                     options.setPassword(Preferences.getBrokerPassword().toCharArray());
-
                     options.setUserName(Preferences.getBrokerUsername());
 
-                    break;
-
-}
+            }
             
             
-            if (Preferences.getBrokerSecurityType() == Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT)
+            if (Preferences.getBrokerSecurityType() == context.getResources().getInteger(R.integer.valBrokerSecurityTypeTlsCustom) )
                 options.setSocketFactory(this.getSSLSocketFactory());
 
 

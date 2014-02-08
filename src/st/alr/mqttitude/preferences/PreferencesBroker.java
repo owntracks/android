@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.services.ServiceBroker;
 import st.alr.mqttitude.services.ServiceProxy;
@@ -102,7 +103,7 @@ public class PreferencesBroker extends DialogPreference {
     protected void onBindDialogView(View view) {
         this.host.setText(Preferences.getBrokerHost());
         this.port.setText(Preferences.getBrokerPort());
-        this.port.setHint(Defaults.VALUE_BROKER_PORT);
+        this.port.setHint(Preferences.getBrokerPortDefault());
 
         userName.setText(Preferences.getBrokerUsername());
 
@@ -186,7 +187,7 @@ public class PreferencesBroker extends DialogPreference {
 
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                PreferencesBroker.this.brokerSecurity.setSelection(Defaults.VALUE_BROKER_SECURITY_SSL);
+                PreferencesBroker.this.brokerSecurity.setSelection(App.getContext().getResources().getInteger(R.integer.valBrokerSecurityTypeTls));
             }
         });
 
@@ -227,18 +228,12 @@ public class PreferencesBroker extends DialogPreference {
     }
 
     private void handleBrokerAuth() {
-        switch (this.brokerAuth.getSelectedItemPosition()) {
-            case Defaults.VALUE_BROKER_AUTH_ANONYMOUS:
+        if(this.brokerAuth.getSelectedItemPosition() == App.getContext().getResources().getInteger(R.integer.valBrokerAuthTypeAnonymous)) {
                 this.brokerPasswordWrapper.setVisibility(View.GONE);
-
-                break;
-            default:
-                // We do not require a passwort as it might be empty (stupid but
-                // possible)
-                this.brokerPasswordWrapper.setVisibility(View.VISIBLE);
-
-                break;
-
+        } else {
+            // We do not require a passwort as it might be empty (stupid but
+            // possible)
+            this.brokerPasswordWrapper.setVisibility(View.VISIBLE);
         }
         conditionalyEnableConnectButton();
     }
@@ -344,23 +339,18 @@ public class PreferencesBroker extends DialogPreference {
     }
 
     private void handleBrokerSecurity() {
-        switch (this.brokerSecurity.getSelectedItemPosition()) {
-            case Defaults.VALUE_BROKER_SECURITY_NONE:
+        if(this.brokerSecurity.getSelectedItemPosition() == App.getContext().getResources().getInteger(R.integer.valBrokerSecurityTypeNone)) { 
                 this.brokerSecuritySSLOptions.setVisibility(View.GONE);
                 this.brokerSecurityNoneOptions.setVisibility(View.VISIBLE);
                 this.requiredPreferences.remove(RequireablePreferences.CACRT);
-                break;
-            case Defaults.VALUE_BROKER_SECURITY_SSL_CUSTOMCACRT:
+        } else if (this.brokerSecurity.getSelectedItemPosition() == App.getContext().getResources().getInteger(R.integer.valBrokerSecurityTypeTlsCustom)) {
                 this.brokerSecuritySSLOptions.setVisibility(View.VISIBLE);
                 this.brokerSecurityNoneOptions.setVisibility(View.GONE);
                 this.requiredPreferences.add(RequireablePreferences.CACRT);
-                break;
-
-            default:
+        } else {
                 this.brokerSecuritySSLOptions.setVisibility(View.GONE);
                 this.brokerSecurityNoneOptions.setVisibility(View.VISIBLE);
                 this.requiredPreferences.remove(RequireablePreferences.CACRT);
-                break;
         }
         conditionalyEnableConnectButton();
 
