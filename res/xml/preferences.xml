@@ -98,8 +98,10 @@
             android:title="@string/preferencesContactsEnabledTitle" />
 
         <EditTextPreference
+            android:defaultValue="@string/valSubTopic"
             android:dependency="@string/keySubEnabled"
             android:dialogTitle="@string/preferencesContactsTopic"
+            android:hint="@string/valSubTopic"
             android:key="@string/keySubTopic"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />

@@ -103,7 +103,6 @@ public class PreferencesBroker extends DialogPreference {
     protected void onBindDialogView(View view) {
         this.host.setText(Preferences.getBrokerHost());
         this.port.setText(Preferences.getBrokerPort());
-        this.port.setHint(Preferences.getBrokerPortDefault());
 
         userName.setText(Preferences.getBrokerUsername());
 

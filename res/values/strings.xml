@@ -11,12 +11,13 @@
     <string name="preferencesServerTitle">"Connection"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
-    <string name="preferencesUserUsername">"User-Name"</string>
-    <string name="preferencesDeviceName">"Device-Name"</string>
+    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesDeviceName">"Device name"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesCaCrtPath">Absolute certificate path</string>
     <string name="preferencesBrokerClientId">"Client ID"</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
@@ -56,7 +57,7 @@
     <string name="preferencesLocatorBackgroundIntervalSummary">Minutes between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
-    <string name="preferencesRepositorySummary">https://github.com/owntracks/android</string>
+    <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesDonate">Donate Bitcoins</string>

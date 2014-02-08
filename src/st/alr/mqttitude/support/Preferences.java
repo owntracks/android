@@ -67,20 +67,11 @@ public class Preferences {
     }
 
     public static int getLocatorBackgroundDisplacement() {
-        try {
-            return Integer.parseInt(getString(R.string.keyLocatorBackgroundDisplacement, R.string.valLocatorBackgroundDisplacement));
-        } catch (Exception e) {
-            return Integer.parseInt(App.getContext().getResources().getString(R.string.keyLocatorBackgroundDisplacement));
-        }
+        return Integer.parseInt(getString(R.string.keyLocatorBackgroundDisplacement, R.string.valLocatorBackgroundDisplacement));
     }
 
     public static long getLocatorBackgroundInterval() {
-        try {
-            return TimeUnit.MINUTES.toMillis(Long.parseLong(getString(R.string.keyLocatorBackgroundInterval, R.string.valLocatorBackgroundInterval)));
-        } catch (Exception e) {
-            return Integer.parseInt(App.getContext().getResources().getString(R.string.valLocatorBackgroundInterval));
-        }
-
+        return TimeUnit.MINUTES.toMillis(Long.parseLong(getString(R.string.keyLocatorBackgroundInterval, R.string.valLocatorBackgroundInterval)));
     }
 
     

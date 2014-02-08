@@ -162,7 +162,6 @@ public class ActivityPreferences extends PreferenceActivity {
                         }
                     });
             
-            // TODO: set hint when device name changes
             setServerPreferenceSummary(getActivity());
 
             backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -184,7 +183,7 @@ public class ActivityPreferences extends PreferenceActivity {
 
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    if (key.equals(Preferences.getKey(R.string.keyBrokerUsername)))
+                    if (key.equals(Preferences.getKey(R.string.keyBrokerUsername)) || key.equals(Preferences.getKey(R.string.keyDeviceName)))
                         setPubTopicHint(topic);
                 }
             };

@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:inputType="textVisiblePassword|textNoSuggestions"
             android:key="serverAddress"
+            android:hint="@string/valBrokerHost"
             android:maxLines="1"
             android:selectAllOnFocus="true"
             android:singleLine="true" />
@@ -38,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:digits="0123456789"
-            android:hint="8883"
+            android:hint="@string/valBrokerPort"
             android:inputType="numberDecimal"
             android:key="serverPort"
             android:maxLength="5"
@@ -93,7 +94,7 @@
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Password" />
+                android:text="@string/preferencesBrokerPassword" />
 
             <EditText
                 android:id="@+id/brokerPassword"
@@ -151,7 +152,7 @@
                         android:id="@+id/textView6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ca.crt path"
+                        android:text="@string/preferencesCaCrtPath"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
@@ -159,7 +160,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:hint="system"
                         android:inputType="textVisiblePassword|textNoSuggestions" />
                 </LinearLayout>
 
