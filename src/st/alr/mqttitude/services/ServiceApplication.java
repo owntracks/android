@@ -25,6 +25,7 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -91,6 +92,10 @@ public class ServiceApplication implements ProxyableService {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
                 if (key.equals(Preferences.getKey(R.string.keyNotificationEnabled)))
+                    handleNotification();
+                else if (key.equals(Preferences.getKey(R.string.keyNotificationGeocoderEnabled)))
+                    handleNotification();
+                else if (key.equals(Preferences.getKey(R.string.keyNotificationLocationEnabled)))
                     handleNotification();
                 else if (key.equals(Preferences.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
                     updateAllContacts();
@@ -193,6 +198,9 @@ public class ServiceApplication implements ProxyableService {
         }
 
     };
+    private Notification notification;
+    private boolean notificationActionAdded;
+    private PendingIntent notificationIntent;
 
     /**
      * @category NOTIFICATION HANDLING
@@ -200,13 +208,19 @@ public class ServiceApplication implements ProxyableService {
     private void handleNotification() {
         Log.v(this.toString(), "handleNotification()");
         this.context.stopForeground(true);
-        if (Preferences.isNotificationEnabled() || !playServicesAvailable)
+        
+        if(notificationManager != null) 
+            notificationManager.cancelAll();
+        
+        if (Preferences.isNotificationEnabled() || !playServicesAvailable) 
             createNotification();
-
+        
     }
 
     private void createNotification() {
         Log.v(this.toString(), "createNotification");
+        //
+        notificationBuilder = new NotificationCompat.Builder(context);
 
         Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
         resultIntent.setAction("android.intent.action.MAIN");
@@ -219,14 +233,12 @@ public class ServiceApplication implements ProxyableService {
 
         notificationBuilder.setContentIntent(resultPendingIntent);
 
-        PendingIntent pIntent = ServiceProxy.getPendingIntentForService(this.context,
+         notificationIntent = ServiceProxy.getPendingIntentForService(this.context,
                 ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
-
-        notificationBuilder.addAction(
-                R.drawable.ic_upload,
-                this.context.getString(R.string.publish),
-                pIntent);
-
+            notificationBuilder.addAction(
+                    R.drawable.ic_upload,
+                    this.context.getString(R.string.publish),
+                    notificationIntent);
         updateNotification();
     }
 
@@ -248,6 +260,7 @@ public class ServiceApplication implements ProxyableService {
         notificationBuilder.setSmallIcon(R.drawable.ic_notification);
         this.notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
 
+        // Clear ticker
         notificationBuilder.setTicker(null);
         this.notificationManager.notify(Defaults.NOTIFCATION_ID, notificationBuilder.build());
         
@@ -289,9 +302,8 @@ public class ServiceApplication implements ProxyableService {
         if (time != 0)
             notificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
 
-        this.context.startForeground(Defaults.NOTIFCATION_ID, notificationBuilder.build());
-        // notificationManager.notify(Defaults.NOTIFCATION_ID,
-        // notificationBuilder.build());
+        notification = notificationBuilder.build();
+        this.context.startForeground(Defaults.NOTIFCATION_ID, notification);
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
