@@ -2,6 +2,8 @@ package st.alr.mqttitude.support;
 
 import java.util.concurrent.TimeUnit;
 
+import com.google.android.gms.location.LocationRequest;
+
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import android.content.SharedPreferences;
@@ -223,5 +225,28 @@ public class Preferences {
         return App.getContext().getString(R.string.valBrokerPort);
     }
 
+    public static int getLocatorForegroundAccuracy(){
+        return getLocatorAccuracy(Integer.parseInt(getString(R.string.keyLocatorAccuracyForeground, R.string.valLocatorAccuracyForeground)));
+    }
+    public static int getLocatorBackgroundAccuracy(){
+        return getLocatorAccuracy(Integer.parseInt(getString(R.string.keyLocatorAccuracyBackground, R.string.valLocatorAccuracyBackground)));
+ 
+    }
+    
+    private static int getLocatorAccuracy(int val){
+        switch (val) {
+            case 0:
+                return LocationRequest.PRIORITY_HIGH_ACCURACY; 
+            case 1:
+                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+            case 2:
+                return LocationRequest.PRIORITY_LOW_POWER;
+            case 3:
+                return LocationRequest.PRIORITY_NO_POWER;
+            default:
+                return LocationRequest.PRIORITY_HIGH_ACCURACY; 
+        }
+    }
+    
     
 }

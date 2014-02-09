@@ -134,6 +134,21 @@
             android:key="@string/keyLocatorBackgroundInterval"
             android:summary="@string/preferencesLocatorBackgroundIntervalSummary"
             android:title="@string/preferencesLocatorBackgroundInterval" />
+
+        <ListPreference
+            android:defaultValue="@string/valLocatorAccuracyBackground"
+            android:entries="@array/locatorAccuracy_readable"
+            android:entryValues="@array/locatorAccuracy"
+            android:key="@string/keyLocatorAccuracyBackground"
+            android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
+            android:title="@string/preferencesLocatorAccuracyBackground" />
+        <ListPreference
+            android:defaultValue="@string/valLocatorAccuracyForeground"
+            android:entries="@array/locatorAccuracy_readable"
+            android:entryValues="@array/locatorAccuracy"
+            android:key="@string/keyLocatorAccuracyForeground"
+            android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
+            android:title="@string/preferencesLocatorAccuracyForeground" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"

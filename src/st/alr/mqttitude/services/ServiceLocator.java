@@ -168,16 +168,20 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     }
 
     private void setupBackgroundLocationRequest() {
+        Log.v(this.toString(), "setupBackgroundLocationRequest with profile: " + Preferences.getLocatorBackgroundAccuracy());
+
         this.mLocationRequest = LocationRequest.create();
-        this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        this.mLocationRequest.setPriority(Preferences.getLocatorBackgroundAccuracy());
         this.mLocationRequest.setInterval(Preferences.getLocatorBackgroundInterval());
         this.mLocationRequest.setFastestInterval(0);
         this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorBackgroundDisplacement());
     }
 
     private void setupForegroundLocationRequest() {
+        Log.v(this.toString(), "setupForegroundLocationRequest with profile: " + Preferences.getLocatorForegroundAccuracy());
+
         this.mLocationRequest = LocationRequest.create();
-        this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        this.mLocationRequest.setPriority(Preferences.getLocatorForegroundAccuracy());
         this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
         this.mLocationRequest.setFastestInterval(0);
         this.mLocationRequest.setSmallestDisplacement(50);
