@@ -2,11 +2,15 @@
 package st.alr.mqttitude.services;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.util.Log;
 import de.greenrobot.event.EventBus;
 
 public class ServiceProxy extends ServiceBindable {
@@ -15,6 +19,7 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_BROKER = "3:Brk";
     public static final String KEY_SERVICE_ID = "srvID";
     private static ServiceProxy instance;
+    private static LinkedList<Runnable> runQueue = new LinkedList<Runnable>();
     private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
 
     @Override
@@ -30,10 +35,30 @@ public class ServiceProxy extends ServiceBindable {
         instance = this;
     }
 
+    
     public static ServiceProxy getInstance() {
         return instance;
     }
 
+    public static boolean runOrQueueRunnable(Runnable r, Activity a, ServiceConnection c) {
+        
+        if(instance != null) {
+            r.run();
+            return true;
+        } else {
+            runQueue.addLast(r);
+            a.bindService(new Intent(a, ServiceProxy.class), c, Context.BIND_AUTO_CREATE);
+            return false;
+        }
+    }
+    
+    public static void runQueuedRunnables(){
+        Log.v("ServiceProxy", "Running " + runQueue.size() + " runnables");
+        for(Runnable r : runQueue) 
+            r.run();
+        runQueue.clear();
+    }
+    
     @Override
     public void onDestroy() {
         for (ProxyableService p : services.values()) {
