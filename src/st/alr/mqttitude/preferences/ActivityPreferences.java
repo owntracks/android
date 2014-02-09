@@ -8,6 +8,9 @@ import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +27,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 import de.greenrobot.event.EventBus;
 
 public class ActivityPreferences extends PreferenceActivity {
@@ -155,9 +159,17 @@ public class ActivityPreferences extends PreferenceActivity {
                     new OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
+                            try {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             intent.setData(Uri.parse("bitcoin:" + Preferences.getBitcoinAddress()));
                             a.startActivity(intent);
+                            
+                            } catch (ActivityNotFoundException e) {
+                                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE); 
+                                ClipData clip = ClipData.newPlainText("bitcoin", Preferences.getBitcoinAddress());
+                                clipboard.setPrimaryClip(clip);
+                                Toast.makeText(getActivity(), getActivity().getString(R.string.copiedToClipboard),Toast.LENGTH_LONG).show();
+                            }
                             return false;
                         }
                     });

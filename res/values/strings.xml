@@ -100,6 +100,12 @@
     <string name="contactsLinkCloudStorageEnabledTitle">Update address book</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostartTitle">Autostart</string>
+    <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
+    <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage when active</string>
+    
+    <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
+        <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
+    
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -113,7 +119,7 @@
     <string name="actionModeOneSelected">1 item selected</string>
     <string name="actionModeMoreSelected">items selected</string>
     <string name="currentLocationNotAvailable">The current location is not available</string>
-
+	<string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
@@ -123,15 +129,16 @@
         <item>Anonymous</item>
         <item>Username / Password</item>
     </string-array>
-    <string-array name="qos">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
     <string-array name="qos_readable">
         <item>"0"</item>
         <item>"1"</item>
         <item>"2"</item>
+    </string-array>
+    <string-array name="locatorAccuracy_readable">
+        <item>High power</item>
+        <item>Balanced power</item>
+        <item>Low power</item>
+        <item>No power</item>
     </string-array>
     <string-array name="transitionType_readable">
         <item>@string/transitionEnter</item>
@@ -149,8 +156,6 @@
     <string name="title_activity_activity_wizzard">Wizzard</string>
     <string name="title_test_list">tests</string>
     <string name="title_test_detail">test Detail</string>
-    
-    
     <string name="keyDeviceName">deviceName</string>
     <string name="keyBrokerHost">brokerHost</string>
     <string name="keyBrokerPort">brokerPort</string>
@@ -177,7 +182,11 @@
     <string name="keyAdvancedConnectionPreferencesEnabled">advancedMode</string>
     <string name="keyAutostartOnBootEnabled">autostartOnBoot</string>
     <string name="keyLocatorBackgroundDisplacement">backgroundDisplacement</string>
+    <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
+    <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyLocatorBackgroundInterval">backgroundInterval</string>
+    
+    
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicWaypointsPart">/waypoints</string>
     <string name="valSubTopic">owntracks/+/+</string>
@@ -185,14 +194,26 @@
     <string name="valBrokerPort">8883</string>
     <string name="valPubAutoInterval">15</string>
     <string name="valPubQos">0</string>
-        <string name="valLocatorBackgroundDisplacement">500</string>
-        <string name="valLocatorBackgroundInterval">30</string>
-            <string name="valEmpty">""</string>
-        
+    <string name="valLocatorBackgroundDisplacement">500</string>
+    <string name="valLocatorBackgroundInterval">30</string>
+    <string name="valEmpty">""</string>
     <string name="valBugsnagApiKey">d7074409bf76697384a454b611917336</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">issues@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
     <string name="valBitcoinAddress">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
+        <string name="valLocatorAccuracyForeground">0</string>
+    <string name="valLocatorAccuracyBackground">1</string>
     
+    <string-array name="locatorAccuracy">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="qos">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>
