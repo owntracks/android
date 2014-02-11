@@ -19,7 +19,6 @@
         <item name="android:background">@drawable/ab_solid</item>
         <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
         <item name="android:icon">@drawable/ic_icon</item>
-        <item name="android:displayOptions">showHome</item>
     </style>
 
 </resources>
