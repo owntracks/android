@@ -141,7 +141,7 @@ public class ServiceApplication implements ProxyableService {
         return App.getContacts();
     }
 
-    public void onEventMainThread(Events.ContactLocationUpdated e) {
+    public void onEventMainThread(Events.LocationMessageReceived e) {
         // Updates a contact or allocates a new one
 
         Contact c = App.getContacts().get(e.getTopic());

@@ -248,5 +248,51 @@ public class Preferences {
         }
     }
     
+    private static String b2s(boolean b){
+        return b? "1" : "0";
+    }
+    
+    // WORK IN PROGRESS for https://github.com/owntracks/android/issues/6
+    private static void export() {
+        StringBuilder sb = new StringBuilder();
+
+        //        {
+        //            "_type": "configuration",
+        sb.append("{\"_type\":\"configuration\",");        
+        //            "deviceid": "phone",
+        sb.append("{\"deviceid\":\"").append(getDeviceName(true)).append("\",");        
+        //            "clientid": "jane-phone",
+        sb.append("{\"clientid\":\"").append(getDeviceName(true)).append("\",");        
+        //            "subscription": "mqttitude/#",
+        sb.append("{\"subscription\":\"").append(getSubTopic(true)).append("\",");        
+        //            "topic": "mqttitude/jane/phone",
+        sb.append("{\"topic\":\"").append(getPubTopic(true)).append("\",");        
+        //            "host": "broker.my.net",
+        sb.append("{\"host\":\"").append(getBrokerHost()).append("\",");        
+        //            "user": "jane",
+        sb.append("{\"user\":\"").append(getBrokerUsername()).append("\",");        
+        //            "subscriptionqos": "1",
+        sb.append("{\"qos\":\"").append(getPubQos()).append("\",");        
+        //            "port": "8883",
+        sb.append("{\"port\":\"").append(getBrokerPort()).append("\",");        
+        //            "retain": "1",
+        sb.append("{\"retain\":\"").append(b2s(getPubRetain())).append("\",");        
+        //            "tls": "1",
+        sb.append("{\"tls\":\"").append(b2s(getBrokerSecurityType() > 0)).append("\",");        
+        //            "auth": "1",
+        sb.append("{\"auth\":\"").append(b2s(getBrokerAuthType() > 0)).append("\",");        
+        //            "mindist": "200",
+        sb.append("{\"mindist\":\"").append("tbd").append("\",");        
+        //            "mintime": "180",
+        sb.append("{\"mintime\":\"").append("tbd").append("\",");        
+        //            "monitoring": "1",
+        sb.append("{\"monitoring\":\"").append("tbd").append("\",");        
+        //            "ab": "0"
+        sb.append("{\"ab\":\"").append("tbd").append("\",");        
+        //        }
+        sb.append("}");
+
+    }
+    
     
 }

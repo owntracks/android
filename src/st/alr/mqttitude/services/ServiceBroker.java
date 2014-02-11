@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
@@ -670,14 +671,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService
             Log.e(this.toString(), "Received invalid message: " + msg);
             return;            
         }
-        if(!type.equals("location")) {
+
+        
+        if(type.equals("location")) {                        
+            //GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
+            LocationMessage lm = LocationMessage.fromJsonObject(json);
+            EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
+    
+        } else {
             Log.d(this.toString(), "Ignoring message of type: " + type);
-            return;            
+            return;
         }
-        
-        
-        GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
-        EventBus.getDefault().postSticky(new Events.ContactLocationUpdated(l, topic));
     }
 
     @Override
