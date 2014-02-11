@@ -35,7 +35,7 @@
 
     <color name="mediumGrey">#696868</color>
     <color name="darkGrey">#3f4246</color>
-    <color name="background">#efefef</color>
+    <color name="background">#eeeeee</color>
     <color name="card_aside">#f9fafa</color>
     <color name="card_shadow">#d9d9d9</color>
     <color name="seperator">#d9d9d9</color>

@@ -632,7 +632,6 @@ public class ActivityMain extends FragmentActivity {
     public static class ContactsFragment extends Fragment implements StaticHandlerInterface {
         private LinearLayout friendsListView;
         private Button currentLoc;
-        private Button report;
         private static Handler handler;
         private static final String TAG_MYLOCATION = "++MYLOCATION++";
 
@@ -722,20 +721,6 @@ public class ActivityMain extends FragmentActivity {
                 }
             });
 
-            this.report = (Button) thisdevice.findViewById(R.id.report);
-            this.report.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    ServiceProxy.runOrQueueRunnable(new Runnable() {
-                        
-                        @Override
-                        public void run() {
-                            ServiceProxy.getServiceLocator().publishLocationMessage();
-                        }
-                    }, getActivity(), serviceConnection);
-                }
-            });
 
             for(Contact c : App.getContacts().values())
                 updateContactView(c);
