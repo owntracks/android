@@ -44,8 +44,6 @@ public class ActivityPreferences extends PreferenceActivity {
     static String ver;
     private static OnSharedPreferenceChangeListener pubTopicListener;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +63,7 @@ public class ActivityPreferences extends PreferenceActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().registerSticky(this);
     }
 
     @Override
@@ -134,14 +132,14 @@ public class ActivityPreferences extends PreferenceActivity {
                             Intent intent = new Intent(Intent.ACTION_SEND);
                             intent.setType("message/rfc822");
 
-                            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {Preferences.getIssuesMail()
+                            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
+                                Preferences.getIssuesMail()
                             });
                             intent.putExtra(Intent.EXTRA_SUBJECT, "OwnTracks (Version: " + ver + ")");
                             a.startActivity(Intent.createChooser(intent, "Send Email"));
                             return false;
                         }
                     });
-
 
             twitter.setOnPreferenceClickListener(
                     new OnPreferenceClickListener() {
@@ -153,27 +151,26 @@ public class ActivityPreferences extends PreferenceActivity {
                             return false;
                         }
                     });
-            
-            
+
             donate.setOnPreferenceClickListener(
                     new OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             try {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("bitcoin:" + Preferences.getBitcoinAddress()));
-                            a.startActivity(intent);
-                            
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse("bitcoin:" + Preferences.getBitcoinAddress()));
+                                a.startActivity(intent);
+
                             } catch (ActivityNotFoundException e) {
-                                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE); 
+                                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
                                 ClipData clip = ClipData.newPlainText("bitcoin", Preferences.getBitcoinAddress());
                                 clipboard.setPrimaryClip(clip);
-                                Toast.makeText(getActivity(), getActivity().getString(R.string.copiedToClipboard),Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), getActivity().getString(R.string.copiedToClipboard), Toast.LENGTH_LONG).show();
                             }
                             return false;
                         }
                     });
-            
+
             setServerPreferenceSummary(getActivity());
 
             backgroundUpdatesIntervall.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -212,8 +209,13 @@ public class ActivityPreferences extends PreferenceActivity {
         super.onDestroy();
     }
 
-    public void onEventMainThread(Events.StateChanged.ServiceBroker event) {
-        setServerPreferenceSummary(this);
+    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+        if (e != null && e.getExtra() != null && e.getExtra() instanceof Exception && ((Exception) e.getExtra()).getCause() != null) {
+            serverPreference.setSummary(getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause()
+                    .getLocalizedMessage());
+        } else {
+            setServerPreferenceSummary(this);
+        }
     }
 
     private static void setServerPreferenceSummary(Context c) {

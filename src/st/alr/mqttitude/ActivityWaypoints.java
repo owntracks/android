@@ -40,7 +40,8 @@ import com.google.android.gms.location.Geofence;
 public class ActivityWaypoints extends FragmentActivity {
     private ListView listView;
     private WaypointAdapter listAdapter;
-
+    private static final String BUNDLE_KEY_POSITION = "position";
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -276,7 +277,7 @@ public class ActivityWaypoints extends FragmentActivity {
         public static AddDialog newInstance(int position) {
             AddDialog f = new AddDialog();
             Bundle args = new Bundle();
-            args.putInt("position", position);
+            args.putInt(BUNDLE_KEY_POSITION, position);
             f.setArguments(args);
             return f;
 
@@ -304,7 +305,7 @@ public class ActivityWaypoints extends FragmentActivity {
                 b = getArguments();
 
             if (b != null)
-                this.w = ((ActivityWaypoints) getActivity()).getListAdapter().getItem(b.getInt("position"));
+                this.w = ((ActivityWaypoints) getActivity()).getListAdapter().getItem(b.getInt(BUNDLE_KEY_POSITION));
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                     .setTitle(getResources().getString(this.w == null ? R.string.waypointAdd : R.string.waypointEdit))

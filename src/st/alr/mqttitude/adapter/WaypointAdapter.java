@@ -1,4 +1,4 @@
-
+    
 package st.alr.mqttitude.adapter;
 
 import java.util.ArrayList;
@@ -98,8 +98,6 @@ public class WaypointAdapter extends BaseAdapter {
             holder.enter.setVisibility(View.GONE);
             holder.leave.setVisibility(View.GONE);
         }
-
-        // holder.radius.setText(w.getRadius().toString());
 
         return rowView;
 
