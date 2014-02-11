@@ -6,6 +6,7 @@ import java.util.Date;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.model.LocationMessage;
 import android.location.Location;
 
 public class Events {
@@ -135,26 +136,27 @@ public class Events {
 
     }
 
-    public static class ContactLocationUpdated extends E {
+    public static class LocationMessageReceived extends E {
         private String t;
-        private GeocodableLocation l;
+        private LocationMessage m;
 
-        public ContactLocationUpdated(Location l, String t) {
-            this(new GeocodableLocation(l), t);
-        }
 
-        public ContactLocationUpdated(GeocodableLocation l, String t) {
+        public LocationMessageReceived(LocationMessage m, String t) {
             super();
-            this.l = l;
             this.t = t;
+            this.m = m;
         }
 
         public String getTopic() {
             return this.t;
         }
+        
+        public LocationMessage getLocationMessage() {
+            return m;
+        }
 
         public GeocodableLocation getGeocodableLocation() {
-            return this.l;
+            return this.m.getLocation();
         }
     }
 

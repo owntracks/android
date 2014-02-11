@@ -54,7 +54,7 @@ public class GeocodableLocation extends Location {
             if (!type.equals("location"))
                 throw new JSONException("wrong type");
         } catch (JSONException e) {
-            Log.e("GeocodableLocation", "Unable to deserialize Location object from JSON");
+            Log.e("GeocodableLocation", "Unable to deserialize GeocodableLocation object from JSON");
             return null;
         }
 

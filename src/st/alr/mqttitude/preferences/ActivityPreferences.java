@@ -133,7 +133,7 @@ public class ActivityPreferences extends PreferenceActivity {
                             intent.setType("message/rfc822");
 
                             intent.putExtra(Intent.EXTRA_EMAIL, new String[] {
-                                Preferences.getIssuesMail()
+                                    Preferences.getIssuesMail()
                             });
                             intent.putExtra(Intent.EXTRA_SUBJECT, "OwnTracks (Version: " + ver + ")");
                             a.startActivity(Intent.createChooser(intent, "Send Email"));
@@ -211,15 +211,18 @@ public class ActivityPreferences extends PreferenceActivity {
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if (e != null && e.getExtra() != null && e.getExtra() instanceof Exception && ((Exception) e.getExtra()).getCause() != null) {
-            serverPreference.setSummary(getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause()
-                    .getLocalizedMessage());
+            setServerPreferenceSummary(getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause().getLocalizedMessage());
         } else {
             setServerPreferenceSummary(this);
         }
     }
 
     private static void setServerPreferenceSummary(Context c) {
-        serverPreference.setSummary(ServiceBroker.getStateAsString(c));
+        setServerPreferenceSummary(ServiceBroker.getStateAsString(c));
+    }
+
+    private static void setServerPreferenceSummary(String s) {
+        serverPreference.setSummary(s);
     }
 
     @Override
