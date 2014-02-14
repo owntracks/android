@@ -63,24 +63,13 @@ public class ServiceApplication implements ProxyableService {
     private int mContactCount;
     private ServiceProxy context;
 
-    private SQLiteDatabase db;
-    private DevOpenHelper helper;
-    private DaoSession daoSession;
-    private DaoMaster daoMaster;
-    private ContactLinkDao contactLinkDao;
-    private WaypointDao waypointDao;
 
     @Override
     public void onCreate(ServiceProxy context) {
         this.context = context;
         checkPlayServices();
 
-        this.helper = new DaoMaster.DevOpenHelper(context, "mqttitude-db", null);
-        this.db = this.helper.getWritableDatabase();
-        this.daoMaster = new DaoMaster(this.db);
-        this.daoSession = this.daoMaster.newSession();
-        this.contactLinkDao = this.daoSession.getContactLinkDao();
-        this.waypointDao = this.daoSession.getWaypointDao();
+
 
         this.notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -118,13 +107,6 @@ public class ServiceApplication implements ProxyableService {
 
     }
 
-    public WaypointDao getWaypointDao() {
-        return this.waypointDao;
-    }
-
-    public ContactLinkDao getContactLinkDao() {
-        return this.contactLinkDao;
-    }
 
     @Override
     public void onDestroy() {
@@ -156,6 +138,12 @@ public class ServiceApplication implements ProxyableService {
 
         App.getContacts().put(e.getTopic(), c);
 
+        
+        if(e.getLocationMessage().hasTransition()) {
+            
+        }
+            
+            
         // Fires a new event with the now updated or created contact to which
         // fragments can react
         EventBus.getDefault().post(new Events.ContactUpdated(c));
@@ -437,7 +425,7 @@ public class ServiceApplication implements ProxyableService {
     }
 
     public long getContactIdFromLocalStorage(Contact c) {
-        ContactLink cl = this.contactLinkDao.load(c.getTopic());
+        ContactLink cl = App.getContactLinkDao().load(c.getTopic());
 
         return cl != null ? cl.getContactId() : 0;
     }
@@ -473,7 +461,7 @@ public class ServiceApplication implements ProxyableService {
         Log.v(this.toString(), "Creating ContactLink from " + c.getTopic() + " to contactId " + contactId);
 
         ContactLink cl = new ContactLink(c.getTopic(), contactId);
-        this.contactLinkDao.insertOrReplace(cl);
+        App.getContactLinkDao().insertOrReplace(cl);
 
         updateContact(c);
         EventBus.getDefault().postSticky(new Events.ContactUpdated(c));

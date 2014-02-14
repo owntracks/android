@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+import st.alr.mqttitude.db.ContactLinkDao;
+import st.alr.mqttitude.db.DaoMaster;
+import st.alr.mqttitude.db.DaoSession;
+import st.alr.mqttitude.db.WaypointDao;
+import st.alr.mqttitude.db.DaoMaster.DevOpenHelper;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Preferences;
@@ -15,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.BatteryManager;
 import android.provider.Settings.Secure;
 import android.widget.Toast;
@@ -27,11 +33,24 @@ public class App extends Application {
     private SimpleDateFormat dateFormater;
     private HashMap<String,Contact> contacts;
 
+    private SQLiteDatabase db;
+    private DevOpenHelper helper;
+    private DaoSession daoSession;
+    private DaoMaster daoMaster;
+    private ContactLinkDao contactLinkDao;
+    private WaypointDao waypointDao;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+        this.helper = new DaoMaster.DevOpenHelper(this, "mqttitude-db", null);
+        this.db = this.helper.getWritableDatabase();
+        this.daoMaster = new DaoMaster(this.db);
+        this.daoSession = this.daoMaster.newSession();
+        this.contactLinkDao = this.daoSession.getContactLinkDao();
+        this.waypointDao = this.daoSession.getWaypointDao();
+        
         this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         this.contacts = new HashMap<String,Contact>();
 
@@ -41,6 +60,14 @@ public class App extends Application {
 
     }
     
+    public static WaypointDao getWaypointDao() {
+        return instance.waypointDao;
+    }
+
+    public static ContactLinkDao getContactLinkDao() {
+        return instance.contactLinkDao;
+    }
+
 
     public static Context getContext() {
         return instance;

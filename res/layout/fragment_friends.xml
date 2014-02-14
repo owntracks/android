@@ -29,8 +29,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:background="?android:attr/selectableItemBackground"
-                    android:drawableLeft="@drawable/ic_mylocation"
-                    android:drawablePadding="@dimen/default_horizontal_spacing_half"
                     android:gravity="center_vertical"
                     android:paddingBottom="0dp"
                     android:paddingLeft="@dimen/default_horizontal_spacing"

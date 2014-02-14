@@ -64,7 +64,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 
         this.context = p;
         this.lastPublish = 0;
-        this.waypointDao = ServiceProxy.getServiceApplication().getWaypointDao();
+        this.waypointDao = App.getWaypointDao();
         loadWaypoints();
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
@@ -398,18 +398,6 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
     public long getLastPublishDate() {
         return this.lastPublish;
     }
-
-//    public boolean areBackgroundUpdatesEnabled() {
-//        return Preferences.getBackgroundPub();
-//    }
-//
-//    public int getUpdateIntervall() {
-//        
-//    }
-//
-//    public long getUpdateIntervallInMiliseconds() {
-//        return TimeUnit.MINUTES.toMillis(getUpdateIntervall());
-//    }
 
     public void onEvent(Events.WaypointAdded e) {
         handleWaypoint(e.getWaypoint(), false, false);
