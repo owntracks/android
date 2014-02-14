@@ -1,15 +1,22 @@
 
 package st.alr.mqttitude.services;
 
+import java.io.Closeable;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.text.GetChars;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 
@@ -19,8 +26,11 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_BROKER = "3:Brk";
     public static final String KEY_SERVICE_ID = "srvID";
     private static ServiceProxy instance;
-    private static LinkedList<Runnable> runQueue = new LinkedList<Runnable>();
     private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
+
+    private static LinkedList<Runnable> runQueue =  new LinkedList<Runnable>();
+    private static ServiceProxyConnection connection;
+    private static boolean connectionBoundOnce = false;
 
     @Override
     public void onCreate() {
@@ -35,30 +45,10 @@ public class ServiceProxy extends ServiceBindable {
         instance = this;
     }
 
-    
     public static ServiceProxy getInstance() {
         return instance;
     }
 
-    public static boolean runOrQueueRunnable(Runnable r, Activity a, ServiceConnection c) {
-        
-        if(instance != null) {
-            r.run();
-            return true;
-        } else {
-            runQueue.addLast(r);
-            a.bindService(new Intent(a, ServiceProxy.class), c, Context.BIND_AUTO_CREATE);
-            return false;
-        }
-    }
-    
-    public static void runQueuedRunnables(){
-        Log.v("ServiceProxy", "Running " + runQueue.size() + " runnables");
-        for(Runnable r : runQueue) 
-            r.run();
-        runQueue.clear();
-    }
-    
     @Override
     public void onDestroy() {
         for (ProxyableService p : services.values()) {
@@ -72,7 +62,11 @@ public class ServiceProxy extends ServiceBindable {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int r = super.onStartCommand(intent, flags, startId); // Invokes onStartOnce(...) the fist time to initialize the service
+        int r = super.onStartCommand(intent, flags, startId); // Invokes
+                                                              // onStartOnce(...)
+                                                              // the fist time
+                                                              // to initialize
+                                                              // the service
 
         ProxyableService s = getServiceForIntent(intent);
         if (s != null)
@@ -121,7 +115,7 @@ public class ServiceProxy extends ServiceBindable {
             return getService(i.getStringExtra(KEY_SERVICE_ID));
         else
             return null;
-        
+
     }
 
     public static PendingIntent getPendingIntentForService(Context c, String targetServiceId, String action, Bundle extras) {
@@ -138,5 +132,66 @@ public class ServiceProxy extends ServiceBindable {
 
         return PendingIntent.getService(c, 0, i, flags);
 
+    }
+
+    public final static class ServiceProxyConnection implements Closeable {
+        private final Context context;
+        private final ServiceConnection serviceConnection;
+
+        private ServiceProxyConnection(Context context, ServiceConnection serviceConnection) {
+            this.context = context;
+            this.serviceConnection = serviceConnection;
+        }
+
+        @Override
+        public void close() {
+            if(connectionBoundOnce) {
+                context.unbindService(serviceConnection);
+                connectionBoundOnce = false;
+            }
+        }
+        public ServiceConnection getServiceConnection() {
+            return serviceConnection;
+        }
+
+
+    }
+    
+    public static void closeServiceConnection() {
+        if(getServiceConnection() != null &&  connectionBoundOnce);
+        connection.close();
+    }
+    
+    public static ServiceProxyConnection getServiceConnection(){
+        return connection;
+    }
+
+    public static void runOrBind(Context context, Runnable runnable) {
+        if (instance != null && getServiceConnection() != null) {
+            runnable.run();
+            return;
+        }
+
+        if (getServiceConnection() == null) {
+            ServiceConnection c = new ServiceConnection() {
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    connectionBoundOnce = false;
+                }
+
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder binder) {
+                    connectionBoundOnce = true;
+                    for (Runnable r : runQueue)
+                        r.run();
+                    runQueue.clear();
+
+                }
+            };
+            connection = new ServiceProxyConnection(context, c);
+        }
+
+        runQueue.addLast(runnable);
+        context.bindService(new Intent(context, ServiceProxy.class), connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 }
