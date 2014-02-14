@@ -11,6 +11,7 @@ import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.services.ServiceProxy.ServiceProxyConnection;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
@@ -61,10 +62,17 @@ import de.greenrobot.event.EventBus;
 public class ActivityMain extends FragmentActivity {
     private static final int CONTACT_PICKER_RESULT = 1001;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         startService(new Intent(this, ServiceProxy.class));
+        ServiceProxy.runOrBind(this, new Runnable() {
+            @Override
+            public void run() {
+                Log.v(this.toString(), "ServiceProxy bound");
+            }
+        });
 
         // delete previously stored fragments after orientation change
         if (savedInstanceState != null)
@@ -83,24 +91,6 @@ public class ActivityMain extends FragmentActivity {
         }
 
     }
-
-    protected static ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
-            Log.v(this.toString(), "Service disconnected");
-            ActivityMain.isConnected = false;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            isConnected = true;
-            Log.v(this.toString(), "Service connected");
-            ServiceProxy.runQueuedRunnables();
-        }
-    };
-    private static boolean isConnected;
 
     public static class FragmentHandler extends Fragment {
         private Class<?> current;
@@ -230,7 +220,7 @@ public class ActivityMain extends FragmentActivity {
         public void removeAll(FragmentActivity fa) {
             FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
 
-            for(Fragment f : fragments.values())
+            for (Fragment f : fragments.values())
                 ft.remove(f);
 
             ft.commitAllowingStateLoss();
@@ -281,17 +271,16 @@ public class ActivityMain extends FragmentActivity {
             startActivity(intent1);
             return true;
         } else if (itemId == R.id.menu_report) {
-            ServiceProxy.runOrQueueRunnable(new Runnable() {
-                
+            ServiceProxy.runOrBind(this, new Runnable() {
+
                 @Override
                 public void run() {
                     if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
                         App.showLocationNotAvailableToast();
                     else
-                        ServiceProxy.getServiceLocator().publishLocationMessage();                    
+                        ServiceProxy.getServiceLocator().publishLocationMessage();
                 }
-            }, this, serviceConnection);
-            
+            });
 
             return true;
         } else if (itemId == R.id.menu_share) {
@@ -307,8 +296,8 @@ public class ActivityMain extends FragmentActivity {
     }
 
     public void share(View view) {
-        ServiceProxy.runOrQueueRunnable(new Runnable() {
-            
+        ServiceProxy.runOrBind(this, new Runnable() {
+
             @Override
             public void run() {
                 GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
@@ -321,38 +310,35 @@ public class ActivityMain extends FragmentActivity {
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, "http://maps.google.com/?q=" + Double.toString(l.getLatitude()) + "," + Double.toString(l.getLongitude()));
                 sendIntent.setType("text/plain");
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.shareLocation)));            }
-        }, this, serviceConnection);
-        
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.shareLocation)));
+            }
+        });
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //bindService(new Intent(this, ServiceProxy.class), serviceConnection, Context.BIND_AUTO_CREATE);
-        ServiceProxy.runOrQueueRunnable(new Runnable() {
-            
+        // bindService(new Intent(this, ServiceProxy.class), serviceConnection,
+        // Context.BIND_AUTO_CREATE);
+        ServiceProxy.runOrBind(this, new Runnable() {
+
             @Override
             public void run() {
-                ServiceProxy.getServiceLocator().enableForegroundMode();                
+                ServiceProxy.getServiceLocator().enableForegroundMode();
             }
-        }, this, serviceConnection);
+        });
     }
 
     @Override
     public void onStop() {
-        ServiceProxy.runOrQueueRunnable(new Runnable() {
-            
+        ServiceProxy.runOrBind(this, new Runnable() {
+
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableBackgroundMode();
-                if (serviceConnection != null && isConnected)
-                    unbindService(serviceConnection);
-
             }
-        }, this, serviceConnection);
-        
+        });
 
         super.onStop();
     }
@@ -365,6 +351,14 @@ public class ActivityMain extends FragmentActivity {
     @Override
     public void onDestroy() {
         FragmentHandler.getInstance().removeAll(this);
+        ServiceProxy.runOrBind(this, new Runnable() {
+            
+            @Override
+            public void run() {
+                ServiceProxy.closeServiceConnection();
+                
+            }
+        });
         super.onDestroy();
     }
 
@@ -385,7 +379,7 @@ public class ActivityMain extends FragmentActivity {
         private ImageView selectedContactImage;
         private Map<String, Contact> markerToContacts;
         private static final String KEY_TRACKING_CURRENT_DEVICE = "+CURRENTDEVICELOCATION+";
-        
+
         public static MapFragment getInstance(Bundle extras) {
             MapFragment instance = new MapFragment();
             instance.setArguments(extras);
@@ -409,7 +403,7 @@ public class ActivityMain extends FragmentActivity {
             super.onResume();
             this.mMapView.onResume();
 
-            for(Contact c : App.getContacts().values()) 
+            for (Contact c : App.getContacts().values())
                 updateContactLocation(c);
 
             focusCurrentlyTrackedContact();
@@ -546,8 +540,8 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void focusCurrentLocation() {
-            ServiceProxy.runOrQueueRunnable(new Runnable() {
-                
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
                 @Override
                 public void run() {
                     GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
@@ -555,10 +549,9 @@ public class ActivityMain extends FragmentActivity {
                         return;
                     selectedContactDetails.setVisibility(View.GONE);
                     Preferences.setTrackingUsername(KEY_TRACKING_CURRENT_DEVICE);
-                    centerMap(l.getLatLng());                    
+                    centerMap(l.getLatLng());
                 }
-            }, getActivity(), serviceConnection);
-            
+            });
 
         }
 
@@ -662,18 +655,18 @@ public class ActivityMain extends FragmentActivity {
         @Override
         public void onResume() {
             super.onResume();
-            
-            for(Contact c : App.getContacts().values())
+
+            for (Contact c : App.getContacts().values())
                 updateContactView(c);
 
-            ServiceProxy.runOrQueueRunnable(new Runnable() {
-                
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
                 @Override
                 public void run() {
                     updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
-                    
+
                 }
-            }, getActivity(), serviceConnection);
+            });
 
         }
 
@@ -708,21 +701,20 @@ public class ActivityMain extends FragmentActivity {
 
                 @Override
                 public void onClick(View v) {
-                    ServiceProxy.runOrQueueRunnable( new Runnable() {
+                    ServiceProxy.runOrBind(getActivity(), new Runnable() {
                         public void run() {
-                            if (ServiceProxy.getServiceLocator().getLastKnownLocation() != null) 
+                            if (ServiceProxy.getServiceLocator().getLastKnownLocation() != null)
                                 ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, getActivity())).focusCurrentLocation();
                             else
                                 App.showLocationNotAvailableToast();
-                                                       
+
                         }
-                    }, getActivity(), serviceConnection);
-                    
+                    });
+
                 }
             });
 
-
-            for(Contact c : App.getContacts().values())
+            for (Contact c : App.getContacts().values())
                 updateContactView(c);
 
             return v;
@@ -733,9 +725,9 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
-            if(l == null)
+            if (l == null)
                 return;
-            
+
             // Current location changes often, don't waste resources to resolve
             // the geocoder
             this.currentLoc.setText(l.toString());
@@ -820,7 +812,7 @@ public class ActivityMain extends FragmentActivity {
             img.setImageBitmap(c.getUserImage());
 
             (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] {
-                c.getLocation()
+                    c.getLocation()
             });
 
         }
@@ -935,16 +927,16 @@ public class ActivityMain extends FragmentActivity {
         private void assignContact(Intent intent) {
             Uri result = intent.getData();
             final String contactId = result.getLastPathSegment();
-            
-ServiceProxy.runOrQueueRunnable(new Runnable() {
-    
-    @Override
-    public void run() {
-        ServiceProxy.getServiceApplication().linkContact(contact, Long.parseLong(contactId));
-        
-    }
-}, getActivity(), serviceConnection);
-            
+
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
+                @Override
+                public void run() {
+                    ServiceProxy.getServiceApplication().linkContact(contact, Long.parseLong(contactId));
+
+                }
+            });
+
         }
 
         @Override

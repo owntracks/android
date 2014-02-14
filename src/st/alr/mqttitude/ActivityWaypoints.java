@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -45,6 +46,14 @@ public class ActivityWaypoints extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, ServiceProxy.class));
+        ServiceProxy.runOrBind(this, new Runnable() {
+            @Override
+            public void run() {
+                Log.v(this.toString(), "ServiceProxy bound");
+            }
+        });
+
         setContentView(R.layout.activity_waypoint);
 
         this.listAdapter = new WaypointAdapter(this);
@@ -73,6 +82,14 @@ public class ActivityWaypoints extends FragmentActivity {
 
     @Override
     public void onDestroy() {
+        ServiceProxy.runOrBind(this, new Runnable() {
+            
+            @Override
+            public void run() {
+                ServiceProxy.closeServiceConnection();
+                
+            }
+        });
         super.onDestroy();
     }
 
@@ -259,14 +276,20 @@ public class ActivityWaypoints extends FragmentActivity {
 
                 @Override
                 public void onClick(View v) {
-                    GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-                    if (l != null) {
-                        AddDialog.this.latitude.setText(l.getLatitude() + "");
-                        AddDialog.this.longitude.setText(l.getLongitude() + "");
-                    } else {
-                        Toast.makeText(getActivity(), "No current location is available", Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                    ServiceProxy.runOrBind(getActivity(), new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+                            if (l != null) {
+                                AddDialog.this.latitude.setText(l.getLatitude() + "");
+                                AddDialog.this.longitude.setText(l.getLongitude() + "");
+                            } else {
+                                Toast.makeText(getActivity(), "No current location is available", Toast.LENGTH_SHORT)
+                                        .show();
+                            }                            
+                        }
+                    });
 
                 }
             });
