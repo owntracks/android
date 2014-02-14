@@ -3,6 +3,7 @@ package st.alr.mqttitude.adapter;
 
 import java.util.ArrayList;
 
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.db.WaypointDao;
@@ -29,7 +30,7 @@ public class WaypointAdapter extends BaseAdapter {
     public WaypointAdapter(Activity c) {
         super();
         this.context = c;
-        this.dao = ServiceProxy.getServiceApplication().getWaypointDao();
+        this.dao = App.getWaypointDao();
         this.list = new ArrayList<Waypoint>(this.dao.loadAll());
         notifyDataSetChanged();
     }
