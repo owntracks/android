@@ -119,7 +119,7 @@ public class LocationMessage {
         try {
             if(json.getString("event").equals("enter")) 
                 m.setTransition(Geofence.GEOFENCE_TRANSITION_ENTER);
-            else 
+            else if(json.getString("event").equals("exit"))
                 m.setTransition(Geofence.GEOFENCE_TRANSITION_EXIT);
         } catch (Exception e) {}
         
