@@ -25,6 +25,7 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -50,6 +51,7 @@ import com.google.android.gms.location.Geofence;
 
 import de.greenrobot.event.EventBus;
 
+@SuppressLint("NewApi")
 public class ServiceApplication implements ProxyableService {
     private static SharedPreferences sharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
@@ -123,6 +125,7 @@ public class ServiceApplication implements ProxyableService {
         return App.getContacts();
     }
 
+    @SuppressLint("NewApi")
     public void onEventMainThread(Events.LocationMessageReceived e) {
         // Updates a contact or allocates a new one
 
@@ -140,7 +143,14 @@ public class ServiceApplication implements ProxyableService {
 
         
         if(e.getLocationMessage().hasTransition()) {
-            
+            Notification noti = new Notification.InboxStyle(
+                    new Notification.Builder(context)
+                       .setContentTitle("title")
+                       .setContentText("subject")
+                       .setSmallIcon(R.drawable.ic_notification))
+                    .addLine("line1")
+                    .build();
+
         }
             
             
