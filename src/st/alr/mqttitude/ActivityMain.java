@@ -369,7 +369,7 @@ public class ActivityMain extends FragmentActivity {
 
     Bundle fragmentBundle;
 
-    public static class MapFragment extends Fragment {
+    public static class MapFragment extends Fragment implements StaticHandlerInterface{
         private GeocodableLocation currentLocation;
         private MapView mMapView;
         private GoogleMap googleMap;
@@ -379,11 +379,19 @@ public class ActivityMain extends FragmentActivity {
         private ImageView selectedContactImage;
         private Map<String, Contact> markerToContacts;
         private static final String KEY_TRACKING_CURRENT_DEVICE = "+CURRENTDEVICELOCATION+";
+        private static Handler handler;
+
 
         public static MapFragment getInstance(Bundle extras) {
             MapFragment instance = new MapFragment();
             instance.setArguments(extras);
             return instance;
+        }
+        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            handler = new StaticHandler(this);
         }
 
         @Override
@@ -563,6 +571,18 @@ public class ActivityMain extends FragmentActivity {
             else if (isTrackingCurrentLocation())
                 focusCurrentLocation();
         }
+        
+        public void handleHandlerMessage(Message msg) {
+
+            if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null)) {
+                    GeocodableLocation l = (GeocodableLocation) msg.obj;
+                    if ((l.getTag() == null) || (this.selectedContactLocation == null) || !l.getTag().equals(getCurrentlyTrackedContact().getTopic()))
+                        return;
+                    
+                    this.selectedContactLocation.setText(l.toString());
+
+            }
+        }
 
         public void focus(final Contact c) {
 
@@ -597,6 +617,12 @@ public class ActivityMain extends FragmentActivity {
                     centerMap(c.getLocation().getLatLng());
                 }
             });
+            
+
+            if (c.getLocation().getGeocoder() == null) 
+                (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] { c.getLocation() });
+            
+
         }
 
         public void onEventMainThread(Events.ContactUpdated e) {
