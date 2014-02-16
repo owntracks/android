@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.Geofence;
+
 import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
@@ -45,9 +49,6 @@ import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.Geofence;
 
 import de.greenrobot.event.EventBus;
 
