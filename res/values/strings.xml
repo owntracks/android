@@ -12,7 +12,7 @@
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
     <string name="preferencesUserUsername">"Username"</string>
-    <string name="preferencesDeviceName">"Device name"</string>
+    <string name="preferencesDeviceName">"Device ID"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
@@ -82,6 +82,7 @@
     <string name="stateLocatingFail">"Error: Unable to acquire location"</string>
     <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
+    
     <string name="stateIdle">"Idle"</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
@@ -102,10 +103,8 @@
     <string name="preferencesAutostartTitle">Autostart</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage when active</string>
-    
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
-        <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
-    
+    <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -119,7 +118,8 @@
     <string name="actionModeOneSelected">1 item selected</string>
     <string name="actionModeMoreSelected">items selected</string>
     <string name="currentLocationNotAvailable">The current location is not available</string>
-	<string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
+    <string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
+
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
@@ -185,8 +185,6 @@
     <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyLocatorBackgroundInterval">backgroundInterval</string>
-    
-    
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicWaypointsPart">/waypoints</string>
     <string name="valSubTopic">owntracks/+/+</string>
@@ -202,9 +200,9 @@
     <string name="valIssuesMail">issues@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
     <string name="valBitcoinAddress">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
-        <string name="valLocatorAccuracyForeground">0</string>
+    <string name="valLocatorAccuracyForeground">0</string>
     <string name="valLocatorAccuracyBackground">1</string>
-    
+
     <string-array name="locatorAccuracy">
         <item>0</item>
         <item>1</item>
@@ -216,4 +214,5 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
 </resources>
