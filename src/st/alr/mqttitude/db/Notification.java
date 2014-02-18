@@ -6,65 +6,66 @@ package st.alr.mqttitude.db;
  */
 public class Notification {
 
-    private Long id;
-    private String topic;
-    private String notificationTitle;
-    private String description;
-    private Integer transitionType;
+	private Long id;
+	private String topic;
+	private String notificationTitle;
+	private String description;
+	private Integer transitionType;
 
-    public Notification() {
-    }
+	public Notification() {
+	}
 
-    public Notification(Long id) {
-        this.id = id;
-    }
+	public Notification(Long id) {
+		this.id = id;
+	}
 
-    public Notification(Long id, String topic, String notificationTitle, String description, Integer transitionType) {
-        this.id = id;
-        this.topic = topic;
-        this.notificationTitle = notificationTitle;
-        this.description = description;
-        this.transitionType = transitionType;
-    }
+	public Notification(Long id, String topic, String notificationTitle,
+			String description, Integer transitionType) {
+		this.id = id;
+		this.topic = topic;
+		this.notificationTitle = notificationTitle;
+		this.description = description;
+		this.transitionType = transitionType;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return this.id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getTopic() {
-        return topic;
-    }
+	public String getTopic() {
+		return this.topic;
+	}
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
-    public String getNotificationTitle() {
-        return notificationTitle;
-    }
+	public String getNotificationTitle() {
+		return this.notificationTitle;
+	}
 
-    public void setNotificationTitle(String notificationTitle) {
-        this.notificationTitle = notificationTitle;
-    }
+	public void setNotificationTitle(String notificationTitle) {
+		this.notificationTitle = notificationTitle;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public String getDescription() {
+		return this.description;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public Integer getTransitionType() {
-        return transitionType;
-    }
+	public Integer getTransitionType() {
+		return this.transitionType;
+	}
 
-    public void setTransitionType(Integer transitionType) {
-        this.transitionType = transitionType;
-    }
+	public void setTransitionType(Integer transitionType) {
+		this.transitionType = transitionType;
+	}
 
 }
