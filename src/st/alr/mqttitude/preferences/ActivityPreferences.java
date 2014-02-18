@@ -227,13 +227,12 @@ public class ActivityPreferences extends PreferenceActivity {
 	}
 
 	public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-		if ((e != null) && (e.getExtra() != null)
-				&& (e.getExtra() instanceof Exception)
-				&& (((Exception) e.getExtra()).getCause() != null)) {
-			setServerPreferenceSummary(getResources().getString(R.string.error)
-					+ ": "
-					+ ((Exception) e.getExtra()).getCause()
-							.getLocalizedMessage());
+		if ((e != null) && (e.getExtra() != null) && (e.getExtra() instanceof Exception)) {
+			if((((Exception) e.getExtra()).getCause() != null))
+			setServerPreferenceSummary(getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause().getLocalizedMessage());
+			else
+				setServerPreferenceSummary(getResources().getString(R.string.error) + ": " +  e.getExtra().toString());
+				
 		} else {
 			setServerPreferenceSummary(this);
 		}

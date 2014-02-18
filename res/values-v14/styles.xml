@@ -6,7 +6,7 @@
         <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_accept</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_action_accept</item>
     </style>
 
     <style name="ActionBar.Solid.Mqttitude.Actionmode" parent="@android:style/Widget.Holo.Light.ActionBar">

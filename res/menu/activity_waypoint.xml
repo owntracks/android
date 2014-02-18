@@ -3,9 +3,9 @@
 
     <item
         android:id="@+id/add"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_action_new"
         android:orderInCategory="97"
         android:showAsAction="ifRoom"
-        android:title="">
+        android:title="@string/addWaypoint">
     </item>
 </menu>

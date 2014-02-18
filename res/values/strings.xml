@@ -119,7 +119,12 @@
     <string name="actionModeMoreSelected">items selected</string>
     <string name="currentLocationNotAvailable">The current location is not available</string>
     <string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
-
+	<string name="addWaypoint">Add waypoint</string>
+	<string name="preferences">Preferences</string>
+	<string name="waypoints">Waypoints</string>
+	<string name="share">Share</string>
+	
+	
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
