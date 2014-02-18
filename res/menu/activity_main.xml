@@ -2,24 +2,24 @@
 
     <item
         android:id="@+id/menu_report"
-        android:icon="@drawable/ic_upload"
+        android:icon="@drawable/ic_action_upload"
         android:orderInCategory="1"
         android:showAsAction="ifRoom"
         android:title="@string/publish"/>
     <item
         android:id="@+id/menu_share"
-        android:icon="@drawable/ic_share"
+        android:icon="@drawable/ic_action_share"
         android:orderInCategory="3"
         android:showAsAction="never"
-        android:title="Share"/>
+        android:title="@string/share"/>
     <item
         android:id="@+id/menu_waypoints"
         android:orderInCategory="4"
         android:showAsAction="never"
-        android:title="Waypoints"/>
+        android:title="@string/waypoints"/>
     <item
         android:id="@+id/menu_preferences"
         android:orderInCategory="100"
-        android:title="Preferences"/>
+        android:title="@string/preferences"/>
 
 </menu>

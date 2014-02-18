@@ -693,7 +693,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			PowerManager pm = (PowerManager) ServiceBroker.this.context
 					.getSystemService(Context.POWER_SERVICE);
 			WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-					"MQTTitude");
+					"OwnTracks");
 			wl.acquire();
 
 			if (isOnline() && !isConnected() && !isConnecting()) {

@@ -227,7 +227,7 @@ public class ServiceApplication implements ProxyableService,
 		this.notificationIntent = ServiceProxy.getPendingIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
 				Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
-		notificationBuilder.addAction(R.drawable.ic_upload,
+		notificationBuilder.addAction(R.drawable.ic_action_upload,
 				this.context.getString(R.string.publish),
 				this.notificationIntent);
 		updateNotification();
@@ -454,7 +454,7 @@ public class ServiceApplication implements ProxyableService,
 				+ " = ? COLLATE NOCASE) AND ("
 				+ ContactsContract.CommonDataKinds.Im.DATA
 				+ " = ? COLLATE NOCASE)";
-		String[] imWhereParams = new String[] { "Mqttitude", c.getTopic() };
+		String[] imWhereParams = new String[] { "OwnTracks", c.getTopic() };
 
 		Cursor cursor = this.context.getContentResolver().query(
 				ContactsContract.Data.CONTENT_URI, null, imWhere,

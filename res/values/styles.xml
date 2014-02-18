@@ -24,13 +24,13 @@
         <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_accept</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_action_accept</item>
     </style>
 
     <color name="pressed">#FFE4E4E4</color>
 
     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
-        <item name="android:src">@drawable/ic_overflow</item>
+        <item name="android:src">@drawable/ic_action_overflow</item>
     </style>
 
     <color name="mediumGrey">#696868</color>
