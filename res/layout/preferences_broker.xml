@@ -79,7 +79,6 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textVisiblePassword|textNoSuggestions"
-            android:maxLength="22"
             android:maxLines="1"
             android:singleLine="true" />
 
