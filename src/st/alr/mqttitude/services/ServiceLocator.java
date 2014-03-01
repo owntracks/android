@@ -118,11 +118,10 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 						.where(Properties.GeofenceId.eq(triggerList.get(i)
 								.getRequestId())).limit(1).unique();
 
-				Log.v(this.toString(),
-						"Waypoint triggered " + w.getDescription()
-								+ " transition: " + transitionType);
 
 				if (w != null) {
+					Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
+
 					EventBus.getDefault().postSticky(
 							new Events.WaypointTransition(w, transitionType));
 
