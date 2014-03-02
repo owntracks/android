@@ -266,12 +266,10 @@ public class PreferencesBroker extends DialogPreference {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE: // Clicked connect
 
-			Preferences.setString(R.string.keyBrokerHost, this.host.getText()
-					.toString());
-			Preferences.setString(R.string.keyBrokerPort, this.port.getText()
-					.toString());
-			Preferences.setString(R.string.keyBrokerUsername, userName
-					.getText().toString());
+			Preferences.setBrokerHost(this.host.getText().toString());
+			Preferences.setBrokerPort(this.port.getText().toString());
+			Preferences.setBrokerUsername(userName.getText().toString());
+
 			Preferences.setString(R.string.keyBrokerPassword, this.password
 					.getText().toString());
 			Preferences.setString(R.string.keyDeviceName, this.deviceName

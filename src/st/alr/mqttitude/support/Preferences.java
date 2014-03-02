@@ -6,8 +6,11 @@ import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
+
+import de.greenrobot.event.EventBus;
 
 public class Preferences {
 
@@ -132,6 +135,34 @@ public class Preferences {
 		return deviceName.equals("") || userUsername.equals("") ? "" : String
 				.format(App.getContext().getString(R.string.valPubTopic),
 						userUsername, deviceName);
+	}
+
+	public static void setBrokerHost(String value) {
+		if (!value.equals(getBrokerHost())) {
+			brokerChanged();
+			setString(R.string.keyBrokerHost, value);
+		}
+	}
+
+	public static void setBrokerPort(String value) {
+		if (!value.equals(getBrokerPort())) {
+
+			setString(R.string.keyBrokerPort, value);
+			brokerChanged();
+		}
+	}
+
+	public static void setBrokerUsername(String value) {
+		if (!value.equals(getBrokerHost())) {
+
+			setString(R.string.keyBrokerUsername, value);
+			brokerChanged();
+		}
+	}
+
+	private static void brokerChanged() {
+		Log.v("Preferences", "broker changed");
+		EventBus.getDefault().post(new Events.BrokerChanged());
 	}
 
 	public static String getBrokerHost() {

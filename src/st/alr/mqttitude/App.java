@@ -10,6 +10,7 @@ import st.alr.mqttitude.db.DaoMaster.OpenHelper;
 import st.alr.mqttitude.db.DaoSession;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import android.app.Application;
 import android.content.Context;
@@ -23,6 +24,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.bugsnag.android.Bugsnag;
+
+import de.greenrobot.event.EventBus;
 
 public class App extends Application {
 	private static App instance;
@@ -61,7 +64,7 @@ public class App extends Application {
 
 		Bugsnag.register(this, Preferences.getBugsnagApiKey());
 		Bugsnag.setNotifyReleaseStages("production", "testing");
-
+		EventBus.getDefault().register(this);
 	}
 
 	public static WaypointDao getWaypointDao() {
@@ -106,5 +109,11 @@ public class App extends Application {
 						.getString(R.string.currentLocationNotAvailable),
 				Toast.LENGTH_SHORT).show();
 	}
+	public void onEventMainThread(Events.BrokerChanged e) {
+		contacts.clear();
+		Log.v(this.toString(), "cleared contacts: " + contacts.size());
+		
+	}
+
 
 }

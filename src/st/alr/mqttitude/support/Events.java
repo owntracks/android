@@ -171,6 +171,10 @@ public class Events {
 		}
 
 	}
+	
+	public static class BrokerChanged extends E {
+		public BrokerChanged() {}
+	}
 
 	public static class StateChanged {
 		public static class ServiceBroker extends E {

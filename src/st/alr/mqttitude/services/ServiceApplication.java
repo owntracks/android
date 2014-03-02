@@ -87,6 +87,7 @@ public class ServiceApplication implements ProxyableService,
 						.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
 					updateAllContacts();
 			}
+
 		};
 
 		this.handler = new StaticHandler(this);
@@ -494,5 +495,6 @@ public class ServiceApplication implements ProxyableService,
 		updateContact(c);
 		EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
 	}
+	
 
 }
