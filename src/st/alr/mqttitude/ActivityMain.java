@@ -598,7 +598,7 @@ public class ActivityMain extends FragmentActivity {
 				GeocodableLocation l = (GeocodableLocation) msg.obj;
 				if ((l.getTag() == null)
 						|| (this.selectedContactLocation == null)
-						|| !l.getTag().equals(
+						|| getCurrentlyTrackedContact() == null || !l.getTag().equals(
 								getCurrentlyTrackedContact().getTopic()))
 					return;
 
