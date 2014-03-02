@@ -214,6 +214,9 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		public void removeAll(FragmentActivity fa) {
+			if(fa == null)
+				return;
+			
 			FragmentTransaction ft = fa.getSupportFragmentManager()
 					.beginTransaction();
 
@@ -773,7 +776,6 @@ public class ActivityMain extends FragmentActivity {
 
 				}
 			});
-
 			for (Contact c : App.getContacts().values())
 				updateContactView(c);
 
@@ -782,6 +784,10 @@ public class ActivityMain extends FragmentActivity {
 
 		public void onEventMainThread(Events.LocationUpdated e) {
 			updateCurrentLocation(e.getGeocodableLocation(), true);
+		}
+		
+		public void onEventMainThread(Events.BrokerChanged e) {
+			this.friendsListView.removeViews(0, this.friendsListView.getChildCount());
 		}
 
 		public void updateCurrentLocation(GeocodableLocation l,
