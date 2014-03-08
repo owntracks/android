@@ -1,0 +1,2 @@
+include ':'
+include ':libs:google-play-services-libproject:google-play-services_lib'

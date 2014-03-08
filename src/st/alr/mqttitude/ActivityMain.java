@@ -1,8 +1,10 @@
 package st.alr.mqttitude;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import st.alr.mqttitude.model.Contact;
@@ -418,8 +420,9 @@ public class ActivityMain extends FragmentActivity {
 			super.onResume();
 			this.mMapView.onResume();
 
-			for (Contact c : App.getContacts().values())
-				updateContactLocation(c);
+			Iterator<Entry<String, Contact>> it = App.getContactIterator();
+			while(it.hasNext())
+				updateContactLocation(it.next().getValue());
 
 			focusCurrentlyTrackedContact();
 		}
@@ -659,8 +662,7 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		public Contact getCurrentlyTrackedContact() {
-			return ServiceApplication.getContacts().get(
-					Preferences.getTrackingUsername());
+			return App.getContact(Preferences.getTrackingUsername());
 		}
 
 		public boolean hasCurrentLocation() {
@@ -709,8 +711,11 @@ public class ActivityMain extends FragmentActivity {
 		public void onResume() {
 			super.onResume();
 
-			for (Contact c : App.getContacts().values())
-				updateContactView(c);
+			onEventMainThread(new Events.BrokerChanged());
+			
+			Iterator<Entry<String, Contact>> it = App.getContactIterator();
+			while(it.hasNext())
+				updateContactView(it.next().getValue());
 
 			ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
@@ -776,8 +781,10 @@ public class ActivityMain extends FragmentActivity {
 
 				}
 			});
-			for (Contact c : App.getContacts().values())
-				updateContactView(c);
+
+			Iterator<Entry<String, Contact>> it = App.getContactIterator();
+			while(it.hasNext())
+				updateContactView(it.next().getValue());
 
 			return v;
 		}
@@ -838,7 +845,7 @@ public class ActivityMain extends FragmentActivity {
 
 			if (v == null) {
 
-				if (c.getView() != null) {
+				if (c.getView() != null && c.getView().getParent() != null) {
 					v = c.getView();
 					// remove from old view first to allow it to be added to the
 					// new view again
@@ -851,8 +858,7 @@ public class ActivityMain extends FragmentActivity {
 
 						@Override
 						public void onClick(View v) {
-							Contact c = ServiceApplication.getContacts().get(
-									v.getTag());
+							Contact c = App.getContact((String) v.getTag());
 							if ((c == null) || (c.getLocation() == null))
 								return;
 
@@ -978,7 +984,8 @@ public class ActivityMain extends FragmentActivity {
 			Bundle extras = FragmentHandler.getInstance().getBundle(
 					this.getClass());
 
-			this.contact = App.getContacts().get(extras.get(KEY_TOPIC));
+			this.contact = App.getContact((String) extras.get(KEY_TOPIC));
+			//this.contact = App.getContacts().get(extras.get(KEY_TOPIC));
 
 			this.name.setText(this.contact.getName());
 			this.topic.setText(this.contact.getTopic());
