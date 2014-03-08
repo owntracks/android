@@ -4,6 +4,58 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
+
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.eclipse.org/content/repositories/paho-releases/"
+    }
+
+}
+
+dependencies {
+    compile "com.android.support:support-v4:19.0.+"
+    compile 'com.google.android.gms:play-services:4.+'
+    compile 'com.bugsnag:bugsnag-android:2.1.1'
+    compile 'de.greenrobot:eventbus:2.2.0'
+    compile 'de.greenrobot:greendao:1.3.7'
+    compile 'org.eclipse.paho:mqtt-client:0.4.+'
+    compile 'com.github.gabrielemariotti.cards:library:1.4.2'
+
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 19
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+        }
+    }
+
+}
+
+android.applicationVariants.all{ variant ->
+    variant.processManifest.doFirst {
+        File manifestFile = file("${buildDir}/exploded-bundles/ComGoogleMapsAndroidAndroidMapsUtils03.aar/AndroidManifest.xml")
+        if (manifestFile.exists()) {
+            println("Replacing minSdkVersion in Android Maps Utils")
+            String content = manifestFile.getText('UTF-8')
+            content = content.replaceAll(/minSdkVersion="8"/, 'minSdkVersion=\"9\"')
+            manifestFile.write(content, 'UTF-8')
+            println(content)
+        }
+    }
+}
+
+
