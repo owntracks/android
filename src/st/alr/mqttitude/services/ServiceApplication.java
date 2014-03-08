@@ -121,35 +121,22 @@ public class ServiceApplication implements ProxyableService,
 		}
 	};
 
-	public static HashMap<String, Contact> getContacts() {
-		return App.getContacts();
-	}
 	public void onEventMainThread(Events.LocationMessageReceived e) {
 		// Updates a contact or allocates a new one
 
-		Contact c = App.getContacts().get(e.getTopic());
+		
+		
+		Contact c = App.getContact(e.getTopic());
 
 		if (c == null) {
 			Log.v(this.toString(), "Allocating new contact for " + e.getTopic());
 			c = new st.alr.mqttitude.model.Contact(e.getTopic());
 			updateContact(c);
+		} else {
+			c.setLocation(e.getGeocodableLocation());
+			App.getContactAdapter().update(c);
 		}
 
-		c.setLocation(e.getGeocodableLocation());
-
-		App.getContacts().put(e.getTopic(), c);
-
-//		if (e.getLocationMessage().hasTransition()) {
-//			Notification noti = new Notification.InboxStyle(
-//					new Notification.Builder(this.context)
-//							.setContentTitle("title").setContentText("subject")
-//							.setSmallIcon(R.drawable.ic_notification)).addLine(
-//					"line1").build();
-//
-//		}
-
-		// Fires a new event with the now updated or created contact to which
-		// fragments can react
 		EventBus.getDefault().post(new Events.ContactUpdated(c));
 
 	}
@@ -369,8 +356,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateAllContacts() {
-		Iterator<Entry<String, Contact>> it = App.getContacts().entrySet()
-				.iterator();
+		Iterator<Entry<String, Contact>> it = App.getContactIterator();
 		while (it.hasNext()) {
 			Entry<String, Contact> item = it.next();
 

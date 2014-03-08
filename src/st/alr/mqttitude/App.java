@@ -3,7 +3,10 @@ package st.alr.mqttitude;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
+import st.alr.mqttitude.adapter.ContactAdapter;
 import st.alr.mqttitude.db.ContactLinkDao;
 import st.alr.mqttitude.db.DaoMaster;
 import st.alr.mqttitude.db.DaoMaster.OpenHelper;
@@ -30,7 +33,7 @@ import de.greenrobot.event.EventBus;
 public class App extends Application {
 	private static App instance;
 	private SimpleDateFormat dateFormater;
-	private HashMap<String, Contact> contacts;
+	//private HashMap<String, Contact> contacts;
 
 	private SQLiteDatabase db;
 	private OpenHelper helper;
@@ -38,6 +41,7 @@ public class App extends Application {
 	private DaoMaster daoMaster;
 	private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
+	private ContactAdapter contactAdapter;
 
 	@Override
 	public void onCreate() {
@@ -60,8 +64,9 @@ public class App extends Application {
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
 				getResources().getConfiguration().locale);
-		this.contacts = new HashMap<String, Contact>();
-
+		//this.contacts = new HashMap<String, Contact>();
+		this.contactAdapter = new ContactAdapter(this);
+		
 		Bugsnag.register(this, Preferences.getBugsnagApiKey());
 		Bugsnag.setNotifyReleaseStages("production", "testing");
 		EventBus.getDefault().register(this);
@@ -79,9 +84,21 @@ public class App extends Application {
 		return instance;
 	}
 
-	public static HashMap<String, Contact> getContacts() {
-		return instance.contacts;
+	public static Contact getContact(String topic) {
+		return getContactAdapter().getItem(topic);
 	}
+	
+	public static Iterator<Entry<String, Contact>> getContactIterator(){
+		return getContactAdapter().getIterator();
+	}
+	
+	public static ContactAdapter getContactAdapter() {
+		return instance.contactAdapter;
+	}
+	
+//	public static HashMap<String, Contact> getContacts() {
+//		return instance.contacts;
+//	}
 
 	public static String formatDate(Date d) {
 		return instance.dateFormater.format(d);
@@ -110,9 +127,7 @@ public class App extends Application {
 				Toast.LENGTH_SHORT).show();
 	}
 	public void onEventMainThread(Events.BrokerChanged e) {
-		contacts.clear();
-		Log.v(this.toString(), "cleared contacts: " + contacts.size());
-		
+		contactAdapter.clear();		
 	}
 
 

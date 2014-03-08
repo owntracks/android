@@ -350,8 +350,8 @@ public class PreferencesBroker extends DialogPreference {
 		if (v == null)
 			return;
 
-		Log.v("Required for connect: ", this.requiredPreferences.toString());
-		Log.v("Currently set", this.okPreferences.toString());
+//		Log.v("Required for connect: ", this.requiredPreferences.toString());
+//		Log.v("Currently set", this.okPreferences.toString());
 
 		v.setEnabled(this.okPreferences.containsAll(this.requiredPreferences));
 	}
