@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
-    style="@style/cardInner"
-    android:background="@drawable/card_list_item_background"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/description"
-        style="@style/card_title"
+        style="@style/listItemPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -17,7 +17,7 @@
 
     <TextView
         android:id="@+id/location"
-        style="@style/card_content"
+        style="@style/listItemSecondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -26,19 +26,6 @@
         android:paddingTop="-5dp"
         android:scrollHorizontally="false"
         android:text="location" />
-
-    <TextView
-        android:id="@+id/meta"
-        style="@style/card_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignStart="@id/description"
-        android:layout_below="@+id/location"
-        android:paddingTop="-5dp"
-        android:scrollHorizontally="false"
-        android:text="meta"
-        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/leave"

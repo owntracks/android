@@ -49,7 +49,7 @@ public class ActivityWaypoints extends FragmentActivity {
 		ServiceProxy.runOrBind(this, new Runnable() {
 			@Override
 			public void run() {
-				Log.v(this.toString(), "ServiceProxy bound");
+				Log.v("ActivityWaypoints", "ServiceProxy bound");
 			}
 		});
 
@@ -58,10 +58,6 @@ public class ActivityWaypoints extends FragmentActivity {
 		this.listAdapter = new WaypointAdapter(this);
 
 		this.listView = (ListView) findViewById(R.id.waypoints);
-		this.listView.addHeaderView(getLayoutInflater().inflate(
-				R.layout.listview_header, null));
-		this.listView.addFooterView(getLayoutInflater().inflate(
-				R.layout.listview_footer, null));
 		this.listView.setAdapter(this.listAdapter);
 
 		this.listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -183,7 +179,6 @@ public class ActivityWaypoints extends FragmentActivity {
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.discard:
-				Log.v(this.toString(), "discard");
 				remove();
 				mode.finish();
 				return true;

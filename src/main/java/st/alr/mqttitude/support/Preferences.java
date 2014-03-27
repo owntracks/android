@@ -10,6 +10,9 @@ import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import de.greenrobot.event.EventBus;
 
 public class Preferences {
@@ -301,4 +304,16 @@ public class Preferences {
 			return LocationRequest.PRIORITY_HIGH_ACCURACY;
 		}
 	}
+
+    private static void fromJson(JSONObject json) {
+        if(!Defaults.isPropperMessageType(json, "configuration"))
+            return;
+
+
+
+    }
+
+    private static JSONObject toJson(){
+        return null;
+    }
 }

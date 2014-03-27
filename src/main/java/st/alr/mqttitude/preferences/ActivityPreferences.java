@@ -105,7 +105,7 @@ public class ActivityPreferences extends PreferenceActivity {
 						@Override
 						public boolean onPreferenceChange(
 								Preference preference, Object newValue) {
-							Log.v(this.toString(), newValue.toString());
+							Log.v("ActivityPreferences", newValue.toString());
 							if (newValue.toString().equals("0")) {
 								SharedPreferences.Editor editor = PreferenceManager
 										.getDefaultSharedPreferences(a).edit();
@@ -186,7 +186,7 @@ public class ActivityPreferences extends PreferenceActivity {
 						@Override
 						public boolean onPreferenceChange(
 								Preference preference, Object newValue) {
-							Log.v(this.toString(), newValue.toString());
+							Log.v("ActivityPreferences", newValue.toString());
 							if (newValue.toString().equals("0")) {
 								SharedPreferences.Editor editor = PreferenceManager
 										.getDefaultSharedPreferences(a).edit();

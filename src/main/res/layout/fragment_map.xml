@@ -10,19 +10,20 @@
         android:layout_height="match_parent" >
     </com.google.android.gms.maps.MapView>
 
+
     <LinearLayout
         android:id="@+id/contactDetails"
 		android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/grey_border_top"
-        android:orientation="vertical" 
+        android:orientation="horizontal"
         android:paddingLeft="0dp"
-        android:paddingRight="@dimen/default_horizontal_spacing"
-        android:paddingTop="@dimen/default_vertical_spacing_half"
-        android:paddingBottom="@dimen/default_vertical_spacing_half">
-        
+        android:paddingRight="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp">
+
         <include layout="@layout/row_contact" />
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -10,7 +10,7 @@
             <!-- Border color -->
             <stroke
                 android:width="2dp"
-                android:color="@color/card_shadow" />
+                android:color="@color/background" />
 
             	<!--  Background color -->
             <solid android:color="@color/pressed" />

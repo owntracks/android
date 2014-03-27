@@ -37,7 +37,6 @@ public class WaypointAdapter extends BaseAdapter {
 
 		public TextView description;
 		public TextView location;
-		public TextView meta;
 		public ImageView enter;
 		public ImageView leave;
 
@@ -67,7 +66,6 @@ public class WaypointAdapter extends BaseAdapter {
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.description = (TextView) rowView
 					.findViewById(R.id.description);
-			viewHolder.meta = (TextView) rowView.findViewById(R.id.meta);
 			viewHolder.location = (TextView) rowView
 					.findViewById(R.id.location);
 			viewHolder.enter = (ImageView) rowView.findViewById(R.id.enter);
@@ -83,10 +81,6 @@ public class WaypointAdapter extends BaseAdapter {
 		holder.location.setText(w.getLatitude() + ":" + w.getLongitude());
 
 		if ((w.getRadius() != null) && (w.getRadius() > 0)) {
-			holder.meta.setText(this.context.getString(R.string.reportOn)
-					+ " "
-					+ Defaults.TransitionType.toString(w.getTransitionType(),
-							this.context));
 
 			if ((w.getTransitionType() & Geofence.GEOFENCE_TRANSITION_ENTER) != 0)
 				holder.enter.setVisibility(View.VISIBLE);

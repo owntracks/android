@@ -5,14 +5,12 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        style="@style/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/default_vertical_spacing"
         android:orientation="vertical" >
 
         <TextView
-            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
@@ -20,13 +18,11 @@
 
         <TextView
             android:id="@+id/name"
-            style="@style/card_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/na" />
 
         <TextView
-            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
@@ -34,13 +30,11 @@
 
         <TextView
             android:id="@+id/topic"
-            style="@style/card_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/na" />
 
         <TextView
-            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
@@ -48,13 +42,11 @@
 
         <TextView
             android:id="@+id/location"
-            style="@style/card_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/na" />
 
         <TextView
-            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
@@ -62,13 +54,11 @@
 
         <TextView
             android:id="@+id/accuracy"
-            style="@style/card_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0" />
 
         <TextView
-            style="@style/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
@@ -76,7 +66,6 @@
 
         <TextView
             android:id="@+id/time"
-            style="@style/card_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/default_vertical_spacing"

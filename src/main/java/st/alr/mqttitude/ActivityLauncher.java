@@ -182,9 +182,7 @@ public class ActivityLauncher extends FragmentActivity {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				Log.v(this.toString(),
-						"Application service started and bound. ");
-				if (!ActivityLauncher.this.autostart)
+		if (!ActivityLauncher.this.autostart)
 					startActivityMain();
 			}
 		};

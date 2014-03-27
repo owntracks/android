@@ -1,12 +1,13 @@
 package st.alr.mqttitude;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import st.alr.mqttitude.adapter.ContactAdapter;
+import st.alr.mqttitude.adapter.MultitypeAdapter;
 import st.alr.mqttitude.db.ContactLinkDao;
 import st.alr.mqttitude.db.DaoMaster;
 import st.alr.mqttitude.db.DaoMaster.OpenHelper;
@@ -41,7 +42,7 @@ public class App extends Application {
 	private DaoMaster daoMaster;
 	private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
-	private ContactAdapter contactAdapter;
+    private HashMap<String, Contact> contacts;
 
 	@Override
 	public void onCreate() {
@@ -64,9 +65,8 @@ public class App extends Application {
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
 				getResources().getConfiguration().locale);
-		//this.contacts = new HashMap<String, Contact>();
-		this.contactAdapter = new ContactAdapter(this);
-		
+		this.contacts = new HashMap<String, Contact>();
+
 		Bugsnag.register(this, Preferences.getBugsnagApiKey());
 		Bugsnag.setNotifyReleaseStages("production", "testing");
 		EventBus.getDefault().register(this);
@@ -85,20 +85,19 @@ public class App extends Application {
 	}
 
 	public static Contact getContact(String topic) {
-		return getContactAdapter().getItem(topic);
+		return instance.contacts.get(topic);
 	}
-	
-	public static Iterator<Entry<String, Contact>> getContactIterator(){
-		return getContactAdapter().getIterator();
+    public static ArrayList<Contact> getContacts() {
+        return new ArrayList<Contact>(instance.contacts.values());
+    }
+    public static void addContact(Contact c) {
+        EventBus.getDefault().post(new Events.ContactAdded(c));
+        instance.contacts.put(c.getTopic(), c);
+    }
+
+    public static Iterator<Entry<String, Contact>> getContactIterator(){
+        return instance.contacts.entrySet().iterator();
 	}
-	
-	public static ContactAdapter getContactAdapter() {
-		return instance.contactAdapter;
-	}
-	
-//	public static HashMap<String, Contact> getContacts() {
-//		return instance.contacts;
-//	}
 
 	public static String formatDate(Date d) {
 		return instance.dateFormater.format(d);
@@ -127,8 +126,9 @@ public class App extends Application {
 				Toast.LENGTH_SHORT).show();
 	}
 	public void onEventMainThread(Events.BrokerChanged e) {
-		contactAdapter.clear();		
+		contacts.clear();
 	}
+
 
 
 }
