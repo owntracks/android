@@ -1,6 +1,6 @@
 package st.alr.mqttitude.support;
 
-public interface MqttPublish {
+public interface ServiceMqttCallbacks {
 	public void publishSuccessfull(Object extra);
 
 	public void publishFailed(Object extra);

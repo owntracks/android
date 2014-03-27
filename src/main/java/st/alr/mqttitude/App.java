@@ -36,11 +36,7 @@ public class App extends Application {
 	private SimpleDateFormat dateFormater;
 	//private HashMap<String, Contact> contacts;
 
-	private SQLiteDatabase db;
-	private OpenHelper helper;
-	private DaoSession daoSession;
-	private DaoMaster daoMaster;
-	private ContactLinkDao contactLinkDao;
+    private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
     private HashMap<String, Contact> contacts;
 
@@ -48,20 +44,20 @@ public class App extends Application {
 	public void onCreate() {
 		super.onCreate();
 		instance = this;
-		this.helper = new DaoMaster.OpenHelper(this, "mqttitude-db", null) {
-			@Override
-			public void onUpgrade(SQLiteDatabase db, int oldVersion,
-					int newVersion) {
-				Log.v(this.toString(), "Migrating db from " + oldVersion
-						+ " to  " + newVersion);
-				// Add migrations here
-			}
-		};
-		this.db = this.helper.getWritableDatabase();
-		this.daoMaster = new DaoMaster(this.db);
-		this.daoSession = this.daoMaster.newSession();
-		this.contactLinkDao = this.daoSession.getContactLinkDao();
-		this.waypointDao = this.daoSession.getWaypointDao();
+        OpenHelper helper = new OpenHelper(this, "mqttitude-db", null) {
+            @Override
+            public void onUpgrade(SQLiteDatabase db, int oldVersion,
+                                  int newVersion) {
+                Log.v(this.toString(), "Migrating db from " + oldVersion
+                        + " to  " + newVersion);
+                // Add migrations here
+            }
+        };
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+		this.contactLinkDao = daoSession.getContactLinkDao();
+		this.waypointDao = daoSession.getWaypointDao();
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
 				getResources().getConfiguration().locale);

@@ -103,15 +103,15 @@ public class Events {
 		}
 	}
 
-	public static class LocationUpdated extends E {
+	public static class CurrentLocationUpdated extends E {
 		GeocodableLocation l;
 
-		public LocationUpdated(Location l) {
+		public CurrentLocationUpdated(Location l) {
 			super();
 			this.l = new GeocodableLocation(l);
 		}
 
-		public LocationUpdated(GeocodableLocation l) {
+		public CurrentLocationUpdated(GeocodableLocation l) {
 			this.l = l;
 		}
 
