@@ -221,4 +221,10 @@
         <item>2</item>
     </string-array>
 
+
+    <string-array name="contactContextMenu">
+        <item>Show</item>
+        <item>Details</item>
+        <item>Navigate</item>
+    </string-array>
 </resources>

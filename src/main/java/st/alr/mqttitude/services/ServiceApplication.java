@@ -1,7 +1,6 @@
 package st.alr.mqttitude.services;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -122,22 +121,21 @@ public class ServiceApplication implements ProxyableService,
 	};
 
 	public void onEventMainThread(Events.LocationMessageReceived e) {
-		// Updates a contact or allocates a new one
 
-		
-		
 		Contact c = App.getContact(e.getTopic());
 
 		if (c == null) {
 			Log.v(this.toString(), "Allocating new contact for " + e.getTopic());
 			c = new st.alr.mqttitude.model.Contact(e.getTopic());
-			updateContact(c);
+			resolveContact(c);
+            c.setLocation(e.getGeocodableLocation());
+            App.addContact(c);
 		} else {
 			c.setLocation(e.getGeocodableLocation());
-			App.getContactAdapter().update(c);
-		}
+            EventBus.getDefault().post(new Events.ContactUpdated(c));
+        }
 
-		EventBus.getDefault().post(new Events.ContactUpdated(c));
+
 
 	}
 
@@ -361,7 +359,7 @@ public class ServiceApplication implements ProxyableService,
 			Entry<String, Contact> item = it.next();
 
 			Contact c = item.getValue();
-			updateContact(c);
+			resolveContact(c);
 			EventBus.getDefault().post(new Events.ContactUpdated(c));
 		}
 
@@ -372,7 +370,7 @@ public class ServiceApplication implements ProxyableService,
 	 * synced cloud contacts. If no mapping is found, no mame is set and the
 	 * default image is assumed
 	 */
-	void updateContact(Contact c) {
+	void resolveContact(Contact c) {
 
 		long contactId = getContactId(c);
 		boolean found = false;
@@ -413,6 +411,7 @@ public class ServiceApplication implements ProxyableService,
 			setContactImageAndName(c, null, null);
 
 		cursor.close();
+
 
 	}
 
@@ -478,7 +477,7 @@ public class ServiceApplication implements ProxyableService,
 		ContactLink cl = new ContactLink(c.getTopic(), contactId);
 		App.getContactLinkDao().insertOrReplace(cl);
 
-		updateContact(c);
+		resolveContact(c);
 		EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
 	}
 	

@@ -2,7 +2,7 @@
 <resources>
 
     
-    <dimen name="card_header">24sp</dimen>
+    <dimen name="card_header">22sp</dimen>
     <dimen name="card_title">19sp</dimen>
     <dimen name="card_content">19sp</dimen>
  		

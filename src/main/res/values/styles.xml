@@ -27,87 +27,27 @@
         <item name="android:actionModeCloseDrawable">@drawable/ic_action_accept</item>
     </style>
 
-    <color name="pressed">#FFE4E4E4</color>
 
     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_action_overflow</item>
     </style>
 
-    <color name="mediumGrey">#696868</color>
-    <color name="darkGrey">#3f4246</color>
-    <color name="background">#eeeeee</color>
-    <color name="card_aside">#f9fafa</color>
-    <color name="card_shadow">#d9d9d9</color>
-    <color name="seperator">#d9d9d9</color>
-    <color name="border">#d9d9d9</color>
+    <color name="textPrimary">#585b5f</color>
+    <color name="textSecondary">#818181</color>
 
-    <style name="seperator">
-        <item name="android:background">@color/seperator</item>
-        <item name="android:visibility">visible</item>
+    <color name="background">#f4f4f4</color>
+    <color name="pressed">#FFE4E4E4</color>
+
+
+
+    <style name="listItemPrimary">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:textSize">18dp</item>
     </style>
 
-    <style name="seperatorH" parent="seperator">
-        <item name="android:layout_height">1dp</item>
-        <item name="android:layout_width">fill_parent</item>
-    </style>
-
-    <style name="seperatorV" parent="seperator">
-        <item name="android:layout_width">1dp</item>
-        <item name="android:layout_height">fill_parent</item>
-    </style>
-
-    <style name="title">
-        <item name="android:textColor">@color/darkGrey</item>
-        <item name="android:textSize">18sp</item>
-    </style>
-
-    <style name="subtitle">
-        <item name="android:textColor">@color/mediumGrey</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="cardInner">
-        <item name="android:background">@drawable/card_list_item_background</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:paddingTop">@dimen/default_vertical_spacing_half</item>
-        <item name="android:paddingBottom">@dimen/default_vertical_spacing_half</item>
-    </style>
-
-    <style name="listItemTitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
-    </style>
-
-    <style name="listItemSubtitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
-    </style>
-
-    <style name="card">
-        <item name="android:layout_marginLeft">16dp</item>
-        <item name="android:layout_marginRight">16dp</item>
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:background">@drawable/card</item>
-    </style>
-
-    <style name="card_title">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/card_title</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/darkGrey</item>
-    </style>
-
-    <style name="card_content">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/card_content</item>
-        <item name="android:textColor">@color/darkGrey</item>
+    <style name="listItemSecondary">
+        <item name="android:textSize">16dp</item>
+        <item name="android:textColor">@color/textSecondary</item>
     </style>
 
 </resources>

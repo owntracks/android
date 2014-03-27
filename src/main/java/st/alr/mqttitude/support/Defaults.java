@@ -2,6 +2,10 @@ package st.alr.mqttitude.support;
 
 import st.alr.mqttitude.R;
 import android.content.Context;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Defaults {
 	public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "st.alr.mqttitude.intent.PUB_LASTKNOWN";
@@ -95,5 +99,19 @@ public class Defaults {
 		};
 
 	}
+
+    public static boolean isPropperMessageType(JSONObject json, String type) {
+        try {
+            if(json == null)
+                Log.e("isPropperMessageType", "Atempt to invoke isPropperMessageType on null object");
+
+            if (!json.getString("_type").equals(type))
+                throw new JSONException("wrong type");
+        } catch (JSONException e) {
+            Log.e("isPropperMessageType", "Unable to deserialize " + type  +" object from JSON " + json.toString());
+            return false;
+        }
+        return true;
+    }
 
 }

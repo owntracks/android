@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import st.alr.mqttitude.adapter.ContactAdapter;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
-import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
@@ -30,18 +30,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -376,7 +378,6 @@ public class ActivityMain extends FragmentActivity {
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
-	Bundle fragmentBundle;
 
 	public static class MapFragment extends Fragment implements
 			StaticHandlerInterface {
@@ -452,11 +453,9 @@ public class ActivityMain extends FragmentActivity {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
 			this.markerToContacts = new HashMap<String, Contact>();
-			this.selectedContactDetails = (LinearLayout) v
-					.findViewById(R.id.contactDetails);
-			this.selectedContactName = (TextView) v.findViewById(R.id.title);
-			this.selectedContactLocation = (TextView) v
-					.findViewById(R.id.subtitle);
+			this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
+			this.selectedContactName = (TextView) v.findViewById(R.id.name);
+			this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
 			this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
 
 			this.selectedContactDetails.setVisibility(View.GONE);
@@ -678,12 +677,20 @@ public class ActivityMain extends FragmentActivity {
 
 	public static class ContactsFragment extends Fragment implements
 			StaticHandlerInterface {
-		private LinearLayout friendsListView;
-		private Button currentLoc;
-		private static Handler handler;
-		private static final String TAG_MYLOCATION = "++MYLOCATION++";
+//		private LinearLayout friendsListView;
+//		private Button currentLoc;
+		private ListView list;
 
-		public static ContactsFragment getInstance() {
+        private static Handler handler;
+		private static final String TAG_MYLOCATION = "++MYLOCATION++";
+        private static final int MENU_CONTACT_SHOW = 0;
+        private static final int MENU_CONTACT_DETAILS = 1;
+        private static final int MENU_CONTACT_NAVIGATE = 2;
+
+        private ContactAdapter listAdapter;
+
+
+        public static ContactsFragment getInstance() {
 			ContactsFragment instance = new ContactsFragment();
 			return instance;
 		}
@@ -692,30 +699,38 @@ public class ActivityMain extends FragmentActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			handler = new StaticHandler(this);
-		}
+            EventBus.getDefault().registerSticky(this);
+
+        }
 
 		@Override
 		public void onStart() {
 			super.onStart();
-			EventBus.getDefault().registerSticky(this);
 		}
 
 		@Override
 		public void onStop() {
-			handler.removeCallbacksAndMessages(null);
-			EventBus.getDefault().unregister(this);
+
 			super.onStop();
 		}
+
+        @Override
+        public void onDestroy() {
+            handler.removeCallbacksAndMessages(null);
+            EventBus.getDefault().unregister(this);
+            super.onDestroy();
+        }
 
 		@Override
 		public void onResume() {
 			super.onResume();
 
 			onEventMainThread(new Events.BrokerChanged());
-			
-			Iterator<Entry<String, Contact>> it = App.getContactIterator();
-			while(it.hasNext())
-				updateContactView(it.next().getValue());
+            registerForContextMenu(this.list);
+
+            //			Iterator<Entry<String, Contact>> it = App.getContactIterator();
+//			while(it.hasNext())
+//				updateContactView(it.next().getValue());
 
 			ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
@@ -729,7 +744,17 @@ public class ActivityMain extends FragmentActivity {
 
 		}
 
-		@Override
+        @Override
+        public void onPause() {
+            unregisterForContextMenu(this.list);
+
+            super.onPause();
+
+        }
+
+
+
+        @Override
 		public void onHiddenChanged(boolean hidden) {
 			if (hidden)
 				onHide();
@@ -745,56 +770,117 @@ public class ActivityMain extends FragmentActivity {
 
 		}
 
-		@Override
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v,
+                                        ContextMenu.ContextMenuInfo menuInfo) {
+            if (v.getId()==R.id.list) {
+
+                String[] menuItems = getResources().getStringArray(R.array.contactContextMenu);
+                menu.add(Menu.NONE, MENU_CONTACT_SHOW, MENU_CONTACT_SHOW, menuItems[MENU_CONTACT_SHOW]);
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, MENU_CONTACT_DETAILS, menuItems[MENU_CONTACT_DETAILS]);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, MENU_CONTACT_NAVIGATE, menuItems[MENU_CONTACT_NAVIGATE]);
+
+
+            }
+        }
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item)
+        {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            int index = info.position;
+
+            Contact c = (Contact) listAdapter.getItemObject(index);
+
+                switch (item.getItemId()) {
+                    case MENU_CONTACT_SHOW:
+                        Log.v(this.toString(), "Show for " +c);
+                    case MENU_CONTACT_DETAILS:
+                        Log.v(this.toString(), "Details for " +c);
+                    case MENU_CONTACT_NAVIGATE:
+                        Log.v(this.toString(), "Navigate for " +c);
+                }
+
+                return true;
+        }
+
+
+
+        @Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 
-			View v = inflater.inflate(R.layout.fragment_friends, container,
+			View v = inflater.inflate(R.layout.fragment_contacts, container,
 					false);
 
-			this.friendsListView = (LinearLayout) v
-					.findViewById(R.id.friendsListView);
-			LinearLayout thisdevice = (LinearLayout) v
-					.findViewById(R.id.thisdevice);
+            this.list = (ListView) v.findViewById(R.id.list);
+            this.listAdapter = new ContactAdapter(getActivity(), App.getContacts());
+            this.list.setAdapter(this.listAdapter);
+            this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-			this.currentLoc = (Button) thisdevice
-					.findViewById(R.id.currentLocation);
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View arg1, final int position, long arg3) {
 
-			this.currentLoc.setOnClickListener(new OnClickListener() {
+                            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+                                @Override
+                                public void run() {
+                                    Contact c = (Contact) listAdapter.getItemObject(position);
 
-				@Override
-				public void onClick(View v) {
-					ServiceProxy.runOrBind(getActivity(), new Runnable() {
-						@Override
-						public void run() {
-							if (ServiceProxy.getServiceLocator()
-									.getLastKnownLocation() != null)
-								((MapFragment) FragmentHandler.getInstance()
-										.forward(MapFragment.class, null,
-												getActivity()))
-										.focusCurrentLocation();
-							else
-								App.showLocationNotAvailableToast();
+                                    ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null,getActivity())).focus(c);
+                                }
+                            });
+                    }
+                });
 
-						}
-					});
+            registerForContextMenu(this.list);
+//			this.friendsListView = (LinearLayout) v
+//					.findViewById(R.id.friendsListView);
+//			LinearLayout thisdevice = (LinearLayout) v
+//					.findViewById(R.id.thisdevice);
+//
+//			this.currentLoc = (Button) thisdevice
+//					.findViewById(R.id.currentLocation);
+//
+//			this.currentLoc.setOnClickListener(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View v) {
+//					ServiceProxy.runOrBind(getActivity(), new Runnable() {
+//						@Override
+//						public void run() {
+//							if (ServiceProxy.getServiceLocator()
+//									.getLastKnownLocation() != null)
+//								((MapFragment) FragmentHandler.getInstance()
+//										.forward(MapFragment.class, null,
+//												getActivity()))
+//										.focusCurrentLocation();
+//							else
+//								App.showLocationNotAvailableToast();
+//
+//						}
+//					});
+//
+//				}
+//			});
 
-				}
-			});
-
-			Iterator<Entry<String, Contact>> it = App.getContactIterator();
-			while(it.hasNext())
-				updateContactView(it.next().getValue());
+//			Iterator<Entry<String, Contact>> it = App.getContactIterator();
+//			while(it.hasNext())
+//				updateContactView(it.next().getValue());
 
 			return v;
 		}
 
 		public void onEventMainThread(Events.LocationUpdated e) {
-			updateCurrentLocation(e.getGeocodableLocation(), true);
+
+
+
+            updateCurrentLocation(e.getGeocodableLocation(), true);
 		}
 		
 		public void onEventMainThread(Events.BrokerChanged e) {
-			this.friendsListView.removeViews(0, this.friendsListView.getChildCount());
+			//TODO
+			//this.friendsListView.removeViews(0, this.friendsListView.getChildCount());
 		}
 
 		public void updateCurrentLocation(GeocodableLocation l,
@@ -802,9 +888,9 @@ public class ActivityMain extends FragmentActivity {
 			if (l == null)
 				return;
 
-			// Current location changes often, don't waste resources to resolve
-			// the geocoder
-			this.currentLoc.setText(l.toString());
+            //TODO: this.listAdapter.updateCurrentLocation(l);
+			//this.currentLoc.setText(l.toString());
+
 
 			if ((l.getGeocoder() == null) && resolveGeocoder) {
 				l.setTag(TAG_MYLOCATION);
@@ -818,88 +904,40 @@ public class ActivityMain extends FragmentActivity {
 
 			if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT)
 					&& (msg.obj != null)) {
-				if (((GeocodableLocation) msg.obj).getTag().equals(
-						TAG_MYLOCATION)) {
-					updateCurrentLocation((GeocodableLocation) msg.obj, false);
-				} else {
-					GeocodableLocation l = (GeocodableLocation) msg.obj;
-
-					if ((l.getTag() == null) || (this.friendsListView == null))
-						return;
-
-					TextView tv = (TextView) this.friendsListView
-							.findViewWithTag(l.getTag()).findViewById(
-									R.id.subtitle);
-					if (tv != null)
-						tv.setText(l.toString());
-				}
+                Log.v(this.toString(), "ReverseGeocodingTask returned " );
+                listAdapter.notifyDataSetChanged();
+//				if (((GeocodableLocation) msg.obj).getTag().equals(TAG_MYLOCATION)) {
+//					updateCurrentLocation((GeocodableLocation) msg.obj, false);
+//				} else {
+//					GeocodableLocation l = (GeocodableLocation) msg.obj;
+//
+//					if ((l.getTag() == null) || (this.friendsListView == null))
+//						return;
+//
+//					TextView tv = (TextView) this.friendsListView
+//							.findViewWithTag(l.getTag()).findViewById(
+//									R.id.subtitle);
+//					if (tv != null)
+//						tv.setText(l.toString());
+//				}
 			}
 		}
 
 		public void onEventMainThread(Events.ContactUpdated e) {
-			updateContactView(e.getContact());
+            resolveContactGeocoder(e.getContact());
+            listAdapter.notifyDataSetChanged();
 		}
+        public void onEventMainThread(Events.ContactAdded e) {
 
-		public void updateContactView(final Contact c) {
-			View v = this.friendsListView.findViewWithTag(c.getTopic());
+            resolveContactGeocoder(e.getContact());
+            listAdapter.addItem(e.getContact());
+        }
 
-			if (v == null) {
+        public void resolveContactGeocoder(Contact c){
+            if(c.getLocation().getGeocoder() == null)
+            (new ReverseGeocodingTask(getActivity(), handler)).execute(new GeocodableLocation[] { c.getLocation() });
 
-				if (c.getView() != null && c.getView().getParent() != null) {
-					v = c.getView();
-					// remove from old view first to allow it to be added to the
-					// new view again
-					((ViewGroup) v.getParent()).removeView(v);
-				} else {
-					v = getActivity().getLayoutInflater().inflate(
-							R.layout.row_contact, null, false);
-					c.setView(v);
-					v.setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							Contact c = App.getContact((String) v.getTag());
-							if ((c == null) || (c.getLocation() == null))
-								return;
-
-							((MapFragment) FragmentHandler.getInstance()
-									.forward(MapFragment.class, null,
-											getActivity())).focus(c);
-						}
-					});
-
-					v.findViewById(R.id.image).setOnClickListener(
-							new OnClickListener() {
-
-								@Override
-								public void onClick(View v) {
-									Bundle b = new Bundle();
-									b.putString(DetailsFragment.KEY_TOPIC,
-											c.getTopic());
-									FragmentHandler.getInstance().forward(
-											DetailsFragment.class, b,
-											getActivity());
-								}
-							});
-
-				}
-				v.setTag(c.getTopic());
-				this.friendsListView.addView(c.getView());
-				this.friendsListView.setVisibility(View.VISIBLE);
-
-			}
-
-			((TextView) v.findViewById(R.id.title)).setText(c.toString());
-			((TextView) v.findViewById(R.id.subtitle)).setText(c.getLocation()
-					.toString());
-			ImageView img = ((ImageView) v.findViewById(R.id.image));
-			img.setImageBitmap(c.getUserImage());
-
-			(new ReverseGeocodingTask(getActivity(), handler))
-					.execute(new GeocodableLocation[] { c.getLocation() });
-
-		}
-
+        }
 	}
 
 	public static class DetailsFragment extends Fragment {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <Button
+        android:id="@+id/currentLocation"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/mylocation"
+        android:gravity="center_vertical"
+        android:paddingBottom="0dp"
+        android:textColor="#6f7275"
+        android:paddingLeft="@dimen/default_horizontal_spacing"
+        android:text="@string/na" />
+
+
+    <ListView
+
+        android:listSelector="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:id="@+id/list"/>
+
+
+
+</LinearLayout>

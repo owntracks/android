@@ -1,129 +1,106 @@
 package st.alr.mqttitude.adapter;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
-import st.alr.mqttitude.db.Waypoint;
-import st.alr.mqttitude.db.WaypointDao;
-import st.alr.mqttitude.model.Contact;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.location.Geofence;
+import java.util.ArrayList;
 
-import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.R;
+import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.model.GeocodableLocation;
+import st.alr.mqttitude.services.ServiceProxy;
 
-public class ContactAdapter extends BaseAdapter {
-	private LinkedHashMap<String, Contact> map;
-	private String[] keys;
-	private Context context;
 
-	public ContactAdapter(Context c) {
-		super();
-		this.context = c;
-		this.map = new LinkedHashMap<String, Contact>();
-		setKeysFromMap();
-		notifyDataSetChanged();
-	}
+public class ContactAdapter extends MultitypeAdapter{
 
-	private void setKeysFromMap() {
-		this.keys = this.map.keySet().toArray(new String[this.map.size()]);
-	}
-	
-	public Iterator<Entry<String, Contact>> getIterator() {
-		return map.entrySet().iterator();
-	}
-	
-	static class ViewHolder {
+    public ContactAdapter(Context context, ArrayList<Contact> contacts) {
+        super(context);
 
-		public TextView title;
-		public TextView subtitle;
-		public ImageView image;
+        if(contacts != null)
+            for (Contact c : contacts)
+                addItem(c);
 
-	}
 
-	@Override
-	public int getCount() {
-		return this.map.size();
-	}
+        notifyDataSetChanged();
+    }
 
-	
-	@Override
-	public Contact getItem(int position) {
-		return getItem(keys[position]);
-	}
+    public static class ContactHolder {
+        TextView name;
+        TextView location;
+        ImageView image;
+    }
 
-	public Contact getItem(String key) {
-		return this.map.get(key);
-	}
-	
-	@Override
-	public long getItemId(int position) {
-		return 0;
-	}
+    @Override
+    public DelegateAdapter getItemDelegateAdapter() {
+        return new ItemDelegateAdapter();
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		View rowView = convertView;
-		if (rowView == null) {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			rowView = inflater.inflate(R.layout.row_contact, null);
-			ViewHolder viewHolder = new ViewHolder();
-			viewHolder.title = (TextView) rowView.findViewById(R.id.title);
-			viewHolder.subtitle = (TextView) rowView.findViewById(R.id.subtitle);
-			viewHolder.image = (ImageView) rowView.findViewById(R.id.image);
+    public class ItemDelegateAdapter implements DelegateAdapter {
 
-			rowView.setTag(viewHolder);
-		}
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Pair<Integer, Object> item) {
+            ContactHolder holder;
+            Contact c = (Contact)item.second;
+            if (convertView == null) {
+                holder = new ContactHolder();
+                convertView = inflater.inflate(R.layout.row_contact, null);
+                holder.name = (TextView)convertView.findViewById(R.id.name);
+                holder.location = (TextView)convertView.findViewById(R.id.location);
+                holder.image = (ImageView)convertView.findViewById(R.id.image);
 
-		Contact c = getItem(position);
+            } else {
+                holder = (ContactHolder)convertView.getTag();
+            }
+            convertView.setTag(holder);
+            holder.name.setText(c.toString());
+            holder.location.setText(c.getLocation().toString());
+            holder.image.setImageBitmap(c.getUserImage());
 
-		ViewHolder holder = (ViewHolder) rowView.getTag();
-		holder.title.setText(c.toString());
-		holder.subtitle.setText(c.getLocation().toString());
-		holder.image.setImageBitmap(c.getUserImage());
-		
-		return rowView;
+            return convertView;
+        }
+    }
 
-	}
 
-	public void update(Contact c) {
-		notifyDataSetChanged();
-	}
 
-	public void add(Contact c) {
-		map.put(c.getTopic(), c);
-		setKeysFromMap();
-		notifyDataSetChanged();
-	}
 
-	public void remove(Contact c) {
-		map.remove(c.getTopic());
-		setKeysFromMap();
-		notifyDataSetChanged();
-	}
-	public void clear() {
-		map.clear();
-		setKeysFromMap();
-		notifyDataSetChanged();
-
-	}
-	
-	
+//    public static class MyLocationHolder {
+//        TextView myLocation;
+//    }
+//
+//    public class MyLocationDelegateAdapter implements DelegateAdapter {
+//
+//        @Override
+//        public View getView(final int position, View convertView, ViewGroup parent, LayoutInflater inflater, final Pair<Integer, Object> item) {
+//            MyLocationHolder holder;
+//
+//            if (convertView == null) {
+//                holder = new MyLocationHolder();
+//                convertView = inflater.inflate(R.layout.row_mylocation, null);
+//                holder.myLocation = (TextView)convertView.findViewById(R.id.currentLocation);
+//
+//            } else {
+//                holder = (MyLocationHolder)convertView.getTag();
+//            }
+//            convertView.setTag(holder);
+//            if(myLocation != null)
+//                holder.myLocation.setText(myLocation.toString());
+//            else
+//                holder.myLocation.setText(context.getResources().getString(R.string.na));
+//            return convertView;
+//        }
+//    }
+//
+//    public void updateCurrentLocation(GeocodableLocation l) {
+//        myLocation = l;
+//        notifyDataSetChanged();
+//    }
 
 }
+
+
+

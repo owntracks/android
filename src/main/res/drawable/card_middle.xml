@@ -2,15 +2,15 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
    <!-- android:bottom="-2dp" hides border,  -1dp shows 1do border, 0dp shows 2dp border   -->
     <item
-        android:bottom="-2dp"
-        android:left="-1dp"
-        android:right="-1dp"
+        android:bottom="0dp"
+        android:left="-2dp"
+        android:right="-2dp"
         android:top="-2dp">
         <shape android:shape="rectangle" >
             <!-- Border color -->
             <stroke
                 android:width="2dp"
-                android:color="@color/card_shadow" />
+                android:color="@color/background" />
 
             	<!--  Background color -->
             <solid android:color="#FFFFFFFF" />
