@@ -16,7 +16,7 @@ import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.model.WaypointMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.MqttPublish;
+import st.alr.mqttitude.support.ServiceMqttCallbacks;
 import st.alr.mqttitude.support.Preferences;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -38,7 +38,7 @@ import com.google.android.gms.location.LocationStatusCodes;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceLocator implements ProxyableService, MqttPublish,
+public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener,
 		LocationClient.OnRemoveGeofencesResultListener,
@@ -137,7 +137,7 @@ public class ServiceLocator implements ProxyableService, MqttPublish,
 		this.lastKnownLocation = new GeocodableLocation(arg0);
 
 		EventBus.getDefault().postSticky(
-				new Events.LocationUpdated(this.lastKnownLocation));
+				new Events.CurrentLocationUpdated(this.lastKnownLocation));
 
 		if (shouldPublishLocation())
 			publishLocationMessage();

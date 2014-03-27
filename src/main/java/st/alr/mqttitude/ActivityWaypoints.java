@@ -240,8 +240,7 @@ public class ActivityWaypoints extends FragmentActivity {
 			this.notification.setChecked(w.getNotification());
 			this.notification.setText(w.getNotificationTitle());
 
-			this.share.setChecked((w.getShared() != null)
-					&& (w.getShared() == true));
+			this.share.setChecked(w.getShared());
 		}
 
 		private View getContentView() {

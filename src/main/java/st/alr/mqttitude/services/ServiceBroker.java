@@ -33,7 +33,7 @@ import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.MqttPublish;
+import st.alr.mqttitude.support.ServiceMqttCallbacks;
 import st.alr.mqttitude.support.Preferences;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -321,7 +321,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		if (this.pingSender == null) {
 			this.pingSender = new PingSender();
 			this.context.registerReceiver(this.pingSender, new IntentFilter(
-					Defaults.INTENT_ACTION_PUBLICH_PING));
+					Defaults.INTENT_ACTION_PUBLISH_PING));
 		}
 
 		scheduleNextPing();
@@ -526,7 +526,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	public void publish(final String topic, final String payload,
 			final boolean retained, final int qos, final int timeout,
-			final MqttPublish callback, final Object extra) {
+			final ServiceMqttCallbacks callback, final Object extra) {
 
 		publish(new DeferredPublishable(topic, payload, retained, qos, timeout,
 				callback, extra));
@@ -580,14 +580,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private class DeferredPublishable extends MqttMessage {
 		private Handler timeoutHandler;
-		private MqttPublish callback;
+		private ServiceMqttCallbacks callback;
 		private String topic;
 		private int timeout = 0;
 		private boolean isPublishing;
 		private Object extra;
 
 		public DeferredPublishable(String topic, String payload,
-				boolean retained, int qos, int timeout, MqttPublish callback,
+				boolean retained, int qos, int timeout, ServiceMqttCallbacks callback,
 				Object extra) {
 
 			super(payload.getBytes());
@@ -747,7 +747,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private void scheduleNextPing() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(this.context,
-				0, new Intent(Defaults.INTENT_ACTION_PUBLICH_PING),
+				0, new Intent(Defaults.INTENT_ACTION_PUBLISH_PING),
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Calendar wakeUpTime = Calendar.getInstance();
