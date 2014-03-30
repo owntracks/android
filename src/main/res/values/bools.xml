@@ -13,5 +13,5 @@
     <bool name="valContactsLinkCloudStorageEnabled">false</bool>
     <bool name="valAutostartOnBootEnabled">false</bool>
     <bool name="valAdvancedConnectionPreferencesEnabled">false</bool>
-
+    <bool name="valZeroLenghClientIdEnabled">false</bool>
 </resources>

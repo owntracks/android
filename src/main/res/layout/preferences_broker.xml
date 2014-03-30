@@ -115,8 +115,63 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="text"
-            android:maxLength="22"
             android:maxLines="1" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+
+            android:layout_height="fill_parent"
+            android:id="@+id/clientIdNegotiationWrapper"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Client ID negotiation"
+                android:id="@+id/textView"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/clientIdNegotiation"
+                android:entries="@array/connect_clientid_negotiation"
+                />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/clientIdNegotiationManualOptions"
+                >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Client ID"
+                        android:id="@+id/textView3"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:id="@+id/clientId"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/clientIdNegotiationAutoOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/securityWrapper"
