@@ -18,7 +18,6 @@
     <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
     <string name="preferencesCaCrtPath">Absolute certificate path</string>
-    <string name="preferencesBrokerClientId">"Client ID"</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
     <string name="preferencesLicensesTitle">"Licenses"</string>
@@ -135,6 +134,11 @@
         <item>Anonymous</item>
         <item>Username / Password</item>
     </string-array>
+    <string-array name="connect_clientid_negotiation">
+        <item>Manual</item>
+        <item>Auto (Requires MQTT 3.1.1 Broker)</item>
+    </string-array>
+
     <string-array name="qos_readable">
         <item>"0"</item>
         <item>"1"</item>
@@ -191,6 +195,8 @@
     <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyLocatorBackgroundInterval">backgroundInterval</string>
+    <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
+    <string name="keyClientId">clientId</string>
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicWaypointsPart">/waypoints</string>
     <string name="valSubTopic">owntracks/+/+</string>

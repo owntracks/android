@@ -38,14 +38,23 @@ public class PreferencesBroker extends DialogPreference {
 	private Spinner brokerSecurity;
 	private View brokerSecuritySSLOptions;
 	private View brokerSecurityNoneOptions;
-	private Spinner brokerAuth;
+    private View clientIdNegotiationManualOptions;
+    private View clientIdNegotiationAutoOptions;
+
+
+    private Spinner brokerAuth;
+    private Spinner clientIdNegotiation;
+    private EditText clientId;
+
 
 	private LinearLayout securityWrapper;
 	private LinearLayout brokerPasswordWrapper;
 	private LinearLayout brokerAuthWrapper;
+    private LinearLayout clientIdNegotiationWrapper;
+
 
 	private enum RequireablePreferences {
-		USER_NAME, DEVICE_NAME, BROKER_HOST, BROKER_PORT, BROKER_PASSWORD, CACRT
+		USER_NAME, DEVICE_NAME, BROKER_HOST, BROKER_PORT, BROKER_PASSWORD, CACRT, CLIENT_ID
 	};
 
 	Set<RequireablePreferences> okPreferences = Collections
@@ -69,28 +78,24 @@ public class PreferencesBroker extends DialogPreference {
 	protected View onCreateDialogView() {
 		View root = super.onCreateDialogView();
 
-		this.brokerAuthWrapper = (LinearLayout) root
-				.findViewById(R.id.brokerAuthWrapper);
-		this.brokerPasswordWrapper = (LinearLayout) root
-				.findViewById(R.id.brokerPasswordWrapper);
-		this.securityWrapper = (LinearLayout) root
-				.findViewById(R.id.securityWrapper);
-
-		this.host = (EditText) root.findViewById(R.id.brokerHost);
+		this.brokerAuthWrapper = (LinearLayout) root.findViewById(R.id.brokerAuthWrapper);
+		this.brokerPasswordWrapper = (LinearLayout) root.findViewById(R.id.brokerPasswordWrapper);
+		this.securityWrapper = (LinearLayout) root.findViewById(R.id.securityWrapper);
+        this.clientIdNegotiationWrapper =(LinearLayout) root.findViewById(R.id.clientIdNegotiationWrapper);
+        this.host = (EditText) root.findViewById(R.id.brokerHost);
 		this.port = (EditText) root.findViewById(R.id.brokerPort);
 		this.deviceName = (EditText) root.findViewById(R.id.deviceName);
-		userName = (EditText) root.findViewById(R.id.userName);
-
+		this.userName = (EditText) root.findViewById(R.id.userName);
 		this.password = (EditText) root.findViewById(R.id.brokerPassword);
 		this.brokerSecurity = (Spinner) root.findViewById(R.id.brokerSecurity);
 		this.brokerAuth = (Spinner) root.findViewById(R.id.brokerAuth);
-
-		this.brokerSecurityNoneOptions = root
-				.findViewById(R.id.brokerSecurityNoneOptions);
-		this.brokerSecuritySSLOptions = root
-				.findViewById(R.id.brokerSecuritySSLOptions);
-		this.brokerSecuritySSLCaCrtPath = (EditText) root
-				.findViewById(R.id.brokerSecuritySSLCaCrtPath);
+        this.clientIdNegotiation = (Spinner) root.findViewById(R.id.clientIdNegotiation);
+        this.clientId = (EditText) root.findViewById(R.id.clientId);
+		this.brokerSecurityNoneOptions = root.findViewById(R.id.brokerSecurityNoneOptions);
+		this.brokerSecuritySSLOptions = root.findViewById(R.id.brokerSecuritySSLOptions);
+		this.brokerSecuritySSLCaCrtPath = (EditText) root.findViewById(R.id.brokerSecuritySSLCaCrtPath);
+        this.clientIdNegotiationAutoOptions = root.findViewById(R.id.clientIdNegotiationAutoOptions);
+        this.clientIdNegotiationManualOptions = root.findViewById(R.id.clientIdNegotiationManualOptions);
 
 		return root;
 	}
@@ -99,8 +104,13 @@ public class PreferencesBroker extends DialogPreference {
 		int visibility = Preferences.isAdvancedModeEnabled() ? View.VISIBLE
 				: View.GONE;
 
-		for (View v : new View[] { this.securityWrapper, this.brokerAuthWrapper })
-			v.setVisibility(visibility);
+        // TODO: Waiting for paho lib to support zero length client ids
+        // for (View v : new View[] {this.clientIdNegotiationWrapper, this.securityWrapper, this.brokerAuthWrapper })
+		//	v.setVisibility(visibility);
+
+        for (View v : new View[] {this.securityWrapper, this.brokerAuthWrapper })
+            v.setVisibility(visibility);
+
 
 	}
 
@@ -119,9 +129,11 @@ public class PreferencesBroker extends DialogPreference {
 		this.brokerAuth.setSelection(Preferences.getBrokerAuthType());
 
 		this.brokerSecurity.setSelection(Preferences.getBrokerSecurityType());
-		this.brokerSecuritySSLCaCrtPath.setText(Preferences
-				.getBrokerSslCaPath());
+		this.brokerSecuritySSLCaCrtPath.setText(Preferences.getBrokerSslCaPath());
 
+        this.clientIdNegotiation.setSelection(Preferences.isZeroLenghClientIdEnabled() ? 0 : 1);
+        this.clientId.setHint(Preferences.getAndroidId());
+        this.clientId.setText(Preferences.getClientId(false));
 	}
 
 	@Override
@@ -131,8 +143,11 @@ public class PreferencesBroker extends DialogPreference {
 		handleHost();
 		handleBrokerAuth();
 		handleUserName();
+        // TODO: Waiting for paho lib to support zero length client ids
+        //handleClientId();
 		handleBrokerSecurity();
 		handleCaCrt();
+
 
 		showHideAdvanced();
 
@@ -205,6 +220,18 @@ public class PreferencesBroker extends DialogPreference {
 			}
 		});
 
+        this.clientIdNegotiation.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                handleClientId();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                PreferencesBroker.this.clientIdNegotiation.setSelection(0);
+            }
+        });
+
 		userName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
@@ -241,7 +268,14 @@ public class PreferencesBroker extends DialogPreference {
 
 	}
 
-	private void handleCaCrt() {
+    private void handleClientId() {
+        boolean auto = this.clientIdNegotiation.getSelectedItemPosition() == 1;
+        Log.v(this.toString(), "ClientId: auto == " + auto);
+        this.clientIdNegotiationManualOptions.setVisibility(auto ? View.GONE : View.VISIBLE);
+        this.clientIdNegotiationAutoOptions.setVisibility(auto ? View.VISIBLE : View.GONE);
+    }
+
+    private void handleCaCrt() {
 		handleState(
 				RequireablePreferences.CACRT,
 				this.brokerSecuritySSLCaCrtPath.getText().toString().length() > 0);
@@ -280,6 +314,9 @@ public class PreferencesBroker extends DialogPreference {
 					this.brokerSecurity.getSelectedItemPosition());
 			Preferences.setString(R.string.keyBrokerSecuritySslCaPath,
 					this.brokerSecuritySSLCaCrtPath.getText().toString());
+
+            Preferences.setClientId(this.clientId.getText().toString());
+            Preferences.setIsZeroLengthClientIdEnabled(this.clientIdNegotiation.getSelectedItemPosition() == 1);
 
 			Runnable r = new Runnable() {
 

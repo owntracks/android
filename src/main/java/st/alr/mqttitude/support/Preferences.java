@@ -51,8 +51,11 @@ public class Preferences {
 	public static void setInt(int resId, int value) {
 		getSharedPreferences().edit().putInt(getKey(resId), value).apply();
 	}
+    public static void setBoolean(int resId, boolean value) {
+        getSharedPreferences().edit().putBoolean(getKey(resId), value).apply();
+    }
 
-	public static String getAndroidId() {
+    public static String getAndroidId() {
 		return App.getAndroidId();
 	}
 
@@ -111,6 +114,25 @@ public class Preferences {
 			name = App.getAndroidId();
 		return name;
 	}
+
+    public static boolean isZeroLenghClientIdEnabled(){
+        return getBoolean(R.string.keyZeroLenghClientIdEnabled, R.bool.valZeroLenghClientIdEnabled);
+    }
+
+    public static void setIsZeroLengthClientIdEnabled(boolean enabled) {
+        Preferences.setBoolean(R.string.keyZeroLenghClientIdEnabled, enabled);
+    }
+
+    public static String getClientId(boolean androidIdFallback) {
+        String name = getString(R.string.keyClientId, R.string.valEmpty);
+        if (name.equals("") && androidIdFallback)
+            name = App.getAndroidId();
+        return name;
+    }
+
+    public static void setClientId(String clientId) {
+        setString(R.string.keyClientId, clientId);
+    }
 
 	public static String getSubTopic(boolean defaultTopicFallback) {
 		String topic = getString(R.string.keySubTopic, R.string.valSubTopic);
