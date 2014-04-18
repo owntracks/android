@@ -5,24 +5,24 @@
         android:key="brokerPreference"
         android:negativeButtonText="@string/preferencesServerCancel"
         android:positiveButtonText="@string/preferencesServerConnect"
-        android:title="@string/preferencesServerTitle" />
+        android:title="@string/preferencesServer" />
 
     <PreferenceScreen
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
         <CheckBoxPreference
-            android:defaultValue="@bool/valPubAutoEnabled"
-            android:key="@string/keyPubAutoEnabled"
+            android:defaultValue="@bool/valPub"
+            android:key="@string/keyPub"
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
-        <EditTextPreference
-            android:defaultValue="@string/valPubAutoInterval"
-            android:dependency="@string/keyPubAutoEnabled"
+        <st.alr.mqttitude.support.EditIntegerPreference
+            android:defaultValue="@integer/valPubInterval"
+            android:dependency="@string/keyPub"
             android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:hint="@string/valPubAutoInterval"
+            android:hint="@integer/valPubInterval"
             android:inputType="number"
-            android:key="@string/keyPubAutoInterval"
+            android:key="@string/keyPubInterval"
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
 
@@ -30,56 +30,56 @@
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
             android:summary="@string/preferencesIncludeBatterySummary"
-            android:title="@string/preferencesIncludeBatteryTitle" />
+            android:title="@string/preferencesIncludeBattery" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"
         android:title="@string/preferencesNotification" >
         <CheckBoxPreference
-            android:defaultValue="@bool/valNotificationEnabled"
-            android:key="@string/keyNotificationEnabled"
+            android:defaultValue="@bool/valNotification"
+            android:key="@string/keyNotification"
             android:summary="@string/preferencesNotificationSummary"
-            android:title="@string/preferencesNotificationTitle" />
+            android:title="@string/preferencesNotification" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valNotificationLocationEnabled"
-            android:dependency="@string/keyNotificationEnabled"
-            android:key="@string/keyNotificationLocationEnabled"
+            android:defaultValue="@bool/valNotificationLocation"
+            android:dependency="@string/keyNotification"
+            android:key="@string/keyNotificationLocation"
             android:summary="@string/preferencesNotificationLocationSummary"
-            android:title="@string/preferencesNotificationLocationTitle" />
+            android:title="@string/preferencesNotificationLocation" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valNotificationGeocoderEnabled"
-            android:dependency="@string/keyNotificationLocationEnabled"
-            android:key="@string/keyNotificationGeocoderEnabled"
+            android:defaultValue="@bool/valNotificationGeocoder"
+            android:dependency="@string/keyNotificationLocation"
+            android:key="@string/keyNotificationGeocoder"
             android:summary="@string/preferencesNotificationGeocoderSummary"
-            android:title="@string/preferencesNotificationGeocoderTitle" />
+            android:title="@string/preferencesNotificationGeocoder" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valNotificationTickerPublish"
-            android:key="@string/keyNotificationTickerPublish"
+            android:defaultValue="@bool/valNotificationTickerOnPublish"
+            android:key="@string/keyNotificationTickerOnPublish"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
-            android:title="@string/preferencesNotificationTickerOnPublishTitle" />
+            android:title="@string/preferencesNotificationTickerOnPublish" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valNotificationTickerGeofence"
-            android:key="@string/keyNotificationTickerGeofence"
+            android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
+            android:key="@string/keyNotificationTickerOnWaypointTransition"
             android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
             android:title="@string/preferencesNotificationTickerOnWaypointTransitionTitle" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="advanced"
-        android:title="@string/preferencesAdvancedTitle" >
+        android:title="@string/preferencesAdvanced" >
         <CheckBoxPreference
-            android:defaultValue="@bool/valAdvancedConnectionPreferencesEnabled"
-            android:key="@string/keyAdvancedConnectionPreferencesEnabled"
-            android:summary="@string/preferencesAdvancedConnectionSummary"
-            android:title="@string/preferencesAdvancedConnectionTitle" />
+            android:defaultValue="@bool/valConnectionAdvancedMode"
+            android:key="@string/keyConnectionAdvancedMode"
+            android:summary="@string/preferencesConnectionAdvancedModeSummary"
+            android:title="@string/preferencesConnectionAdvancedMode" />
 
         <EditTextPreference
             android:dialogTitle="@string/preferencesTopic"
-            android:key="@string/keyPubTopic"
+            android:key="@string/keyPubTopicBase"
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
         <ListPreference
-            android:defaultValue="@string/valPubQos"
+            android:defaultValue="@integer/valPubQos"
             android:entries="@array/qos_readable"
             android:entryValues="@array/qos"
             android:key="@string/keyPubQos"
@@ -92,14 +92,14 @@
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valSubEnabled"
-            android:key="@string/keySubEnabled"
+            android:defaultValue="@bool/valSub"
+            android:key="@string/keySub"
             android:summary="@string/preferencesContactsEnabledSummary"
-            android:title="@string/preferencesContactsEnabledTitle" />
+            android:title="@string/preferencesContactsEnabled" />
 
         <EditTextPreference
             android:defaultValue="@string/valSubTopic"
-            android:dependency="@string/keySubEnabled"
+            android:dependency="@string/keySub"
             android:dialogTitle="@string/preferencesContactsTopic"
             android:hint="@string/valSubTopic"
             android:key="@string/keySubTopic"
@@ -107,43 +107,43 @@
             android:title="@string/preferencesContactsTopic" />
 
         <CheckBoxPreference
-            android:defaultValue="@bool/valContactsLinkCloudStorageEnabled"
-            android:dependency="@string/keySubEnabled"
-            android:key="@string/keyContactsLinkCloudStorageEnabled"
+            android:defaultValue="@bool/valUpdateAddressBook"
+            android:dependency="@string/keySub"
+            android:key="@string/keyUpdateAddressBook"
             android:summary="@string/contactsLinkCloudStorageEnabledSummary"
-            android:title="@string/contactsLinkCloudStorageEnabledTitle" />
+            android:title="@string/contactsLinkCloudStorageEnabled" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valAutostartOnBootEnabled"
-            android:key="@string/keyAutostartOnBootEnabled"
+            android:defaultValue="@bool/valAutostartOnBoot"
+            android:key="@string/keyAutostartOnBoot"
             android:summary="@string/preferencesAutostartSummary"
-            android:title="@string/preferencesAutostartTitle" />
+            android:title="@string/preferencesAutostart" />
 
-        <EditTextPreference
-            android:defaultValue="@string/valLocatorBackgroundDisplacement"
-            android:dialogTitle="@string/preferencesLocatorBackgroundDisplacement"
-            android:hint="@string/valLocatorBackgroundDisplacement"
+        <st.alr.mqttitude.support.EditIntegerPreference
+            android:defaultValue="@integer/valLocatorDisplacement"
+            android:dialogTitle="@string/preferencesLocatorDisplacement"
+            android:hint="@integer/valLocatorDisplacement"
             android:inputType="number"
-            android:key="@string/keyLocatorBackgroundDisplacement"
-            android:summary="@string/preferencesLocatorBackgroundDisplacementSummary"
-            android:title="@string/preferencesLocatorBackgroundDisplacement" />
-        <EditTextPreference
-            android:defaultValue="@string/valLocatorBackgroundInterval"
-            android:dialogTitle="@string/preferencesLocatorBackgroundInterval"
-            android:hint="@string/valLocatorBackgroundInterval"
+            android:key="@string/keyLocatorDisplacement"
+            android:summary="@string/preferencesLocatorDisplacementSummary"
+            android:title="@string/preferencesLocatorDisplacement" />
+        <st.alr.mqttitude.support.EditIntegerPreference
+            android:defaultValue="@integer/valLocatorInterval"
+            android:dialogTitle="@string/preferencesLocatorInterval"
+            android:hint="@integer/valLocatorInterval"
             android:inputType="number"
-            android:key="@string/keyLocatorBackgroundInterval"
-            android:summary="@string/preferencesLocatorBackgroundIntervalSummary"
-            android:title="@string/preferencesLocatorBackgroundInterval" />
+            android:key="@string/keyLocatorInterval"
+            android:summary="@string/preferencesLocatorIntervalSummary"
+            android:title="@string/preferencesLocatorInterval" />
 
         <ListPreference
-            android:defaultValue="@string/valLocatorAccuracyBackground"
+            android:defaultValue="@integer/valLocatorAccuracyBackground"
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyBackground"
             android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
             android:title="@string/preferencesLocatorAccuracyBackground" />
         <ListPreference
-            android:defaultValue="@string/valLocatorAccuracyForeground"
+            android:defaultValue="@integer/valLocatorAccuracyForeground"
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyForeground"
@@ -154,9 +154,13 @@
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
         <Preference
+            android:key="documentation"
+            android:summary="@string/preferencesDocumentationSummary"
+            android:title="@string/preferencesDocumentation" />
+        <Preference
             android:key="mail"
             android:summary="@string/preferencesMailSummary"
-            android:title="@string/preferencesMailTitle" />
+            android:title="@string/preferencesMail" />
         <Preference
             android:key="repo"
             android:summary="@string/preferencesRepositorySummary"
@@ -173,13 +177,13 @@
         <st.alr.mqttitude.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"
             android:negativeButtonText=""
-            android:positiveButtonText="@string/preferencesLicensesDismiss"
+            android:positiveButtonText="@string/close"
             android:summary="@string/preferencesLicensesSummary"
-            android:title="@string/preferencesLicensesTitle" />
+            android:title="@string/preferencesLicenses" />
 
         <Preference
             android:key="versionReadOnly"
-            android:title="@string/preferencesVersionTitle" />
+            android:title="@string/preferencesVersion" />
     </PreferenceScreen>
 
 </PreferenceScreen>

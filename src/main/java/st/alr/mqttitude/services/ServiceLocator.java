@@ -74,9 +74,9 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			@Override
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreference, String key) {
-				if (key.equals(Preferences.getKey(R.string.keyPubAutoEnabled))
+				if (key.equals(Preferences.getKey(R.string.keyPub))
 						|| key.equals(Preferences
-								.getKey(R.string.keyPubAutoInterval)))
+								.getKey(R.string.keyPubInterval)))
 					handlePreferences();
 			}
 		};
@@ -148,7 +148,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return true;
 
 		if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES
-				.toMillis(Preferences.getPubAutoInterval()))
+				.toMillis(Preferences.getPubInterval()))
 			return true;
 
 		return false;
@@ -188,25 +188,25 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 	private void setupBackgroundLocationRequest() {
 		Log.v(this.toString(), "setupBackgroundLocationRequest with profile: "
-				+ Preferences.getLocatorBackgroundAccuracy());
+				+ Preferences.getLocatorAccuracyBackground());
 
 		this.mLocationRequest = LocationRequest.create();
 		this.mLocationRequest.setPriority(Preferences
-				.getLocatorBackgroundAccuracy());
+				.getLocatorAccuracyBackground());
 		this.mLocationRequest.setInterval(Preferences
-				.getLocatorBackgroundInterval());
+				.getLocatorInterval());
 		this.mLocationRequest.setFastestInterval(0);
 		this.mLocationRequest.setSmallestDisplacement(Preferences
-				.getLocatorBackgroundDisplacement());
+				.getLocatorDisplacement());
 	}
 
 	private void setupForegroundLocationRequest() {
 		Log.v(this.toString(), "setupForegroundLocationRequest with profile: "
-				+ Preferences.getLocatorForegroundAccuracy());
+				+ Preferences.getLocatorAccuracyForeground());
 
 		this.mLocationRequest = LocationRequest.create();
 		this.mLocationRequest.setPriority(Preferences
-				.getLocatorForegroundAccuracy());
+				.getLocatorAccuracyForeground());
 		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
 		this.mLocationRequest.setFastestInterval(0);
 		this.mLocationRequest.setSmallestDisplacement(50);
@@ -235,7 +235,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		if (this.foreground || Preferences.isPubAutoEnabled()) {
+		if (this.foreground || Preferences.getPub()) {
 			this.mLocationClient.requestLocationUpdates(this.mLocationRequest,
 					ServiceProxy.getPendingIntentForService(this.context,
 							ServiceProxy.SERVICE_LOCATOR,
@@ -317,7 +317,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		l.setAccuracy(w.getRadius());
 		l.getLocation().setTime(System.currentTimeMillis());
 
-		LocationMessage r = new LocationMessage(l);
+		LocationMessage r = getLocationMessage(l);
 
 		r.setTransition(transition);
 		r.setWaypoint(w);
@@ -327,6 +327,13 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 	}
 
+    public LocationMessage getLocationMessage(GeocodableLocation l) {
+        if(l!= null)
+            return new LocationMessage(l);
+        else
+            return new LocationMessage(getLastKnownLocation());
+    }
+
 	private void publishWaypointMessage(WaypointMessage r) {
 		if (ServiceProxy.getServiceBroker() == null) {
 			Log.e(this.toString(),
@@ -334,14 +341,14 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		String topic = Preferences.getPubTopic(true);
+		String topic = Preferences.getPubTopicBase(true);
 		if (topic == null) {
 			changeState(Defaults.State.ServiceLocator.NOTOPIC);
 			return;
 		}
 
 		ServiceProxy.getServiceBroker().publish(
-				topic + Preferences.getWaypointPubTopicPart(), r.toString(),
+				topic + Preferences.getPubTopicPartWaypoints(), r.toString(),
 				false, Preferences.getPubQos(), 20, this, null);
 	}
 
@@ -354,8 +361,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 		// Safety checks
 		if (ServiceProxy.getServiceBroker() == null) {
-			Log.e(this.toString(),
-					"publishLocationMessage but ServiceMqtt not ready");
+			Log.e(this.toString(), "publishLocationMessage but ServiceMqtt not ready");
 			return;
 		}
 
@@ -364,7 +370,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		String topic = Preferences.getPubTopic(true);
+		String topic = Preferences.getPubTopicBase(true);
 		if (topic == null) {
 			changeState(Defaults.State.ServiceLocator.NOTOPIC);
 			return;
@@ -372,11 +378,11 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 		LocationMessage report;
 		if (r == null)
-			report = new LocationMessage(getLastKnownLocation());
+			report = getLocationMessage(null);
 		else
 			report = r;
 
-		if (Preferences.includeBattery())
+		if (Preferences.getPubIncludeBattery())
 			report.setBattery(App.getBatteryLevel());
 
 		ServiceProxy.getServiceBroker().publish(topic, report.toString(),
@@ -585,4 +591,25 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		}
 
 	}
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public boolean isForeground() {
+        return foreground;
+    }
+
+    public Integer getWaypointCount() {
+        return waypoints != null ? waypoints.size() : -1;
+    }
+
+
+    public boolean hasLocationClient() {
+        return mLocationClient != null;
+    }
+
+    public boolean hasLocationRequest() {
+        return mLocationRequest != null;
+    }
 }

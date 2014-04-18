@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wizzardpager/wizzardpager.iml" filepath="$PROJECT_DIR$/wizzardpager/wizzardpager.iml" />
     </modules>
   </component>
 </project>

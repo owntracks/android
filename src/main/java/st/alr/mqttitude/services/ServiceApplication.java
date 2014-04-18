@@ -8,7 +8,9 @@ import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.ContactLink;
+import st.alr.mqttitude.model.ConfigurationMessage;
 import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.model.DumpMessage;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.model.LocationMessage;
 import st.alr.mqttitude.support.Defaults;
@@ -74,16 +76,16 @@ public class ServiceApplication implements ProxyableService,
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreference, String key) {
 				if (key.equals(Preferences
-						.getKey(R.string.keyNotificationEnabled)))
+						.getKey(R.string.keyNotification)))
 					handleNotification();
 				else if (key.equals(Preferences
-						.getKey(R.string.keyNotificationGeocoderEnabled)))
+						.getKey(R.string.keyNotificationGeocoder)))
 					handleNotification();
 				else if (key.equals(Preferences
-						.getKey(R.string.keyNotificationLocationEnabled)))
+						.getKey(R.string.keyNotificationLocation)))
 					handleNotification();
 				else if (key.equals(Preferences
-						.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
+						.getKey(R.string.keyUpdateAddressBook)))
 					updateAllContacts();
 			}
 
@@ -188,7 +190,7 @@ public class ServiceApplication implements ProxyableService,
 		if (this.notificationManager != null)
 			this.notificationManager.cancelAll();
 
-		if (Preferences.isNotificationEnabled() || !playServicesAvailable)
+		if (Preferences.getNotification() || !playServicesAvailable)
 			createNotification();
 
 	}
@@ -249,12 +251,12 @@ public class ServiceApplication implements ProxyableService,
 
 		// if the notification is not enabled, the ticker will create an empty
 		// one that we get rid of
-		if (!Preferences.isNotificationEnabled())
+		if (!Preferences.getNotification())
 			this.notificationManager.cancel(Defaults.NOTIFCATION_ID);
 	}
 
 	public void updateNotification() {
-		if (!Preferences.isNotificationEnabled() || !playServicesAvailable)
+		if (!Preferences.getNotification() || !playServicesAvailable)
 			return;
 
 		String title = null;
@@ -262,11 +264,11 @@ public class ServiceApplication implements ProxyableService,
 		long time = 0;
 
 		if ((this.lastPublishedLocation != null)
-				&& Preferences.isNotificationLocationEnabled()) {
+				&& Preferences.getNotificationLocation()) {
 			time = this.lastPublishedLocationTime.getTime();
 
 			if ((this.lastPublishedLocation.getGeocoder() != null)
-					&& Preferences.isNotificationGeocoderEnabled()) {
+					&& Preferences.getNotificationGeocoder()) {
 				title = this.lastPublishedLocation.toString();
 			} else {
 				title = this.lastPublishedLocation.toLatLonString();
@@ -307,7 +309,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEvent(Events.WaypointTransition e) {
-		if (Preferences.notificationOnGeofenceTransition()) {
+		if (Preferences.getNotificationTickerOnWaypointTransition()) {
 			if (e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
 				updateTicker(this.context
 						.getString(R.string.transitionEntering)
@@ -328,14 +330,14 @@ public class ServiceApplication implements ProxyableService,
 			this.lastPublishedLocation = l.getLocation();
 			this.lastPublishedLocationTime = l.getLocation().getDate();
 
-			if (Preferences.isNotificationGeocoderEnabled()
+			if (Preferences.getNotificationGeocoder()
 					&& (l.getLocation().getGeocoder() == null))
 				(new ReverseGeocodingTask(this.context, this.handler))
 						.execute(new GeocodableLocation[] { l.getLocation() });
 
 			updateNotification();
 
-			if (Preferences.notificationTickerOnPublish()
+			if (Preferences.getNotificationTickerOnPublish()
 					&& !l.doesSupressTicker())
 				updateTicker(this.context.getString(R.string.statePublished));
 
@@ -421,7 +423,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	private long getContactId(Contact c) {
-		if (Preferences.isContactLinkCloudStorageEnabled())
+		if (Preferences.getUpdateAdressBook())
 			return getContactIdFromCloud(c);
 		else
 			return getContactIdFromLocalStorage(c);
@@ -466,7 +468,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void linkContact(Contact c, long contactId) {
-		if (Preferences.isContactLinkCloudStorageEnabled()) {
+		if (Preferences.getUpdateAdressBook()) {
 			Log.e(this.toString(),
 					"Saving a ContactLink to the cloud is not yet supported");
 			return;
@@ -480,6 +482,31 @@ public class ServiceApplication implements ProxyableService,
 		resolveContact(c);
 		EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
 	}
-	
 
+
+    public void dump() {
+        LocationMessage location = ServiceProxy.getServiceLocator().getLocationMessage(null);
+        ConfigurationMessage config = Preferences.getConfigurationMessage();
+
+        DumpMessage dump = new DumpMessage();
+        dump.setLocation(location);
+        dump.setConfiguration(config);
+
+        dump.setLocatorReady(ServiceProxy.getServiceLocator().isReady());
+        dump.setLocatorState(ServiceLocator.getState());
+        dump.setLocatorForeground(ServiceProxy.getServiceLocator().isForeground());
+        dump.setLocatorLastKnownLocation(ServiceProxy.getServiceLocator().getLastKnownLocation());
+        dump.setLocatorLastPublishDate(ServiceProxy.getServiceLocator().getLastPublishDate());
+        dump.setLocatorWaypointCount(ServiceProxy.getServiceLocator().getWaypointCount());
+        dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
+        dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
+        dump.setBrokerKeepAliveSeconds(ServiceProxy.getServiceBroker().getKeepaliveSeconds());
+        dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
+        dump.setBrokerState(ServiceBroker.getState());
+        dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());
+        dump.setApplicationPlayServicesAvailable(playServicesAvailable);
+
+        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString());
+
+    }
 }

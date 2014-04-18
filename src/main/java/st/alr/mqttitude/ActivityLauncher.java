@@ -2,6 +2,8 @@ package st.alr.mqttitude;
 
 import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.Preferences;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -71,6 +73,7 @@ public class ActivityLauncher extends FragmentActivity {
 		super.onResume();
 
 		checkPlayServices();
+        checkSettings();
 
 		if (this.playServicesOk)
 			checkSettings();
@@ -79,13 +82,16 @@ public class ActivityLauncher extends FragmentActivity {
 			launchChecksComplete();
 	}
 
-	private void checkSettings() {
+    private void checkSettings() {
 
-		this.settingsOK = true;
-		if (!this.settingsOK)
-			startActivityWizzard();
+        settingsOK = Preferences.canConnect();
+        if(!settingsOK)
+            startActivityWizzard();
 
-	}
+        Log.v(this.toString(), "Preflight check passed: " + settingsOK);
+    }
+
+
 
 	private void checkPlayServices() {
 

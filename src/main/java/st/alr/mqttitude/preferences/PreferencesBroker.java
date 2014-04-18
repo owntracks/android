@@ -101,8 +101,7 @@ public class PreferencesBroker extends DialogPreference {
 	}
 
 	private void showHideAdvanced() {
-		int visibility = Preferences.isAdvancedModeEnabled() ? View.VISIBLE
-				: View.GONE;
+		int visibility = Preferences.getConnectionAdvancedMode() ? View.VISIBLE : View.GONE;
 
         // TODO: Waiting for paho lib to support zero length client ids
         // for (View v : new View[] {this.clientIdNegotiationWrapper, this.securityWrapper, this.brokerAuthWrapper })
@@ -122,16 +121,16 @@ public class PreferencesBroker extends DialogPreference {
 		userName.setText(Preferences.getBrokerUsername());
 
 		this.deviceName.setHint(Preferences.getAndroidId());
-		this.deviceName.setText(Preferences.getDeviceName(false));
+		this.deviceName.setText(Preferences.getDeviceId(false));
 
 		this.password.setText(Preferences.getBrokerPassword());
 
-		this.brokerAuth.setSelection(Preferences.getBrokerAuthType());
+		this.brokerAuth.setSelection(Preferences.getAuth() ? 1 : 0);
 
-		this.brokerSecurity.setSelection(Preferences.getBrokerSecurityType());
-		this.brokerSecuritySSLCaCrtPath.setText(Preferences.getBrokerSslCaPath());
+		this.brokerSecurity.setSelection(Preferences.getTls());
+		this.brokerSecuritySSLCaCrtPath.setText(Preferences.getTlsCrtPath());
 
-        this.clientIdNegotiation.setSelection(Preferences.isZeroLenghClientIdEnabled() ? 0 : 1);
+        this.clientIdNegotiation.setSelection(Preferences.getZeroLenghClientId() ? 0 : 1);
         this.clientId.setHint(Preferences.getAndroidId());
         this.clientId.setText(Preferences.getClientId(false));
 	}
@@ -216,7 +215,7 @@ public class PreferencesBroker extends DialogPreference {
 			public void onNothingSelected(AdapterView<?> arg0) {
 				PreferencesBroker.this.brokerSecurity.setSelection(App
 						.getContext().getResources()
-						.getInteger(R.integer.valBrokerSecurityTypeTls));
+						.getInteger(R.integer.valTls));
 			}
 		});
 
@@ -283,15 +282,11 @@ public class PreferencesBroker extends DialogPreference {
 	}
 
 	private void handleBrokerAuth() {
-		if (this.brokerAuth.getSelectedItemPosition() == App.getContext()
-				.getResources()
-				.getInteger(R.integer.valBrokerAuthTypeAnonymous)) {
+		if (this.brokerAuth.getSelectedItemPosition() == 0)
 			this.brokerPasswordWrapper.setVisibility(View.GONE);
-		} else {
-			// We do not require a passwort as it might be empty (stupid but
-			// possible)
+		else
 			this.brokerPasswordWrapper.setVisibility(View.VISIBLE);
-		}
+
 		conditionalyEnableConnectButton();
 	}
 
@@ -300,23 +295,17 @@ public class PreferencesBroker extends DialogPreference {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE: // Clicked connect
 
-			Preferences.setBrokerHost(this.host.getText().toString());
-			Preferences.setBrokerPort(this.port.getText().toString());
-			Preferences.setBrokerUsername(userName.getText().toString());
-
-			Preferences.setString(R.string.keyBrokerPassword, this.password
-					.getText().toString());
-			Preferences.setString(R.string.keyDeviceName, this.deviceName
-					.getText().toString());
-			Preferences.setInt(R.string.keyBrokerAuth,
-					this.brokerAuth.getSelectedItemPosition());
-			Preferences.setInt(R.string.keyBrokerSecurity,
-					this.brokerSecurity.getSelectedItemPosition());
-			Preferences.setString(R.string.keyBrokerSecuritySslCaPath,
-					this.brokerSecuritySSLCaCrtPath.getText().toString());
+			Preferences.setHost(this.host.getText().toString());
+			Preferences.setPort(Integer.parseInt(this.port.getText().toString()));
+			Preferences.setUsername(userName.getText().toString());
+            Preferences.setPassword(this.password.getText().toString());
+            Preferences.setDeviceId(this.deviceName.getText().toString());
+            Preferences.setAuth(this.brokerAuth.getSelectedItemPosition() == 1);
+            Preferences.setTls(this.brokerSecurity.getSelectedItemPosition());
+            Preferences.setTlsCrtPath(this.brokerSecuritySSLCaCrtPath.getText().toString());
 
             Preferences.setClientId(this.clientId.getText().toString());
-            Preferences.setIsZeroLengthClientIdEnabled(this.clientIdNegotiation.getSelectedItemPosition() == 1);
+            Preferences.setZeroLenghClientId(this.clientIdNegotiation.getSelectedItemPosition() == 1);
 
 			Runnable r = new Runnable() {
 
@@ -408,14 +397,11 @@ public class PreferencesBroker extends DialogPreference {
 	}
 
 	private void handleBrokerSecurity() {
-		if (this.brokerSecurity.getSelectedItemPosition() == App.getContext()
-				.getResources().getInteger(R.integer.valBrokerSecurityTypeNone)) {
+		if (this.brokerSecurity.getSelectedItemPosition() == Preferences.getIntResource(R.integer.valTlsNone)) {
 			this.brokerSecuritySSLOptions.setVisibility(View.GONE);
 			this.brokerSecurityNoneOptions.setVisibility(View.VISIBLE);
 			this.requiredPreferences.remove(RequireablePreferences.CACRT);
-		} else if (this.brokerSecurity.getSelectedItemPosition() == App
-				.getContext().getResources()
-				.getInteger(R.integer.valBrokerSecurityTypeTlsCustom)) {
+		} else if (this.brokerSecurity.getSelectedItemPosition() == Preferences.getIntResource(R.integer.valTlsCustom)) {
 			this.brokerSecuritySSLOptions.setVisibility(View.VISIBLE);
 			this.brokerSecurityNoneOptions.setVisibility(View.GONE);
 			this.requiredPreferences.add(RequireablePreferences.CACRT);

@@ -90,9 +90,9 @@ public class ActivityPreferences extends PreferenceActivity {
 			donate = findPreference("donate");
 			serverPreference = findPreference("brokerPreference");
 			backgroundUpdatesIntervall = findPreference(Preferences
-					.getKey(R.string.keyPubAutoInterval));
+					.getKey(R.string.keyPubInterval));
 			topic = (EditTextPreference) findPreference(Preferences
-					.getKey(R.string.keyPubTopic));
+					.getKey(R.string.keyPubTopicBase));
 
 			try {
 				ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
@@ -204,9 +204,9 @@ public class ActivityPreferences extends PreferenceActivity {
 				public void onSharedPreferenceChanged(
 						SharedPreferences sharedPreferences, String key) {
 					if (key.equals(Preferences
-							.getKey(R.string.keyBrokerUsername))
+							.getKey(R.string.keyUsername))
 							|| key.equals(Preferences
-									.getKey(R.string.keyDeviceName)))
+									.getKey(R.string.keyDeviceId)))
 						setPubTopicHint(topic);
 				}
 			};

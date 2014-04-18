@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <bool name="valPubAutoEnabled">false</bool>
-    <bool name="valSubEnabled">true</bool>
+    <bool name="valTrue">true</bool>
+    <bool name="valFalse">false</bool>
+
+
+    <bool name="valPub">false</bool>
+    <bool name="valSub">true</bool>
     <bool name="valPubIncludeBattery">false</bool>
-    <bool name="valNotificationEnabled">true</bool>
-    <bool name="valNotificationTickerPublish">true</bool>
-    <bool name="valNotificationGeocoderEnabled">true</bool>
-    <bool name="valNotificationLocationEnabled">true</bool>
-    <bool name="valNotificationTickerGeofence">true</bool>
+    <bool name="valNotification">true</bool>
+    <bool name="valNotificationGeocoder">true</bool>
+    <bool name="valNotificationLocation">true</bool>
+    <bool name="valNotificationTickerOnWaypointTransition">true</bool>
+    <bool name="valNotificationTickerOnPublish">true</bool>
     <bool name="valPubRetain">true</bool>
-    <bool name="valContactsLinkCloudStorageEnabled">false</bool>
-    <bool name="valAutostartOnBootEnabled">false</bool>
-    <bool name="valAdvancedConnectionPreferencesEnabled">false</bool>
+    <bool name="valUpdateAddressBook">false</bool>
+    <bool name="valAutostartOnBoot">false</bool>
+    <bool name="valConnectionAdvancedMode">false</bool>
     <bool name="valZeroLenghClientIdEnabled">false</bool>
+    <bool name="valAuth">true</bool>
 </resources>
