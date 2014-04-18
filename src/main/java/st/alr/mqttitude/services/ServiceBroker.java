@@ -88,8 +88,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
 
-		doStart();
-
+        if(Preferences.canConnect())
+    		doStart();
 	}
 
 	@Override
@@ -194,13 +194,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		try {
-			String prefix = Preferences.getBrokerSecurityType() == this.context
-					.getResources().getInteger(
-							R.integer.valBrokerSecurityTypeNone) ? "tcp" : "ssl";
-			String cid = Preferences.getDeviceName(true);
+			String prefix = Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsNone) ? "tcp" : "ssl";
+			String cid = Preferences.getDeviceId(true);
 
 			Log.v(this.toString(), "broker port: " + Preferences.getBrokerPort());
-            if(Preferences.isZeroLenghClientIdEnabled())
+            if(Preferences.getZeroLenghClientId())
                 Log.v(this.toString(), "Using zero-lengh (MQTT v 3.1.1) client-id");
             else
 
@@ -223,7 +221,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			NoSuchAlgorithmException, IOException, KeyManagementException {
 		CertificateFactory cf = CertificateFactory.getInstance("X.509");
 		InputStream caInput = new BufferedInputStream(new FileInputStream(
-				Preferences.getBrokerSslCaPath()));
+				Preferences.getTlsCrtPath()));
 		java.security.cert.Certificate ca;
 		try {
 			ca = cf.generateCertificate(caInput);
@@ -261,17 +259,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			MqttConnectOptions options = new MqttConnectOptions();
 			setWill(options);
 
-			if (Preferences.getBrokerAuthType() != this.context.getResources()
-					.getInteger(R.integer.valBrokerSecurityTypeNone)) {
-				options.setPassword(Preferences.getBrokerPassword()
-						.toCharArray());
+			if (Preferences.getAuth()) {
+				options.setPassword(Preferences.getBrokerPassword().toCharArray());
 				options.setUserName(Preferences.getBrokerUsername());
-
 			}
 
-			if (Preferences.getBrokerSecurityType() == this.context
-					.getResources().getInteger(
-							R.integer.valBrokerSecurityTypeTlsCustom))
+			if (Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsCustom))
 				options.setSocketFactory(this.getSSLSocketFactory());
 
 			// setWill(options);
@@ -303,7 +296,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 						.currentTimeMillis()))).append("\"");
 		payload.append("}");
 
-		m.setWill(this.mqttClient.getTopic(Preferences.getPubTopic(true)),
+		m.setWill(this.mqttClient.getTopic(Preferences.getPubTopicBase(true)),
 				payload.toString().getBytes(), 0, false);
 
 	}
@@ -331,7 +324,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 
-			if (Preferences.isSubEnabled())
+			if (Preferences.getSub())
 				this.mqttClient.subscribe(Preferences.getSubTopic(true));
 
 		} catch (MqttException e) {
@@ -581,7 +574,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 	}
 
-	private class DeferredPublishable extends MqttMessage {
+    public short getKeepaliveSeconds() {
+        return keepAliveSeconds;
+    }
+
+    public Exception getError() {
+        return error;
+    }
+
+    public Integer getDeferredPublishablesCound() {
+        return deferredPublishables != null ? deferredPublishables.size() : -1;
+    }
+
+    private class DeferredPublishable extends MqttMessage {
 		private Handler timeoutHandler;
 		private ServiceMqttCallbacks callback;
 		private String topic;
@@ -672,10 +677,25 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		if (type.equals("location")) {
-			// GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
-			LocationMessage lm = LocationMessage.fromJsonObject(json);
-			EventBus.getDefault().postSticky(
-					new Events.LocationMessageReceived(lm, topic));
+            // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
+            LocationMessage lm = LocationMessage.fromJsonObject(json);
+            EventBus.getDefault().postSticky(
+                    new Events.LocationMessageReceived(lm, topic));
+        } else if(type.equals("cmd")) {
+            String action = "";
+            try {
+                action = json.getString("action");
+            } catch (Exception e) {
+                Log.v(this.toString(), "Received cmd message without action");
+                return;
+            }
+            if(action.equals("dump")) {
+                Log.v(this.toString(), "Received dump cmd message");
+                ServiceProxy.getServiceApplication().dump();
+
+            } else
+                Log.v(this.toString(), "Received cmd message with unsupported action");
+
 
 		} else {
 			Log.d(this.toString(), "Ignoring message of type: " + type);

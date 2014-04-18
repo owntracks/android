@@ -5,10 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="titleActivityPreferences">"Settings"</string>
     <string name="titleActivityStatus">"Status"</string>
-    <string name="titleMap">"Map"</string>
-    <string name="titleFriends">"Locations"</string>
-    <string name="titleStatus">"Status"</string>
-    <string name="preferencesServerTitle">"Connection"</string>
+    <string name="preferencesServer">"Connection"</string>
     <string name="preferencesServerAddress">"Host"</string>
     <string name="preferencesServerPort">"Port"</string>
     <string name="preferencesUserUsername">"Username"</string>
@@ -20,24 +17,22 @@
     <string name="preferencesCaCrtPath">Absolute certificate path</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
-    <string name="preferencesLicensesTitle">"Licenses"</string>
+    <string name="preferencesLicenses">"Licenses"</string>
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
-    <string name="preferencesLicensesDismiss">"Dismiss"</string>
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
-    <string name="preferencesNotificationTickerOnPublishTitle">Ticker on report</string>
+    <string name="preferencesNotificationTickerOnPublish">Ticker on report</string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
     <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Ticker on waypoint </string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
-    <string name="preferencesNotificationTitle">"Notification"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
-    <string name="preferencesNotificationLocationTitle">"Last reported location"</string>
+    <string name="preferencesNotificationLocation">"Last reported location"</string>
     <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
-    <string name="preferencesNotificationGeocoderTitle">"Geocoder"</string>
-    <string name="preferencesAdvancedConnectionSummary">"Show advanced connection preferences"</string>
-    <string name="preferencesAdvancedConnectionTitle">"Advanced connection preferences"</string>
-    <string name="preferencesAdvancedTitle">"Advanced"</string>
-    <string name="preferencesVersionTitle">"Version"</string>
+    <string name="preferencesNotificationGeocoder">"Geocoder"</string>
+    <string name="preferencesConnectionAdvancedModeSummary">"Show advanced connection preferences"</string>
+    <string name="preferencesConnectionAdvancedMode">"Advanced connection preferences"</string>
+    <string name="preferencesAdvanced">"Advanced"</string>
+    <string name="preferencesVersion">"Version"</string>
     <string name="preferencesTopicSettings">"Reporting"</string>
     <string name="preferencesTopic">"Publish topic"</string>
     <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
@@ -50,18 +45,20 @@
     <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic reporting</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
-    <string name="preferencesLocatorBackgroundDisplacement">Locator displacement</string>
-    <string name="preferencesLocatorBackgroundDisplacementSummary">Distance between location updates</string>
-    <string name="preferencesLocatorBackgroundInterval">Locator interval</string>
-    <string name="preferencesLocatorBackgroundIntervalSummary">Minutes between location updates</string>
+    <string name="preferencesLocatorDisplacement">Locator displacement</string>
+    <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
+    <string name="preferencesLocatorInterval">Locator interval</string>
+    <string name="preferencesLocatorIntervalSummary">Minutes between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
+    <string name="preferencesDocumentation">Source Code</string>
+    <string name="preferencesDocumentationSummary">github.com/owntracks/owntracks/wiki/android</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesDonate">Donate Bitcoins</string>
     <string name="preferencesDonateSummary">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
-    <string name="preferencesMailTitle">Mail</string>
+    <string name="preferencesMail">Mail</string>
     <string name="preferencesMailSummary">issues@owntracks.org</string>
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
@@ -73,35 +70,31 @@
     <string name="currentLocation">Current</string>
     <string name="shareLocation">Share location</string>
     <string name="share">Share</string>
-
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
     <string name="error">"Error"</string>
+    <string name="close">"Close"</string>
     <string name="statePublished">"Location reported"</string>
     <string name="stateNotopic">"Error: No topic set"</string>
     <string name="statePublishTimeout">"Error: Timeout"</string>
     <string name="stateLocatingFail">"Error: Unable to acquire location"</string>
     <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
-    
     <string name="stateIdle">"Idle"</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
-    <string name="finish">tbd</string>
-    <string name="submit_confirm_message">tbd</string>
-    <string name="submit_confirm_button">tbd</string>
     <string name="preferencesContactSettings">Contacts</string>
-    <string name="preferencesContactsEnabledTitle">Subscribe</string>
+    <string name="preferencesContactsEnabled">Subscribe</string>
     <string name="preferencesContactsEnabledSummary">Subscribe to receive messages</string>
     <string name="preferencesContactsTopic">Subscribe topic</string>
     <string name="preferencesContactsTopicSummary">Topic on which messages are received</string>
     <string name="publish">Report</string>
     <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
-    <string name="preferencesIncludeBatteryTitle">Include battery</string>
+    <string name="preferencesIncludeBattery">Include battery</string>
     <string name="contactsLinkCloudStorageEnabledSummary">Store contact links in Google address book</string>
-    <string name="contactsLinkCloudStorageEnabledTitle">Update address book</string>
+    <string name="contactsLinkCloudStorageEnabled">Update address book</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
-    <string name="preferencesAutostartTitle">Autostart</string>
+    <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage when active</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
@@ -119,12 +112,10 @@
     <string name="actionModeMoreSelected">items selected</string>
     <string name="currentLocationNotAvailable">The current location is not available</string>
     <string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
-	<string name="addWaypoint">Add waypoint</string>
-	<string name="preferences">Preferences</string>
-	<string name="waypoints">Waypoints</string>
+    <string name="addWaypoint">Add waypoint</string>
+    <string name="preferences">Preferences</string>
+    <string name="waypoints">Waypoints</string>
 
-	
-	
     <string-array name="connect_options_security">
         <item>None</item>
         <item>TLS</item>
@@ -138,7 +129,6 @@
         <item>Manual</item>
         <item>Auto (Requires MQTT 3.1.1 Broker)</item>
     </string-array>
-
     <string-array name="qos_readable">
         <item>"0"</item>
         <item>"1"</item>
@@ -163,57 +153,50 @@
     <string name="transitionEntering">Entering</string>
     <string name="transitionLeaving">Leaving</string>
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
-    <string name="title_activity_activity_wizzard">Wizzard</string>
-    <string name="title_test_list">tests</string>
-    <string name="title_test_detail">test Detail</string>
-    <string name="keyDeviceName">deviceName</string>
-    <string name="keyBrokerHost">brokerHost</string>
-    <string name="keyBrokerPort">brokerPort</string>
-    <string name="keyBrokerPassword">brokerPassword</string>
-    <string name="keyBrokerUsername">userUsername</string>
-    <string name="keyBrokerAuth">brokerAuth</string>
-    <string name="keyBrokerSecurity">brokerSecurity</string>
-    <string name="keyBrokerSecuritySslCaPath">brokerSecuritySslCaPath</string>
-    <string name="keyPubAutoEnabled">backgroundUpdates</string>
-    <string name="keyPubAutoInterval">backgroundUpdatesInterval</string>
-    <string name="keyPubTopic">topic</string>
-    <string name="keyPubRetain">retain</string>
-    <string name="keyPubQos">qos</string>
-    <string name="keyPubIncludeBattery">includeBattery</string>
-    <string name="keyNotificationEnabled">notificationEnabled</string>
-    <string name="keyNotificationGeocoderEnabled">notificationGeocoder</string>
-    <string name="keyNotificationLocationEnabled">notificationLocation</string>
-    <string name="keyNotificationTickerPublish">notificationTickerOnPublishEnabled</string>
-    <string name="keyNotificationTickerGeofence">tickerOnWaypointTransitionEnabled</string>
+    <string name="keyDeviceId">deviceId</string>
+    <string name="keyClientId">clientId</string>
+    <string name="keyHost">host</string>
+    <string name="keyPort">port</string>
+    <string name="keyPassword">password</string>
+    <string name="keyUsername">username</string>
+    <string name="keyPubQos">pubQos</string>
+    <string name="keyKeepalive">keepalive</string>
+    <string name="keyPubRetain">pubRetain</string>
+    <string name="keyTls">tls</string>
+    <string name="keyTlsCrtPath">tlsCrtPath</string>
+    <string name="keyLocatorDisplacement">locatorDisplacement</string>
+    <string name="keyLocatorInterval">locatorInterval</string>
+    <string name="keyAuth">auth</string>
+    <string name="keyPubIncludeBattery">pubIncludeBattery</string>
+    <string name="keyConnectionAdvancedMode">connectionAdvancedMode</string>
+    <string name="keySub">sub</string>
+    <string name="keyPub">pub</string>
+    <string name="keyUpdateAddressBook">updateAdressBook</string>
+    <string name="keyPubInterval">pubInterval</string>
+    <string name="keyPubTopicBase">topic</string>
+    <string name="keyNotification">notification</string>
+    <string name="keyNotificationGeocoder">notificationGeocoder</string>
+    <string name="keyNotificationLocation">notificationLocation</string>
+    <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
+    <string name="keyNotificationTickerOnWaypointTransition">tickerOnWaypointTransition</string>
     <string name="keyTrackingUsername">trackingUsername</string>
-    <string name="keySubEnabled">subEnabled</string>
     <string name="keySubTopic">subTopic</string>
-    <string name="keyContactsLinkCloudStorageEnabled">contactsLinkCloudStorageEnabled</string>
-    <string name="keyAdvancedConnectionPreferencesEnabled">advancedMode</string>
-    <string name="keyAutostartOnBootEnabled">autostartOnBoot</string>
-    <string name="keyLocatorBackgroundDisplacement">backgroundDisplacement</string>
+    <string name="keyAutostartOnBoot">autostartOnBoot</string>
     <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
-    <string name="keyLocatorBackgroundInterval">backgroundInterval</string>
     <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
-    <string name="keyClientId">clientId</string>
-    <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
-    <string name="valPubTopicWaypointsPart">/waypoints</string>
-    <string name="valSubTopic">owntracks/+/+</string>
-    <string name="valBrokerHost">127.0.0.1</string>
-    <string name="valBrokerPort">8883</string>
-    <string name="valPubAutoInterval">15</string>
-    <string name="valPubQos">0</string>
-    <string name="valLocatorBackgroundDisplacement">500</string>
-    <string name="valLocatorBackgroundInterval">30</string>
+    <string name="keyPreferencesVersion">preferencesVersion</string>
     <string name="valEmpty">""</string>
+    <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
+    <string name="valPubTopicPartWaypoints">/waypoints</string>
+    <string name="valSubTopic">owntracks/+/+</string>
+    <string name="valHost">127.0.0.1</string>
     <string name="valBugsnagApiKey">d7074409bf76697384a454b611917336</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">issues@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
     <string name="valBitcoinAddress">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
-    <string name="valLocatorAccuracyForeground">0</string>
-    <string name="valLocatorAccuracyBackground">1</string>
+    <string name="valDocumentationurl">https://github.com/owntracks/owntracks/wiki/android</string>
 
     <string-array name="locatorAccuracy">
         <item>0</item>
@@ -226,11 +209,13 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
-
     <string-array name="contactContextMenu">
         <item>Show</item>
         <item>Details</item>
         <item>Navigate</item>
     </string-array>
+
+    <string name="title_activity_activity_wizzard">Wizzard</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

@@ -9,16 +9,16 @@
         android:required="true" />
 
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="11"
         android:targetSdkVersion="19" />
 
     <permission
         android:name="st.alr.mqttitude.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
-    <meta-data android:name="com.google.android.gms.version"
+    <meta-data
+        android:name="com.google.android.gms.version"
         android:value="@integer/google_play_services_version" />
-
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- To access the network -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To handle connectivity changes and reconnect -->
@@ -85,6 +85,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="st.alr.mqttitude.ActivityWizzard"
+            android:label="@string/title_activity_activity_wizzard" >
+        </activity>
     </application>
 
 </manifest>

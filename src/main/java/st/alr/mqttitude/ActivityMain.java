@@ -970,7 +970,7 @@ public class ActivityMain extends FragmentActivity {
 				public void onSharedPreferenceChanged(
 						SharedPreferences sharedPreference, String key) {
 					if (key.equals(Preferences
-							.getKey(R.string.keyContactsLinkCloudStorageEnabled)))
+							.getKey(R.string.keyUpdateAddressBook)))
 						showHideAssignContactButton();
 				}
 			};
@@ -987,7 +987,7 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		void showHideAssignContactButton() {
-			if (!Preferences.isContactLinkCloudStorageEnabled())
+			if (!Preferences.getUpdateAdressBook())
 				this.assignContact.setVisibility(View.VISIBLE);
 			else
 				this.assignContact.setVisibility(View.GONE);

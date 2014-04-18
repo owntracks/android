@@ -149,4 +149,8 @@ public class LocationMessage {
 		this.description = string;
 	}
 
+    //TODO
+    public JSONObject toJSONObject() {
+        return new JSONObject();
+    }
 }
