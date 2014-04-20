@@ -1,13 +1,15 @@
 package st.alr.mqttitude.model;
 
+import android.util.Log;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by alexander on 18.04.14.
- */
+import st.alr.mqttitude.support.Preferences;
+
 public class ConfigurationMessage {
-    //TODO
+    public String toString() {return toJSONObject().toString(); }
     public JSONObject toJSONObject() {
-        return new JSONObject();
+        return Preferences.toJSONObject();
     }
 }

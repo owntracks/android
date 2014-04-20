@@ -115,15 +115,15 @@ public class PreferencesBroker extends DialogPreference {
 
 	@Override
 	protected void onBindDialogView(View view) {
-		this.host.setText(Preferences.getBrokerHost());
-		this.port.setText(Preferences.getBrokerPort());
+		this.host.setText(Preferences.getHost());
+		this.port.setText(Preferences.getPort());
 
-		userName.setText(Preferences.getBrokerUsername());
+		userName.setText(Preferences.getUsername());
 
 		this.deviceName.setHint(Preferences.getAndroidId());
 		this.deviceName.setText(Preferences.getDeviceId(false));
 
-		this.password.setText(Preferences.getBrokerPassword());
+		this.password.setText(Preferences.getPassword());
 
 		this.brokerAuth.setSelection(Preferences.getAuth() ? 1 : 0);
 
