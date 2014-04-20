@@ -150,6 +150,27 @@
             android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
             android:title="@string/preferencesLocatorAccuracyForeground" />
     </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="importexport"
+        android:title="@string/preferencesImportExport" >
+
+        <st.alr.mqttitude.preferences.PreferencesExport
+           android:title="@string/preferencesExport"
+            android:summary="@string/preferencesExportSummmary"
+        />
+
+        <st.alr.mqttitude.preferences.PreferencesImportFile
+            android:title="@string/preferencesImportFile"
+            android:summary="@string/preferencesImportFileSummmary"
+        />
+
+        <st.alr.mqttitude.preferences.PreferencesImportClipboard
+            android:title="@string/preferencesImportClipboard"
+            android:summary="@string/preferencesImportClipboardSummmary"
+            />
+
+    </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
