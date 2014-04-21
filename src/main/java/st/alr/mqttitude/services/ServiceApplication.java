@@ -485,14 +485,20 @@ public class ServiceApplication implements ProxyableService,
 
 
     public void dump() {
+        Log.v(this.toString(), "Initiating dump procedure");
         LocationMessage location = ServiceProxy.getServiceLocator().getLocationMessage(null);
+        Log.v(this.toString(), "1");
         ConfigurationMessage config = new ConfigurationMessage();
+        Log.v(this.toString(), "2");
+
         config.removeUsernamePassword();
         config.addWaypoints();
+        Log.v(this.toString(), "3");
 
         DumpMessage dump = new DumpMessage();
         dump.setLocation(location);
         dump.setConfiguration(config);
+        Log.v(this.toString(), "4");
 
         dump.setLocatorReady(ServiceProxy.getServiceLocator().isReady());
         dump.setLocatorState(ServiceLocator.getState());
@@ -502,11 +508,18 @@ public class ServiceApplication implements ProxyableService,
         dump.setLocatorWaypointCount(ServiceProxy.getServiceLocator().getWaypointCount());
         dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
         dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
+        Log.v(this.toString(), "5");
+
         dump.setBrokerKeepAliveSeconds(ServiceProxy.getServiceBroker().getKeepaliveSeconds());
         dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
         dump.setBrokerState(ServiceBroker.getState());
         dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
+        Log.v(this.toString(), "6");
+
+        Log.v(this.toString(), "Dump data: " + dump.toString());
+
+
 
         ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString());
 

@@ -296,16 +296,16 @@ public class PreferencesBroker extends DialogPreference {
 		case DialogInterface.BUTTON_POSITIVE: // Clicked connect
 
 			Preferences.setHost(this.host.getText().toString());
-			Preferences.setPort(Integer.parseInt(this.port.getText().toString()));
-			Preferences.setUsername(userName.getText().toString());
+            try {Preferences.setPort(Integer.parseInt(this.port.getText().toString())); } catch (NumberFormatException e) {}
+            Preferences.setUsername(userName.getText().toString());
             Preferences.setPassword(this.password.getText().toString());
             Preferences.setDeviceId(this.deviceName.getText().toString());
             Preferences.setAuth(this.brokerAuth.getSelectedItemPosition() == 1);
             Preferences.setTls(this.brokerSecurity.getSelectedItemPosition());
             Preferences.setTlsCrtPath(this.brokerSecuritySSLCaCrtPath.getText().toString());
 
-            Preferences.setClientId(this.clientId.getText().toString());
-            Preferences.setZeroLenghClientId(this.clientIdNegotiation.getSelectedItemPosition() == 1);
+            //Preferences.setClientId(this.clientId.getText().toString());
+            //Preferences.setZeroLenghClientId(this.clientIdNegotiation.getSelectedItemPosition() == 1);
 
 			Runnable r = new Runnable() {
 

@@ -124,6 +124,6 @@ public class DumpMessage {
             Log.e(this.toString(), e.toString());
 
         }
-        return toJsonObject();
+        return json;
     }
 }
