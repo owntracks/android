@@ -486,7 +486,9 @@ public class ServiceApplication implements ProxyableService,
 
     public void dump() {
         LocationMessage location = ServiceProxy.getServiceLocator().getLocationMessage(null);
-        ConfigurationMessage config = Preferences.getConfigurationMessage();
+        ConfigurationMessage config = new ConfigurationMessage();
+        config.removeUsernamePassword();
+        config.addWaypoints();
 
         DumpMessage dump = new DumpMessage();
         dump.setLocation(location);

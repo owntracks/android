@@ -191,8 +191,16 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 				+ Preferences.getLocatorAccuracyBackground());
 
 		this.mLocationRequest = LocationRequest.create();
-		this.mLocationRequest.setPriority(Preferences
-				.getLocatorAccuracyBackground());
+
+        if(Preferences.getLocatorAccuracyBackground() == 0) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        } else if (Preferences.getLocatorAccuracyBackground() == 1) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        } else if (Preferences.getLocatorAccuracyBackground() == 2) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+        } else {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
+        }
 		this.mLocationRequest.setInterval(Preferences
 				.getLocatorInterval());
 		this.mLocationRequest.setFastestInterval(0);
@@ -205,8 +213,16 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 				+ Preferences.getLocatorAccuracyForeground());
 
 		this.mLocationRequest = LocationRequest.create();
-		this.mLocationRequest.setPriority(Preferences
-				.getLocatorAccuracyForeground());
+        if(Preferences.getLocatorAccuracyForeground() == 0) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        } else if (Preferences.getLocatorAccuracyForeground() == 1) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        } else if (Preferences.getLocatorAccuracyForeground() == 2) {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+        } else {
+            this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
+        }
+
 		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
 		this.mLocationRequest.setFastestInterval(0);
 		this.mLocationRequest.setSmallestDisplacement(50);

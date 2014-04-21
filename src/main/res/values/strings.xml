@@ -222,9 +222,15 @@
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
     <string name="exportIncludeUsernamePassword">Broker username / password</string>
     <string name="exportIncludeBrokerConnection">Broker connection preferences</string>
-    <string name="exportIncludeWaypoints">Includes</string>
+    <string name="exportIncludes">Includes</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Export preferences</string>
-    <string name="exportWaypoints">Waypoints</string>
+    <string name="exportIncludeWaypoints">Waypoints</string>
+    <string name="preferencesExport">Export preferences</string>
+    <string name="preferencesExportSummary">Export preferences</string>
+    <string name="preferencesImportFile">Import from file</string>
+    <string name="preferencesImportFileSummary">Import preferences from file</string>
+    <string name="preferencesImportClipboard">Import from clipboard</string>
+    <string name="preferencesImportClipboardSummary">Import preferences from file</string>
 
 </resources>

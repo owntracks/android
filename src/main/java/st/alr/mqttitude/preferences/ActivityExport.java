@@ -1,5 +1,6 @@
 package st.alr.mqttitude.preferences;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -20,7 +21,7 @@ import st.alr.mqttitude.model.ConfigurationMessage;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Preferences;
 
-public class ActivityExport extends PreferenceActivity {
+public class ActivityExport extends Activity {
     CheckBox includeConnection;
     CheckBox includeUsernamePassword;
     CheckBox includeDeviceIdentification;
@@ -53,72 +54,44 @@ public class ActivityExport extends PreferenceActivity {
             public void onClick(View v) {
                 Log.v("Export", "Export includes: connection=" + includeConnection.isChecked() + ", username/password=" + includeUsernamePassword.isChecked() + ", device identification=" + includeDeviceIdentification.isChecked() + ", waypoints=" + includeWaypoints.isChecked());
                 ConfigurationMessage config = new ConfigurationMessage();
-                JSONObject json = config.toJSONObject();
 
 
                 if (!includeConnection.isChecked()) {
-                    json.remove(Preferences.getStringRessource(R.string.keyHost));
-                    json.remove(Preferences.getStringRessource(R.string.keyPort));
-                    json.remove(Preferences.getStringRessource(R.string.keyAuth));
-                    json.remove(Preferences.getStringRessource(R.string.keyTls));
-                    json.remove(Preferences.getStringRessource(R.string.keyTlsCrtPath));
-                    json.remove(Preferences.getStringRessource(R.string.keyConnectionAdvancedMode));
-
-                    jsonRemoveUsernamePassword(json);
-                    jsonRemoveDeviceIdentification(json);
+                    config.removeDeviceIdentification();
+                    config.removeUsernamePassword();
+                    config.remove(Preferences.getStringRessource(R.string.keyHost));
+                    config.remove(Preferences.getStringRessource(R.string.keyPort));
+                    config.remove(Preferences.getStringRessource(R.string.keyAuth));
+                    config.remove(Preferences.getStringRessource(R.string.keyTls));
+                    config.remove(Preferences.getStringRessource(R.string.keyTlsCrtPath));
+                    config.remove(Preferences.getStringRessource(R.string.keyConnectionAdvancedMode));
 
                 } else {
                     if (!includeUsernamePassword.isChecked())
-                        jsonRemoveUsernamePassword(json);
+                        config.removeUsernamePassword();
+
                     if (!includeDeviceIdentification.isChecked())
-                        jsonRemoveDeviceIdentification(json);
+                        config.removeDeviceIdentification();
 
                 }
 
                 if(includeWaypoints.isChecked())
-                    try { jsonAddWaypoints(json); } catch (JSONException e) { e.printStackTrace(); }
+                    config.addWaypoints();
 
-                Log.v("Export", "Config: \n" + json.toString());
+
+                Log.v("Export", "Config: \n" + config.toString());
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, json.toString());
-                sendIntent.setType("text/json");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, config.toString());
+                sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.exportConfiguration)));
             }
         });
-    }
-
-    private void jsonAddWaypoints(JSONObject json) throws JSONException {
-        JSONArray waypoints = new JSONArray();
-
-        for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
-            JSONObject w = new JSONObject();
-            try { w.put("_type", "waypoint"); } catch (JSONException e) { }
-            try { w.put("tst", waypoint.getDate().getTime()); } catch (JSONException e) { }
-            try { w.put("lat", waypoint.getLatitude()); } catch (JSONException e) { }
-            try { w.put("lon", waypoint.getLongitude()); } catch (JSONException e) { }
-            try { w.put("rad", waypoint.getRadius()); } catch (JSONException e) { }
-            try { w.put("shared", waypoint.getShared() ? 1 : 0); } catch (JSONException e) { }
-            try { w.put("desc", waypoint.getDescription()); } catch (JSONException e) { }
-            try { w.put("transition", waypoint.getTransitionType()); } catch (JSONException e) { }
-            waypoints.put(w);
-        }
-
-        json.put("waypoints", waypoints);
 
 
     }
 
-    private void jsonRemoveUsernamePassword(JSONObject json) {
-        json.remove(Preferences.getStringRessource(R.string.keyUsername));
-        json.remove(Preferences.getStringRessource(R.string.keyPassword));
-    }
-
-    private void jsonRemoveDeviceIdentification(JSONObject json) {
-        json.remove(Preferences.getStringRessource(R.string.keyDeviceId));
-        json.remove(Preferences.getStringRessource(R.string.keyClientId));
-    }
 
 
 }

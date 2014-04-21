@@ -116,7 +116,7 @@ public class PreferencesBroker extends DialogPreference {
 	@Override
 	protected void onBindDialogView(View view) {
 		this.host.setText(Preferences.getHost());
-		this.port.setText(Preferences.getPort());
+		this.port.setText(String.valueOf(Preferences.getPort()));
 
 		userName.setText(Preferences.getUsername());
 
