@@ -72,9 +72,10 @@ public class Preferences {
 
     public static boolean canConnect() {
 
-        return !getHost().equals("")
-                && !getUsername().equals("")
-                && ((getAuth() && !getPassword().equals("")) || !getAuth());
+        return     !getHost().trim().equals("")
+                && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()))
+                && ((getTls() == getIntResource(R.integer.valTls)) || (getTls() == getIntResource(R.integer.valTlsNone) || (getTls() == getIntResource(R.integer.valTlsCustom) && !getTlsCrtPath().trim().equals(""))))
+                ;
     }
 
     public static JSONObject toJSONObject() {
@@ -110,8 +111,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keySubTopic), getSubTopic(true))
                     .put(getStringRessource(R.string.keyAutostartOnBoot), getAutostartOnBoot())
                     .put(getStringRessource(R.string.keyLocatorAccuracyBackground), getLocatorAccuracyBackground())
-                    .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
-                    .put(getStringRessource(R.string.keyZeroLenghClientIdEnabled), getZeroLenghClientId());
+                    .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground());
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());
@@ -154,7 +154,6 @@ public class Preferences {
         try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
         try { setLocatorAccuracyBackground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyBackground))); } catch (JSONException e) {}
         try { setLocatorAccuracyForeground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyForeground))); } catch (JSONException e) {}
-        try { setZeroLenghClientId(json.getBoolean(getStringRessource(R.string.keyZeroLenghClientIdEnabled))); } catch (JSONException e) {}
 
     }
 

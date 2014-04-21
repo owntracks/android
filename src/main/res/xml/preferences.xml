@@ -78,7 +78,7 @@
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
-        <ListPreference
+        <st.alr.mqttitude.support.ListIntegerPreference
             android:defaultValue="@integer/valPubQos"
             android:entries="@array/qos_readable"
             android:entryValues="@array/qos"
@@ -135,15 +135,13 @@
             android:summary="@string/preferencesLocatorIntervalSummary"
             android:title="@string/preferencesLocatorInterval" />
 
-        <ListPreference
-            android:defaultValue="@integer/valLocatorAccuracyBackground"
+        <st.alr.mqttitude.support.ListIntegerPreference
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyBackground"
             android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
             android:title="@string/preferencesLocatorAccuracyBackground" />
-        <ListPreference
-            android:defaultValue="@integer/valLocatorAccuracyForeground"
+        <st.alr.mqttitude.support.ListIntegerPreference
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyForeground"
@@ -155,19 +153,26 @@
         android:key="importexport"
         android:title="@string/preferencesImportExport" >
 
-        <st.alr.mqttitude.preferences.PreferencesExport
-           android:title="@string/preferencesExport"
-            android:summary="@string/preferencesExportSummmary"
-        />
+        <Preference
+            android:title="@string/preferencesExport"
+            android:summary="@string/preferencesExportSummary">
 
-        <st.alr.mqttitude.preferences.PreferencesImportFile
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="st.alr.mqttitude"
+            android:targetClass="st.alr.mqttitude.preferences.ActivityExport"
+            />
+
+        </Preference>
+
+        <Preference
             android:title="@string/preferencesImportFile"
-            android:summary="@string/preferencesImportFileSummmary"
+            android:summary="@string/preferencesImportFileSummary"
         />
 
-        <st.alr.mqttitude.preferences.PreferencesImportClipboard
+        <Preference
             android:title="@string/preferencesImportClipboard"
-            android:summary="@string/preferencesImportClipboardSummmary"
+            android:summary="@string/preferencesImportClipboardSummary"
             />
 
     </PreferenceScreen>

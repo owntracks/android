@@ -84,7 +84,7 @@ public class ActivityLauncher extends FragmentActivity {
 
     private void checkSettings() {
 
-        settingsOK = Preferences.canConnect();
+        settingsOK = true; // for now
         if(!settingsOK)
             startActivityWizzard();
 

@@ -88,7 +88,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
 
-        if(Preferences.canConnect())
     		doStart();
 	}
 
@@ -103,6 +102,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void doStart(final boolean force) {
+
 
 		Thread thread1 = new Thread() {
 			@Override
@@ -126,7 +126,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	void handleStart(boolean force) {
 		Log.v(this.toString(), "handleStart. force: " + force);
-
+        if(!Preferences.canConnect()) {
+            Log.v(this.toString(), "canConnect() == false. Prerequisites not met.");
+            return;
+        } else {
+            Log.v(this.toString(), "Prerequisites to connect met");
+        }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
 		if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
@@ -281,6 +286,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
 			Log.e(this.toString(), e.toString());
+            e.printStackTrace();
 			changeState(e);
 			return false;
 		}

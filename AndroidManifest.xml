@@ -54,6 +54,11 @@
             android:label="Preferences" >
         </activity>
         <activity
+            android:name="st.alr.mqttitude.preferences.ActivityExport"
+            android:configChanges="orientation"
+            android:label="Export" >
+        </activity>
+        <activity
             android:name="st.alr.mqttitude.ActivityWaypoints"
             android:configChanges="orientation"
             android:label="Waypoints" >
