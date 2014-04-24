@@ -78,8 +78,8 @@ public class Preferences {
                 ;
     }
 
-    public static JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
+    public static StringifiedJSONObject toJSONObject() {
+        StringifiedJSONObject json = new StringifiedJSONObject();
         try {
             json.put("_type", "configuration")
                     .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
