@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.StringifiedJSONObject;
 
 public class DumpMessage {
     LocationMessage location;
@@ -91,31 +92,31 @@ public class DumpMessage {
         return toJsonObject().toString();
     }
 
-    public JSONObject toJsonObject() {
-        JSONObject json = new JSONObject();
+    public StringifiedJSONObject toJsonObject() {
+        StringifiedJSONObject json = new StringifiedJSONObject();
         try {
             json.put("_type", "dump")
                 .put("location", location.toJSONObject())
                 .put("configuration", configuration.toJSONObject())
-                .put("internal", new JSONObject()
-                        .put("locator", new JSONObject()
-                                .put("ready", locatorReady)
-                                .put("foreground", locatorForeground)
-                                .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
-                                .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
-                                .put("waypointCount", locatorWaypointCount)
-                                .put("hasLocationClient", locatorHasLocationClient)
-                                .put("hasLocationRequest", locatorHasLocationRequest)
-                                .put("state", locatorState)
+                .put("internal", new StringifiedJSONObject()
+                        .put("locator", new StringifiedJSONObject()
+                                        .put("ready", locatorReady)
+                                        .put("foreground", locatorForeground)
+                                        .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
+                                        .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
+                                        .put("waypointCount", locatorWaypointCount)
+                                        .put("hasLocationClient", locatorHasLocationClient)
+                                        .put("hasLocationRequest", locatorHasLocationRequest)
+                                        .put("state", locatorState)
                         )
-                        .put("broker", new JSONObject()
-                                .put("keepAliveSeconds", brokerKeepAliveSeconds)
-                                .put("error", brokerError != null ? brokerError.toString() : null)
-                                .put("deferredPublishablesCount", brokerDeferredPublishablesCount)
-                                .put("state", brokerState)
+                        .put("broker", new StringifiedJSONObject()
+                                        .put("keepAliveSeconds", brokerKeepAliveSeconds)
+                                        .put("error", brokerError != null ? brokerError.toString() : null)
+                                        .put("deferredPublishablesCount", brokerDeferredPublishablesCount)
+                                        .put("state", brokerState)
                         )
-                        .put("application", new JSONObject()
-                                .put("playServicesAvailable", applicationPlayServicesAvailable)
+                        .put("application", new StringifiedJSONObject()
+                                        .put("playServicesAvailable", applicationPlayServicesAvailable)
                         )
                 );
 

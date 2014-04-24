@@ -10,15 +10,16 @@ import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.support.Preferences;
+import st.alr.mqttitude.support.StringifiedJSONObject;
 
 public class ConfigurationMessage {
-    JSONObject json;
+    StringifiedJSONObject json;
 
     public ConfigurationMessage() {
         this.json = Preferences.toJSONObject();
     }
     public String toString() {return json.toString(); }
-    public JSONObject toJSONObject() {
+    public StringifiedJSONObject toJSONObject() {
         return json;
     }
 
@@ -27,7 +28,7 @@ public class ConfigurationMessage {
         JSONArray waypoints = new JSONArray();
 
         for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
-            JSONObject w = new JSONObject();
+            StringifiedJSONObject w = new StringifiedJSONObject();
             try { w.put("_type", "waypoint"); } catch (JSONException e) { }
             try { w.put("tst", waypoint.getDate().getTime()); } catch (JSONException e) { }
             try { w.put("lat", waypoint.getLatitude()); } catch (JSONException e) { }

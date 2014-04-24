@@ -6,6 +6,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.support.StringifiedJSONObject;
+
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
@@ -52,43 +54,37 @@ public class LocationMessage {
 		this.battery = battery;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
+    @Override
+    public String toString() {
+        return this.toJSONObject().toString();
+    }
 
-		builder.append("{");
-		builder.append("\"_type\": ").append("\"").append("location")
-				.append("\"");
-		builder.append(", \"lat\": ").append("\"")
-				.append(this.location.getLatitude()).append("\"");
-		builder.append(", \"lon\": ").append("\"")
-				.append(this.location.getLongitude()).append("\"");
-		builder.append(", \"tst\": ")
-				.append("\"")
-				.append((int) (TimeUnit.MILLISECONDS.toSeconds(this.location
-						.getTime()))).append("\"");
-		builder.append(", \"acc\": ")
-				.append("\"")
-				.append(Math
-						.round(this.location.getLocation().getAccuracy() * 100) / 100.0d)
-				.append("\"");
+	public StringifiedJSONObject toJSONObject() {
+        StringifiedJSONObject json = new StringifiedJSONObject();
 
-		if (this.battery != -1)
-			builder.append(", \"batt\": ").append("\"").append(this.battery)
-					.append("\"");
+        try {
+            json.put("_type", "location")
+                    .put("lat", this.location.getLatitude())
+                    .put("lon", this.location.getLongitude())
+                    .put("tst", (TimeUnit.MILLISECONDS.toSeconds(this.location.getTime())))
+                    .put("acc", Math.round(this.location.getLocation().getAccuracy() * 100) / 100.0d);
 
-		if ((this.waypoint != null)
-				&& ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
-			if (this.waypoint.getShared())
-				builder.append(", \"desc\": ").append("\"")
-						.append(this.waypoint.getDescription()).append("\"");
-			builder.append(", \"event\": ")
-					.append("\"")
-					.append(this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter"
-							: "leave").append("\"");
-		}
+            if (this.battery != -1)
+                json.put("batt", this.battery);
 
-		return builder.append("}").toString();
+
+            if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
+                if (this.waypoint.getShared())
+                    json.put("desc", this.waypoint.getDescription());
+
+                json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
+
+            }
+        } catch (JSONException e) {
+
+        }
+
+            return json;
 
 	}
 
@@ -108,7 +104,7 @@ public class LocationMessage {
 		return this.battery;
 	}
 
-	public static LocationMessage fromJsonObject(JSONObject json) {
+	public static LocationMessage fromJsonObject(StringifiedJSONObject json) {
 		try {
 			String type = json.getString("_type");
 			if (!type.equals("location"))
@@ -149,8 +145,4 @@ public class LocationMessage {
 		this.description = string;
 	}
 
-    //TODO
-    public JSONObject toJSONObject() {
-        return new JSONObject();
-    }
 }

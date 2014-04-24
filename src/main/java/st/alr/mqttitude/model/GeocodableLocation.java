@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import st.alr.mqttitude.support.StringifiedJSONObject;
+
 public class GeocodableLocation extends Location {
 	String geocoder;
 	LatLng latlng;
@@ -42,7 +44,7 @@ public class GeocodableLocation extends Location {
 					location.getLongitude());
 	}
 
-	public static GeocodableLocation fromJsonObject(JSONObject json) {
+	public static GeocodableLocation fromJsonObject(StringifiedJSONObject json) {
 		Double lat;
 		Double lon;
 		Float acc;
