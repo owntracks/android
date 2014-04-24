@@ -53,6 +53,7 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.support.StringifiedJSONObject;
 
 public class ServiceBroker implements MqttCallback, ProxyableService {
 
@@ -670,10 +671,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		String msg = new String(message.getPayload());
 		String type;
-		JSONObject json;
+		StringifiedJSONObject json;
 
 		try {
-			json = new JSONObject(msg);
+			json = new StringifiedJSONObject(msg);
 			type = json.getString("_type");
 		} catch (Exception e) {
 			Log.e(this.toString(), "Received invalid message: " + msg);

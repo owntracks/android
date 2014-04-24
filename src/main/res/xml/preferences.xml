@@ -130,7 +130,7 @@
             android:defaultValue="@integer/valLocatorInterval"
             android:dialogTitle="@string/preferencesLocatorInterval"
             android:hint="@integer/valLocatorInterval"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:key="@string/keyLocatorInterval"
             android:summary="@string/preferencesLocatorIntervalSummary"
             android:title="@string/preferencesLocatorInterval" />
@@ -140,13 +140,15 @@
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyBackground"
             android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
-            android:title="@string/preferencesLocatorAccuracyBackground" />
+            android:title="@string/preferencesLocatorAccuracyBackground"
+            android:defaultValue="@integer/valLocatorAccuracyBackground"/>
         <st.alr.mqttitude.support.ListIntegerPreference
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyForeground"
             android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
-            android:title="@string/preferencesLocatorAccuracyForeground" />
+            android:title="@string/preferencesLocatorAccuracyForeground"
+            android:defaultValue="@integer/valLocatorAccuracyForeground"/>
     </PreferenceScreen>
 
     <PreferenceScreen

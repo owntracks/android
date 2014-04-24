@@ -6,6 +6,13 @@ import org.json.JSONObject;
 
 public class StringifiedJSONObject extends JSONObject {
 
+    public StringifiedJSONObject(String str) throws JSONException {
+        super(str);
+    }
+    public StringifiedJSONObject() {
+        super();
+    }
+
     public JSONObject put(String name, boolean value) throws JSONException {
         return putEverythingAsString(name, value ? "1" : "0");
     }
