@@ -1,6 +1,7 @@
 package st.alr.mqttitude.support;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
@@ -32,4 +33,11 @@ public class ListIntegerPreference extends ListPreference
             return defaultReturnValue;
         }
     }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return String.valueOf(a.getInt(index, 0));
+    }
+
+
 }

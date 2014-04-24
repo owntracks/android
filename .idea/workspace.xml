@@ -29,12 +29,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51addcf9-08bb-4276-93d6-ccca8ec0fc82" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/ConfigurationMessage.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/ConfigurationMessage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/DumpMessage.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/DumpMessage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/LocationMessage.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/LocationMessage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/WaypointMessage.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/WaypointMessage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/res/xml/preferences.xml" afterPath="$PROJECT_DIR$/src/main/res/xml/preferences.xml" />
     </list>
     <ignored path="android.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -97,65 +95,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ServiceApplication.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6480" max-vertical-offset="7215">
-              <caret line="497" column="13" selection-start-line="497" selection-start-column="13" selection-end-line="497" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="328" max-vertical-offset="690">
-              <caret line="8" column="1" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DumpMessage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/DumpMessage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1306" max-vertical-offset="1950">
-              <caret line="99" column="8" selection-start-line="99" selection-start-column="8" selection-end-line="99" selection-end-column="8" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#2892#2893#0" expanded="true" />
-                <element signature="e#2940#2941#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GeocodableLocation.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="1920">
-              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="JSON.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Applications/adt/sdk/sources/android-19/org/json/JSON.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1620">
-              <caret line="18" column="10" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WaypointMessage.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="WaypointMessage.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/WaypointMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.089020774" vertical-offset="0" max-vertical-offset="674">
-              <caret line="10" column="28" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
+              <caret line="25" column="38" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
               <folding>
                 <element signature="e#377#378#0" expanded="true" />
                 <element signature="e#422#423#0" expanded="true" />
@@ -164,11 +108,72 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JSONObject.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Applications/adt/sdk/sources/android-19/org/json/JSONObject.java">
+      <file leaf-file-name="ServiceLocator.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.346154" vertical-offset="5018" max-vertical-offset="11055">
-              <caret line="381" column="5" selection-start-line="374" selection-start-column="0" selection-end-line="381" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2605" max-vertical-offset="8475">
+              <caret line="233" column="5" selection-start-line="233" selection-start-column="5" selection-end-line="233" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="preferences.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/res/xml/preferences.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.33333334" vertical-offset="1088" max-vertical-offset="3330">
+              <caret line="80" column="55" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="55" />
+              <folding>
+                <element signature="e#4217#4237#0" expanded="true" />
+                <element signature="e#5644#5692#0" expanded="true" />
+                <element signature="e#6842#6870#0" expanded="true" />
+                <element signature="e#7436#7475#0" expanded="true" />
+                <element signature="e#7677#7715#0" expanded="true" />
+                <element signature="e#7904#7943#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ListIntegerPreference.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="298" max-vertical-offset="675">
+              <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ServiceBroker.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="9595" max-vertical-offset="11775">
+              <caret line="676" column="32" selection-start-line="676" selection-start-column="32" selection-end-line="676" selection-end-column="32" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ActivityPreferences.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityPreferences.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="694" max-vertical-offset="3060">
+              <caret line="80" column="0" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ListPreference.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file:///Applications/adt/sdk/sources/android-19/android/preference/ListPreference.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="169" max-vertical-offset="4590">
+              <caret line="49" column="19" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -188,28 +193,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ConfigurationMessage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/ConfigurationMessage.java">
+      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/res/values/strings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="1020">
-              <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#603#604#0" expanded="true" />
-                <element signature="e#630#631#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="2970" max-vertical-offset="3615">
+              <caret line="210" column="19" selection-start-line="200" selection-start-column="0" selection-end-line="210" selection-end-column="19" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Preferences.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java">
+      <file leaf-file-name="integers.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/res/values/integers.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1504" max-vertical-offset="7530">
-              <caret line="81" column="62" selection-start-line="81" selection-start-column="62" selection-end-line="81" selection-end-column="62" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+              <caret line="12" column="24" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -1517,7 +1516,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/res/anim/exit_to_right.xml" />
         <option value="$PROJECT_DIR$/src/main/res/anim/zoom_in.xml" />
         <option value="$PROJECT_DIR$/src/main/res/anim/zoom_out.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
@@ -1528,11 +1526,9 @@
         <option value="$PROJECT_DIR$/DaoGenerator/src/main/java/st/alr/mqttitude/daogenerator/DaoGenerator.java" />
         <option value="$PROJECT_DIR$/src/main/res/layout/preferences_broker.xml" />
         <option value="$PROJECT_DIR$/src/main/res/values/bools.xml" />
-        <option value="$PROJECT_DIR$/src/main/res/values/integers.xml" />
         <option value="$PROJECT_DIR$/src/main/res/values/bools.xml" />
         <option value="$PROJECT_DIR$/src/main/res/layout/preferences_broker.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityPreferences.java" />
-        <option value="$PROJECT_DIR$/src/main/res/values/integers.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/BootCompleteReceiver.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Wizard.java" />
@@ -1542,32 +1538,35 @@
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Key.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/PreferenceAccessor.java" />
         <option value="$PROJECT_DIR$/src/main/res/layout/activity_export.xml" />
-        <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" />
         <option value="$PROJECT_DIR$/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesExport.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java" />
-        <option value="$PROJECT_DIR$/src/main/res/xml/preferences.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/EditIntegerPreference.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityExport.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesBroker.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesBroker.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/OrderedJSONObject.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/DumpMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/ConfigurationMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/LocationMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/WaypointMessage.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java" />
+        <option value="/Applications/adt/sdk/sources/android-19/android/preference/ListPreference.java" />
+        <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/src/main/res/xml/preferences.xml" />
+        <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/src/main/res/values/integers.xml" />
+        <option value="$PROJECT_DIR$/src/main/res/values/integers.xml" />
       </list>
     </option>
   </component>
@@ -2153,14 +2152,14 @@
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49779087" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48860398" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44444445" sideWeight="0.884375" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44444445" sideWeight="0.884375" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.171875" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22890624" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22890624" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34330484" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
@@ -2190,13 +2189,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/res/anim/enter_from_right.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
-          <caret line="6" column="27" selection-start-line="6" selection-start-column="27" selection-end-line="6" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/anim/exit_to_right.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
@@ -2314,13 +2306,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/res/values/integers.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06676558" vertical-offset="0" max-vertical-offset="674">
-          <caret line="3" column="29" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Defaults.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="755" max-vertical-offset="1770">
@@ -2378,14 +2363,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0769231" vertical-offset="2605" max-vertical-offset="8475">
-          <caret line="219" column="59" selection-start-line="219" selection-start-column="59" selection-end-line="219" selection-end-column="59" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="735" max-vertical-offset="1635">
@@ -2402,52 +2379,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
-          <caret line="6" column="34" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#274#275#0" expanded="true" />
-            <element signature="e#311#312#0" expanded="true" />
-            <element signature="e#364#365#0" expanded="true" />
-            <element signature="e#394#395#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/res/values/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2776" max-vertical-offset="3615">
-          <caret line="200" column="24" selection-start-line="200" selection-start-column="24" selection-end-line="200" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Applications/adt/sdk/sources/android-19/android/app/ActivityThread.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="30416" max-vertical-offset="72810">
           <caret line="2194" column="0" selection-start-line="2194" selection-start-column="0" selection-end-line="2194" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/res/xml/preferences.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.1538463" vertical-offset="229" max-vertical-offset="3300">
-          <caret line="19" column="32" selection-start-line="19" selection-start-column="20" selection-end-line="19" selection-end-column="32" />
-          <folding>
-            <element signature="e#868#893#0" expanded="true" />
-            <element signature="e#4217#4237#0" expanded="true" />
-            <element signature="e#6121#6154#0" expanded="true" />
-            <element signature="e#6618#6647#0" expanded="true" />
-            <element signature="e#6742#6771#0" expanded="true" />
-            <element signature="e#7598#7636#0" expanded="true" />
-            <element signature="e#7982#8009#0" expanded="true" />
-            <element signature="e#8038#8072#0" expanded="true" />
-            <element signature="e#8423#8461#0" expanded="true" />
-            <element signature="e#8585#8628#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2506,14 +2442,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityPreferences.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.1538463" vertical-offset="2869" max-vertical-offset="3060">
-          <caret line="249" column="16" selection-start-line="249" selection-start-column="14" selection-end-line="249" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/preferences_broker.xml">
       <provider editor-type-id="android-designer">
         <state />
@@ -2530,16 +2458,6 @@
         <state vertical-scroll-proportion="-10.230769" vertical-offset="3304" max-vertical-offset="5550">
           <caret line="277" column="20" selection-start-line="277" selection-start-column="20" selection-end-line="277" selection-end-column="20" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.923077" vertical-offset="7778" max-vertical-offset="11760">
-          <caret line="557" column="0" selection-start-line="557" selection-start-column="0" selection-end-line="557" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2589,24 +2507,6 @@
           <caret line="81" column="62" selection-start-line="81" selection-start-column="62" selection-end-line="81" selection-end-column="62" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.65178573" vertical-offset="309" max-vertical-offset="645">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#374#375#0" expanded="true" />
-            <element signature="e#431#432#0" expanded="true" />
-            <element signature="e#505#506#0" expanded="true" />
-            <element signature="e#562#563#0" expanded="true" />
-            <element signature="e#637#638#0" expanded="true" />
-            <element signature="e#694#695#0" expanded="true" />
-            <element signature="e#1003#1004#0" expanded="true" />
-            <element signature="e#1062#1063#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2665,11 +2565,99 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/WaypointMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.089020774" vertical-offset="0" max-vertical-offset="674">
-          <caret line="10" column="28" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
+          <caret line="25" column="38" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
           <folding>
             <element signature="e#377#378#0" expanded="true" />
             <element signature="e#422#423#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2605" max-vertical-offset="8475">
+          <caret line="233" column="5" selection-start-line="233" selection-start-column="5" selection-end-line="233" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/StringifiedJSONObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.49848944" vertical-offset="0" max-vertical-offset="630">
+          <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#219#220#0" expanded="true" />
+            <element signature="e#245#246#0" expanded="true" />
+            <element signature="e#305#306#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="9595" max-vertical-offset="11775">
+          <caret line="676" column="32" selection-start-line="676" selection-start-column="32" selection-end-line="676" selection-end-column="32" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityPreferences.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="694" max-vertical-offset="3060">
+          <caret line="80" column="0" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="298" max-vertical-offset="675">
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/adt/sdk/sources/android-19/android/preference/ListPreference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="169" max-vertical-offset="4590">
+          <caret line="49" column="19" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2970" max-vertical-offset="3615">
+          <caret line="210" column="19" selection-start-line="200" selection-start-column="0" selection-end-line="210" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/res/values/integers.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+          <caret line="12" column="24" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/res/xml/preferences.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334" vertical-offset="1088" max-vertical-offset="3330">
+          <caret line="80" column="55" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="55" />
+          <folding>
+            <element signature="e#4217#4237#0" expanded="true" />
+            <element signature="e#5644#5692#0" expanded="true" />
+            <element signature="e#6842#6870#0" expanded="true" />
+            <element signature="e#7436#7475#0" expanded="true" />
+            <element signature="e#7677#7715#0" expanded="true" />
+            <element signature="e#7904#7943#0" expanded="true" />
           </folding>
         </state>
       </provider>
