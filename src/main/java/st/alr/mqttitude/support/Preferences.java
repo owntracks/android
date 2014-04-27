@@ -163,30 +163,28 @@ public class Preferences {
 
     }
 
-    private static boolean getRemoteConfiguration() {
+    public static boolean getRemoteConfiguration() {
         return getBoolean(R.string.keyRemoteConfiguration, R.bool.valRemoteConfiguration);
-
     }
 
-    private static boolean getRemoteCommandReportLocation() {
+    public static boolean getRemoteCommandReportLocation() {
         return getBoolean(R.string.keyRemoteCommandReportLocation, R.bool.valRemoteCommandReportLocation);
     }
 
-    private static boolean getRemoteCommandDump() {
+    public static boolean getRemoteCommandDump() {
         return getBoolean(R.string.keyRemoteCommandDump, R.bool.valRemoteCommandDump);
     }
 
-    private static void setRemoteConfiguration(boolean aBoolean) {
-
-
+    public static void setRemoteConfiguration(boolean aBoolean) {
+        setBoolean(R.string.keyRemoteConfiguration, aBoolean);
     }
 
-    private static void setRemoteCommandReportLocation(boolean aBoolean) {
-
+    public static void setRemoteCommandReportLocation(boolean aBoolean) {
+        setBoolean(R.string.keyRemoteCommandReportLocation, aBoolean);
     }
 
-    private static void setRemoteCommandDump(boolean aBoolean) {
-
+    public static void setRemoteCommandDump(boolean aBoolean) {
+        setBoolean(R.string.keyRemoteCommandDump, aBoolean);
     }
 
     public static boolean getConnectionAdvancedMode() {

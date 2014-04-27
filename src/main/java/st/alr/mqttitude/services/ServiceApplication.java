@@ -278,10 +278,13 @@ public class ServiceApplication implements ProxyableService,
 			title = this.context.getString(R.string.app_name);
 		}
 
-		subtitle = ServiceLocator.getStateAsString(this.context) + " | "
-				+ ServiceBroker.getStateAsString(this.context);
 
-		notificationBuilder.setContentTitle(title);
+        if(ServiceLocator.getState() == Defaults.State.ServiceLocator.INITIAL)
+		    subtitle = ServiceBroker.getStateAsString(this.context);
+        else
+            subtitle = ServiceLocator.getStateAsString(this.context) + " | " + ServiceBroker.getStateAsString(this.context);
+
+        notificationBuilder.setContentTitle(title);
 		notificationBuilder
 				.setSmallIcon(R.drawable.ic_notification)
 				.setContentText(subtitle)

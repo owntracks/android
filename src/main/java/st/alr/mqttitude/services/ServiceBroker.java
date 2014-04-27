@@ -683,8 +683,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		if (type.equals("location")) {
             // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
             LocationMessage lm = LocationMessage.fromJsonObject(json);
-            EventBus.getDefault().postSticky(
-                    new Events.LocationMessageReceived(lm, topic));
+            EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
         } else if(type.equals("cmd")) {
             String action = "";
             try {
@@ -693,16 +692,29 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 Log.v(this.toString(), "Received cmd message without action");
                 return;
             }
-            if(action.equals("dump")) {
+
+            if (action.equals("dump")) {
                 Log.v(this.toString(), "Received dump cmd message");
+                if(!Preferences.getRemoteCommandDump()) {
+                    Log.i(this.toString(), "Command is disabled");
+                    return;
+                }
                 ServiceProxy.getServiceApplication().dump();
+            } else if (action.equals("reportLocation")){
+                Log.v(this.toString(), "Received reportLocation cmd message");
 
-            } else
-                Log.v(this.toString(), "Received cmd message with unsupported action");
+                if(!Preferences.getRemoteCommandReportLocation()) {
+                    Log.i(this.toString(), "Command is disabled");
+                    return;
+                }
+                ServiceProxy.getServiceLocator().publishLocationMessage();
 
+            } else {
+                Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
+            }
 
 		} else {
-			Log.d(this.toString(), "Ignoring message of type: " + type);
+			Log.d(this.toString(), "Received unknown message (" + type + ")");
 			return;
 		}
 	}
