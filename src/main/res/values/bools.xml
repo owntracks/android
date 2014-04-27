@@ -19,4 +19,8 @@
     <bool name="valConnectionAdvancedMode">false</bool>
     <bool name="valZeroLenghClientIdEnabled">false</bool>
     <bool name="valAuth">true</bool>
+    <bool name="valRemoteCommandReportLocation">false</bool>
+    <bool name="valRemoteCommandDump">false</bool>
+    <bool name="valRemoteConfiguration">false</bool>
+
 </resources>

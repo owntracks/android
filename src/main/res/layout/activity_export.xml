@@ -11,6 +11,7 @@
     android:layout_height="fill_parent"
 >
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,18 +19,28 @@
         android:text="@string/exportIncludes"
         android:id="@+id/textView"/>
 
-    <CheckBox
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preferences"
+            android:id="@+id/includePreferences"
+            android:checked="true"/>
+
+        <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/exportIncludeBrokerConnection"
         android:id="@+id/includeConnection"
+        android:layout_marginLeft="@dimen/default_horizontal_spacing"
         android:checked="true"/>
 
-    <CheckBox
+        <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/exportIncludeUsernamePassword"
         android:id="@+id/includeUsernamePassword"
+        android:layout_marginLeft="@dimen/default_horizontal_spacing"
+
         android:checked="false"/>
 
     <CheckBox
@@ -37,6 +48,8 @@
         android:layout_height="wrap_content"
         android:text="@string/exportIncludeDeviceIdentiaction"
         android:id="@+id/includeDeviceIdentification"
+        android:layout_marginLeft="@dimen/default_horizontal_spacing"
+
         android:checked="false"/>
 
         <CheckBox

@@ -99,6 +99,14 @@
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage when active</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
     <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
+
+    <string name="preferencesRemoteCommandDump">Remote dump command</string>
+    <string name="preferencesRemoteCommandDumpSummary">Respond to remote dump command</string>
+    <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
+    <string name="preferencesRemoteCommandReportLocationSummary">Respond to remote report location command</string>
+    <string name="preferencesRemoteConfiguration">Remote configuration</string>
+    <string name="preferencesRemoteConfigurationSummary">Allow remote configuration </string>
+
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -186,6 +194,10 @@
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
     <string name="keyPreferencesVersion">preferencesVersion</string>
+    <string name="keyRemoteCommandDump">remoteCommandDump</string>
+    <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
+    <string name="keyRemoteConfiguration">remoteConfiguration</string>
+
     <string name="valEmpty">""</string>
     <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicPartWaypoints">/waypoints</string>
@@ -221,7 +233,7 @@
     <string name="title_activity_activity_export">Export</string>
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
     <string name="exportIncludeUsernamePassword">Broker username / password</string>
-    <string name="exportIncludeBrokerConnection">Broker connection preferences</string>
+    <string name="exportIncludeBrokerConnection">Broker connection</string>
     <string name="exportIncludes">Includes</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Export preferences</string>

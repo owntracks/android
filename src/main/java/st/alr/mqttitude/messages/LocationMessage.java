@@ -1,11 +1,11 @@
-package st.alr.mqttitude.model;
+package st.alr.mqttitude.messages;
 
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.support.StringifiedJSONObject;
 
 import android.util.Log;

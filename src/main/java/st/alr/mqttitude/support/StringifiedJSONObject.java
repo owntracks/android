@@ -41,4 +41,10 @@ public class StringifiedJSONObject extends JSONObject {
     public boolean getBoolean(String name) throws JSONException {
         return get(name).equals("1") ? true : false;
     }
+
+    public StringifiedJSONObject putAll(StringifiedJSONObject o) throws JSONException{
+            for(int i = 0 ; i < o.names().length(); i++)
+                this.put((String)o.names().get(i), o.names().get(i));
+         return this;
+    }
 }

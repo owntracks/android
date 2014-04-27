@@ -26,10 +26,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
-import org.json.JSONObject;
 
 import st.alr.mqttitude.R;
-import st.alr.mqttitude.model.LocationMessage;
+import st.alr.mqttitude.messages.LocationMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;

@@ -1,6 +1,7 @@
 package st.alr.mqttitude.services;
 
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -8,11 +9,11 @@ import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.ContactLink;
-import st.alr.mqttitude.model.ConfigurationMessage;
+import st.alr.mqttitude.messages.ConfigurationMessage;
 import st.alr.mqttitude.model.Contact;
-import st.alr.mqttitude.model.DumpMessage;
+import st.alr.mqttitude.messages.DumpMessage;
 import st.alr.mqttitude.model.GeocodableLocation;
-import st.alr.mqttitude.model.LocationMessage;
+import st.alr.mqttitude.messages.LocationMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
@@ -486,19 +487,9 @@ public class ServiceApplication implements ProxyableService,
 
     public void dump() {
         Log.v(this.toString(), "Initiating dump procedure");
-        LocationMessage location = ServiceProxy.getServiceLocator().getLocationMessage(null);
-        Log.v(this.toString(), "1");
-        ConfigurationMessage config = new ConfigurationMessage();
-        Log.v(this.toString(), "2");
-
-        config.removeUsernamePassword();
-        config.addWaypoints();
-        Log.v(this.toString(), "3");
-
         DumpMessage dump = new DumpMessage();
-        dump.setLocation(location);
-        dump.setConfiguration(config);
-        Log.v(this.toString(), "4");
+        dump.setLocation(ServiceProxy.getServiceLocator().getLocationMessage(null));
+        dump.setConfiguration(new ConfigurationMessage(EnumSet.of(ConfigurationMessage.Includes.PREFERENCES, ConfigurationMessage.Includes.CONNECTION, ConfigurationMessage.Includes.IDENTIFICATION)));
 
         dump.setLocatorReady(ServiceProxy.getServiceLocator().isReady());
         dump.setLocatorState(ServiceLocator.getState());
@@ -508,15 +499,11 @@ public class ServiceApplication implements ProxyableService,
         dump.setLocatorWaypointCount(ServiceProxy.getServiceLocator().getWaypointCount());
         dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
         dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
-        Log.v(this.toString(), "5");
-
         dump.setBrokerKeepAliveSeconds(ServiceProxy.getServiceBroker().getKeepaliveSeconds());
         dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
         dump.setBrokerState(ServiceBroker.getState());
         dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
-        Log.v(this.toString(), "6");
-
         Log.v(this.toString(), "Dump data: " + dump.toString());
 
 

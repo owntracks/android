@@ -1,10 +1,10 @@
-package st.alr.mqttitude.model;
+package st.alr.mqttitude.messages;
 
 import android.util.Log;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
+import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.StringifiedJSONObject;
 
@@ -87,7 +87,6 @@ public class DumpMessage {
         this.brokerState = brokerState;
     }
 
-
     public String toString() {
         return toJsonObject().toString();
     }
@@ -99,25 +98,25 @@ public class DumpMessage {
                 .put("location", location.toJSONObject())
                 .put("configuration", configuration.toJSONObject())
                 .put("internal", new StringifiedJSONObject()
-                        .put("locator", new StringifiedJSONObject()
-                                        .put("ready", locatorReady)
-                                        .put("foreground", locatorForeground)
-                                        .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
-                                        .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
-                                        .put("waypointCount", locatorWaypointCount)
-                                        .put("hasLocationClient", locatorHasLocationClient)
-                                        .put("hasLocationRequest", locatorHasLocationRequest)
-                                        .put("state", locatorState)
-                        )
-                        .put("broker", new StringifiedJSONObject()
-                                        .put("keepAliveSeconds", brokerKeepAliveSeconds)
-                                        .put("error", brokerError != null ? brokerError.toString() : null)
-                                        .put("deferredPublishablesCount", brokerDeferredPublishablesCount)
-                                        .put("state", brokerState)
-                        )
-                        .put("application", new StringifiedJSONObject()
-                                        .put("playServicesAvailable", applicationPlayServicesAvailable)
-                        )
+                                .put("locator", new StringifiedJSONObject()
+                                                .put("ready", locatorReady)
+                                                .put("foreground", locatorForeground)
+                                                .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
+                                                .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
+                                                .put("waypointCount", locatorWaypointCount)
+                                                .put("hasLocationClient", locatorHasLocationClient)
+                                                .put("hasLocationRequest", locatorHasLocationRequest)
+                                                .put("state", locatorState)
+                                )
+                                .put("broker", new StringifiedJSONObject()
+                                                .put("keepAliveSeconds", brokerKeepAliveSeconds)
+                                                .put("error", brokerError != null ? brokerError.toString() : null)
+                                                .put("deferredPublishablesCount", brokerDeferredPublishablesCount)
+                                                .put("state", brokerState)
+                                )
+                                .put("application", new StringifiedJSONObject()
+                                                .put("playServicesAvailable", applicationPlayServicesAvailable)
+                                )
                 );
 
 
