@@ -111,7 +111,10 @@ public class Preferences {
                     .put(getStringRessource(R.string.keySubTopic), getSubTopic(true))
                     .put(getStringRessource(R.string.keyAutostartOnBoot), getAutostartOnBoot())
                     .put(getStringRessource(R.string.keyLocatorAccuracyBackground), getLocatorAccuracyBackground())
-                    .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground());
+                    .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
+                    .put(getStringRessource(R.string.keyRemoteCommandDump), getRemoteCommandDump())
+                    .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
+                    .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration());
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());
@@ -119,7 +122,7 @@ public class Preferences {
         return json;
     }
 
-    public static void fromJsonObject(JSONObject json) {
+    public static void fromJsonObject(StringifiedJSONObject json) {
         if (!Defaults.isPropperMessageType(json, "configuration"))
             return;
 
@@ -154,6 +157,35 @@ public class Preferences {
         try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
         try { setLocatorAccuracyBackground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyBackground))); } catch (JSONException e) {}
         try { setLocatorAccuracyForeground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyForeground))); } catch (JSONException e) {}
+        try { setRemoteCommandDump(json.getBoolean(getStringRessource(R.string.keyRemoteCommandDump))); } catch (JSONException e) {}
+        try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
+        try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
+
+    }
+
+    private static boolean getRemoteConfiguration() {
+        return getBoolean(R.string.keyRemoteConfiguration, R.bool.valRemoteConfiguration);
+
+    }
+
+    private static boolean getRemoteCommandReportLocation() {
+        return getBoolean(R.string.keyRemoteCommandReportLocation, R.bool.valRemoteCommandReportLocation);
+    }
+
+    private static boolean getRemoteCommandDump() {
+        return getBoolean(R.string.keyRemoteCommandDump, R.bool.valRemoteCommandDump);
+    }
+
+    private static void setRemoteConfiguration(boolean aBoolean) {
+
+
+    }
+
+    private static void setRemoteCommandReportLocation(boolean aBoolean) {
+
+    }
+
+    private static void setRemoteCommandDump(boolean aBoolean) {
 
     }
 
