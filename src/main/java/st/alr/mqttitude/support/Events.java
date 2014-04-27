@@ -5,7 +5,7 @@ import java.util.Date;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
-import st.alr.mqttitude.model.LocationMessage;
+import st.alr.mqttitude.messages.LocationMessage;
 import android.location.Location;
 
 public class Events {

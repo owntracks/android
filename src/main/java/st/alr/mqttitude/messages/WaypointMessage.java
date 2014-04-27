@@ -1,10 +1,12 @@
-package st.alr.mqttitude.model;
+package st.alr.mqttitude.messages;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
+import st.alr.mqttitude.App;
 import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.support.StringifiedJSONObject;
 

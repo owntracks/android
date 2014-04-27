@@ -66,11 +66,8 @@
     <PreferenceScreen
         android:key="advanced"
         android:title="@string/preferencesAdvanced" >
-        <CheckBoxPreference
-            android:defaultValue="@bool/valConnectionAdvancedMode"
-            android:key="@string/keyConnectionAdvancedMode"
-            android:summary="@string/preferencesConnectionAdvancedModeSummary"
-            android:title="@string/preferencesConnectionAdvancedMode" />
+
+        <PreferenceCategory android:title="Publish Subscribe">
 
         <EditTextPreference
             android:dialogTitle="@string/preferencesTopic"
@@ -105,18 +102,29 @@
             android:key="@string/keySubTopic"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
+</PreferenceCategory>
+        <PreferenceCategory android:title="Remote commands">
 
         <CheckBoxPreference
-            android:defaultValue="@bool/valUpdateAddressBook"
+            android:defaultValue="@bool/valRemoteCommandReportLocation"
             android:dependency="@string/keySub"
-            android:key="@string/keyUpdateAddressBook"
-            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
-            android:title="@string/contactsLinkCloudStorageEnabled" />
+            android:key="@string/keyRemoteCommandReportLocation"
+            android:summary="@string/preferencesRemoteCommandReportLocationSummary"
+            android:title="@string/preferencesRemoteCommandReportLocation" />
         <CheckBoxPreference
-            android:defaultValue="@bool/valAutostartOnBoot"
-            android:key="@string/keyAutostartOnBoot"
-            android:summary="@string/preferencesAutostartSummary"
-            android:title="@string/preferencesAutostart" />
+            android:defaultValue="@bool/valRemoteCommandDump"
+            android:dependency="@string/keySub"
+            android:key="@string/keyRemoteCommandDump"
+            android:summary="@string/preferencesRemoteCommandDumpSummary"
+            android:title="@string/preferencesRemoteCommandDump" />
+        <CheckBoxPreference
+            android:defaultValue="@bool/valRemoteCommandReportLocation"
+            android:dependency="@string/keySub"
+            android:key="@string/keyRemoteConfiguration"
+            android:summary="@string/preferencesRemoteConfigurationSummary"
+            android:title="@string/preferencesRemoteConfiguration" />
+        </PreferenceCategory>
+        <PreferenceCategory android:title="Locator">
 
         <st.alr.mqttitude.support.EditIntegerPreference
             android:defaultValue="@integer/valLocatorDisplacement"
@@ -149,6 +157,26 @@
             android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
             android:title="@string/preferencesLocatorAccuracyForeground"
             android:defaultValue="@integer/valLocatorAccuracyForeground"/>
+        </PreferenceCategory>
+<PreferenceCategory android:title="Misc">
+        <CheckBoxPreference
+            android:defaultValue="@bool/valUpdateAddressBook"
+            android:key="@string/keyUpdateAddressBook"
+            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
+            android:title="@string/contactsLinkCloudStorageEnabled" />
+
+        <CheckBoxPreference
+            android:defaultValue="@bool/valConnectionAdvancedMode"
+            android:key="@string/keyConnectionAdvancedMode"
+            android:summary="@string/preferencesConnectionAdvancedModeSummary"
+            android:title="@string/preferencesConnectionAdvancedMode" />
+
+        <CheckBoxPreference
+            android:defaultValue="@bool/valAutostartOnBoot"
+            android:key="@string/keyAutostartOnBoot"
+            android:summary="@string/preferencesAutostartSummary"
+            android:title="@string/preferencesAutostart" />
+</PreferenceCategory>
     </PreferenceScreen>
 
     <PreferenceScreen
