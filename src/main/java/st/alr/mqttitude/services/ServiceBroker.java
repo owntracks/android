@@ -41,7 +41,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -49,7 +48,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.support.StringifiedJSONObject;
@@ -60,9 +58,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private short keepAliveSeconds;
 	private MqttClient mqttClient;
-	private SharedPreferences sharedPreferences;
 	private static ServiceBroker instance;
-	private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
 	private Thread workerThread;
 	private LinkedList<DeferredPublishable> deferredPublishables;
 	private Exception error;
@@ -72,23 +68,21 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private BroadcastReceiver netConnReceiver;
 	private BroadcastReceiver pingSender;
 	private ServiceProxy context;
+    private LinkedList<String> subscribtions;
 
-	@Override
+    @Override
 	public void onCreate(ServiceProxy p) {
 		this.context = p;
 		this.workerThread = null;
 		this.error = null;
-		changeState(Defaults.State.ServiceBroker.INITIAL);
+        this.subscribtions = new LinkedList<String>();
 		this.keepAliveSeconds = 15 * 60;
-		this.sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(this.context);
 		this.deferredPublishables = new LinkedList<DeferredPublishable>();
-
 		this.pubThread = new HandlerThread("MQTTPUBTHREAD");
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
-
-    		doStart();
+        changeState(Defaults.State.ServiceBroker.INITIAL);
+        doStart();
 	}
 
 	@Override
@@ -299,7 +293,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 						.currentTimeMillis()))).append("\"");
 		payload.append("}");
 
-		m.setWill(this.mqttClient.getTopic(Preferences.getPubTopicBase(true)),
+		m.setWill(this.mqttClient.getTopic(Preferences.getBaseTopic()),
 				payload.toString().getBytes(), 0, false);
 
 	}
@@ -324,17 +318,36 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		scheduleNextPing();
+        resubscribe();
 
-		try {
-
-			if (Preferences.getSub())
-				this.mqttClient.subscribe(Preferences.getSubTopic(true));
-
-		} catch (MqttException e) {
-			e.printStackTrace();
-		}
 
 	}
+
+    public void resubscribe(){
+        Log.v(this.toString(), "Resubscribing");
+        
+        if (!isConnected())
+            return;
+
+        try {
+            mqttClient.unsubscribe(subscribtions.toArray(new String[subscribtions.size()]));
+            subscribtions.clear();
+        } catch (MqttException e) { }
+
+        try {
+            if (Preferences.getSub()) {
+                this.mqttClient.subscribe(Preferences.getSubTopic(true));
+                subscribtions.push(Preferences.getSubTopic(true));
+            }
+
+            this.mqttClient.subscribe(Preferences.getBaseTopic());
+            subscribtions.push(Preferences.getBaseTopic());
+
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 	public void disconnect(boolean fromUser) {
 		Log.v(this.toString(), "disconnect. from user: " + fromUser);
@@ -470,10 +483,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		disconnect(false);
 
 		changeState(Defaults.State.ServiceBroker.DISCONNECTED);
-
-		this.sharedPreferences
-				.unregisterOnSharedPreferenceChangeListener(this.preferencesChangedListener);
-
 	}
 
 	public static Defaults.State.ServiceBroker getState() {
@@ -684,7 +693,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
             LocationMessage lm = LocationMessage.fromJsonObject(json);
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
-        } else if(type.equals("cmd")) {
+        } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic())) {
             String action = "";
             try {
                 action = json.getString("action");
@@ -714,7 +723,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             }
 
 		} else {
-			Log.d(this.toString(), "Received unknown message (" + type + ")");
+			Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
 			return;
 		}
 	}

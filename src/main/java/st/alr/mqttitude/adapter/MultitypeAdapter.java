@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.model.Contact;
@@ -52,6 +53,34 @@ public abstract class MultitypeAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public Object removeItem(Object o) {
+
+        int i = findItemIndex(o);
+        if(i != -1)
+            return removeItem(i);
+        return null;
+    }
+
+    public Object removeItem(int position) {
+        Object tmp = rows.remove(position).second;
+        notifyDataSetChanged();
+        return tmp;
+    }
+
+    public int findItemIndex(Object o) {
+        for(int i = 0; i < rows.size(); i++ )
+            if(rows.get(i).first.equals(ROW_TYPE_ITEM) && rows.get(i).second.equals(o))
+                return i;
+        return -1;
+    }
+
+    public void updateItem(Object o){
+        int i = findItemIndex(o);
+        if (i != -1) {
+            rows.set(i, new Pair<Integer, Object>(ROW_TYPE_ITEM, o));
+            notifyDataSetChanged();
+        }
+    }
     @Override
     public int getItemViewType(int position) {
         return rows.get(position).first;
@@ -70,20 +99,17 @@ public abstract class MultitypeAdapter extends BaseAdapter {
         return position;
     }
 
-    public Object getItemObject(int position) {
-        return rows.get(position).second;
-    }
+
     public Object getItem(int position) {
-        return rows.get(position);
+        return rows.get(position).second;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        System.out.println("getView " + position + " " + convertView + " type = " + getItemViewType(position));
-        return delegateAdapters.get(getItemViewType(position)).getView(position, convertView, parent, inflater, (Pair<Integer, Object>)getItem(position));
+        return delegateAdapters.get(getItemViewType(position)).getView(position, convertView, parent, inflater, getItem(position));
     }
 
     public interface DelegateAdapter {
-        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Pair<Integer, Object> item);
+        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Object item);
     }
 
     public abstract class ItemDelegateAdapter implements DelegateAdapter {}
@@ -95,7 +121,7 @@ public abstract class MultitypeAdapter extends BaseAdapter {
     public class HeaderDelegateAdapter implements DelegateAdapter {
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Pair<Integer, Object> item) {
+        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Object item) {
             HeaderHolder holder;
             if (convertView == null) {
                 holder = new HeaderHolder();
@@ -106,14 +132,8 @@ public abstract class MultitypeAdapter extends BaseAdapter {
                 holder = (HeaderHolder)convertView.getTag();
             }
             convertView.setTag(holder);
-            holder.header.setText((String)item.second);
+            holder.header.setText((String)item);
             return convertView;
         }
     }
-
-
-
-
-
-
 }

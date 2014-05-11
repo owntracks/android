@@ -44,6 +44,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -278,16 +279,34 @@ public class ActivityMain extends FragmentActivity {
         switch (item.getItemId()) {
             case MENU_CONTACT_SHOW:
                 transitionToContactMap(c);
-
+                break;
             case MENU_CONTACT_DETAILS:
                 transitionToContactDetails(c);
-
+                break;
             case MENU_CONTACT_NAVIGATE:
                 Log.v(this.toString(), "Navigate for " +c);
+                launchNavigation(c);
         }
         return true;
 
     }
+
+    private void launchNavigation(Contact c) {
+        if(c.getLocation() != null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + c.getLocation().getLatitude() + "," + c.getLocation().getLongitude()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } else {
+            Toast.makeText(
+                    App.getContext(),
+                    App.getContext()
+                            .getString(R.string.contactLocationUnknown),
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        }
+    }
+
     private void transitionToContactDetails(Contact c) {
         Bundle b = new Bundle();
         b.putString(DetailsFragment.KEY_TOPIC, c.getTopic());
@@ -766,7 +785,7 @@ public class ActivityMain extends FragmentActivity {
 
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View arg1, final int position, long arg3) {
-                    ((ActivityMain)getActivity()).transitionToContactMap((Contact) listAdapter.getItemObject(position));
+                    ((ActivityMain)getActivity()).transitionToContactMap((Contact) listAdapter.getItem(position));
                 }
             });
 
@@ -879,7 +898,7 @@ public class ActivityMain extends FragmentActivity {
         public boolean onContextItemSelected(MenuItem item)
         {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            Contact c = (Contact) listAdapter.getItemObject(info.position);
+            Contact c = (Contact) listAdapter.getItem(info.position);
 
 
             return ((ActivityMain)getActivity()).onContactContextItemSelected(item, c);

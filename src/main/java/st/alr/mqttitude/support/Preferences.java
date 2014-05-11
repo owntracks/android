@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.services.ServiceProxy;
 
 public class Preferences {
     public static SharedPreferences getSharedPreferences() {
@@ -274,6 +275,10 @@ public class Preferences {
         return topic;
     }
 
+    public static String getBaseTopic() {
+        return getPubTopicBase(true);
+    }
+
     public static String getPubTopicPartWaypoints() {
         return getStringRessource(R.string.valPubTopicPartWaypoints);
     }
@@ -349,7 +354,7 @@ public class Preferences {
 
     private static void setPubTopicBase(String string) {
         setString(R.string.keyPubTopicBase, string);
-
+        ServiceProxy.getServiceBroker().resubscribe();
     }
 
     private static void setNotification(boolean aBoolean) {

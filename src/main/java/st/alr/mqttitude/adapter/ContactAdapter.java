@@ -43,9 +43,8 @@ public class ContactAdapter extends MultitypeAdapter{
     public class ItemDelegateAdapter implements DelegateAdapter {
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Pair<Integer, Object> item) {
+        public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Object item) {
             ContactHolder holder;
-            Contact c = (Contact)item.second;
             if (convertView == null) {
                 holder = new ContactHolder();
                 convertView = inflater.inflate(R.layout.row_contact, null);
@@ -57,9 +56,9 @@ public class ContactAdapter extends MultitypeAdapter{
                 holder = (ContactHolder)convertView.getTag();
             }
             convertView.setTag(holder);
-            holder.name.setText(c.toString());
-            holder.location.setText(c.getLocation().toString());
-            holder.image.setImageBitmap(c.getUserImage());
+            holder.name.setText(((Contact)item).toString());
+            holder.location.setText(((Contact)item).getLocation().toString());
+            holder.image.setImageBitmap(((Contact)item).getUserImage());
 
             return convertView;
         }
