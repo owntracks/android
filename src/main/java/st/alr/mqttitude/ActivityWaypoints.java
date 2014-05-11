@@ -1,11 +1,16 @@
 package st.alr.mqttitude;
 
+import java.util.ArrayList;
 import java.util.Date;
 
+import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.adapter.WaypointAdapter;
 import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.Events;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -40,7 +45,8 @@ import com.google.android.gms.location.Geofence;
 public class ActivityWaypoints extends FragmentActivity {
 	private ListView listView;
 	private WaypointAdapter listAdapter;
-	private static final String BUNDLE_KEY_POSITION = "position";
+    private WaypointDao dao;
+    private static final String BUNDLE_KEY_POSITION = "position";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,8 @@ public class ActivityWaypoints extends FragmentActivity {
 
 		setContentView(R.layout.activity_waypoint);
 
-		this.listAdapter = new WaypointAdapter(this);
+        this.dao = App.getWaypointDao();
+		this.listAdapter = new WaypointAdapter(this, new ArrayList<Waypoint>(dao.loadAll()));
 
 		this.listView = (ListView) findViewById(R.id.waypoints);
 		this.listView.setAdapter(this.listAdapter);
@@ -68,7 +75,7 @@ public class ActivityWaypoints extends FragmentActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				AddDialog addDialog = AddDialog.newInstance(position - 1);
+				AddDialog addDialog = AddDialog.newInstance(position);
 				getFragmentManager().beginTransaction()
 						.add(addDialog, "addDialog").commit();
 
@@ -93,7 +100,9 @@ public class ActivityWaypoints extends FragmentActivity {
 	}
 
 	protected void add(Waypoint w) {
-		this.listAdapter.add(w);
+        this.dao.insert(w);
+        this.listAdapter.addItem(w);
+        EventBus.getDefault().post(new Events.WaypointAdded(w));
 
 		if (this.listView.getVisibility() == View.GONE)
 			this.listView.setVisibility(View.VISIBLE);
@@ -101,8 +110,11 @@ public class ActivityWaypoints extends FragmentActivity {
 	}
 
 	protected void update(Waypoint w) {
-		this.listAdapter.update(w);
-	}
+
+        this.dao.update(w);
+        this.listAdapter.updateItem(w);
+        EventBus.getDefault().post(new Events.WaypointUpdated(w));
+    }
 
 	protected void remove() {
 		final SparseBooleanArray checkedItems = this.listView
@@ -117,8 +129,10 @@ public class ActivityWaypoints extends FragmentActivity {
 
 				final boolean isChecked = checkedItems.valueAt(i);
 				if (isChecked) {
-					this.listAdapter.remove(this.listAdapter
-							.getItem(position - 1));
+
+                    Waypoint r = (Waypoint)this.listAdapter.removeItem(position);
+                    this.dao.delete(r);
+                    EventBus.getDefault().post(new Events.WaypointRemoved(r));
 
 				}
 			}
@@ -346,8 +360,7 @@ public class ActivityWaypoints extends FragmentActivity {
 				b = getArguments();
 
 			if (b != null)
-				this.w = ((ActivityWaypoints) getActivity()).getListAdapter()
-						.getItem(b.getInt(BUNDLE_KEY_POSITION));
+				this.w = (Waypoint)((ActivityWaypoints) getActivity()).getListAdapter().getItem(b.getInt(BUNDLE_KEY_POSITION));
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 					.setTitle(

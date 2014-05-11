@@ -34,8 +34,8 @@
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesTopicSettings">"Reporting"</string>
-    <string name="preferencesTopic">"Publish topic"</string>
-    <string name="preferencesTopicSummary">"The topic to which locations will be published"</string>
+    <string name="preferencesTopic">"Base topic"</string>
+    <string name="preferencesTopicSummary">"Base topic to send and receive messages"</string>
     <string name="preferencesRetain">"Publish retained"</string>
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
     <string name="preferencesQOS">"Publish QOS"</string>
@@ -85,9 +85,9 @@
     <string name="prev">Previous</string>
     <string name="preferencesContactSettings">Contacts</string>
     <string name="preferencesContactsEnabled">Subscribe</string>
-    <string name="preferencesContactsEnabledSummary">Subscribe to receive messages</string>
+    <string name="preferencesContactsEnabledSummary">Subscribe custom topic</string>
     <string name="preferencesContactsTopic">Subscribe topic</string>
-    <string name="preferencesContactsTopicSummary">Topic on which messages are received</string>
+    <string name="preferencesContactsTopicSummary">Custom topic to receive messages</string>
     <string name="publish">Report</string>
     <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
     <string name="preferencesIncludeBattery">Include battery</string>
@@ -101,9 +101,9 @@
     <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
 
     <string name="preferencesRemoteCommandDump">Remote dump command</string>
-    <string name="preferencesRemoteCommandDumpSummary">Respond to remote dump command</string>
+    <string name="preferencesRemoteCommandDumpSummary">Respond to dump command</string>
     <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
-    <string name="preferencesRemoteCommandReportLocationSummary">Respond to remote report location command</string>
+    <string name="preferencesRemoteCommandReportLocationSummary">Respond to report location command</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Allow remote configuration </string>
 
@@ -181,7 +181,7 @@
     <string name="keyPub">pub</string>
     <string name="keyUpdateAddressBook">updateAdressBook</string>
     <string name="keyPubInterval">pubInterval</string>
-    <string name="keyPubTopicBase">topic</string>
+    <string name="keyPubTopicBase">pubTopicBase</string>
     <string name="keyNotification">notification</string>
     <string name="keyNotificationGeocoder">notificationGeocoder</string>
     <string name="keyNotificationLocation">notificationLocation</string>
@@ -244,5 +244,6 @@
     <string name="preferencesImportFileSummary">Import preferences from file</string>
     <string name="preferencesImportClipboard">Import from clipboard</string>
     <string name="preferencesImportClipboardSummary">Import preferences from file</string>
+    <string name="contactLocationUnknown">No location known for this contact</string>
 
 </resources>
