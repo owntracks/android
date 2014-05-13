@@ -392,26 +392,26 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 	}
 
-	@SuppressLint("Wakelock")
-	// Lint check derps with the wl.release() call.
 	@Override
 	public void connectionLost(Throwable t) {
 		Log.e(this.toString(), "error: " + t.toString());
+        t.printStackTrace();
 		// we protect against the phone switching off while we're doing this
 		// by requesting a wake lock - we request the minimum possible wake
 		// lock - just enough to keep the CPU running until we've finished
 		PowerManager pm = (PowerManager) this.context
 				.getSystemService(Context.POWER_SERVICE);
-		WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
+		WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Owntracks-ServiceBroker-ConnectionLost");
 		wl.acquire();
 
 		if (!isOnline()) {
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
-		} else {
+            wl.release();
+        } else {
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED);
 			scheduleNextPing();
-		}
-		wl.release();
+            wl.release();
+        }
 	}
 
 	public void reconnect() {
@@ -444,13 +444,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		ConnectivityManager cm = (ConnectivityManager) this.context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
+        Log.v(this.toString(), "isONline netinfo:" + netInfo +  ", available: " + netInfo.isAvailable() + ", connected: " + netInfo.isConnected());
 		return (netInfo != null) && netInfo.isAvailable()
 				&& netInfo.isConnected();
 	}
 
 	public boolean isConnected() {
-		return ((this.mqttClient != null) && (this.mqttClient.isConnected() == true));
+		return this.mqttClient != null && this.mqttClient.isConnected(  );
 	}
 
 	public static boolean isErrorState(Defaults.State.ServiceBroker state) {
@@ -675,7 +675,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			throws Exception {
 		scheduleNextPing();
 		Log.v(this.toString(), "Received message: " + topic + " : "
-				+ message.getPayload().toString());
+				+ message.getPayload());
 
 		String msg = new String(message.getPayload());
 		String type;
@@ -735,21 +735,23 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
 
 		@Override
-		@SuppressLint("Wakelock")
 		public void onReceive(Context ctx, Intent intent) {
-			PowerManager pm = (PowerManager) ServiceBroker.this.context
+			Log.v(this.toString(), "NetworkConnectionIntentReceiver, onReceive");
+            PowerManager pm = (PowerManager) ServiceBroker.this.context
 					.getSystemService(Context.POWER_SERVICE);
-			WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-					"OwnTracks");
-			wl.acquire();
+
+            WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Owntracks-ServiceBroker-NetworkConnectionIntentReceiver");
+
+            wl.acquire();
 
 			if (isOnline() && !isConnected() && !isConnecting()) {
-				Log.v(this.toString(),
-						"NetworkConnectionIntentReceiver: triggering doStart");
-				doStart();
+				Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart");
+                wl.release(); // otherwise wakelock will leak when this thread is killed in doStart()
+                doStart();
 
-			}
-			wl.release();
+			} else {
+                wl.release();
+            }
 		}
 	}
 
@@ -817,6 +819,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		message.setPayload(new byte[] { 0 });
 
 		try {
+            Log.v(this.toString(), "Sending PING");
 			topic.publish(message);
 		} catch (org.eclipse.paho.client.mqttv3.MqttPersistenceException e) {
 			e.printStackTrace();

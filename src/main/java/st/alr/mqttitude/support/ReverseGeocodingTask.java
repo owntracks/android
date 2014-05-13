@@ -41,10 +41,12 @@ public class ReverseGeocodingTask extends
 						.getLongitude(), 1);
 				if ((addresses != null) && (addresses.size() > 0)) {
 
-					if (addresses.get(0).getLocality() != null)
-						l.setGeocoder(addresses.get(0).getLocality());
+
+
+					if (addresses.get(0) != null)
+						l.setGeocoder(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality());
 					else
-						l.setGeocoder(addresses.get(0).getCountryName());
+						l.setGeocoder(null);
 
 					r = GEOCODER_RESULT;
 				}
