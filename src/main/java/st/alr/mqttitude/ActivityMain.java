@@ -1,8 +1,10 @@
 package st.alr.mqttitude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +14,7 @@ import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
@@ -480,9 +483,10 @@ public class ActivityMain extends FragmentActivity {
 			super.onResume();
 			this.mMapView.onResume();
 
-			Iterator<Entry<String, Contact>> it = App.getContactIterator();
-			while(it.hasNext())
-				updateContactLocation(it.next().getValue());
+
+            HashMap<String, Contact> contacts = new HashMap<String, Contact>(App.getCachedContacts());
+            for(Contact c : contacts.values())
+				updateContactLocation(c);
 
 			focusCurrentlyTrackedContact();
 		}
@@ -523,23 +527,12 @@ public class ActivityMain extends FragmentActivity {
 
 			this.mMapView = (MapView) v.findViewById(R.id.mapView);
 			this.mMapView.onCreate(savedInstanceState);
-			this.mMapView.onResume(); // needed to get the map to display
-										// immediately
+			this.mMapView.onResume(); // needed to get the map to display immediately
 			this.googleMap = this.mMapView.getMap();
 
 			// Check if we were successful in obtaining the map.
 			if (this.mMapView != null) {
-//				try {
-					MapsInitializer.initialize(getActivity());
-//				} catch (GooglePlayServicesNotAvailableException e) {
-					// This shouldn't happen as we check things beforehand.
-					// If it does anyway, the launcher activity will take care
-					// of it by displaying handling dialogues
-//					startActivity(new Intent(getActivity(),
-//							ActivityLauncher.class));
-//					return null;
-//				}
-
+                MapsInitializer.initialize(getActivity());
 				setUpMap();
 			}
 
@@ -732,7 +725,19 @@ public class ActivityMain extends FragmentActivity {
 				focusCurrentLocation();
 		}
 
-		public Contact getCurrentlyTrackedContact() {
+        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+                clearMap();
+
+        }
+
+        public void clearMap() {
+                markerToContacts.clear();
+                mMapView.invalidate();
+                this.selectedContactDetails.setVisibility(View.GONE);
+        }
+
+        public Contact getCurrentlyTrackedContact() {
 			return App.getContact(Preferences.getTrackingUsername());
 		}
 
@@ -757,7 +762,7 @@ public class ActivityMain extends FragmentActivity {
 		private ListView list;
         private ContactAdapter listAdapter;
         private Button currentLocation;
-
+        private ArrayList<Contact> contacts;
         public static ContactsFragment getInstance() {
 			return new ContactsFragment();
 		}
@@ -767,7 +772,6 @@ public class ActivityMain extends FragmentActivity {
 			super.onCreate(savedInstanceState);
 			handler = new StaticHandler(this);
             EventBus.getDefault().registerSticky(this);
-
         }
 
         @Override
@@ -778,9 +782,8 @@ public class ActivityMain extends FragmentActivity {
                     false);
 
             this.list = (ListView) v.findViewById(R.id.list);
-            this.listAdapter = new ContactAdapter(getActivity(), App.getContacts());
+            setListAdapter(true);
             this.currentLocation = (Button) v.findViewById(R.id.currentLocation);
-            this.list.setAdapter(this.listAdapter);
             this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
@@ -790,41 +793,15 @@ public class ActivityMain extends FragmentActivity {
             });
 
             registerForContextMenu(this.list);
-            //			this.friendsListView = (LinearLayout) v
-            //					.findViewById(R.id.friendsListView);
-            //			LinearLayout thisdevice = (LinearLayout) v
-            //					.findViewById(R.id.thisdevice);
-            //
-            //			this.currentLoc = (Button) thisdevice
-            //					.findViewById(R.id.currentLocation);
-            //
-            //			this.currentLoc.setOnClickListener(new OnClickListener() {
-            //
-            //				@Override
-            //				public void onClick(View v) {
-            //					ServiceProxy.runOrBind(getActivity(), new Runnable() {
-            //						@Override
-            //						public void run() {
-            //							if (ServiceProxy.getServiceLocator()
-            //									.getLastKnownLocation() != null)
-            //								((MapFragment) FragmentHandler.getInstance()
-            //										.forward(MapFragment.class, null,
-            //												getActivity()))
-            //										.focusCurrentLocation();
-            //							else
-            //								App.showLocationNotAvailableToast();
-            //
-            //						}
-            //					});
-            //
-            //				}
-            //			});
 
-            //			Iterator<Entry<String, Contact>> it = App.getContactIterator();
-            //			while(it.hasNext())
-            //				updateContactView(it.next().getValue());
 
             return v;
+        }
+
+
+        private void setListAdapter(boolean fromCache) {
+            this.listAdapter = new ContactAdapter(this.getActivity(), fromCache ? new ArrayList<Contact>(App.getCachedContacts().values()) : null);
+            this.list.setAdapter(this.listAdapter);
         }
 
         @Override
@@ -848,7 +825,6 @@ public class ActivityMain extends FragmentActivity {
 		public void onResume() {
 			super.onResume();
 
-			onEventMainThread(new Events.BrokerChanged());
             registerForContextMenu(this.list);
 
 			ServiceProxy.runOrBind(getActivity(), new Runnable() {
@@ -911,9 +887,9 @@ public class ActivityMain extends FragmentActivity {
             updateCurrentLocation(e.getGeocodableLocation(), true);
 		}
 
-		public void onEventMainThread(Events.BrokerChanged e) {
-			//TODO
-			//this.friendsListView.removeViews(0, this.friendsListView.getChildCount());
+		public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+                setListAdapter(false);
 		}
 
 		public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
@@ -1119,7 +1095,16 @@ public class ActivityMain extends FragmentActivity {
 				onShow();
 		}
 
-		@Override
+        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+            // Contact will be cleared, close this view
+            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING) {
+                FragmentHandler.getInstance().back(getActivity());
+            }
+
+        }
+
+
+        @Override
 		public void onSaveInstanceState(Bundle b) {
 			super.onSaveInstanceState(b);
 			b.putString(KEY_TOPIC, this.contact.getTopic());
