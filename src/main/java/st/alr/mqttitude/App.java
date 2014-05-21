@@ -14,6 +14,7 @@ import st.alr.mqttitude.db.DaoMaster.OpenHelper;
 import st.alr.mqttitude.db.DaoSession;
 import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.model.Contact;
+import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import android.app.Application;
@@ -34,11 +35,10 @@ import de.greenrobot.event.EventBus;
 public class App extends Application {
 	private static App instance;
 	private SimpleDateFormat dateFormater;
-	//private HashMap<String, Contact> contacts;
 
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
-    private HashMap<String, Contact> contacts;
+    private static HashMap<String, Contact> contacts;
 
 	@Override
 	public void onCreate() {
@@ -83,17 +83,22 @@ public class App extends Application {
 	public static Contact getContact(String topic) {
 		return instance.contacts.get(topic);
 	}
-    public static ArrayList<Contact> getContacts() {
-        return new ArrayList<Contact>(instance.contacts.values());
+
+
+    public static HashMap<String, Contact> getCachedContacts() {
+        return contacts;
     }
+
+    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+        Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
+        if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+            instance.contacts.clear();
+    }
+
     public static void addContact(Contact c) {
         EventBus.getDefault().post(new Events.ContactAdded(c));
         instance.contacts.put(c.getTopic(), c);
     }
-
-    public static Iterator<Entry<String, Contact>> getContactIterator(){
-        return instance.contacts.entrySet().iterator();
-	}
 
 	public static String formatDate(Date d) {
 		return instance.dateFormater.format(d);

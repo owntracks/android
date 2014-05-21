@@ -25,13 +25,17 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="mqttitude" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="app: st.alr.mqttitude" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51addcf9-08bb-4276-93d6-ccca8ec0fc82" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ReverseGeocodingTask.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ReverseGeocodingTask.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/res/layout/fragment_details.xml" afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_details.xml" />
     </list>
     <ignored path="android.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -94,68 +98,66 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="fragment_details.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/res/layout/fragment_details.xml">
-          <provider selected="true" editor-type-id="android-designer">
-            <state />
-          </provider>
-          <provider editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="1605">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReverseGeocodingTask.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ReverseGeocodingTask.java">
+      <file leaf-file-name="ServiceBroker.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="1050">
-              <caret line="45" column="49" selection-start-line="45" selection-start-column="49" selection-end-line="45" selection-end-column="49" />
-              <folding />
+            <state vertical-scroll-proportion="-9.307693" vertical-offset="4693" max-vertical-offset="12450">
+              <caret line="331" column="13" selection-start-line="331" selection-start-column="13" selection-end-line="331" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#6202#6222#0" expanded="true" />
+                <element signature="e#8504#8526#0" expanded="true" />
+                <element signature="e#14398#14399#0" expanded="true" />
+                <element signature="e#14470#14471#0" expanded="true" />
+                <element signature="e#15461#15505#0" expanded="true" />
+                <element signature="e#15843#16218#0" expanded="true" />
+                <element signature="e#16213#16214#0" expanded="true" />
+                <element signature="e#16831#17468#0" expanded="true" />
+                <element signature="e#17463#17464#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="styles.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/res/values/styles.xml">
+      <file leaf-file-name="ActivityLauncher.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="423" max-vertical-offset="870">
-              <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="615" max-vertical-offset="2970">
+              <caret line="86" column="37" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="preferences_licenses.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/res/layout/preferences_licenses.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
+      <file leaf-file-name="App.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2505">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+            <state vertical-scroll-proportion="-7.769231" vertical-offset="623" max-vertical-offset="1485">
+              <caret line="93" column="62" selection-start-line="93" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+              <folding>
+                <element signature="e#2751#2752#0" expanded="true" />
+                <element signature="e#2782#2783#0" expanded="true" />
+                <element signature="e#3926#3997#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ActivityMain.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="ActivityMain.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14610">
-              <caret line="871" column="0" selection-start-line="871" selection-start-column="0" selection-end-line="871" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Events.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Events.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2023" max-vertical-offset="2670">
-              <caret line="183" column="32" selection-start-line="183" selection-start-column="19" selection-end-line="183" selection-end-column="32" />
-              <folding />
+            <state vertical-scroll-proportion="2.7535818" vertical-offset="13094" max-vertical-offset="14415">
+              <caret line="1098" column="55" selection-start-line="1098" selection-start-column="55" selection-end-line="1098" selection-end-column="55" />
+              <folding>
+                <element signature="e#5530#5531#0" expanded="true" />
+                <element signature="e#5552#5553#0" expanded="true" />
+                <element signature="e#9109#9197#0" expanded="true" />
+                <element signature="e#11430#11463#0" expanded="true" />
+                <element signature="e#13671#13688#0" expanded="true" />
+                <element signature="e#24961#24962#0" expanded="true" />
+                <element signature="e#25019#25020#0" expanded="true" />
+                <element signature="e#26848#26877#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -163,72 +165,19 @@
       <file leaf-file-name="ServiceApplication.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4125" max-vertical-offset="7695">
-              <caret line="281" column="38" selection-start-line="281" selection-start-column="38" selection-end-line="281" selection-end-column="38" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="-4.8846154" vertical-offset="4523" max-vertical-offset="7020">
+              <caret line="363" column="30" selection-start-line="363" selection-start-column="30" selection-end-line="363" selection-end-column="30" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ServiceLocator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5309" max-vertical-offset="8475">
-              <caret line="410" column="25" selection-start-line="410" selection-start-column="23" selection-end-line="410" selection-end-column="25" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#2599#2933#0" expanded="false" />
-                <element signature="e#2928#2929#0" expanded="false" />
-                <element signature="e#11611#11612#0" expanded="false" />
-                <element signature="e#11646#11647#0" expanded="false" />
-                <element signature="e#12822#12823#0" expanded="false" />
-                <element signature="e#12841#12842#0" expanded="false" />
-                <element signature="e#12894#12895#0" expanded="false" />
-                <element signature="e#12936#12937#0" expanded="false" />
-                <element signature="e#13026#13027#0" expanded="false" />
-                <element signature="e#13073#13074#0" expanded="false" />
-                <element signature="e#13505#13506#0" expanded="false" />
-                <element signature="e#13565#13566#0" expanded="false" />
-                <element signature="e#13726#13727#0" expanded="false" />
-                <element signature="e#13756#13757#0" expanded="false" />
-                <element signature="e#13804#13805#0" expanded="false" />
-                <element signature="e#13856#13857#0" expanded="false" />
-                <element signature="e#13906#13907#0" expanded="false" />
-                <element signature="e#13957#13958#0" expanded="false" />
-                <element signature="e#14007#14008#0" expanded="false" />
-                <element signature="e#14058#14059#0" expanded="false" />
-                <element signature="e#14491#14501#0" expanded="false" />
-                <element signature="e#15543#15553#0" expanded="false" />
-                <element signature="e#15637#15638#0" expanded="false" />
-                <element signature="e#15675#15676#0" expanded="false" />
-                <element signature="e#15778#15786#0" expanded="false" />
-                <element signature="e#16394#16395#0" expanded="false" />
-                <element signature="e#16451#16452#0" expanded="false" />
-                <element signature="e#17552#17553#0" expanded="false" />
-                <element signature="e#17580#17581#0" expanded="false" />
-                <element signature="e#17617#17618#0" expanded="false" />
-                <element signature="e#17650#17651#0" expanded="false" />
-                <element signature="e#17691#17692#0" expanded="false" />
-                <element signature="e#17755#17756#0" expanded="false" />
-                <element signature="e#17798#17799#0" expanded="false" />
-                <element signature="e#17844#17845#0" expanded="false" />
-                <element signature="e#17887#17888#0" expanded="false" />
-                <element signature="e#17934#17935#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ServiceBroker.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33114755" vertical-offset="11344" max-vertical-offset="12090">
-              <caret line="797" column="19" selection-start-line="797" selection-start-column="19" selection-end-line="797" selection-end-column="19" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="1635">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -663,9 +612,9 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="2796101367000" />
+        <entry key="$PROJECT_DIR$" value="2800982702000" />
         <entry key="$PROJECT_DIR$/../../mqttitude/apps/android" value="1380646241000" />
-        <entry key="$PROJECT_DIR$" value="2796101367000" />
+        <entry key="$PROJECT_DIR$" value="2801183944000" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -750,7 +699,7 @@
                       </ExternalModuleBuildClasspathPojo>
                     </value>
                   </entry>
-                  <entry key="$PROJECT_DIR$/wizzardpager">
+                  <entry key="$PROJECT_DIR$/paho">
                     <value>
                       <ExternalModuleBuildClasspathPojo>
                         <option name="entries">
@@ -821,7 +770,7 @@
                             <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.proguard/proguard-gradle/4.10/edad1b6af1c08c54a58fb39da9fa48e03bc6678d/proguard-gradle-4.10.jar" />
                           </list>
                         </option>
-                        <option name="path" value="$PROJECT_DIR$/wizzardpager" />
+                        <option name="path" value="$PROJECT_DIR$/paho" />
                       </ExternalModuleBuildClasspathPojo>
                     </value>
                   </entry>
@@ -1095,24 +1044,11 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityPreferences.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/BootCompleteReceiver.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Wizard.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityWizzard.java" />
-        <option value="$PROJECT_DIR$/settings.gradle" />
-        <option value="$PROJECT_DIR$/src/main/res/layout/layout_export.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Key.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/PreferenceAccessor.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" />
-        <option value="$PROJECT_DIR$/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesExport.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/EditIntegerPreference.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesBroker.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesBroker.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/OrderedJSONObject.java" />
-        <option value="$PROJECT_DIR$/build.gradle" />
-        <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/LocationMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java" />
@@ -1130,22 +1066,35 @@
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/messages/ConfigurationMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/ActivityExport.java" />
         <option value="$PROJECT_DIR$/src/main/res/xml/preferences.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
         <option value="$PROJECT_DIR$/src/main/res/values/bools.xml" />
         <option value="$PROJECT_DIR$/src/main/res/values/bools.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/Preferences.java" />
         <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityWaypoints.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/WaypointAdapter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java" />
         <option value="$PROJECT_DIR$/src/main/res/layout/fragment_details.xml" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ReverseGeocodingTask.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/MqttConnection.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho/AlarmPingSender.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker2.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBrokernew.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho/ServiceBrokerV2.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho/MqttConnection.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho/MqttService.java" />
+        <option value="$PROJECT_DIR$/src/main/res/menu/activity_wizzard.xml" />
+        <option value="$PROJECT_DIR$/build.gradle" />
+        <option value="$PROJECT_DIR$/build.gradle" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBrokerV2.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ProxyableService.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
       </list>
     </option>
   </component>
@@ -1172,7 +1121,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="2" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -1187,6 +1136,9 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane">
+        <subPane />
+      </pane>
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -1227,88 +1179,6 @@
               <option name="myItemId" value="main" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="xml" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="values" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="layout" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -1333,133 +1203,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="mqttitude" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mqttitude" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="support" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mqttitude" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="services" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mqttitude" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="preferences" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OwnTracks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mqttitude" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="adapter" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
-      </pane>
-      <pane id="PackagesPane">
-        <subPane />
       </pane>
     </panes>
   </component>
@@ -1485,7 +1232,7 @@
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager2.WIDTH" value="166" />
-    <property name="android.project.structure.last.selected" value="wizzardpager" />
+    <property name="android.project.structure.last.selected" value="" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="DEBUGGABLE_DEVICE" value="lge-nexus_4-005da00260544ee9" />
     <property name="DEBUGGABLE_PROCESS" value="st.alr.mqttitude" />
@@ -1493,6 +1240,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho" />
       <recent name="$PROJECT_DIR$/src/main/res/anim" />
       <recent name="$PROJECT_DIR$/src/main/res/drawable" />
       <recent name="$PROJECT_DIR$/src/main/res/layout" />
@@ -1501,11 +1249,11 @@
       <recent name="st.alr.mqttitude.model" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/main/res" />
-      <recent name="$PROJECT_DIR$/res" />
-      <recent name="$PROJECT_DIR$/wizzardpager/src/main/res" />
-      <recent name="$PROJECT_DIR$/wizzardpager/src/main" />
+      <recent name="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/paho" />
+      <recent name="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/paho" />
+      <recent name="$PROJECT_DIR$/libs" />
       <recent name="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support" />
+      <recent name="$PROJECT_DIR$/src/main/res" />
     </key>
   </component>
   <component name="RunManager" selected="Android Application.OwnTracks">
@@ -1745,7 +1493,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1280" height="774" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1759,7 +1507,7 @@
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49779087" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48860398" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44444445" sideWeight="0.884375" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44444445" sideWeight="0.884375" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.171875" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -1795,99 +1543,53 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="3" />
+      <option name="time" value="5" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Applications/adt/sdk/sources/android-19/android/app/ActivityThread.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="30416" max-vertical-offset="72810">
-          <caret line="2194" column="0" selection-start-line="2194" selection-start-column="0" selection-end-line="2194" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="11485" max-vertical-offset="12600">
+          <caret line="820" column="13" selection-start-line="820" selection-start-column="13" selection-end-line="820" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#6202#6222#0" expanded="true" />
+            <element signature="e#8504#8526#0" expanded="true" />
+            <element signature="e#14398#14399#0" expanded="true" />
+            <element signature="e#14470#14471#0" expanded="true" />
+            <element signature="e#15461#15505#0" expanded="true" />
+            <element signature="e#15843#16218#0" expanded="true" />
+            <element signature="e#16213#16214#0" expanded="true" />
+            <element signature="e#16831#17468#0" expanded="true" />
+            <element signature="e#17463#17464#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file:///Applications/adt/sdk/sources/android-19/android/preference/EditTextPreference.java">
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/mqtt-client/0.4.1-SNAPSHOT/5c35438f4ff14c186bbb90c130657836e24914db/mqtt-client-0.4.1-SNAPSHOT-sources.jar!/org/eclipse/paho/client/mqttv3/MqttMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.2314816" vertical-offset="2394" max-vertical-offset="3060">
-          <caret line="44" column="13" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/EditIntegerPreference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-17.884615" vertical-offset="0" max-vertical-offset="600">
-          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/mqtt-client/0.4.0/a0228fd9306c10834cd421421e1dce6724ec3131/mqtt-client-0.4.0-sources.jar!/org/eclipse/paho/client/mqttv3/MqttConnectOptions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.307693" vertical-offset="744" max-vertical-offset="6555">
-          <caret line="80" column="22" selection-start-line="80" selection-start-column="16" selection-end-line="80" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/res/layout/preferences_broker.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="73.51852" vertical-offset="2540" max-vertical-offset="3510">
-          <caret line="37" column="24" selection-start-line="37" selection-start-column="24" selection-end-line="37" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/preferences/PreferencesBroker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.230769" vertical-offset="3304" max-vertical-offset="5550">
-          <caret line="277" column="20" selection-start-line="277" selection-start-column="20" selection-end-line="277" selection-end-column="20" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="705" max-vertical-offset="3315">
+          <caret line="47" column="11" selection-start-line="47" selection-start-column="11" selection-end-line="47" selection-end-column="11" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ProxyableService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
-          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="255">
+          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="328" max-vertical-offset="690">
-          <caret line="8" column="1" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Applications/adt/sdk/sources/android-19/java/lang/Number.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3314917" vertical-offset="375" max-vertical-offset="1080">
-          <caret line="50" column="27" selection-start-line="50" selection-start-column="27" selection-end-line="50" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Applications/adt/sdk/sources/android-19/org/json/JSON.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1620">
-          <caret line="18" column="10" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/GeocodableLocation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="1920">
-          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ListIntegerPreference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="298" max-vertical-offset="675">
-          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="690">
+          <caret line="15" column="1" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="67" />
+          <folding>
+            <marker date="1400693150000" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400693150000" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1900,14 +1602,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/fragment_waypoint.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-4.703704" vertical-offset="1538" max-vertical-offset="2370">
           <caret line="111" column="17" selection-start-line="111" selection-start-column="17" selection-end-line="111" selection-end-column="17" />
-          <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file:///Applications/adt/sdk/sources/android-19/android/preference/ListPreference.java">
@@ -1921,7 +1622,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="8195" max-vertical-offset="79020">
           <caret line="644" column="13" selection-start-line="644" selection-start-column="13" selection-end-line="644" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1944,9 +1644,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="1905">
           <caret line="34" column="16" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1954,13 +1651,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="1635">
           <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBindable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="344" max-vertical-offset="1005">
-          <caret line="57" column="15" selection-start-line="57" selection-start-column="15" selection-end-line="57" selection-end-column="15" />
         </state>
       </provider>
     </entry>
@@ -1972,14 +1662,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/activity_export.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="478" max-vertical-offset="1200">
           <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
-          <folding />
         </state>
+      </provider>
+      <provider selected="true" editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file:///Applications/adt/sdk/sources/android-19/org/json/JSONObject.java">
@@ -1993,14 +1682,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6270718" vertical-offset="268" max-vertical-offset="660">
           <caret line="45" column="56" selection-start-line="45" selection-start-column="56" selection-end-line="45" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceProxy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="277" max-vertical-offset="2700">
-          <caret line="55" column="13" selection-start-line="55" selection-start-column="13" selection-end-line="55" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2030,7 +1711,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3323442" vertical-offset="3781" max-vertical-offset="5775">
           <caret line="287" column="27" selection-start-line="287" selection-start-column="16" selection-end-line="287" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2040,165 +1720,6 @@
           <caret line="278" column="37" selection-start-line="278" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="false" />
-            <element signature="e#2480#2496#0" expanded="false" />
-            <element signature="e#2530#2550#0" expanded="false" />
-            <element signature="e#2583#2605#0" expanded="false" />
-            <element signature="e#2901#2921#0" expanded="false" />
-            <element signature="e#2987#3007#0" expanded="false" />
-            <element signature="e#3073#3089#0" expanded="false" />
-            <element signature="e#3147#3163#0" expanded="false" />
-            <element signature="e#3221#3241#0" expanded="false" />
-            <element signature="e#3303#3323#0" expanded="false" />
-            <element signature="e#3385#3403#0" expanded="false" />
-            <element signature="e#3463#3484#0" expanded="false" />
-            <element signature="e#3547#3568#0" expanded="false" />
-            <element signature="e#3631#3646#0" expanded="false" />
-            <element signature="e#3703#3725#0" expanded="false" />
-            <element signature="e#3789#3820#0" expanded="false" />
-            <element signature="e#3893#3920#0" expanded="false" />
-            <element signature="e#3989#4005#0" expanded="false" />
-            <element signature="e#4063#4092#0" expanded="false" />
-            <element signature="e#4163#4197#0" expanded="false" />
-            <element signature="e#4273#4288#0" expanded="false" />
-            <element signature="e#4345#4360#0" expanded="false" />
-            <element signature="e#4417#4446#0" expanded="false" />
-            <element signature="e#4516#4539#0" expanded="false" />
-            <element signature="e#4604#4628#0" expanded="false" />
-            <element signature="e#4698#4722#0" expanded="false" />
-            <element signature="e#4788#4820#0" expanded="false" />
-            <element signature="e#4894#4926#0" expanded="false" />
-            <element signature="e#5000#5039#0" expanded="false" />
-            <element signature="e#5120#5170#0" expanded="false" />
-            <element signature="e#5262#5282#0" expanded="false" />
-            <element signature="e#5348#5375#0" expanded="false" />
-            <element signature="e#5444#5481#0" expanded="false" />
-            <element signature="e#5560#5597#0" expanded="false" />
-            <element signature="e#5676#5705#0" expanded="false" />
-            <element signature="e#5776#5815#0" expanded="false" />
-            <element signature="e#5896#5927#0" expanded="false" />
-            <element signature="e#6297#6317#0" expanded="false" />
-            <element signature="e#6411#6431#0" expanded="false" />
-            <element signature="e#6521#6537#0" expanded="false" />
-            <element signature="e#6624#6640#0" expanded="false" />
-            <element signature="e#6734#6754#0" expanded="false" />
-            <element signature="e#6848#6868#0" expanded="false" />
-            <element signature="e#6957#6975#0" expanded="false" />
-            <element signature="e#7067#7088#0" expanded="false" />
-            <element signature="e#7184#7205#0" expanded="false" />
-            <element signature="e#7291#7306#0" expanded="false" />
-            <element signature="e#7402#7424#0" expanded="false" />
-            <element signature="e#7526#7557#0" expanded="false" />
-            <element signature="e#7655#7682#0" expanded="false" />
-            <element signature="e#7773#7789#0" expanded="false" />
-            <element signature="e#7893#7922#0" expanded="false" />
-            <element signature="e#8031#8065#0" expanded="false" />
-            <element signature="e#8155#8170#0" expanded="false" />
-            <element signature="e#8260#8275#0" expanded="false" />
-            <element signature="e#8378#8407#0" expanded="false" />
-            <element signature="e#8501#8524#0" expanded="false" />
-            <element signature="e#8622#8646#0" expanded="false" />
-            <element signature="e#8745#8769#0" expanded="false" />
-            <element signature="e#8876#8908#0" expanded="false" />
-            <element signature="e#9015#9047#0" expanded="false" />
-            <element signature="e#9161#9200#0" expanded="false" />
-            <element signature="e#9325#9375#0" expanded="false" />
-            <element signature="e#9469#9489#0" expanded="false" />
-            <element signature="e#9591#9618#0" expanded="false" />
-            <element signature="e#9726#9763#0" expanded="false" />
-            <element signature="e#9871#9908#0" expanded="false" />
-            <element signature="e#10012#10041#0" expanded="false" />
-            <element signature="e#10155#10194#0" expanded="false" />
-            <element signature="e#10300#10331#0" expanded="false" />
-            <element signature="e#10452#10483#0" expanded="false" />
-            <element signature="e#10611#10650#0" expanded="false" />
-            <element signature="e#10776#10805#0" expanded="false" />
-            <element signature="e#10929#10960#0" expanded="false" />
-            <element signature="e#11073#11112#0" expanded="false" />
-            <element signature="e#11215#11244#0" expanded="false" />
-            <element signature="e#11346#11380#0" expanded="false" />
-            <element signature="e#11501#11530#0" expanded="false" />
-            <element signature="e#11648#11663#0" expanded="false" />
-            <element signature="e#11764#11793#0" expanded="false" />
-            <element signature="e#11912#11970#0" expanded="false" />
-            <element signature="e#12056#12084#0" expanded="false" />
-            <element signature="e#12172#12203#0" expanded="false" />
-            <element signature="e#12205#12237#0" expanded="false" />
-            <element signature="e#12358#12385#0" expanded="false" />
-            <element signature="e#12403#12431#0" expanded="false" />
-            <element signature="e#12499#12549#0" expanded="false" />
-            <element signature="e#12622#12638#0" expanded="false" />
-            <element signature="e#12753#12803#0" expanded="false" />
-            <element signature="e#12999#13035#0" expanded="false" />
-            <element signature="e#13175#13211#0" expanded="false" />
-            <element signature="e#13318#13368#0" expanded="false" />
-            <element signature="e#13559#13579#0" expanded="false" />
-            <element signature="e#13691#13744#0" expanded="false" />
-            <element signature="e#13820#13868#0" expanded="false" />
-            <element signature="e#13990#14044#0" expanded="false" />
-            <element signature="e#14208#14209#0" expanded="false" />
-            <element signature="e#14252#14253#0" expanded="false" />
-            <element signature="e#14343#14376#0" expanded="false" />
-            <element signature="e#14628#14652#0" expanded="false" />
-            <element signature="e#14825#14841#0" expanded="false" />
-            <element signature="e#14965#14981#0" expanded="false" />
-            <element signature="e#15093#15109#0" expanded="false" />
-            <element signature="e#15111#15128#0" expanded="false" />
-            <element signature="e#15203#15224#0" expanded="false" />
-            <element signature="e#15302#15323#0" expanded="false" />
-            <element signature="e#15325#15347#0" expanded="false" />
-            <element signature="e#15471#15491#0" expanded="false" />
-            <element signature="e#15632#15661#0" expanded="false" />
-            <element signature="e#15770#15804#0" expanded="false" />
-            <element signature="e#15895#15910#0" expanded="false" />
-            <element signature="e#16000#16015#0" expanded="false" />
-            <element signature="e#16118#16147#0" expanded="false" />
-            <element signature="e#16234#16257#0" expanded="false" />
-            <element signature="e#16350#16374#0" expanded="false" />
-            <element signature="e#16526#16550#0" expanded="false" />
-            <element signature="e#16658#16690#0" expanded="false" />
-            <element signature="e#16805#16844#0" expanded="false" />
-            <element signature="e#16970#17020#0" expanded="false" />
-            <element signature="e#17111#17131#0" expanded="false" />
-            <element signature="e#17232#17259#0" expanded="false" />
-            <element signature="e#17361#17398#0" expanded="false" />
-            <element signature="e#17497#17534#0" expanded="false" />
-            <element signature="e#17639#17671#0" expanded="false" />
-            <element signature="e#17762#17789#0" expanded="false" />
-            <element signature="e#17882#17913#0" expanded="false" />
-            <element signature="e#18007#18028#0" expanded="false" />
-            <element signature="e#18111#18129#0" expanded="false" />
-            <element signature="e#18221#18241#0" expanded="false" />
-            <element signature="e#18333#18353#0" expanded="false" />
-            <element signature="e#18439#18455#0" expanded="false" />
-            <element signature="e#18536#18551#0" expanded="false" />
-            <element signature="e#18651#18673#0" expanded="false" />
-            <element signature="e#18908#18953#0" expanded="false" />
-            <element signature="e#19018#19068#0" expanded="false" />
-            <element signature="e#19132#19147#0" expanded="false" />
-            <element signature="e#19149#19165#0" expanded="false" />
-            <element signature="e#19233#19285#0" expanded="false" />
-            <element signature="e#19366#19390#0" expanded="false" />
-            <element signature="e#19538#19588#0" expanded="false" />
-            <element signature="e#19751#19790#0" expanded="false" />
-            <element signature="e#19935#19967#0" expanded="false" />
-            <element signature="e#20105#20137#0" expanded="false" />
-            <element signature="e#20270#20288#0" expanded="false" />
-            <element signature="e#20306#20325#0" expanded="false" />
-            <element signature="e#20404#20425#0" expanded="false" />
-            <element signature="e#20519#20542#0" expanded="false" />
-            <element signature="e#20544#20568#0" expanded="false" />
-            <element signature="e#20641#20656#0" expanded="false" />
-            <element signature="e#20756#20783#0" expanded="false" />
-            <element signature="e#20897#20950#0" expanded="false" />
-            <element signature="e#21014#21061#0" expanded="false" />
-            <element signature="e#21129#21179#0" expanded="false" />
-            <element signature="e#21247#21297#0" expanded="false" />
-            <element signature="e#21369#21423#0" expanded="false" />
-            <element signature="e#21504#21521#0" expanded="false" />
-            <element signature="e#21608#21645#0" expanded="false" />
-            <element signature="e#21647#21685#0" expanded="false" />
-            <element signature="e#21772#21809#0" expanded="false" />
-            <element signature="e#21811#21849#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -2225,28 +1746,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="615" max-vertical-offset="2970">
-          <caret line="86" column="37" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.51359516" vertical-offset="1045" max-vertical-offset="1410">
-          <caret line="121" column="43" selection-start-line="117" selection-start-column="0" selection-end-line="121" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.8846154" vertical-offset="386" max-vertical-offset="1440">
-          <caret line="44" column="17" selection-start-line="44" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/WaypointAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-17.5" vertical-offset="265" max-vertical-offset="900">
@@ -2254,30 +1753,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1620" max-vertical-offset="2175">
-          <caret line="108" column="5" selection-start-line="108" selection-start-column="5" selection-end-line="108" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/fragment_map.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
+      <provider selected="true" editor-type-id="android-designer">
+        <state />
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/xml/preferences.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1298" max-vertical-offset="3750">
           <caret line="104" column="20" selection-start-line="104" selection-start-column="2" selection-end-line="104" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2290,32 +1780,29 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/preferences_licenses.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2505">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/res/layout/fragment_details.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1605">
           <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
         </state>
+      </provider>
+      <provider selected="true" editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/support/ReverseGeocodingTask.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="316" max-vertical-offset="900">
           <caret line="45" column="49" selection-start-line="45" selection-start-column="49" selection-end-line="45" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2327,63 +1814,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4125" max-vertical-offset="7695">
-          <caret line="281" column="38" selection-start-line="281" selection-start-column="38" selection-end-line="281" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5309" max-vertical-offset="8475">
-          <caret line="410" column="25" selection-start-line="410" selection-start-column="23" selection-end-line="410" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2599#2933#0" expanded="false" />
-            <element signature="e#2928#2929#0" expanded="false" />
-            <element signature="e#11611#11612#0" expanded="false" />
-            <element signature="e#11646#11647#0" expanded="false" />
-            <element signature="e#12822#12823#0" expanded="false" />
-            <element signature="e#12841#12842#0" expanded="false" />
-            <element signature="e#12894#12895#0" expanded="false" />
-            <element signature="e#12936#12937#0" expanded="false" />
-            <element signature="e#13026#13027#0" expanded="false" />
-            <element signature="e#13073#13074#0" expanded="false" />
-            <element signature="e#13505#13506#0" expanded="false" />
-            <element signature="e#13565#13566#0" expanded="false" />
-            <element signature="e#13726#13727#0" expanded="false" />
-            <element signature="e#13756#13757#0" expanded="false" />
-            <element signature="e#13804#13805#0" expanded="false" />
-            <element signature="e#13856#13857#0" expanded="false" />
-            <element signature="e#13906#13907#0" expanded="false" />
-            <element signature="e#13957#13958#0" expanded="false" />
-            <element signature="e#14007#14008#0" expanded="false" />
-            <element signature="e#14058#14059#0" expanded="false" />
-            <element signature="e#14491#14501#0" expanded="false" />
-            <element signature="e#15543#15553#0" expanded="false" />
-            <element signature="e#15637#15638#0" expanded="false" />
-            <element signature="e#15675#15676#0" expanded="false" />
-            <element signature="e#15778#15786#0" expanded="false" />
-            <element signature="e#16394#16395#0" expanded="false" />
-            <element signature="e#16451#16452#0" expanded="false" />
-            <element signature="e#17552#17553#0" expanded="false" />
-            <element signature="e#17580#17581#0" expanded="false" />
-            <element signature="e#17617#17618#0" expanded="false" />
-            <element signature="e#17650#17651#0" expanded="false" />
-            <element signature="e#17691#17692#0" expanded="false" />
-            <element signature="e#17755#17756#0" expanded="false" />
-            <element signature="e#17798#17799#0" expanded="false" />
-            <element signature="e#17844#17845#0" expanded="false" />
-            <element signature="e#17887#17888#0" expanded="false" />
-            <element signature="e#17934#17935#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityWaypoints.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="5805">
@@ -2392,20 +1822,139 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java">
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14610">
-          <caret line="871" column="0" selection-start-line="871" selection-start-column="0" selection-end-line="871" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="362">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/mqtt-client/0.4.1-SNAPSHOT/5c35438f4ff14c186bbb90c130657836e24914db/mqtt-client-0.4.1-SNAPSHOT-sources.jar!/org/eclipse/paho/client/mqttv3/internal/ClientComms.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.1346445" vertical-offset="885" max-vertical-offset="9420">
+          <caret line="40" column="13" selection-start-line="40" selection-start-column="13" selection-end-line="40" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/res/menu/activity_wizzard.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="195">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/mqtt-client/0.4.1-SNAPSHOT/5c35438f4ff14c186bbb90c130657836e24914db/mqtt-client-0.4.1-SNAPSHOT-sources.jar!/org/eclipse/paho/client/mqttv3/MqttMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="331" max-vertical-offset="2895">
+          <caret line="47" column="11" selection-start-line="47" selection-start-column="11" selection-end-line="47" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="16" max-vertical-offset="690">
+          <caret line="15" column="1" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="67" />
+          <folding>
+            <marker date="1400693150000" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400693150000" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ProxyableService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="1635">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33114755" vertical-offset="11344" max-vertical-offset="12090">
-          <caret line="797" column="19" selection-start-line="797" selection-start-column="19" selection-end-line="797" selection-end-column="19" />
+        <state vertical-scroll-proportion="-9.307693" vertical-offset="4693" max-vertical-offset="12450">
+          <caret line="331" column="13" selection-start-line="331" selection-start-column="13" selection-end-line="331" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#6202#6222#0" expanded="true" />
+            <element signature="e#8504#8526#0" expanded="true" />
+            <element signature="e#14398#14399#0" expanded="true" />
+            <element signature="e#14470#14471#0" expanded="true" />
+            <element signature="e#15461#15505#0" expanded="true" />
+            <element signature="e#15843#16218#0" expanded="true" />
+            <element signature="e#16213#16214#0" expanded="true" />
+            <element signature="e#16831#17468#0" expanded="true" />
+            <element signature="e#17463#17464#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3323782" vertical-offset="409" max-vertical-offset="1860">
+          <caret line="50" column="16" selection-start-line="50" selection-start-column="16" selection-end-line="50" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/ContactAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.49723756" vertical-offset="0" max-vertical-offset="900">
+          <caret line="25" column="19" selection-start-line="25" selection-start-column="19" selection-end-line="25" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.8846154" vertical-offset="4523" max-vertical-offset="7020">
+          <caret line="363" column="30" selection-start-line="363" selection-start-column="30" selection-end-line="363" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.769231" vertical-offset="623" max-vertical-offset="1485">
+          <caret line="93" column="62" selection-start-line="93" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding>
+            <element signature="e#2751#2752#0" expanded="true" />
+            <element signature="e#2782#2783#0" expanded="true" />
+            <element signature="e#3926#3997#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="615" max-vertical-offset="2970">
+          <caret line="86" column="37" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.7535818" vertical-offset="13094" max-vertical-offset="14415">
+          <caret line="1098" column="55" selection-start-line="1098" selection-start-column="55" selection-end-line="1098" selection-end-column="55" />
+          <folding>
+            <element signature="e#5530#5531#0" expanded="true" />
+            <element signature="e#5552#5553#0" expanded="true" />
+            <element signature="e#9109#9197#0" expanded="true" />
+            <element signature="e#11430#11463#0" expanded="true" />
+            <element signature="e#13671#13688#0" expanded="true" />
+            <element signature="e#24961#24962#0" expanded="true" />
+            <element signature="e#25019#25020#0" expanded="true" />
+            <element signature="e#26848#26877#0" expanded="true" />
           </folding>
         </state>
       </provider>

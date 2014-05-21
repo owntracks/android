@@ -63,42 +63,6 @@ public class ContactAdapter extends MultitypeAdapter{
             return convertView;
         }
     }
-
-
-
-
-//    public static class MyLocationHolder {
-//        TextView myLocation;
-//    }
-//
-//    public class MyLocationDelegateAdapter implements DelegateAdapter {
-//
-//        @Override
-//        public View getView(final int position, View convertView, ViewGroup parent, LayoutInflater inflater, final Pair<Integer, Object> item) {
-//            MyLocationHolder holder;
-//
-//            if (convertView == null) {
-//                holder = new MyLocationHolder();
-//                convertView = inflater.inflate(R.layout.row_mylocation, null);
-//                holder.myLocation = (TextView)convertView.findViewById(R.id.currentLocation);
-//
-//            } else {
-//                holder = (MyLocationHolder)convertView.getTag();
-//            }
-//            convertView.setTag(holder);
-//            if(myLocation != null)
-//                holder.myLocation.setText(myLocation.toString());
-//            else
-//                holder.myLocation.setText(context.getResources().getString(R.string.na));
-//            return convertView;
-//        }
-//    }
-//
-//    public void updateCurrentLocation(GeocodableLocation l) {
-//        myLocation = l;
-//        notifyDataSetChanged();
-//    }
-
 }
 
 

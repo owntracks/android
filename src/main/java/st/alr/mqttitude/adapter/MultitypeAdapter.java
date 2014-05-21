@@ -74,6 +74,10 @@ public abstract class MultitypeAdapter extends BaseAdapter {
         return -1;
     }
 
+    public void clear() {
+
+    }
+
     public void updateItem(Object o){
         int i = findItemIndex(o);
         if (i != -1) {

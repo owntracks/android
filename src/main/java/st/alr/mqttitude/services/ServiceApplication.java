@@ -360,11 +360,9 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateAllContacts() {
-		Iterator<Entry<String, Contact>> it = App.getContactIterator();
+		Iterator<Contact> it = App.getCachedContacts().values().iterator();
 		while (it.hasNext()) {
-			Entry<String, Contact> item = it.next();
-
-			Contact c = item.getValue();
+			Contact c = it.next();
 			resolveContact(c);
 			EventBus.getDefault().post(new Events.ContactUpdated(c));
 		}
