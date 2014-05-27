@@ -30,13 +30,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51addcf9-08bb-4276-93d6-ccca8ec0fc82" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Contact.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Contact.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" afterPath="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/res/menu/activity_main.xml" afterPath="$PROJECT_DIR$/src/main/res/menu/activity_main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/src/main/res/values/strings.xml" />
     </list>
     <ignored path="android.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -102,18 +97,33 @@
       <file leaf-file-name="ServiceBroker.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4965" max-vertical-offset="12810">
+            <state vertical-scroll-proportion="0.0" vertical-offset="4170" max-vertical-offset="11535">
               <caret line="331" column="13" selection-start-line="331" selection-start-column="13" selection-end-line="331" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ActivityLauncher.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ServiceLocator.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.099071205" vertical-offset="3178" max-vertical-offset="8175">
+              <caret line="254" column="9" selection-start-line="254" selection-start-column="9" selection-end-line="254" selection-end-column="9" />
+              <folding>
+                <element signature="e#5433#5434#0" expanded="true" />
+                <element signature="e#5464#5465#0" expanded="true" />
+                <element signature="e#7438#7439#0" expanded="true" />
+                <element signature="e#7469#7470#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ActivityLauncher.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33126935" vertical-offset="2488" max-vertical-offset="2910">
-              <caret line="205" column="52" selection-start-line="205" selection-start-column="52" selection-end-line="205" selection-end-column="52" />
+            <state vertical-scroll-proportion="-8.730769" vertical-offset="2488" max-vertical-offset="2910">
+              <caret line="213" column="13" selection-start-line="213" selection-start-column="13" selection-end-line="213" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -142,8 +152,8 @@
       <file leaf-file-name="ActivityMain.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.038462" vertical-offset="9268" max-vertical-offset="15030">
-              <caret line="749" column="52" selection-start-line="749" selection-start-column="52" selection-end-line="749" selection-end-column="52" />
+            <state vertical-scroll-proportion="-8.730769" vertical-offset="10123" max-vertical-offset="15030">
+              <caret line="810" column="43" selection-start-line="810" selection-start-column="43" selection-end-line="810" selection-end-column="43" />
               <folding>
                 <element signature="e#3848#3868#0" expanded="true" />
                 <element signature="e#9340#9428#0" expanded="true" />
@@ -163,9 +173,9 @@
                 <element signature="e#17740#17741#0" expanded="true" />
                 <element signature="e#20717#20718#0" expanded="true" />
                 <element signature="e#20763#20764#0" expanded="true" />
-                <element signature="e#27719#27748#0" expanded="true" />
-                <element signature="e#31815#31816#0" expanded="true" />
-                <element signature="e#31896#31897#0" expanded="true" />
+                <element signature="e#27712#27741#0" expanded="true" />
+                <element signature="e#31808#31809#0" expanded="true" />
+                <element signature="e#31889#31890#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -197,19 +207,6 @@
             <state vertical-scroll-proportion="-4.1153846" vertical-offset="2758" max-vertical-offset="6840">
               <caret line="239" column="0" selection-start-line="239" selection-start-column="0" selection-end-line="239" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ServiceLocator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.730769" vertical-offset="2008" max-vertical-offset="8400">
-              <caret line="189" column="30" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
-              <folding>
-                <element signature="e#10104#10105#0" expanded="true" />
-                <element signature="e#10135#10136#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -1057,11 +1054,11 @@
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java" />
         <option value="$PROJECT_DIR$/src/main/res/menu/activity_main.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Contact.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceApplication.java" />
-        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" />
         <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java" />
+        <option value="$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java" />
       </list>
     </option>
   </component>
@@ -1931,14 +1928,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4965" max-vertical-offset="12810">
-          <caret line="331" column="13" selection-start-line="331" selection-start-column="13" selection-end-line="331" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/adapter/MultitypeAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3323782" vertical-offset="409" max-vertical-offset="1860">
@@ -1977,10 +1966,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="553" max-vertical-offset="1440">
+          <caret line="97" column="23" selection-start-line="97" selection-start-column="23" selection-end-line="97" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Contact.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1320" max-vertical-offset="1965">
+          <caret line="143" column="0" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.730769" vertical-offset="2488" max-vertical-offset="2910">
+          <caret line="213" column="13" selection-start-line="213" selection-start-column="13" selection-end-line="213" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityMain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.038462" vertical-offset="9268" max-vertical-offset="15030">
-          <caret line="749" column="52" selection-start-line="749" selection-start-column="52" selection-end-line="749" selection-end-column="52" />
+        <state vertical-scroll-proportion="-8.730769" vertical-offset="10123" max-vertical-offset="15030">
+          <caret line="810" column="43" selection-start-line="810" selection-start-column="43" selection-end-line="810" selection-end-column="43" />
           <folding>
             <element signature="e#3848#3868#0" expanded="true" />
             <element signature="e#9340#9428#0" expanded="true" />
@@ -2000,26 +2013,10 @@
             <element signature="e#17740#17741#0" expanded="true" />
             <element signature="e#20717#20718#0" expanded="true" />
             <element signature="e#20763#20764#0" expanded="true" />
-            <element signature="e#27719#27748#0" expanded="true" />
-            <element signature="e#31815#31816#0" expanded="true" />
-            <element signature="e#31896#31897#0" expanded="true" />
+            <element signature="e#27712#27741#0" expanded="true" />
+            <element signature="e#31808#31809#0" expanded="true" />
+            <element signature="e#31889#31890#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="553" max-vertical-offset="1440">
-          <caret line="97" column="23" selection-start-line="97" selection-start-column="23" selection-end-line="97" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/model/Contact.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1320" max-vertical-offset="1965">
-          <caret line="143" column="0" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2031,22 +2028,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceBroker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.730769" vertical-offset="2008" max-vertical-offset="8400">
-          <caret line="189" column="30" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
-          <folding>
-            <element signature="e#10104#10105#0" expanded="true" />
-            <element signature="e#10135#10136#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="4965" max-vertical-offset="12810">
+          <caret line="331" column="13" selection-start-line="331" selection-start-column="13" selection-end-line="331" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/ActivityLauncher.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/st/alr/mqttitude/services/ServiceLocator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33126935" vertical-offset="2488" max-vertical-offset="2910">
-          <caret line="205" column="52" selection-start-line="205" selection-start-column="52" selection-end-line="205" selection-end-column="52" />
-          <folding />
+        <state vertical-scroll-proportion="0.099071205" vertical-offset="3178" max-vertical-offset="8175">
+          <caret line="254" column="9" selection-start-line="254" selection-start-column="9" selection-end-line="254" selection-end-column="9" />
+          <folding>
+            <element signature="e#5433#5434#0" expanded="true" />
+            <element signature="e#5464#5465#0" expanded="true" />
+            <element signature="e#7438#7439#0" expanded="true" />
+            <element signature="e#7469#7470#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

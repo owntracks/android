@@ -787,7 +787,6 @@ public class ActivityMain extends FragmentActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			handler = new StaticHandler(this);
-            EventBus.getDefault().registerSticky(this);
         }
 
         @Override
@@ -809,6 +808,7 @@ public class ActivityMain extends FragmentActivity {
             });
 
             registerForContextMenu(this.list);
+            EventBus.getDefault().register(this);
 
 
             return v;
@@ -905,7 +905,7 @@ public class ActivityMain extends FragmentActivity {
 
 		public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
-                setListAdapter(false);
+                setListAdapter(true);
 		}
 
 		public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
