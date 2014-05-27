@@ -141,7 +141,6 @@ public class Contact {
 	public static Bitmap resolveImage(ContentResolver cr, long id) {
 		Uri uri = ContentUris.withAppendedId(
 				ContactsContract.Contacts.CONTENT_URI, id);
-		Log.v("loadContactPhoto", "using URI " + uri);
 		InputStream input = ContactsContract.Contacts
 				.openContactPhotoInputStream(cr, uri);
 		if (input == null) {

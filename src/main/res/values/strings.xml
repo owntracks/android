@@ -245,5 +245,7 @@
     <string name="preferencesImportClipboard">Import from clipboard</string>
     <string name="preferencesImportClipboardSummary">Import preferences from file</string>
     <string name="contactLocationUnknown">No location known for this contact</string>
+    <string name="develop_1">Develop 1</string>
+    <string name="develop_2">Develop 2</string>
 
 </resources>

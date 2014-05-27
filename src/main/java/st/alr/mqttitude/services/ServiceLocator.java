@@ -187,9 +187,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void setupBackgroundLocationRequest() {
-		Log.v(this.toString(), "setupBackgroundLocationRequest with profile: "
-				+ Preferences.getLocatorAccuracyBackground());
-
 		this.mLocationRequest = LocationRequest.create();
 
         if(Preferences.getLocatorAccuracyBackground() == 0) {
@@ -312,7 +309,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	public void enableBackgroundMode() {
-		Log.d(this.toString(), "enableBackgroundMode");
 		this.foreground = false;
 		setupLocationRequest();
 		requestLocationUpdates();
@@ -322,7 +318,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 	@Override
 	public void onDestroy() {
-		Log.v(this.toString(), "onDestroy. Disabling location updates");
 		disableLocationUpdates();
 	}
 

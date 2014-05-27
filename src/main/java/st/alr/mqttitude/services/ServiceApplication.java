@@ -128,7 +128,6 @@ public class ServiceApplication implements ProxyableService,
 		Contact c = App.getContact(e.getTopic());
 
 		if (c == null) {
-			Log.v(this.toString(), "Allocating new contact for " + e.getTopic());
 			c = new st.alr.mqttitude.model.Contact(e.getTopic());
 			resolveContact(c);
             c.setLocation(e.getGeocodableLocation());
@@ -238,7 +237,6 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateTicker(String text) {
-		Log.v(this.toString(), "Updating ticker with " + text);
 		notificationBuilder.setTicker(text
 				+ ((this.even = this.even ? false : true) ? " " : ""));
 		notificationBuilder.setSmallIcon(R.drawable.ic_notification);
@@ -371,7 +369,7 @@ public class ServiceApplication implements ProxyableService,
 
 	/*
 	 * Resolves username and image either from a locally saved mapping or from
-	 * synced cloud contacts. If no mapping is found, no mame is set and the
+	 * synced cloud contacts. If no mapping is found, no name is set and the
 	 * default image is assumed
 	 */
 	void resolveContact(Contact c) {
@@ -380,15 +378,11 @@ public class ServiceApplication implements ProxyableService,
 		boolean found = false;
 
 		if (contactId <= 0) {
-			Log.v(this.toString(),
-					"contactId could not be resolved for " + c.getTopic());
 			setContactImageAndName(c, null, null);
 			return;
-		} else {
-			Log.v(this.toString(), "contactId for " + c.getTopic()
-					+ " was resolved to " + contactId);
 		}
 
+        // Resolve image and name from contact id
 		Cursor cursor = this.context.getContentResolver().query(
 				RawContacts.CONTENT_URI, null,
 				ContactsContract.Data.CONTACT_ID + " = ?",
@@ -396,14 +390,8 @@ public class ServiceApplication implements ProxyableService,
 		if (!cursor.isAfterLast()) {
 
 			while (cursor.moveToNext()) {
-				Bitmap image = Contact.resolveImage(
-						this.context.getContentResolver(), contactId);
-				String displayName = cursor
-						.getString(cursor
-								.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
-				Log.v(this.toString(), "Resolved display Name: " + displayName
-						+ ", image: " + image + " for topic " + c.getTopic());
+				Bitmap image = Contact.resolveImage(this.context.getContentResolver(), contactId);
+				String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 				c.setName(displayName);
 				c.setUserImage(image);
 				found = true;
