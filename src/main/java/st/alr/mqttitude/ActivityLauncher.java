@@ -103,9 +103,7 @@ public class ActivityLauncher extends FragmentActivity {
 			int resultCode = GooglePlayServicesUtil
 					.isGooglePlayServicesAvailable(this);
 
-			Log.e("checkPlayServices",
-					"Google Play services not available. Result code "
-							+ resultCode);
+			Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
 
 			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 
@@ -177,7 +175,7 @@ public class ActivityLauncher extends FragmentActivity {
 
 	private void launchChecksComplete() {
 		Log.v(this.toString(),
-				"Launch checks complete. Starting application service");
+				"Launch checks complete");
 		Intent i = new Intent(this, ServiceProxy.class);
 		startService(i);
 		this.serviceApplicationConnection = new ServiceConnection() {
@@ -206,8 +204,6 @@ public class ActivityLauncher extends FragmentActivity {
 	}
 
 	public void startActivityFromClass(Class<?> c) {
-		Log.v(this.toString(), "Starting activity for class" + c.toString());
-
 		Intent intent = new Intent(this.context, c);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
 				| Intent.FLAG_ACTIVITY_NEW_TASK);

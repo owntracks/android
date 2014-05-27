@@ -13,6 +13,7 @@ import st.alr.mqttitude.adapter.ContactAdapter;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.preferences.ActivityPreferences;
+import st.alr.mqttitude.services.ServiceApplication;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -265,6 +266,12 @@ public class ActivityMain extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+
+        if(!App.isDebugBuild()) {
+            menu.findItem(R.id.menu_develop_1).setVisible(false);
+            menu.findItem(R.id.menu_develop_2).setVisible(false);
+
+        }
 		return true;
 	}
 
@@ -352,38 +359,46 @@ public class ActivityMain extends FragmentActivity {
 			this.share(null);
 			return true;
 		} else if (itemId == R.id.menu_waypoints) {
-			Intent intent1 = new Intent(this, ActivityWaypoints.class);
-			startActivity(intent1);
-			return true;
-		} else {
+            Intent intent1 = new Intent(this, ActivityWaypoints.class);
+            startActivity(intent1);
+            return true;
+        } else if (itemId == R.id.menu_develop_1) {
+            devMenu1();
+            return true;
+        } else if (itemId == R.id.menu_develop_2) {
+            devMenu2();
+            return true;
+        } else {
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	public void share(View view) {
+
+    public void share(View view) {
 		ServiceProxy.runOrBind(this, new Runnable() {
 
-			@Override
-			public void run() {
-				GeocodableLocation l = ServiceProxy.getServiceLocator()
-						.getLastKnownLocation();
-				if (l == null) {
-					App.showLocationNotAvailableToast();
-					return;
-				}
+            @Override
+            public void run() {
+                GeocodableLocation l = ServiceProxy.getServiceLocator()
+                        .getLastKnownLocation();
+                if (l == null) {
+                    App.showLocationNotAvailableToast();
+                    return;
+                }
 
-				Intent sendIntent = new Intent();
-				sendIntent.setAction(Intent.ACTION_SEND);
-				sendIntent.putExtra(
-						Intent.EXTRA_TEXT,
-						"http://maps.google.com/?q="
-								+ Double.toString(l.getLatitude()) + ","
-								+ Double.toString(l.getLongitude()));
-				sendIntent.setType("text/plain");
-				startActivity(Intent.createChooser(sendIntent,
-						getString(R.string.shareLocation)));
-			}
-		});
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        "http://maps.google.com/?q="
+                                + Double.toString(l.getLatitude()) + ","
+                                + Double.toString(l.getLongitude())
+                );
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent,
+                        getString(R.string.shareLocation)));
+            }
+        });
 
 	}
 
@@ -396,11 +411,11 @@ public class ActivityMain extends FragmentActivity {
 		// Context.BIND_AUTO_CREATE);
 		ServiceProxy.runOrBind(this, new Runnable() {
 
-			@Override
-			public void run() {
-				ServiceProxy.getServiceLocator().enableForegroundMode();
-			}
-		});
+            @Override
+            public void run() {
+                ServiceProxy.getServiceLocator().enableForegroundMode();
+            }
+        });
 	}
 
 	@Override
@@ -732,8 +747,9 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void clearMap() {
+                Log.v(this.toString(), "Clearing map");
                 markerToContacts.clear();
-                mMapView.invalidate();
+                mMapView.getMap().clear();
                 this.selectedContactDetails.setVisibility(View.GONE);
         }
 
@@ -1097,9 +1113,8 @@ public class ActivityMain extends FragmentActivity {
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             // Contact will be cleared, close this view
-            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING) {
+            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
                 FragmentHandler.getInstance().back(getActivity());
-            }
 
         }
 
@@ -1113,4 +1128,13 @@ public class ActivityMain extends FragmentActivity {
 
 
 	}
+
+    // Developer menu options to quickly trigger code in order to test things
+    private void devMenu1() {
+        Log.i(this.toString(), "Developer quickaccess option 1 selected");
+        ServiceProxy.getServiceBroker().reconnect();
+    }
+    private void devMenu2() {
+        Log.i(this.toString(), "Developer quickaccess option 2 selected");
+    }
 }
