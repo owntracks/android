@@ -161,9 +161,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	@Override
 	public void onConnected(Bundle arg0) {
 		this.ready = true;
-
-		Log.v(this.toString(), "Connected");
-
 		initLocationRequest();
 		initGeofences();
 	}
@@ -499,7 +496,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		Log.v(this.toString(), "Adding" + fences.size() + " geofences");
+		Log.v(this.toString(), "Adding " + fences.size() + " geofences");
 		this.mLocationClient.addGeofences(fences, ServiceProxy
 				.getPendingIntentForService(this.context,
 						ServiceProxy.SERVICE_LOCATOR,
