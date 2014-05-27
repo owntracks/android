@@ -90,9 +90,10 @@ public class App extends Application {
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-        Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
-        if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+        if(e.getState() == Defaults.State.ServiceBroker.CONNECTING) {
+            Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
             instance.contacts.clear();
+        }
     }
 
     public static void addContact(Contact c) {
