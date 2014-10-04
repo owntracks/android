@@ -30,6 +30,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Owntracks with IM name set to the topic) -->
     <uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- To save contact links -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/> <!-- For BLE beacon detection -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>  <!-- For BLE beacon detection -->
 
     <application
         android:name="st.alr.mqttitude.App"
