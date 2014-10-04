@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.2'
     }
 }
 
@@ -12,7 +12,10 @@ apply plugin: 'android'
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
+    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }		
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
@@ -23,11 +26,13 @@ dependencies {
     compile 'de.greenrobot:greendao:1.3.7'
     compile 'org.eclipse.paho:mqtt-client:0.4.0'
     compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.android.support:appcompat-v7:19.+'
+	compile 'org.altbeacon:android-beacon-library:2+@aar'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 11

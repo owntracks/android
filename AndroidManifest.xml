@@ -95,10 +95,10 @@
             android:name="st.alr.mqttitude.ActivityWizzard"
             android:label="@string/title_activity_activity_wizzard" >
         </activity>
-        <activity
-            android:name="st.alr.mqttitude.preferences.ActivityExport"
-            android:label="@string/title_activity_activity_export" >
-        </activity>
+        <!--<activity-->
+            <!--android:name="st.alr.mqttitude.preferences.ActivityExport"-->
+            <!--android:label="@string/title_activity_activity_export" >-->
+        <!--</activity>-->
     </application>
 
 </manifest>
