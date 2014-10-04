@@ -129,7 +129,4 @@ public class App extends Application {
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
 	}
-
-
-
 }
