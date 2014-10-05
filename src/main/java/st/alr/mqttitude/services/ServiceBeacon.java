@@ -13,6 +13,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
@@ -27,6 +28,9 @@ import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ServiceMqttCallbacks;
+
+// Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
+//  -> https://github.com/AltBeacon/spec
 
 public class ServiceBeacon implements
         ProxyableService, ServiceMqttCallbacks,
@@ -88,7 +92,8 @@ public class ServiceBeacon implements
                     beacon.getManufacturer(),
                     beacon.getBluetoothAddress(),
                     beacon.getBeaconTypeCode(),
-                    beacon.getTxPower());
+                    beacon.getTxPower(),
+                    System.currentTimeMillis());
 
             publishBeaconMessage(r);
         }
@@ -102,6 +107,10 @@ public class ServiceBeacon implements
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
         //mBeaconManager.setDebug(true);
+
+
+        mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
         //mBackgroundPowerSaver = new BackgroundPowerSaver(this.context);
 

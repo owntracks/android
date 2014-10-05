@@ -7,6 +7,8 @@ import st.alr.mqttitude.support.StringifiedJSONObject;
 
 import android.util.Log;
 
+import java.util.concurrent.TimeUnit;
+
 public class BeaconMessage {
 
     private Identifier uuid;
@@ -19,10 +21,11 @@ public class BeaconMessage {
     private String bluetoothAddress;
     private int beaconTypeCode;
     private int txPower;
+    private long time;
 
     public BeaconMessage(Identifier uuid, Identifier major, Identifier minor, int rssi,
                          double distance, String bluetoothName, int manufacturer,
-                         String bluetoothAddress, int beaconTypeCode, int txPower) {
+                         String bluetoothAddress, int beaconTypeCode, int txPower, long time) {
         this.uuid = uuid;
         this.major = major;
         this.minor = minor;
@@ -33,6 +36,7 @@ public class BeaconMessage {
         this.bluetoothAddress = bluetoothAddress;
         this.beaconTypeCode = beaconTypeCode;
         this.txPower = txPower;
+        this.time = time;
     }
 
     @Override
@@ -45,16 +49,22 @@ public class BeaconMessage {
 
         try {
             json.put("_type", "beacon")
+
+                    // Same as iBeacon report
                     .put("uuid", this.uuid)
                     .put("major", this.major)
                     .put("minor", this.minor)
+                    .put("tst", this.time)
                     .put("rssi", this.rssi)
-                    .put("dist", this.distance)
-                    .put("name", this.bluetoothName)
-                    .put("mfr", this.manufacturer)
-                    .put("addr", this.bluetoothAddress)
-                    .put("type", this.beaconTypeCode)
-                    .put("txpwr", this.txPower);
+
+                    // Differs here
+                    .put("dist", this.distance) // distance in meters
+                    .put("txpwr", this.txPower); // txPower + rssi can be used to calc distance
+
+                    //.put("name", this.bluetoothName)
+                    //.put("mfr", this.manufacturer)
+                    //.put("addr", this.bluetoothAddress)
+                    //.put("type", this.beaconTypeCode)
         } catch (JSONException e) {
 
         }
