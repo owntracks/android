@@ -32,11 +32,13 @@ public class Contact {
 	private String topic;
 	private GeocodableLocation location;
 	private Bitmap userImage;
+    private BitmapDescriptor userImageDescriptor;
 	private static final int userImageHeightScale = (int) convertDpToPixel(48);
 	public static Bitmap defaultUserImage = getRoundedShape(Bitmap
 			.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy
 					.getInstance().getResources(), R.drawable.noimage),
 					userImageHeightScale, userImageHeightScale, true));
+    private static BitmapDescriptor defaultUserImageDescriptor = BitmapDescriptorFactory.fromBitmap(defaultUserImage);
 
 	private Marker marker;
 	private View view;
@@ -104,9 +106,8 @@ public class Contact {
 	}
 
 	public void setUserImage(Bitmap image) {
-		this.userImage = image != null ? getRoundedShape(Bitmap
-				.createScaledBitmap(image, userImageHeightScale,
-						userImageHeightScale, true)) : null;
+		this.userImage = image != null ? getRoundedShape(Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true)) : null;
+        this.userImageDescriptor = image != null ? BitmapDescriptorFactory.fromBitmap(userImage) : null;
 	}
 
 	public Bitmap getUserImage() {
@@ -114,9 +115,7 @@ public class Contact {
 	}
 
 	public BitmapDescriptor getUserImageDescriptor() {
-		return this.userImage != null ? BitmapDescriptorFactory
-				.fromBitmap(getUserImage()) : BitmapDescriptorFactory
-				.fromBitmap(defaultUserImage);
+		return this.userImage != null ? userImageDescriptor : defaultUserImageDescriptor;
 	}
 
 	public void setTopic(String topic) {

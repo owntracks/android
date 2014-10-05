@@ -157,10 +157,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			if (isOnline()) {
 				Log.v(this.toString(), "handleStart: isOnline() == true");
 
-				if (connect()) {
-					Log.v(this.toString(), "handleStart: connect() == true");
+				if (connect())
 					onConnect();
-				}
+
 			} else {
 				Log.e(this.toString(), "handleStart: isDisconnected() == false");
 				changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
@@ -246,7 +245,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private boolean connect() {
 		this.workerThread = Thread.currentThread(); // We connect, so we're the
 													// worker thread
-		Log.v(this.toString(), "connect");
 		this.error = null; // clear previous error on connect
 		init();
 
@@ -327,23 +325,27 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         try {
             unsubscribe();
 
-            subscribe(Preferences.getBaseTopic());
-
             if (Preferences.getSub())
-                subscribe(Preferences.getSubTopic(true));
-
+                subscribe(new String[]{Preferences.getSubTopic(true), Preferences.getBaseTopic()});
+            else
+                subscribe(new String[]{Preferences.getBaseTopic()});
 
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    private void subscribe(String topic) throws MqttException{
+    private void subscribe(String topic) throws MqttException {
+        subscribe(new String[]{topic});
+    }
+
+    private void subscribe(String[] topics) throws MqttException{
         if(!isConnected())
             return;
 
-        this.mqttClient.subscribe(topic);
-        subscribtions.push(topic);
+        this.mqttClient.subscribe(topics);
+        for (int i = 0; i < topics.length; i++)
+           subscribtions.push(topics[i]);
     }
     private void unsubscribe() throws MqttException{
         if(!isConnected())
@@ -548,6 +550,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			final boolean retained, final int qos, final int timeout,
 			final ServiceMqttCallbacks callback, final Object extra) {
 
+        Log.v(this.toString(), "Publishing: " + payload);
 		publish(new DeferredPublishable(topic, payload, retained, qos, timeout,
 				callback, extra));
 
