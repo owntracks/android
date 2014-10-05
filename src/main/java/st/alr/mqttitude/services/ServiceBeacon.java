@@ -1,46 +1,32 @@
 package st.alr.mqttitude.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import st.alr.mqttitude.App;
-import st.alr.mqttitude.R;
-import st.alr.mqttitude.messages.BeaconMessage;
-import st.alr.mqttitude.support.Defaults;
-import st.alr.mqttitude.support.Events;
-import st.alr.mqttitude.support.ServiceMqttCallbacks;
-import st.alr.mqttitude.support.Preferences;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 
-import de.greenrobot.event.EventBus;
-
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
+
+import java.util.Collection;
+
+import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.messages.BeaconMessage;
+import st.alr.mqttitude.support.Defaults;
+import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.Preferences;
+import st.alr.mqttitude.support.ServiceMqttCallbacks;
 
 public class ServiceBeacon implements
         ProxyableService, ServiceMqttCallbacks,
@@ -88,18 +74,10 @@ public class ServiceBeacon implements
 
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> arg0, Region arg1) {
-        Log.d(this.toString(), "Found beacon(s)");
-//        "_type":"beacon",
-//        "uuid":"CA271EAE-5FA8-4E80-8F08-2A302A95A959",
-//        "major":1,
-//        "minor":1,
-//        "tst":"1399028969",
-//        "acc":n,
-//        "rssi":n,
-//        "prox":n,
-
         for(Beacon beacon : arg0)
         {
+            Log.d(this.toString(), "Found beacon: " + beacon.getId1());
+
             BeaconMessage r = new BeaconMessage(
                     beacon.getId1(),
                     beacon.getId2(),
@@ -111,20 +89,8 @@ public class ServiceBeacon implements
                     beacon.getBluetoothAddress(),
                     beacon.getBeaconTypeCode(),
                     beacon.getTxPower());
-            publishBeaconMessage(r);
 
-            Log.d(this.toString(), "uuid " + beacon.getId1());
-            Log.d(this.toString(), "major " + beacon.getId2());
-            Log.d(this.toString(), "minor " + beacon.getId3());
-            Log.d(this.toString(), "tst " + "not supported");
-            Log.d(this.toString(), "acc " + "not supported");
-            Log.d(this.toString(), "rssi " + beacon.getRssi());
-            Log.d(this.toString(), "dist " + beacon.getDistance());
-            Log.d(this.toString(), "name " + beacon.getBluetoothName());
-            Log.d(this.toString(), "manu " + beacon.getManufacturer());
-            Log.d(this.toString(), "btaddr " + beacon.getBluetoothAddress());
-            Log.d(this.toString(), "type " + beacon.getBeaconTypeCode());
-            Log.d(this.toString(), "txpwr " + beacon.getTxPower());
+            publishBeaconMessage(r);
         }
     }
 
@@ -162,17 +128,6 @@ public class ServiceBeacon implements
         ServiceProxy.getServiceBroker().publish(topic, r.toString(),
                 Preferences.getPubRetain(), Preferences.getPubQos(), 20, this, r);
 
-    }
-
-    private boolean shouldPublishBeacon() {
-        if (this.lastPublish == 0)
-            return true;
-
-        if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES
-                .toMillis(Preferences.getPubInterval()))
-            return true;
-
-        return false;
     }
 
     @Override
