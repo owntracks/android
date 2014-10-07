@@ -61,6 +61,7 @@ public class BeaconMessage {
                     .put("dist", this.distance) // distance in meters
                     .put("txpwr", this.txPower); // txPower + rssi can be used to calc distance
 
+                    // Potentially useful for debugging
                     //.put("name", this.bluetoothName)
                     //.put("mfr", this.manufacturer)
                     //.put("addr", this.bluetoothAddress)
