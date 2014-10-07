@@ -188,6 +188,13 @@ public class Preferences {
         setBoolean(R.string.keyRemoteCommandDump, aBoolean);
     }
 
+    public static void setCleanSession(boolean aBoolean) {
+        setBoolean(R.string.keyCleanSession, aBoolean);
+    }
+    public static boolean getCleanSession() {
+        return getBoolean(R.string.keyCleanSession,R.bool.valCleanSession);
+    }
+
     public static boolean getConnectionAdvancedMode() {
         return getBoolean(R.string.keyConnectionAdvancedMode, R.bool.valConnectionAdvancedMode);
     }
