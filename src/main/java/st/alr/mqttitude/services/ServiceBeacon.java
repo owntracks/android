@@ -14,9 +14,9 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.BleNotAvailableException;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
-import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
@@ -40,7 +40,7 @@ public class ServiceBeacon implements
 
     private SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
-    private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
+    private static Defaults.State.ServiceBeacon state = Defaults.State.ServiceBeacon.INITIAL;
     private ServiceProxy context;
 
     private boolean ready = false;
@@ -50,19 +50,17 @@ public class ServiceBeacon implements
     private RegionBootstrap regionBootstrap;
     private Region region;
     private BeaconManager mBeaconManager;
-    private BackgroundPowerSaver mBackgroundPowerSaver;
 
     @Override
     public void didDetermineStateForRegion(int arg0, Region arg1) {
-        Log.d(this.toString(), "Got a didDetermineStateForRegion call");
-        Log.d(this.toString(), "State: " + arg1.getUniqueId() + ", " + arg1.toString());
+        Log.v(this.toString(), "didDetermineStateForRegion: " + arg1.getUniqueId() + ", " + arg1.toString());
     }
 
     @Override
     public void didEnterRegion(Region arg0) {
         Log.d(this.toString(), "Region entered: " + arg0.getUniqueId() + ", " + arg0.toString());
         try {
-            Log.d(this.toString(), "Beginning ranging");
+            Log.v(this.toString(), "Beginning ranging");
             mBeaconManager.startRangingBeaconsInRegion(region);
             mBeaconManager.setRangeNotifier(this);
         } catch (RemoteException e) {
@@ -72,8 +70,7 @@ public class ServiceBeacon implements
 
     @Override
     public void didExitRegion(Region arg0) {
-        Log.d(this.toString(), "Got a didExitRegion call");
-        Log.d(this.toString(), "Region exited: " + arg0.getUniqueId() + ", " + arg0.toString());
+        Log.v(this.toString(), "didExitRegion: " + arg0.getUniqueId() + ", " + arg0.toString());
     }
 
     @Override
@@ -106,15 +103,33 @@ public class ServiceBeacon implements
         this.lastPublish = 0;
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
-        //mBeaconManager.setDebug(true);
 
+        try
+        {
+            if(!mBeaconManager.checkAvailability()) {
+                changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
+                Log.e(this.toString(), "Bluetooth not available");
+                return;
+            }
+        }
+        catch (BleNotAvailableException e)
+        {
+            changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
+            Log.e(this.toString(), "Bluetooth not available");
+            return;
+        }
 
+        // Should add prefs for these
+        mBeaconManager.setBackgroundBetweenScanPeriod(30000L);  // default is 300000L
+        mBeaconManager.setBackgroundScanPeriod(2000L);          // default is 10000L
+        mBeaconManager.setForegroundBetweenScanPeriod(0L);      // default is 0L
+        mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
+
+        // Not sure that we can publish this without violating Apple IP.
         mBeaconManager.getBeaconParsers().add(new BeaconParser().
                 setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
-        //mBackgroundPowerSaver = new BackgroundPowerSaver(this.context);
-
-        // wake up the app when any beacon is seen (you can specify specific id filers in the parameters below)
+        // Detect all valid beacons
         region = new Region("all beacons", null, null, null);
         regionBootstrap = new RegionBootstrap(this, region);
     }
@@ -130,7 +145,7 @@ public class ServiceBeacon implements
 
         String topic = Preferences.getPubTopicBase(true);
         if (topic == null) {
-            changeState(Defaults.State.ServiceLocator.NOTOPIC);
+            changeState(Defaults.State.ServiceBeacon.NOTOPIC);
             return;
         }
 
@@ -169,7 +184,7 @@ public class ServiceBeacon implements
     public void onDestroy() {
     }
 
-    public static Defaults.State.ServiceLocator getState() {
+    public static Defaults.State.ServiceBeacon getState() {
         return state;
     }
 
@@ -177,15 +192,15 @@ public class ServiceBeacon implements
         return stateAsString(getState(), c);
     }
 
-    public static String stateAsString(Defaults.State.ServiceLocator state,
+    public static String stateAsString(Defaults.State.ServiceBeacon state,
                                        Context c) {
         return Defaults.State.toString(state, c);
     }
 
-    private void changeState(Defaults.State.ServiceLocator newState) {
-        Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
+    private void changeState(Defaults.State.ServiceBeacon newState) {
+        Log.d(this.toString(), "ServiceBeacon state changed to: " + newState);
         EventBus.getDefault().postSticky(
-                new Events.StateChanged.ServiceLocator(newState));
+                new Events.StateChanged.ServiceBeacon(newState));
         state = newState;
     }
 
@@ -201,17 +216,17 @@ public class ServiceBeacon implements
 
     @Override
     public void publishFailed(Object extra) {
-        changeState(Defaults.State.ServiceLocator.PUBLISHING_TIMEOUT);
+        changeState(Defaults.State.ServiceBeacon.PUBLISHING_TIMEOUT);
     }
 
     @Override
     public void publishing(Object extra) {
-        changeState(Defaults.State.ServiceLocator.PUBLISHING);
+        changeState(Defaults.State.ServiceBeacon.PUBLISHING);
     }
 
     @Override
     public void publishWaiting(Object extra) {
-        changeState(Defaults.State.ServiceLocator.PUBLISHING_WAITING);
+        changeState(Defaults.State.ServiceBeacon.PUBLISHING_WAITING);
     }
 
     public long getLastPublishDate() {
@@ -226,7 +241,7 @@ public class ServiceBeacon implements
     }
 
     @Override
-    public Context getApplicationContext() { // FLAT WRONG (I think?)
+    public Context getApplicationContext() {
         return this.context;
     }
 }
