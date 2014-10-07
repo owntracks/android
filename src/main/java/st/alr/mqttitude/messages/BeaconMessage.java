@@ -22,10 +22,12 @@ public class BeaconMessage {
     private int beaconTypeCode;
     private int txPower;
     private long time;
+    private int proximity;
 
     public BeaconMessage(Identifier uuid, Identifier major, Identifier minor, int rssi,
                          double distance, String bluetoothName, int manufacturer,
-                         String bluetoothAddress, int beaconTypeCode, int txPower, long time) {
+                         String bluetoothAddress, int beaconTypeCode, int txPower, long time,
+                         int proximity) {
         this.uuid = uuid;
         this.major = major;
         this.minor = minor;
@@ -37,6 +39,7 @@ public class BeaconMessage {
         this.beaconTypeCode = beaconTypeCode;
         this.txPower = txPower;
         this.time = time;
+        this.proximity = proximity;
     }
 
     @Override
@@ -56,8 +59,10 @@ public class BeaconMessage {
                     .put("minor", this.minor)
                     .put("tst", this.time)
                     .put("rssi", this.rssi)
+                    .put("acc", -1)
+                    .put("prox", proximity)
 
-                    // Differs here
+                    // Provide some additional info
                     .put("dist", this.distance) // distance in meters
                     .put("txpwr", this.txPower); // txPower + rssi can be used to calc distance
 

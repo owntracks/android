@@ -79,6 +79,18 @@ public class ServiceBeacon implements
         {
             Log.d(this.toString(), "Found beacon: " + beacon.getId1());
 
+            int proximity = 0;
+            double distance = beacon.getDistance();
+
+            // Calculate proximity
+            if(distance < 1) // Under 1 meter: immediate
+                proximity = 1;
+            else if(distance < 5) // Under 4 meters: near
+                proximity = 2;
+            else
+                proximity = 3; // More than 4 meters: far
+
+
             BeaconMessage r = new BeaconMessage(
                     beacon.getId1(),
                     beacon.getId2(),
@@ -90,7 +102,8 @@ public class ServiceBeacon implements
                     beacon.getBluetoothAddress(),
                     beacon.getBeaconTypeCode(),
                     beacon.getTxPower(),
-                    System.currentTimeMillis());
+                    System.currentTimeMillis(),
+                    proximity);
 
             publishBeaconMessage(r);
         }
