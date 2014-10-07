@@ -102,7 +102,7 @@
             android:key="@string/keySubTopic"
             android:summary="@string/preferencesContactsTopicSummary"
             android:title="@string/preferencesContactsTopic" />
-</PreferenceCategory>
+        </PreferenceCategory>
         <PreferenceCategory android:title="Remote commands">
 
         <CheckBoxPreference
@@ -158,7 +158,7 @@
             android:title="@string/preferencesLocatorAccuracyForeground"
             android:defaultValue="@integer/valLocatorAccuracyForeground"/>
         </PreferenceCategory>
-<PreferenceCategory android:title="Misc">
+        <PreferenceCategory android:title="Misc">
         <CheckBoxPreference
             android:defaultValue="@bool/valUpdateAddressBook"
             android:key="@string/keyUpdateAddressBook"
@@ -176,7 +176,7 @@
             android:key="@string/keyAutostartOnBoot"
             android:summary="@string/preferencesAutostartSummary"
             android:title="@string/preferencesAutostart" />
-</PreferenceCategory>
+        </PreferenceCategory>
     </PreferenceScreen>
 
     <PreferenceScreen
