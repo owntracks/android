@@ -26,7 +26,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" /> <!-- To access Google Play Services -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- To locate the device -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- To prevent the device from sleeping while handling MQTT traffic -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- To  prevent the device from sleeping while handling MQTT traffic -->
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Owntracks with IM name set to the topic) -->
     <uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- To save contact links -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
