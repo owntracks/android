@@ -203,7 +203,7 @@
     <string name="keyRemoteCommandDump">remoteCommandDump</string>
     <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
     <string name="keyRemoteConfiguration">remoteConfiguration</string>
-
+    <string name="keyCustomBeaconLayout">customBeaconLayout</string>
     <string name="valEmpty">""</string>
     <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicPartWaypoints">/waypoints</string>
@@ -253,5 +253,11 @@
     <string name="contactLocationUnknown">No location known for this contact</string>
     <string name="develop_1">Develop 1</string>
     <string name="develop_2">Develop 2</string>
+    <string name="preferencesAdvancedCategoryBeacons">Beacons</string>
+    <string name="preferencesCustomBeaconLayout">Custom beacon layout</string>
+    <string name="preferencesCustomBeaconLayoutSummary">Custom layout to detect beacons</string>
+    <string name="keyBeaconRangingEnabled">ranging</string>
+    <string name="beaconRangingEnabledSummary">Enable ranging for BLE beacons</string>
+    <string name="beaconRangingEnabled">Ranging</string>
 
 </resources>

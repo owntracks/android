@@ -138,6 +138,11 @@ public class ServiceBeacon implements
         mBeaconManager.setForegroundBetweenScanPeriod(0L);      // default is 0L
         mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
 
+        String customBeaconlayout = Preferences.getCustomBeaconLayout();
+        if(!customBeaconlayout.equals(""))
+            mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(customBeaconlayout));
+
+
         // Detect all valid beacons
         region = new Region("all beacons", null, null, null);
         regionBootstrap = new RegionBootstrap(this, region);

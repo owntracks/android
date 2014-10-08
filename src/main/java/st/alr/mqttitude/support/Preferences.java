@@ -569,4 +569,12 @@ public class Preferences {
         }
     }
 
+    public static String getCustomBeaconLayout() {
+        return getString(R.string.keyCustomBeaconLayout, R.string.valEmpty);
+    }
+
+    public static boolean getBeaconRangingEnabled() {
+        return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
+    }
+
 }
