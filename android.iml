@@ -103,8 +103,8 @@
     <orderEntry type="library" exported="" name="play-services-4.4.52" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
-    <orderEntry type="library" exported="" name="mqtt-client-0.4.0" level="project" />
     <orderEntry type="library" exported="" name="bugsnag-1.2.6" level="project" />
+    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.0.1-SNAPSHOT" level="project" />
   </component>
 </module>
 

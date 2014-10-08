@@ -115,7 +115,9 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
                     .put(getStringRessource(R.string.keyRemoteCommandDump), getRemoteCommandDump())
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
-                    .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration());
+                    .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
+                    .put(getStringRessource(R.string.keyCleanSession), getCleanSession());
+
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());
@@ -161,6 +163,7 @@ public class Preferences {
         try { setRemoteCommandDump(json.getBoolean(getStringRessource(R.string.keyRemoteCommandDump))); } catch (JSONException e) {}
         try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
         try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
+        try { setCleanSession(json.getBoolean(getStringRessource(R.string.keyCleanSession))); } catch (JSONException e) {}
 
     }
 

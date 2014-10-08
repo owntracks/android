@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -13,9 +16,13 @@ import java.security.cert.CertificateFactory;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -210,7 +217,95 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 	}
 
-	//
+	private static class CustomSocketFactory extends javax.net.ssl.SSLSocketFactory{
+        private javax.net.ssl.SSLSocketFactory factory;
+
+        public CustomSocketFactory(boolean sideloadCa) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null, null);
+
+            if(sideloadCa) {
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCrtPath()));
+                java.security.cert.Certificate ca;
+                try {
+                    ca = cf.generateCertificate(caInput);
+                } finally {
+                    caInput.close();
+                }
+
+                keyStore.setCertificateEntry("ca", ca);
+            }
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            context.init(null, tmf.getTrustManagers(), null);
+            this.factory= context.getSocketFactory();
+            Log.v(this.toString(), "socket factory initialized to: " + this.factory);
+
+        }
+
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return this.factory.getDefaultCipherSuites();
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return this.factory.getSupportedCipherSuites();
+        }
+
+        @Override
+        public Socket createSocket() throws IOException{
+            SSLSocket r = (SSLSocket)this.factory.createSocket();
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+
+        @Override
+        public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+            SSLSocket r = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+
+        @Override
+        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+
+            SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+
+        @Override
+        public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException {
+            SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress host, int port) throws IOException {
+            SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+            SSLSocket r = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
+            r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+            return r;
+        }
+    }
+
 	private javax.net.ssl.SSLSocketFactory getSSLSocketFactory()
 			throws CertificateException, KeyStoreException,
 			NoSuchAlgorithmException, IOException, KeyManagementException {
@@ -236,8 +331,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		tmf.init(keyStore);
 
 		// Create an SSLContext that uses our TrustManager
-		SSLContext context = SSLContext.getInstance("TLS");
-		context.init(null, tmf.getTrustManagers(), null);
+//		SSLContext context = SSLContext.getInstance("TLS");
+        SSLContext context = SSLContext.getInstance("TLSv1.2");
+        context.init(null, tmf.getTrustManagers(), null);
+        Log.d(this.toString(), "SSLSocketFactory supported protocols count: " +context.getSupportedSSLParameters().getProtocols().length);
+        String[] protocols = context.getSupportedSSLParameters().getProtocols();
+        for (String protocol : protocols) {
+            Log.d(this.toString(), "Context supported protocol: " + protocol);
+        }
+
 
 		return context.getSocketFactory();
 	}
@@ -258,8 +360,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				options.setUserName(Preferences.getUsername());
 			}
 
-			if (Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsCustom))
-				options.setSocketFactory(this.getSSLSocketFactory());
+			if (Preferences.getTls() != Preferences.getIntResource(R.integer.valTlsNone)) {
+                options.setSocketFactory(new CustomSocketFactory(Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsCustom)));
+            }
 
 			// setWill(options);
 			options.setKeepAliveInterval(this.keepAliveSeconds);
