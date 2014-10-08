@@ -17,6 +17,7 @@ public class ServiceProxy extends ServiceBindable {
 	public static final String SERVICE_APP = "1:App";
 	public static final String SERVICE_LOCATOR = "2:Loc";
 	public static final String SERVICE_BROKER = "3:Brk";
+    public static final String SERVICE_BEACON = "4:Bec";
 	public static final String KEY_SERVICE_ID = "srvID";
 	private static ServiceProxy instance;
 	private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
@@ -34,7 +35,8 @@ public class ServiceProxy extends ServiceBindable {
 	protected void onStartOnce() {
 		instantiateService(SERVICE_APP);
 		instantiateService(SERVICE_BROKER);
-		instantiateService(SERVICE_LOCATOR);
+        instantiateService(SERVICE_LOCATOR);
+        instantiateService(SERVICE_BEACON);
 		instance = this;
 	}
 
@@ -81,8 +83,10 @@ public class ServiceProxy extends ServiceBindable {
 			p = new ServiceApplication();
 		else if (id.equals(SERVICE_BROKER))
 			p = new ServiceBroker();
-		else if (id.equals(SERVICE_LOCATOR))
-			p = new ServiceLocator();
+        else if (id.equals(SERVICE_LOCATOR))
+            p = new ServiceLocator();
+        else if (id.equals(SERVICE_BEACON))
+            p = new ServiceBeacon();
 
 		services.put(id, p);
 		p.onCreate(this);
@@ -102,6 +106,10 @@ public class ServiceProxy extends ServiceBindable {
 	public static ServiceBroker getServiceBroker() {
 		return (ServiceBroker) getService(SERVICE_BROKER);
 	}
+
+    public static ServiceBeacon getServiceBeacon() {
+        return (ServiceBeacon) getService(SERVICE_BEACON);
+    }
 
 	public static ProxyableService getServiceForIntent(Intent i) {
 		if ((i != null) && (i.getStringExtra(KEY_SERVICE_ID) != null))

@@ -414,6 +414,7 @@ public class ActivityMain extends FragmentActivity {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableForegroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
         });
 	}
@@ -425,6 +426,7 @@ public class ActivityMain extends FragmentActivity {
 			@Override
 			public void run() {
 				ServiceProxy.getServiceLocator().enableBackgroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(true);
 			}
 		});
 
