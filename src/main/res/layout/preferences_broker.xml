@@ -225,19 +225,26 @@
             </FrameLayout>
         </LinearLayout>
 
-       <TextView
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/cleanSessionWrapper"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/preferencesCleanSessionEnabled" />
-        <CheckBox
-            android:id="@+id/cleanSession"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/preferencesCleanSessionSummary"
-            android:key="@string/keyCleanSession"
-            android:checked="@bool/valCleanSession"/>
+            android:orientation="vertical"
+            android:visibility="gone" >
 
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/preferencesCleanSessionEnabled" />
+            <CheckBox
+                android:id="@+id/cleanSession"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/preferencesCleanSessionSummary"
+                android:key="@string/keyCleanSession"
+                android:checked="@bool/valCleanSession"/>
+        </LinearLayout>
 
     </LinearLayout>
 
