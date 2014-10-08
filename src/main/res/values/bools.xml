@@ -23,5 +23,6 @@
     <bool name="valRemoteCommandReportLocation">false</bool>
     <bool name="valRemoteCommandDump">false</bool>
     <bool name="valRemoteConfiguration">false</bool>
+    <bool name="valBeaconRangingEnabled">false</bool>
 
 </resources>
