@@ -323,6 +323,15 @@ public class ActivityMain extends FragmentActivity {
         FragmentHandler.getInstance().forward(DetailsFragment.class, b, this);
     }
 
+    private void transitionToCurrentLocationMap() {
+        final FragmentActivity that = this;
+        ServiceProxy.runOrBind(this, new Runnable() {
+            @Override
+            public void run() {
+                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).focusCurrentLocation();
+            }
+        });
+    }
 
     private void transitionToContactMap(final Contact c) {
         final FragmentActivity that = this;
@@ -658,13 +667,11 @@ public class ActivityMain extends FragmentActivity {
 
 				@Override
 				public void run() {
-					GeocodableLocation l = ServiceProxy.getServiceLocator()
-							.getLastKnownLocation();
+					GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
 					if (l == null)
 						return;
                     hideSelectedContactDetails();
-					Preferences
-							.setTrackingUsername(KEY_TRACKING_CURRENT_DEVICE);
+					Preferences.setTrackingUsername(KEY_TRACKING_CURRENT_DEVICE);
 					centerMap(l.getLatLng());
 				}
 			});
@@ -812,6 +819,24 @@ public class ActivityMain extends FragmentActivity {
             this.list = (ListView) v.findViewById(R.id.list);
             setListAdapter(true);
             this.currentLocation = (Button) v.findViewById(R.id.currentLocation);
+            this.currentLocation.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if(ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
+                                ((ActivityMain) getActivity()).transitionToCurrentLocationMap();
+                            } else {
+                                App.showLocationNotAvailableToast();
+                            }
+                        }
+                    });
+
+                }
+            });
+
             this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
@@ -924,6 +949,7 @@ public class ActivityMain extends FragmentActivity {
 		public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
 			if (l == null)
 				return;
+
 
             currentLocation.setText(l.toString());
 

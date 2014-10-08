@@ -12,7 +12,7 @@
         android:id="@+id/currentLocation"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@drawable/mylocation"
+        android:background="@drawable/mylocationbutton"
         android:gravity="center_vertical"
         android:paddingBottom="0dp"
         android:textColor="#6f7275"
