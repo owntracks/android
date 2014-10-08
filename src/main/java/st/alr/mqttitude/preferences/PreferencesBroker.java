@@ -53,7 +53,7 @@ public class PreferencesBroker extends DialogPreference {
 	private LinearLayout brokerPasswordWrapper;
 	private LinearLayout brokerAuthWrapper;
     private LinearLayout clientIdNegotiationWrapper;
-
+    private LinearLayout cleanSessionWrapper;
 
 	private enum RequireablePreferences {
 		USER_NAME, DEVICE_NAME, BROKER_HOST, BROKER_PORT, BROKER_PASSWORD, CACRT, CLIENT_ID
@@ -84,6 +84,7 @@ public class PreferencesBroker extends DialogPreference {
 		this.brokerPasswordWrapper = (LinearLayout) root.findViewById(R.id.brokerPasswordWrapper);
 		this.securityWrapper = (LinearLayout) root.findViewById(R.id.securityWrapper);
         this.clientIdNegotiationWrapper =(LinearLayout) root.findViewById(R.id.clientIdNegotiationWrapper);
+        this.cleanSessionWrapper = (LinearLayout) root.findViewById(R.id.cleanSessionWrapper);
         this.host = (EditText) root.findViewById(R.id.brokerHost);
 		this.port = (EditText) root.findViewById(R.id.brokerPort);
 		this.deviceName = (EditText) root.findViewById(R.id.deviceName);
@@ -111,7 +112,7 @@ public class PreferencesBroker extends DialogPreference {
         // for (View v : new View[] {this.clientIdNegotiationWrapper, this.securityWrapper, this.brokerAuthWrapper })
 		//	v.setVisibility(visibility);
 
-        for (View v : new View[] {this.securityWrapper, this.brokerAuthWrapper })
+        for (View v : new View[] {this.securityWrapper, this.brokerAuthWrapper, this.cleanSessionWrapper })
             v.setVisibility(visibility);
 
 

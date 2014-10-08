@@ -67,36 +67,67 @@ public class Defaults {
 			return c.getString(id);
 		}
 
-		public static enum ServiceLocator {
-			INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION
-		}
+        public static enum ServiceLocator {
+            INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION
+        }
 
-		public static String toString(
-				st.alr.mqttitude.support.Defaults.State.ServiceLocator state,
-				Context c) {
-			int id;
-			switch (state) {
-			case PUBLISHING:
-				id = R.string.statePublishing;
-				break;
-			case PUBLISHING_WAITING:
-				id = R.string.stateWaiting;
-				break;
-			case PUBLISHING_TIMEOUT:
-				id = R.string.statePublishTimeout;
-				break;
-			case NOTOPIC:
-				id = R.string.stateNotopic;
-				break;
-			case NOLOCATION:
-				id = R.string.stateLocatingFail;
-				break;
-			default:
-				id = R.string.stateIdle;
-			}
+        public static String toString(
+                st.alr.mqttitude.support.Defaults.State.ServiceLocator state,
+                Context c) {
+            int id;
+            switch (state) {
+                case PUBLISHING:
+                    id = R.string.statePublishing;
+                    break;
+                case PUBLISHING_WAITING:
+                    id = R.string.stateWaiting;
+                    break;
+                case PUBLISHING_TIMEOUT:
+                    id = R.string.statePublishTimeout;
+                    break;
+                case NOTOPIC:
+                    id = R.string.stateNotopic;
+                    break;
+                case NOLOCATION:
+                    id = R.string.stateLocatingFail;
+                    break;
+                default:
+                    id = R.string.stateIdle;
+            }
 
-			return c.getString(id);
-		};
+            return c.getString(id);
+        };
+
+        public static enum ServiceBeacon {
+            INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
+        }
+
+        public static String toString(
+                st.alr.mqttitude.support.Defaults.State.ServiceBeacon state,
+                Context c) {
+            int id;
+            switch (state) {
+                case PUBLISHING:
+                    id = R.string.statePublishing;
+                    break;
+                case PUBLISHING_WAITING:
+                    id = R.string.stateWaiting;
+                    break;
+                case PUBLISHING_TIMEOUT:
+                    id = R.string.statePublishTimeout;
+                    break;
+                case NOTOPIC:
+                    id = R.string.stateNotopic;
+                    break;
+                case NOBLUETOOTH:
+                    id = R.string.stateBluetoothFail;
+                    break;
+                default:
+                    id = R.string.stateIdle;
+            }
+
+            return c.getString(id);
+        };
 
 	}
 

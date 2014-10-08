@@ -133,7 +133,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 	@Override
 	public void onLocationChanged(Location arg0) {
-		Log.v(this.toString(), "onLocationChanged");
 		this.lastKnownLocation = new GeocodableLocation(arg0);
 
 		EventBus.getDefault().postSticky(
@@ -162,9 +161,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	@Override
 	public void onConnected(Bundle arg0) {
 		this.ready = true;
-
-		Log.v(this.toString(), "Connected");
-
 		initLocationRequest();
 		initGeofences();
 	}
@@ -175,7 +171,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void initLocationRequest() {
-		setupLocationRequest();
 		requestLocationUpdates();
 	}
 
@@ -206,9 +201,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void setupForegroundLocationRequest() {
-		Log.v(this.toString(), "setupForegroundLocationRequest with profile: "
-				+ Preferences.getLocatorAccuracyForeground());
-
 		this.mLocationRequest = LocationRequest.create();
         if(Preferences.getLocatorAccuracyForeground() == 0) {
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -226,12 +218,10 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	protected void handlePreferences() {
-		setupLocationRequest();
 		requestLocationUpdates();
 	}
 
 	private void disableLocationUpdates() {
-		Log.v(this.toString(), "Disabling updates");
 		if ((this.mLocationClient != null)
 				&& this.mLocationClient.isConnected()) {
 			this.mLocationClient.removeLocationUpdates(ServiceProxy
@@ -242,11 +232,24 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void requestLocationUpdates() {
+        if (!this.ready) {
+            Log.e(this.toString(), "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
+            return;
+        }
+
+
+        disableLocationUpdates();
+
+        if (this.foreground)
+            setupForegroundLocationRequest();
+        else
+            setupBackgroundLocationRequest();
+
+        // State may have changed. Check again
 		if (!this.ready) {
-			Log.e(this.toString(),
-					"requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
-			return;
-		}
+            Log.e(this.toString(), "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
+            return;
+        }
 
 		if (this.foreground || Preferences.getPub()) {
 			this.mLocationClient.requestLocationUpdates(this.mLocationRequest,
@@ -254,10 +257,9 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 							ServiceProxy.SERVICE_LOCATOR,
 							Defaults.INTENT_ACTION_LOCATION_CHANGED, null));
 
-		} else {
-			Log.d(this.toString(),
-					"Location updates are disabled (not in foreground or background updates disabled)");
-		}
+		} else
+			Log.d(this.toString(), "Location updates not requested (in foreground: "+ this.foreground +", background updates: " +  Preferences.getPub());
+
 	}
 
 	@Override
@@ -287,33 +289,15 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		return 0;
 	}
 
-	private void setupLocationRequest() {
-		if (!this.ready)
-			return;
-
-		disableLocationUpdates();
-
-		if (this.foreground)
-			setupForegroundLocationRequest();
-		else
-			setupBackgroundLocationRequest();
-	}
 
 	public void enableForegroundMode() {
-		Log.d(this.toString(), "enableForegroundMode");
 		this.foreground = true;
-		setupLocationRequest();
 		requestLocationUpdates();
-		// removeGeofences();
-		// initGeofences();
 	}
 
 	public void enableBackgroundMode() {
 		this.foreground = false;
-		setupLocationRequest();
 		requestLocationUpdates();
-		// removeGeofences();
-		// initGeofences();
 	}
 
 	@Override
@@ -512,7 +496,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		Log.v(this.toString(), "Adding" + fences.size() + " geofences");
+		Log.v(this.toString(), "Adding " + fences.size() + " geofences");
 		this.mLocationClient.addGeofences(fences, ServiceProxy
 				.getPendingIntentForService(this.context,
 						ServiceProxy.SERVICE_LOCATOR,

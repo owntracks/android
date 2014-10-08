@@ -158,6 +158,23 @@
             android:title="@string/preferencesLocatorAccuracyForeground"
             android:defaultValue="@integer/valLocatorAccuracyForeground"/>
         </PreferenceCategory>
+        <PreferenceCategory android:title="@string/preferencesAdvancedCategoryBeacons">
+
+        <CheckBoxPreference
+            android:defaultValue="@bool/valBeaconRangingEnabled"
+            android:key="@string/keyBeaconRangingEnabled"
+            android:summary="@string/beaconRangingEnabledSummary"
+            android:title="@string/beaconRangingEnabled" />
+
+        <EditTextPreference
+                android:defaultValue="@string/valEmpty"
+                android:dialogTitle="@string/preferencesCustomBeaconLayout"
+                android:key="@string/keyCustomBeaconLayout"
+                android:summary="@string/preferencesCustomBeaconLayoutSummary"
+                android:title="@string/preferencesCustomBeaconLayout"
+                android:dependency="@string/keyBeaconRangingEnabled"/>
+        </PreferenceCategory>
+
         <PreferenceCategory android:title="Misc">
         <CheckBoxPreference
             android:defaultValue="@bool/valUpdateAddressBook"
