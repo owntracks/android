@@ -264,7 +264,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			// setWill(options);
 			options.setKeepAliveInterval(this.keepAliveSeconds);
 			options.setConnectionTimeout(10);
-			options.setCleanSession(false);
+			options.setCleanSession(Preferences.getCleanSession());
 
 			this.mqttClient.connect(options);
 			changeState(Defaults.State.ServiceBroker.CONNECTED);
