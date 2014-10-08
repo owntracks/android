@@ -23,7 +23,7 @@
         android:paddingRight="0dp"
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
-        android:background="@color/background">
+        android:background="@drawable/map_contact_details_background">
 
         <include layout="@layout/row_contact" />
 
