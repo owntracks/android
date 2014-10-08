@@ -110,7 +110,7 @@
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="radius">Radius</string>
+    <string name="radius">Radius (metres)</string>
     <string name="transitionType">Transition</string>
     <string name="notification">Notification</string>
     <string name="notificationTitle">Notification title</string>
