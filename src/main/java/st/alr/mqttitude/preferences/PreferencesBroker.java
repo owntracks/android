@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -45,6 +46,7 @@ public class PreferencesBroker extends DialogPreference {
     private Spinner brokerAuth;
     private Spinner clientIdNegotiation;
     private EditText clientId;
+    private CheckBox cleanSession;
 
 
 	private LinearLayout securityWrapper;
@@ -96,6 +98,8 @@ public class PreferencesBroker extends DialogPreference {
 		this.brokerSecuritySSLCaCrtPath = (EditText) root.findViewById(R.id.brokerSecuritySSLCaCrtPath);
         this.clientIdNegotiationAutoOptions = root.findViewById(R.id.clientIdNegotiationAutoOptions);
         this.clientIdNegotiationManualOptions = root.findViewById(R.id.clientIdNegotiationManualOptions);
+        this.cleanSession= (CheckBox) root.findViewById(R.id.cleanSession);
+
 
 		return root;
 	}
@@ -133,6 +137,8 @@ public class PreferencesBroker extends DialogPreference {
         this.clientIdNegotiation.setSelection(Preferences.getZeroLenghClientId() ? 0 : 1);
         this.clientId.setHint(Preferences.getAndroidId());
         this.clientId.setText(Preferences.getClientId(false));
+
+        this.cleanSession.setChecked(Preferences.getCleanSession());
 	}
 
 	@Override
@@ -265,7 +271,7 @@ public class PreferencesBroker extends DialogPreference {
 					}
 				});
 
-	}
+    }
 
     private void handleClientId() {
         boolean auto = this.clientIdNegotiation.getSelectedItemPosition() == 1;
@@ -303,6 +309,7 @@ public class PreferencesBroker extends DialogPreference {
             Preferences.setAuth(this.brokerAuth.getSelectedItemPosition() == 1);
             Preferences.setTls(this.brokerSecurity.getSelectedItemPosition());
             Preferences.setTlsCrtPath(this.brokerSecuritySSLCaCrtPath.getText().toString());
+            Preferences.setCleanSession(this.cleanSession.isChecked());
 
             //Preferences.setClientId(this.clientId.getText().toString());
             //Preferences.setZeroLenghClientId(this.clientIdNegotiation.getSelectedItemPosition() == 1);
