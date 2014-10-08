@@ -30,9 +30,11 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- To read linked contacts (Custom IM type Owntracks with IM name set to the topic) -->
     <uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- To save contact links -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
+    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- For BLE beacon detection -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
 
     <application
-        android:name="st.alr.mqttitude.App"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -45,32 +47,32 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="st.alr.mqttitude.ActivityMain"
+            android:name=".ActivityMain"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="st.alr.mqttitude.preferences.ActivityPreferences"
+            android:name=".preferences.ActivityPreferences"
             android:configChanges="orientation"
             android:label="Preferences" >
         </activity>
         <activity
-            android:name="st.alr.mqttitude.preferences.ActivityExport"
+            android:name=".preferences.ActivityExport"
             android:configChanges="orientation"
             android:label="Export" >
         </activity>
         <activity
-            android:name="st.alr.mqttitude.ActivityWaypoints"
+            android:name=".ActivityWaypoints"
             android:configChanges="orientation"
             android:label="Waypoints" >
         </activity>
 
         <service
-            android:name="st.alr.mqttitude.services.ServiceProxy"
+            android:name=".services.ServiceProxy"
             android:exported="false" >
         </service>
 
         <activity
-            android:name="st.alr.mqttitude.ActivityLauncher"
+            android:name=".ActivityLauncher"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:noHistory="true"
@@ -83,7 +85,7 @@
         </activity>
 
         <receiver
-            android:name="st.alr.mqttitude.support.BootCompleteReceiver"
+            android:name=".support.BootCompleteReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
@@ -91,14 +93,14 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name="st.alr.mqttitude.ActivityWizzard"
-            android:label="@string/title_activity_activity_wizzard" >
-        </activity>
-        <activity
-            android:name="st.alr.mqttitude.preferences.ActivityExport"
-            android:label="@string/title_activity_activity_export" >
-        </activity>
+        <!--<activity-->
+            <!--android:name=".ActivityWizzard"-->
+            <!--android:label="@string/title_activity_activity_wizzard" >-->
+        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name="st.alr.mqttitude.preferences.ActivityExport" -->
+        <!-- android:label="@string/title_activity_activity_export" > -->
+        <!-- </activity> -->
     </application>
 
 </manifest>

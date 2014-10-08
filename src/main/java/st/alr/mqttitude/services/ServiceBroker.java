@@ -122,30 +122,29 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	void handleStart(boolean force) {
-		Log.v(this.toString(), "handleStart. force: " + force);
+		Log.v(this.toString(), "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
-            Log.v(this.toString(), "canConnect() == false. Prerequisites not met.");
+            Log.v(this.toString(), "handleStart: canConnect() == false");
             return;
         } else {
-            Log.v(this.toString(), "Prerequisites to connect met");
+            Log.v(this.toString(), "handleStart: canConnect() == true");
         }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
 		if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
 				&& !force) {
-			Log.d(this.toString(), "handleStart: respecting user disconnect ");
-
+			Log.d(this.toString(), "handleStart: userdisconnect==true");
 			return;
 		}
 
 		if (isConnecting()) {
-			Log.d(this.toString(), "handleStart: already connecting");
+			Log.d(this.toString(), "handleStart: isConnecting == true");
 			return;
 		}
 
 		// Respect user's wish to not use data
 		if (!isBackgroundDataEnabled()) {
-			Log.e(this.toString(), "handleStart: !isBackgroundDataEnabled");
+			Log.e(this.toString(), "handleStart: isBackgroundDataEnabled == false");
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
 			return;
 		}
@@ -153,29 +152,26 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// Don't do anything unless we're disconnected
 
 		if (isDisconnected()) {
-			Log.v(this.toString(), "handleStart: !isConnected");
+			Log.v(this.toString(), "handleStart: isDisconnected() == true");
 			// Check if there is a data connection
 			if (isOnline()) {
-				Log.v(this.toString(), "handleStart: isOnline");
+				Log.v(this.toString(), "handleStart: isOnline() == true");
 
-				if (connect()) {
-					Log.v(this.toString(), "handleStart: connect sucessfull");
+				if (connect())
 					onConnect();
-				}
+
 			} else {
-				Log.e(this.toString(), "handleStart: !isOnline");
+				Log.e(this.toString(), "handleStart: isDisconnected() == false");
 				changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
 			}
 		} else {
-			Log.d(this.toString(), "handleStart: isConnected");
+			Log.d(this.toString(), "handleStart: isDisconnected() == false");
 
 		}
 	}
 
 	private boolean isDisconnected() {
 
-		Log.v(this.toString(), "disconnect check: " + state
-				+ ", mqttClient.isConnected() == " + isConnected());
 		return (state == Defaults.State.ServiceBroker.INITIAL)
 				|| (state == Defaults.State.ServiceBroker.DISCONNECTED)
 				|| (state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
@@ -249,7 +245,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private boolean connect() {
 		this.workerThread = Thread.currentThread(); // We connect, so we're the
 													// worker thread
-		Log.v(this.toString(), "connect");
 		this.error = null; // clear previous error on connect
 		init();
 
@@ -272,8 +267,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			options.setCleanSession(Preferences.getCleanSession());
 
 			this.mqttClient.connect(options);
-
-			Log.d(this.toString(), "No error during connect");
 			changeState(Defaults.State.ServiceBroker.CONNECTED);
 
 			return true;
@@ -332,23 +325,27 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         try {
             unsubscribe();
 
-            subscribe(Preferences.getBaseTopic());
-
             if (Preferences.getSub())
-                subscribe(Preferences.getSubTopic(true));
-
+                subscribe(new String[]{Preferences.getSubTopic(true), Preferences.getBaseTopic()});
+            else
+                subscribe(new String[]{Preferences.getBaseTopic()});
 
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    private void subscribe(String topic) throws MqttException{
+    private void subscribe(String topic) throws MqttException {
+        subscribe(new String[]{topic});
+    }
+
+    private void subscribe(String[] topics) throws MqttException{
         if(!isConnected())
             return;
 
-        this.mqttClient.subscribe(topic);
-        subscribtions.push(topic);
+        this.mqttClient.subscribe(topics);
+        for (int i = 0; i < topics.length; i++)
+           subscribtions.push(topics[i]);
     }
     private void unsubscribe() throws MqttException{
         if(!isConnected())
@@ -447,7 +444,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void changeState(Defaults.State.ServiceBroker newState, Exception e) {
-		Log.d(this.toString(), "ServiceMqtt state changed to: " + newState);
+		Log.d(this.toString(), "ServiceBroker state changed to: " + newState);
 		state = newState;
 		EventBus.getDefault().postSticky(
 				new Events.StateChanged.ServiceBroker(newState, e));
@@ -553,6 +550,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			final boolean retained, final int qos, final int timeout,
 			final ServiceMqttCallbacks callback, final Object extra) {
 
+        Log.v(this.toString(), "Publishing: " + payload);
 		publish(new DeferredPublishable(topic, payload, retained, qos, timeout,
 				callback, extra));
 
@@ -690,10 +688,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void messageArrived(String topic, MqttMessage message)
 			throws Exception {
 		scheduleNextPing();
-		Log.v(this.toString(), "Received message: " + topic + " : "
-				+ message.getPayload());
 
 		String msg = new String(message.getPayload());
+        Log.v(this.toString(), "Received message: " + topic + " : "
+                + msg);
+
 		String type;
 		StringifiedJSONObject json;
 

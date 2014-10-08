@@ -414,6 +414,7 @@ public class ActivityMain extends FragmentActivity {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableForegroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
         });
 	}
@@ -425,6 +426,7 @@ public class ActivityMain extends FragmentActivity {
 			@Override
 			public void run() {
 				ServiceProxy.getServiceLocator().enableBackgroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(true);
 			}
 		});
 
@@ -538,7 +540,7 @@ public class ActivityMain extends FragmentActivity {
 			this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
 			this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
 
-			this.selectedContactDetails.setVisibility(View.GONE);
+            hideSelectedContactDetails();
 
 			this.mMapView = (MapView) v.findViewById(R.id.mapView);
 			this.mMapView.onCreate(savedInstanceState);
@@ -583,7 +585,8 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		private void setUpMap() {
-			this.googleMap.setIndoorEnabled(true);
+			this.googleMap.setIndoorEnabled(false);
+            this.googleMap.setBuildingsEnabled(true);
 
 			UiSettings s = this.googleMap.getUiSettings();
 			s.setCompassEnabled(false);
@@ -613,13 +616,19 @@ public class ActivityMain extends FragmentActivity {
 
 						@Override
 						public void onMapClick(LatLng arg0) {
-							MapFragment.this.selectedContactDetails
-									.setVisibility(View.GONE);
+                            hideSelectedContactDetails();
 
 						}
 					});
 		}
 
+
+        public void showSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.VISIBLE);
+        }
+        public void hideSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.GONE);
+        }
 		public void centerMap(LatLng l) {
 			centerMap(l, 15.0f);
 		}
@@ -630,13 +639,13 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		public void updateContactLocation(Contact c) {
-			if (c.getMarker() != null) {
-				c.getMarker().remove();
-			}
 
-			Marker m = this.googleMap.addMarker(new MarkerOptions().position(
-					c.getLocation().getLatLng()).icon(
-					c.getMarkerImageDescriptor()));
+			if (c.getMarker() != null) {
+                this.markerToContacts.remove(c.getMarker().getId());
+                c.getMarker().remove();
+            }
+
+			Marker m = this.googleMap.addMarker(new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 
@@ -653,8 +662,7 @@ public class ActivityMain extends FragmentActivity {
 							.getLastKnownLocation();
 					if (l == null)
 						return;
-					MapFragment.this.selectedContactDetails
-							.setVisibility(View.GONE);
+                    hideSelectedContactDetails();
 					Preferences
 							.setTrackingUsername(KEY_TRACKING_CURRENT_DEVICE);
 					centerMap(l.getLatLng());
@@ -716,8 +724,8 @@ public class ActivityMain extends FragmentActivity {
 				}
 			});
 
-			this.selectedContactDetails.setVisibility(View.VISIBLE);
-			this.selectedContactDetails
+            showSelectedContactDetails();
+            this.selectedContactDetails
 					.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -735,7 +743,12 @@ public class ActivityMain extends FragmentActivity {
 			updateContactLocation(e.getContact());
 		}
 
-		public void onEventMainThread(Events.CurrentLocationUpdated e) {
+        public void onEventMainThread(Events.ContactAdded e) {
+            updateContactLocation(e.getContact());
+        }
+
+
+        public void onEventMainThread(Events.CurrentLocationUpdated e) {
 			if (isTrackingCurrentLocation())
 				focusCurrentLocation();
 		}
@@ -750,7 +763,7 @@ public class ActivityMain extends FragmentActivity {
                 Log.v(this.toString(), "Clearing map");
                 markerToContacts.clear();
                 mMapView.getMap().clear();
-                this.selectedContactDetails.setVisibility(View.GONE);
+                hideSelectedContactDetails();
         }
 
         public Contact getCurrentlyTrackedContact() {
@@ -787,7 +800,6 @@ public class ActivityMain extends FragmentActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			handler = new StaticHandler(this);
-            EventBus.getDefault().registerSticky(this);
         }
 
         @Override
@@ -809,6 +821,7 @@ public class ActivityMain extends FragmentActivity {
             });
 
             registerForContextMenu(this.list);
+            EventBus.getDefault().register(this);
 
 
             return v;
@@ -905,7 +918,7 @@ public class ActivityMain extends FragmentActivity {
 
 		public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
-                setListAdapter(false);
+                setListAdapter(false); // Ignore cached values. Either they're removed already or are invalid and will be removed soon
 		}
 
 		public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {

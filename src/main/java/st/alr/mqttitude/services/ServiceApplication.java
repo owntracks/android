@@ -184,7 +184,6 @@ public class ServiceApplication implements ProxyableService,
 	 * @category NOTIFICATION HANDLING
 	 */
 	private void handleNotification() {
-		Log.v(this.toString(), "handleNotification()");
 		this.context.stopForeground(true);
 
 		if (this.notificationManager != null)
@@ -196,7 +195,6 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	private void createNotification() {
-		Log.v(this.toString(), "createNotification");
 		//
 		notificationBuilder = new NotificationCompat.Builder(this.context);
 
