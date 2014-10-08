@@ -202,17 +202,30 @@ public class Events {
 
 		}
 
-		public static class ServiceLocator extends E {
-			private Defaults.State.ServiceLocator state;
+        public static class ServiceLocator extends E {
+            private Defaults.State.ServiceLocator state;
 
-			public ServiceLocator(Defaults.State.ServiceLocator state) {
-				this.state = state;
-			}
+            public ServiceLocator(Defaults.State.ServiceLocator state) {
+                this.state = state;
+            }
 
-			public Defaults.State.ServiceLocator getState() {
-				return this.state;
-			}
+            public Defaults.State.ServiceLocator getState() {
+                return this.state;
+            }
 
-		}
+        }
+
+        public static class ServiceBeacon extends E {
+            private Defaults.State.ServiceBeacon state;
+
+            public ServiceBeacon(Defaults.State.ServiceBeacon state) {
+                this.state = state;
+            }
+
+            public Defaults.State.ServiceBeacon getState() {
+                return this.state;
+            }
+
+        }
 	}
 }
