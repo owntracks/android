@@ -639,7 +639,7 @@ public class ActivityMain extends FragmentActivity {
             this.selectedContactDetails.setVisibility(View.GONE);
         }
 		public void centerMap(LatLng l) {
-			centerMap(l, 15.0f);
+			centerMap(l, this.mMapView.getMap().getCameraPosition().zoom);
 		}
 
 		public void centerMap(LatLng latlon, float f) {
