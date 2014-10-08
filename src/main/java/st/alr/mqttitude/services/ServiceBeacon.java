@@ -138,10 +138,6 @@ public class ServiceBeacon implements
         mBeaconManager.setForegroundBetweenScanPeriod(0L);      // default is 0L
         mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
 
-        // Not sure that we can publish this without violating Apple IP.
-        mBeaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
-
         // Detect all valid beacons
         region = new Region("all beacons", null, null, null);
         regionBootstrap = new RegionBootstrap(this, region);
