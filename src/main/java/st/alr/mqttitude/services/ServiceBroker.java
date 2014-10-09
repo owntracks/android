@@ -834,7 +834,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     Log.i(this.toString(), "Command is disabled");
                     return;
                 }
-                ServiceProxy.getServiceLocator().publishLocationMessage();
+                ServiceProxy.getServiceLocator().publishResponseLocationMessage();
 
             } else {
                 Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");

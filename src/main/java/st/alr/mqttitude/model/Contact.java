@@ -30,7 +30,8 @@ public class Contact {
 	private int uid;
 	private String name;
 	private String topic;
-	private GeocodableLocation location;
+    private String tid;
+    private GeocodableLocation location;
 	private Bitmap userImage;
     private BitmapDescriptor userImageDescriptor;
 	private static final int userImageHeightScale = (int) convertDpToPixel(48);
@@ -87,7 +88,15 @@ public class Contact {
 		this.name = name;
 	}
 
-	public GeocodableLocation getLocation() {
+    public String getTid() {
+        return tid;
+    }
+
+    public void setTid(String tid) {
+        this.tid = tid;
+    }
+
+    public GeocodableLocation getLocation() {
 		return this.location;
 	}
 
