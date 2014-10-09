@@ -17,7 +17,10 @@ public class LocationMessage {
 	Waypoint waypoint;
 
 	String description;
-	int transition;
+    String tid;
+    String t;
+
+    int transition;
 	int battery;
 
 	boolean supressesTicker;
@@ -28,6 +31,8 @@ public class LocationMessage {
 		this.battery = -1;
 		this.waypoint = null;
 		this.supressesTicker = false;
+        this.tid = null;
+        this.t = null;
 	}
 
 	public boolean doesSupressTicker() {
@@ -50,7 +55,15 @@ public class LocationMessage {
 		this.transition = transition;
 	}
 
-	public void setBattery(int battery) {
+    public void setTid(String tid) { this.tid = tid; }
+    public String getTid() { return this.tid; }
+
+
+    public void setT(String t) { this.t = t; }
+    public String getT() { return this.t; }
+
+
+    public void setBattery(int battery) {
 		this.battery = battery;
 	}
 
@@ -78,8 +91,11 @@ public class LocationMessage {
                     json.put("desc", this.waypoint.getDescription());
 
                 json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
-
             }
+
+            if(t != null)
+                json.put("t", t);
+
         } catch (JSONException e) {
 
         }
@@ -128,6 +144,11 @@ public class LocationMessage {
 			m.setDescription(json.getString("desc"));
 		} catch (Exception e) {
 		}
+
+        try {
+            m.setTid(json.getString("tid"));
+        } catch (Exception e) {
+        }
 
 		try {
 			if (json.getString("event").equals("enter"))

@@ -131,9 +131,11 @@ public class ServiceApplication implements ProxyableService,
 			c = new st.alr.mqttitude.model.Contact(e.getTopic());
 			resolveContact(c);
             c.setLocation(e.getGeocodableLocation());
+            c.setTid(e.getLocationMessage().getTid());
             App.addContact(c);
 		} else {
 			c.setLocation(e.getGeocodableLocation());
+            c.setTid(e.getLocationMessage().getTid());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
 
@@ -470,6 +472,13 @@ public class ServiceApplication implements ProxyableService,
 		resolveContact(c);
 		EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
 	}
+
+    public void unlinkContact(Contact c) {
+        App.getContactLinkDao().deleteByKey(c.getTopic());
+        c.setName(null);
+        c.setUserImage(null);
+        EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
+    }
 
 
     public void dump() {

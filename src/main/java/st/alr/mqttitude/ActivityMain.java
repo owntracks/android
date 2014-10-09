@@ -379,7 +379,7 @@ public class ActivityMain extends FragmentActivity {
 						App.showLocationNotAvailableToast();
 					else
 						ServiceProxy.getServiceLocator()
-								.publishLocationMessage();
+								.publishManualLocationMessage();
 				}
 			});
 
@@ -1150,14 +1150,23 @@ public class ActivityMain extends FragmentActivity {
 			this.time.setText(App.formatDate(this.contact.getLocation()
 					.getDate()));
 
-			this.assignContact.setOnClickListener(new OnClickListener() {
+            if(this.contact.getName() != null) {
+                this.assignContact.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-					startActivityForResult(new Intent(Intent.ACTION_PICK,
-							Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
-				}
-			});
+                    @Override
+                    public void onClick(View v) {
+                        startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
+                    }
+                });
+            } else {
+                this.assignContact.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
+                    }
+                });
+            }
 		}
 
 		private void onHide() {
@@ -1174,6 +1183,18 @@ public class ActivityMain extends FragmentActivity {
 					&& (resultCode == RESULT_OK))
 				assignContact(data);
 		}
+
+        private void unassignContact(Contact c) {
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
+                @Override
+                public void run() {
+                    ServiceProxy.getServiceApplication().unlinkContact(DetailsFragment.this.contact);
+
+                }
+            });
+
+        }
 
 		private void assignContact(Intent intent) {
 			Uri result = intent.getData();
