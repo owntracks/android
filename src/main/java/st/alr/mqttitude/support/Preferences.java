@@ -1,6 +1,5 @@
 package st.alr.mqttitude.support;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import st.alr.mqttitude.App;
@@ -12,7 +11,6 @@ import android.util.Log;
 import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.services.ServiceProxy;
@@ -216,12 +214,21 @@ public class Preferences {
                 R.bool.valUpdateAddressBook);
     }
 
-    public static String getTrackingUsername() {
-        return getString(R.string.keyTrackingUsername, R.string.valEmpty);
+    public static boolean getFollowingSelectedContact() {
+        return getBoolean(R.string.keyFollowingSelectedContact, R.bool.valFalse);
     }
 
-    public static void setTrackingUsername(String topic) {
-        setString(R.string.keyTrackingUsername, topic);
+    public static void setFollowingSelectedContact(boolean following) {
+        Log.v("Preferences", "foolow mode for selected contact: " + following);
+        setBoolean(R.string.keyFollowingSelectedContact, following);
+    }
+
+    public static String getSelectedContactTopic() {
+        return getString(R.string.keySelectedContactTopic, R.string.valEmpty);
+    }
+
+    public static void setSelectedContactTopic(String topic) {
+        setString(R.string.keySelectedContactTopic, topic);
     }
 
     public static int getLocatorDisplacement() {
