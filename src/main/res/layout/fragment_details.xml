@@ -11,19 +11,52 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <TextView
-            style="@style/listItemSecondary"
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Name" />
 
-        <TextView
-            android:id="@+id/name"
-            style="@style/listItemPrimary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/contactContextMenu"
+                android:background="@drawable/abc_ic_menu_moreoverflow_normal_holo_light"
+                android:baselineAlignBottom="false"
+                android:clickable="false"
+                android:focusable="false"
+                android:adjustViewBounds="false"
+                android:scaleType="fitEnd"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="-6dp"
+                android:layout_alignParentEnd="true"/>
+
+            <TextView
+                style="@style/listItemSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contactDetailsName"
+                android:layout_alignParentTop="true"
+                android:id="@+id/textView"
+                android:layout_toLeftOf="@id/contactContextMenu"
+                android:layout_toStartOf="@id/contactContextMenu"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+            <TextView
+                android:id="@+id/name"
+                style="@style/listItemPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:layout_below="@id/textView"
+                android:layout_toLeftOf="@id/contactContextMenu"
+                android:layout_toStartOf="@id/contactContextMenu"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                />
+
+        </RelativeLayout>
 
         <TextView
             style="@style/listItemSecondary"
@@ -31,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="Topic" />
+            android:text="@string/contactDetailsTopic" />
 
         <TextView
             style="@style/listItemPrimary"
@@ -47,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="Location" />
+            android:text="@string/contactDetailsLocation" />
 
 
         <TextView
@@ -64,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="Accuracy" />
+            android:text="@string/contactDetailsAccuracy" />
 
         <TextView
             style="@style/listItemPrimary"
@@ -72,7 +105,7 @@
             android:id="@+id/accuracy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="0" />
+            android:text="@string/na" />
 
         <TextView
             style="@style/listItemSecondary"
@@ -80,7 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="Reported" />
+            android:text="@string/contactDetailsReportedTime" />
 
         <TextView
             style="@style/listItemPrimary"
@@ -91,12 +124,6 @@
             android:layout_marginBottom="@dimen/default_vertical_spacing"
             android:text="@string/na" />
 
-        <Button
-            android:id="@+id/assignContact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Assign contact"
-            android:visibility="gone" />
     </LinearLayout>
 
 </ScrollView>

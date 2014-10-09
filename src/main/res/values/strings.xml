@@ -265,5 +265,15 @@
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuContactFollow">Follow</string>
     <string name="menuContactUnfollow">Unfollow</string>
+    <string name="assignContact">Link contact</string>
+    <string name="unassignContact">Unlink contact</string>
+    <string name="contactDetailsLocation">Location</string>
+    <string name="contactDetailsAccuracy">Accuracy</string>
+    <string name="contactDetailsReportedTime">Reported</string>
+    <string name="contactDetailsTopic">Topic</string>
+    <string name="contactDetailsName">Name</string>
+    <string name="menuContactDetailsLink">Link</string>
+    <string name="menuContactDetailsUnlink">Unlink</string>
+    <string name="contactListPlaceholder">No contact information received yet</string>
 
 </resources>

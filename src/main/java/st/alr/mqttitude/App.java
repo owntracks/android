@@ -91,14 +91,14 @@ public class App extends Application {
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if(e.getState() == Defaults.State.ServiceBroker.CONNECTING) {
-            Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
+            //Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
             instance.contacts.clear();
         }
     }
 
     public static void addContact(Contact c) {
-        EventBus.getDefault().post(new Events.ContactAdded(c));
         instance.contacts.put(c.getTopic(), c);
+        EventBus.getDefault().post(new Events.ContactAdded(c));
     }
 
 	public static String formatDate(Date d) {
@@ -121,12 +121,10 @@ public class App extends Application {
 	}
 
 	public static void showLocationNotAvailableToast() {
-		Toast.makeText(
-				App.getContext(),
-				App.getContext()
-						.getString(R.string.currentLocationNotAvailable),
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(App.getContext(), App.getContext()
+						.getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
 	}
+
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
 	}

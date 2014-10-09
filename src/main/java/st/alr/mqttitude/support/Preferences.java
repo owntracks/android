@@ -99,7 +99,6 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyConnectionAdvancedMode), getConnectionAdvancedMode())
                     .put(getStringRessource(R.string.keySub), getSub())
                     .put(getStringRessource(R.string.keyPub), getPub())
-                    .put(getStringRessource(R.string.keyUpdateAddressBook), getUpdateAdressBook())
                     .put(getStringRessource(R.string.keyPubInterval), getPubInterval())
                     .put(getStringRessource(R.string.keyPubTopicBase), getPubTopicBase(true))
                     .put(getStringRessource(R.string.keyNotification), getNotification())
@@ -146,7 +145,6 @@ public class Preferences {
         try { setConnectionAdvancedMode(json.getBoolean(getStringRessource(R.string.keyConnectionAdvancedMode))); } catch (JSONException e) {}
         try { setSub(json.getBoolean(getStringRessource(R.string.keySub))); } catch (JSONException e) {}
         try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
-        try { setUpdateAdressBook(json.getBoolean(getStringRessource(R.string.keyUpdateAddressBook))); } catch (JSONException e) {}
         try { setPubInterval(json.getInt(getStringRessource(R.string.keyPubInterval))); } catch (JSONException e) {}
         try { setPubTopicBase(json.getString(getStringRessource(R.string.keyPubTopicBase))); } catch (JSONException e) {}
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
@@ -207,11 +205,6 @@ public class Preferences {
 
     public static boolean getSub() {
         return getBoolean(R.string.keySub, R.bool.valSub);
-    }
-
-    public static boolean getUpdateAdressBook() {
-        return getBoolean(R.string.keyUpdateAddressBook,
-                R.bool.valUpdateAddressBook);
     }
 
     public static boolean getFollowingSelectedContact() {
@@ -358,10 +351,6 @@ public class Preferences {
 
     private static void setPub(boolean aBoolean) {
         setBoolean(R.string.keyPub, aBoolean);
-    }
-
-    private static void setUpdateAdressBook(boolean aBoolean) {
-        setBoolean(R.string.keyUpdateAddressBook, aBoolean);
     }
 
     private static void setPubInterval(int anInt) {
