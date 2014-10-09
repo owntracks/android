@@ -106,6 +106,10 @@ public class Contact {
 									// resolving returns
 	}
 
+    public boolean isLinked() {
+        return this.name != null;
+    }
+
 	@Override
 	public String toString() {
 		if (getName() != null)

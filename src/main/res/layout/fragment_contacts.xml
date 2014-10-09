@@ -19,6 +19,12 @@
         android:paddingLeft="@dimen/default_horizontal_spacing"
         android:text="@string/na" />
 
+    <TextView android:id="@+id/contactsListPlaceholder"
+              android:gravity="center"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:text="@string/contactListPlaceholder" />
+
 
     <ListView
 
@@ -27,7 +33,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:scrollbarStyle="outsideOverlay"
-        android:id="@+id/list"/>
+        android:id="@+id/contactsList"/>
 
 
 

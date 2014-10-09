@@ -129,29 +129,29 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	void handleStart(boolean force) {
-		Log.v(this.toString(), "handleStart: force == " + force);
+		//Log.v(this.toString(), "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
-            Log.v(this.toString(), "handleStart: canConnect() == false");
+            //Log.v(this.toString(), "handleStart: canConnect() == false");
             return;
         } else {
-            Log.v(this.toString(), "handleStart: canConnect() == true");
+            //Log.v(this.toString(), "handleStart: canConnect() == true");
         }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
 		if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
 				&& !force) {
-			Log.d(this.toString(), "handleStart: userdisconnect==true");
+			//Log.d(this.toString(), "handleStart: userdisconnect==true");
 			return;
 		}
 
 		if (isConnecting()) {
-			Log.d(this.toString(), "handleStart: isConnecting == true");
+			//Log.d(this.toString(), "handleStart: isConnecting == true");
 			return;
 		}
 
 		// Respect user's wish to not use data
 		if (!isBackgroundDataEnabled()) {
-			Log.e(this.toString(), "handleStart: isBackgroundDataEnabled == false");
+			//Log.e(this.toString(), "handleStart: isBackgroundDataEnabled == false");
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
 			return;
 		}
@@ -159,20 +159,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// Don't do anything unless we're disconnected
 
 		if (isDisconnected()) {
-			Log.v(this.toString(), "handleStart: isDisconnected() == true");
+			//Log.v(this.toString(), "handleStart: isDisconnected() == true");
 			// Check if there is a data connection
 			if (isOnline()) {
-				Log.v(this.toString(), "handleStart: isOnline() == true");
+				//Log.v(this.toString(), "handleStart: isOnline() == true");
 
 				if (connect())
 					onConnect();
 
 			} else {
-				Log.e(this.toString(), "handleStart: isDisconnected() == false");
+				//Log.e(this.toString(), "handleStart: isDisconnected() == false");
 				changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
 			}
 		} else {
-			Log.d(this.toString(), "handleStart: isDisconnected() == false");
+			//Log.d(this.toString(), "handleStart: isDisconnected() == false");
 
 		}
 	}
@@ -248,7 +248,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             SSLContext context = SSLContext.getInstance("TLSv1.2");
             context.init(null, tmf.getTrustManagers(), null);
             this.factory= context.getSocketFactory();
-            Log.v(this.toString(), "socket factory initialized to: " + this.factory);
 
         }
 
@@ -306,44 +305,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
     }
 
-	private javax.net.ssl.SSLSocketFactory getSSLSocketFactory()
-			throws CertificateException, KeyStoreException,
-			NoSuchAlgorithmException, IOException, KeyManagementException {
-		CertificateFactory cf = CertificateFactory.getInstance("X.509");
-		InputStream caInput = new BufferedInputStream(new FileInputStream(
-				Preferences.getTlsCrtPath()));
-		java.security.cert.Certificate ca;
-		try {
-			ca = cf.generateCertificate(caInput);
-		} finally {
-			caInput.close();
-		}
-
-		// Create a KeyStore containing our trusted CAs
-		String keyStoreType = KeyStore.getDefaultType();
-		KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-		keyStore.load(null, null);
-		keyStore.setCertificateEntry("ca", ca);
-
-		// Create a TrustManager that trusts the CAs in our KeyStore
-		String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-		tmf.init(keyStore);
-
-		// Create an SSLContext that uses our TrustManager
-//		SSLContext context = SSLContext.getInstance("TLS");
-        SSLContext context = SSLContext.getInstance("TLSv1.2");
-        context.init(null, tmf.getTrustManagers(), null);
-        Log.d(this.toString(), "SSLSocketFactory supported protocols count: " +context.getSupportedSSLParameters().getProtocols().length);
-        String[] protocols = context.getSupportedSSLParameters().getProtocols();
-        for (String protocol : protocols) {
-            Log.d(this.toString(), "Context supported protocol: " + protocol);
-        }
-
-
-		return context.getSocketFactory();
-	}
-
 	private boolean connect() {
 		this.workerThread = Thread.currentThread(); // We connect, so we're the
 													// worker thread
@@ -399,8 +360,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private void onConnect() {
 
-		if (!isConnected())
-			Log.e(this.toString(), "onConnect: !isConnected");
+		//if (!isConnected())
+		//	Log.e(this.toString(), "onConnect: !isConnected");
 
 		// Establish observer to monitor wifi and radio connectivity
 		if (this.netConnReceiver == null) {
@@ -423,7 +384,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
     public void resubscribe(){
-        Log.v(this.toString(), "Resubscribing");
+        //Log.v(this.toString(), "Resubscribing");
 
         try {
             unsubscribe();
@@ -459,7 +420,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 	public void disconnect(boolean fromUser) {
-		Log.v(this.toString(), "disconnect. from user: " + fromUser);
+		//Log.v(this.toString(), "disconnect. from user: " + fromUser);
 
 		if (isConnecting()) // throws
 							// MqttException.REASON_CODE_CONNECT_IN_PROGRESS
@@ -482,7 +443,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 			if (isConnected()) {
-				Log.v(this.toString(), "Disconnecting");
+				//Log.v(this.toString(), "Disconnecting");
 				this.mqttClient.disconnect(0);
 			}
 		} catch (Exception e) {
@@ -547,7 +508,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void changeState(Defaults.State.ServiceBroker newState, Exception e) {
-		Log.d(this.toString(), "ServiceBroker state changed to: " + newState);
+		//Log.d(this.toString(), "ServiceBroker state changed to: " + newState);
 		state = newState;
 		EventBus.getDefault().postSticky(
 				new Events.StateChanged.ServiceBroker(newState, e));
@@ -653,7 +614,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			final boolean retained, final int qos, final int timeout,
 			final ServiceMqttCallbacks callback, final Object extra) {
 
-        Log.v(this.toString(), "Publishing: " + payload);
 		publish(new DeferredPublishable(topic, payload, retained, qos, timeout,
 				callback, extra));
 
@@ -816,22 +776,22 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             try {
                 action = json.getString("action");
             } catch (Exception e) {
-                Log.v(this.toString(), "Received cmd message without action");
+                //Log.v(this.toString(), "Received cmd message without action");
                 return;
             }
 
             if (action.equals("dump")) {
-                Log.v(this.toString(), "Received dump cmd message");
+                //Log.v(this.toString(), "Received dump cmd message");
                 if(!Preferences.getRemoteCommandDump()) {
-                    Log.i(this.toString(), "Command is disabled");
+                    Log.i(this.toString(), "Dump remote command is disabled");
                     return;
                 }
                 ServiceProxy.getServiceApplication().dump();
             } else if (action.equals("reportLocation")){
-                Log.v(this.toString(), "Received reportLocation cmd message");
+                //Log.v(this.toString(), "Received reportLocation cmd message");
 
                 if(!Preferences.getRemoteCommandReportLocation()) {
-                    Log.i(this.toString(), "Command is disabled");
+                    Log.i(this.toString(), "ReportLocation remote command is disabled");
                     return;
                 }
                 ServiceProxy.getServiceLocator().publishResponseLocationMessage();
@@ -854,7 +814,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
-			Log.v(this.toString(), "NetworkConnectionIntentReceiver, onReceive");
 
             if(networkWakelock == null )
                 networkWakelock = ((PowerManager) ServiceBroker.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Owntracks-ServiceBroker-ConnectionLost");
@@ -863,7 +822,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 networkWakelock.acquire();
 
 			if (isOnline() && !isConnected() && !isConnecting()) {
-				Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart");
+				//Log.v(this.toString(), "NetworkConnectionIntentReceiver: triggering doStart");
                 doStart();
             }
 
@@ -877,34 +836,29 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		public void onReceive(Context context, Intent intent) {
 
 			if (isOnline() && !isConnected() && !isConnecting()) {
-				Log.v(this.toString(), "ping: isOnline()=" + isOnline()
-						+ ", isConnected()=" + isConnected());
+				//Log.v(this.toString(), "ping: isOnline()=" + isOnline() + ", isConnected()=" + isConnected());
 				doStart();
 			} else if (!isOnline()) {
-				Log.d(this.toString(),
-						"ping: Waiting for network to come online again");
+				Log.d(this.toString(), "Ping: Waiting for network to come online again");
 			} else {
 				try {
 					ping();
 				} catch (MqttException e) {
-					// if something goes wrong, it should result in
-					// connectionLost
-					// being called, so we will handle it there
-					Log.e(this.toString(), "ping failed - MQTT exception", e);
-
+					// if something goes wrong, it should result in connectionLost  being called, so we will handle it there
+					//Log.e(this.toString(), "ping failed - MQTT exception", e);
 					// assume the client connection is broken - trash it
 					try {
 						ServiceBroker.this.mqttClient.disconnect();
 					} catch (MqttPersistenceException e1) {
 						Log.e(this.toString(),
-								"disconnect failed - persistence exception", e1);
+								"Disconnect failed - persistence exception", e1);
 					} catch (MqttException e2) {
 						Log.e(this.toString(),
-								"disconnect failed - mqtt exception", e2);
+								"Disconnect failed - mqtt exception", e2);
 					}
 
 					// reconnect
-					Log.w(this.toString(), "onReceive: MqttException=" + e);
+					//Log.w(this.toString(), "onReceive: MqttException=" + e);
 					doStart();
 				}
 			}
@@ -935,7 +889,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		message.setPayload(new byte[] { 0 });
 
 		try {
-            Log.v(this.toString(), "Sending PING");
+            //Log.v(this.toString(), "Sending PING");
 			topic.publish(message);
 		} catch (org.eclipse.paho.client.mqttv3.MqttPersistenceException e) {
 			e.printStackTrace();

@@ -40,6 +40,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -61,12 +62,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends FragmentActivity {
-	private static final int CONTACT_PICKER_RESULT = 1001;
-    private static final int MENU_CONTACT_SHOW = 0;
-    private static final int MENU_CONTACT_DETAILS = 1;
-    private static final int MENU_CONTACT_NAVIGATE = 2;
-    private static final int MENU_CONTACT_FOLLOW = 3;
-    private static final int MENU_CONTACT_UNFOLLOW = 4;
+    private static final int CONTACT_PICKER_RESULT = 1001;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -278,48 +274,6 @@ public class ActivityMain extends FragmentActivity {
 		return true;
 	}
 
-    private void onCreateContactContextMenu(ContextMenu menu, View v, int viewId) {
-        if (v.getId()==viewId) {
-            Log.v(this.toString(), "onCreateContactContextMenu");
-            Log.v(this.toString(), FragmentHandler.getInstance().getCurrentFragmentClass().toString());
-
-            if(FragmentHandler.getInstance().getCurrentFragmentClass() == ContactsFragment.class) {
-                Log.v(this.toString(), "ContactsFragment");
-                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
-                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
-                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
-            } else if(FragmentHandler.getInstance().getCurrentFragmentClass() == MapFragment.class) {
-                Log.v(this.toString(), "MapFragment");
-                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
-
-                if(Preferences.getFollowingSelectedContact())
-                    menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
-                else
-                    menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
-
-                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
-                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
-
-            }
-
-        }
-    }
-
-    private boolean onContactContextItemSelected(MenuItem item, Contact c) {
-        switch (item.getItemId()) {
-            case MENU_CONTACT_SHOW:
-                transitionToContactMap(c);
-                break;
-            case MENU_CONTACT_DETAILS:
-                transitionToContactDetails(c);
-                break;
-            case MENU_CONTACT_NAVIGATE:
-                Log.v(this.toString(), "Navigate for " +c);
-                launchNavigation(c);
-        }
-        return true;
-
-    }
 
     private void launchNavigation(Contact c) {
         if(c.getLocation() != null) {
@@ -496,7 +450,15 @@ public class ActivityMain extends FragmentActivity {
 		private TextView selectedContactLocation;
 		//private ImageView selectedContactImage;
 		private Map<String, Contact> markerToContacts;
-		private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
+
+        private static final int MENU_CONTACT_SHOW = 0;
+        private static final int MENU_CONTACT_DETAILS = 1;
+        private static final int MENU_CONTACT_NAVIGATE = 2;
+        private static final int MENU_CONTACT_FOLLOW = 3;
+        private static final int MENU_CONTACT_UNFOLLOW = 4;
+
+
+        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
         private static final String KEY_NOTOPIC = "+NOTOPIC+";
 
         private static final int SELECT_UPDATE = 0;
@@ -568,9 +530,7 @@ public class ActivityMain extends FragmentActivity {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			Log.v(this.toString(), "onCreateView");
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
 			this.markerToContacts = new HashMap<String, Contact>();
@@ -597,9 +557,21 @@ public class ActivityMain extends FragmentActivity {
 			return v;
 		}
 
+
+
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-            ((ActivityMain)getActivity()).onCreateContactContextMenu(menu, v, R.id.contactDetails);
+            if (v.getId()==R.id.contactDetails) {
+                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+
+                if(Preferences.getFollowingSelectedContact())
+                    menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
+                else
+                    menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
+
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
+            }
         }
 
 
@@ -696,7 +668,6 @@ public class ActivityMain extends FragmentActivity {
         }
 
 		public void centerMap(LatLng latlon, int centerMode) {
-            Log.v(this.toString(), "centerMap with mode: " + centerMode);
             if(centerMode!=SELECT_UPDATE) {
                 CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER ? this.mMapView.getMap().getCameraPosition().zoom : 15f);
                 this.mMapView.getMap().animateCamera(center);
@@ -760,11 +731,8 @@ public class ActivityMain extends FragmentActivity {
          }
 
          public void selectContact(final Contact c, int centerMode) {
-
-			if (c == null) {
-				Log.v(this.toString(), "no contact, abandon ship!");
+			if (c == null)
 				return;
-			}
 
 			Preferences.setSelectedContactTopic(c.getTopic());
 
@@ -773,30 +741,7 @@ public class ActivityMain extends FragmentActivity {
 			this.selectedContactName.setText(c.toString());
 			this.selectedContactLocation.setText(c.getLocation().toString());
 
-/*
-			this.selectedContactImage.setImageBitmap(c.getUserImage());
-			this.selectedContactImage.setTag(c.getTopic());
-			this.selectedContactImage.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					Bundle b = new Bundle();
-					b.putString(DetailsFragment.KEY_TOPIC, c.getTopic());
-					FragmentHandler.getInstance().forward(
-							DetailsFragment.class, b, getActivity());
-				}
-			});
-*/
-
             showSelectedContactDetails();
-/*
-            this.selectedContactDetails.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-*/
 
 			if (c.getLocation().getGeocoder() == null)
 				(new ReverseGeocodingTask(getActivity(), handler)).execute(c.getLocation());
@@ -824,7 +769,6 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public void clearMap() {
-                Log.v(this.toString(), "Clearing map");
                 markerToContacts.clear();
                 mMapView.getMap().clear();
                 hideSelectedContactDetails();
@@ -847,7 +791,6 @@ public class ActivityMain extends FragmentActivity {
         }
 
         public boolean isFollowingSelectedContact() {
-            Log.v(this.toString(), "following in getter: " + Preferences.getFollowingSelectedContact());
             return Preferences.getFollowingSelectedContact();
         }
     }
@@ -856,10 +799,13 @@ public class ActivityMain extends FragmentActivity {
 			StaticHandlerInterface {
 
         private static final String TAG_CURRENTLOCATION = "TAG_CURRENTLOCATION";
+        private static final int MENU_CONTACT_SHOW = 0;
+        private static final int MENU_CONTACT_DETAILS = 1;
+        private static final int MENU_CONTACT_NAVIGATE = 2;
 
         private static Handler handler;
 
-		private ListView list;
+		private ListView contactsList;
         private ContactAdapter listAdapter;
         private Button currentLocation;
         private ArrayList<Contact> contacts;
@@ -880,7 +826,8 @@ public class ActivityMain extends FragmentActivity {
             View v = inflater.inflate(R.layout.fragment_contacts, container,
                     false);
 
-            this.list = (ListView) v.findViewById(R.id.list);
+            this.contactsList = (ListView) v.findViewById(R.id.contactsList);
+            this.contactsList.setEmptyView((View) v.findViewById(R.id.contactsListPlaceholder));
             setListAdapter(true);
             this.currentLocation = (Button) v.findViewById(R.id.currentLocation);
             this.currentLocation.setOnClickListener(new OnClickListener() {
@@ -901,15 +848,15 @@ public class ActivityMain extends FragmentActivity {
                 }
             });
 
-            this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            this.contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View arg1, final int position, long arg3) {
-                    ((ActivityMain)getActivity()).transitionToContactMap((Contact) listAdapter.getItem(position));
+                    ((ActivityMain) getActivity()).transitionToContactMap((Contact) listAdapter.getItem(position));
                 }
             });
 
-            registerForContextMenu(this.list);
+            registerForContextMenu(this.contactsList);
             EventBus.getDefault().register(this);
 
 
@@ -919,7 +866,7 @@ public class ActivityMain extends FragmentActivity {
 
         private void setListAdapter(boolean fromCache) {
             this.listAdapter = new ContactAdapter(this.getActivity(), fromCache ? new ArrayList<Contact>(App.getCachedContacts().values()) : null);
-            this.list.setAdapter(this.listAdapter);
+            this.contactsList.setAdapter(this.listAdapter);
         }
 
         @Override
@@ -943,7 +890,7 @@ public class ActivityMain extends FragmentActivity {
 		public void onResume() {
 			super.onResume();
 
-            registerForContextMenu(this.list);
+            registerForContextMenu(this.contactsList);
 
 			ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
@@ -958,7 +905,7 @@ public class ActivityMain extends FragmentActivity {
 
         @Override
         public void onPause() {
-            unregisterForContextMenu(this.list);
+            unregisterForContextMenu(this.contactsList);
 
             super.onPause();
 
@@ -984,9 +931,12 @@ public class ActivityMain extends FragmentActivity {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-            ((ActivityMain)getActivity()).onCreateContactContextMenu(menu, v, R.id.list);
+            if (v.getId()==R.id.contactsList) {
+                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
+            }
         }
-
 
         @Override
         public boolean onContextItemSelected(MenuItem item)
@@ -994,8 +944,17 @@ public class ActivityMain extends FragmentActivity {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             Contact c = (Contact) listAdapter.getItem(info.position);
 
-
-            return ((ActivityMain)getActivity()).onContactContextItemSelected(item, c);
+            switch (item.getItemId()) {
+                case MENU_CONTACT_SHOW:
+                    ((ActivityMain)getActivity()).transitionToContactMap(c);
+                    break;
+                case MENU_CONTACT_DETAILS:
+                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
+                    break;
+                case MENU_CONTACT_NAVIGATE:
+                    ((ActivityMain)getActivity()).launchNavigation(c);
+            }
+            return true;
         }
 
 
@@ -1061,6 +1020,8 @@ public class ActivityMain extends FragmentActivity {
 
     public static class DetailsFragment extends Fragment {
 		public static final String KEY_TOPIC = "TOPIC";
+        private static final int MENU_CONTACT_DETAILS_LINK = 0;
+        private static final int MENU_CONTACT_DETAILS_UNLINK = 1;
 
 		private Contact contact;
 		private TextView name;
@@ -1068,7 +1029,7 @@ public class ActivityMain extends FragmentActivity {
 		private TextView location;
 		private TextView accuracy;
 		private TextView time;
-		private Button assignContact;
+        private ImageButton contactContextMenu;
 		private OnSharedPreferenceChangeListener preferencesChangedListener;
 
 		public static DetailsFragment getInstance() {
@@ -1078,20 +1039,6 @@ public class ActivityMain extends FragmentActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-
-			this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-				@Override
-				public void onSharedPreferenceChanged(
-						SharedPreferences sharedPreference, String key) {
-					if (key.equals(Preferences
-							.getKey(R.string.keyUpdateAddressBook)))
-						showHideAssignContactButton();
-				}
-			};
-			PreferenceManager.getDefaultSharedPreferences(getActivity())
-					.registerOnSharedPreferenceChangeListener(
-							this.preferencesChangedListener);
-
 		}
 
 		@Override
@@ -1100,33 +1047,31 @@ public class ActivityMain extends FragmentActivity {
 			EventBus.getDefault().registerSticky(this);
 		}
 
-		void showHideAssignContactButton() {
-			if (!Preferences.getUpdateAdressBook())
-				this.assignContact.setVisibility(View.VISIBLE);
-			else
-				this.assignContact.setVisibility(View.GONE);
-		}
 
 		@Override
 		public void onDestroy() {
-			PreferenceManager.getDefaultSharedPreferences(getActivity())
-					.unregisterOnSharedPreferenceChangeListener(
-							this.preferencesChangedListener);
 
 			super.onDestroy();
 		}
 
 		@Override
 		public void onStop() {
+
 			EventBus.getDefault().unregister(this);
 			super.onStop();
 		}
 
 		@Override
 		public void onResume() {
-			super.onResume();
-
+            registerForContextMenu(this.contactContextMenu);
+            super.onResume();
 		}
+
+        @Override
+        public void onPause() {
+            unregisterForContextMenu(this.contactContextMenu);
+            super.onPause();
+        }
 
 		@Override
 		public void onHiddenChanged(boolean hidden) {
@@ -1140,33 +1085,15 @@ public class ActivityMain extends FragmentActivity {
 			Bundle extras = FragmentHandler.getInstance().getBundle(DetailsFragment.class);
 
 			this.contact = App.getContact((String) extras.get(KEY_TOPIC));
-			//this.contact = App.getContacts().get(extras.get(KEY_TOPIC));
-
-			this.name.setText(this.contact.getName());
-			this.topic.setText(this.contact.getTopic());
+			if(this.contact.isLinked())
+                this.name.setText(this.contact.getName());
+            else
+                this.name.setText(getString(R.string.na));
+            this.topic.setText(this.contact.getTopic());
 			this.location.setText(this.contact.getLocation().toString());
-			this.accuracy
-					.setText("" + this.contact.getLocation().getAccuracy());
-			this.time.setText(App.formatDate(this.contact.getLocation()
-					.getDate()));
+			this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
+			this.time.setText(App.formatDate(this.contact.getLocation().getDate()));
 
-            if(this.contact.getName() != null) {
-                this.assignContact.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
-                    }
-                });
-            } else {
-                this.assignContact.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
-                    }
-                });
-            }
 		}
 
 		private void onHide() {
@@ -1179,12 +1106,15 @@ public class ActivityMain extends FragmentActivity {
 				Intent data) {
 			super.onActivityResult(requestCode, resultCode, data);
 
-			if ((requestCode == CONTACT_PICKER_RESULT)
-					&& (resultCode == RESULT_OK))
+			if ((requestCode == CONTACT_PICKER_RESULT) && (resultCode == RESULT_OK))
 				assignContact(data);
 		}
 
         private void unassignContact(Contact c) {
+
+            if(c == null)
+                return;
+
             ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
                 @Override
@@ -1224,13 +1154,43 @@ public class ActivityMain extends FragmentActivity {
 			this.location = (TextView) v.findViewById(R.id.location);
 			this.accuracy = (TextView) v.findViewById(R.id.accuracy);
 			this.time = (TextView) v.findViewById(R.id.time);
-			this.assignContact = (Button) v.findViewById(R.id.assignContact);
-			showHideAssignContactButton();
-			onShow();
+            this.contactContextMenu = (ImageButton) v.findViewById(R.id.contactContextMenu);
+
+    		onShow();
 			return v;
 		}
 
-		public void onEventMainThread(Events.ContactUpdated e) {
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+           if(contact == null)
+               return;
+
+            if (v.getId()==R.id.contactContextMenu) {
+                if(this.contact.isLinked())
+                    menu.add(Menu.NONE, MENU_CONTACT_DETAILS_UNLINK, 0, R.string.menuContactDetailsUnlink);
+                else
+                    menu.add(Menu.NONE, MENU_CONTACT_DETAILS_LINK, 0, R.string.menuContactDetailsLink);
+            }
+        }
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case MENU_CONTACT_DETAILS_LINK:
+                    startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
+                    break;
+                case MENU_CONTACT_DETAILS_UNLINK:
+                    unassignContact(this.contact);
+                    break;
+            }
+            return true;
+
+        }
+
+
+
+
+        public void onEventMainThread(Events.ContactUpdated e) {
 			if (e.getContact() == this.contact)
 				onShow();
 		}
@@ -1255,10 +1215,10 @@ public class ActivityMain extends FragmentActivity {
 
     // Developer menu options to quickly trigger code in order to test things
     private void devMenu1() {
-        Log.i(this.toString(), "Developer quickaccess option 1 selected");
+        Log.d(this.toString(), "Developer quickaccess option 1 selected");
         ServiceProxy.getServiceBroker().reconnect();
     }
     private void devMenu2() {
-        Log.i(this.toString(), "Developer quickaccess option 2 selected");
+        Log.d(this.toString(), "Developer quickaccess option 2 selected");
     }
 }

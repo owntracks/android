@@ -57,7 +57,7 @@ public class ServiceApplication implements ProxyableService,
 	private Date lastPublishedLocationTime;
 	private boolean even = false;
 	private Handler handler;
-	private int mContactCount;
+	//private int mContactCount;
 	private ServiceProxy context;
 
 	@Override
@@ -65,29 +65,19 @@ public class ServiceApplication implements ProxyableService,
 		this.context = context;
 		checkPlayServices();
 
-		this.notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationBuilder = new NotificationCompat.Builder(context);
 
-		sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 		this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			@Override
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreference, String key) {
-				if (key.equals(Preferences
-						.getKey(R.string.keyNotification)))
+				if (key.equals(Preferences.getKey(R.string.keyNotification)) || key.equals(Preferences
+                        .getKey(R.string.keyNotificationGeocoder)) || key.equals(Preferences
+                        .getKey(R.string.keyNotificationLocation)))
 					handleNotification();
-				else if (key.equals(Preferences
-						.getKey(R.string.keyNotificationGeocoder)))
-					handleNotification();
-				else if (key.equals(Preferences
-						.getKey(R.string.keyNotificationLocation)))
-					handleNotification();
-				else if (key.equals(Preferences
-						.getKey(R.string.keyUpdateAddressBook)))
-					updateAllContacts();
 			}
 
 		};
@@ -98,9 +88,8 @@ public class ServiceApplication implements ProxyableService,
 				.registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 		handleNotification();
 
-		this.mContactCount = getContactCount();
-		context.getContentResolver().registerContentObserver(
-				ContactsContract.Contacts.CONTENT_URI, true, this.mObserver);
+		//this.mContactCount = getContactCount();
+		//context.getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, this.mObserver);
 
 	}
 
@@ -124,11 +113,10 @@ public class ServiceApplication implements ProxyableService,
 	};
 
 	public void onEventMainThread(Events.LocationMessageReceived e) {
-
 		Contact c = App.getContact(e.getTopic());
 
 		if (c == null) {
-			c = new st.alr.mqttitude.model.Contact(e.getTopic());
+			c = new Contact(e.getTopic());
 			resolveContact(c);
             c.setLocation(e.getGeocodableLocation());
             c.setTid(e.getLocationMessage().getTid());
@@ -138,12 +126,9 @@ public class ServiceApplication implements ProxyableService,
             c.setTid(e.getLocationMessage().getTid());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
-
-
-
 	}
 
-	private int getContactCount() {
+/*	private int getContactCount() {
 		Cursor cursor = null;
 		try {
 			cursor = this.context.getContentResolver().query(
@@ -178,7 +163,7 @@ public class ServiceApplication implements ProxyableService,
 			ServiceApplication.this.mContactCount = currentCount;
 		}
 
-	};
+	};*/
 	private Notification notification;
 	private PendingIntent notificationIntent;
 
@@ -197,7 +182,6 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	private void createNotification() {
-		//
 		notificationBuilder = new NotificationCompat.Builder(this.context);
 
 		Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
@@ -230,8 +214,7 @@ public class ServiceApplication implements ProxyableService,
 		nb.setContentTitle(App.getContext().getString(R.string.app_name))
 				.setSmallIcon(R.drawable.ic_notification)
 				.setContentText("Google Play Services are not available")
-				.setPriority(
-						android.support.v4.app.NotificationCompat.PRIORITY_MIN);
+				.setPriority(android.support.v4.app.NotificationCompat.PRIORITY_MIN);
 		nm.notify(Defaults.NOTIFCATION_ID, nb.build());
 
 	}
@@ -286,15 +269,12 @@ public class ServiceApplication implements ProxyableService,
 		notificationBuilder
 				.setSmallIcon(R.drawable.ic_notification)
 				.setContentText(subtitle)
-				.setPriority(
-						android.support.v4.app.NotificationCompat.PRIORITY_MIN);
+				.setPriority(android.support.v4.app.NotificationCompat.PRIORITY_MIN);
 		if (time != 0)
-			notificationBuilder.setWhen(this.lastPublishedLocationTime
-					.getTime());
+			notificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
 
 		this.notification = notificationBuilder.build();
-		this.context
-				.startForeground(Defaults.NOTIFCATION_ID, this.notification);
+		this.context.startForeground(Defaults.NOTIFCATION_ID, this.notification);
 	}
 
 	public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
@@ -314,41 +294,33 @@ public class ServiceApplication implements ProxyableService,
 		if (Preferences.getNotificationTickerOnWaypointTransition()) {
 			if (e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
 				updateTicker(this.context
-						.getString(R.string.transitionEntering)
-						+ " "
-						+ e.getWaypoint().getDescription());
+						.getString(R.string.transitionEntering) + " " + e.getWaypoint().getDescription());
 			else
-				updateTicker(this.context.getString(R.string.transitionLeaving)
-						+ " " + e.getWaypoint().getDescription());
+				updateTicker(this.context.getString(R.string.transitionLeaving) + " " + e.getWaypoint().getDescription());
 
 		}
 	}
 
 	public void onEvent(Events.PublishSuccessfull e) {
-		Log.v(this.toString(), "Publish successful");
 		if ((e.getExtra() != null) && (e.getExtra() instanceof LocationMessage)) {
 			LocationMessage l = (LocationMessage) e.getExtra();
 
 			this.lastPublishedLocation = l.getLocation();
 			this.lastPublishedLocationTime = l.getLocation().getDate();
 
-			if (Preferences.getNotificationGeocoder()
-					&& (l.getLocation().getGeocoder() == null))
-				(new ReverseGeocodingTask(this.context, this.handler))
-						.execute(new GeocodableLocation[] { l.getLocation() });
+			if (Preferences.getNotificationGeocoder() && (l.getLocation().getGeocoder() == null))
+				(new ReverseGeocodingTask(this.context, this.handler)).execute(new GeocodableLocation[] { l.getLocation() });
 
 			updateNotification();
 
-			if (Preferences.getNotificationTickerOnPublish()
-					&& !l.doesSupressTicker())
+			if (Preferences.getNotificationTickerOnPublish() && !l.doesSupressTicker())
 				updateTicker(this.context.getString(R.string.statePublished));
 
 		}
 	}
 
 	public static boolean checkPlayServices() {
-		playServicesAvailable = ConnectionResult.SUCCESS == GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(App.getContext());
+		playServicesAvailable = ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
 
 		if (!playServicesAvailable)
 			showPlayServicesNotAvilableNotification();
@@ -383,10 +355,7 @@ public class ServiceApplication implements ProxyableService,
 		}
 
         // Resolve image and name from contact id
-		Cursor cursor = this.context.getContentResolver().query(
-				RawContacts.CONTENT_URI, null,
-				ContactsContract.Data.CONTACT_ID + " = ?",
-				new String[] { contactId + "" }, null);
+		Cursor cursor = this.context.getContentResolver().query(RawContacts.CONTENT_URI, null,ContactsContract.Data.CONTACT_ID + " = ?", new String[] { contactId + "" }, null);
 		if (!cursor.isAfterLast()) {
 
 			while (cursor.moveToNext()) {
@@ -404,7 +373,6 @@ public class ServiceApplication implements ProxyableService,
 
 		cursor.close();
 
-
 	}
 
 	void setContactImageAndName(Contact c, Bitmap image, String name) {
@@ -413,59 +381,12 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	private long getContactId(Contact c) {
-		if (Preferences.getUpdateAdressBook())
-			return getContactIdFromCloud(c);
-		else
-			return getContactIdFromLocalStorage(c);
-	}
-
-	public long getContactIdFromLocalStorage(Contact c) {
 		ContactLink cl = App.getContactLinkDao().load(c.getTopic());
-
 		return cl != null ? cl.getContactId() : 0;
 	}
 
-	public long getContactIdFromCloud(Contact c) {
-		Long cId = (long) 0;
-		String imWhere = "("
-				+ ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL
-				+ " = ? COLLATE NOCASE) AND ("
-				+ ContactsContract.CommonDataKinds.Im.DATA
-				+ " = ? COLLATE NOCASE)";
-		String[] imWhereParams = new String[] { "OwnTracks", c.getTopic() };
-
-		Cursor cursor = this.context.getContentResolver().query(
-				ContactsContract.Data.CONTENT_URI, null, imWhere,
-				imWhereParams, null);
-
-		cursor.move(-1);
-		while (cursor.moveToNext()) {
-			cId = cursor.getLong(cursor
-					.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-			Log.v(this.toString(),
-					"found matching raw contact id "
-							+ cursor.getString(cursor
-									.getColumnIndex(BaseColumns._ID))
-							+ " with contact id "
-							+ cId
-							+ " to be associated with topic "
-							+ cursor.getString(cursor
-									.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
-			break;
-		}
-		cursor.close();
-		return cId;
-	}
 
 	public void linkContact(Contact c, long contactId) {
-		if (Preferences.getUpdateAdressBook()) {
-			Log.e(this.toString(),
-					"Saving a ContactLink to the cloud is not yet supported");
-			return;
-		}
-		Log.v(this.toString(), "Creating ContactLink from " + c.getTopic()
-				+ " to contactId " + contactId);
-
 		ContactLink cl = new ContactLink(c.getTopic(), contactId);
 		App.getContactLinkDao().insertOrReplace(cl);
 
@@ -501,8 +422,6 @@ public class ServiceApplication implements ProxyableService,
         dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
         Log.v(this.toString(), "Dump data: " + dump.toString());
-
-
 
         ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString());
 
