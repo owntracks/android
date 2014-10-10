@@ -291,14 +291,15 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEvent(Events.WaypointTransition e) {
-		if (Preferences.getNotificationTickerOnWaypointTransition()) {
-			if (e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
-				updateTicker(this.context
-						.getString(R.string.transitionEntering) + " " + e.getWaypoint().getDescription());
-			else
-				updateTicker(this.context.getString(R.string.transitionLeaving) + " " + e.getWaypoint().getDescription());
+        if(e.getWaypoint().getNotificationOnEnter() || e.getWaypoint().getNotificationOnLeave()) {
+            String formatString = e.getWaypoint().getNotificationMessage();
 
-		}
+            if(formatString == null || formatString.equals(""))
+                formatString = context.getString(R.string.waypointLocalDefaultFormatMessage);
+
+            updateTicker(Defaults.formatNotificationMessage(context, formatString, e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER, e.getWaypoint()));
+
+        }
 	}
 
 	public void onEvent(Events.PublishSuccessfull e) {

@@ -17,7 +17,8 @@ public class GeocodableLocation extends Location {
 	String geocoder;
 	LatLng latlng;
 	String tag;
-	Date date;
+	Object extra;
+    Date date;
 
 	public String getTag() {
 		return this.tag;
@@ -27,7 +28,15 @@ public class GeocodableLocation extends Location {
 		this.tag = tag;
 	}
 
-	public GeocodableLocation(Location location) {
+    public Object getExtra() {
+        return extra;
+    }
+
+    public void setExtra(Object extra) {
+        this.extra = extra;
+    }
+
+    public GeocodableLocation(Location location) {
 		this(location, null);
 	}
 
@@ -115,13 +124,14 @@ public class GeocodableLocation extends Location {
 	public void setLatitude(double latitude) {
 		super.setLatitude(latitude);
 		this.latlng = new LatLng(latitude, getLongitude());
+        this.setGeocoder(null);
 	}
 
 	@Override
 	public void setLongitude(double longitude) {
 		super.setLongitude(longitude);
 		this.latlng = new LatLng(getLatitude(), longitude);
-
+        this.setGeocoder(null);
 	}
 
 	public void setGeocoder(String geocoder) {

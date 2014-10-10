@@ -1,6 +1,7 @@
 package st.alr.mqttitude.support;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +57,8 @@ public class ReverseGeocodingTask extends
 		} else {
 			r = GEOCODER_RESULT;
 		}
-		Message.obtain(this.mHandler, r, l).sendToTarget();
+        if(params.length == 1)
+		    Message.obtain(this.mHandler, r, l).sendToTarget();
 
 		return null;
 	}

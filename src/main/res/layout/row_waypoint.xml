@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
     android:orientation="vertical"
+    android:padding="@dimen/default_horizontal_spacing"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -27,22 +28,18 @@
         android:scrollHorizontally="false"
         android:text="location" />
 
-    <ImageView
-        android:id="@+id/leave"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_alignBottom="@+id/description"
-        android:layout_alignTop="@+id/description"
-        android:layout_toRightOf="@+id/description"
-        android:src="@drawable/ic_leave" />
+    <TextView
+        android:id="@+id/details"
+        style="@style/listItemSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignStart="@id/location"
+        android:layout_below="@+id/location"
+        android:paddingTop="-5dp"
+        android:scrollHorizontally="false"
+        android:text="details" />
 
-    <ImageView
-        android:id="@+id/enter"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_alignBottom="@+id/description"
-        android:layout_alignTop="@+id/leave"
-        android:layout_toRightOf="@+id/leave"
-        android:src="@drawable/ic_enter" />
+
 
 </RelativeLayout>
