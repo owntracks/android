@@ -1,7 +1,9 @@
 package st.alr.mqttitude.services;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -22,10 +24,12 @@ import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.util.Collection;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.messages.BeaconMessage;
+import st.alr.mqttitude.support.BluetoothStateChangeReceiver;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
@@ -44,6 +48,32 @@ public class ServiceBeacon implements
     private OnSharedPreferenceChangeListener preferencesChangedListener;
     private static Defaults.State.ServiceBeacon state = Defaults.State.ServiceBeacon.INITIAL;
     private ServiceProxy context;
+
+    public void setBluetoothMode(int state) {
+        switch (state) {
+            case BluetoothAdapter.STATE_OFF:
+                Log.v(this.toString(), "Bluetooth turned off");
+                stopBeaconScanning();
+                break;
+            case BluetoothAdapter.STATE_TURNING_OFF:
+                Log.v(this.toString(), "Bluetooth is turning off");
+                stopBeaconScanning();
+                break;
+            case BluetoothAdapter.STATE_ON:
+                Log.v(this.toString(), "Bluetooth on");
+                if(Preferences.getBeaconRangingEnabled())
+                    initializeBeaconScanning();
+                break;
+            case BluetoothAdapter.STATE_TURNING_ON:
+                Log.v(this.toString(), "Bluetooth is turning on");
+                break;
+        }
+    }
+
+    private enum ScanningState {
+        DISABLED, ENABLED
+    }
+    private ScanningState scanningState;
 
     private boolean ready = false;
 
@@ -129,6 +159,11 @@ public class ServiceBeacon implements
         this.sharedPreferences
                 .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
+        context.registerReceiver(BluetoothStateChangeReceiver.GetBroadcastReceiver(), null);
+
+        mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
+        scanningState = ScanningState.DISABLED;
+
         // Detect all valid beacons
         region = new Region("all beacons", null, null, null);
 
@@ -141,13 +176,18 @@ public class ServiceBeacon implements
 
     private void handlePreferences(String key)
     {
-        if (key.equalsIgnoreCase(Preferences.getKey(R.string.beaconRangingEnabled)))
+        if (key.equals(Preferences.getKey(R.string.keyBeaconRangingEnabled)))
         {
             Log.v(this.toString(), "Beacon ranging toggle");
             if(Preferences.getBeaconRangingEnabled())
                 initializeBeaconScanning();
             else
                 stopBeaconScanning();
+        }
+        else if(key.equals(Preferences.getKey(R.string.keyCustomBeaconLayout)))
+        {
+            Log.v(this.toString(), "Setting custom beacon layout");
+            refreshCustomParser();
         }
 
         // TODO: Beacon ranging intervals
@@ -156,14 +196,12 @@ public class ServiceBeacon implements
     private void initializeBeaconScanning()
     {
         Log.v(this.toString(), "Initializing beacon scanning");
-        mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
 
         try
         {
             if(!mBeaconManager.checkAvailability()) {
                 changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
                 Log.e(this.toString(), "Bluetooth not available");
-                mBeaconManager = null;
                 return;
             }
         }
@@ -171,7 +209,6 @@ public class ServiceBeacon implements
         {
             changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
             Log.e(this.toString(), "Bluetooth not available");
-            mBeaconManager = null;
             return;
         }
 
@@ -182,24 +219,41 @@ public class ServiceBeacon implements
         mBeaconManager.setForegroundBetweenScanPeriod(0L);      // default is 0L
         mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
 
-        String customBeaconlayout = Preferences.getCustomBeaconLayout();
-        if(!customBeaconlayout.equals(""))
-        {
-            Log.v(this.toString(), "Got custom layout");
-            mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(customBeaconlayout));
-        }
+        refreshCustomParser();
 
         Log.v(this.toString(), "Setting up RegionBootstrap");
         regionBootstrap = new RegionBootstrap(this, region);
+
+        scanningState = ScanningState.ENABLED;
+    }
+
+    private void refreshCustomParser()
+    {
+        if(scanningState != ScanningState.ENABLED)
+            return;
+
+        String customBeaconlayout = Preferences.getCustomBeaconLayout();
+        if(!customBeaconlayout.equals(""))
+        {
+            Log.v(this.toString(), "Got custom parser layout");
+            List<BeaconParser> parsers = mBeaconManager.getBeaconParsers();
+            Log.v(this.toString(), "Parser count: " + parsers.size());
+
+            if(parsers.size() > 0)
+                parsers.remove(parsers.get(parsers.size() - 1)); // Remove last parser
+
+            parsers.add(new BeaconParser().setBeaconLayout(customBeaconlayout));
+        }
     }
 
     private void stopBeaconScanning()
     {
         Log.v(this.toString(), "Stopping beacon scanning");
-        changeState(Defaults.State.ServiceBeacon.SCANNING_DISABLED);
 
-        if(mBeaconManager == null)
+        if(scanningState != ScanningState.ENABLED)
             return;
+
+        scanningState = ScanningState.DISABLED;
 
         regionBootstrap.disable();
         try {
@@ -261,6 +315,7 @@ public class ServiceBeacon implements
 
     @Override
     public void onDestroy() {
+        context.unregisterReceiver(BluetoothStateChangeReceiver.GetBroadcastReceiver());
     }
 
     public static Defaults.State.ServiceBeacon getState() {
@@ -285,8 +340,10 @@ public class ServiceBeacon implements
 
     public void setBackgroundMode(boolean backgroundMode)
     {
-        if(mBeaconManager != null)
-            mBeaconManager.setBackgroundMode(backgroundMode);
+        if(scanningState != ScanningState.ENABLED)
+            return;
+
+        mBeaconManager.setBackgroundMode(backgroundMode);
     }
 
     @Override
