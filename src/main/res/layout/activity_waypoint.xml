@@ -7,16 +7,11 @@
         android:id="@+id/waypoints"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="@dimen/default_horizontal_spacing"
-        android:layout_marginRight="@dimen/default_horizontal_spacing"
-        android:layout_marginTop="0dp"
-        android:clipToPadding="false"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:paddingBottom="@dimen/default_vertical_spacing"
-        android:paddingTop="@dimen/default_vertical_spacing"
-        android:scrollbars="none" >
-    </ListView>
+        android:clipToPadding="false"/>
 
+    <TextView android:id="@+id/waypointListPlaceholder"
+              android:gravity="center"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:text="@string/waypointListPlaceholder" />
 </RelativeLayout>

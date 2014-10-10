@@ -468,7 +468,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		if (update || remove)
 			removeGeofence(w);
 
-		if (!remove) {
+		if (!remove && w.getRadius() != null && w.getRadius() > 0) {
 			requestGeofences();
 		}
 	}
@@ -496,8 +496,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
 					.setTransitionTypes(w.getTransitionType())
-					.setCircularRegion(w.getLatitude(), w.getLongitude(),
-							w.getRadius())
+					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
 			fences.add(geofence);
@@ -558,8 +557,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
-		return (w.getRadius() != null) && (w.getRadius() > 0)
-				&& (w.getLatitude() != null) && (w.getLongitude() != null);
+		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
 	}
 
 	@Override

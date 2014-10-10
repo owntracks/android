@@ -67,7 +67,7 @@
     <string name="connectivityDisconnectedUserDisconnect">"Disconnected: By user"</string>
     <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
     <string name="na">Not available</string>
-    <string name="currentLocation">Current</string>
+    <string name="currentLocation">Use current location</string>
     <string name="shareLocation">Share location</string>
     <string name="share">Share</string>
     <string name="save">"Save"</string>
@@ -162,7 +162,7 @@
     <string name="reportOn">Report on</string>
     <string name="transitionEnter">Enter</string>
     <string name="transitionLeave">Leave</string>
-    <string name="transitionBoth">Enter and Leave</string>
+    <string name="transitionBoth">Enter &amp; Leave</string>
     <string name="transitionEntering">Entering</string>
     <string name="transitionLeaving">Leaving</string>
     <string name="title_activity_activity_launcher">ActivityLauncher</string>
@@ -275,5 +275,12 @@
     <string name="menuContactDetailsLink">Link</string>
     <string name="menuContactDetailsUnlink">Unlink</string>
     <string name="contactListPlaceholder">No contact information received yet</string>
+    <string name="waypointListPlaceholder">No waypoints defined yet</string>
+    <string name="notificationMessage">Notification</string>
+    <string name="Enabled">Enabled</string>
+    <string name="waypointLocalDefaultFormatMessage" formatted="false">%e %d</string>
+    <string name="transitionEnteringNotification">entering</string>
+    <string name="transitionLeavingNotification">leaving</string>
+    <string name="geofenceActive">Geofence active</string>
 
 </resources>

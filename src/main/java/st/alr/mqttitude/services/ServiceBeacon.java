@@ -66,6 +66,8 @@ public class ServiceBeacon implements
         } catch (RemoteException e) {
             Log.e(this.toString(), "Cannot start ranging");
         }
+
+
     }
 
     @Override

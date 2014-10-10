@@ -3,49 +3,80 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dip" >
+>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/textView0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/description"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <EditText
-            android:id="@+id/description"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text" >
-        </EditText>
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/default_horizontal_spacing"
+            android:paddingRight="@dimen/default_horizontal_spacing"
+            android:paddingTop="@dimen/default_horizontal_spacing_half"
+            android:paddingBottom="@dimen/default_horizontal_spacing_half"
+            android:background="@drawable/mylocationbutton"
+            android:id="@+id/currentLocationWrapper">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
 
-            <LinearLayout
+            <TextView
+                android:textColor="#6f7275"
+                android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/useCurrent"
-                android:orientation="vertical" >
+                android:text="@string/currentLocation"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:textColor="#6f7275"
+                android:id="@+id/currentLocation"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/na"
+                android:layout_marginBottom="@dimen/default_horizontal_spacing_half"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/default_horizontal_spacing"
+            android:paddingRight="@dimen/default_horizontal_spacing"
+            android:paddingTop="@dimen/default_horizontal_spacing_half"
+            android:paddingBottom="@dimen/default_horizontal_spacing_half"
+            android:id="@+id/waypointDetails">
+
+            <TextView
+                android:id="@+id/textView0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text" >
+                </EditText>
 
                 <TextView
                     android:id="@+id/textView1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/latitude"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <EditText
                     android:id="@+id/latitude"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="-0123456789."
                     android:ems="10"
@@ -53,7 +84,7 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/longitude"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -64,90 +95,132 @@
                     android:layout_height="wrap_content"
                     android:digits="-0123456789."
                     android:ems="10"
-                    android:inputType="numberDecimal" />
+                    android:inputType="numberDecimal"/>
 
-                <TextView
-                    android:id="@+id/textView3"
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content">
+
+                    <TextView
+                            android:id="@+id/textView3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/radius"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <EditText
+                            android:id="@+id/radius"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:inputType="numberDecimal" >
+                        </EditText>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/radius"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:layout_marginLeft="@dimen/default_horizontal_spacing_half">
 
-                <EditText
-                    android:id="@+id/radius"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:inputType="numberDecimal" >
+                    <TextView
+                            android:id="@+id/textView7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/share"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    <requestFocus />
-                </EditText>
+                    <CheckBox
+                            android:id="@+id/share"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"/>
+                </LinearLayout>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/useCurrent"
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                    android:orientation="vertical"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="Current" />
-        </RelativeLayout>
+                android:visibility="gone"
+                android:id="@+id/waypointGeofenceSettings"
+                >
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/transitionType"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/transitionType"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <Spinner
-            android:id="@+id/transitionType"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/transitionType_readable" />
+                <Spinner
+                    android:id="@+id/transitionType"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/transitionType_readable" />
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/share"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
 
-        <CheckBox
-            android:id="@+id/share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content">
+                        <TextView
+                            android:id="@+id/textView8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notificationMessage"
+                            android:textAppearance="?android:attr/textAppearanceSmall"  />
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/notification"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:visibility="gone" />
+                        <EditText
+                            android:id="@+id/notificationMessage"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:hint="@string/waypointLocalDefaultFormatMessage"/>
 
-        <CheckBox
-            android:id="@+id/notification"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+                    </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/notificationTitle"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:visibility="gone" />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/wrapper2"
+                        android:layout_marginLeft="@dimen/default_horizontal_spacing_half">
 
-        <EditText
-            android:id="@+id/notificationTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:visibility="gone" >
-        </EditText>
+
+                        <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Enabled"
+                            android:textAppearance="?android:attr/textAppearanceSmall"  />
+
+                        <CheckBox
+                            android:id="@+id/waypointNotificationOnEnterLeave"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center|right"
+                            android:checked="true"
+                            android:enabled="true"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
 </ScrollView>
