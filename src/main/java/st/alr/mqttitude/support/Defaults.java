@@ -99,7 +99,8 @@ public class Defaults {
         };
 
         public static enum ServiceBeacon {
-            INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
+            INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH,
+            SCANNING_DISABLED
         }
 
         public static String toString(
@@ -121,6 +122,9 @@ public class Defaults {
                     break;
                 case NOBLUETOOTH:
                     id = R.string.stateBluetoothFail;
+                    break;
+                case SCANNING_DISABLED:
+                    id = R.string.stateBluetoothScanningDisabled;
                     break;
                 default:
                     id = R.string.stateIdle;

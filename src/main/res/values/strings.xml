@@ -79,6 +79,7 @@
     <string name="statePublishTimeout">"Error: Timeout"</string>
     <string name="stateLocatingFail">"Error: Unable to acquire location"</string>
     <string name="stateBluetoothFail">"Error: Bluetooth is unavailable"</string>
+    <string name="stateBluetoothScanningDisabled">"Error: Beacon scanning disabled"</string>
     <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
