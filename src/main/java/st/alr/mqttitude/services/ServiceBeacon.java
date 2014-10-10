@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,6 +24,7 @@ import org.altbeacon.beacon.startup.RegionBootstrap;
 import java.util.Collection;
 
 import de.greenrobot.event.EventBus;
+import st.alr.mqttitude.R;
 import st.alr.mqttitude.messages.BeaconMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
@@ -111,10 +113,49 @@ public class ServiceBeacon implements
 
     @Override
     public void onCreate(ServiceProxy p) {
-
         this.context = p;
         this.lastPublish = 0;
 
+        this.sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(this.context);
+
+        this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(
+                    SharedPreferences sharedPreference, String key) {
+                handlePreferences(key);
+            }
+        };
+        this.sharedPreferences
+                .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
+
+        // Detect all valid beacons
+        region = new Region("all beacons", null, null, null);
+
+        if(Preferences.getBeaconRangingEnabled()) {
+            Log.v(this.toString(), "Ranging enabled on startup");
+            initializeBeaconScanning();
+        } else
+            Log.v(this.toString(), "Ranging disabled on startup");
+    }
+
+    private void handlePreferences(String key)
+    {
+        if (key.equalsIgnoreCase(Preferences.getKey(R.string.beaconRangingEnabled)))
+        {
+            Log.v(this.toString(), "Beacon ranging toggle");
+            if(Preferences.getBeaconRangingEnabled())
+                initializeBeaconScanning();
+            else
+                stopBeaconScanning();
+        }
+
+        // TODO: Beacon ranging intervals
+    }
+
+    private void initializeBeaconScanning()
+    {
+        Log.v(this.toString(), "Initializing beacon scanning");
         mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
 
         try
@@ -122,6 +163,7 @@ public class ServiceBeacon implements
             if(!mBeaconManager.checkAvailability()) {
                 changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
                 Log.e(this.toString(), "Bluetooth not available");
+                mBeaconManager = null;
                 return;
             }
         }
@@ -129,9 +171,11 @@ public class ServiceBeacon implements
         {
             changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
             Log.e(this.toString(), "Bluetooth not available");
+            mBeaconManager = null;
             return;
         }
 
+        Log.v(this.toString(), "Beacon scanning should be available");
         // Should add prefs for these
         mBeaconManager.setBackgroundBetweenScanPeriod(30000L);  // default is 300000L
         mBeaconManager.setBackgroundScanPeriod(2000L);          // default is 10000L
@@ -140,12 +184,33 @@ public class ServiceBeacon implements
 
         String customBeaconlayout = Preferences.getCustomBeaconLayout();
         if(!customBeaconlayout.equals(""))
+        {
+            Log.v(this.toString(), "Got custom layout");
             mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(customBeaconlayout));
+        }
 
-
-        // Detect all valid beacons
-        region = new Region("all beacons", null, null, null);
+        Log.v(this.toString(), "Setting up RegionBootstrap");
         regionBootstrap = new RegionBootstrap(this, region);
+    }
+
+    private void stopBeaconScanning()
+    {
+        Log.v(this.toString(), "Stopping beacon scanning");
+        changeState(Defaults.State.ServiceBeacon.SCANNING_DISABLED);
+
+        if(mBeaconManager == null)
+            return;
+
+        regionBootstrap.disable();
+        try {
+            mBeaconManager.stopRangingBeaconsInRegion(region);
+            mBeaconManager.stopMonitoringBeaconsInRegion(region);
+            mBeaconManager = null;
+        }
+        catch (RemoteException e)
+        {
+            return;
+        }
     }
 
     private void publishBeaconMessage(BeaconMessage r) {
@@ -220,7 +285,8 @@ public class ServiceBeacon implements
 
     public void setBackgroundMode(boolean backgroundMode)
     {
-        mBeaconManager.setBackgroundMode(backgroundMode);
+        if(mBeaconManager != null)
+            mBeaconManager.setBackgroundMode(backgroundMode);
     }
 
     @Override
