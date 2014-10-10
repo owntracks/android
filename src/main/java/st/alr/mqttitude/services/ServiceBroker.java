@@ -771,6 +771,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
             LocationMessage lm = LocationMessage.fromJsonObject(json);
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
+        } else if(type.equals("waypoint")) {
+
+
         } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic())) {
             String action = "";
             try {

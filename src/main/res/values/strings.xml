@@ -282,5 +282,7 @@
     <string name="transitionEnteringNotification">entering</string>
     <string name="transitionLeavingNotification">leaving</string>
     <string name="geofenceActive">Geofence active</string>
+    <string name="menuWaypointDelete">Remove</string>
+    <string name="Topic">topic</string>
 
 </resources>

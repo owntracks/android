@@ -46,7 +46,15 @@ public abstract class MultitypeAdapter extends BaseAdapter {
         rows.add(new Pair<Integer, Object>(ROW_TYPE_HEADER, str));
         notifyDataSetChanged();
     }
+    public void addHeaderAtIndex(String str, int index) {
+        rows.add(index, new Pair<Integer, Object>(ROW_TYPE_HEADER, str));
+        notifyDataSetChanged();
+    }
 
+    public void addItemAtIndex(Object o, int index) {
+        rows.add(index, new Pair<Integer, Object>(ROW_TYPE_ITEM, o));
+        notifyDataSetChanged();
+    }
 
     public void addItem(Object o) {
         rows.add(new Pair<Integer, Object>(ROW_TYPE_ITEM, o));

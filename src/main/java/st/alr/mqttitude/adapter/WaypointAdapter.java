@@ -13,6 +13,11 @@ import android.widget.TextView;
 import com.google.android.gms.location.Geofence;
 
 public class WaypointAdapter extends MultitypeAdapter {
+
+    public WaypointAdapter(Context context) {
+        super(context);
+    }
+
     public WaypointAdapter(Context context, ArrayList<Waypoint> waypoints) {
         super(context);
 

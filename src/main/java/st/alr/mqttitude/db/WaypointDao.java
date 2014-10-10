@@ -54,7 +54,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'WAYPOINT' (" + //
-                "'ID' INTEGER PRIMARY KEY ," + // 0: id
+                "'ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "'TYPE' INTEGER," + // 1: type
                 "'DESCRIPTION' TEXT," + // 2: description
                 "'LATITUDE' REAL," + // 3: latitude
