@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/default_horizontal_spacing"
+            android:paddingRight="@dimen/default_horizontal_spacing"
+            android:paddingTop="@dimen/default_horizontal_spacing_half"
+            android:paddingBottom="@dimen/default_horizontal_spacing_half"
+            android:background="@drawable/mylocationbutton"
+            android:id="@+id/currentLocationWrapper">
+
+
+            <TextView
+                android:textColor="#6f7275"
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/currentLocation"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:textColor="#6f7275"
+                android:id="@+id/currentLocation"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/na"
+                android:layout_marginBottom="@dimen/default_horizontal_spacing_half"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/default_horizontal_spacing"
+            android:paddingRight="@dimen/default_horizontal_spacing"
+            android:paddingTop="@dimen/default_horizontal_spacing_half"
+            android:paddingBottom="@dimen/default_horizontal_spacing_half"
+            android:id="@+id/waypointDetails">
+
+            <TextView
+                android:id="@+id/textView0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text" >
+                </EditText>
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Topic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            <EditText
+                android:id="@+id/monitorTopic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"/>
+
+            <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/latitude"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <EditText
+                    android:id="@+id/latitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="-0123456789."
+                    android:ems="10"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/longitude"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <EditText
+                    android:id="@+id/longitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="-0123456789."
+                    android:ems="10"
+                    android:inputType="numberDecimal"/>
+
+
+            <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/radius"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                    android:id="@+id/radius"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="numberDecimal" >
+                </EditText>
+
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transitionType"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <Spinner
+                android:id="@+id/transitionType"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/transitionType_readable" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content">
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notificationMessage"
+                        android:textAppearance="?android:attr/textAppearanceSmall"  />
+
+                    <EditText
+                        android:id="@+id/notificationMessage"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="text"
+                        android:hint="@string/waypointLocalDefaultFormatMessage"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/wrapper2"
+                    android:layout_marginLeft="@dimen/default_horizontal_spacing_half">
+
+
+                    <TextView
+                        android:id="@+id/textView6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Enabled"
+                        android:textAppearance="?android:attr/textAppearanceSmall"  />
+
+                    <CheckBox
+                        android:id="@+id/waypointNotificationOnEnterLeave"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|right"
+                        android:checked="true"
+                        android:enabled="true"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
