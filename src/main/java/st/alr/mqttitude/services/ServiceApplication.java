@@ -3,12 +3,15 @@ package st.alr.mqttitude.services;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.ContactLink;
+import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.messages.ConfigurationMessage;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.messages.DumpMessage;
@@ -115,6 +118,7 @@ public class ServiceApplication implements ProxyableService,
 	public void onEventMainThread(Events.LocationMessageReceived e) {
 		Contact c = App.getContact(e.getTopic());
 
+
 		if (c == null) {
 			c = new Contact(e.getTopic());
 			resolveContact(c);
@@ -126,6 +130,21 @@ public class ServiceApplication implements ProxyableService,
             c.setTid(e.getLocationMessage().getTid());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
+
+        // TESTING
+        // Check if we have a local monitor waypoint on this topic
+        List<Waypoint> monitorWaypoints = App.getWaypointDao().queryBuilder().where(WaypointDao.Properties.Type.eq(2))
+                .list();
+        Log.D(this.toString(), "TESTING: MATCHING MONITORING WAYPOINTS")
+        Log.d(this.toString(), "Location messsage received on topic: " + e.getTopic());
+        for(Waypoint w : monitorWaypoints) {
+            if(w.getTopic().equals(e.getTopic())) {
+                Log.d(this.toString(), "MONITORING WAYPOINT REGISTERED for topic");
+                Log.d(this.toString(), "WAYPOINT: lat " + w.getLatitude() + " long " +w.getLongitude() + " rad " + w.getRadius() + " transition " + w.getTransitionType() );
+            }
+
+        }
+
 	}
 
 /*	private int getContactCount() {
@@ -383,7 +402,8 @@ public class ServiceApplication implements ProxyableService,
 
 	private long getContactId(Contact c) {
 		ContactLink cl = App.getContactLinkDao().load(c.getTopic());
-		return cl != null ? cl.getContactId() : 0;
+
+        return cl != null ? cl.getContactId() : 0;
 	}
 
 

@@ -22,7 +22,7 @@ public class DaoGenerator {
 
 
         Entity waypoint = schema.addEntity("Waypoint");
-        waypoint.addLongProperty("id").primaryKey();
+        waypoint.addLongProperty("id").primaryKey().autoincrement();
         waypoint.addIntProperty("type"); // 0 == local, 1 == shared from remote, 2==local for monitoring enter/leave without events
 
         waypoint.addStringProperty("description");
