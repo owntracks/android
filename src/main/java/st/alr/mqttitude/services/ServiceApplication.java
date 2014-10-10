@@ -291,7 +291,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEvent(Events.WaypointTransition e) {
-        if(e.getWaypoint().getNotificationOnEnter() || e.getWaypoint().getNotificationOnLeave()) {
+        if(Preferences.getNotificationTickerOnWaypointTransition() &&  (e.getWaypoint().getNotificationOnEnter() || e.getWaypoint().getNotificationOnLeave())) {
             String formatString = e.getWaypoint().getNotificationMessage();
 
             if(formatString == null || formatString.equals(""))
