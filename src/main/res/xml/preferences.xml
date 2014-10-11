@@ -10,6 +10,7 @@
     <PreferenceScreen
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
+
         <CheckBoxPreference
             android:defaultValue="@bool/valPub"
             android:key="@string/keyPub"
@@ -31,6 +32,17 @@
             android:key="@string/keyPubIncludeBattery"
             android:summary="@string/preferencesIncludeBatterySummary"
             android:title="@string/preferencesIncludeBattery" />
+
+        <EditTextPreference
+            android:defaultValue="@string/valTrackerId"
+            android:dialogTitle="@string/preferencesTrackerId"
+            android:key="@string/keyTrackerId"
+            android:summary="@string/preferencesTrackerIdSummary"
+            android:title="@string/preferencesTrackerId"
+            android:maxLength="2"
+            android:inputType="textNoSuggestions"
+            android:digits="0123456789abcdefghilmnopqrstuvzxyjk"/>
+
     </PreferenceScreen>
     <PreferenceScreen
         android:key="activitySettings"

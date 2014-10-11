@@ -30,7 +30,7 @@ public class Contact {
 	private int uid;
 	private String name;
 	private String topic;
-    private String tid;
+    private String trackerId;
     private GeocodableLocation location;
 	private Bitmap userImage;
     private BitmapDescriptor userImageDescriptor;
@@ -88,12 +88,12 @@ public class Contact {
 		this.name = name;
 	}
 
-    public String getTid() {
-        return tid;
+    public String getTrackerId() {
+        return trackerId;
     }
 
-    public void setTid(String tid) {
-        this.tid = tid;
+    public void setTrackerId(String tid) {
+        this.trackerId = tid;
     }
 
     public GeocodableLocation getLocation() {

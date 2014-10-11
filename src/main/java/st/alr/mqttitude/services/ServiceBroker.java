@@ -200,12 +200,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 			String prefix = Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsNone) ? "tcp" : "ssl";
-			String cid = Preferences.getDeviceId(true);
-
-            //if(Preferences.getZeroLenghClientId())
-            //    Log.v(this.toString(), "Using zero-lengh (MQTT v 3.1.1) client-id");
-            //else
-
+			String cid = Preferences.getClientId(true);
+            Log.v(this.toString(), "Using client id: " + cid);
 
             this.mqttClient = new MqttClient(prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort(), cid, null);
 			this.mqttClient.setCallback(this);

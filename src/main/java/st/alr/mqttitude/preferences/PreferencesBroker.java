@@ -30,40 +30,28 @@ public class PreferencesBroker extends DialogPreference {
 	private EditText host;
 	private EditText port;
 	private EditText password;
-
-	private EditText deviceName;
 	private static EditText userName;
-
 	private EditText brokerSecuritySSLCaCrtPath;
-
 	private Spinner brokerSecurity;
 	private View brokerSecuritySSLOptions;
 	private View brokerSecurityNoneOptions;
-    private View clientIdNegotiationManualOptions;
-    private View clientIdNegotiationAutoOptions;
-
-
     private Spinner brokerAuth;
-    private Spinner clientIdNegotiation;
+    private EditText deviceId;
     private EditText clientId;
     private CheckBox cleanSession;
-
 
 	private LinearLayout securityWrapper;
 	private LinearLayout brokerPasswordWrapper;
 	private LinearLayout brokerAuthWrapper;
-    private LinearLayout clientIdNegotiationWrapper;
     private LinearLayout cleanSessionWrapper;
+    private LinearLayout clientIdWrapper;
 
 	private enum RequireablePreferences {
-		USER_NAME, DEVICE_NAME, BROKER_HOST, BROKER_PORT, BROKER_PASSWORD, CACRT, CLIENT_ID
+		USER_NAME, DEVICE_NAME, BROKER_HOST, BROKER_PORT, BROKER_PASSWORD, CACRT, DEVICE_ID
 	};
 
-	Set<RequireablePreferences> okPreferences = Collections
-			.synchronizedSet(EnumSet.noneOf(RequireablePreferences.class));
-	Set<RequireablePreferences> requiredPreferences = Collections
-			.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST,
-					RequireablePreferences.USER_NAME));
+	Set<RequireablePreferences> okPreferences = Collections.synchronizedSet(EnumSet.noneOf(RequireablePreferences.class));
+	Set<RequireablePreferences> requiredPreferences = Collections.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST, RequireablePreferences.USER_NAME, RequireablePreferences.DEVICE_ID, RequireablePreferences.USER_NAME));
 
 	public PreferencesBroker(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -83,22 +71,19 @@ public class PreferencesBroker extends DialogPreference {
 		this.brokerAuthWrapper = (LinearLayout) root.findViewById(R.id.brokerAuthWrapper);
 		this.brokerPasswordWrapper = (LinearLayout) root.findViewById(R.id.brokerPasswordWrapper);
 		this.securityWrapper = (LinearLayout) root.findViewById(R.id.securityWrapper);
-        this.clientIdNegotiationWrapper =(LinearLayout) root.findViewById(R.id.clientIdNegotiationWrapper);
         this.cleanSessionWrapper = (LinearLayout) root.findViewById(R.id.cleanSessionWrapper);
+        this.clientIdWrapper = (LinearLayout) root.findViewById(R.id.clientIdWrapper);
         this.host = (EditText) root.findViewById(R.id.brokerHost);
 		this.port = (EditText) root.findViewById(R.id.brokerPort);
-		this.deviceName = (EditText) root.findViewById(R.id.deviceName);
 		this.userName = (EditText) root.findViewById(R.id.userName);
 		this.password = (EditText) root.findViewById(R.id.brokerPassword);
 		this.brokerSecurity = (Spinner) root.findViewById(R.id.brokerSecurity);
 		this.brokerAuth = (Spinner) root.findViewById(R.id.brokerAuth);
-        this.clientIdNegotiation = (Spinner) root.findViewById(R.id.clientIdNegotiation);
+        this.deviceId = (EditText) root.findViewById(R.id.deviceId);
         this.clientId = (EditText) root.findViewById(R.id.clientId);
 		this.brokerSecurityNoneOptions = root.findViewById(R.id.brokerSecurityNoneOptions);
 		this.brokerSecuritySSLOptions = root.findViewById(R.id.brokerSecuritySSLOptions);
 		this.brokerSecuritySSLCaCrtPath = (EditText) root.findViewById(R.id.brokerSecuritySSLCaCrtPath);
-        this.clientIdNegotiationAutoOptions = root.findViewById(R.id.clientIdNegotiationAutoOptions);
-        this.clientIdNegotiationManualOptions = root.findViewById(R.id.clientIdNegotiationManualOptions);
         this.cleanSession= (CheckBox) root.findViewById(R.id.cleanSession);
 
 
@@ -108,11 +93,7 @@ public class PreferencesBroker extends DialogPreference {
 	private void showHideAdvanced() {
 		int visibility = Preferences.getConnectionAdvancedMode() ? View.VISIBLE : View.GONE;
 
-        // TODO: Waiting for paho lib to support zero length client ids
-        // for (View v : new View[] {this.clientIdNegotiationWrapper, this.securityWrapper, this.brokerAuthWrapper })
-		//	v.setVisibility(visibility);
-
-        for (View v : new View[] {this.securityWrapper, this.brokerAuthWrapper, this.cleanSessionWrapper })
+        for (View v : new View[] {this.securityWrapper, this.brokerAuthWrapper, this.clientIdWrapper, this.cleanSessionWrapper })
             v.setVisibility(visibility);
 
 
@@ -123,11 +104,7 @@ public class PreferencesBroker extends DialogPreference {
 		this.host.setText(Preferences.getHost());
 		this.port.setText(String.valueOf(Preferences.getPort()));
 
-		userName.setText(Preferences.getUsername());
-
-		this.deviceName.setHint(Preferences.getAndroidId());
-		this.deviceName.setText(Preferences.getDeviceId(false));
-
+		this.userName.setText(Preferences.getUsername());
 		this.password.setText(Preferences.getPassword());
 
 		this.brokerAuth.setSelection(Preferences.getAuth() ? 1 : 0);
@@ -135,12 +112,20 @@ public class PreferencesBroker extends DialogPreference {
 		this.brokerSecurity.setSelection(Preferences.getTls());
 		this.brokerSecuritySSLCaCrtPath.setText(Preferences.getTlsCrtPath());
 
-        this.clientIdNegotiation.setSelection(Preferences.getZeroLenghClientId() ? 0 : 1);
-        this.clientId.setHint(Preferences.getAndroidId());
+
+        this.deviceId.setText(Preferences.getDeviceId(false));
+        this.deviceId.setHint(Preferences.getDeviceIdFallback());
+
         this.clientId.setText(Preferences.getClientId(false));
+        this.clientId.setHint(Preferences.getClientIdFallback());
 
         this.cleanSession.setChecked(Preferences.getCleanSession());
 	}
+
+
+    private void updateClientIdHint() {
+        this.clientId.setHint(getTmpClientIdFallback(userName.getText().toString(), this.deviceId.getText().toString()));
+    }
 
 	@Override
 	protected void showDialog(Bundle state) {
@@ -149,8 +134,7 @@ public class PreferencesBroker extends DialogPreference {
 		handleHost();
 		handleBrokerAuth();
 		handleUserName();
-        // TODO: Waiting for paho lib to support zero length client ids
-        //handleClientId();
+        handleDeviceId();
 		handleBrokerSecurity();
 		handleCaCrt();
 
@@ -163,14 +147,10 @@ public class PreferencesBroker extends DialogPreference {
 		this.host.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -181,14 +161,10 @@ public class PreferencesBroker extends DialogPreference {
 		this.port.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -196,96 +172,78 @@ public class PreferencesBroker extends DialogPreference {
 			}
 		});
 
-		this.brokerSecurity
-				.setOnItemSelectedListener(new OnItemSelectedListener() {
+		this.brokerSecurity.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                handleBrokerSecurity();
+            }
 
-					@Override
-					public void onItemSelected(AdapterView<?> arg0, View arg1,
-							int arg2, long arg3) {
-						handleBrokerSecurity();
-					}
-
-					@Override
-					public void onNothingSelected(AdapterView<?> arg0) {
-					}
-				});
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
 
 		this.brokerAuth.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
+			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				handleBrokerAuth();
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				PreferencesBroker.this.brokerSecurity.setSelection(App
-						.getContext().getResources()
-						.getInteger(R.integer.valTls));
+				PreferencesBroker.this.brokerSecurity.setSelection(App.getContext().getResources().getInteger(R.integer.valTls));
 			}
 		});
 
-        this.clientIdNegotiation.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                handleClientId();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                PreferencesBroker.this.clientIdNegotiation.setSelection(0);
-            }
-        });
-
-		userName.addTextChangedListener(new TextWatcher() {
+		this.userName.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
 				handleUserName();
 			}
 		});
-		this.brokerSecuritySSLCaCrtPath
-				.addTextChangedListener(new TextWatcher() {
-					@Override
-					public void onTextChanged(CharSequence s, int start,
-							int before, int count) {
-					}
 
-					@Override
-					public void beforeTextChanged(CharSequence s, int start,
-							int count, int after) {
-					}
+        this.deviceId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
-					@Override
-					public void afterTextChanged(Editable s) {
-						handleCaCrt();
-					}
-				});
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                handleDeviceId();
+            }
+        });
+
+		this.brokerSecuritySSLCaCrtPath.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                handleCaCrt();
+            }
+        });
 
     }
 
-    private void handleClientId() {
-        boolean auto = this.clientIdNegotiation.getSelectedItemPosition() == 1;
-        Log.v(this.toString(), "ClientId: auto == " + auto);
-        this.clientIdNegotiationManualOptions.setVisibility(auto ? View.GONE : View.VISIBLE);
-        this.clientIdNegotiationAutoOptions.setVisibility(auto ? View.VISIBLE : View.GONE);
+    private void handleDeviceId() {
+        handleState(RequireablePreferences.DEVICE_ID, !deviceId.getText().toString().equals(""));
+        updateClientIdHint();
     }
 
     private void handleCaCrt() {
-		handleState(
-				RequireablePreferences.CACRT,
-				this.brokerSecuritySSLCaCrtPath.getText().toString().length() > 0);
-
+		handleState(RequireablePreferences.CACRT, this.brokerSecuritySSLCaCrtPath.getText().toString().length() > 0);
 	}
 
 	private void handleBrokerAuth() {
@@ -301,20 +259,16 @@ public class PreferencesBroker extends DialogPreference {
 	public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE: // Clicked connect
-
 			Preferences.setHost(this.host.getText().toString());
             try {Preferences.setPort(Integer.parseInt(this.port.getText().toString())); } catch (NumberFormatException e) {}
             Preferences.setUsername(userName.getText().toString());
             Preferences.setPassword(this.password.getText().toString());
-            Preferences.setDeviceId(this.deviceName.getText().toString());
+            Preferences.setDeviceId(this.deviceId.getText().toString());
+            Preferences.setClientId(this.clientId.getText().toString());
             Preferences.setAuth(this.brokerAuth.getSelectedItemPosition() == 1);
             Preferences.setTls(this.brokerSecurity.getSelectedItemPosition());
             Preferences.setTlsCrtPath(this.brokerSecuritySSLCaCrtPath.getText().toString());
             Preferences.setCleanSession(this.cleanSession.isChecked());
-
-            //Preferences.setClientId(this.clientId.getText().toString());
-            //Preferences.setZeroLenghClientId(this.clientIdNegotiation.getSelectedItemPosition() == 1);
-
 			Runnable r = new Runnable() {
 
 				@Override
@@ -375,17 +329,15 @@ public class PreferencesBroker extends DialogPreference {
 	}
 
 	private void handleUserName() {
-		handleState(RequireablePreferences.USER_NAME, !userName.getText()
-				.toString().equals(""));
+		handleState(RequireablePreferences.USER_NAME, !userName.getText().toString().equals(""));
+        updateClientIdHint();
+
 	}
 
 	private void conditionalyEnableConnectButton() {
 		View v = getDialog().findViewById(android.R.id.button1);
 		if (v == null)
 			return;
-
-//		Log.v("Required for connect: ", this.requiredPreferences.toString());
-//		Log.v("Currently set", this.okPreferences.toString());
 
 		v.setEnabled(this.okPreferences.containsAll(this.requiredPreferences));
 	}
@@ -421,4 +373,16 @@ public class PreferencesBroker extends DialogPreference {
 		conditionalyEnableConnectButton();
 
 	}
+
+    // A bit meh as the same logic is also implemented in Preferences, but this needs to read values
+    // that are not yet saved to the preferences
+    public static String getTmpClientIdFallback(String username, String deviceId) {
+        String d;
+        if(!"".equals(deviceId))
+            d = deviceId;
+        else
+            d = Preferences.getAndroidId();
+
+        return !"".equals(username) ? username+"/"+d : d;
+    }
 }

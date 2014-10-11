@@ -12,14 +12,14 @@ import st.alr.mqttitude.support.StringifiedJSONObject;
 
 public class WaypointMessage {
 	Waypoint waypoint;
-
+    	String trackerId;
 	public WaypointMessage(Waypoint w) {
-		this.waypoint = w;
-	}
+        	this.waypoint = w;
+    	}
 
 	@Override
 	public String toString() {
-        return toJSONObject().toString();
+        	return toJSONObject().toString();
 	}
 
     public StringifiedJSONObject toJSONObject() {
@@ -31,9 +31,18 @@ public class WaypointMessage {
                     .put("lon", this.waypoint.getLongitude())
                     .put("tst", (int) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
                     .put("rad", this.waypoint.getRadius() != null ? this.waypoint.getRadius() : 0);
-        }catch (JSONException e) {
 
+            if (this.trackerId != null && !this.trackerId.isEmpty()) 
+                json.put("tid", this.trackerId);
+
+        }catch (JSONException e) {
         }
+
         return json;
     }
+
+    public void setTrackerId(String tid) {
+        this.trackerId = tid;
+    }
+    public String getTrackerId(){ return this.trackerId; }
 }

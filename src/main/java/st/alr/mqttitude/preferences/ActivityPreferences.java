@@ -38,6 +38,7 @@ public class ActivityPreferences extends PreferenceActivity {
 	private static Preference donate;
 
 	private static EditTextPreference topic;
+    private static EditTextPreference trackerId;
 
 	static String ver;
 	private static OnSharedPreferenceChangeListener pubTopicListener;
@@ -94,7 +95,11 @@ public class ActivityPreferences extends PreferenceActivity {
 			topic = (EditTextPreference) findPreference(Preferences
 					.getKey(R.string.keyPubTopicBase));
 
-			try {
+            trackerId = (EditTextPreference) findPreference(Preferences
+                    .getKey(R.string.keyTrackerId));
+
+
+            try {
 				ver = pm.getPackageInfo(a.getPackageName(), 0).versionName;
 			} catch (NameNotFoundException e) {
 				ver = a.getString(R.string.na);
@@ -203,19 +208,23 @@ public class ActivityPreferences extends PreferenceActivity {
 				@Override
 				public void onSharedPreferenceChanged(
 						SharedPreferences sharedPreferences, String key) {
-					if (key.equals(Preferences
-							.getKey(R.string.keyUsername))
-							|| key.equals(Preferences
-									.getKey(R.string.keyDeviceId)))
-						setPubTopicHint(topic);
+					if (key.equals(Preferences.getKey(R.string.keyUsername))|| key.equals(Preferences.getKey(R.string.keyDeviceId))) {
+                        setPubTopicHint(topic);
+                        setTrackerIdHint(trackerId);
+                    }
 				}
 			};
 			PreferenceManager.getDefaultSharedPreferences(a)
 					.registerOnSharedPreferenceChangeListener(pubTopicListener);
 
 			setPubTopicHint(topic);
+            setTrackerIdHint(trackerId);
 		}
-	}
+
+        public void setTrackerIdHint(EditTextPreference e) {
+            e.getEditText().setHint(Preferences.getTrackerIdFallback());
+        }
+    }
 
 	@Override
 	protected void onDestroy() {

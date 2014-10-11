@@ -71,7 +71,7 @@ public class Preferences {
 
     public static boolean canConnect() {
 
-        return     !getHost().trim().equals("")
+        return  !getHost().trim().equals("")
                 && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()))
                 && ((getTls() == getIntResource(R.integer.valTls)) || (getTls() == getIntResource(R.integer.valTlsNone) || (getTls() == getIntResource(R.integer.valTlsCustom) && !getTlsCrtPath().trim().equals(""))))
                 ;
@@ -244,26 +244,29 @@ public class Preferences {
 
     }
 
-    public static String getDeviceId(boolean androidIdFallback) {
-        String name = getString(R.string.keyDeviceId, R.string.valEmpty);
-        if (name.equals("") && androidIdFallback)
-            name = App.getAndroidId();
-        return name;
+    public static String getDeviceId(boolean fallback) {
+        String deviceId = getString(R.string.keyDeviceId, R.string.valEmpty);
+        if ("".equals(deviceId) && fallback)
+            deviceId = getDeviceIdFallback();
+        return deviceId;
     }
 
-    public static boolean getZeroLenghClientId() {
-        return getBoolean(R.string.keyZeroLenghClientIdEnabled, R.bool.valZeroLenghClientIdEnabled);
+    public static String getDeviceIdFallback() {
+        return getAndroidId();
     }
 
-    public static void setZeroLenghClientId(boolean enabled) {
-        Preferences.setBoolean(R.string.keyZeroLenghClientIdEnabled, enabled);
+    public static String getClientId(boolean fallback) {
+        String clientId = getString(R.string.keyClientId, R.string.valEmpty);
+        if ("".equals(clientId) && fallback)
+            clientId = getClientIdFallback();
+        return clientId;
     }
 
-    public static String getClientId(boolean androidIdFallback) {
-        String name = getString(R.string.keyClientId, R.string.valEmpty);
-        if (name.equals("") && androidIdFallback)
-            name = App.getAndroidId();
-        return name;
+    public static String getClientIdFallback() {
+        String username = getUsername();
+        String deviceId = getDeviceId(true);
+
+        return !"".equals(username) ? username+"/"+deviceId : deviceId;
     }
 
     public static void setClientId(String clientId) {
@@ -277,9 +280,9 @@ public class Preferences {
         return topic;
     }
 
-    public static String getPubTopicBase(boolean defaultFallback) {
+    public static String getPubTopicBase(boolean fallback) {
         String topic = getString(R.string.keyPubTopicBase, R.string.valEmpty);
-        if (topic.equals("") && defaultFallback)
+        if (topic.equals("") && fallback)
             topic = getPubTopicFallback();
 
         return topic;
@@ -289,15 +292,34 @@ public class Preferences {
         return getPubTopicBase(true);
     }
 
+    public static String getTrackerId() {
+
+        String tid=getString(R.string.keyTrackerId, R.string.valTrackerId);
+
+        if(tid==null || tid.isEmpty())
+            return getTrackerIdFallback();
+        else
+            return tid;
+    }
+
+    public static String getTrackerIdFallback(){
+        String topicText = getPubTopicBase(true);
+
+        if(topicText!=null && topicText.length() >= 2)
+            return topicText.substring(topicText.length() - 2);   // defaults to the last two characters of configured topic.
+        else
+            return "";  // Empty trackerId won't be included in the message. Alternatively, "na" not available could be returned?
+    }
+
     public static String getPubTopicPartWaypoints() {
         return getStringRessource(R.string.valPubTopicPartWaypoints);
     }
 
     public static String getPubTopicFallback() {
         String deviceId = getDeviceId(true);
-        String userUsername = getUsername();
+        String username = getUsername();
 
-        return deviceId.equals("") || userUsername.equals("") ? "" : String.format(getStringRessource(R.string.valPubTopicBase), userUsername, deviceId);
+        return deviceId.equals("") || username.equals("") ? "" : String.format(getStringRessource(R.string.valPubTopicBase), username, deviceId);
     }
 
     public static void setHost(String value) {
@@ -583,4 +605,6 @@ public class Preferences {
     public static void setNotificationOnReceivedWaypointTransition(boolean val) {
         setBoolean(R.string.keyNotificationOnReceivedWaypointTransition, val);
     }
+
+
 }
