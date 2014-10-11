@@ -55,7 +55,9 @@ public class ConfigurationMessage {
 
         JSONArray waypoints = new JSONArray();
         for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
-            StringifiedJSONObject wp = new WaypointMessage(waypoint).toJSONObject();
+            WaypointMessage wpM = new WaypointMessage(waypoint);
+            wpM.setTrackerId(Preferences.getTrackerId());
+            StringifiedJSONObject wp = wpM.toJSONObject();
             try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
             try { wp.put("transition", waypoint.getTransitionType()); } catch (JSONException e) { }
             waypoints.put(wp);

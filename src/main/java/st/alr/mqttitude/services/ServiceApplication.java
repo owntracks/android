@@ -123,11 +123,11 @@ public class ServiceApplication implements ProxyableService,
 			c = new Contact(e.getTopic());
 			resolveContact(c);
             c.setLocation(e.getGeocodableLocation());
-            c.setTid(e.getLocationMessage().getTid());
+            c.setTrackerId(e.getLocationMessage().getTrackerId());
             App.addContact(c);
 		} else {
 			c.setLocation(e.getGeocodableLocation());
-            c.setTid(e.getLocationMessage().getTid());
+            c.setTrackerId(e.getLocationMessage().getTrackerId());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
 
@@ -140,7 +140,7 @@ public class ServiceApplication implements ProxyableService,
             String name = c.getName();
 
             if(c.getName() == null) {
-                name = e.getLocationMessage().getTid();
+                name = e.getLocationMessage().getTrackerId();
             }
 
             if(c.getName() == null) {
