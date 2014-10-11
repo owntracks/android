@@ -44,6 +44,12 @@
     <string name="preferencesBackgroundUpdatesInterval">Reporting interval</string>
     <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic reporting</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
+
+    <string name="valTrackerId">""</string>
+    <string name="preferencesTrackerId">TrackerID</string>
+    <string name="keyTrackerId">trackerId</string>
+    <string name="preferencesTrackerIdSummary">Set TrackerID</string>
+    <string name="dialogMessageTrackerId">"TrackerID may contain up to 2 alphanumeric characters only"</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>

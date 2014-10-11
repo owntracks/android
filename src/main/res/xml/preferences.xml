@@ -10,6 +10,18 @@
     <PreferenceScreen
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
+
+        <EditTextPreference
+            android:defaultValue="@string/valTrackerId"
+            android:dialogTitle="@string/preferencesTrackerId"
+            android:dialogMessage="@string/dialogMessageTrackerId"
+            android:key="@string/keyTrackerId"
+            android:summary="@string/preferencesTrackerIdSummary"
+            android:title="@string/preferencesTrackerId"
+            android:maxLength="2"
+            android:inputType="text"
+            android:digits="0123456789abcdefghilmnopqrstuvzxyjk"/>
+
         <CheckBoxPreference
             android:defaultValue="@bool/valPub"
             android:key="@string/keyPub"

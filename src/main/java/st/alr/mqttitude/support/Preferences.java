@@ -286,6 +286,25 @@ public class Preferences {
         return getPubTopicBase(true);
     }
 
+    public static String getTrackerId() {
+
+        String tid=getString(R.string.keyTrackerId, R.string.valTrackerId);
+
+        if(tid==null || tid.isEmpty())
+            return getTrackerIdFallback();
+        else
+            return tid;
+    }
+
+    public static String getTrackerIdFallback(){
+        String topicText = getPubTopicBase(true);
+
+        if(topicText!=null && topicText.length() >= 2)
+            return topicText.substring(topicText.length() - 2);   // defaults to the last two characters of configured topic.
+        else
+            return "";  // Empty trackerId won't be included in the message. Alternatively, "na" not available could be returned?
+    }
+
     public static String getPubTopicPartWaypoints() {
         return getStringRessource(R.string.valPubTopicPartWaypoints);
     }

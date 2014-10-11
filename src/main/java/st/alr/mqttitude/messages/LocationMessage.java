@@ -17,7 +17,8 @@ public class LocationMessage {
 	Waypoint waypoint;
 
 	String description;
-	int transition;
+    String trackerId;
+    int transition;
 	int battery;
 
 	boolean supressesTicker;
@@ -54,6 +55,10 @@ public class LocationMessage {
 		this.battery = battery;
 	}
 
+    public void setTrackerId(String tid) {
+        this.trackerId = tid;
+    }
+
     @Override
     public String toString() {
         return this.toJSONObject().toString();
@@ -80,6 +85,12 @@ public class LocationMessage {
                 json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
 
             }
+
+            if (this.trackerId != null && !this.trackerId.isEmpty()) {
+
+                json.put("tid", this.trackerId);
+            }
+
         } catch (JSONException e) {
 
         }
@@ -103,6 +114,8 @@ public class LocationMessage {
 	public int getBattery() {
 		return this.battery;
 	}
+
+    public String getTrackerId(){ return this.trackerId; }
 
 	public static LocationMessage fromJsonObject(StringifiedJSONObject json) {
 		try {
@@ -128,6 +141,11 @@ public class LocationMessage {
 			m.setDescription(json.getString("desc"));
 		} catch (Exception e) {
 		}
+
+        try {
+            m.setTrackerId(json.getString("tid"));
+        } catch (Exception e) {
+        }
 
 		try {
 			if (json.getString("event").equals("enter"))
