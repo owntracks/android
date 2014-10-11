@@ -24,21 +24,15 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
-        public final static Property Type = new Property(1, Integer.class, "type", false, "TYPE");
-        public final static Property Description = new Property(2, String.class, "description", false, "DESCRIPTION");
-        public final static Property Latitude = new Property(3, Double.class, "latitude", false, "LATITUDE");
-        public final static Property Longitude = new Property(4, Double.class, "longitude", false, "LONGITUDE");
-        public final static Property Geocoder = new Property(5, String.class, "geocoder", false, "GEOCODER");
-        public final static Property Shared = new Property(6, Boolean.class, "shared", false, "SHARED");
-        public final static Property Date = new Property(7, java.util.Date.class, "date", false, "DATE");
-        public final static Property Radius = new Property(8, Float.class, "radius", false, "RADIUS");
-        public final static Property TransitionType = new Property(9, Integer.class, "transitionType", false, "TRANSITION_TYPE");
-        public final static Property GeofenceId = new Property(10, String.class, "geofenceId", false, "GEOFENCE_ID");
-        public final static Property Topic = new Property(11, String.class, "topic", false, "TOPIC");
-        public final static Property NotificationOnEnter = new Property(12, Boolean.class, "notificationOnEnter", false, "NOTIFICATION_ON_ENTER");
-        public final static Property NotificationOnLeave = new Property(13, Boolean.class, "notificationOnLeave", false, "NOTIFICATION_ON_LEAVE");
-        public final static Property NotificationTopic = new Property(14, String.class, "notificationTopic", false, "NOTIFICATION_TOPIC");
-        public final static Property NotificationMessage = new Property(15, String.class, "notificationMessage", false, "NOTIFICATION_MESSAGE");
+        public final static Property Description = new Property(1, String.class, "description", false, "DESCRIPTION");
+        public final static Property Latitude = new Property(2, Double.class, "latitude", false, "LATITUDE");
+        public final static Property Longitude = new Property(3, Double.class, "longitude", false, "LONGITUDE");
+        public final static Property Geocoder = new Property(4, String.class, "geocoder", false, "GEOCODER");
+        public final static Property Shared = new Property(5, Boolean.class, "shared", false, "SHARED");
+        public final static Property Date = new Property(6, java.util.Date.class, "date", false, "DATE");
+        public final static Property Radius = new Property(7, Float.class, "radius", false, "RADIUS");
+        public final static Property TransitionType = new Property(8, Integer.class, "transitionType", false, "TRANSITION_TYPE");
+        public final static Property GeofenceId = new Property(9, String.class, "geofenceId", false, "GEOFENCE_ID");
     };
 
 
@@ -54,22 +48,16 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'WAYPOINT' (" + //
-                "'ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "'TYPE' INTEGER," + // 1: type
-                "'DESCRIPTION' TEXT," + // 2: description
-                "'LATITUDE' REAL," + // 3: latitude
-                "'LONGITUDE' REAL," + // 4: longitude
-                "'GEOCODER' TEXT," + // 5: geocoder
-                "'SHARED' INTEGER," + // 6: shared
-                "'DATE' INTEGER," + // 7: date
-                "'RADIUS' REAL," + // 8: radius
-                "'TRANSITION_TYPE' INTEGER," + // 9: transitionType
-                "'GEOFENCE_ID' TEXT," + // 10: geofenceId
-                "'TOPIC' TEXT," + // 11: topic
-                "'NOTIFICATION_ON_ENTER' INTEGER," + // 12: notificationOnEnter
-                "'NOTIFICATION_ON_LEAVE' INTEGER," + // 13: notificationOnLeave
-                "'NOTIFICATION_TOPIC' TEXT," + // 14: notificationTopic
-                "'NOTIFICATION_MESSAGE' TEXT);"); // 15: notificationMessage
+                "'ID' INTEGER PRIMARY KEY ," + // 0: id
+                "'DESCRIPTION' TEXT," + // 1: description
+                "'LATITUDE' REAL," + // 2: latitude
+                "'LONGITUDE' REAL," + // 3: longitude
+                "'GEOCODER' TEXT," + // 4: geocoder
+                "'SHARED' INTEGER," + // 5: shared
+                "'DATE' INTEGER," + // 6: date
+                "'RADIUS' REAL," + // 7: radius
+                "'TRANSITION_TYPE' INTEGER," + // 8: transitionType
+                "'GEOFENCE_ID' TEXT);"); // 9: geofenceId
     }
 
     /** Drops the underlying database table. */
@@ -88,79 +76,49 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             stmt.bindLong(1, id);
         }
  
-        Integer type = entity.getType();
-        if (type != null) {
-            stmt.bindLong(2, type);
-        }
- 
         String description = entity.getDescription();
         if (description != null) {
-            stmt.bindString(3, description);
+            stmt.bindString(2, description);
         }
  
         Double latitude = entity.getLatitude();
         if (latitude != null) {
-            stmt.bindDouble(4, latitude);
+            stmt.bindDouble(3, latitude);
         }
  
         Double longitude = entity.getLongitude();
         if (longitude != null) {
-            stmt.bindDouble(5, longitude);
+            stmt.bindDouble(4, longitude);
         }
  
         String geocoder = entity.getGeocoder();
         if (geocoder != null) {
-            stmt.bindString(6, geocoder);
+            stmt.bindString(5, geocoder);
         }
  
         Boolean shared = entity.getShared();
         if (shared != null) {
-            stmt.bindLong(7, shared ? 1l: 0l);
+            stmt.bindLong(6, shared ? 1l: 0l);
         }
  
         java.util.Date date = entity.getDate();
         if (date != null) {
-            stmt.bindLong(8, date.getTime());
+            stmt.bindLong(7, date.getTime());
         }
  
         Float radius = entity.getRadius();
         if (radius != null) {
-            stmt.bindDouble(9, radius);
+            stmt.bindDouble(8, radius);
         }
  
         Integer transitionType = entity.getTransitionType();
         if (transitionType != null) {
-            stmt.bindLong(10, transitionType);
+            stmt.bindLong(9, transitionType);
         }
  
         String geofenceId = entity.getGeofenceId();
         if (geofenceId != null) {
-            stmt.bindString(11, geofenceId);
-        }
- 
-        String topic = entity.getTopic();
-        if (topic != null) {
-            stmt.bindString(12, topic);
-        }
- 
-        Boolean notificationOnEnter = entity.getNotificationOnEnter();
-        if (notificationOnEnter != null) {
-            stmt.bindLong(13, notificationOnEnter ? 1l: 0l);
-        }
- 
-        Boolean notificationOnLeave = entity.getNotificationOnLeave();
-        if (notificationOnLeave != null) {
-            stmt.bindLong(14, notificationOnLeave ? 1l: 0l);
-        }
- 
-        String notificationTopic = entity.getNotificationTopic();
-        if (notificationTopic != null) {
-            stmt.bindString(15, notificationTopic);
-        }
- 
-        String notificationMessage = entity.getNotificationMessage();
-        if (notificationMessage != null) {
-            stmt.bindString(16, notificationMessage);
+            stmt.bindString(10, geofenceId);
         }
     }
 
@@ -175,21 +133,15 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public Waypoint readEntity(Cursor cursor, int offset) {
         Waypoint entity = new Waypoint( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // type
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // description
-            cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3), // latitude
-            cursor.isNull(offset + 4) ? null : cursor.getDouble(offset + 4), // longitude
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // geocoder
-            cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0, // shared
-            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // date
-            cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8), // radius
-            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // transitionType
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // geofenceId
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // topic
-            cursor.isNull(offset + 12) ? null : cursor.getShort(offset + 12) != 0, // notificationOnEnter
-            cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0, // notificationOnLeave
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // notificationTopic
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // notificationMessage
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // description
+            cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2), // latitude
+            cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3), // longitude
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // geocoder
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // shared
+            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // date
+            cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7), // radius
+            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // transitionType
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // geofenceId
         );
         return entity;
     }
@@ -198,21 +150,15 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     @Override
     public void readEntity(Cursor cursor, Waypoint entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setType(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setDescription(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3));
-        entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getDouble(offset + 4));
-        entity.setGeocoder(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setShared(cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0);
-        entity.setDate(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
-        entity.setRadius(cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8));
-        entity.setTransitionType(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
-        entity.setGeofenceId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setTopic(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setNotificationOnEnter(cursor.isNull(offset + 12) ? null : cursor.getShort(offset + 12) != 0);
-        entity.setNotificationOnLeave(cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0);
-        entity.setNotificationTopic(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setNotificationMessage(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setDescription(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2));
+        entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3));
+        entity.setGeocoder(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setShared(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setDate(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setRadius(cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7));
+        entity.setTransitionType(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
+        entity.setGeofenceId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     /** @inheritdoc */

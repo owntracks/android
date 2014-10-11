@@ -16,19 +16,6 @@ public class Defaults {
 	public static final String INTENT_ACTION_FENCE_TRANSITION = "st.alr.mqttitude.intent.FENCE_TRANSITION";
 	public static final int NOTIFCATION_ID = 1338;
 
-    public static String formatNotificationMessage(Context c, String formatString, boolean enter, Waypoint w) {
-        if(enter)
-            formatString = formatString.replace("%d", w.getDescription()).replace("%e", c.getString(R.string.transitionEnteringNotification));
-        else
-            formatString = formatString.replace("%d", w.getDescription()).replace("%e", c.getString(R.string.transitionLeavingNotification));
-
-        formatString =  formatString.replaceAll("%g", w.getGeocoder());
-        formatString =  formatString.replaceAll("%lat", w.getLatitude().toString());
-        formatString = formatString.replaceAll("%lon", w.getLongitude().toString());
-        formatString = formatString.replaceAll("%r", w.getRadius().toString());
-        return formatString.substring(0, 1).toUpperCase() + formatString.substring(1); // Capitalize beginning
-    }
-
 	public static class TransitionType {
 		public static String toString(int type, Context c) {
 			int id;

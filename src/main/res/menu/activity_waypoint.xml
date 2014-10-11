@@ -8,13 +8,4 @@
         android:showAsAction="ifRoom"
         android:title="@string/addWaypoint">
     </item>
-
-    <item
-        android:id="@+id/addMonitor"
-        android:icon="@drawable/ic_action_share"
-        android:orderInCategory="97"
-        android:showAsAction="ifRoom"
-        android:title="@string/addWaypoint">
-    </item>
-
 </menu>

@@ -22,25 +22,16 @@ public class DaoGenerator {
 
 
         Entity waypoint = schema.addEntity("Waypoint");
-        waypoint.addLongProperty("id").primaryKey().autoincrement();
-        waypoint.addIntProperty("type"); // 0 == local, 1 == shared from remote, 2==local for monitoring enter/leave without events
-
+        waypoint.addLongProperty("id").primaryKey();
         waypoint.addStringProperty("description");
         waypoint.addDoubleProperty("latitude");
         waypoint.addDoubleProperty("longitude");
         waypoint.addStringProperty("geocoder");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
-
         waypoint.addFloatProperty("radius");
         waypoint.addIntProperty("transitionType");
         waypoint.addStringProperty("geofenceId");
-        waypoint.addStringProperty("topic"); // if type == 1|2
-
-        waypoint.addBooleanProperty("notificationOnEnter");
-        waypoint.addBooleanProperty("notificationOnLeave");
-        waypoint.addStringProperty("notificationTopic");
-        waypoint.addStringProperty("notificationMessage");
 
         new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, args[0]);
     }

@@ -53,6 +53,11 @@
             android:summary="@string/preferencesNotificationGeocoderSummary"
             android:title="@string/preferencesNotificationGeocoder" />
         <CheckBoxPreference
+            android:defaultValue="@bool/valNotificationOnReceivedWaypointTransition"
+            android:key="@string/keyNotificationOnReceivedWaypointTransition"
+            android:summary="@string/preferencesNotificationOnReceivedWaypointTransitionSummary"
+            android:title="@string/preferencesNotificationOnReceivedWaypointTransitionTitle" />
+        <CheckBoxPreference
             android:defaultValue="@bool/valNotificationTickerOnPublish"
             android:key="@string/keyNotificationTickerOnPublish"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
@@ -176,11 +181,6 @@
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Misc">
-        <CheckBoxPreference
-            android:defaultValue="@bool/valUpdateAddressBook"
-            android:key="@string/keyUpdateAddressBook"
-            android:summary="@string/contactsLinkCloudStorageEnabledSummary"
-            android:title="@string/contactsLinkCloudStorageEnabled" />
 
         <CheckBoxPreference
             android:defaultValue="@bool/valConnectionAdvancedMode"
