@@ -576,4 +576,11 @@ public class Preferences {
         return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
     }
 
+    public static Boolean getNotificationOnReceivedWaypointTransition() {
+        return getBoolean(R.string.keyNotificationOnReceivedWaypointTransition, R.bool.valNotificationOnReceivedWaypointTransition);
+    }
+
+    public static void setNotificationOnReceivedWaypointTransition(boolean val) {
+        setBoolean(R.string.keyNotificationOnReceivedWaypointTransition, val);
+    }
 }

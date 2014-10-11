@@ -113,7 +113,6 @@ public class ServiceBeacon implements
 
     @Override
     public void onCreate(ServiceProxy p) {
-
         this.context = p;
         this.lastPublish = 0;
 

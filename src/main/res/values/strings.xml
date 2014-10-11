@@ -24,6 +24,8 @@
     <string name="preferencesNotificationTickerOnPublish">Ticker on report</string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
     <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Ticker on waypoint </string>
+    <string name="preferencesNotificationOnReceivedWaypointTransitionSummary">Show a notification on received waypoint transitions </string>
+    <string name="preferencesNotificationOnReceivedWaypointTransitionTitle">Notification on waypoint transition</string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
@@ -96,8 +98,6 @@
     <string name="publish">Report</string>
     <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
     <string name="preferencesIncludeBattery">Include battery</string>
-    <string name="contactsLinkCloudStorageEnabledSummary">Store contact links in Google address book</string>
-    <string name="contactsLinkCloudStorageEnabled">Update address book</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
@@ -193,6 +193,7 @@
     <string name="keyNotificationLocation">notificationLocation</string>
     <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
     <string name="keyNotificationTickerOnWaypointTransition">tickerOnWaypointTransition</string>
+    <string name="keyNotificationOnReceivedWaypointTransition">notificationOnReceivedWaypointTransition</string>
     <string name="keySelectedContactTopic">selectedContactTopic</string>
     <string name="keyFollowingSelectedContact">followingSelectedContact</string>
     <string name="keySubTopic">subTopic</string>
@@ -282,5 +283,6 @@
     <string name="transitionEnteringNotification">entering</string>
     <string name="transitionLeavingNotification">leaving</string>
     <string name="geofenceActive">Geofence active</string>
+    <string name="waypointRemove">remove</string>
 
 </resources>

@@ -30,10 +30,12 @@ import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -1155,6 +1157,9 @@ public class ActivityMain extends FragmentActivity {
 			this.accuracy = (TextView) v.findViewById(R.id.accuracy);
 			this.time = (TextView) v.findViewById(R.id.time);
             this.contactContextMenu = (ImageButton) v.findViewById(R.id.contactContextMenu);
+
+
+
 
     		onShow();
 			return v;
