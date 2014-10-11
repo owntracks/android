@@ -323,10 +323,16 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
     public LocationMessage getLocationMessage(GeocodableLocation l) {
+        LocationMessage lm;
+
         if(l!= null)
-            return new LocationMessage(l);
+            lm = new LocationMessage(l);
         else
-            return new LocationMessage(getLastKnownLocation());
+            lm = new LocationMessage(getLastKnownLocation());
+
+        lm.setTrackerId(Preferences.getTrackerId());
+
+        return lm;
     }
 
 	private void publishWaypointMessage(WaypointMessage r) {
@@ -342,7 +348,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 			return;
 		}
 
-		ServiceProxy.getServiceBroker().publish(
+        ServiceProxy.getServiceBroker().publish(
 				topic + Preferences.getPubTopicPartWaypoints(), r.toString(),
 				false, Preferences.getPubQos(), 20, this, null);
 	}
@@ -447,8 +453,11 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
-		if (!remove && w.getShared())
-			publishWaypointMessage(new WaypointMessage(w));
+		if (!remove && w.getShared()){
+            WaypointMessage wpM = new WaypointMessage(w);
+            wpM.setTrackerId(Preferences.getTrackerId());
+            publishWaypointMessage(wpM);
+        }
 
 		if (!isWaypointWithValidGeofence(w))
 			return;
