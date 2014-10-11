@@ -114,7 +114,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession());
-
+            Log.v("PREFERENCES", json.toString());
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());

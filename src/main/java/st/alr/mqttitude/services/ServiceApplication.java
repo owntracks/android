@@ -396,7 +396,7 @@ public class ServiceApplication implements ProxyableService,
         Log.v(this.toString(), "Initiating dump procedure");
         DumpMessage dump = new DumpMessage();
         dump.setLocation(ServiceProxy.getServiceLocator().getLocationMessage(null));
-        dump.setConfiguration(new ConfigurationMessage(EnumSet.of(ConfigurationMessage.Includes.PREFERENCES, ConfigurationMessage.Includes.CONNECTION, ConfigurationMessage.Includes.IDENTIFICATION)));
+        dump.setConfiguration(new ConfigurationMessage(EnumSet.of(ConfigurationMessage.Includes.CONNECTION, ConfigurationMessage.Includes.IDENTIFICATION)));
 
         dump.setLocatorReady(ServiceProxy.getServiceLocator().isReady());
         dump.setLocatorState(ServiceLocator.getState());

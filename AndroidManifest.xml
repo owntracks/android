@@ -93,6 +93,24 @@
             </intent-filter>
         </receiver>
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="st.alr.mqttitude.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="file" />
+            <data android:host="*" />
+            <data android:pathPattern=".*\\.otrc" />
+        </intent-filter>
+
         <!--<activity-->
             <!--android:name=".ActivityWizzard"-->
             <!--android:label="@string/title_activity_activity_wizzard" >-->
