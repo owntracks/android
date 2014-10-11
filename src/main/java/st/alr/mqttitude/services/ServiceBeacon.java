@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -48,6 +49,7 @@ public class ServiceBeacon implements
     private OnSharedPreferenceChangeListener preferencesChangedListener;
     private static Defaults.State.ServiceBeacon state = Defaults.State.ServiceBeacon.INITIAL;
     private ServiceProxy context;
+    private BluetoothStateChangeReceiver bluetoothStateChangeReceiver;
 
     public void setBluetoothMode(int state) {
         switch (state) {
@@ -161,7 +163,8 @@ public class ServiceBeacon implements
         this.sharedPreferences
                 .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
-        context.registerReceiver(BluetoothStateChangeReceiver.GetBroadcastReceiver(), null);
+        bluetoothStateChangeReceiver = new BluetoothStateChangeReceiver();
+        this.context.registerReceiver(bluetoothStateChangeReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this.context);
         scanningState = ScanningState.DISABLED;
@@ -317,7 +320,7 @@ public class ServiceBeacon implements
 
     @Override
     public void onDestroy() {
-        context.unregisterReceiver(BluetoothStateChangeReceiver.GetBroadcastReceiver());
+        context.unregisterReceiver(bluetoothStateChangeReceiver);
     }
 
     public static Defaults.State.ServiceBeacon getState() {
