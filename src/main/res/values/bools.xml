@@ -15,7 +15,6 @@
     <bool name="valNotificationTickerOnWaypointTransition">true</bool>
     <bool name="valNotificationTickerOnPublish">true</bool>
     <bool name="valPubRetain">true</bool>
-    <bool name="valUpdateAddressBook">false</bool>
     <bool name="valAutostartOnBoot">false</bool>
     <bool name="valConnectionAdvancedMode">false</bool>
     <bool name="valZeroLenghClientIdEnabled">false</bool>
@@ -24,5 +23,5 @@
     <bool name="valRemoteCommandDump">false</bool>
     <bool name="valRemoteConfiguration">false</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
-
+    <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
 </resources>

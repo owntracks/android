@@ -126,44 +126,34 @@ public class ServiceApplication implements ProxyableService,
             c.setTid(e.getLocationMessage().getTid());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
+
+        // EXPERIMENTAL
+        Log.v(this.toString(), "test if updating ticker ");
+
+        if(e.getLocationMessage().getTransition() != -1 &&  Preferences.getNotificationOnReceivedWaypointTransition()) {
+            Log.v(this.toString(), "updating ticker with event message");
+            String description = e.getLocationMessage().getDescription();
+            String name = c.getName();
+
+            if(c.getName() == null) {
+                name = e.getLocationMessage().getTid();
+            }
+
+            if(c.getName() == null) {
+                name = e.getTopic();
+            }
+
+            if(description == null) {
+                description = "a location";
+            }
+
+            updateTicker(name + " " + context.getString(e.getLocationMessage().getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " "  + description );
+
+        }
+
 	}
 
-/*	private int getContactCount() {
-		Cursor cursor = null;
-		try {
-			cursor = this.context.getContentResolver().query(
-					ContactsContract.Contacts.CONTENT_URI, null, null, null,
-					null);
-			if (cursor != null) {
-				return cursor.getCount();
-			} else {
-				return 0;
-			}
-		} catch (Exception ignore) {
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
-		}
-		return 0;
-	}
 
-	private ContentObserver mObserver = new ContentObserver(new Handler()) {
-
-		@Override
-		public void onChange(boolean selfChange) {
-			super.onChange(selfChange);
-
-			final int currentCount = getContactCount();
-			// We can only track the contact count so we cannot determine which
-			// contact was added, removed or updated. Thus we have to update all
-			if (currentCount != ServiceApplication.this.mContactCount) {
-				updateAllContacts();
-			}
-			ServiceApplication.this.mContactCount = currentCount;
-		}
-
-	};*/
 	private Notification notification;
 	private PendingIntent notificationIntent;
 
@@ -291,14 +281,8 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEvent(Events.WaypointTransition e) {
-        if(Preferences.getNotificationTickerOnWaypointTransition() &&  (e.getWaypoint().getNotificationOnEnter() || e.getWaypoint().getNotificationOnLeave())) {
-            String formatString = e.getWaypoint().getNotificationMessage();
-
-            if(formatString == null || formatString.equals(""))
-                formatString = context.getString(R.string.waypointLocalDefaultFormatMessage);
-
-            updateTicker(Defaults.formatNotificationMessage(context, formatString, e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER, e.getWaypoint()));
-
+        if(Preferences.getNotificationTickerOnWaypointTransition()) {
+            updateTicker(context.getString(e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " " + e.getWaypoint().getDescription());
         }
 	}
 

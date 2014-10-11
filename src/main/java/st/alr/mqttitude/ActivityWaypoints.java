@@ -33,6 +33,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,7 +54,8 @@ import android.widget.Toast;
 import com.google.android.gms.location.Geofence;
 
 public class ActivityWaypoints extends FragmentActivity implements StaticHandlerInterface {
-	private ListView listView;
+    private static final int MENU_WAYPOINT_REMOVE = 0;
+    private ListView listView;
 	private WaypointAdapter listAdapter;
     private WaypointDao dao;
     private GeocodableLocation currentLocation;
@@ -83,8 +85,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 		this.listView.setAdapter(this.listAdapter);
 
         this.waypointListPlaceholder = (TextView) findViewById(R.id.waypointListPlaceholder);
-		this.listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-		this.listView.setMultiChoiceModeListener(this.multiChoiceListener);
 		this.listView.setEmptyView(waypointListPlaceholder);
         this.listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -105,7 +105,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
     private void requestWaypointGeocoder(Waypoint w, boolean force){
         if(w.getGeocoder() == null || force) {
-            Log.v("handler", "request");
 
             GeocodableLocation l = new GeocodableLocation("Waypoint");
             l.setLatitude(w.getLatitude());
@@ -119,7 +118,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
     @Override
     public void handleHandlerMessage(Message msg) {
-        Log.v("handler", "handlehandlermessage");
         if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && ((GeocodableLocation)msg.obj).getExtra() instanceof  Waypoint) {
             Log.v("handler", "result");
 
@@ -164,31 +162,10 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
     }
 
 
-	protected void remove() {
-		final SparseBooleanArray checkedItems = this.listView
-				.getCheckedItemPositions();
-
-		if (checkedItems != null) {
-			final int checkedItemsCount = checkedItems.size();
-
-			this.listView.setAdapter(null);
-			for (int i = checkedItemsCount - 1; i >= 0; i--) {
-				final int position = checkedItems.keyAt(i);
-
-				final boolean isChecked = checkedItems.valueAt(i);
-				if (isChecked) {
-
-                    Waypoint r = (Waypoint)this.listAdapter.removeItem(position);
-                    this.dao.delete(r);
-                    EventBus.getDefault().post(new Events.WaypointRemoved(r));
-
-				}
-			}
-			this.listView.setAdapter(this.listAdapter);
-			this.listAdapter.notifyDataSetChanged();
-		}
-		if (this.listAdapter.getCount() == 0)
-			this.listView.setVisibility(View.GONE);
+	protected void remove(Waypoint w) {
+        this.listAdapter.removeItem(w);
+        this.dao.delete(w);
+        EventBus.getDefault().post(new Events.WaypointRemoved(w));
 	}
 
 	public WaypointAdapter getListAdapter() {
@@ -206,65 +183,46 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 		switch (item.getItemId()) {
 		case R.id.add:
 			LocalWaypointDialog LocalWaypointDialog = new LocalWaypointDialog();
-			getFragmentManager().beginTransaction().add(LocalWaypointDialog, "LocalWaypointDialog")
-					.commit();
+			getFragmentManager().beginTransaction().add(LocalWaypointDialog, "LocalWaypointDialog").commit();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	private MultiChoiceModeListener multiChoiceListener = new MultiChoiceModeListener() {
-		@Override
-		public void onItemCheckedStateChanged(ActionMode mode, int position,
-				long id, boolean checked) {
-			final int checkedCount = ActivityWaypoints.this.listView
-					.getCheckedItemCount();
-			switch (checkedCount) {
-			case 0:
-				mode.setTitle(null);
-				break;
-			case 1:
-				mode.setTitle(getResources().getString(
-						R.string.actionModeOneSelected));
-				break;
-			default:
-				mode.setTitle(checkedCount
-						+ " "
-						+ getResources().getString(
-								R.string.actionModeMoreSelected));
-				break;
-			}
-		}
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerForContextMenu(this.listView);
+    }
 
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			switch (item.getItemId()) {
-			case R.id.discard:
-				remove();
-				mode.finish();
-				return true;
-			default:
-				return false;
-			}
-		}
+    @Override
+    public void onPause() {
+        unregisterForContextMenu(this.listView);
+        super.onPause();
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.activity_waypoint_actionmode, menu);
-			return true;
-		}
+    }
 
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-		}
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.waypoints) {
+            menu.add(Menu.NONE, MENU_WAYPOINT_REMOVE, 1,getString(R.string.waypointRemove));
+        }
+    }
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-	};
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case MENU_WAYPOINT_REMOVE:
+                remove( (Waypoint) listAdapter.getItem(info.position));
+                break;
+        }
+        return true;
+    }
+
 
     public static class LocalWaypointDialog extends DialogFragment implements StaticHandlerInterface {
         private TextView description;
@@ -272,8 +230,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
         private TextView longitude;
         private TextView radius;
         private Spinner transitionType;
-        private CheckBox waypointNotificationOnEnterLeave;
-        private TextView notificationMessage;
         private TextView currentLocationText;
         private LinearLayout currentLocationWrapper;
         private LinearLayout waypointGeofenceSettings;
@@ -310,9 +266,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 				this.transitionType.setSelection(2);
 				break;
 			}
-
-            notificationMessage.setText(w.getNotificationMessage());
-            waypointNotificationOnEnterLeave.setChecked(w.getNotificationOnEnter() || w.getNotificationOnLeave()); // Both are always set for local waypoints
 
 		}
 
@@ -366,8 +319,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 			this.radius = (TextView) view.findViewById(R.id.radius);
 			this.transitionType = (Spinner) view
 					.findViewById(R.id.transitionType);
-			this.waypointNotificationOnEnterLeave = (CheckBox) view.findViewById(R.id.waypointNotificationOnEnterLeave);
-			this.notificationMessage = (TextView) view.findViewById(R.id.notificationMessage);
             this.currentLocationWrapper = (LinearLayout) view.findViewById(R.id.currentLocationWrapper);
             this.currentLocationText = (TextView) view.findViewById(R.id.currentLocation);
             this.waypointGeofenceSettings = (LinearLayout) view.findViewById(R.id.waypointGeofenceSettings);
@@ -505,20 +456,14 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
                             switch (LocalWaypointDialog.this.transitionType.getSelectedItemPosition()) {
                                 case 0:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);
-                                    LocalWaypointDialog.this.w.setNotificationOnEnter(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                                 case 1:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointDialog.this.w.setNotificationOnLeave(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                                 default:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointDialog.this.w.setNotificationOnEnter(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    LocalWaypointDialog.this.w.setNotificationOnLeave(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                             }
-
-                            LocalWaypointDialog.this.w.setNotificationMessage(LocalWaypointDialog.this.notificationMessage.getText().toString());
 
 
                             if (update)
