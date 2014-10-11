@@ -166,4 +166,7 @@ public class LocationMessage {
 		this.description = string;
 	}
 
+    public String getDescription() {
+        return description;
+    }
 }

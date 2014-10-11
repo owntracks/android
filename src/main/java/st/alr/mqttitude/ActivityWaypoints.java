@@ -56,7 +56,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.Geofence;
 
 public class ActivityWaypoints extends FragmentActivity implements StaticHandlerInterface {
-    private static final int MENU_WAYPOINT_DELETE = 0;
+    private static final int MENU_WAYPOINT_REMOVE = 0;
     private ListView listView;
 	private WaypointAdapter listAdapter;
     private WaypointDao dao;
@@ -86,29 +86,14 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
         this.dao = App.getWaypointDao();
         this.handler = new StaticHandler(this);
-
-		//this.listAdapter = new WaypointAdapter(this, new ArrayList<Waypoint>(dao.loadAll()));
-
-        this.listAdapter = new WaypointAdapter(this);
-        this.listAdapter.addHeader("MONITORING"); // initial idx 1;
-
-        List<Waypoint> waypoints = this.dao.queryBuilder().where(WaypointDao.Properties.Id.isNotNull())
-                .orderAsc(WaypointDao.Properties.Type, WaypointDao.Properties.Description)
-                .list();
-        //this.listAdapter.addHeader("LOCAL WAYPOINTS");
-        for(Waypoint w : waypoints) {
-            addWaypointToList(w);
-        }
-
-
+        this.listAdapter = new WaypointAdapter(this, new ArrayList<Waypoint>(this.dao.loadAll()));
 
 		this.listView = (ListView) findViewById(R.id.waypoints);
 		this.listView.setAdapter(this.listAdapter);
 
-        registerForContextMenu(this.listView);
         this.waypointListPlaceholder = (TextView) findViewById(R.id.waypointListPlaceholder);
+	    this.listView.setEmptyView(waypointListPlaceholder);
 
-		this.listView.setEmptyView(waypointListPlaceholder);
         this.listView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -121,28 +106,11 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
             }
         });
-        this.listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View v, int position, long id) {
-                if (listAdapter.getItemViewType(position) == listAdapter.ROW_TYPE_HEADER)
-                    return true;
-
-                listView.showContextMenu(); //to show
-                return true;
-            }
-        });
-
-
-//		if (this.listAdapter.getCount() == 0)
-//			this.listView.setVisibility(View.GONE);
-
 	}
 
 
     private void requestWaypointGeocoder(Waypoint w, boolean force){
         if(w.getGeocoder() == null || force) {
-            Log.v("handler", "request");
 
             GeocodableLocation l = new GeocodableLocation("Waypoint");
             l.setLatitude(w.getLatitude());
@@ -156,7 +124,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
     @Override
     public void handleHandlerMessage(Message msg) {
-        Log.v("handler", "handlehandlermessage");
         if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && ((GeocodableLocation)msg.obj).getExtra() instanceof  Waypoint) {
             Log.v("handler", "result");
 
@@ -171,7 +138,8 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 
     @Override
 	public void onDestroy() {
-		ServiceProxy.runOrBind(this, new Runnable() {
+        handler.removeCallbacksAndMessages(null); // disable handler
+        ServiceProxy.runOrBind(this, new Runnable() {
 
             @Override
             public void run() {
@@ -182,61 +150,25 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 		super.onDestroy();
 	}
 
-    private void addWaypointToList(Waypoint w) {
-        if(w.getType() == WAYPOINT_TYPE_LOCAL) {
-            if(!localHeaderAdded) {
-                this.listAdapter.addHeaderAtIndex("LOCAL", 0);
-                localHeaderAdded = true;
-            }
-
-            this.listAdapter.addItemAtIndex(w, ++waypointLocalLastIdx);
-        } else if(w.getType() == WAYPOINT_TYPE_LOCAL_MONITORING) {
-            if(!localMonitoringHeaderAdded) {
-                this.listAdapter.addHeaderAtIndex("MONITORING", waypointLocalMonitoringLastIdx + waypointLocalLastIdx);
-                localMonitoringHeaderAdded = true;
-            }
-            this.listAdapter.addItemAtIndex(w, (waypointLocalMonitoringLastIdx+(++waypointLocalMonitoringLastIdx)));
-        }
-    }
-
-    private void removeWaypointFromList(Waypoint w) {
-        this.listAdapter.removeItem(w);
-
-        if(w.getType() == WAYPOINT_TYPE_LOCAL) {
-            waypointLocalLastIdx--;
-            if(waypointLocalLastIdx == 0)
-                this.listAdapter.removeItem(0);
-        } else {
-            waypointLocalMonitoringLastIdx--;
-            if(waypointLocalMonitoringLastIdx == 0)
-                this.listAdapter.removeItem(waypointLocalLastIdx + waypointLocalMonitoringLastIdx);
-        }
-    }
 
 	protected void add(Waypoint w) {
         this.dao.insert(w);
-        addWaypointToList(w);
-
-        requestWaypointGeocoder(w, false);
-        if(w.getType() == WAYPOINT_TYPE_LOCAL)
-            EventBus.getDefault().post(new Events.WaypointAdded(w));
-
-		if (this.listView.getVisibility() == View.GONE)
-			this.listView.setVisibility(View.VISIBLE);
-
-	}
+        this.listAdapter.addItem(w);
+        EventBus.getDefault().post(new Events.WaypointAdded(w));
+        requestWaypointGeocoder(w, true);
+    }
 
     protected void update(Waypoint w) {
         this.dao.update(w);
         this.listAdapter.updateItem(w);
-        EventBus.getDefault().post(new Events.WaypointUpdated(w));
         requestWaypointGeocoder(w, true);
+        EventBus.getDefault().post(new Events.WaypointUpdated(w));
     }
 
 
 	protected void remove(Waypoint w) {
+        this.listAdapter.removeItem(w);
         this.dao.delete(w);
-        this.removeWaypointFromList(w);
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
 	}
 
@@ -251,44 +183,49 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 	}
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-
-        if (v.getId()==R.id.waypoints) {
-            menu.add(Menu.NONE, MENU_WAYPOINT_DELETE, 0, R.string.menuWaypointDelete);
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case MENU_WAYPOINT_DELETE:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                remove((Waypoint) this.listAdapter.getItem(info.position));
-                break;
-        }
-        return true;
-
-    }
-
-
-
-    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add:
 			LocalWaypointDialog LocalWaypointDialog = new LocalWaypointDialog();
-			getFragmentManager().beginTransaction().add(LocalWaypointDialog, "LocalWaypointDialog")
-					.commit();
+			getFragmentManager().beginTransaction().add(LocalWaypointDialog, "LocalWaypointDialog").commit();
 			return true;
-        case R.id.addMonitor:
-                LocalWaypointMonitorDialog LocalWaypointMonitorDialog = new LocalWaypointMonitorDialog();
-                getFragmentManager().beginTransaction().add(LocalWaypointMonitorDialog, "LocalWaypointMonitorDialog")
-                        .commit();
-                return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerForContextMenu(this.listView);
+    }
+
+    @Override
+    public void onPause() {
+        unregisterForContextMenu(this.listView);
+        super.onPause();
+
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.waypoints) {
+            menu.add(Menu.NONE, MENU_WAYPOINT_REMOVE, 1,getString(R.string.waypointRemove));
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Log.v("menu", "position: " + info.position);
+        switch (item.getItemId()) {
+            case MENU_WAYPOINT_REMOVE:
+                remove( (Waypoint) this.listAdapter.getItem(info.position));
+                break;
+        }
+        return true;
+    }
 
 
     public static class LocalWaypointDialog extends DialogFragment implements StaticHandlerInterface {
@@ -297,8 +234,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
         private TextView longitude;
         private TextView radius;
         private Spinner transitionType;
-        private CheckBox waypointNotificationOnEnterLeave;
-        private TextView notificationMessage;
         private TextView currentLocationText;
         private LinearLayout currentLocationWrapper;
         private LinearLayout waypointGeofenceSettings;
@@ -335,9 +270,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 				this.transitionType.setSelection(2);
 				break;
 			}
-
-            notificationMessage.setText(w.getNotificationMessage());
-            waypointNotificationOnEnterLeave.setChecked(w.getNotificationOnEnter() || w.getNotificationOnLeave()); // Both are always set for local waypoints
 
 		}
 
@@ -391,8 +323,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 			this.radius = (TextView) view.findViewById(R.id.radius);
 			this.transitionType = (Spinner) view
 					.findViewById(R.id.transitionType);
-			this.waypointNotificationOnEnterLeave = (CheckBox) view.findViewById(R.id.waypointNotificationOnEnterLeave);
-			this.notificationMessage = (TextView) view.findViewById(R.id.notificationMessage);
             this.currentLocationWrapper = (LinearLayout) view.findViewById(R.id.currentLocationWrapper);
             this.currentLocationText = (TextView) view.findViewById(R.id.currentLocation);
             this.waypointGeofenceSettings = (LinearLayout) view.findViewById(R.id.waypointGeofenceSettings);
@@ -508,7 +438,6 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
                             boolean update;
                             if (LocalWaypointDialog.this.w == null) {
                                 LocalWaypointDialog.this.w = new Waypoint();
-                                w.setType(WAYPOINT_TYPE_LOCAL);
                                 update = false;
                             } else {
                                 update = true;
@@ -531,20 +460,14 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
                             switch (LocalWaypointDialog.this.transitionType.getSelectedItemPosition()) {
                                 case 0:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);
-                                    LocalWaypointDialog.this.w.setNotificationOnEnter(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                                 case 1:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointDialog.this.w.setNotificationOnLeave(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                                 default:
                                     LocalWaypointDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointDialog.this.w.setNotificationOnEnter(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    LocalWaypointDialog.this.w.setNotificationOnLeave(LocalWaypointDialog.this.waypointNotificationOnEnterLeave.isChecked());
                                     break;
                             }
-
-                            LocalWaypointDialog.this.w.setNotificationMessage(LocalWaypointDialog.this.notificationMessage.getText().toString());
 
 
                             if (update)
@@ -571,270 +494,4 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 		}
 
 	}
-
-
-
-
-    public static class LocalWaypointMonitorDialog extends DialogFragment implements StaticHandlerInterface {
-        private TextView description;
-        private TextView latitude;
-        private TextView longitude;
-        private TextView radius;
-        private Spinner transitionType;
-        private CheckBox waypointNotificationOnEnterLeave;
-        private TextView notificationMessage;
-        private TextView currentLocationText;
-        private LinearLayout currentLocationWrapper;
-        private TextView topic;
-
-        private static Handler handler;
-
-
-        CheckBox share;
-        GeocodableLocation location;
-
-        Waypoint w;
-
-        private void show(Waypoint w) {
-            this.description.setText(w.getDescription());
-            this.latitude.setText(w.getLatitude().toString());
-            this.longitude.setText(w.getLongitude().toString());
-            if (w.getRadius() != null)
-                this.radius.setText(w.getRadius().toString());
-            this.share.setChecked(w.getShared());
-
-
-            Log.v(this.toString(),
-                    "w.getTransitionType() " + w.getTransitionType());
-            switch (w.getTransitionType()) {
-                case Geofence.GEOFENCE_TRANSITION_ENTER:
-                    this.transitionType.setSelection(0);
-                    break;
-                case Geofence.GEOFENCE_TRANSITION_EXIT:
-                    this.transitionType.setSelection(1);
-                    break;
-                default:
-                    this.transitionType.setSelection(2);
-                    break;
-            }
-
-            notificationMessage.setText(w.getNotificationMessage());
-            waypointNotificationOnEnterLeave.setChecked(w.getNotificationOnEnter() || w.getNotificationOnLeave()); // Both are always set for local waypoints
-
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            EventBus.getDefault().registerSticky(this);
-        }
-
-        @Override
-        public void onStop() {
-
-            EventBus.getDefault().unregister(this);
-            super.onStop();
-        }
-
-        public void onEventMainThread(Events.CurrentLocationUpdated e) {
-            updateCurrentLocation(e.getGeocodableLocation(), true);
-        }
-
-        private void updateCurrentLocation(GeocodableLocation l, boolean updateGeocoderIfNotResolved){
-            if(updateGeocoderIfNotResolved && l!= null && l.getGeocoder() == null) {
-                (new ReverseGeocodingTask(getActivity(), handler)).execute(l);
-            }
-
-            ((ActivityWaypoints)getActivity()).currentLocation = l;
-            currentLocationText.setText(l.toString());
-
-        }
-
-        @Override
-        public void handleHandlerMessage(Message msg) {
-
-            if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null))
-                updateCurrentLocation((GeocodableLocation)msg.obj, false);
-        }
-
-
-
-
-        private View getContentView() {
-            View view = getActivity().getLayoutInflater().inflate(
-                    R.layout.fragment_waypoint, null);
-
-            this.description = (TextView) view.findViewById(R.id.description);
-            this.topic = (TextView) view.findViewById(R.id.monitorTopic);
-            this.latitude = (TextView) view.findViewById(R.id.latitude);
-            this.longitude = (TextView) view.findViewById(R.id.longitude);
-            this.radius = (TextView) view.findViewById(R.id.radius);
-            this.transitionType = (Spinner) view.findViewById(R.id.transitionType);
-            this.waypointNotificationOnEnterLeave = (CheckBox) view.findViewById(R.id.waypointNotificationOnEnterLeave);
-            this.notificationMessage = (TextView) view.findViewById(R.id.notificationMessage);
-            this.currentLocationWrapper = (LinearLayout) view.findViewById(R.id.currentLocationWrapper);
-            this.currentLocationText = (TextView) view.findViewById(R.id.currentLocation);
-
-            if (this.w != null)
-                show(this.w);
-
-            TextWatcher requiredForSave = new TextWatcher() {
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void beforeTextChanged(CharSequence s, int start,
-                                              int count, int after) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    conditionallyEnableSaveButton();
-                }
-            };
-
-            this.description.addTextChangedListener(requiredForSave);
-            this.latitude.addTextChangedListener(requiredForSave);
-            this.longitude.addTextChangedListener(requiredForSave);
-            this.radius.addTextChangedListener(requiredForSave);
-            this.topic.addTextChangedListener(requiredForSave);
-
-            this.currentLocationWrapper.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    if (((ActivityWaypoints)getActivity()).currentLocation != null) {
-                        LocalWaypointMonitorDialog.this.latitude.setText("" + ((ActivityWaypoints)getActivity()).currentLocation.getLatitude());
-                        LocalWaypointMonitorDialog.this.longitude.setText("" + ((ActivityWaypoints)getActivity()).currentLocation.getLongitude());
-                    } else {
-                        Toast.makeText(getActivity(), "No current location is available", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-
-            return view;
-        }
-
-        public static LocalWaypointDialog newInstance(int position) {
-            LocalWaypointDialog f = new LocalWaypointDialog();
-            Bundle args = new Bundle();
-            args.putInt(BUNDLE_KEY_POSITION, position);
-            f.setArguments(args);
-            return f;
-
-        }
-
-        private void conditionallyEnableSaveButton() {
-            View v = getDialog().findViewById(android.R.id.button1);
-
-            if (v == null)
-                return;
-
-            if ((this.description.getText().toString().length() > 0)
-                    && (this.latitude.getText().toString().length() > 0)
-                    && (this.longitude.getText().toString().length() > 0)
-                    && (this.topic.getText().toString().length() > 0)
-                    && (this.radius.getText().toString().length() > 0))
-
-            v.setEnabled(true);
-            else
-                v.setEnabled(false);
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-            Bundle b;
-            if (savedInstanceState != null)
-                b = savedInstanceState;
-            else
-                b = getArguments();
-
-            if (b != null)
-                this.w = (Waypoint)((ActivityWaypoints) getActivity()).getListAdapter().getItem(b.getInt(BUNDLE_KEY_POSITION));
-
-            handler = new StaticHandler(this);
-
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                    .setTitle(getResources().getString( this.w == null ? R.string.waypointAdd : R.string.waypointEdit))
-                    .setView(getContentView())
-                    .setNegativeButton(getResources().getString(R.string.cancel),new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog,
-                                            int which) {dismiss();	}
-                    })
-                    .setPositiveButton(getResources().getString(R.string.save),new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog,
-                                            int which) {
-                            boolean update;
-                            if (LocalWaypointMonitorDialog.this.w == null) {
-                                LocalWaypointMonitorDialog.this.w = new Waypoint();
-                                w.setType(WAYPOINT_TYPE_LOCAL_MONITORING);
-                                update = false;
-                            } else {
-                                update = true;
-                            }
-                            LocalWaypointMonitorDialog.this.w.setDescription(LocalWaypointMonitorDialog.this.description.getText().toString());
-                            try {
-                                LocalWaypointMonitorDialog.this.w.setLatitude(Double.parseDouble(LocalWaypointMonitorDialog.this.latitude.getText().toString()));
-                                LocalWaypointMonitorDialog.this.w.setLongitude(Double.parseDouble(LocalWaypointMonitorDialog.this.longitude.getText().toString()));
-                            } catch (NumberFormatException e) {
-                            }
-
-                            try {
-                                LocalWaypointMonitorDialog.this.w.setRadius(Float.parseFloat(LocalWaypointMonitorDialog.this.radius.getText().toString()));
-                            } catch (NumberFormatException e) {
-                                LocalWaypointMonitorDialog.this.w.setRadius(null);
-                            }
-
-                            LocalWaypointMonitorDialog.this.w.setShared(LocalWaypointMonitorDialog.this.share.isChecked());
-
-                            switch (LocalWaypointMonitorDialog.this.transitionType.getSelectedItemPosition()) {
-                                case 0:
-                                    LocalWaypointMonitorDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);
-                                    LocalWaypointMonitorDialog.this.w.setNotificationOnEnter(LocalWaypointMonitorDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    break;
-                                case 1:
-                                    LocalWaypointMonitorDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointMonitorDialog.this.w.setNotificationOnLeave(LocalWaypointMonitorDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    break;
-                                default:
-                                    LocalWaypointMonitorDialog.this.w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
-                                    LocalWaypointMonitorDialog.this.w.setNotificationOnEnter(LocalWaypointMonitorDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    LocalWaypointMonitorDialog.this.w.setNotificationOnLeave(LocalWaypointMonitorDialog.this.waypointNotificationOnEnterLeave.isChecked());
-                                    break;
-                            }
-
-                            LocalWaypointMonitorDialog.this.w.setNotificationMessage(LocalWaypointMonitorDialog.this.notificationMessage.getText().toString());
-
-
-                            if (update)
-                                ((ActivityWaypoints) getActivity()).update(LocalWaypointMonitorDialog.this.w);
-                            else {
-                                LocalWaypointMonitorDialog.this.w.setDate(new Date());
-                                ((ActivityWaypoints) getActivity()).add(LocalWaypointMonitorDialog.this.w);
-                            }
-
-                            dismiss();
-                        }
-                    });
-
-            Dialog dialog = builder.create();
-            dialog.setOnShowListener(new OnShowListener() {
-
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    conditionallyEnableSaveButton();
-
-                }
-            });
-            return dialog;
-        }
-
-    }
-
 }

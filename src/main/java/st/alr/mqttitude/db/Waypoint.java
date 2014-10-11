@@ -10,7 +10,6 @@ package st.alr.mqttitude.db;
 public class Waypoint {
 
     private Long id;
-    private Integer type;
     private String description;
     private Double latitude;
     private Double longitude;
@@ -20,11 +19,6 @@ public class Waypoint {
     private Float radius;
     private Integer transitionType;
     private String geofenceId;
-    private String topic;
-    private Boolean notificationOnEnter;
-    private Boolean notificationOnLeave;
-    private String notificationTopic;
-    private String notificationMessage;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -36,9 +30,8 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, Integer type, String description, Double latitude, Double longitude, String geocoder, Boolean shared, java.util.Date date, Float radius, Integer transitionType, String geofenceId, String topic, Boolean notificationOnEnter, Boolean notificationOnLeave, String notificationTopic, String notificationMessage) {
+    public Waypoint(Long id, String description, Double latitude, Double longitude, String geocoder, Boolean shared, java.util.Date date, Float radius, Integer transitionType, String geofenceId) {
         this.id = id;
-        this.type = type;
         this.description = description;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -48,11 +41,6 @@ public class Waypoint {
         this.radius = radius;
         this.transitionType = transitionType;
         this.geofenceId = geofenceId;
-        this.topic = topic;
-        this.notificationOnEnter = notificationOnEnter;
-        this.notificationOnLeave = notificationOnLeave;
-        this.notificationTopic = notificationTopic;
-        this.notificationMessage = notificationMessage;
     }
 
     public Long getId() {
@@ -61,14 +49,6 @@ public class Waypoint {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
     }
 
     public String getDescription() {
@@ -141,46 +121,6 @@ public class Waypoint {
 
     public void setGeofenceId(String geofenceId) {
         this.geofenceId = geofenceId;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public Boolean getNotificationOnEnter() {
-        return notificationOnEnter;
-    }
-
-    public void setNotificationOnEnter(Boolean notificationOnEnter) {
-        this.notificationOnEnter = notificationOnEnter;
-    }
-
-    public Boolean getNotificationOnLeave() {
-        return notificationOnLeave;
-    }
-
-    public void setNotificationOnLeave(Boolean notificationOnLeave) {
-        this.notificationOnLeave = notificationOnLeave;
-    }
-
-    public String getNotificationTopic() {
-        return notificationTopic;
-    }
-
-    public void setNotificationTopic(String notificationTopic) {
-        this.notificationTopic = notificationTopic;
-    }
-
-    public String getNotificationMessage() {
-        return notificationMessage;
-    }
-
-    public void setNotificationMessage(String notificationMessage) {
-        this.notificationMessage = notificationMessage;
     }
 
     // KEEP METHODS - put your custom methods here
