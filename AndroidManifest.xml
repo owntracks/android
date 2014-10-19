@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="st.alr.mqttitude"
-    android:versionCode="0422"
-    android:versionName="0.4.22" >
+    android:versionCode="0500"
+    android:versionName="0.5.00" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -58,7 +58,8 @@
         <activity
             android:name=".preferences.ActivityExport"
             android:configChanges="orientation"
-            android:label="Export" >
+            android:label="Export">
+
         </activity>
         <activity
             android:name=".ActivityWaypoints"
@@ -103,13 +104,38 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
+
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.EDIT" />
             <category android:name="android.intent.category.DEFAULT" />
-            <data android:scheme="file" />
-            <data android:host="*" />
-            <data android:pathPattern=".*\\.otrc" />
+            <data
+                android:mimeType="application/octet-stream"
+                android:host="*"
+                android:pathPattern=".*\\.otrc"
+                />
         </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.EDIT" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data
+                android:mimeType="application/otrc"
+                android:host="*"
+                android:pathPattern=".*\\.otrc"
+                />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.EDIT" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data
+                android:mimeType="text/plain"
+                android:host="*"
+                android:pathPattern=".*\\.otrc"
+                />
+        </intent-filter>
+>
 
         <!--<activity-->
             <!--android:name=".ActivityWizzard"-->
