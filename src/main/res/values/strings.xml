@@ -110,6 +110,11 @@
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
     <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
 
+    <string name="preferencesBeaconForegroundPeriod">Foreground beacon scanning period</string>
+    <string name="preferencesBeaconForegroundPeriodSummary">Seconds between foreground beacon scans</string>
+    <string name="preferencesBeaconBackgroundPeriod">Background beacon scannning period</string>
+    <string name="preferencesBeaconBackgroundPeriodSummary">Seconds between background beacon scans</string>
+
     <string name="preferencesRemoteCommandDump">Remote dump command</string>
     <string name="preferencesRemoteCommandDumpSummary">Respond to dump command</string>
     <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
@@ -211,6 +216,8 @@
     <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
     <string name="keyRemoteConfiguration">remoteConfiguration</string>
     <string name="keyCustomBeaconLayout">customBeaconLayout</string>
+    <string name="keyBeaconBackgroundScanPeriod">beaconBackgroundScanPeriod</string>
+    <string name="keyBeaconForegroundScanPeriod">beaconForegroundScanPeriod</string>
     <string name="valEmpty">""</string>
     <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
     <string name="valPubTopicPartWaypoints">/waypoints</string>

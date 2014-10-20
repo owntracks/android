@@ -110,6 +110,8 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyAutostartOnBoot), getAutostartOnBoot())
                     .put(getStringRessource(R.string.keyLocatorAccuracyBackground), getLocatorAccuracyBackground())
                     .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
+                    .put(getStringRessource(R.string.keyBeaconBackgroundScanPeriod), getBeaconBackgroundScanPeriod())
+                    .put(getStringRessource(R.string.keyBeaconForegroundScanPeriod), getBeaconForegroundScanPeriod())
                     .put(getStringRessource(R.string.keyRemoteCommandDump), getRemoteCommandDump())
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
@@ -160,6 +162,9 @@ public class Preferences {
         try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
         try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
         try { setCleanSession(json.getBoolean(getStringRessource(R.string.keyCleanSession))); } catch (JSONException e) {}
+
+        try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
+        try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
 
     }
 
@@ -433,6 +438,16 @@ public class Preferences {
 
     }
 
+    private static void setBeaconBackgroundScanPeriod(int anInt) {
+        setInt(R.string.keyBeaconBackgroundScanPeriod, anInt);
+
+    }
+
+    private static void setBeaconForegroundScanPeriod(int anInt) {
+        setInt(R.string.keyBeaconBackgroundScanPeriod, anInt);
+
+    }
+
     private static void setLocatorDisplacement(int anInt) {
         setInt(R.string.keyLocatorDisplacement, anInt);
 
@@ -569,6 +584,14 @@ public class Preferences {
 
     public static int getLocatorAccuracyForeground() {
         return getInt(R.string.keyLocatorAccuracyForeground, R.integer.valLocatorAccuracyForeground);
+    }
+
+    public static int getBeaconBackgroundScanPeriod() {
+        return getInt(R.string.keyBeaconBackgroundScanPeriod, R.integer.valBeaconBackgroundScanPeriod);
+    }
+
+    public static int getBeaconForegroundScanPeriod() {
+        return getInt(R.string.keyBeaconBackgroundScanPeriod, R.integer.valBeaconForegroundScanPeriod);
     }
 
     public static int getLocatorAccuracyBackground() {
