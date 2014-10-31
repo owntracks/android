@@ -67,18 +67,26 @@ public class ActivityExport extends Activity {
     private void setUsernameDeviceExport(boolean isChecked) {
         includeCredentials.setEnabled(isChecked);
         includeDeviceIdentification.setEnabled(isChecked);
+
+        // Uncheck Credentials and DeviceIdentification if Connection is not checked
+        if(!isChecked) {
+            includeCredentials.setChecked(isChecked);
+            includeDeviceIdentification.setChecked(isChecked);
+        }
     }
 
     private void export() {
         Log.v("Export", "Export includes: connection=" + includeConnection.isChecked() + ", username/password=" + includeCredentials.isChecked() + ", device identification=" + includeDeviceIdentification.isChecked() + ", waypoints=" + includeWaypoints.isChecked());
 
 
+
         EnumSet<ConfigurationMessage.Includes> includes = EnumSet.noneOf(ConfigurationMessage.Includes.class);
-        if (includeConnection.isChecked() && includeConnection.isActivated())
+
+        if (includeConnection.isChecked() && includeConnection.isEnabled())
             includes.add(ConfigurationMessage.Includes.CONNECTION);
-        if (includeCredentials.isChecked()&& includeCredentials.isActivated())
-            includes.add(ConfigurationMessage.Includes.CONNECTION);
-        if (includeDeviceIdentification.isChecked() && includeCredentials.isActivated())
+        if (includeCredentials.isChecked()&& includeCredentials.isEnabled())
+            includes.add(ConfigurationMessage.Includes.CREDENTIALS);
+        if (includeDeviceIdentification.isChecked() && includeCredentials.isEnabled())
             includes.add(ConfigurationMessage.Includes.IDENTIFICATION);
         if (includeWaypoints.isChecked())
             includes.add(ConfigurationMessage.Includes.WAYPOINTS);
