@@ -113,7 +113,9 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyRemoteCommandDump), getRemoteCommandDump())
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
-                    .put(getStringRessource(R.string.keyCleanSession), getCleanSession());
+                    .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
+                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId());
+
             Log.v("PREFERENCES", json.toString());
 
         } catch (JSONException e) {
@@ -160,7 +162,7 @@ public class Preferences {
         try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
         try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
         try { setCleanSession(json.getBoolean(getStringRessource(R.string.keyCleanSession))); } catch (JSONException e) {}
-
+        try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
     }
 
     public static boolean getRemoteConfiguration() {
@@ -334,6 +336,21 @@ public class Preferences {
             setInt(R.string.keyPort, value);
             brokerChanged();
         }
+    }
+
+    public static void setTrackerId(String value){
+        int len=value.length();
+        // value validation - must be max 2 characters, only letters and digits
+        if(len>=2){
+            value=value.substring(0,2);
+            if( Character.isLetterOrDigit(value.charAt(0)) && Character.isLetterOrDigit(value.charAt(1)) )
+                setString(R.string.keyTrackerId, value);
+        }
+        else {
+            if( len >0 && Character.isLetterOrDigit(value.charAt(0)))
+                setString(R.string.keyTrackerId, value);
+        }
+
     }
 
     public static int getPort() {
