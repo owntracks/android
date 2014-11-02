@@ -183,13 +183,34 @@
             android:summary="@string/beaconRangingEnabledSummary"
             android:title="@string/beaconRangingEnabled" />
 
+
+        <st.alr.mqttitude.support.EditIntegerPreference
+            android:defaultValue="@integer/valBeaconForegroundScanPeriod"
+            android:dialogTitle="@string/preferencesBeaconForegroundPeriod"
+            android:hint="@integer/valBeaconForegroundScanPeriod"
+            android:inputType="numberDecimal"
+            android:key="@string/keyBeaconForegroundScanPeriod"
+            android:summary="@string/preferencesBeaconForegroundPeriodSummary"
+            android:title="@string/preferencesBeaconForegroundPeriod"
+            android:dependency="@string/keyBeaconRangingEnabled" />
+
+        <st.alr.mqttitude.support.EditIntegerPreference
+            android:defaultValue="@integer/valBeaconBackgroundScanPeriod"
+            android:dialogTitle="@string/preferencesBeaconBackgroundPeriod"
+            android:hint="@integer/valBeaconBackgroundScanPeriod"
+            android:inputType="numberDecimal"
+            android:key="@string/keyBeaconBackgroundScanPeriod"
+            android:summary="@string/preferencesBeaconBackgroundPeriodSummary"
+            android:title="@string/preferencesBeaconBackgroundPeriod"
+            android:dependency="@string/keyBeaconRangingEnabled" />
+
         <EditTextPreference
-                android:defaultValue="@string/valEmpty"
-                android:dialogTitle="@string/preferencesCustomBeaconLayout"
-                android:key="@string/keyCustomBeaconLayout"
-                android:summary="@string/preferencesCustomBeaconLayoutSummary"
-                android:title="@string/preferencesCustomBeaconLayout"
-                android:dependency="@string/keyBeaconRangingEnabled"/>
+            android:defaultValue="@string/valEmpty"
+            android:dialogTitle="@string/preferencesCustomBeaconLayout"
+            android:key="@string/keyCustomBeaconLayout"
+            android:summary="@string/preferencesCustomBeaconLayoutSummary"
+            android:title="@string/preferencesCustomBeaconLayout"
+            android:dependency="@string/keyBeaconRangingEnabled"/>
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Misc">
