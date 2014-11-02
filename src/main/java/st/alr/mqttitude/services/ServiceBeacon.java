@@ -194,8 +194,16 @@ public class ServiceBeacon implements
             Log.v(this.toString(), "Setting custom beacon layout");
             refreshCustomParser();
         }
-
-        // TODO: Beacon ranging intervals
+        else if(key.equals(Preferences.getKey(R.string.keyBeaconBackgroundScanPeriod)))
+        {
+            Log.v(this.toString(), "Setting background beacon scan period");
+            setBeaconScanningIntervals();
+        }
+        else if(key.equals(Preferences.getKey(R.string.keyBeaconForegroundScanPeriod)))
+        {
+            Log.v(this.toString(), "Setting foreground beacon scan period");
+            setBeaconScanningIntervals();
+        }
     }
 
     private void initializeBeaconScanning()
@@ -218,11 +226,7 @@ public class ServiceBeacon implements
         }
 
         Log.v(this.toString(), "Beacon scanning should be available");
-        // Should add prefs for these
-        mBeaconManager.setBackgroundBetweenScanPeriod(30000L);  // default is 300000L
-        mBeaconManager.setBackgroundScanPeriod(2000L);          // default is 10000L
-        mBeaconManager.setForegroundBetweenScanPeriod(0L);      // default is 0L
-        mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
+        setBeaconScanningIntervals();
 
         refreshCustomParser();
 
@@ -230,6 +234,17 @@ public class ServiceBeacon implements
         regionBootstrap = new RegionBootstrap(this, region);
 
         scanningState = ScanningState.ENABLED;
+    }
+
+    private void setBeaconScanningIntervals()
+    {
+        if(scanningState != ScanningState.ENABLED)
+            return;
+
+        mBeaconManager.setBackgroundBetweenScanPeriod(Preferences.getBeaconBackgroundScanPeriod() * 1000);  // default is 300000L
+        mBeaconManager.setBackgroundScanPeriod(2000L);          // default is 10000L
+        mBeaconManager.setForegroundBetweenScanPeriod(Preferences.getBeaconForegroundScanPeriod() * 1000);      // default is 0L
+        mBeaconManager.setForegroundScanPeriod(1100L);          // Default is 1100L
     }
 
     private void refreshCustomParser()

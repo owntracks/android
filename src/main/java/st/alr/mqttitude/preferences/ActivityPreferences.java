@@ -30,7 +30,7 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityPreferences extends PreferenceActivity {
 	private static Preference serverPreference;
-	private static Preference backgroundUpdatesIntervall;
+    private static Preference backgroundUpdatesIntervall;
 	private static Preference version;
 	private static Preference repo;
 	private static Preference mail;
@@ -92,6 +92,7 @@ public class ActivityPreferences extends PreferenceActivity {
 			serverPreference = findPreference("brokerPreference");
 			backgroundUpdatesIntervall = findPreference(Preferences
 					.getKey(R.string.keyPubInterval));
+
 			topic = (EditTextPreference) findPreference(Preferences
 					.getKey(R.string.keyPubTopicBase));
 
