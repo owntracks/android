@@ -38,6 +38,11 @@ public class ConfigurationMessage {
             }
     }
 
+    // To be used when a ConfigurationMessage is received
+    public ConfigurationMessage(StringifiedJSONObject json){
+        this.json=json;
+    }
+
 
     private StringifiedJSONObject getPreferencesJson() {
         return Preferences.toJSONObject();

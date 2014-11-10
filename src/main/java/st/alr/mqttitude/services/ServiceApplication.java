@@ -94,11 +94,11 @@ public class ServiceApplication implements ProxyableService,
 		//this.mContactCount = getContactCount();
 		//context.getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, this.mObserver);
 
-	}
+    }
 
-	@Override
+    @Override
 	public void onDestroy() {
-	}
+    }
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -156,6 +156,22 @@ public class ServiceApplication implements ProxyableService,
         }
 
 	}
+
+    public void onEventMainThread(Events.ConfigurationMessageReceived e){
+
+        Preferences.fromJsonObject(e.getConfigurationMessage().toJSONObject());
+
+        // Reconnect to broker after new configuration has been saved.
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                ServiceProxy.getServiceBroker().reconnect();
+            }
+        };
+        new Thread(r).start();
+
+    }
 
 
 	private Notification notification;

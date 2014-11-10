@@ -194,7 +194,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
 		this.mLocationRequest.setInterval(Preferences
-				.getLocatorInterval());
+				.getLocatorIntervalMillis());
 		this.mLocationRequest.setFastestInterval(0);
 		this.mLocationRequest.setSmallestDisplacement(Preferences
 				.getLocatorDisplacement());

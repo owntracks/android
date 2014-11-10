@@ -127,7 +127,7 @@ public class ActivityPreferences extends PreferenceActivity {
 			repo.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setData(Uri.parse(Preferences.getRepoUrl()));
 					a.startActivity(intent);
 					return false;
