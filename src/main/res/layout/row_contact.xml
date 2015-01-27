@@ -3,6 +3,7 @@
     android:id="@+id/layout"
     android:background="?android:attr/selectableItemBackground"
     android:padding="@dimen/default_horizontal_spacing"
+    android:layout_margin="0dp"
     android:orientation="vertical"
     android:layout_height="wrap_content"
     android:layout_width="match_parent">

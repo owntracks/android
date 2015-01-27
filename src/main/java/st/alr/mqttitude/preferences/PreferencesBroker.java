@@ -51,7 +51,7 @@ public class PreferencesBroker extends DialogPreference {
 	};
 
 	Set<RequireablePreferences> okPreferences = Collections.synchronizedSet(EnumSet.noneOf(RequireablePreferences.class));
-	Set<RequireablePreferences> requiredPreferences = Collections.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST, RequireablePreferences.USER_NAME, RequireablePreferences.DEVICE_ID, RequireablePreferences.USER_NAME));
+	Set<RequireablePreferences> requiredPreferences = Collections.synchronizedSet(EnumSet.of(RequireablePreferences.BROKER_HOST, RequireablePreferences.USER_NAME,  RequireablePreferences.USER_NAME));
 
 	public PreferencesBroker(Context context, AttributeSet attrs) {
 		super(context, attrs);

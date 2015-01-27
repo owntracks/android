@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
+
 import de.greenrobot.event.EventBus;
 
 public class ServiceProxy extends ServiceBindable {
@@ -173,10 +175,14 @@ public class ServiceProxy extends ServiceBindable {
 	}
 
 	public static void runOrBind(Context context, Runnable runnable) {
+        Log.v("ServiceProxy", "runOrBind");
 		if ((instance != null) && (getServiceConnection() != null)) {
-			runnable.run();
+            Log.v("ServiceProxy", "running immediately");
+
+            runnable.run();
 			return;
 		}
+        Log.v("ServiceProxy", "binding");
 
 		if (getServiceConnection() == null) {
 			ServiceConnection c = new ServiceConnection() {
@@ -188,7 +194,9 @@ public class ServiceProxy extends ServiceBindable {
 				@Override
 				public void onServiceConnected(ComponentName name,
 						IBinder binder) {
-					connectionBoundOnce = true;
+                    Log.v("ServiceProxy", "serviceConnected, running queue");
+
+                    connectionBoundOnce = true;
 					for (Runnable r : runQueue)
 						r.run();
 					runQueue.clear();
@@ -199,7 +207,15 @@ public class ServiceProxy extends ServiceBindable {
 		}
 
 		runQueue.addLast(runnable);
-		context.bindService(new Intent(context, ServiceProxy.class),
-				connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        Log.v("ServiceProxy", "bindService called");
+
+        try {
+            context.bindService(new Intent(context, ServiceProxy.class),
+                    connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        } catch (Exception e) {
+            Log.v("ServiceProxy", "bind exception ");
+            e.printStackTrace();
+
+        }
 	}
 }

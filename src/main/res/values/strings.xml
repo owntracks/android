@@ -106,9 +106,9 @@
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
-    <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage when active</string>
+    <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
-    <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the background</string>
+    <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the foreground</string>
 
     <string name="preferencesBeaconForegroundPeriod">Foreground beacon scanning period</string>
     <string name="preferencesBeaconForegroundPeriodSummary">Seconds between foreground beacon scans</string>

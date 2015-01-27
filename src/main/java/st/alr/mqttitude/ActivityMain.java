@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +31,9 @@ import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -63,7 +66,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityMain extends FragmentActivity {
+public class ActivityMain extends ActionBarActivity {
     private static final int CONTACT_PICKER_RESULT = 1001;
 
     @Override
@@ -84,8 +87,14 @@ public class ActivityMain extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setElevation(5);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setIcon(R.drawable.ic_icon);
 
-		FragmentHandler.getInstance().init(ContactsFragment.class);
+        FragmentHandler.getInstance().init(ContactsFragment.class);
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
         MapsInitializer.initialize(this);
@@ -268,11 +277,11 @@ public class ActivityMain extends FragmentActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 
-        if(!App.isDebugBuild()) {
+        //if(!App.isDebugBuild()) {
             menu.findItem(R.id.menu_develop_1).setVisible(false);
             menu.findItem(R.id.menu_develop_2).setVisible(false);
 
-        }
+        //}
 		return true;
 	}
 
@@ -392,12 +401,16 @@ public class ActivityMain extends FragmentActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		// bindService(new Intent(this, ServiceProxy.class), serviceConnection,
+        Log.v("ActivityMain", "app onStartCalled called");
+
+        // bindService(new Intent(this, ServiceProxy.class), serviceConnection,
 		// Context.BIND_AUTO_CREATE);
 		ServiceProxy.runOrBind(this, new Runnable() {
 
             @Override
             public void run() {
+                Log.v("ActivityMain", "runOrBind onStart");
+
                 ServiceProxy.getServiceLocator().enableForegroundMode();
                 ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
@@ -406,10 +419,13 @@ public class ActivityMain extends FragmentActivity {
 
 	@Override
 	public void onStop() {
+        Log.v("ActivityMain", "app onStop called");
 		ServiceProxy.runOrBind(this, new Runnable() {
 
             @Override
             public void run() {
+                Log.v("ActivityMain", "runOrBind onStop");
+
                 ServiceProxy.getServiceLocator().enableBackgroundMode();
                 ServiceProxy.getServiceBeacon().setBackgroundMode(true);
             }
@@ -831,7 +847,7 @@ public class ActivityMain extends FragmentActivity {
             this.contactsList = (ListView) v.findViewById(R.id.contactsList);
             this.contactsList.setEmptyView((View) v.findViewById(R.id.contactsListPlaceholder));
             setListAdapter(true);
-            this.currentLocation = (Button) v.findViewById(R.id.currentLocation);
+            this.currentLocation = (Button) v.findViewById(R.id.currentLocationButton);
             this.currentLocation.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -938,6 +954,9 @@ public class ActivityMain extends FragmentActivity {
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
             }
+
+
+
         }
 
         @Override
