@@ -27,7 +27,7 @@
             android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
             android:title="@string/preferencesBackgroundUpdatesInterval" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
             android:summary="@string/preferencesIncludeBatterySummary"

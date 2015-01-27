@@ -132,7 +132,7 @@ public class ServiceApplication implements ProxyableService,
         }
 
         // EXPERIMENTAL
-        Log.v(this.toString(), "test if updating ticker ");
+        //Log.v(this.toString(), "test if updating ticker ");
 
         if(e.getLocationMessage().getTransition() != -1 &&  Preferences.getNotificationOnReceivedWaypointTransition()) {
             Log.v(this.toString(), "updating ticker with event message");

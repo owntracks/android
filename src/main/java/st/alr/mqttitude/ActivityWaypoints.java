@@ -25,11 +25,14 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -55,7 +58,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 
-public class ActivityWaypoints extends FragmentActivity implements StaticHandlerInterface {
+public class ActivityWaypoints extends ActionBarActivity implements StaticHandlerInterface {
     private static final int MENU_WAYPOINT_REMOVE = 0;
     private ListView listView;
 	private WaypointAdapter listAdapter;
@@ -82,7 +85,18 @@ public class ActivityWaypoints extends FragmentActivity implements StaticHandler
 			}
 		});
 
+
+
 		setContentView(R.layout.activity_waypoint);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setElevation(0);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setIcon(R.drawable.ic_icon);
+        if(Build.VERSION.SDK_INT >= 21 ) {
+            getActionBar().setElevation(0);
+        }
 
         this.dao = App.getWaypointDao();
         this.handler = new StaticHandler(this);

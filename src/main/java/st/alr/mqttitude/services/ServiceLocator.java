@@ -31,9 +31,9 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationStatusCodes;
 
 import de.greenrobot.event.EventBus;
@@ -49,7 +49,6 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
 	private ServiceProxy context;
 
-	private LocationClient mLocationClient;
 	private LocationRequest mLocationRequest;
 	private boolean ready = false;
 	private boolean foreground = false;
@@ -252,10 +251,12 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
         }
 
 		if (this.foreground || Preferences.getPub()) {
-			this.mLocationClient.requestLocationUpdates(this.mLocationRequest,
-					ServiceProxy.getPendingIntentForService(this.context,
-							ServiceProxy.SERVICE_LOCATOR,
-							Defaults.INTENT_ACTION_LOCATION_CHANGED, null));
+            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context,
+                    ServiceProxy.SERVICE_LOCATOR,
+                    Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
+            Log.v(this.toString(), "setting up location updates with pending intent " + i);
+            LocationServices.FusedLocationApi.requestLocationUpdates(this.mLocationRequest, i
+            );
 
 		} else
 			Log.d(this.toString(), "Location updates not requested (in foreground: "+ this.foreground +", background updates: " +  Preferences.getPub());
@@ -292,11 +293,14 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 	public void enableForegroundMode() {
 		this.foreground = true;
+        Log.v(this.toString(), "enableForegroundMode");
 		requestLocationUpdates();
 	}
 
 	public void enableBackgroundMode() {
 		this.foreground = false;
+        Log.v(this.toString(), "enableBackgroundMode");
+
 		requestLocationUpdates();
 	}
 

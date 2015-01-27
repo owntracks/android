@@ -12,9 +12,6 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="19" />
 
-    <permission
-        android:name="st.alr.mqttitude.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" />
 
     <meta-data
         android:name="com.google.android.gms.version"
@@ -47,8 +44,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ActivityMain"
-            android:label="@string/app_name" >
+            android:name=".ActivityMain">
         </activity>
         <activity
             android:name=".preferences.ActivityPreferences"

@@ -9,17 +9,21 @@
     >
 
     <Button
-        android:id="@+id/currentLocation"
+        android:id="@+id/currentLocationButton"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/mylocationbutton"
+        android:layout_height="56dp"
         android:gravity="center_vertical"
         android:paddingBottom="0dp"
-        android:textColor="#6f7275"
+        android:textColor="#999999"
+        android:elevation="10dp"    style="?android:attr/borderlessButtonStyle"
+
+
         android:paddingLeft="@dimen/default_horizontal_spacing"
         android:text="@string/na" />
 
     <TextView android:id="@+id/contactsListPlaceholder"
+              android:elevation="2dp"
+
               android:gravity="center"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -27,6 +31,7 @@
 
 
     <ListView
+        android:elevation="2dp"
 
         android:listSelector="@android:color/transparent"
         android:layout_width="match_parent"
