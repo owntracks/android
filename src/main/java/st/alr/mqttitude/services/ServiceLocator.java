@@ -19,6 +19,7 @@ import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.ServiceMqttCallbacks;
 import st.alr.mqttitude.support.Preferences;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,23 +29,29 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingEvent;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationStatusCodes;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
-		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener,
-		LocationClient.OnRemoveGeofencesResultListener,
-		LocationClient.OnAddGeofencesResultListener {
-
-	private SharedPreferences sharedPreferences;
+public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this.context)
+            .addApi(LocationServices.API)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .build();
+    private SharedPreferences sharedPreferences;
 	private OnSharedPreferenceChangeListener preferencesChangedListener;
 	private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
 	private ServiceProxy context;
@@ -66,105 +73,122 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		this.waypointDao = App.getWaypointDao();
 		loadWaypoints();
 
-		this.sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(this.context);
+		this.sharedPreferences = PreferenceManager .getDefaultSharedPreferences(this.context);
 
 		this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			@Override
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreference, String key) {
-				if (key.equals(Preferences.getKey(R.string.keyPub))
-						|| key.equals(Preferences
-								.getKey(R.string.keyPubInterval)))
+				if (key.equals(Preferences.getKey(R.string.keyPub)) || key.equals(Preferences .getKey(R.string.keyPubInterval)))
 					handlePreferences();
 			}
 		};
-		this.sharedPreferences
-				.registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
+		this.sharedPreferences .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
-		this.mLocationClient = new LocationClient(this.context, this, this);
 
-		if (!this.mLocationClient.isConnected()
-				&& !this.mLocationClient.isConnecting()
-				&& ServiceApplication.checkPlayServices())
-			this.mLocationClient.connect();
+		if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting() && ServiceApplication.checkPlayServices()) {
+            this.googleApiClient.connect();
+        }
+        this.ready = false;
+        ServiceApplication.checkPlayServices(); // show error notification if
+        // play services were disabled
 
-	}
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(this.toString(), "PlayServices API failed to connect. Result: " + connectionResult);
+    }
+
+    @Override
+    public void onConnected(Bundle arg0) {
+        Log.e(this.toString(), "PlayServices API connected");
+        this.ready = true;
+        initLocationRequest();
+        initGeofences();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.v(this.toString(), "PlayServices API connection suspended");
+    }
 
 	public GeocodableLocation getLastKnownLocation() {
-		if ((this.mLocationClient != null)
-				&& this.mLocationClient.isConnected()
-				&& (this.mLocationClient.getLastLocation() != null))
-			this.lastKnownLocation = new GeocodableLocation(
-					this.mLocationClient.getLastLocation());
+		if ((this.googleApiClient != null) && this.googleApiClient.isConnected() && (LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null))
+			this.lastKnownLocation = new GeocodableLocation(LocationServices.FusedLocationApi.getLastLocation(googleApiClient));
 
 		return this.lastKnownLocation;
 	}
 
+    private LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            lastKnownLocation = new GeocodableLocation(location);
+
+            EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
+
+            if (shouldPublishLocation())
+                publishLocationMessage();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            Log.v(this.toString(), "mLocationListener onStatusChanged: " +provider +" -> " + status);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            Log.v(this.toString(), "mLocationListener onProviderEnabled: " +provider);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            Log.v(this.toString(), "mLocationListener onProviderDisabled: " +provider);
+        }
+    };
+
 	public void onFenceTransition(Intent intent) {
-		int transitionType = LocationClient.getGeofenceTransition(intent);
+        GeofencingEvent event = GeofencingEvent.fromIntent(intent);
+        Log.v(this.toString(), "onFenceTransistion");
+        if(event != null){
+            if(event.hasError()) {
+                Log.e(this.toString(), "Geofence event has error: " + event.getErrorCode());
+                return;
+            }
 
-		// Test that a valid transition was reported
-		if ((transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
-				|| (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)) {
-			List<Geofence> triggerList = LocationClient
-					.getTriggeringGeofences(intent);
+            int transition = event.getGeofenceTransition();
 
-			for (int i = 0; i < triggerList.size(); i++) {
+            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT){
+                String[] geofenceIds = new String[event.getTriggeringGeofences().size()];
+                for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
-				Waypoint w = this.waypointDao
-						.queryBuilder()
-						.where(Properties.GeofenceId.eq(triggerList.get(i)
-								.getRequestId())).limit(1).unique();
+                    Waypoint w = this.waypointDao.queryBuilder().where(Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
 
-
-				if (w != null) {
-					Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transitionType);
-
-					EventBus.getDefault().postSticky(
-							new Events.WaypointTransition(w, transitionType));
-
-					publishGeofenceTransitionEvent(w, transitionType);
-				}
-			}
-		}
+                    if (w != null) {
+                        Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transition);
+                        EventBus.getDefault().postSticky(new Events.WaypointTransition(w, transition));
+                        publishGeofenceTransitionEvent(w, transition);
+                    }
+                }
+            }
+        }
 	}
 
-	@Override
-	public void onLocationChanged(Location arg0) {
-		this.lastKnownLocation = new GeocodableLocation(arg0);
 
-		EventBus.getDefault().postSticky(
-				new Events.CurrentLocationUpdated(this.lastKnownLocation));
-
-		if (shouldPublishLocation())
-			publishLocationMessage();
-	}
 
 	private boolean shouldPublishLocation() {
 		if (this.lastPublish == 0)
 			return true;
 
-		if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES
-				.toMillis(Preferences.getPubInterval()))
+		if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()))
 			return true;
 
 		return false;
 	}
 
-	@Override
-	public void onConnectionFailed(ConnectionResult connectionResult) {
-		Log.e(this.toString(), "Failed to connect");
-	}
 
-	@Override
-	public void onConnected(Bundle arg0) {
-		this.ready = true;
-		initLocationRequest();
-		initGeofences();
-	}
 
-	private void initGeofences() {
+    private void initGeofences() {
 		removeGeofences();
 		requestGeofences();
 	}
@@ -173,12 +197,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		requestLocationUpdates();
 	}
 
-	@Override
-	public void onDisconnected() {
-		this.ready = false;
-		ServiceApplication.checkPlayServices(); // show error notification if
-												// play services were disabled
-	}
+
 
 	private void setupBackgroundLocationRequest() {
 		this.mLocationRequest = LocationRequest.create();
@@ -221,12 +240,20 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	}
 
 	private void disableLocationUpdates() {
-		if ((this.mLocationClient != null)
-				&& this.mLocationClient.isConnected()) {
-			this.mLocationClient.removeLocationUpdates(ServiceProxy
-					.getPendingIntentForService(this.context,
-							ServiceProxy.SERVICE_LOCATOR,
-							Defaults.INTENT_ACTION_LOCATION_CHANGED, null, 0));
+		if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
+            PendingResult<Status> r = LocationServices.FusedLocationApi.removeLocationUpdates(this.googleApiClient, mLocationListener);
+            r.setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(Status status) {
+                    if (status.isSuccess()) {
+                        Log.v(this.toString(), "removeLocationUpdates successfull");
+                    } else if (status.hasResolution()) {
+                        Log.v(this.toString(), "removeLocationUpdates failed. HasResolution");
+                    } else {
+                        Log.v(this.toString(), "removeLocationUpdates failed. " + status.getStatusMessage());
+                    }
+                }
+            });
 		}
 	}
 
@@ -251,13 +278,22 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
         }
 
 		if (this.foreground || Preferences.getPub()) {
-            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context,
-                    ServiceProxy.SERVICE_LOCATOR,
-                    Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
+            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
             Log.v(this.toString(), "setting up location updates with pending intent " + i);
-            LocationServices.FusedLocationApi.requestLocationUpdates(this.mLocationRequest, i
-            );
 
+            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,mLocationRequest,mLocationListener);
+            r.setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(Status status) {
+                    if (status.isSuccess()) {
+                        Log.v(this.toString(), "requestLocationUpdates successfull");
+                    } else if (status.hasResolution()) {
+                        Log.v(this.toString(), "requestLocationUpdates failed. HasResolution");
+                    } else {
+                        Log.v(this.toString(), "requestLocationUpdates failed. " + status.getStatusMessage());
+                    }
+                }
+            });
 		} else
 			Log.d(this.toString(), "Location updates not requested (in foreground: "+ this.foreground +", background updates: " +  Preferences.getPub());
 
@@ -266,22 +302,17 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if ((intent != null) && (intent.getAction() != null)) {
-			if (intent.getAction().equals(
-					Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
+			if (intent.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
 				publishLocationMessage();
-			} else if (intent.getAction().equals(
-					Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
-				Location location = intent
-						.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
+			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
+				Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
 
 				if (location != null)
-					onLocationChanged(location);
+					mLocationListener.onLocationChanged(location);
 
-			} else if (intent.getAction().equals(
-					Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
+			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
 				Log.v(this.toString(), "Geofence transition occured");
 				onFenceTransition(intent);
-
 			} else {
 				Log.v(this.toString(), "Received unknown intent");
 			}
@@ -521,11 +552,19 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		}
 
 		Log.v(this.toString(), "Adding " + fences.size() + " geofences");
-		this.mLocationClient.addGeofences(fences, ServiceProxy
-				.getPendingIntentForService(this.context,
-						ServiceProxy.SERVICE_LOCATOR,
-						Defaults.INTENT_ACTION_FENCE_TRANSITION, null), this);
-
+        PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_FENCE_TRANSITION, null));
+        r.setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                if (status.isSuccess()) {
+                    Log.v(this.toString(), "Geofence registration successfull");
+                } else if (status.hasResolution()) {
+                    Log.v(this.toString(), "Geofence registration failed. HasResolution");
+                } else {
+                    Log.v(this.toString(), "Geofence registration failed. " + status.getStatusMessage());
+                }
+            }
+        });
 	}
 
 	private void removeGeofence(Waypoint w) {
@@ -559,7 +598,19 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		if (ids.isEmpty())
 			return;
 
-		this.mLocationClient.removeGeofences(ids, this);
+        PendingResult<Status> r = LocationServices.GeofencingApi.removeGeofences(googleApiClient, ids);
+        r.setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                if (status.isSuccess()) {
+                    Log.v(this.toString(), "Geofence removal successfull");
+                } else if (status.hasResolution()) {
+                    Log.v(this.toString(), "Geofence removal failed. HasResolution");
+                } else {
+                    Log.v(this.toString(), "Geofence removal failed. " + status.getStatusMessage());
+                }
+            }
+        });
 	}
 
 	public void onEvent(Object event) {
@@ -573,42 +624,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
 	}
 
-	@Override
-	public void onAddGeofencesResult(int arg0, String[] arg1) {
-		if (LocationStatusCodes.SUCCESS == arg0) {
-			for (int i = 0; i < arg1.length; i++) {
-				Log.v(this.toString(), "geofence " + arg1[i] + " added");
 
-			}
-
-		} else {
-			Log.v(this.toString(), "geofence adding failed");
-		}
-
-	}
-
-	@Override
-	public void onRemoveGeofencesByPendingIntentResult(int arg0,
-			PendingIntent arg1) {
-		if (LocationStatusCodes.SUCCESS == arg0) {
-			Log.v(this.toString(), "geofence removed");
-		} else {
-			Log.v(this.toString(), "geofence removing failed");
-		}
-
-	}
-
-	@Override
-	public void onRemoveGeofencesByRequestIdsResult(int arg0, String[] arg1) {
-		if (LocationStatusCodes.SUCCESS == arg0) {
-			for (int i = 0; i < arg1.length; i++) {
-				Log.v(this.toString(), "geofence " + arg1[i] + " removed");
-			}
-		} else {
-			Log.v(this.toString(), "geofence removing failed");
-		}
-
-	}
 
     public boolean isReady() {
         return ready;
@@ -624,12 +640,13 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks,
 
 
     public boolean hasLocationClient() {
-        return mLocationClient != null;
+        return googleApiClient != null;
     }
 
     public boolean hasLocationRequest() {
         return mLocationRequest != null;
     }
+
 
 
 }

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="org.eclipse.paho.client.mqttv3-1.0.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.0.1/9f187b2d83a03913d32e20108f783083a504a55c/org.eclipse.paho.client.mqttv3-1.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
