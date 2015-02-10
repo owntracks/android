@@ -18,25 +18,6 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="Theme.AppCompat.Light.NoActionBar" parent="@style/Theme.AppCompat.Light">
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item> <!-- For 2.x version  -->
-    </style>
-
-    <style name="Theme.Application" parent="@style/Theme.AppCompat" />
-
-    <style name="Theme.Settings" parent="@style/Theme.Application">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-
-        <item name="toolbarStyle">@style/Widget.Toolbar</item>
-    </style>
-
-    <style name="Widget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:navigationIcon">?attr/homeAsUpIndicator</item>
-        <item name="navigationIcon">?attr/homeAsUpIndicator</item>
-    </style>
 
 
     <style name="Theme.Mqttitude" parent="@style/Theme.AppCompat.Light.NoActionBar">
@@ -46,9 +27,10 @@
         <item name="android:actionModeCloseDrawable">@drawable/ic_action_accept</item>
         <item name="android:textColor">@color/textPrimary</item>
 
-        <!-- Set AppCompat’s color theming attrs -->
+    <!-- Set AppCompat’s color theming attrs -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/secondary</item>
+
     </style>
 
 
