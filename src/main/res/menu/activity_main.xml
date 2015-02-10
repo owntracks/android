@@ -4,7 +4,7 @@
         android:id="@+id/menu_report"
         android:icon="@drawable/ic_action_upload"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:title="@string/publish"/>
     <item
         android:id="@+id/menu_share"

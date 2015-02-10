@@ -7,11 +7,12 @@
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:theme="@style/Theme.Mqttitude.Toolbar"
-        app:popupTheme="@style/Theme.Mqttitude.Toolbar.Popup"
+        theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        popupTheme="@style/ThemeOverlay.AppCompat.Light"
 
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary" />
+
     <ListView
         android:id="@+id/waypoints"
         android:layout_width="match_parent"

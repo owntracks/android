@@ -46,11 +46,7 @@ import com.google.android.gms.location.LocationServices;
 import de.greenrobot.event.EventBus;
 
 public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this.context)
-            .addApi(LocationServices.API)
-            .addConnectionCallbacks(this)
-            .addOnConnectionFailedListener(this)
-            .build();
+    GoogleApiClient googleApiClient;
     private SharedPreferences sharedPreferences;
 	private OnSharedPreferenceChangeListener preferencesChangedListener;
 	private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
@@ -85,7 +81,11 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		};
 		this.sharedPreferences .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
-
+        googleApiClient = new GoogleApiClient.Builder(this.context)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 		if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting() && ServiceApplication.checkPlayServices()) {
             this.googleApiClient.connect();
         }
@@ -131,17 +131,14 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
                 publishLocationMessage();
         }
 
-        @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.v(this.toString(), "mLocationListener onStatusChanged: " +provider +" -> " + status);
         }
 
-        @Override
         public void onProviderEnabled(String provider) {
             Log.v(this.toString(), "mLocationListener onProviderEnabled: " +provider);
         }
 
-        @Override
         public void onProviderDisabled(String provider) {
             Log.v(this.toString(), "mLocationListener onProviderDisabled: " +provider);
         }

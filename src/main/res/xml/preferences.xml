@@ -11,7 +11,11 @@
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
 
-        <CheckBoxPreference
+        <st.alr.mqttitude.preferences.ToolbarPreference
+            android:key="topicSettings"
+            android:title="@string/preferencesTopicSettings" />
+
+        <SwitchPreference
             android:defaultValue="@bool/valPub"
             android:key="@string/keyPub"
             android:summary="@string/preferencesBackgroundUpdatesSummary"
@@ -45,36 +49,40 @@
 
     </PreferenceScreen>
     <PreferenceScreen
-        android:key="activitySettings"
+        android:key="preferencesNotification"
         android:title="@string/preferencesNotification" >
-        <CheckBoxPreference
+        <st.alr.mqttitude.preferences.ToolbarPreference
+            android:key="preferencesNotification"
+            android:title="@string/preferencesNotification" />
+
+        <SwitchPreference
             android:defaultValue="@bool/valNotification"
             android:key="@string/keyNotification"
             android:summary="@string/preferencesNotificationSummary"
             android:title="@string/preferencesNotification" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valNotificationLocation"
             android:dependency="@string/keyNotification"
             android:key="@string/keyNotificationLocation"
             android:summary="@string/preferencesNotificationLocationSummary"
             android:title="@string/preferencesNotificationLocation" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valNotificationGeocoder"
             android:dependency="@string/keyNotificationLocation"
             android:key="@string/keyNotificationGeocoder"
             android:summary="@string/preferencesNotificationGeocoderSummary"
             android:title="@string/preferencesNotificationGeocoder" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valNotificationOnReceivedWaypointTransition"
             android:key="@string/keyNotificationOnReceivedWaypointTransition"
             android:summary="@string/preferencesNotificationOnReceivedWaypointTransitionSummary"
             android:title="@string/preferencesNotificationOnReceivedWaypointTransitionTitle" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valNotificationTickerOnPublish"
             android:key="@string/keyNotificationTickerOnPublish"
             android:summary="@string/preferencesNotificationTickerOnPublishSummary"
             android:title="@string/preferencesNotificationTickerOnPublish" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
             android:key="@string/keyNotificationTickerOnWaypointTransition"
             android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
@@ -83,6 +91,9 @@
     <PreferenceScreen
         android:key="advanced"
         android:title="@string/preferencesAdvanced" >
+        <st.alr.mqttitude.preferences.ToolbarPreference
+            android:key="advanced"
+            android:title="@string/preferencesAdvanced" />
 
         <PreferenceCategory android:title="Publish Subscribe">
 
@@ -100,7 +111,7 @@
             android:summary="@string/preferencesQOSSummary"
             android:title="@string/preferencesQOS" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valPubRetain"
             android:key="@string/keyPubRetain"
             android:summary="@string/preferencesRetainSummary"
@@ -122,19 +133,19 @@
         </PreferenceCategory>
         <PreferenceCategory android:title="Remote commands">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandReportLocation"
             android:dependency="@string/keySub"
             android:key="@string/keyRemoteCommandReportLocation"
             android:summary="@string/preferencesRemoteCommandReportLocationSummary"
             android:title="@string/preferencesRemoteCommandReportLocation" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandDump"
             android:dependency="@string/keySub"
             android:key="@string/keyRemoteCommandDump"
             android:summary="@string/preferencesRemoteCommandDumpSummary"
             android:title="@string/preferencesRemoteCommandDump" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandReportLocation"
             android:dependency="@string/keySub"
             android:key="@string/keyRemoteConfiguration"
@@ -177,7 +188,7 @@
         </PreferenceCategory>
         <PreferenceCategory android:title="@string/preferencesAdvancedCategoryBeacons">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valBeaconRangingEnabled"
             android:key="@string/keyBeaconRangingEnabled"
             android:summary="@string/beaconRangingEnabledSummary"
@@ -215,13 +226,13 @@
 
         <PreferenceCategory android:title="Misc">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valConnectionAdvancedMode"
             android:key="@string/keyConnectionAdvancedMode"
             android:summary="@string/preferencesConnectionAdvancedModeSummary"
             android:title="@string/preferencesConnectionAdvancedMode" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valAutostartOnBoot"
             android:key="@string/keyAutostartOnBoot"
             android:summary="@string/preferencesAutostartSummary"
@@ -232,6 +243,9 @@
     <PreferenceScreen
         android:key="importexport"
         android:title="@string/preferencesImportExport" >
+        <st.alr.mqttitude.preferences.ToolbarPreference
+            android:key="importexport"
+            android:title="@string/preferencesImportExport" />
 
         <Preference
             android:title="@string/preferencesExport"
@@ -259,6 +273,10 @@
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
+        <st.alr.mqttitude.preferences.ToolbarPreference
+            android:key="activityInfo"
+            android:title="@string/preferencesInfo" />
+
         <Preference
             android:key="documentation"
             android:summary="@string/preferencesDocumentationSummary"
@@ -275,10 +293,6 @@
             android:key="twitter"
             android:summary="@string/preferencesTwitterSummary"
             android:title="@string/preferencesTwitter" />
-        <Preference
-            android:key="donate"
-            android:summary="@string/preferencesDonateSummary"
-            android:title="@string/preferencesDonate" />
 
         <st.alr.mqttitude.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"

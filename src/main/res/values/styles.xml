@@ -18,14 +18,40 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="Theme.AppCompat.Light.NoActionBar" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item> <!-- For 2.x version  -->
+    </style>
 
-    <style name="Theme.Mqttitude" parent="@android:style/Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.Mqttitude</item>
+    <style name="Theme.Application" parent="@style/Theme.AppCompat" />
+
+    <style name="Theme.Settings" parent="@style/Theme.Application">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+
+        <item name="toolbarStyle">@style/Widget.Toolbar</item>
+    </style>
+
+    <style name="Widget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:navigationIcon">?attr/homeAsUpIndicator</item>
+        <item name="navigationIcon">?attr/homeAsUpIndicator</item>
+    </style>
+
+
+    <style name="Theme.Mqttitude" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:actionOverflowButtonStyle">@style/AppTheme.ActionBar.Overflow</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionModeCloseDrawable">@drawable/ic_action_accept</item>
+        <item name="android:textColor">@color/textPrimary</item>
+
+        <!-- Set AppCompat’s color theming attrs -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/secondary</item>
     </style>
+
+
 
 
     <style name="AppTheme.ActionBar.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
@@ -38,6 +64,8 @@
     <color name="background">#f4f4f4</color>
     <color name="pressed">#FFE4E4E4</color>
 
+    <color name="primary">#3E86F4</color>
+    <color name="secondary">#3669D6</color>
 
 
     <style name="listItemPrimary">
