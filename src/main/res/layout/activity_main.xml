@@ -9,14 +9,4 @@
               android:id="@+id/main"
               tools:context=".ActivityMain">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        app:theme="@style/Theme.Mqttitude.Toolbar"
-        app:popupTheme="@style/Theme.Mqttitude.Toolbar.Popup"
-
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary" />
-
 </LinearLayout>

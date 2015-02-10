@@ -9,36 +9,32 @@ import java.util.concurrent.ConcurrentHashMap;
 import st.alr.mqttitude.adapter.ContactAdapter;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
-import st.alr.mqttitude.preferences.ActivityPreferences;
 import st.alr.mqttitude.services.ServiceProxy;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Events;
+import st.alr.mqttitude.support.FragmentToolbarProvider;
 import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +42,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -87,12 +82,6 @@ public class ActivityMain extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setElevation(5);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setIcon(R.drawable.ic_icon);
 
         FragmentHandler.getInstance().init(ContactsFragment.class);
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
@@ -139,13 +128,13 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		public Fragment showFragment(Class<?> c, Bundle extras,
-				FragmentActivity fa, int direction) {
+				ActionBarActivity fa, int direction) {
 			Fragment f = getFragment(c);
 			Fragment prev = getFragment(this.current);
 
+
 			handleFragmentArguments(c, extras);
-			FragmentTransaction ft = fa.getSupportFragmentManager()
-					.beginTransaction();
+			FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
 
             if(direction == DIRECTION_FORWARD)
                 ft.setCustomAnimations(R.anim.enter_from_right, R.anim.zoom_out);
@@ -162,17 +151,19 @@ public class ActivityMain extends ActionBarActivity {
 
 			ft.commitAllowingStateLoss();
 			fa.getSupportFragmentManager().executePendingTransactions();
-			this.current = c;
+
+
+            this.current = c;
 
 			return f;
 		}
 
 		// Shows the previous fragment
-		public Fragment back(FragmentActivity fa) {
+		public Fragment back(ActionBarActivity fa) {
 			return showFragment(popBackStack(), null, fa, DIRECTION_BACK);
 		}
 
-		public Fragment forward(Class<?> c, Bundle extras, FragmentActivity fa) {
+		public Fragment forward(Class<?> c, Bundle extras, ActionBarActivity fa) {
 			pushBackStack(this.current);
 			return showFragment(c, extras, fa, DIRECTION_FORWARD);
 		}
@@ -181,7 +172,7 @@ public class ActivityMain extends ActionBarActivity {
 			this.root = c;
 		}
 
-		public void showCurrentOrRoot(FragmentActivity fa) {
+		public void showCurrentOrRoot(ActionBarActivity fa) {
 			if (this.current != null)
 				showFragment(this.current, null, fa, DIRECTION_NONE);
 			else
@@ -226,7 +217,7 @@ public class ActivityMain extends ActionBarActivity {
 
 		}
 
-		public void removeAll(FragmentActivity fa) {
+		public void removeAll(ActionBarActivity fa) {
 			if(fa == null)
 				return;
 
@@ -309,7 +300,7 @@ public class ActivityMain extends ActionBarActivity {
     }
 
     private void transitionToCurrentLocationMap() {
-        final FragmentActivity that = this;
+        final ActionBarActivity that = this;
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
@@ -319,7 +310,7 @@ public class ActivityMain extends ActionBarActivity {
     }
 
     private void transitionToContactMap(final Contact c) {
-        final FragmentActivity that = this;
+        final ActionBarActivity that = this;
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
@@ -468,7 +459,7 @@ public class ActivityMain extends ActionBarActivity {
 		private TextView selectedContactLocation;
 		//private ImageView selectedContactImage;
 		private Map<String, Contact> markerToContacts;
-
+        private Toolbar toolbar;
         private static final int MENU_CONTACT_SHOW = 0;
         private static final int MENU_CONTACT_DETAILS = 1;
         private static final int MENU_CONTACT_NAVIGATE = 2;
@@ -551,7 +542,8 @@ public class ActivityMain extends ActionBarActivity {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
-			this.markerToContacts = new HashMap<String, Contact>();
+            this.toolbar = (Toolbar)v.findViewById(R.id.fragmentToolbar);
+            this.markerToContacts = new HashMap<String, Contact>();
 			this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
             registerForContextMenu(this.selectedContactDetails);
 
@@ -631,7 +623,12 @@ public class ActivityMain extends ActionBarActivity {
 
 		private void onShow() {
 
-		}
+            ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        }
 
 		private void onHide() {
 		}
@@ -811,6 +808,7 @@ public class ActivityMain extends ActionBarActivity {
         public boolean isFollowingSelectedContact() {
             return Preferences.getFollowingSelectedContact();
         }
+
     }
 
 	public static class ContactsFragment extends Fragment implements
@@ -820,12 +818,12 @@ public class ActivityMain extends ActionBarActivity {
         private static final int MENU_CONTACT_SHOW = 0;
         private static final int MENU_CONTACT_DETAILS = 1;
         private static final int MENU_CONTACT_NAVIGATE = 2;
-
+        private  Toolbar toolbar;
         private static Handler handler;
 
 		private ListView contactsList;
         private ContactAdapter listAdapter;
-        private Button currentLocation;
+        private TextView currentLocation;
         private ArrayList<Contact> contacts;
         public static ContactsFragment getInstance() {
 			return new ContactsFragment();
@@ -843,11 +841,20 @@ public class ActivityMain extends ActionBarActivity {
 
             View v = inflater.inflate(R.layout.fragment_contacts, container,
                     false);
+            this.toolbar = (Toolbar)v.findViewById(R.id.fragmentToolbar);
+           // LinearLayout subView = (LinearLayout) v.findViewById(R.id.fragmentToolbarChild);
+           // ((ViewGroup)subView.getParent()).removeView(subView);
+           // Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+           // layoutParams.gravity = Gravity.LEFT  | Gravity.BOTTOM;
+
+            //this.toolbar.addView(subView, layoutParams);
+
+
 
             this.contactsList = (ListView) v.findViewById(R.id.contactsList);
             this.contactsList.setEmptyView((View) v.findViewById(R.id.contactsListPlaceholder));
             setListAdapter(true);
-            this.currentLocation = (Button) v.findViewById(R.id.currentLocationButton);
+            this.currentLocation = (TextView) v.findViewById(R.id.currentLocation);
             this.currentLocation.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -877,7 +884,7 @@ public class ActivityMain extends ActionBarActivity {
             registerForContextMenu(this.contactsList);
             EventBus.getDefault().register(this);
 
-
+            onShow();
             return v;
         }
 
@@ -940,8 +947,12 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		private void onShow() {
+            ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-		}
+
+        }
 
 		private void onHide() {
 
@@ -1035,15 +1046,17 @@ public class ActivityMain extends ActionBarActivity {
             updateContactLocation(e.getContact(), true);
         }
 
-	}
+
+    }
 
 
 
-    public static class DetailsFragment extends Fragment {
+    public static class DetailsFragment extends Fragment  {
 		public static final String KEY_TOPIC = "TOPIC";
         private static final int MENU_CONTACT_DETAILS_LINK = 0;
         private static final int MENU_CONTACT_DETAILS_UNLINK = 1;
 
+        private Toolbar toolbar;
 		private Contact contact;
 		private TextView name;
 		private TextView topic;
@@ -1115,6 +1128,9 @@ public class ActivityMain extends ActionBarActivity {
 			this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
 			this.time.setText(App.formatDate(this.contact.getLocation().getDate()));
 
+            ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 
 		private void onHide() {
@@ -1170,6 +1186,7 @@ public class ActivityMain extends ActionBarActivity {
 
 			View v = inflater.inflate(R.layout.fragment_details, container,
 					false);
+            this.toolbar = (Toolbar)v.findViewById(R.id.fragmentToolbar);
 			this.name = (TextView) v.findViewById(R.id.name);
 			this.topic = (TextView) v.findViewById(R.id.topic);
 			this.location = (TextView) v.findViewById(R.id.location);
@@ -1222,7 +1239,7 @@ public class ActivityMain extends ActionBarActivity {
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             // Contact will be cleared, close this view
             if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
-                FragmentHandler.getInstance().back(getActivity());
+                FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
 
         }
 
@@ -1234,8 +1251,7 @@ public class ActivityMain extends ActionBarActivity {
 			FragmentHandler.getInstance().setBundle(DetailsFragment.class, b);
 		}
 
-
-	}
+    }
 
     // Developer menu options to quickly trigger code in order to test things
     private void devMenu1() {

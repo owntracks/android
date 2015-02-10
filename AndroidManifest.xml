@@ -47,7 +47,7 @@
             android:name=".ActivityMain">
         </activity>
         <activity
-            android:name=".preferences.ActivityPreferences"
+            android:name=".ActivityPreferences"
             android:configChanges="orientation"
             android:label="Preferences" >
         </activity>

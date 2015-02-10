@@ -59,7 +59,7 @@
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
-    <string name="preferencesDocumentation">Source Code</string>
+    <string name="preferencesDocumentation">Documentation</string>
     <string name="preferencesDocumentationSummary">github.com/owntracks/owntracks/wiki/android</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>

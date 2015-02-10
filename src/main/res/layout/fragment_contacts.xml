@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,19 +9,35 @@
     android:background="@color/background"
 
     >
-
-    <Button
-        android:id="@+id/currentLocationButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:gravity="center_vertical"
-        android:paddingBottom="0dp"
-        android:textColor="#999999"
-        android:elevation="10dp"    style="?android:attr/borderlessButtonStyle"
+    <include layout="@layout/toolbar"/>
 
 
-        android:paddingLeft="@dimen/default_horizontal_spacing"
-        android:text="@string/na" />
+     <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:background="@color/primary"
+            android:layout_height="48dp">
+
+         <TextView
+                 android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:id="@+id/currentLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="@string/currentLocationNotAvailable"
+                android:gravity="left|center_vertical"
+                android:layout_weight="1"
+                android:paddingRight="@dimen/default_horizontal_spacing_half"
+                 android:paddingLeft="72dp"
+                android:textColor="#FFF"
+                android:layout_alignParentTop="true"
+/>
+
+
+     </LinearLayout>
+
+
+
+
 
     <TextView android:id="@+id/contactsListPlaceholder"
               android:elevation="2dp"
