@@ -116,7 +116,7 @@
             android:key="@string/keyPubRetain"
             android:summary="@string/preferencesRetainSummary"
             android:title="@string/preferencesRetain" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/valSub"
             android:key="@string/keySub"
             android:summary="@string/preferencesContactsEnabledSummary"

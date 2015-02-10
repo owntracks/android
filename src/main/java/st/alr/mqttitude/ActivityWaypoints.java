@@ -88,15 +88,13 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
 
 		setContentView(R.layout.activity_waypoint);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setElevation(0);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setIcon(R.drawable.ic_icon);
-        if(Build.VERSION.SDK_INT >= 21 ) {
-            getActionBar().setElevation(0);
-        }
+        toolbar.setTitle(getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         this.dao = App.getWaypointDao();
         this.handler = new StaticHandler(this);
