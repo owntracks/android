@@ -27,7 +27,7 @@
                 android:gravity="left|center_vertical"
                 android:layout_weight="1"
                 android:paddingRight="@dimen/default_horizontal_spacing_half"
-                 android:paddingLeft="72dp"
+                 android:paddingLeft="@dimen/default_horizontal_spacing"
                 android:textColor="#FFF"
                 android:layout_alignParentTop="true"
 />

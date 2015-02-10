@@ -950,7 +950,7 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
 
         }
 

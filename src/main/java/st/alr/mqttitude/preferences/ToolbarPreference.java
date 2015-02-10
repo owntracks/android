@@ -25,8 +25,7 @@ public class ToolbarPreference extends Preference {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.settings_toolbar, parent, false);
 
-        Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_action_accept); // todo, add back icon
+        Toolbar toolbar = (Toolbar) layout.findViewById(R.id.fragmentToolbar);
         toolbar.setTitle(getTitle());
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
