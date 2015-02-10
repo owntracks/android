@@ -30,6 +30,7 @@
     <!-- Set AppCompat’s color theming attrs -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/secondary</item>
+        <item name="colorAccent">@color/primary</item>
 
     </style>
 
