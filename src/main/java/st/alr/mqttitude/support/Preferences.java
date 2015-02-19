@@ -118,7 +118,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
                     .put(getStringRessource(R.string.keyTrackerId), getTrackerId());
 
-            Log.v("PREFERENCES", json.toString());
+            Log.v("PREFERENCES toJsonObject", json.toString());
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());
@@ -129,6 +129,7 @@ public class Preferences {
     public static void fromJsonObject(StringifiedJSONObject json) {
         if (!Defaults.isPropperMessageType(json, "configuration"))
             return;
+        Log.v("PREFERENCES:fromJsonObject", json.toString());
 
 
         try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
@@ -167,6 +168,7 @@ public class Preferences {
         try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
+
     }
 
     public static boolean getRemoteConfiguration() {
@@ -234,12 +236,17 @@ public class Preferences {
         return getInt(R.string.keyLocatorDisplacement, R.integer.valLocatorDisplacement);
     }
 
-    public static long getLocatorInterval() {
+    public static long getLocatorIntervalMillis() {
         return TimeUnit.MINUTES.toMillis(getInt(
                 R.string.keyLocatorInterval,
                 R.integer.valLocatorInterval));
     }
 
+    // Locator interval is set by the user in minutes and therefore should be exported/imported in minutes.
+    // getLocatorIntervalMillis can be used to get the millisec value (e.g as needed by ServiceLocator)
+    public static int getLocatorInterval() {
+        return getInt(R.string.keyLocatorInterval,R.integer.valLocatorInterval);
+    }
 
     public static String getUsername() {
         return getString(R.string.keyUsername, R.string.valEmpty);
@@ -330,8 +337,8 @@ public class Preferences {
 
     public static void setHost(String value) {
         if (!value.equals(getHost())) {
-            brokerChanged();
             setString(R.string.keyHost, value);
+            brokerChanged();
         }
     }
 
@@ -371,7 +378,7 @@ public class Preferences {
     }
 
     public static void setUsername(String value) {
-        if (!value.equals(getHost())) {
+        if (!value.equals(getUsername())) {
 
             setString(R.string.keyUsername, value);
             brokerChanged();
@@ -482,8 +489,12 @@ public class Preferences {
 
 
     public static void setPassword(String password) {
-        setString(R.string.keyPassword, password);
+        if (!password.equals(getPassword())) {
+            setString(R.string.keyPassword, password);
+            brokerChanged();
+        }
     }
+
 
     public static void setDeviceId(String deviceId) {
         setString(R.string.keyDeviceId, deviceId);

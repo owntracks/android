@@ -157,9 +157,25 @@ public class ServiceApplication implements ProxyableService,
 
 	}
 
+    public void onEventMainThread(Events.ConfigurationMessageReceived e){
+
+        Preferences.fromJsonObject(e.getConfigurationMessage().toJSONObject());
+
+        // Reconnect to broker after new configuration has been saved.
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                ServiceProxy.getServiceBroker().reconnect();
+            }
+        };
+        new Thread(r).start();
+
+    }
 
 	private Notification notification;
 	private PendingIntent notificationIntent;
+
 
 	/**
 	 * @category NOTIFICATION HANDLING
