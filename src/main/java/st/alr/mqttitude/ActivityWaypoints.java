@@ -53,6 +53,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -118,7 +119,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
             }
         });
-	}
+    }
 
 
     private void requestWaypointGeocoder(Waypoint w, boolean force){
@@ -253,7 +254,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
         private static Handler handler;
 
 
-        CheckBox share;
+        Switch share;
         GeocodableLocation location;
 
         Waypoint w;
@@ -338,8 +339,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
             this.currentLocationWrapper = (LinearLayout) view.findViewById(R.id.currentLocationWrapper);
             this.currentLocationText = (TextView) view.findViewById(R.id.currentLocation);
             this.waypointGeofenceSettings = (LinearLayout) view.findViewById(R.id.waypointGeofenceSettings);
-            this.share = (CheckBox) view.findViewById(R.id.share);
-
+            this.share = (Switch) view.findViewById(R.id.share);
 			if (this.w != null)
 				show(this.w);
 
@@ -435,7 +435,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
             handler = new StaticHandler(this);
 
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 					.setTitle(getResources().getString( this.w == null ? R.string.waypointAdd : R.string.waypointEdit))
 					.setView(getContentView())
 					.setNegativeButton(getResources().getString(R.string.cancel),new DialogInterface.OnClickListener() {

@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_report"
+        android:icon="@drawable/ic_action_upload"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        android:title="@string/publish"/>
+    <item
+        android:id="@+id/menu_share"
+        android:icon="@drawable/ic_action_share"
+        android:orderInCategory="3"
+        app:showAsAction="never"
+        android:title="@string/share"/>
+
+    <item
+        android:id="@+id/menu_preferences"
+        android:orderInCategory="100"
+        android:title="@string/preferences"/>
+
+</menu>
