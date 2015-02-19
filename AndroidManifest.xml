@@ -56,6 +56,30 @@
             android:configChanges="orientation"
             android:label="Export">
 
+            <!--  Handle intent from an email attachment -->
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+            <!--  Handle intent from a file browser app,etc -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:pathPattern=".*\\.otrc" />
+            </intent-filter>
+
+
+
         </activity>
         <activity
             android:name=".ActivityWaypoints"

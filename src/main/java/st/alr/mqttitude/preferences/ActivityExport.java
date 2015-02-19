@@ -1,7 +1,11 @@
 package st.alr.mqttitude.preferences;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,17 +17,30 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.google.android.gms.location.Geofence;
+
+import org.json.JSONException;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.EnumSet;
 
+import de.greenrobot.event.EventBus;
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.db.Waypoint;
 import st.alr.mqttitude.messages.ConfigurationMessage;
+import st.alr.mqttitude.services.ServiceProxy;
+import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.Preferences;
+import st.alr.mqttitude.support.StringifiedJSONObject;
 
 public class ActivityExport extends Activity {
     private static final String TEMP_FILE_NAME = "config.otrc";
@@ -62,7 +79,30 @@ public class ActivityExport extends Activity {
         });
 
 
+        // Look for Import Preference File Intent
+        final Intent intent = getIntent();
+        final String action = intent.getAction();
+
+        if(Intent.ACTION_VIEW.equals(action)) {
+
+            Uri uri = intent.getData();
+
+            if (uri != null) {
+                if(uri.getPath().endsWith(".otrc")){
+                    importPreferenceDialog(uri.getPath());
+                }
+                else{
+                    /* Because of the way the Intent filter is defined, this activity could receive Intents that do not contain an otrc file.
+                     * In that case, I am ignoring the intent and closing the activity. The user won't even notice that the owntracks app got notified
+                     * however this isn't a good a solution and a better way of associating .otrc file to the app should be found.   */
+
+                    this.finish(); // close activity
+                }
+            }
+        }
+
     }
+
 
     private void setUsernameDeviceExport(boolean isChecked) {
         includeCredentials.setEnabled(isChecked);
@@ -128,8 +168,89 @@ public class ActivityExport extends Activity {
         sendIntent.setAction(Intent.ACTION_SEND);
         //sendIntent.putExtra(Intent.EXTRA_TEXT, config.toString());
         sendIntent.putExtra(Intent.EXTRA_STREAM, configUri);
-
         sendIntent.setType("text/plain");
+
+
         startActivity(Intent.createChooser(sendIntent, getString(R.string.exportConfiguration)));
+    }
+
+    private void importPreferenceDialog(String filePath){
+
+        try{
+            final String fileContent=readFile(filePath);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.preferencesImportFile))
+                    .setMessage(filePath)
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // ???
+                        }
+                    })
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+
+                                Preferences.fromJsonObject(new StringifiedJSONObject(fileContent));
+                                Runnable r = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ServiceProxy.getServiceBroker().reconnect();
+                                    }
+                                };
+                                new Thread(r).start();
+
+                            } catch (JSONException e) {
+                                importPreferenceResultDialog("Preferences import failed!");
+                            }
+
+                            importPreferenceResultDialog("Preferences imported successfully !");
+                        }
+                    });
+
+            Dialog dialog = builder.create();
+            dialog.show();
+
+        }catch(Exception e){
+
+            Log.d("Export", "importPreferenceDialog exception");
+            importPreferenceResultDialog("Preferences import failed!");
+        }
+
+    }
+
+    private void importPreferenceResultDialog(String message){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.preferencesImportFile))
+                .setMessage(message)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        Dialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private String readFile( String file ) throws IOException {
+
+        BufferedReader reader = new BufferedReader( new FileReader (file));
+        String         line = null;
+        StringBuilder  stringBuilder = new StringBuilder();
+        String         ls = System.getProperty("line.separator");
+
+        while( ( line = reader.readLine() ) != null ) {
+            stringBuilder.append( line );
+            stringBuilder.append( ls );
+        }
+
+        reader.close();
+
+        return stringBuilder.toString();
     }
 }

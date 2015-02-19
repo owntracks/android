@@ -95,4 +95,9 @@ public class ConfigurationMessage {
         json.remove(key);
     }
 
+    public ConfigurationMessage(StringifiedJSONObject json){
+        this.json=json;
+    }
+
+
 }

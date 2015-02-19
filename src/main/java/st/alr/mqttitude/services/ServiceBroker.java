@@ -36,6 +36,7 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 
 import st.alr.mqttitude.R;
+import st.alr.mqttitude.messages.ConfigurationMessage;
 import st.alr.mqttitude.messages.LocationMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
@@ -753,8 +754,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		scheduleNextPing();
 
 		String msg = new String(message.getPayload());
-        Log.v(this.toString(), "Received message: " + topic + " : "
-                + msg);
+        Log.v(this.toString(), "Received message: " + topic + " : "  + msg);
 
 		String type;
 		StringifiedJSONObject json;
@@ -803,7 +803,16 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
             }
 
-		} else {
+        } else if (type.equals("configuration") ) {
+            // read configuration message and post event only if Remote Configuration is enabled
+            if (!Preferences.getRemoteConfiguration()) {
+                Log.i(this.toString(), "Remote Configuration is disabled");
+                return;
+            }
+            ConfigurationMessage cm = new ConfigurationMessage(json);
+            EventBus.getDefault().post(new Events.ConfigurationMessageReceived(cm, topic));
+
+        } else {
 			Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
 			return;
 		}

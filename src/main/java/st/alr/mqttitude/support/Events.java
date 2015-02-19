@@ -3,6 +3,7 @@ package st.alr.mqttitude.support;
 import java.util.Date;
 
 import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.messages.ConfigurationMessage;
 import st.alr.mqttitude.messages.WaypointMessage;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
@@ -178,6 +179,26 @@ public class Events {
         }
     }
 
+    public static class ConfigurationMessageReceived extends E {
+        private String t;
+        private ConfigurationMessage m;
+
+        public ConfigurationMessageReceived(ConfigurationMessage m, String t) {
+            super();
+            this.t = t;
+            this.m = m;
+        }
+
+        public String getTopic() {
+            return this.t;
+        }
+
+        public ConfigurationMessage getConfigurationMessage() {
+            return this.m;
+        }
+    }
+
+
     public static class ContactUpdated extends E {
 		private Contact c;
 
@@ -248,4 +269,5 @@ public class Events {
 
         }
 	}
+
 }
