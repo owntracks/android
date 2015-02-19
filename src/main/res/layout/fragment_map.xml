@@ -5,15 +5,8 @@
 
     android:layout_height="match_parent" >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/fragmentToolbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    <include layout="@layout/toolbar"/>
 
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary" />
 
     <com.google.android.gms.maps.MapView
         xmlns:android="http://schemas.android.com/apk/res/android"

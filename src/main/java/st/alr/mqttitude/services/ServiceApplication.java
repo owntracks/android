@@ -116,11 +116,11 @@ public class ServiceApplication implements ProxyableService,
 	};
 
 	public void onEventMainThread(Events.LocationMessageReceived e) {
-		Contact c = App.getContact(e.getTopic());
+        st.alr.mqttitude.model.Contact c = App.getContact(e.getTopic());
 
 
 		if (c == null) {
-			c = new Contact(e.getTopic());
+			c = new st.alr.mqttitude.model.Contact(e.getTopic());
 			resolveContact(c);
             c.setLocation(e.getGeocodableLocation());
             c.setTrackerId(e.getLocationMessage().getTrackerId());

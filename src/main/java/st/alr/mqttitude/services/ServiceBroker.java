@@ -226,14 +226,18 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             if(sideloadCa) {
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCrtPath()));
+                Log.v(this.toString(), "Using custom tls cert from : " + Preferences.getTlsCrtPath());
                 java.security.cert.Certificate ca;
                 try {
                     ca = cf.generateCertificate(caInput);
+                    keyStore.setCertificateEntry("ca", ca);
+
+                } catch (Exception e) {
+                    Log.e(this.toString(), e.toString());
                 } finally {
                     caInput.close();
                 }
 
-                keyStore.setCertificateEntry("ca", ca);
             }
             // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();

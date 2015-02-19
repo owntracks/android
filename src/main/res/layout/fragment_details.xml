@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+
+<android.support.v7.widget.Toolbar
+android:id="@+id/fragmentToolbar"
+android:layout_height="wrap_content"
+android:layout_width="match_parent"
+theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+popupTheme="@style/ThemeOverlay.AppCompat.Light"
+
+android:minHeight="?attr/actionBarSize"
+android:background="?attr/colorPrimary" />
+
+<ScrollView     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     android:padding="@dimen/default_horizontal_spacing"
@@ -13,15 +28,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/fragmentToolbar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            popupTheme="@style/ThemeOverlay.AppCompat.Light"
 
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -138,3 +145,4 @@
     </LinearLayout>
 
 </ScrollView>
+    </LinearLayout>

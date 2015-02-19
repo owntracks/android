@@ -27,14 +27,17 @@ import android.os.Message;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,6 +45,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,6 +67,7 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends ActionBarActivity {
     private static final int CONTACT_PICKER_RESULT = 1001;
+    private DrawerLayout drawerLayout;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,12 +88,21 @@ public class ActivityMain extends ActionBarActivity {
 
 		setContentView(R.layout.activity_main);
 
+
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
         FragmentHandler.getInstance().init(ContactsFragment.class);
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
         MapsInitializer.initialize(this);
 	}
-
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+       // toggle.syncState();
+    }
 	public static class FragmentHandler extends Fragment {
 		private Class<?> current;
 		private Class<?> root;
@@ -137,9 +151,9 @@ public class ActivityMain extends ActionBarActivity {
 			FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
 
             if(direction == DIRECTION_FORWARD)
-                ft.setCustomAnimations(R.anim.enter_from_right, R.anim.zoom_out);
+                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out  );
             else if(direction == DIRECTION_BACK)
-                ft.setCustomAnimations(R.anim.zoom_in, R.anim.exit_to_right);
+                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
 
             if ((prev != null) && prev.isAdded() && prev.isVisible())
 				ft.hide(prev);
@@ -247,7 +261,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		public Class<?> popBackStack() {
-			return backStack.removeLast();
+            return backStack.removeLast();
 		}
 
 		public Integer getBackStackSize() {
@@ -262,18 +276,6 @@ public class ActivityMain extends ActionBarActivity {
 			super.onBackPressed();
 		else
 			FragmentHandler.getInstance().back(this);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-
-        //if(!App.isDebugBuild()) {
-            menu.findItem(R.id.menu_develop_1).setVisible(false);
-            menu.findItem(R.id.menu_develop_2).setVisible(false);
-
-        //}
-		return true;
 	}
 
 
@@ -353,6 +355,13 @@ public class ActivityMain extends ActionBarActivity {
         } else if (itemId == R.id.menu_develop_2) {
             devMenu2();
             return true;
+        } else if( itemId == android.R.id.home) {
+            if(!FragmentHandler.getInstance().atRoot()) {
+                FragmentHandler.getInstance().back(this);
+                return true;
+            } else {
+                return super.onOptionsItemSelected(item);
+            }
         } else {
 			return super.onOptionsItemSelected(item);
 		}
@@ -457,9 +466,11 @@ public class ActivityMain extends ActionBarActivity {
 		private LinearLayout selectedContactDetails;
 		private TextView selectedContactName;
 		private TextView selectedContactLocation;
-		//private ImageView selectedContactImage;
+		private ImageView selectedContactImage;
 		private Map<String, Contact> markerToContacts;
         private Toolbar toolbar;
+        private Menu mMenu;
+
         private static final int MENU_CONTACT_SHOW = 0;
         private static final int MENU_CONTACT_DETAILS = 1;
         private static final int MENU_CONTACT_NAVIGATE = 2;
@@ -476,6 +487,7 @@ public class ActivityMain extends ActionBarActivity {
 
 
         private static Handler handler;
+        private MenuInflater mInflater;
 
 
         public static MapFragment getInstance(Bundle extras) {
@@ -543,13 +555,16 @@ public class ActivityMain extends ActionBarActivity {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
             this.toolbar = (Toolbar)v.findViewById(R.id.fragmentToolbar);
+
+
+
             this.markerToContacts = new HashMap<String, Contact>();
 			this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
             registerForContextMenu(this.selectedContactDetails);
 
             this.selectedContactName = (TextView) v.findViewById(R.id.name);
 			this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
-			//this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
+			this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
 
             hideSelectedContactDetails();
 
@@ -564,10 +579,24 @@ public class ActivityMain extends ActionBarActivity {
 				setUpMap();
 			}
 
+            setHasOptionsMenu(true);
+            onShow();
+
 			return v;
 		}
 
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+                if(menu != null) {
+                    mMenu = menu;
+                    mInflater = inflater;
+                } else if(mMenu == null || mInflater == null) {
+                    return;
+                }
 
+                mMenu.clear();
+                mInflater.inflate(R.menu.fragment_map, mMenu);
+        }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
@@ -626,7 +655,8 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("");
+            onCreateOptionsMenu(mMenu, mInflater);
 
         }
 
@@ -755,6 +785,7 @@ public class ActivityMain extends ActionBarActivity {
 
 			this.selectedContactName.setText(c.toString());
 			this.selectedContactLocation.setText(c.getLocation().toString());
+            this.selectedContactImage.setImageBitmap(c.getUserImage());
 
             showSelectedContactDetails();
 
@@ -825,6 +856,10 @@ public class ActivityMain extends ActionBarActivity {
         private ContactAdapter listAdapter;
         private TextView currentLocation;
         private ArrayList<Contact> contacts;
+        private Menu mMenu;
+        private MenuInflater mInflater;
+        ActionBarDrawerToggle toggle;
+
         public static ContactsFragment getInstance() {
 			return new ContactsFragment();
 		}
@@ -852,6 +887,8 @@ public class ActivityMain extends ActionBarActivity {
 
 
             this.contactsList = (ListView) v.findViewById(R.id.contactsList);
+            this.toolbar = (Toolbar)v.findViewById(R.id.fragmentToolbar);
+
             this.contactsList.setEmptyView((View) v.findViewById(R.id.contactsListPlaceholder));
             setListAdapter(true);
             this.currentLocation = (TextView) v.findViewById(R.id.currentLocation);
@@ -884,8 +921,26 @@ public class ActivityMain extends ActionBarActivity {
             registerForContextMenu(this.contactsList);
             EventBus.getDefault().register(this);
 
+            setHasOptionsMenu(true);
+
+
+
+
             onShow();
             return v;
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            if(menu != null) {
+                mMenu = menu;
+                mInflater = inflater;
+            } else if(mMenu == null || mInflater == null) {
+                return;
+            }
+
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_contacts, mMenu);
         }
 
 
@@ -948,15 +1003,26 @@ public class ActivityMain extends ActionBarActivity {
 
 		private void onShow() {
             ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Locations");
+
+            toggle = new ActionBarDrawerToggle(getActivity(), ((ActivityMain)getActivity()).drawerLayout, toolbar, R.string.na, R.string.close);
+            toggle.setDrawerIndicatorEnabled(true);
+            ((ActivityMain)getActivity()).drawerLayout.setDrawerListener(toggle);
+            toggle.syncState();
+
+
+            onCreateOptionsMenu(mMenu, mInflater);
 
         }
 
 		private void onHide() {
 
 		}
+
+
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
@@ -991,6 +1057,17 @@ public class ActivityMain extends ActionBarActivity {
 
 
 
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Pass the event to ActionBarDrawerToggle, if it returns
+            // true, then it has handled the app icon touch event
+            if (toggle.onOptionsItemSelected(item)) {
+                return true;
+            }
+            // Handle your other action bar items...
+
+            return super.onOptionsItemSelected(item);
+        }
 
 		public void onEventMainThread(Events.CurrentLocationUpdated e) {
             updateCurrentLocation(e.getGeocodableLocation(), true);
@@ -1065,8 +1142,10 @@ public class ActivityMain extends ActionBarActivity {
 		private TextView time;
         private ImageButton contactContextMenu;
 		private OnSharedPreferenceChangeListener preferencesChangedListener;
+        private Menu mMenu;
+        private MenuInflater mInflater;
 
-		public static DetailsFragment getInstance() {
+        public static DetailsFragment getInstance() {
 			return new DetailsFragment();
 		}
 
@@ -1131,6 +1210,7 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).setSupportActionBar(toolbar);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            onCreateOptionsMenu(mMenu, mInflater);
 		}
 
 		private void onHide() {
@@ -1196,10 +1276,23 @@ public class ActivityMain extends ActionBarActivity {
 
 
 
-
+            setHasOptionsMenu(true);
     		onShow();
 			return v;
 		}
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            if(menu != null) {
+                mMenu = menu;
+                mInflater = inflater;
+            } else if(mMenu == null || mInflater == null) {
+                return;
+            }
+
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_map, mMenu);
+        }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {

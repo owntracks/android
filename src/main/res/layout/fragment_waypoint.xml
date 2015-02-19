@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="@dimen/default_horizontal_spacing"
+            android:paddingLeft="32dp"
             android:paddingRight="@dimen/default_horizontal_spacing"
             android:paddingTop="@dimen/default_horizontal_spacing_half"
             android:paddingBottom="@dimen/default_horizontal_spacing_half"
@@ -138,7 +138,7 @@
                             android:text="@string/share"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    <CheckBox
+                    <Switch
                             android:id="@+id/share"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
