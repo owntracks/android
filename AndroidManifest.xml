@@ -42,8 +42,8 @@
             android:value="@string/GOOGLE_MAPS_API_KEY" />
 
         <meta-data
-            android:name="com.bugsnag.android.API_KEY"
-            android:value="@string/BUGSNAP_API_KEY"/>
+            android:name="com.crashlytics.ApiKey"
+            android:value="@string/FABRIC_API_KEY" />
 
 
         <meta-data

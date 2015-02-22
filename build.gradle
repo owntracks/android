@@ -2,13 +2,16 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
 apply plugin: 'android'
+apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
@@ -16,6 +19,7 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
@@ -34,6 +38,9 @@ dependencies {
     compile 'com.rengwuxian.materialedittext:library:1.8.2'
     compile('com.mikepenz.materialdrawer:library:0.9.6@aar') {
         transitive = true
+    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.1@aar') {
+        transitive = true;
     }
 }
 
