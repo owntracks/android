@@ -3,7 +3,7 @@ package org.owntracks.android;
 import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Schema;
 
-// Generates Data Access Objects in src/main/java/st/alr/mqttitude/db
+// Generates Data Access Objects in src/main/java/org.owntracks.android/db
 // Increase schema version if changes are made
 // To generate files, open gGradle tasks and double click android > :DaoGenerator > run
 
@@ -12,7 +12,7 @@ public class DaoGenerator {
 
     public static void main(String args[]) throws Exception {
 
-        Schema schema = new Schema(SCHEMA_VERSION, "st.alr.mqttitude.db");
+        Schema schema = new Schema(SCHEMA_VERSION, "org.owntracks.android.db");
         schema.enableKeepSectionsByDefault();
 
 

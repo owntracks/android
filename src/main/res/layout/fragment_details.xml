@@ -7,140 +7,250 @@
     android:orientation="vertical" >
 
 
-<android.support.v7.widget.Toolbar
-android:id="@+id/fragmentToolbar"
-android:layout_height="wrap_content"
-android:layout_width="match_parent"
-theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-popupTheme="@style/ThemeOverlay.AppCompat.Light"
-
-android:minHeight="?attr/actionBarSize"
-android:background="?attr/colorPrimary" />
-
-<ScrollView     android:layout_width="match_parent"
+<ScrollView
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="@dimen/default_horizontal_spacing"
      >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:paddingTop="8dp">
+
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+
+            android:layout_height="wrap_content"
+            android:minHeight="72dp">
+
+            <LinearLayout
+                android:id="@+id/textview_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@+id/image"
+                android:orientation="vertical"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp">
+
+                <TextView
+                    android:id="@+id/b"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsTopic"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:paddingBottom="4dp"
+                    />
+
+                <TextView
+                    android:id="@+id/topic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    />
+
+
+            </LinearLayout>
+        </RelativeLayout>
 
 
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:background="?android:attr/selectableItemBackground"
 
+            android:layout_height="wrap_content"
+            android:minHeight="72dp">
 
-            <ImageButton
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/contactContextMenu"
-                android:baselineAlignBottom="false"
-                android:clickable="false"
-                android:focusable="false"
-                android:adjustViewBounds="false"
-                android:scaleType="fitEnd"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="-6dp"
-                android:layout_alignParentEnd="true"/>
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+>
 
-            <TextView
-                style="@style/listItemSecondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/contactDetailsName"
-                android:layout_alignParentTop="true"
-                android:id="@+id/textView"
-                android:layout_toLeftOf="@id/contactContextMenu"
-                android:layout_toStartOf="@id/contactContextMenu"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
+                <TextView
+                    android:id="@+id/contactDetailsTopic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsName"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:paddingBottom="4dp"
 
-            <TextView
-                android:id="@+id/name"
-                style="@style/listItemPrimary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/na"
-                android:layout_below="@id/textView"
-                android:layout_toLeftOf="@id/contactContextMenu"
-                android:layout_toStartOf="@id/contactContextMenu"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                />
+                    />
 
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    />
+
+
+            </LinearLayout>
         </RelativeLayout>
 
-        <TextView
-            style="@style/listItemSecondary"
 
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+
+            android:background="#1E000000"
+            />
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="@string/contactDetailsTopic" />
+            android:minHeight="72dp">
 
-        <TextView
-            style="@style/listItemPrimary"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+                >
 
-            android:id="@+id/topic"
+                <TextView
+                    android:id="@+id/contactDetailsLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsLocation"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:paddingBottom="4dp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    />
+
+
+            </LinearLayout>
+        </RelativeLayout>
+
+
+
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+
             android:layout_height="wrap_content"
-            android:text="@string/na" />
+            android:minHeight="72dp">
 
-        <TextView
-            style="@style/listItemSecondary"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+                >
 
+                <TextView
+                    android:id="@+id/contactDetailsAccuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsAccuracy"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:paddingBottom="4dp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/accuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    />
+
+
+            </LinearLayout>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="@string/contactDetailsLocation" />
+            android:minHeight="72dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    android:id="@+id/contactDetailsReportedTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsReportedTime"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:paddingBottom="4dp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na"
+                    android:textSize="16sp"
+                    android:textColor="#212121"
+                    />
 
 
-        <TextView
-            style="@style/listItemPrimary"
+            </LinearLayout>
+        </RelativeLayout>
 
-            android:id="@+id/location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
 
-        <TextView
-            style="@style/listItemSecondary"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="@string/contactDetailsAccuracy" />
-
-        <TextView
-            style="@style/listItemPrimary"
-
-            android:id="@+id/accuracy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/na" />
-
-        <TextView
-            style="@style/listItemSecondary"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_vertical_spacing_half"
-            android:text="@string/contactDetailsReportedTime" />
-
-        <TextView
-            style="@style/listItemPrimary"
-
-            android:id="@+id/time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/default_vertical_spacing"
-            android:text="@string/na" />
 
     </LinearLayout>
 

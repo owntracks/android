@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="st.alr.mqttitude"
+    package="org.owntracks.android"
     android:versionCode="0500"
     android:versionName="0.5.00" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-
-    <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="19" />
-
 
     <meta-data
         android:name="com.google.android.gms.version"
@@ -29,22 +28,29 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To autostart the app once the device boots -->
     <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="18" /> <!-- For config import/export -->
 
     <application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Mqttitude" >
+        android:theme="@style/Theme.Owntracks" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDL80DnlIzyG5GNcMoy9yX7uuWEJcCvW7c" />
+            android:value="@string/GOOGLE_MAPS_API_KEY" />
+
+        <meta-data
+            android:name="com.bugsnag.android.API_KEY"
+            android:value="@string/BUGSNAP_API_KEY"/>
+
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".ActivityMain">
+        <activity android:name=".ActivityMain" >
         </activity>
         <activity
             android:name=".ActivityPreferences"
@@ -54,22 +60,26 @@
         <activity
             android:name=".preferences.ActivityExport"
             android:configChanges="orientation"
-            android:label="Export">
+            android:label="Export" >
 
-            <!--  Handle intent from an email attachment -->
-            <intent-filter >
+            <!-- Handle intent from an email attachment -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
             </intent-filter>
 
-            <!--  Handle intent from a file browser app,etc -->
+            <!-- Handle intent from a file browser app,etc -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:scheme="ftp" />
@@ -77,15 +87,8 @@
                 <data android:scheme="content" />
                 <data android:pathPattern=".*\\.otrc" />
             </intent-filter>
-
-
-
         </activity>
-        <activity
-            android:name=".ActivityWaypoints"
-            android:configChanges="orientation"
-            android:label="Waypoints" >
-        </activity>
+
 
         <service
             android:name=".services.ServiceProxy"
@@ -93,7 +96,7 @@
         </service>
 
         <activity
-            android:name="st.alr.mqttitude.ActivityLauncher"
+            android:name=".ActivityLauncher"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:noHistory="true"
@@ -116,55 +119,70 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="st.alr.mqttitude.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:authorities="org.owntracks.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
 
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.EDIT" />
 
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <action android:name="android.intent.action.EDIT" />
             <category android:name="android.intent.category.DEFAULT" />
+
             <data
+                android:host="*"
                 android:mimeType="application/octet-stream"
-                android:host="*"
-                android:pathPattern=".*\\.otrc"
-                />
+                android:pathPattern=".*\\.otrc" />
         </intent-filter>
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
             <action android:name="android.intent.action.EDIT" />
+
             <category android:name="android.intent.category.DEFAULT" />
+
             <data
+                android:host="*"
                 android:mimeType="application/otrc"
-                android:host="*"
-                android:pathPattern=".*\\.otrc"
-                />
+                android:pathPattern=".*\\.otrc" />
         </intent-filter>
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
             <action android:name="android.intent.action.EDIT" />
+
             <category android:name="android.intent.category.DEFAULT" />
+
             <data
-                android:mimeType="text/plain"
                 android:host="*"
-                android:pathPattern=".*\\.otrc"
-                />
+                android:mimeType="text/plain"
+                android:pathPattern=".*\\.otrc" />
         </intent-filter>
 >
 
-        <!--<activity-->
-            <!--android:name=".ActivityWizzard"-->
-            <!--android:label="@string/title_activity_activity_wizzard" >-->
-        <!--</activity>-->
         <!-- <activity -->
-        <!-- android:name="st.alr.mqttitude.preferences.ActivityExport" -->
+        <!-- android:name=".ActivityWizzard" -->
+        <!-- android:label="@string/title_activity_activity_wizzard" > -->
+        <!-- </activity> -->
+        <!-- <activity -->
+        <!-- android:name="org.owntracks.android.preferences.ActivityExport" -->
         <!-- android:label="@string/title_activity_activity_export" > -->
         <!-- </activity> -->
+
+        <activity
+            android:name=".ActivityWaypoints"
+            android:label="@string/waypoints" >
+        </activity>
+        <activity
+            android:name=".ActivityWaypoint"
+            android:label="Waypoint"
+            android:parentActivityName=".ActivityWaypoints" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityWaypoints" />
+        </activity>
     </application>
 
 </manifest>

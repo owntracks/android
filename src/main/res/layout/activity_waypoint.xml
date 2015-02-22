@@ -1,26 +1,207 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:orientation="vertical"
+    >
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 
-    <include layout="@layout/toolbar"
-         />
-
-    <ListView
-        android:id="@+id/waypoints"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:layout_below="@+id/fragmentToolbar" />
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:navigationContentDescription="@string/abc_action_bar_up_description"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title=""
+
+        android:elevation="4dp"
+        app:contentInsetStart="72dp">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="112dp">
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Description"
+                app:floatingLabel="normal"
+                app:baseColor="#FFF"
+                app:primaryColor="@color/accent"
+                android:gravity="bottom"
+                android:inputType="textFilter|textNoSuggestions"
+                android:textSize="24sp"
+                android:id="@+id/description"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
 
 
-    <TextView android:id="@+id/waypointListPlaceholder"
-              android:gravity="center"
-        android:visibility="gone"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:text="@string/waypointListPlaceholder" />
 
-</RelativeLayout>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginEnd="@dimen/default_horizontal_spacing"
+            android:layout_marginRight="@dimen/default_horizontal_spacing">
+
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:layout_marginLeft="16dp"
+                app:iconLeft="@drawable/ic_location"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Latitude"
+                app:floatingLabel="normal"
+                app:baseColor="@color/textPrimary"
+                app:primaryColor="@color/accent"
+                android:id="@+id/latitude"
+                android:digits="-0123456789."
+                android:inputType="numberDecimal"
+                app:helperText="" />
+
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:layout_marginLeft="16dp"
+                app:iconLeft="@drawable/ic_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Longitude"
+                app:floatingLabel="normal"
+                app:baseColor="@color/textPrimary"
+                app:primaryColor="@color/accent"
+                android:id="@+id/longitude"
+                android:digits="-0123456789."
+                android:inputType="numberDecimal"
+                app:helperText=""
+
+
+
+                />
+
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="16dp"
+                    app:iconLeft="@drawable/ic_radius"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Radius"
+                    app:helperText="Meters"
+
+                    app:floatingLabel="normal"
+                    app:baseColor="@color/textPrimary"
+                    app:primaryColor="@color/accent"
+                    android:id="@+id/radius"
+                    android:digits="0123456789"
+                    android:inputType="numberDecimal"
+                    />
+
+
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/waypointGeofenceSettings"
+                    android:layout_marginLeft="72dp"
+                    android:visibility="gone"
+                    >
+
+                    <RelativeLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/enter"
+                            android:textSize="18sp"
+
+                            android:id="@+id/enterDesc"/>
+                        <Switch
+                            android:id="@+id/enter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:layout_centerVertical="true"
+
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"/>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/leave"
+                            android:textSize="18sp"
+                            android:id="@+id/descLeave"/>
+                        <Switch
+
+                            android:id="@+id/leave"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:layout_centerVertical="true"
+
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"/>
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginLeft="72dp"
+
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/share"
+                    android:textSize="18sp"
+                    android:id="@+id/descShare"/>
+                <Switch
+
+                    android:id="@+id/share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_centerVertical="true"
+
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

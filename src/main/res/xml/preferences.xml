@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <st.alr.mqttitude.preferences.PreferencesBroker
+    <org.owntracks.android.preferences.PreferencesBroker
         android:key="brokerPreference"
         android:negativeButtonText="@string/preferencesServerCancel"
         android:positiveButtonText="@string/preferencesServerConnect"
@@ -11,7 +11,7 @@
         android:key="topicSettings"
         android:title="@string/preferencesTopicSettings" >
 
-        <st.alr.mqttitude.preferences.ToolbarPreference
+        <org.owntracks.android.preferences.ToolbarPreference
             android:key="topicSettings"
             android:title="@string/preferencesTopicSettings" />
 
@@ -21,7 +21,7 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
-        <st.alr.mqttitude.support.EditIntegerPreference
+        <org.owntracks.android.support.EditIntegerPreference
             android:defaultValue="@integer/valPubInterval"
             android:dependency="@string/keyPub"
             android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
@@ -51,7 +51,7 @@
     <PreferenceScreen
         android:key="preferencesNotification"
         android:title="@string/preferencesNotification" >
-        <st.alr.mqttitude.preferences.ToolbarPreference
+        <org.owntracks.android.preferences.ToolbarPreference
             android:key="preferencesNotification"
             android:title="@string/preferencesNotification" />
 
@@ -91,7 +91,7 @@
     <PreferenceScreen
         android:key="advanced"
         android:title="@string/preferencesAdvanced" >
-        <st.alr.mqttitude.preferences.ToolbarPreference
+        <org.owntracks.android.preferences.ToolbarPreference
             android:key="advanced"
             android:title="@string/preferencesAdvanced" />
 
@@ -103,7 +103,7 @@
             android:summary="@string/preferencesTopicSummary"
             android:title="@string/preferencesTopic" />
 
-        <st.alr.mqttitude.support.ListIntegerPreference
+        <org.owntracks.android.support.ListIntegerPreference
             android:defaultValue="@integer/valPubQos"
             android:entries="@array/qos_readable"
             android:entryValues="@array/qos"
@@ -154,7 +154,7 @@
         </PreferenceCategory>
         <PreferenceCategory android:title="Locator">
 
-        <st.alr.mqttitude.support.EditIntegerPreference
+        <org.owntracks.android.support.EditIntegerPreference
             android:defaultValue="@integer/valLocatorDisplacement"
             android:dialogTitle="@string/preferencesLocatorDisplacement"
             android:hint="@integer/valLocatorDisplacement"
@@ -162,7 +162,7 @@
             android:key="@string/keyLocatorDisplacement"
             android:summary="@string/preferencesLocatorDisplacementSummary"
             android:title="@string/preferencesLocatorDisplacement" />
-        <st.alr.mqttitude.support.EditIntegerPreference
+        <org.owntracks.android.support.EditIntegerPreference
             android:defaultValue="@integer/valLocatorInterval"
             android:dialogTitle="@string/preferencesLocatorInterval"
             android:hint="@integer/valLocatorInterval"
@@ -171,14 +171,14 @@
             android:summary="@string/preferencesLocatorIntervalSummary"
             android:title="@string/preferencesLocatorInterval" />
 
-        <st.alr.mqttitude.support.ListIntegerPreference
+        <org.owntracks.android.support.ListIntegerPreference
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyBackground"
             android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
             android:title="@string/preferencesLocatorAccuracyBackground"
             android:defaultValue="@integer/valLocatorAccuracyBackground"/>
-        <st.alr.mqttitude.support.ListIntegerPreference
+        <org.owntracks.android.support.ListIntegerPreference
             android:entries="@array/locatorAccuracy_readable"
             android:entryValues="@array/locatorAccuracy"
             android:key="@string/keyLocatorAccuracyForeground"
@@ -195,7 +195,7 @@
             android:title="@string/beaconRangingEnabled" />
 
 
-        <st.alr.mqttitude.support.EditIntegerPreference
+        <org.owntracks.android.support.EditIntegerPreference
             android:defaultValue="@integer/valBeaconForegroundScanPeriod"
             android:dialogTitle="@string/preferencesBeaconForegroundPeriod"
             android:hint="@integer/valBeaconForegroundScanPeriod"
@@ -205,7 +205,7 @@
             android:title="@string/preferencesBeaconForegroundPeriod"
             android:dependency="@string/keyBeaconRangingEnabled" />
 
-        <st.alr.mqttitude.support.EditIntegerPreference
+        <org.owntracks.android.support.EditIntegerPreference
             android:defaultValue="@integer/valBeaconBackgroundScanPeriod"
             android:dialogTitle="@string/preferencesBeaconBackgroundPeriod"
             android:hint="@integer/valBeaconBackgroundScanPeriod"
@@ -243,7 +243,7 @@
     <PreferenceScreen
         android:key="importexport"
         android:title="@string/preferencesImportExport" >
-        <st.alr.mqttitude.preferences.ToolbarPreference
+        <org.owntracks.android.preferences.ToolbarPreference
             android:key="importexport"
             android:title="@string/preferencesImportExport" />
 
@@ -253,8 +253,8 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="st.alr.mqttitude"
-            android:targetClass="st.alr.mqttitude.preferences.ActivityExport"
+            android:targetPackage="org.owntracks.android"
+            android:targetClass="org.owntracks.android.preferences.ActivityExport"
             />
 
         </Preference>
@@ -273,7 +273,7 @@
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
-        <st.alr.mqttitude.preferences.ToolbarPreference
+        <org.owntracks.android.preferences.ToolbarPreference
             android:key="activityInfo"
             android:title="@string/preferencesInfo" />
 
@@ -294,7 +294,7 @@
             android:summary="@string/preferencesTwitterSummary"
             android:title="@string/preferencesTwitter" />
 
-        <st.alr.mqttitude.preferences.ImplementedDialogPreference
+        <org.owntracks.android.preferences.ImplementedDialogPreference
             android:dialogLayout="@layout/preferences_licenses"
             android:negativeButtonText=""
             android:positiveButtonText="@string/close"
