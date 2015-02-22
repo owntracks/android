@@ -23,5 +23,4 @@ To build a development version of the app from source, follow the instructions o
 	4. If you use a custom keystore run ```keytool -list -v -keystore $PATH_TO_YOUR_KEYSTORE.jks``` and replace BC:CF:...:D9:65 with your SHA1 fingerprint
 	5. Replace ```YOUR_GOOGLE_MAPS_API_KEY``` in src/main/res/values-1/keys.xml with the generated forty-character API key
 
-9. Optional: If you need crash reports, register at [Bugsnag.com](https://bugsnag.com), create a new Android project and replace YOUR_BUGSNAG_API_KEY in src/main/res/values-1/keys.xml with your API key 
 10. Build the project
