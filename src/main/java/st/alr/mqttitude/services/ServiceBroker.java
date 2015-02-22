@@ -16,13 +16,10 @@ import java.security.cert.CertificateFactory;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -33,16 +30,16 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.messages.LocationMessage;
+import st.alr.mqttitude.messages.UserMessage;
 import st.alr.mqttitude.support.Defaults;
 import st.alr.mqttitude.support.Defaults.State;
 import st.alr.mqttitude.support.Events;
 import st.alr.mqttitude.support.ServiceMqttCallbacks;
 import st.alr.mqttitude.support.Preferences;
-import android.annotation.SuppressLint;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -799,7 +796,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
             }
 
-		} else {
+		} else if(type.equals("user") && topic.equals(Preferences.getBaseTopic())){
+            if(Preferences.getNotificationMessage()) {
+                UserMessage nm = UserMessage.fromJsonObject(json);
+                EventBus.getDefault().postSticky(new Events.NotificationMessageReceived(nm, topic));
+                return;
+            }
+        }else {
 			Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
 			return;
 		}

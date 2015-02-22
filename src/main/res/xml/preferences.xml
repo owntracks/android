@@ -79,6 +79,8 @@
             android:key="@string/keyNotificationTickerOnWaypointTransition"
             android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
             android:title="@string/preferencesNotificationTickerOnWaypointTransitionTitle" />
+
+
     </PreferenceScreen>
     <PreferenceScreen
         android:key="advanced"
@@ -140,6 +142,16 @@
             android:key="@string/keyRemoteConfiguration"
             android:summary="@string/preferencesRemoteConfigurationSummary"
             android:title="@string/preferencesRemoteConfiguration" />
+        <CheckBoxPreference
+            android:defaultValue="@bool/valUserMessage"
+            android:key="@string/keyUserMessage"
+            android:summary="Show user messages sent do topic"
+            android:title="User messages" />
+        <CheckBoxPreference
+            android:defaultValue="@bool/valUserMessageSound"
+            android:key="@string/keyUserMessageSound"
+            android:summary="Play notification sound on user messages"
+            android:title="User message audible notification" />
         </PreferenceCategory>
         <PreferenceCategory android:title="Locator">
 
