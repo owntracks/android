@@ -29,7 +29,7 @@ public class DrawerFactory {
                 .withActionBarCompatibility(false)
                 .withActionBarDrawerToggle(hamburger)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Locations").withIdentifier(R.string.idLocations).withIcon(activity.getDrawable(R.drawable.ic_location)),
+                        new PrimaryDrawerItem().withName("Locations").withIdentifier(R.string.idLocations).withIcon(activity.getDrawable(R.drawable.ic_locations)),
                         new PrimaryDrawerItem().withName("Waypoints").withIdentifier(R.string.idWaypoints).withIcon(activity.getDrawable(R.drawable.ic_waypoints)),
                         new PrimaryDrawerItem().withName("Preferences").withIdentifier(R.string.idSettings).withIcon(activity.getDrawable(R.drawable.ic_settings))
                 )

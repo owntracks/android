@@ -51,7 +51,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                Log.v("ActivityWaypoints", "ServiceProxy bound");
+                //Log.v("ActivityWaypoints", "ServiceProxy bound");
             }
         });
 
@@ -121,11 +121,13 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
                     return;
 
                 Intent detailIntent = new Intent(context, ActivityWaypoint.class);
-                startActivity(detailIntent);
+                detailIntent.putExtra("keyId", Long.toString(((Waypoint) listAdapter.getItem(position)).getId()));
 
+                startActivity(detailIntent);
             }
         });
     }
+
 
     private void requestWaypointGeocoder(Waypoint w, boolean force) {
         if (w.getGeocoder() == null || force) {
@@ -142,13 +144,14 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
     public void handleHandlerMessage(Message msg) {
         if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && ((GeocodableLocation)msg.obj).getExtra() instanceof  Waypoint) {
-            Log.v("handler", "result");
 
             // Gets the geocoder from the returned array of [Geocoder, Waypoint] and assigns the geocoder to the waypoint
+            // The Geocoder will not change unless the location of the waypoint is updated. Therefore it is stored in the DAO and only overwritten when the waypoint is updated by the user
             Waypoint w = (Waypoint) ((GeocodableLocation)msg.obj).getExtra();
             w.setGeocoder(((GeocodableLocation)msg.obj).getGeocoder());
             this.dao.update(w);
             this.listAdapter.updateItem(w);
+            this.listAdapter.notifyDataSetChanged();
         }
     }
 
@@ -190,19 +193,22 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
         finish();
     }
 
-    @Override
-    public void onStop() {
 
-        EventBus.getDefault().unregister(this);
-        super.onStop();
+
+
+
+    // These get posted by ActivityWaypoint with a sticky flag, so they're received when this activity
+    // gains focus to update the UI
+    // WaypointAdded and WaypointUpdated are not posted sticky and only handled by ServiceLocator to do the acutal work
+    public void onEventMainThread(Events.WaypointAddedByUser e) {
+        this.listAdapter.addItem(e.getWaypoint());
+        this.listAdapter.notifyDataSetChanged();
+        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        EventBus.getDefault().register(this);
-
+    public void onEventMainThread(Events.WaypointUpdatedByUser e) {
+        this.listAdapter.updateItem(e.getWaypoint());
+        this.listAdapter.notifyDataSetChanged();
+        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
     }
 
     public void onEventMainThread(Events.WaypointAdded e) {
@@ -246,16 +252,18 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
     public void onResume() {
         super.onResume();
         registerForContextMenu(this.listView);
+        EventBus.getDefault().registerSticky(this);
     }
 
     @Override
     public void onPause() {
         unregisterForContextMenu(this.listView);
+        EventBus.getDefault().unregister(this);
         super.onPause();
 
     }
 
-    @Override
+        @Override
     public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId()==R.id.waypoints) {
             menu.add(Menu.NONE, MENU_WAYPOINT_REMOVE, 1,getString(R.string.waypointRemove));
