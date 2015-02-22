@@ -2,6 +2,8 @@ package org.owntracks.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +51,7 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityWaypoint extends ActionBarActivity implements StaticHandlerInterface {
     private WaypointDao dao;
+    TextWatcher requiredForSave;
     private GeocodableLocation currentLocation;
     private Handler handler;
     private TextView waypointListPlaceholder;
@@ -89,7 +92,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         });
 
 
-        TextWatcher requiredForSave = new TextWatcher() {
+        requiredForSave = new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
@@ -122,11 +125,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
 
 
         this.description = (EditText) findViewById(R.id.description);
-        this.description.addTextChangedListener(requiredForSave);
         this.latitude = (EditText) findViewById(R.id.latitude);
-        this.latitude.addTextChangedListener(requiredForSave);
         this.longitude = (EditText) findViewById(R.id.longitude);
-        this.longitude.addTextChangedListener(requiredForSave);
         this.radius = (EditText) findViewById(R.id.radius);
         this.radius.addTextChangedListener(requiredForGeofence);
 
@@ -136,7 +136,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 enterValue = isChecked;
-
+                if(saveButton != null)
+                    conditionallyEnableSaveButton();
             }
         });
         this.leave = (Switch) findViewById(R.id.leave);
@@ -144,6 +145,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 leaveValue = isChecked;
+                if(saveButton != null)
+                    conditionallyEnableSaveButton();
             }
         });
         this.share = (Switch) findViewById(R.id.share);
@@ -165,7 +168,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
 
         Bundle extras = getIntent().getExtras();
         if(extras == null || extras.getString("keyId") == null) {
-            this.waypoint = new Waypoint();
+
         } else {
             Query query = this.dao.queryBuilder().where( WaypointDao.Properties.Id.eq(extras.getString("keyId"))).build();
             try {
@@ -212,25 +215,21 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
                 return;
             }
 
-            conditionallyShowGeofenceSettings();
-            conditionallyEnableSaveButton();
         }
-
-
-
-
+        conditionallyShowGeofenceSettings();
     }
     private void conditionallyEnableSaveButton() {
-
-
-        if ((this.description.getText().toString().length() > 0)
+        boolean enabled = (this.description.getText().toString().length() > 0)
                 && (this.latitude.getText().toString().length() > 0)
                 && (this.longitude.getText().toString().length() > 0)
-                && ((this.radius.getText().toString().length() > 0) && (Float.parseFloat(this.latitude.getText().toString()) > 0)) && (enterValue || leaveValue)
-           )
-            saveButton.setEnabled(true);
-        else
-            saveButton.setEnabled(false);
+                && (    (!((this.radius.getText().toString().length() > 0) // if radius is set, enter or leave are required
+                        && (Float.parseFloat(this.latitude.getText().toString()) > 0))) || (enterValue || leaveValue)
+                    );
+
+        Log.v(this.toString(), "conditionallyEnableSaveButton: " +enabled);
+        saveButton.setEnabled(enabled);
+        saveButton.getIcon().setAlpha(enabled ? 255 : 130);
+
     }
 
     private void conditionallyShowGeofenceSettings() {
@@ -240,6 +239,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         } catch (Exception e) {
             visible = false;
         }
+
+        Log.v(this.toString(), "conditionallyShowGeofenceSettings: " +visible);
 
         this.geofenceSettings.setVisibility(visible ? View.VISIBLE : View.GONE);
 
@@ -263,12 +264,14 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
 
     protected void add(Waypoint w) {
         this.dao.insert(w);
-        EventBus.getDefault().post(new Events.WaypointAdded(w));
+        EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
+        EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     protected void update(Waypoint w) {
         this.dao.update(w);
-        EventBus.getDefault().post(new Events.WaypointUpdated(w));
+        EventBus.getDefault().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
+        EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
 
@@ -276,7 +279,15 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_waypoint, menu);
         this.saveButton = menu.findItem(R.id.save);
-        this.saveButton.setEnabled(this.waypoint != null);
+
+        // Setup change listener that change enabled state of save button
+        this.description.addTextChangedListener(requiredForSave);
+        this.latitude.addTextChangedListener(requiredForSave);
+        this.longitude.addTextChangedListener(requiredForSave);
+        this.radius.addTextChangedListener(requiredForSave);
+
+        // Check if we should initially enable or disable save button based on values set in onCreate
+        conditionallyEnableSaveButton();
         return true;
     }
 
@@ -320,10 +331,10 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         boolean update;
         if (this.waypoint == null) {
             w = new Waypoint();
-            update = true;
+            update = false;
         } else {
             w = this.waypoint;
-            update = false;
+            update = true;
         }
 
         w.setDescription(this.description.getText().toString());

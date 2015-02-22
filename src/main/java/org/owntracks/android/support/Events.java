@@ -12,19 +12,7 @@ import android.location.Location;
 
 public class Events {
 
-	public static class WaypointUpdated extends E {
-		Waypoint w;
 
-		public WaypointUpdated(Waypoint w) {
-			super();
-			this.w = w;
-		}
-
-		public Waypoint getWaypoint() {
-			return this.w;
-		}
-
-	}
 
 	public static class WaypointTransition extends E {
 		Waypoint w;
@@ -46,10 +34,10 @@ public class Events {
 
 	}
 
-	public static class WaypointAdded extends E {
+	public static class WaypointAddedByUser extends E {
 		Waypoint w;
 
-		public WaypointAdded(Waypoint w) {
+		public WaypointAddedByUser(Waypoint w) {
 			super();
 			this.w = w;
 		}
@@ -59,6 +47,49 @@ public class Events {
 		}
 
 	}
+    public static class WaypointAdded extends E {
+        Waypoint w;
+
+        public WaypointAdded(Waypoint w) {
+            super();
+            this.w = w;
+        }
+
+        public Waypoint getWaypoint() {
+            return this.w;
+        }
+
+    }
+
+
+    public static class WaypointUpdated extends E {
+        Waypoint w;
+
+        public WaypointUpdated(Waypoint w) {
+            super();
+            this.w = w;
+        }
+
+        public Waypoint getWaypoint() {
+            return this.w;
+        }
+
+    }
+
+    public static class WaypointUpdatedByUser extends E {
+        Waypoint w;
+
+        public WaypointUpdatedByUser(Waypoint w) {
+            super();
+            this.w = w;
+        }
+
+        public Waypoint getWaypoint() {
+            return this.w;
+        }
+
+    }
+
 
 	public static class WaypointRemoved extends E {
 		Waypoint w;
