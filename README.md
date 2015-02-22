@@ -15,12 +15,12 @@ To build a development version of the app from source, follow the instructions o
 4. Click on Sync Project with Gradle files to download all the dependencies
 5. Open the SDK manager to install the required Android SDK Tools and Android SDK Build-tools
 6. The project contains a preconfigured keystore to sign debug builds. If you already have a custom keystore you can specify it in build.gradle android.signingConfigs.debug
-7. Copy the file src/main/res/values/keys.xml to src/main/res/values-1/keys.xml. If the src/main/res/values-1 directory does not exist, create it. 
+7. Copy the file ```src/main/res/values/keys.xml``` to ```src/main/res/values-1/keys.xml```. If the ```src/main/res/values-1``` directory does not exist, create it. 
 8. Required: Create a custom Google Maps API Key
 	1. Go go to https://developers.google.com/maps/documentation/android/start
 	2. Scroll down to Obtain a Google Maps API key and follow the instructions
 	3. If you use the preconfigured debug keystore, enter ```BC:CF:16:C8:4B:5E:5D:2D:DA:B7:35:FF:2A:53:CF:89:83:C2:D9:65;debug.org.owntracks.android```
 	4. If you use a custom keystore run ```keytool -list -v -keystore $PATH_TO_YOUR_KEYSTORE.jks``` and replace BC:CF:...:D9:65 with your SHA1 fingerprint
-	5. Replace ```YOUR_GOOGLE_MAPS_API_KEY``` in src/main/res/values-1/keys.xml with the generated forty-character API key
+	5. Replace ```YOUR_GOOGLE_MAPS_API_KEY``` in ```src/main/res/values-1/keys.xml``` with the generated forty-character API key
 
 10. Build the project
