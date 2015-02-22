@@ -1,5 +1,7 @@
 package org.owntracks.android;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,17 +45,16 @@ public class App extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		instance = this;
-        Bugsnag.init(this);
 
         Preferences.handleFirstStart();
 
+        if(Preferences.getFabric())
+            Fabric.with(this, new Crashlytics());
+
         OpenHelper helper = new OpenHelper(this, "mqttitude-db", null) {
             @Override
-            public void onUpgrade(SQLiteDatabase db, int oldVersion,
-                                  int newVersion) {
-                Log.v(this.toString(), "Migrating db from " + oldVersion
-                        + " to  " + newVersion);
+            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                Log.v(this.toString(), "Migrating db from " + oldVersion  + " to  " + newVersion);
                 // Add migrations here
             }
         };
@@ -63,8 +64,7 @@ public class App extends Application {
 		this.contactLinkDao = daoSession.getContactLinkDao();
 		this.waypointDao = daoSession.getWaypointDao();
 
-		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-				getResources().getConfiguration().locale);
+		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
 
 		Bugsnag.setNotifyReleaseStages("production", "testing");
