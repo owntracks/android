@@ -2,7 +2,7 @@
 
     <item
         android:id="@+id/menu_report"
-        android:icon="@drawable/ic_action_upload"
+        android:icon="@drawable/ic_report"
         android:orderInCategory="1"
         app:showAsAction="never"
         android:title="@string/publish"/>

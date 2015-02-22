@@ -13,38 +13,54 @@ apply plugin: 'android'
 repositories {
     maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
     mavenCentral()
-	flatDir {
-		dirs 'libs'
-	}
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.+'
-    compile 'com.android.support:support-v4:21.0.+'
-    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:cardview-v7:21.0.3'
     compile 'com.google.android.gms:play-services-maps:6.5.87'
     compile 'com.google.android.gms:play-services-location:6.5.87'
     compile 'com.google.android.gms:play-services-base:6.5.87'
-
-    compile 'com.bugsnag:bugsnag-android:2.1.1'
+    compile 'com.bugsnag:bugsnag-android:+'
     compile 'de.greenrobot:eventbus:2.2.0'
     compile 'de.greenrobot:greendao:1.3.7'
-    compile 'org.altbeacon:android-beacon-library:2+@aar'
+    compile 'org.altbeacon:android-beacon-library:2.+@aar'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.1'
-
+    // Material design widget libraries
+    compile 'com.rengwuxian.materialedittext:library:1.8.2'
+    compile('com.mikepenz.materialdrawer:library:0.9.6@aar') {
+        transitive = true
+    }
 }
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'debug.owntracks.org'
+            keyPassword '__DEBUG__'
+            storeFile file('./debug-keystore.jks')
+            storePassword '__DEBUG__'
+        }
+    }
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
-
+    buildToolsVersion '21.1.2'
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 21
     }
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix 'debug.'
         }
     }
 }

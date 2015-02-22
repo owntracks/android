@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="GOOGLE_MAPS_API_KEY">REPLACEME</string>
+    <string name="BUGSNAP_API_KEY">REPLACEME</string>
+</resources>

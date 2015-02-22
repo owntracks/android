@@ -3,10 +3,17 @@
     >
 
     <item
-        android:id="@+id/add"
-        android:icon="@drawable/ic_action_new"
+        android:id="@+id/save"
+        android:icon="@drawable/ic_done"
         android:orderInCategory="97"
         app:showAsAction="always"
-        android:title="@string/addWaypoint">
+        android:title="@string/save">
+    </item>
+    <item
+        android:id="@+id/useCurrent"
+        android:icon="@drawable/ic_mylocation"
+        android:orderInCategory="97"
+        app:showAsAction="always"
+        android:title="@string/currentLocation">
     </item>
 </menu>

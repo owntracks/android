@@ -1,26 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
         android:id="@+id/menu_report"
-        android:icon="@drawable/ic_action_upload"
+        android:icon="@drawable/ic_report"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:title="@string/publish"/>
-    <item
-        android:id="@+id/menu_share"
-        android:icon="@drawable/ic_action_share"
-        android:orderInCategory="3"
-        app:showAsAction="never"
-        android:title="@string/share"/>
-    <item
-        android:id="@+id/menu_waypoints"
-        android:orderInCategory="4"
-        app:showAsAction="never"
-        android:title="@string/waypoints"/>
 
     <item
-        android:id="@+id/menu_preferences"
-        android:orderInCategory="100"
-        android:title="@string/preferences"/>
+        android:id="@+id/menu_mylocation"
+        android:icon="@drawable/ic_mylocation"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"
+        android:title="@string/currentLocation"/>
 
 </menu>

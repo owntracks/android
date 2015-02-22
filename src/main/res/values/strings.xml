@@ -296,5 +296,16 @@
     <string name="transitionLeavingNotification">leaving</string>
     <string name="geofenceActive">Geofence active</string>
     <string name="waypointRemove">Remove</string>
+    <string name="idLocations">drawer.id.locations</string>
+    <string name="idWaypoints">drawer.id.waypoints</string>
+    <string name="idSettings">drawer.id.settings</string>
+    <string name="leave">Leave</string>
+    <string name="enter">Enter</string>
+    <string name="keyFistStart">firstStart</string>
+
+    <string-array name="share_dontshare">
+        <item>Shared</item>
+        <item>Not shared</item>
+    </string-array>
 
 </resources>
