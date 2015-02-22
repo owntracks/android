@@ -19,7 +19,7 @@
     <string name="preferencesServerConnect">"Connect"</string>
     <string name="preferencesLicenses">"Licenses"</string>
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
-    <string name="preferencesNotification">Notifications</string>
+    <string name="preferencesNotification">Notifications</string>preferencesNotification
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
     <string name="preferencesNotificationTickerOnPublish">Ticker on report</string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
@@ -29,6 +29,10 @@
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
+    <string name="preferencesUserMessage">"Messages from Broker"</string>
+    <string name="preferencesUserMessageSummary">"Receive user notification messages"</string>
+    <string name="preferencesUserMessageSound">"Play sound on messages"</string>
+    <string name="preferencesUserMessageSoundSummary">"Play default tone on message"</string>
     <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
     <string name="preferencesNotificationGeocoder">"Geocoder"</string>
     <string name="preferencesConnectionAdvancedModeSummary">"Show advanced connection preferences"</string>
@@ -201,6 +205,8 @@
     <string name="keyNotification">notification</string>
     <string name="keyNotificationGeocoder">notificationGeocoder</string>
     <string name="keyNotificationLocation">notificationLocation</string>
+    <string name="keyUserMessage">notificationMessage</string>
+    <string name="keyUserMessageSound">notificationMessageSound</string>
     <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
     <string name="keyNotificationTickerOnWaypointTransition">tickerOnWaypointTransition</string>
     <string name="keyNotificationOnReceivedWaypointTransition">notificationOnReceivedWaypointTransition</string>

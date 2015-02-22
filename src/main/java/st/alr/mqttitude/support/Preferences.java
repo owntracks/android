@@ -104,6 +104,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyNotification), getNotification())
                     .put(getStringRessource(R.string.keyNotificationGeocoder), getNotificationGeocoder())
                     .put(getStringRessource(R.string.keyNotificationLocation), getNotificationLocation())
+                    .put(getStringRessource(R.string.keyUserMessage), getNotificationMessage())
                     .put(getStringRessource(R.string.keyNotificationTickerOnPublish), getNotificationTickerOnPublish())
                     .put(getStringRessource(R.string.keyNotificationTickerOnWaypointTransition), getNotificationTickerOnWaypointTransition())
                     .put(getStringRessource(R.string.keySubTopic), getSubTopic(true))
@@ -154,6 +155,8 @@ public class Preferences {
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
         try { setNotificationGeocoder(json.getBoolean(getStringRessource(R.string.keyNotificationGeocoder))); } catch (JSONException e) {}
         try { setNotificationLocation(json.getBoolean(getStringRessource(R.string.keyNotificationLocation))); } catch (JSONException e) {}
+        try { setNotificationMessage(json.getBoolean(getStringRessource(R.string.keyUserMessage))); } catch (JSONException e) {}
+        try { setNotificationMessageSound(json.getBoolean(getStringRessource(R.string.keyUserMessageSound)));} catch(JSONException e){}
         try { setNotificationTickerOnPublish(json.getBoolean(getStringRessource(R.string.keyNotificationTickerOnPublish))); } catch (JSONException e) {}
         try { setNotificationTickerOnWaypointTransition(json.getBoolean(getStringRessource(R.string.keyNotificationTickerOnWaypointTransition))); } catch (JSONException e) {}
         try { setSubTopic(json.getString(getStringRessource(R.string.keySubTopic))); } catch (JSONException e) {}
@@ -378,7 +381,6 @@ public class Preferences {
         }
     }
 
-
     private static void setPubIncludeBattery(boolean aBoolean) {
         setBoolean(R.string.keyPubIncludeBattery, aBoolean);
     }
@@ -413,6 +415,14 @@ public class Preferences {
 
     private static void setNotificationLocation(boolean aBoolean) {
         setBoolean(R.string.keyNotificationLocation, aBoolean);
+
+    }
+    private static void setNotificationMessage(boolean aBoolean) {
+        setBoolean(R.string.keyUserMessage, aBoolean);
+
+    }
+    private static void setNotificationMessageSound(boolean aBoolean) {
+        setBoolean(R.string.keyUserMessageSound, aBoolean);
 
     }
 
@@ -547,6 +557,14 @@ public class Preferences {
                 R.bool.valNotificationLocation);
     }
 
+    public static boolean getNotificationMessage() {
+        return getBoolean(R.string.keyUserMessage,
+                R.bool.valUserMessage);
+    }
+    public static boolean getNotificationMessageSound() {
+        return getBoolean(R.string.keyUserMessageSound,
+                R.bool.valUserMessageSound);
+    }
     public static int getPubQos() {
         return getInt(
                 R.string.keyPubQos,

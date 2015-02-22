@@ -3,16 +3,13 @@ package st.alr.mqttitude.services;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 
 import st.alr.mqttitude.ActivityLauncher;
 import st.alr.mqttitude.App;
 import st.alr.mqttitude.R;
 import st.alr.mqttitude.db.ContactLink;
-import st.alr.mqttitude.db.Waypoint;
-import st.alr.mqttitude.db.WaypointDao;
 import st.alr.mqttitude.messages.ConfigurationMessage;
+import st.alr.mqttitude.messages.UserMessage;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.messages.DumpMessage;
 import st.alr.mqttitude.model.GeocodableLocation;
@@ -23,20 +20,20 @@ import st.alr.mqttitude.support.Preferences;
 import st.alr.mqttitude.support.ReverseGeocodingTask;
 import st.alr.mqttitude.support.StaticHandler;
 import st.alr.mqttitude.support.StaticHandlerInterface;
-import android.annotation.SuppressLint;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
@@ -62,6 +59,7 @@ public class ServiceApplication implements ProxyableService,
 	private Handler handler;
 	//private int mContactCount;
 	private ServiceProxy context;
+    private int notificationMessageID = Defaults.NOTIFCATION_ID;
 
 	@Override
 	public void onCreate(ServiceProxy context) {
@@ -231,6 +229,38 @@ public class ServiceApplication implements ProxyableService,
 			this.notificationManager.cancel(Defaults.NOTIFCATION_ID);
 	}
 
+    public void addNotificationMessage(UserMessage e) {
+        if (!playServicesAvailable)
+            return;
+
+        String title = "%s: %s".format(e.getSender(), e.getTitle());
+        String subtitle = e.getBody();
+        long time = e.getTime();
+
+        NotificationCompat.Builder messageNotificationBuilder  = new NotificationCompat.Builder(this.context);
+
+        messageNotificationBuilder.setContentTitle(title);
+        messageNotificationBuilder
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentText(subtitle)
+                .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_MIN);
+
+
+        if (time != 0)
+            messageNotificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
+
+        Notification messageNotification = messageNotificationBuilder.build();
+        this.notificationMessageID++;
+        this.notificationManager.notify(this.notificationMessageID,messageNotification);
+
+        if(Preferences.getNotificationMessageSound()) {
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            //Should do this, but it doesn't work on 5.0
+            // messageNotificationBuilder.setSound(soundUri);
+            RingtoneManager.getRingtone(context, soundUri).play();
+        }
+    }
+
 	public void updateNotification() {
 		if (!Preferences.getNotification() || !playServicesAvailable)
 			return;
@@ -307,6 +337,10 @@ public class ServiceApplication implements ProxyableService,
 
 		}
 	}
+
+    public void onEvent(Events.NotificationMessageReceived e) {
+        addNotificationMessage(e.getNotificationMessage());
+    }
 
 	public static boolean checkPlayServices() {
 		playServicesAvailable = ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());

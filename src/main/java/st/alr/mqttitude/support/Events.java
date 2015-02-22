@@ -3,10 +3,12 @@ package st.alr.mqttitude.support;
 import java.util.Date;
 
 import st.alr.mqttitude.db.Waypoint;
+import st.alr.mqttitude.messages.UserMessage;
 import st.alr.mqttitude.messages.WaypointMessage;
 import st.alr.mqttitude.model.Contact;
 import st.alr.mqttitude.model.GeocodableLocation;
 import st.alr.mqttitude.messages.LocationMessage;
+
 import android.location.Location;
 
 public class Events {
@@ -176,6 +178,20 @@ public class Events {
         public WaypointMessage getLocationMessage() {
             return this.m;
         }
+    }
+
+    public static class NotificationMessageReceived extends E{
+        private String t;
+        private UserMessage m;
+
+        public NotificationMessageReceived(UserMessage m, String t){
+            super();
+            this.t = t;
+            this.m = m;
+        }
+
+        public String getTopic() { return this.t; }
+        public UserMessage getNotificationMessage(){ return this.m; }
     }
 
     public static class ContactUpdated extends E {

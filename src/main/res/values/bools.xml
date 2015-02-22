@@ -14,6 +14,8 @@
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationTickerOnWaypointTransition">true</bool>
     <bool name="valNotificationTickerOnPublish">true</bool>
+    <bool name="valUserMessage">true</bool>
+    <bool name="valUserMessageSound">false</bool>
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">false</bool>
     <bool name="valConnectionAdvancedMode">false</bool>
