@@ -119,7 +119,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="org.owntracks.android.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true" >
             <meta-data
