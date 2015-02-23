@@ -175,14 +175,11 @@ public class ServiceProxy extends ServiceBindable {
 	}
 
 	public static void runOrBind(Context context, Runnable runnable) {
-        Log.v("ServiceProxy", "runOrBind");
 		if ((instance != null) && (getServiceConnection() != null)) {
-            Log.v("ServiceProxy", "running immediately");
 
             runnable.run();
 			return;
 		}
-        Log.v("ServiceProxy", "binding");
 
 		if (getServiceConnection() == null) {
 			ServiceConnection c = new ServiceConnection() {

@@ -238,12 +238,7 @@
             android:summary="@string/preferencesAutostartSummary"
             android:title="@string/preferencesAutostart" />
 
-        <SwitchPreference
-            android:defaultValue="@bool/valFabric"
-            android:key="@string/keyFabric"
-            android:summary="@string/preferencesFabricSummary"
-            android:title="@string/preferencesFabric" />
-        </PreferenceCategory>
+      </PreferenceCategory>
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -273,6 +268,7 @@
         <Preference
             android:title="@string/preferencesImportClipboard"
             android:summary="@string/preferencesImportClipboardSummary"
+            android:enabled="false"
             />
 
     </PreferenceScreen>

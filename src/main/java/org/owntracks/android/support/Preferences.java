@@ -656,10 +656,6 @@ public class Preferences {
         setBoolean(R.string.keyNotificationOnReceivedWaypointTransition, val);
     }
 
-    public static boolean getFabric() {
-        return getBoolean(R.string.keyFabric, R.bool.valFabric);
-    }
-
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards

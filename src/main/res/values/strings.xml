@@ -302,9 +302,6 @@
     <string name="leave">Leave</string>
     <string name="enter">Enter</string>
     <string name="keyFistStart">firstStart</string>
-    <string name="keyFabric">keyFabric</string>
-    <string name="preferencesFabric">Crash reporting</string>
-    <string name="preferencesFabricSummary">Enable Fabric.io crash reporting</string>
 
     <string-array name="share_dontshare">
         <item>Shared</item>

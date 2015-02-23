@@ -278,9 +278,13 @@ public class ServiceApplication implements ProxyableService,
         notificationBuilder.setContentTitle(title);
 		notificationBuilder
 				.setSmallIcon(R.drawable.ic_notification)
-				.setContentText(subtitle)
-				.setPriority(android.support.v4.app.NotificationCompat.PRIORITY_MIN);
-		if (time != 0)
+                .setColor(context.getResources().getColor(R.color.primary))
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+				.setPriority(NotificationCompat.PRIORITY_MIN)
+                .setContentText(subtitle);
+
+        if (time != 0)
 			notificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
 
 		this.notification = notificationBuilder.build();
