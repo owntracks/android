@@ -17,13 +17,10 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -34,7 +31,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
@@ -44,7 +40,7 @@ import org.owntracks.android.support.Defaults.State;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.ServiceMqttCallbacks;
 import org.owntracks.android.support.Preferences;
-import android.annotation.SuppressLint;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -263,7 +259,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 // system keystore when using KeyStore.getInstance("AndroidKeystore"). Instead,
                 // an empty keystore is returned. However, when passing null to the tmf.init method
                 // the system keystore is used
-                tmf.init((KeyStore)null);
+                tmf.init((KeyStore) null);
 
             }
 
@@ -367,7 +363,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void setWill(MqttConnectOptions m) {
-		StringBuffer payload = new StringBuffer();
+		StringBuilder payload = new StringBuilder();
 		payload.append("{");
 		payload.append("\"_type\": ").append("\"").append("lwt").append("\"");
 		payload.append(", \"tst\": ")
@@ -431,8 +427,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             return;
 
         this.mqttClient.subscribe(topics);
-        for (int i = 0; i < topics.length; i++)
-           subscribtions.push(topics[i]);
+        for (String topic : topics) {
+            subscribtions.push(topic);
+        }
     }
     private void unsubscribe() throws MqttException{
         if(!isConnected())
@@ -544,7 +541,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         if(netInfo != null && netInfo.isAvailable() && netInfo.isConnected()) {
             return true;
         } else {
-            Log.e(this.toString(), "isONline == true. activeNetworkInfo: "+ (netInfo != null) +", available=" + (netInfo != null ? netInfo.isAvailable() : false) + ", connected: " + (netInfo != null ? netInfo.isConnected() : false));
+            Log.e(this.toString(), "isONline == true. activeNetworkInfo: "+ (netInfo != null) +", available=" + (netInfo != null && netInfo.isAvailable()) + ", connected: " + (netInfo != null && netInfo.isConnected()));
             return false;
         }
 	}
@@ -570,9 +567,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		return isOnline();
 	}
 
-	/**
-	 * @category MISC
-	 */
 	public static ServiceBroker getInstance() {
 		return instance;
 	}
@@ -793,11 +787,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
             LocationMessage lm = LocationMessage.fromJsonObject(json);
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
-        } else if(type.equals("waypoint")) {
-
-
         } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic())) {
-            String action = "";
+            String action;
             try {
                 action = json.getString("action");
             } catch (Exception e) {
@@ -805,24 +796,28 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 return;
             }
 
-            if (action.equals("dump")) {
-                //Log.v(this.toString(), "Received dump cmd message");
-                if(!Preferences.getRemoteCommandDump()) {
-                    Log.i(this.toString(), "Dump remote command is disabled");
-                    return;
-                }
-                ServiceProxy.getServiceApplication().dump();
-            } else if (action.equals("reportLocation")){
-                //Log.v(this.toString(), "Received reportLocation cmd message");
+            switch (action) {
+                case "dump":
+                    //Log.v(this.toString(), "Received dump cmd message");
+                    if (!Preferences.getRemoteCommandDump()) {
+                        Log.i(this.toString(), "Dump remote command is disabled");
+                        return;
+                    }
+                    ServiceProxy.getServiceApplication().dump();
+                    break;
+                case "reportLocation":
+                    //Log.v(this.toString(), "Received reportLocation cmd message");
 
-                if(!Preferences.getRemoteCommandReportLocation()) {
-                    Log.i(this.toString(), "ReportLocation remote command is disabled");
-                    return;
-                }
-                ServiceProxy.getServiceLocator().publishResponseLocationMessage();
+                    if (!Preferences.getRemoteCommandReportLocation()) {
+                        Log.i(this.toString(), "ReportLocation remote command is disabled");
+                        return;
+                    }
+                    ServiceProxy.getServiceLocator().publishResponseLocationMessage();
 
-            } else {
-                Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
+                    break;
+                default:
+                    Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
+                    break;
             }
 
         } else if (type.equals("configuration") ) {
@@ -836,7 +831,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
         } else {
 			Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
-			return;
 		}
 	}
 

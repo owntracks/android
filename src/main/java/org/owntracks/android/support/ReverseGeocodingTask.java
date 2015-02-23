@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,11 +13,10 @@ import android.os.Handler;
 import android.os.Message;
 
 // AsyncTask encapsulating the reverse-geocoding API
-public class ReverseGeocodingTask extends
-		AsyncTask<GeocodableLocation, Void, Void> {
+public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
 
-	Context mContext;
-	Handler mHandler;
+    private Context mContext;
+    private Handler mHandler;
 	public static final int GEOCODER_RESULT = 3452;
 	public static final int GEOCODER_NORESULT = 3453;
 

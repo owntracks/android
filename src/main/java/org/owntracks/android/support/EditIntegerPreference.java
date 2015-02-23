@@ -1,11 +1,8 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.preference.EditTextPreference;
-import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 
 public class EditIntegerPreference extends EditTextPreference{
 
@@ -22,11 +19,7 @@ public class EditIntegerPreference extends EditTextPreference{
     }
     @Override
     protected boolean persistString(String value) {
-        if(value == null) {
-            return false;
-        } else {
-            return persistInt(Integer.valueOf(value));
-        }
+        return value != null && persistInt(Integer.valueOf(value));
     }
 
     @Override

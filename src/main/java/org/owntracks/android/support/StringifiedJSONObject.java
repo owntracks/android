@@ -42,7 +42,7 @@ public class StringifiedJSONObject extends JSONObject {
     }
 
     public boolean getBoolean(String name) throws JSONException {
-        return get(name).equals("1") ? true : false;
+        return get(name).equals("1");
     }
 
     public StringifiedJSONObject putAll(StringifiedJSONObject o) throws JSONException{
@@ -58,18 +58,13 @@ public class StringifiedJSONObject extends JSONObject {
             return (js1 == js2);
         }
 
-        int i=0;
         String key;
-
         JSONArray js1Names=js1.names();
-        JSONArray js2Names=js2.names();
-
-
-        for (i=0; i<js1Names.length(); i++) {
+        for (int i=0; i<js1Names.length(); i++) {
             key=js1Names.get(i).toString();
 
             if(!js1.get(key).equals(js2.get(key)))
-                Log.v("StringifiedJSONObject.compareJSONObjs", "Differ: " + key + " " + js1.get(key) + "!=" + js2.get(key));
+                Log.v("StringifiedJSONObject", "compareJSONObjs Differ: " + key + " " + js1.get(key) + "!=" + js2.get(key));
         }
 
         return true;

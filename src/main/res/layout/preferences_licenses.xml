@@ -15,7 +15,7 @@
                 android:id="@+id/eventbusHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="License for file eventbus.jar"
+                android:text="@string/eventbusLicense"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
@@ -40,7 +40,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
                 android:id="@+id/pahoHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="License for file paho.jar"
+                android:text="@string/pahoLicense"
                 android:textAppearance="?android:attr/textAppearanceMedium" 
                 android:layout_marginTop="14dip"/>
 
@@ -125,7 +125,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
                 android:id="@+id/bugsnagHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="License for file bugsnag-android.jar"
+                android:text="@string/bugsnagLicense"
                 android:textAppearance="?android:attr/textAppearanceMedium" 
                 android:layout_marginTop="14dip"/>
 
@@ -153,9 +153,7 @@ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-                
-                ></TextView>
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
             
             
         </LinearLayout>

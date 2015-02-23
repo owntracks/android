@@ -81,14 +81,20 @@ public class ServiceProxy extends ServiceBindable {
 		if (p != null)
 			return p;
 
-		if (id.equals(SERVICE_APP))
-			p = new ServiceApplication();
-		else if (id.equals(SERVICE_BROKER))
-			p = new ServiceBroker();
-        else if (id.equals(SERVICE_LOCATOR))
-            p = new ServiceLocator();
-        else if (id.equals(SERVICE_BEACON))
-            p = new ServiceBeacon();
+        switch (id) {
+            case SERVICE_APP:
+                p = new ServiceApplication();
+                break;
+            case SERVICE_BROKER:
+                p = new ServiceBroker();
+                break;
+            case SERVICE_LOCATOR:
+                p = new ServiceLocator();
+                break;
+            case SERVICE_BEACON:
+                p = new ServiceBeacon();
+                break;
+        }
 
 		services.put(id, p);
 		p.onCreate(this);
@@ -166,8 +172,7 @@ public class ServiceProxy extends ServiceBindable {
 
 	public static void closeServiceConnection() {
 		if ((getServiceConnection() != null) && connectionBoundOnce)
-			;
-		connection.close();
+	        connection.close();
 	}
 
 	public static ServiceProxyConnection getServiceConnection() {

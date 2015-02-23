@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import org.owntracks.android.R;
 
-// This is a prefrence that fakes a toolbar for a preference screen
+// This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences screens
 public class ToolbarPreference extends Preference {
 
     public ToolbarPreference(Context context, AttributeSet attrs) {
@@ -21,9 +21,11 @@ public class ToolbarPreference extends Preference {
     @Override
     protected View onCreateView(ViewGroup parent) {
         parent.setPadding(0, 0, 0, 0);
-        parent.setElevation(4);
+
+
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.settings_toolbar, parent, false);
+
         Toolbar toolbar = (Toolbar) layout.findViewById(R.id.fragmentToolbar);
         toolbar.setTitle(getTitle());
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

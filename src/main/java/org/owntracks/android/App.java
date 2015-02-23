@@ -2,13 +2,9 @@ package org.owntracks.android;
 
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
-import org.owntracks.android.adapter.MultitypeAdapter;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.DaoMaster;
 import org.owntracks.android.db.DaoMaster.OpenHelper;
@@ -119,7 +115,7 @@ public class App extends Application {
 	public static int getBatteryLevel() {
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		Intent batteryStatus = getContext().registerReceiver(null, ifilter);
-		return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
 	public static void showLocationNotAvailableToast() {

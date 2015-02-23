@@ -2,47 +2,32 @@ package org.owntracks.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.location.Geofence;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import org.owntracks.android.adapter.WaypointAdapter;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
-
-import java.sql.Date;
-import java.util.ArrayList;
 
 import de.greenrobot.dao.DaoException;
 import de.greenrobot.dao.query.Query;
@@ -51,7 +36,7 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityWaypoint extends ActionBarActivity implements StaticHandlerInterface {
     private WaypointDao dao;
-    TextWatcher requiredForSave;
+    private TextWatcher requiredForSave;
     private GeocodableLocation currentLocation;
     private Handler handler;
     private TextView waypointListPlaceholder;

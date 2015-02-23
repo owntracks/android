@@ -2,20 +2,16 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.support.v4.util.LongSparseArray;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import org.owntracks.android.R;
-import org.owntracks.android.model.Contact;
 
 public abstract class MultitypeAdapter extends BaseAdapter {
 
@@ -80,10 +76,6 @@ public abstract class MultitypeAdapter extends BaseAdapter {
             if(rows.get(i).first.equals(ROW_TYPE_ITEM) && rows.get(i).second.equals(o))
                 return i;
         return -1;
-    }
-
-    public void clear() {
-
     }
 
     public void updateItem(Object o){

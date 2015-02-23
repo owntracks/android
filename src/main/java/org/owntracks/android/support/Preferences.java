@@ -118,7 +118,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
                     .put(getStringRessource(R.string.keyTrackerId), getTrackerId());
 
-            Log.v("PREFERENCES toJsonObject", json.toString());
+            Log.v("Preferences", "toJsonObject: " + json.toString());
 
         } catch (JSONException e) {
             Log.e("Preferences", e.toString());
@@ -129,7 +129,7 @@ public class Preferences {
     public static void fromJsonObject(StringifiedJSONObject json) {
         if (!Defaults.isPropperMessageType(json, "configuration"))
             return;
-        Log.v("PREFERENCES:fromJsonObject", json.toString());
+        Log.v("Preferences", "fromJsonObject: " +  json.toString());
 
 
         try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
@@ -597,11 +597,6 @@ public class Preferences {
 
     public static String getTwitterUrl() {
         return App.getContext().getString(R.string.valTwitterUrl);
-
-    }
-
-    public static String getBitcoinAddress() {
-        return App.getContext().getString(R.string.valBitcoinAddress);
 
     }
 

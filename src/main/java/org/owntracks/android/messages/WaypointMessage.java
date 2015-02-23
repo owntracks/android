@@ -1,12 +1,9 @@
 package org.owntracks.android.messages;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
-import org.owntracks.android.App;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.StringifiedJSONObject;
 

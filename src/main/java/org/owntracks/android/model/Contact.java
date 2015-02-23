@@ -35,7 +35,7 @@ public class Contact {
 	private Bitmap userImage;
     private BitmapDescriptor userImageDescriptor;
 	private static final int userImageHeightScale = (int) convertDpToPixel(48);
-	public static Bitmap defaultUserImage = getRoundedShape(Bitmap
+    private static Bitmap defaultUserImage = getRoundedShape(Bitmap
 			.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy
 					.getInstance().getResources(), R.drawable.noimage),
 					userImageHeightScale, userImageHeightScale, true));
@@ -135,7 +135,7 @@ public class Contact {
 		this.topic = topic;
 	}
 
-	public static float convertDpToPixel(float dp) {
+	private static float convertDpToPixel(float dp) {
 		return dp
 				* (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
 	}
@@ -161,7 +161,7 @@ public class Contact {
 		return BitmapFactory.decodeStream(input);
 	}
 
-	public static Bitmap getRoundedShape(Bitmap bitmap) {
+	private static Bitmap getRoundedShape(Bitmap bitmap) {
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
 				bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);

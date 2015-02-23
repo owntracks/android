@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import android.content.Context;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.google.android.gms.location.Geofence;
 
 public class WaypointAdapter extends MultitypeAdapter {
 

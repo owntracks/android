@@ -3,13 +3,13 @@
 
 <item
         android:id="@+id/action_assign"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_contact_link"
         android:title="@string/assignContact"/>
 
     <item
         android:id="@+id/action_unassign"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_contact_unlink"
         android:title="@string/unassignContact"/>
 

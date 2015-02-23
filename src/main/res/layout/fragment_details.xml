@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
-
 
 <ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -24,7 +19,6 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:background="?android:attr/selectableItemBackground"
-
             android:layout_height="wrap_content"
             android:minHeight="72dp">
 
@@ -34,9 +28,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignWithParentIfMissing="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_toRightOf="@+id/image"
+                android:layout_marginLeft="@dimen/default_spacing"
+                android:layout_marginRight="@dimen/default_spacing"
                 android:orientation="vertical"
                 android:paddingBottom="20dp"
                 android:paddingTop="20dp">
@@ -48,8 +41,7 @@
                     android:text="@string/contactDetailsTopic"
                     android:textSize="14sp"
                     android:textColor="#757575"
-                    android:paddingBottom="4dp"
-                    />
+                    android:paddingBottom="4dp" />
 
                 <TextView
                     android:id="@+id/topic"
@@ -70,7 +62,6 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:background="?android:attr/selectableItemBackground"
-
             android:layout_height="wrap_content"
             android:minHeight="72dp">
 
@@ -81,8 +72,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:orientation="vertical"
->
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/contactDetailsTopic"
@@ -255,4 +245,3 @@
     </LinearLayout>
 
 </ScrollView>
-    </LinearLayout>

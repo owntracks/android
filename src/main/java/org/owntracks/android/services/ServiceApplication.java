@@ -3,15 +3,11 @@ package org.owntracks.android.services;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 
 import org.owntracks.android.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.messages.DumpMessage;
@@ -23,20 +19,19 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
-import android.annotation.SuppressLint;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
@@ -113,7 +108,7 @@ public class ServiceApplication implements ProxyableService,
 			geocoderAvailableForLocation(((GeocodableLocation) msg.obj));
 			break;
 		}
-	};
+	}
 
 	public void onEventMainThread(Events.LocationMessageReceived e) {
         org.owntracks.android.model.Contact c = App.getContact(e.getTopic());
@@ -231,7 +226,7 @@ public class ServiceApplication implements ProxyableService,
 
 	public void updateTicker(String text) {
 		notificationBuilder.setTicker(text
-				+ ((this.even = this.even ? false : true) ? " " : ""));
+				+ ((this.even = !this.even) ? " " : ""));
 		notificationBuilder.setSmallIcon(R.drawable.ic_notification);
 		this.notificationManager.notify(Defaults.NOTIFCATION_ID,
 				notificationBuilder.build());
@@ -251,8 +246,8 @@ public class ServiceApplication implements ProxyableService,
 		if (!Preferences.getNotification() || !playServicesAvailable)
 			return;
 
-		String title = null;
-		String subtitle = null;
+		String title;
+		String subtitle;
 		long time = 0;
 
 		if ((this.lastPublishedLocation != null)
@@ -279,10 +274,13 @@ public class ServiceApplication implements ProxyableService,
 		notificationBuilder
 				.setSmallIcon(R.drawable.ic_notification)
                 .setColor(context.getResources().getColor(R.color.primary))
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
 				.setPriority(NotificationCompat.PRIORITY_MIN)
                 .setContentText(subtitle);
+
+        if(android.os.Build.VERSION.SDK_INT >= 21) {
+            notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
 
         if (time != 0)
 			notificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
@@ -339,12 +337,10 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateAllContacts() {
-		Iterator<Contact> it = App.getCachedContacts().values().iterator();
-		while (it.hasNext()) {
-			Contact c = it.next();
-			resolveContact(c);
-			EventBus.getDefault().post(new Events.ContactUpdated(c));
-		}
+        for (Contact c : App.getCachedContacts().values()) {
+            resolveContact(c);
+            EventBus.getDefault().post(new Events.ContactUpdated(c));
+        }
 
 	}
 

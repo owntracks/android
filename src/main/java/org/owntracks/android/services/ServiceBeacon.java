@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -283,7 +282,7 @@ public class ServiceBeacon implements
         }
         catch (RemoteException e)
         {
-            return;
+            Log.e(this.toString(), e.toString());
         }
     }
 

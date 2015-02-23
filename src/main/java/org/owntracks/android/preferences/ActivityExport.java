@@ -3,8 +3,6 @@ package org.owntracks.android.preferences;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,38 +15,28 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import com.google.android.gms.location.Geofence;
-
 import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Date;
 import java.util.EnumSet;
 
-import de.greenrobot.event.EventBus;
 import org.owntracks.android.R;
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ActivityExport extends Activity {
     private static final String TEMP_FILE_NAME = "config.otrc";
-    CheckBox includePreferences;
-    CheckBox includeConnection;
-    CheckBox includeCredentials;
-    CheckBox includeDeviceIdentification;
-    CheckBox includeWaypoints;
+    private CheckBox includePreferences;
+    private CheckBox includeConnection;
+    private CheckBox includeCredentials;
+    private CheckBox includeDeviceIdentification;
+    private CheckBox includeWaypoints;
     Button exportButton;
 
 
@@ -142,13 +130,8 @@ public class ActivityExport extends Activity {
         File cDir = getBaseContext().getCacheDir();
         File tempFile = new File(cDir.getPath() + "/" + TEMP_FILE_NAME) ;
 
-        String strLine="";
-        StringBuilder text = new StringBuilder();
-
-
-        FileWriter writer=null;
         try {
-            writer = new FileWriter(tempFile);
+            FileWriter writer = new FileWriter(tempFile);
 
             writer.write(config.toString());
 

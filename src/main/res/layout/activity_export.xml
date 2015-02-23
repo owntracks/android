@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_margin="@dimen/default_horizontal_spacing">
+    android:layout_margin="@dimen/default_spacing">
 
 
     <LinearLayout
@@ -11,35 +11,37 @@
     android:layout_height="fill_parent">
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/exportIncludes"
-        android:id="@+id/textView"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/exportIncludes"
+            android:id="@+id/textView"/>
 
         <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/exportIncludeBrokerConnection"
-        android:id="@+id/includeConnection"
-        android:checked="true"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/exportIncludeBrokerConnection"
+            android:id="@+id/includeConnection"
+            android:checked="true"/>
 
         <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/exportIncludeUsernamePassword"
-        android:id="@+id/includeUsernamePassword"
-        android:layout_marginLeft="@dimen/default_horizontal_spacing"
-        android:checked="false"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/exportIncludeUsernamePassword"
+            android:id="@+id/includeUsernamePassword"
+            android:layout_marginLeft="@dimen/default_spacing"
+            android:layout_marginStart="@dimen/default_spacing"
+            android:checked="false"/>
 
         <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/exportIncludeDeviceIdentiaction"
-        android:layout_marginLeft="@dimen/default_horizontal_spacing"
-        android:id="@+id/includeDeviceIdentification"
-        android:checked="false"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/exportIncludeDeviceIdentiaction"
+            android:layout_marginLeft="@dimen/default_spacing"
+            android:layout_marginStart="@dimen/default_spacing"
+            android:id="@+id/includeDeviceIdentification"
+            android:checked="false"/>
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -47,8 +49,6 @@
             android:text="@string/exportIncludeWaypoints"
             android:id="@+id/includeWaypoints"
             android:checked="false"/>
-
-
     </LinearLayout>
 
     <Button

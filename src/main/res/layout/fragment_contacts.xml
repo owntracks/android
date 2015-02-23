@@ -1,57 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:fab="http://schemas.android.com/apk/res-auto"
-
-              android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background"
+    android:orientation="vertical">
 
-    >
-
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:background="@color/primary"
-         android:elevation="4dp"
-            android:visibility="gone"
-         android:layout_height="48dp">
-
-         <TextView
-
-                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:id="@+id/currentLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/currentLocationNotAvailable"
-                android:gravity="left|center_vertical"
-                android:layout_weight="1"
-                android:paddingRight="@dimen/default_horizontal_spacing_half"
-                 android:paddingLeft="@dimen/default_horizontal_spacing"
-                android:textColor="#FFF"
-                android:layout_alignParentTop="true"
-                android:footerDividersEnabled="false"
-             />
-
-
-     </LinearLayout>
-
-
-
-
-
-    <TextView android:id="@+id/contactsListPlaceholder"
-              android:elevation="2dp"
-
-              android:gravity="center"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:text="@string/contactListPlaceholder" />
-
+    <TextView
+        android:id="@+id/contactsListPlaceholder"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/contactListPlaceholder" />
 
     <ListView
-        android:elevation="2dp"
         android:divider="@drawable/inset"
         android:dividerHeight="0dp"
         android:listSelector="@android:color/transparent"
@@ -61,9 +22,5 @@
         android:scrollbarStyle="outsideOverlay"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-
         android:id="@+id/contactsList"/>
-
-
-
 </LinearLayout>

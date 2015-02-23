@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.owntracks.android"
-    android:versionCode="0502"
-    android:versionName="0.5.02" >
+          package="org.owntracks.android"
+          android:versionCode="0502"
+          android:versionName="0.5.02" >
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
-
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
-
-    <meta-data
-        android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
+    <uses-feature  android:glEsVersion="0x00020000"  android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- To access the network -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To handle connectivity changes and reconnect -->
@@ -37,6 +27,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Owntracks" >
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
@@ -83,6 +74,40 @@
                 <data android:scheme="content" />
                 <data android:pathPattern=".*\\.otrc" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="application/octet-stream"
+                    android:pathPattern=".*\\.otrc" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="application/otrc"
+                    android:pathPattern=".*\\.otrc" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\.otrc" />
+            </intent-filter>
         </activity>
 
 
@@ -123,49 +148,6 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <action android:name="android.intent.action.EDIT" />
-
-            <category android:name="android.intent.category.DEFAULT" />
-
-            <data
-                android:host="*"
-                android:mimeType="application/octet-stream"
-                android:pathPattern=".*\\.otrc" />
-        </intent-filter>
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <action android:name="android.intent.action.EDIT" />
-
-            <category android:name="android.intent.category.DEFAULT" />
-
-            <data
-                android:host="*"
-                android:mimeType="application/otrc"
-                android:pathPattern=".*\\.otrc" />
-        </intent-filter>
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <action android:name="android.intent.action.EDIT" />
-
-            <category android:name="android.intent.category.DEFAULT" />
-
-            <data
-                android:host="*"
-                android:mimeType="text/plain"
-                android:pathPattern=".*\\.otrc" />
-        </intent-filter>
->
-
-        <!-- <activity -->
-        <!-- android:name=".ActivityWizzard" -->
-        <!-- android:label="@string/title_activity_activity_wizzard" > -->
-        <!-- </activity> -->
-        <!-- <activity -->
-        <!-- android:name="org.owntracks.android.preferences.ActivityExport" -->
-        <!-- android:label="@string/title_activity_activity_export" > -->
-        <!-- </activity> -->
 
         <activity
             android:name=".ActivityWaypoints"

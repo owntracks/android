@@ -28,7 +28,7 @@
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Description"
+                android:hint="@string/description"
                 app:floatingLabel="normal"
                 app:baseColor="#FFF"
                 app:primaryColor="@color/accent"
@@ -55,17 +55,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginEnd="@dimen/default_horizontal_spacing"
-            android:layout_marginRight="@dimen/default_horizontal_spacing">
+            android:layout_marginEnd="@dimen/default_spacing"
+            android:layout_marginRight="@dimen/default_spacing">
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/default_spacing"
+                android:layout_marginStart="@dimen/default_spacing"
                 app:iconLeft="@drawable/ic_location"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Latitude"
+                android:hint="@string/latitude"
                 app:floatingLabel="normal"
                 app:baseColor="@color/textPrimary"
                 app:primaryColor="@color/accent"
@@ -76,42 +77,36 @@
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="@dimen/default_spacing"
+                android:layout_marginStart="@dimen/default_spacing"
                 app:iconLeft="@drawable/ic_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Longitude"
+                android:hint="@string/longitude"
                 app:floatingLabel="normal"
                 app:baseColor="@color/textPrimary"
                 app:primaryColor="@color/accent"
                 android:id="@+id/longitude"
                 android:digits="-0123456789."
                 android:inputType="numberDecimal"
-                app:helperText=""
+                app:helperText=""/>
 
 
-
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:layout_marginLeft="@dimen/default_spacing"
+                android:layout_marginStart="@dimen/default_spacing"
+                app:iconLeft="@drawable/ic_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/radius"
+                app:helperText="Meters"
+                app:floatingLabel="normal"
+                app:baseColor="@color/textPrimary"
+                app:primaryColor="@color/accent"
+                android:id="@+id/radius"
+                android:digits="0123456789"
+                android:inputType="numberDecimal"
                 />
-
-
-                <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="16dp"
-                    app:iconLeft="@drawable/ic_radius"
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Radius"
-                    app:helperText="Meters"
-
-                    app:floatingLabel="normal"
-                    app:baseColor="@color/textPrimary"
-                    app:primaryColor="@color/accent"
-                    android:id="@+id/radius"
-                    android:digits="0123456789"
-                    android:inputType="numberDecimal"
-                    />
-
-
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -119,14 +114,13 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/waypointGeofenceSettings"
                     android:layout_marginLeft="72dp"
-                    android:visibility="gone"
-                    >
+                    android:layout_marginStartt="72dp"
+                    android:visibility="gone">
 
                     <RelativeLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        >
+                        android:layout_height="48dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -140,7 +134,7 @@
                             android:id="@+id/enter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="right"
+                            android:layout_gravity="end"
                             android:layout_centerVertical="true"
 
                             android:layout_alignParentRight="true"
@@ -150,8 +144,7 @@
                     <RelativeLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        >
+                        android:layout_height="48dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -165,7 +158,7 @@
                             android:id="@+id/leave"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="right"
+                            android:layout_gravity="end"
                             android:layout_centerVertical="true"
 
                             android:layout_alignParentRight="true"
@@ -180,8 +173,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginLeft="72dp"
-
-                >
+                android:layout_marginStart="72dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -195,9 +187,8 @@
                     android:id="@+id/share"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_gravity="end"
                     android:layout_centerVertical="true"
-
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"/>
             </RelativeLayout>

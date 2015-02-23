@@ -105,9 +105,7 @@ public class ActivityMain extends ActionBarActivity {
 
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
-                        if (ActivityMain.FragmentHandler.getInstance().atRoot()) {
-                            // Already at root, do nothing
-                        } else {
+                        if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
                             // We're showing the root and rolling back the complete back stack so we discard it
                             FragmentHandler.getInstance().clearBackStack();
                             FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (ActionBarActivity) context, FragmentHandler.DIRECTION_BACK);
@@ -168,10 +166,10 @@ public class ActivityMain extends ActionBarActivity {
 
         static FragmentHandler instance;
 
-		private static HashMap<Class<?>, Bundle> store = new HashMap<Class<?>, Bundle>();
-		private static ConcurrentHashMap<Class<?>, Fragment> fragments = new ConcurrentHashMap<Class<?>, Fragment>();
+		private static HashMap<Class<?>, Bundle> store = new HashMap<>();
+		private static ConcurrentHashMap<Class<?>, Fragment> fragments = new ConcurrentHashMap<>();
 
-		private static LinkedList<Class<?>> backStack = new LinkedList<Class<?>>();
+		private static LinkedList<Class<?>> backStack = new LinkedList<>();
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -316,7 +314,7 @@ public class ActivityMain extends ActionBarActivity {
             backStack.addLast(c);
 		}
         public void clearBackStack() {
-            backStack.clear();;
+            backStack.clear();
             return;
         }
 		public Class<?> popBackStack() {
@@ -1091,11 +1089,6 @@ public class ActivityMain extends ActionBarActivity {
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
-     //       if(item.getItemId() == R.id.menu_mylocation) {
-       //         FragmentHandler.getInstance().forward(MapFragment)
-         //       return true;
-          //  }
-
             return super.onOptionsItemSelected(item);
         }
 

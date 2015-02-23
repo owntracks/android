@@ -33,7 +33,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Radius = new Property(7, Float.class, "radius", false, "RADIUS");
         public final static Property TransitionType = new Property(8, Integer.class, "transitionType", false, "TRANSITION_TYPE");
         public final static Property GeofenceId = new Property(9, String.class, "geofenceId", false, "GEOFENCE_ID");
-    };
+    }
 
 
     public WaypointDao(DaoConfig config) {

@@ -10,8 +10,10 @@
                   android:layout_width="match_parent"
                   android:layout_height="56dp"
                   android:orientation="vertical"
-                  android:paddingLeft="@dimen/default_horizontal_spacing"
-                  >
+                  android:paddingLeft="@dimen/default_spacing"
+                  android:paddingRight="@dimen/default_spacing"
+
+        >
 
         <TextView
             android:visibility="gone"
@@ -39,7 +41,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-            android:paddingBottom="@dimen/default_horizontal_spacing"/>
+            android:paddingBottom="@dimen/default_spacing"/>
 
         </RelativeLayout>
 
