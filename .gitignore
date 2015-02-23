@@ -32,3 +32,4 @@ target/
 
 # private API keys for release builds
 src/main/res/values-v1/keys.xml
+crashlytics.properties

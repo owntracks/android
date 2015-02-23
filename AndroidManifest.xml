@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0500"
-    android:versionName="0.5.00" >
+    android:versionCode="0501"
+    android:versionName="0.5.01" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -40,10 +40,6 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
-
-        <meta-data
-            android:name="com.crashlytics.ApiKey"
-            android:value="@string/FABRIC_API_KEY" />
 
 
         <meta-data
