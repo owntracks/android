@@ -114,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/waypointGeofenceSettings"
                     android:layout_marginLeft="72dp"
-                    android:layout_marginStartt="72dp"
+                    android:layout_marginStart="72dp"
                     android:visibility="gone">
 
                     <RelativeLayout
