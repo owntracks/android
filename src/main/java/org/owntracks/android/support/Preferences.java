@@ -410,7 +410,6 @@ public class Preferences {
 
     private static void setPubTopicBase(String string) {
         setString(R.string.keyPubTopicBase, string);
-        ServiceProxy.getServiceBroker().resubscribe();
     }
 
     private static void setNotification(boolean aBoolean) {
