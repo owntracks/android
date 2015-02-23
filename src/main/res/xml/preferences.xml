@@ -241,36 +241,16 @@
       </PreferenceCategory>
     </PreferenceScreen>
 
-    <PreferenceScreen
-        android:key="importexport"
-        android:title="@string/preferencesImportExport" >
-        <org.owntracks.android.preferences.ToolbarPreference
-            android:key="importexport"
-            android:title="@string/preferencesImportExport" />
-
-        <Preference
-            android:title="@string/preferencesExport"
-            android:summary="@string/preferencesExportSummary">
+    <Preference
+        android:title="@string/preferencesExport">
 
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="org.owntracks.android"
             android:targetClass="org.owntracks.android.preferences.ActivityExport"
             />
+    </Preference>
 
-        </Preference>
-        <!--
-        <Preference
-            android:title="@string/preferencesImportFile"
-            android:summary="@string/preferencesImportFileSummary"
-        />
-
-        <Preference
-     droid:title="@string/preferencesImportClipboard"
-            android:summary="@string/preferencesImportClipboardSummary"
-            />-->       an
-
-    </PreferenceScreen>
     <PreferenceScreen
         android:key="activityInfo"
         android:title="@string/preferencesInfo" >
