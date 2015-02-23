@@ -51,7 +51,7 @@ public class ActivityExport extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getTitle());
+        getSupportActionBar().setTitle(getResources().getString(R.string.export));
 
         includeConnection = (CheckBox) findViewById(R.id.includeConnection);
         includeCredentials = (CheckBox) findViewById(R.id.includeUsernamePassword);
@@ -64,33 +64,6 @@ public class ActivityExport extends ActionBarActivity {
                 setUsernameDeviceExport(isChecked);
             }
         });
-
-
-
-
-
-        // Look for Import Preference File Intent
-        final Intent intent = getIntent();
-        final String action = intent.getAction();
-
-        if(Intent.ACTION_VIEW.equals(action)) {
-
-            Uri uri = intent.getData();
-
-            if (uri != null) {
-                if(uri.getPath().endsWith(".otrc")){
-                    importPreferenceDialog(uri.getPath());
-                }
-                else{
-                    /* Because of the way the Intent filter is defined, this activity could receive Intents that do not contain an otrc file.
-                     * In that case, I am ignoring the intent and closing the activity. The user won't even notice that the owntracks app got notified
-                     * however this isn't a good a solution and a better way of associating .otrc file to the app should be found.   */
-
-                    this.finish(); // close activity
-                }
-            }
-        }
-
     }
 
     @Override
@@ -178,85 +151,5 @@ public class ActivityExport extends ActionBarActivity {
 
 
         startActivity(Intent.createChooser(sendIntent, getString(R.string.exportConfiguration)));
-    }
-
-    private void importPreferenceDialog(String filePath){
-
-        try{
-            final String fileContent=readFile(filePath);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.preferencesImportFile))
-                    .setMessage(filePath)
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // ???
-                        }
-                    })
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            try {
-
-                                Preferences.fromJsonObject(new StringifiedJSONObject(fileContent));
-                                Runnable r = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ServiceProxy.getServiceBroker().reconnect();
-                                    }
-                                };
-                                new Thread(r).start();
-
-                            } catch (JSONException e) {
-                                importPreferenceResultDialog("Preferences import failed!");
-                            }
-
-                            importPreferenceResultDialog("Preferences imported successfully !");
-                        }
-                    });
-
-            Dialog dialog = builder.create();
-            dialog.show();
-
-        }catch(Exception e){
-
-            Log.d("Export", "importPreferenceDialog exception");
-            importPreferenceResultDialog("Preferences import failed!");
-        }
-
-    }
-
-    private void importPreferenceResultDialog(String message){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.preferencesImportFile))
-                .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-        Dialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private String readFile( String file ) throws IOException {
-
-        BufferedReader reader = new BufferedReader( new FileReader (file));
-        String         line = null;
-        StringBuilder  stringBuilder = new StringBuilder();
-        String         ls = System.getProperty("line.separator");
-
-        while( ( line = reader.readLine() ) != null ) {
-            stringBuilder.append( line );
-            stringBuilder.append( ls );
-        }
-
-        reader.close();
-
-        return stringBuilder.toString();
     }
 }

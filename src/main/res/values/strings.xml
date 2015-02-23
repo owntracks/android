@@ -220,7 +220,7 @@
     <string name="export">Export</string>
     <string name="exportConfiguration">Export preferences</string>
     <string name="exportIncludeWaypoints">Waypoints</string>
-    <string name="preferencesExport">Export preferences</string>
+    <string name="preferencesExport">Export</string>
     <string name="preferencesExportSummary">Export preferences</string>
     <string name="preferencesImportFile">Import from file</string>
     <string name="preferencesImportFileSummary">Import preferences from file</string>
@@ -261,6 +261,8 @@
     <string name="pahoLicense">License for file paho.jar</string>
     <string name="bugsnagLicense">License for file bugsnag-android.jar</string>
     <string name="userImage">user image</string>
+    <string name="importConfig">Import</string>
+    <string name="importWarning">The following preference values will be imported:</string>
 
 
 </resources>
