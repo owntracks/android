@@ -28,7 +28,7 @@ public class ActivityLauncher extends FragmentActivity {
 	private ServiceConnection serviceApplicationConnection;
 	private Context context;
 	private boolean playServicesOk = false;
-	private boolean settingsOK = false;
+
 
 	public static class ErrorDialogFragment extends DialogFragment {
 		private Dialog mDialog;
@@ -59,8 +59,7 @@ public class ActivityLauncher extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		this.context = this;
 
-		if ((savedInstanceState != null)
-				&& savedInstanceState.getBoolean("autostart"))
+		if ((savedInstanceState != null) && savedInstanceState.getBoolean("autostart"))
 			this.autostart = true;
 
 		setContentView(R.layout.activity_launcher);
@@ -73,7 +72,7 @@ public class ActivityLauncher extends FragmentActivity {
 
 		checkPlayServices();
 
-		if (this.playServicesOk && this.settingsOK)
+		if (this.playServicesOk)
 			launchChecksComplete();
 	}
 
@@ -134,10 +133,8 @@ public class ActivityLauncher extends FragmentActivity {
 	}
 
 	@Override
-	protected void onActivityResult(final int requestCode,
-			final int resultCode, final Intent data) {
-		Log.v(this.toString(), "onActivityResult. RequestCode = " + requestCode
-				+ ", resultCode " + resultCode);
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		Log.v(this.toString(), "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
 		if (requestCode == CONNECTION_FAILURE_RESOLUTION_REQUEST) {
 			if (resultCode != RESULT_OK) {
 				Toast.makeText(this, "Google Play Services must be installed.",
@@ -158,8 +155,7 @@ public class ActivityLauncher extends FragmentActivity {
 	}
 
 	private void launchChecksComplete() {
-		Log.v(this.toString(),
-				"Launch checks complete");
+		Log.v(this.toString(), "Launch checks complete");
 		Intent i = new Intent(this, ServiceProxy.class);
 		startService(i);
 		this.serviceApplicationConnection = new ServiceConnection() {
@@ -170,13 +166,12 @@ public class ActivityLauncher extends FragmentActivity {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
-		if (!ActivityLauncher.this.autostart)
-					startActivityMain();
-			}
+                if (!ActivityLauncher.this.autostart)
+                    startActivityMain();
+            }
 		};
 
-		bindService(i, this.serviceApplicationConnection,
-				Context.BIND_AUTO_CREATE);
+		bindService(i, this.serviceApplicationConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	public void startActivityMain() {
@@ -185,10 +180,8 @@ public class ActivityLauncher extends FragmentActivity {
 
 	public void startActivityFromClass(Class<?> c) {
 		Intent intent = new Intent(this.context, c);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
-
 	}
 
 	@Override

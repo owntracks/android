@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="GOOGLE_MAPS_API_KEY">YOUR_GOOGLE_MAPS_API_KEY</string>
-    <string name="BUGSNAG_API_KEY">YOUR_FABRIC_API_KEY</string>
+    <string name="BUGSNAG_API_KEY">YOUR_BUGSNAG_API_KEY</string>
 </resources>
