@@ -17,7 +17,7 @@ public class ListIntegerPreference extends ListPreference
 
     @Override
     protected boolean persistString(String value) {
-        return value != null && persistString(value);
+        return value != null && persistInt(Integer.valueOf(value));
     }
 
     @Override
