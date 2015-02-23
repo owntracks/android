@@ -47,7 +47,7 @@
         <activity
             android:name=".preferences.ActivityExport"
             android:configChanges="orientation"
-            android:label="Export" >
+            android:label="@string/export" >
 
             <!-- Handle intent from an email attachment -->
             <intent-filter>
