@@ -259,17 +259,16 @@
             />
 
         </Preference>
-
+        <!--
         <Preference
             android:title="@string/preferencesImportFile"
             android:summary="@string/preferencesImportFileSummary"
         />
 
         <Preference
-            android:title="@string/preferencesImportClipboard"
+     droid:title="@string/preferencesImportClipboard"
             android:summary="@string/preferencesImportClipboardSummary"
-            android:enabled="false"
-            />
+            />-->       an
 
     </PreferenceScreen>
     <PreferenceScreen

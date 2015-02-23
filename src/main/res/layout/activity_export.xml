@@ -2,13 +2,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_margin="@dimen/default_spacing">
+    >
 
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
-    android:orientation="vertical"
+        android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:layout_margin="@dimen/default_spacing"
+
+    android:layout_below="@+id/fragmentToolbar">
 
 
         <TextView
@@ -50,14 +54,5 @@
             android:id="@+id/includeWaypoints"
             android:checked="false"/>
     </LinearLayout>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/export"
-        android:id="@+id/exportButton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
