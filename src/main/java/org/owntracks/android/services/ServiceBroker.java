@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -218,20 +219,25 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         private javax.net.ssl.SSLSocketFactory factory;
 
         public CustomSocketFactory(boolean sideloadCa) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
+            Log.v(this.toString(), "initializing CustomSocketFactory");
 
-            // Create a KeyStore containing our trusted CAs
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null, null);
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+
 
             if(sideloadCa) {
+                Log.v(this.toString(), "CA sideload: true");
+
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                keyStore.load(null, null);
+
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCrtPath()));
                 Log.v(this.toString(), "Using custom tls cert from : " + Preferences.getTlsCrtPath());
                 java.security.cert.Certificate ca;
                 try {
                     ca = cf.generateCertificate(caInput);
-                    keyStore.setCertificateEntry("ca", ca);
+                    keyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
 
                 } catch (Exception e) {
                     Log.e(this.toString(), e.toString());
@@ -239,11 +245,27 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     caInput.close();
                 }
 
+
+                Log.v(this.toString(), "Keystore content: ");
+                Enumeration<String> aliases = keyStore.aliases();
+
+                for (; aliases.hasMoreElements();) {
+                    String o = aliases.nextElement();
+                    Log.v(this.toString(), "Alias: " + o);
+                }
+
+                tmf.init(keyStore);
+
+            } else {
+                Log.v(this.toString(), "CA sideload: false, using system keystore");
+                // Use system KeyStore. This is some kind of magic.
+                // On devices with hardware backed keystore, one does not get a an instance of the
+                // system keystore when using KeyStore.getInstance("AndroidKeystore"). Instead,
+                // an empty keystore is returned. However, when passing null to the tmf.init method
+                // the system keystore is used
+                tmf.init((KeyStore)null);
+
             }
-            // Create a TrustManager that trusts the CAs in our KeyStore
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
 
             // Create an SSLContext that uses our TrustManager
             SSLContext context = SSLContext.getInstance("TLSv1.2");
