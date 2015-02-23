@@ -9,24 +9,21 @@ import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 public class DumpMessage {
-    LocationMessage location;
-    ConfigurationMessage configuration;
-
-    boolean locatorReady;
-    boolean locatorForeground;
-    GeocodableLocation locatorLastKnownLocation;
-    Long locatorLastPublishDate;
-    Integer locatorWaypointCount;
-    boolean locatorHasLocationClient;
-    boolean locatorHasLocationRequest;
-    Defaults.State.ServiceLocator locatorState;
-
-    Short brokerKeepAliveSeconds;
-    Exception brokerError;
-    Integer brokerDeferredPublishablesCount;
-    Defaults.State.ServiceBroker brokerState;
-
-    boolean applicationPlayServicesAvailable;
+    private LocationMessage location;
+    private ConfigurationMessage configuration;
+    private boolean locatorReady;
+    private boolean locatorForeground;
+    private GeocodableLocation locatorLastKnownLocation;
+    private Long locatorLastPublishDate;
+    private Integer locatorWaypointCount;
+    private boolean locatorHasLocationClient;
+    private boolean locatorHasLocationRequest;
+    private Defaults.State.ServiceLocator locatorState;
+    private Short brokerKeepAliveSeconds;
+    private Exception brokerError;
+    private Integer brokerDeferredPublishablesCount;
+    private Defaults.State.ServiceBroker brokerState;
+    private boolean applicationPlayServicesAvailable;
 
     public void setLocation(LocationMessage location) {
         this.location = location;

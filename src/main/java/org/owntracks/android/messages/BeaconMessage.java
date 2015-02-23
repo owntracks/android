@@ -7,8 +7,6 @@ import org.owntracks.android.support.StringifiedJSONObject;
 
 import android.util.Log;
 
-import java.util.concurrent.TimeUnit;
-
 public class BeaconMessage {
 
     private Identifier uuid;

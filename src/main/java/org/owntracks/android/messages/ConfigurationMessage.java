@@ -1,10 +1,7 @@
 package org.owntracks.android.messages;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.EnumSet;
 
@@ -15,7 +12,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ConfigurationMessage {
-    StringifiedJSONObject json;
+    private StringifiedJSONObject json;
     public static enum Includes {CONNECTION, CREDENTIALS, IDENTIFICATION, WAYPOINTS}
 
     public ConfigurationMessage(EnumSet<Includes> includes) {
@@ -43,7 +40,6 @@ public class ConfigurationMessage {
         return Preferences.toJSONObject();
     }
     private JSONArray getWaypointJson() {
-        StringifiedJSONObject j = new StringifiedJSONObject();
 
         JSONArray waypoints = new JSONArray();
         for(Waypoint waypoint : App.getWaypointDao().loadAll()) {

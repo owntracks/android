@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.location.Location;
 import android.util.Log;
@@ -14,11 +13,11 @@ import com.google.android.gms.maps.model.LatLng;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 public class GeocodableLocation extends Location {
-	String geocoder;
-	LatLng latlng;
-	String tag;
-	Object extra;
-    Date date;
+    private String geocoder;
+    private LatLng latlng;
+    private String tag;
+    private Object extra;
+    private Date date;
 
 	public String getTag() {
 		return this.tag;
@@ -75,19 +74,19 @@ public class GeocodableLocation extends Location {
 		} catch (Exception e) {
 			lat = (double) 0;
 		}
-		;
+
 		try {
 			lon = json.getDouble("lon");
 		} catch (Exception e) {
 			lon = (double) 0;
 		}
-		;
+
 		try {
 			acc = Float.parseFloat(json.getString("acc"));
 		} catch (Exception e) {
 			acc = (float) 0;
 		}
-		;
+
 		try {
 			tst = TimeUnit.SECONDS.toMillis(Long.parseLong(json
 					.getString("tst")));

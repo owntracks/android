@@ -2,9 +2,6 @@
 <resources>
 
     <string name="app_name">Owntracks</string>
-    <string name="action_settings">Settings</string>
-    <string name="titleActivityPreferences">"Settings"</string>
-    <string name="titleActivityStatus">"Status"</string>
     <string name="preferencesServer">"Connection"</string>
     <string name="preferencesServerAddress">"Host*"</string>
     <string name="preferencesServerPort">"Port"</string>
@@ -12,7 +9,6 @@
     <string name="preferencesDeviceName">"Device ID*"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
-    <string name="preferencesBrokerUsernameUseUserUsername">"Use username"</string>
     <string name="preferencesBrokerPassword">"Password*"</string>
     <string name="preferencesCaCrtPath">Absolute certificate path*</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
@@ -42,7 +38,6 @@
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
     <string name="preferencesQOS">"Publish QOS"</string>
     <string name="preferencesQOSSummary">"QOS for publishes"</string>
-    <string name="preferencesActivity">"Background activity"</string>
     <string name="preferencesBackgroundUpdatesInterval">Reporting interval</string>
     <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic reporting</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
@@ -63,8 +58,6 @@
     <string name="preferencesDocumentationSummary">github.com/owntracks/owntracks/wiki/android</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
-    <string name="preferencesDonate">Donate Bitcoins</string>
-    <string name="preferencesDonateSummary">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
     <string name="preferencesMail">Mail</string>
     <string name="preferencesMailSummary">issues@owntracks.org</string>
     <string name="connectivityConnecting">"Connecting"</string>
@@ -89,16 +82,12 @@
     <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
-    <string name="next">Next</string>
-    <string name="prev">Previous</string>
-    <string name="preferencesContactSettings">Contacts</string>
     <string name="preferencesContactsEnabled">Subscribe</string>
     <string name="preferencesContactsEnabledSummary">Subscribe custom topic</string>
     <string name="preferencesContactsTopic">Subscribe topic</string>
     <string name="preferencesContactsTopicSummary">Custom topic to receive messages</string>
 
     <string name="preferencesCleanSessionEnabled">Clean Session</string>
-    <string name="preferencesCleanSessionSummary">Enable clean session</string>
 
     <string name="publish">Report</string>
     <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
@@ -125,18 +114,9 @@
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="radius">Radius (metres)</string>
-    <string name="transitionType">Transition</string>
-    <string name="notification">Notification</string>
-    <string name="notificationTitle">Notification title</string>
-    <string name="waypointEdit">Edit waypoint</string>
-    <string name="waypointAdd">Add waypoint</string>
-    <string name="actionModeOneSelected">1 item selected</string>
-    <string name="actionModeMoreSelected">items selected</string>
+    <string name="radius">Radius</string>
     <string name="currentLocationNotAvailable">The current location is not available</string>
-    <string name="copiedToClipboard">Bitcoin address copied to clipboard</string>
     <string name="addWaypoint">Add waypoint</string>
-    <string name="preferences">Preferences</string>
     <string name="waypoints">Waypoints</string>
 
     <string-array name="connect_options_security">
@@ -163,19 +143,13 @@
         <item>Low power</item>
         <item>No power</item>
     </string-array>
-    <string-array name="transitionType_readable">
-        <item>@string/transitionEnter</item>
-        <item>@string/transitionLeave</item>
-        <item>@string/transitionBoth</item>
-    </string-array>
 
-    <string name="reportOn">Report on</string>
+
     <string name="transitionEnter">Enter</string>
     <string name="transitionLeave">Leave</string>
     <string name="transitionBoth">Enter &amp; Leave</string>
     <string name="transitionEntering">Entering</string>
     <string name="transitionLeaving">Leaving</string>
-    <string name="title_activity_activity_launcher">ActivityLauncher</string>
     <string name="keyDeviceId">deviceId</string>
     <string name="keyClientId">clientId</string>
     <string name="keyHost">host</string>
@@ -195,7 +169,6 @@
     <string name="keyConnectionAdvancedMode">connectionAdvancedMode</string>
     <string name="keySub">sub</string>
     <string name="keyPub">pub</string>
-    <string name="keyUpdateAddressBook">updateAdressBook</string>
     <string name="keyPubInterval">pubInterval</string>
     <string name="keyPubTopicBase">pubTopicBase</string>
     <string name="keyNotification">notification</string>
@@ -211,7 +184,6 @@
     <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
-    <string name="keyPreferencesVersion">preferencesVersion</string>
     <string name="keyRemoteCommandDump">remoteCommandDump</string>
     <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
     <string name="keyRemoteConfiguration">remoteConfiguration</string>
@@ -227,8 +199,6 @@
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">issues@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
-    <string name="valBitcoinAddress">1DYpxrXRLQe5eLnT2FncyxjuQGBgWjtX2t</string>
-    <string name="valDocumentationurl">https://github.com/owntracks/owntracks/wiki/android</string>
 
     <string-array name="locatorAccuracy">
         <item>0</item>
@@ -241,16 +211,8 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-    <string-array name="contactContextMenu">
-        <item>Show</item>
-        <item>Details</item>
-        <item>Navigate</item>
-    </string-array>
 
-    <string name="title_activity_activity_wizzard">Wizzard</string>
-    <string name="hello_world">Hello world!</string>
     <string name="preferencesImportExport">Import / Export</string>
-    <string name="title_activity_activity_export">Export</string>
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
     <string name="exportIncludeUsernamePassword">Broker username / password</string>
     <string name="exportIncludeBrokerConnection">Broker connection</string>
@@ -265,8 +227,6 @@
     <string name="preferencesImportClipboard">Import from clipboard</string>
     <string name="preferencesImportClipboardSummary">Import preferences from file</string>
     <string name="contactLocationUnknown">No location known for this contact</string>
-    <string name="develop_1">Develop 1</string>
-    <string name="develop_2">Develop 2</string>
     <string name="preferencesAdvancedCategoryBeacons">Beacons</string>
     <string name="preferencesCustomBeaconLayout">Custom beacon layout</string>
     <string name="preferencesCustomBeaconLayoutSummary">Custom layout to detect beacons</string>
@@ -285,15 +245,9 @@
     <string name="contactDetailsReportedTime">Reported</string>
     <string name="contactDetailsTopic">Topic</string>
     <string name="contactDetailsName">Name</string>
-    <string name="menuContactDetailsLink">Link</string>
-    <string name="menuContactDetailsUnlink">Unlink</string>
-    <string name="contactListPlaceholder">No contact information received yet</string>
+    <string name="contactListPlaceholder">No locations received yet</string>
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
-    <string name="notificationMessage">Notification</string>
-    <string name="Enabled">Enabled</string>
     <string name="waypointLocalDefaultFormatMessage" formatted="false">%e %d</string>
-    <string name="transitionEnteringNotification">entering</string>
-    <string name="transitionLeavingNotification">leaving</string>
     <string name="geofenceActive">Geofence active</string>
     <string name="waypointRemove">Remove</string>
     <string name="idLocations">drawer.id.locations</string>
@@ -302,10 +256,11 @@
     <string name="leave">Leave</string>
     <string name="enter">Enter</string>
     <string name="keyFistStart">firstStart</string>
+    <string name="clientId">Client ID</string>
+    <string name="eventbusLicense">License for file eventbus.jar</string>
+    <string name="pahoLicense">License for file paho.jar</string>
+    <string name="bugsnagLicense">License for file bugsnag-android.jar</string>
+    <string name="userImage">user image</string>
 
-    <string-array name="share_dontshare">
-        <item>Shared</item>
-        <item>Not shared</item>
-    </string-array>
 
 </resources>

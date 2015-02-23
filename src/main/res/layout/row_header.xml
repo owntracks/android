@@ -7,16 +7,15 @@
     >
 
     <TextView
-        android:paddingRight="@dimen/default_horizontal_spacing"
-        android:paddingLeft="@dimen/default_horizontal_spacing"
-        android:paddingTop="@dimen/default_horizontal_spacing_half"
-        android:paddingBottom="@dimen/default_horizontal_spacing_half"
+        android:paddingRight="@dimen/default_spacing"
+        android:paddingLeft="@dimen/default_spacing"
+        android:paddingTop="@dimen/default_spacing_half"
+        android:paddingBottom="@dimen/default_spacing_half"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-           android:text="HEADER"
+        android:text="@string/na"
         android:id="@+id/header"
-        android:capitalize="none"
         android:focusableInTouchMode="false"
         android:textStyle="bold"/>
 </RelativeLayout>

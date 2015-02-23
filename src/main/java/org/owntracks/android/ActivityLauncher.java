@@ -2,7 +2,6 @@ package org.owntracks.android;
 
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Preferences;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -73,25 +72,10 @@ public class ActivityLauncher extends FragmentActivity {
 		super.onResume();
 
 		checkPlayServices();
-        checkSettings();
-
-		if (this.playServicesOk)
-			checkSettings();
 
 		if (this.playServicesOk && this.settingsOK)
 			launchChecksComplete();
 	}
-
-    private void checkSettings() {
-
-        settingsOK = true; // for now
-        if(!settingsOK)
-            startActivityWizzard();
-
-        Log.v(this.toString(), "Preflight check passed: " + settingsOK);
-    }
-
-
 
 	private void checkPlayServices() {
 
@@ -197,10 +181,6 @@ public class ActivityLauncher extends FragmentActivity {
 
 	public void startActivityMain() {
 		startActivityFromClass(ActivityMain.class);
-	}
-
-	public void startActivityWizzard() {
-		// startActivityFromClass(ActivityWizzard.class);
 	}
 
 	public void startActivityFromClass(Class<?> c) {

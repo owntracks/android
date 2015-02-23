@@ -104,7 +104,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
         this.dao = App.getWaypointDao();
         this.handler = new StaticHandler(this);
-        this.listAdapter = new WaypointAdapter(this, new ArrayList<Waypoint>(this.dao.loadAll()));
+        this.listAdapter = new WaypointAdapter(this, new ArrayList<>(this.dao.loadAll()));
 
         this.listView = (ListView) findViewById(R.id.waypoints);
         this.listView.setAdapter(this.listAdapter);

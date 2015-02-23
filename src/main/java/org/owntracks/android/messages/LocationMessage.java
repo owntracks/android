@@ -13,16 +13,14 @@ import android.util.Log;
 import com.google.android.gms.location.Geofence;
 
 public class LocationMessage {
-	GeocodableLocation location;
-	Waypoint waypoint;
-
-	String description;
-    	String trackerId;
-    	String trigger;
-    	int transition;
-	int battery;
-
-	boolean supressesTicker;
+    private GeocodableLocation location;
+    private Waypoint waypoint;
+    private String description;
+    private String trackerId;
+    private String trigger;
+    private int transition;
+    private int battery;
+    private boolean supressesTicker;
 
 	public LocationMessage(GeocodableLocation l) {
 		this.location = l;

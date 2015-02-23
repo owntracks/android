@@ -1,7 +1,6 @@
 package org.owntracks.android.adapter;
 
 import android.content.Context;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,6 @@ import java.util.ArrayList;
 
 import org.owntracks.android.R;
 import org.owntracks.android.model.Contact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceProxy;
 
 
 public class ContactAdapter extends MultitypeAdapter{

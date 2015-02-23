@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 import org.owntracks.android.R;
-import org.owntracks.android.db.Waypoint;
 
 import android.content.Context;
 import android.util.Log;
@@ -16,7 +15,7 @@ public class Defaults {
 	public static final String INTENT_ACTION_FENCE_TRANSITION = "org.owntracks.android.intent.FENCE_TRANSITION";
 	public static final int NOTIFCATION_ID = 1338;
 
-	public static class TransitionType {
+	private static class TransitionType {
 		public static String toString(int type, Context c) {
 			int id;
 			switch (type) {
@@ -98,7 +97,7 @@ public class Defaults {
             }
 
             return c.getString(id);
-        };
+        }
 
         public static enum ServiceBeacon {
             INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
@@ -129,7 +128,7 @@ public class Defaults {
             }
 
             return c.getString(id);
-        };
+        }
 
 	}
 

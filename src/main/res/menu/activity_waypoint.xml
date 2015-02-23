@@ -6,14 +6,14 @@
         android:id="@+id/save"
         android:icon="@drawable/ic_done"
         android:orderInCategory="97"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/save">
     </item>
     <item
         android:id="@+id/useCurrent"
         android:icon="@drawable/ic_mylocation"
         android:orderInCategory="97"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/currentLocation">
     </item>
 </menu>
