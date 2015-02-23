@@ -554,14 +554,17 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 	}
 
 	private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
+        Log.v(this.toString(), "handleWaypoint: update:" +update + " remove:"+remove );
 		if (!remove && w.getShared()){
             WaypointMessage wpM = new WaypointMessage(w);
             wpM.setTrackerId(Preferences.getTrackerId());
             publishWaypointMessage(wpM);
         }
 
-		if (!isWaypointWithValidGeofence(w))
-			return;
+		if (!isWaypointWithValidGeofence(w)) {
+            Log.v(this.toString(), "!isWaypointWithValidGeofence");
+            return;
+        }
 
 		if (update || remove)
 			removeGeofence(w);
@@ -641,8 +644,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		for (Waypoint w : list == null ? loadWaypoints() : list) {
 			if (w.getGeofenceId() == null)
 				continue;
-			Log.v(this.toString(), "adding " + w.getGeofenceId()
-					+ " for removal");
+			Log.v(this.toString(), "adding " + w.getGeofenceId() + " for removal");
 			l.add(w.getGeofenceId());
 			w.setGeofenceId(null);
 			this.waypointDao.update(w);

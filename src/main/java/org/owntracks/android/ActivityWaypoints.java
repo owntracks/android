@@ -170,8 +170,8 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
     }
 
     protected void remove(Waypoint w) {
-        this.listAdapter.removeItem(w);
         this.dao.delete(w);
+        Log.v(this.toString(), "Waypoint " +w + " removed ");
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
     }
 
@@ -200,11 +200,13 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
     // gains focus to update the UI
     // WaypointAdded and WaypointUpdated are not posted sticky and only handled by ServiceLocator to do the acutal work
     public void onEventMainThread(Events.WaypointAddedByUser e) {
+        EventBus.getDefault().removeStickyEvent(e);
         this.listAdapter.addItem(e.getWaypoint());
         this.listAdapter.notifyDataSetChanged();
         requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
     }
     public void onEventMainThread(Events.WaypointUpdatedByUser e) {
+        EventBus.getDefault().removeStickyEvent(e);
         this.listAdapter.updateItem(e.getWaypoint());
         this.listAdapter.notifyDataSetChanged();
         requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
