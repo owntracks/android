@@ -32,6 +32,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
@@ -804,6 +805,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                         return;
                     }
                     ServiceProxy.getServiceApplication().dump();
+                    break;
+                case "debug":
+                    //Log.v(this.toString(), "Received dump cmd message");
+                    String s= ((App)context.getApplication()).getDebugLogger().toString();
+                    Log.v(this.toString(), s);
+                    publish(Preferences.getBaseTopic(), s);
                     break;
                 case "reportLocation":
                     //Log.v(this.toString(), "Received reportLocation cmd message");

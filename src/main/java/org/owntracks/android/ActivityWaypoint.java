@@ -204,13 +204,18 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         conditionallyShowGeofenceSettings();
     }
     private void conditionallyEnableSaveButton() {
-        boolean enabled = (this.description.getText().toString().length() > 0)
-                && (this.latitude.getText().toString().length() > 0)
-                && (this.longitude.getText().toString().length() > 0)
-                && (    (!((this.radius.getText().toString().length() > 0) // if radius is set, enter or leave are required
-                        && (Float.parseFloat(this.latitude.getText().toString()) > 0))) || (enterValue || leaveValue)
-                    );
 
+        boolean enabled = false;
+        try {
+            enabled = (this.description.getText().toString().length() > 0)
+                    && (this.latitude.getText().toString().length() > 0)
+                    && (this.longitude.getText().toString().length() > 0)
+                    && ((!((this.radius.getText().toString().length() > 0) // if radius is set, enter or leave are required
+                    && (Float.parseFloat(this.radius.getText().toString()) > 0))) || (enterValue || leaveValue)
+            );
+        } catch (Exception e) {
+            enabled = false; // invalid input or NumberFormatException result in no valid input
+        }
         Log.v(this.toString(), "conditionallyEnableSaveButton: " +enabled);
         saveButton.setEnabled(enabled);
         saveButton.getIcon().setAlpha(enabled ? 255 : 130);
