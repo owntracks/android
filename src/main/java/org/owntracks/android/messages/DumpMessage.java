@@ -4,9 +4,12 @@ import android.util.Log;
 
 import org.json.JSONException;
 
+import org.json.JSONObject;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.StringifiedJSONObject;
+
+import java.sql.Date;
 
 public class DumpMessage {
     private LocationMessage location;
@@ -24,6 +27,7 @@ public class DumpMessage {
     private Integer brokerDeferredPublishablesCount;
     private Defaults.State.ServiceBroker brokerState;
     private boolean applicationPlayServicesAvailable;
+        private JSONObject locatorDebug;
 
     public void setLocation(LocationMessage location) {
         this.location = location;
@@ -92,19 +96,11 @@ public class DumpMessage {
         StringifiedJSONObject json = new StringifiedJSONObject();
         try {
             json.put("_type", "dump")
+                .put("systemDate", new java.util.Date())
                 .put("location", location.toJSONObject())
                 .put("configuration", configuration.toJSONObject())
                 .put("internal", new StringifiedJSONObject()
-                                .put("locator", new StringifiedJSONObject()
-                                                .put("ready", locatorReady)
-                                                .put("foreground", locatorForeground)
-                                                .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
-                                                .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
-                                                .put("waypointCount", locatorWaypointCount)
-                                                .put("hasLocationClient", locatorHasLocationClient)
-                                                .put("hasLocationRequest", locatorHasLocationRequest)
-                                                .put("state", locatorState)
-                                )
+
                                 .put("broker", new StringifiedJSONObject()
                                                 .put("keepAliveSeconds", brokerKeepAliveSeconds)
                                                 .put("error", brokerError != null ? brokerError.toString() : null)
@@ -114,6 +110,18 @@ public class DumpMessage {
                                 .put("application", new StringifiedJSONObject()
                                                 .put("playServicesAvailable", applicationPlayServicesAvailable)
                                 )
+                                .put("locator", new StringifiedJSONObject()
+                                                .put("ready", locatorReady)
+                                                .put("foreground", locatorForeground)
+                                                .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)
+                                                .put("lastPublishDate", locatorLastPublishDate != null ? locatorLastPublishDate : null)
+                                                .put("waypointCount", locatorWaypointCount)
+                                                .put("hasLocationClient", locatorHasLocationClient)
+                                                .put("hasLocationRequest", locatorHasLocationRequest)
+                                                .put("serviceCreationDate", locatorState)
+                                                .put("state", locatorState)
+                                                .put("debug", locatorDebug)
+                                )
                 );
 
 
@@ -122,5 +130,13 @@ public class DumpMessage {
 
         }
         return json;
+    }
+
+    public void setLocatorDebug(JSONObject locatorDebug) {
+        this.locatorDebug = locatorDebug;
+    }
+
+    public JSONObject getLocatorDebug() {
+        return locatorDebug;
     }
 }

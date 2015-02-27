@@ -422,6 +422,8 @@ public class ServiceApplication implements ProxyableService,
         dump.setLocatorWaypointCount(ServiceProxy.getServiceLocator().getWaypointCount());
         dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
         dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
+        dump.setLocatorDebug(ServiceProxy.getServiceLocator().getDebugData());
+
         dump.setBrokerKeepAliveSeconds(ServiceProxy.getServiceBroker().getKeepaliveSeconds());
         dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
         dump.setBrokerState(ServiceBroker.getState());
@@ -429,7 +431,11 @@ public class ServiceApplication implements ProxyableService,
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
         Log.v(this.toString(), "Dump data: " + dump.toString());
 
-        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString());
+        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString(), false);
 
+    }
+
+    public void dumpLog() {
+        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), ((App)context.getApplication()).getDebugLogger().toString(), false);
     }
 }

@@ -45,15 +45,13 @@ public class App extends Application {
 	public void onCreate() {
 		super.onCreate();
         instance = this;
-        this.debugLogger = new DebugLogger();
-        if(!BuildConfig.DEBUG) {
-            Log.v(this.toString(), "Fabric.io crash reporting enabled");
-            final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
-            Fabric.with(fabric);
 
-        } else {
-            Log.v(this.toString(), "Fabric.io crash reporting disabled in debug build");
-        }
+        Log.v(this.toString(), "Fabric.io crash reporting enabled");
+        final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
+        Fabric.with(fabric);
+
+
+        this.debugLogger = new DebugLogger();
 
         Preferences.handleFirstStart();
         OpenHelper helper = new OpenHelper(this, "org.owntracks.android.db", null) {

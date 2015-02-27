@@ -29,8 +29,8 @@ public class DebugLogger {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-        for (String log : this.list) {
-            s.append(log);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            s.append(list.get(i));
             s.append("\n");
         }
         return s.toString();

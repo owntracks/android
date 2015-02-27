@@ -806,11 +806,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     }
                     ServiceProxy.getServiceApplication().dump();
                     break;
-                case "debug":
+                case "dumpLog":
                     //Log.v(this.toString(), "Received dump cmd message");
-                    String s= ((App)context.getApplication()).getDebugLogger().toString();
-                    Log.v(this.toString(), s);
-                    publish(Preferences.getBaseTopic(), s);
+                    if (!Preferences.getRemoteCommandDump()) {
+                        Log.i(this.toString(), "Dump remote command is disabled");
+                        return;
+                    }
+                    ServiceProxy.getServiceApplication().dumpLog();
                     break;
                 case "reportLocation":
                     //Log.v(this.toString(), "Received reportLocation cmd message");
