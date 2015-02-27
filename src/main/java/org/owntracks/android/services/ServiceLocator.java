@@ -14,6 +14,7 @@ import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.WaypointMessage;
+import org.owntracks.android.support.DebugLogger;
 import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.ServiceMqttCallbacks;
@@ -58,12 +59,18 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 	private List<Waypoint> waypoints;
 	private WaypointDao waypointDao;
 
+    private DebugLogger logger;
+
+
 	@Override
 	public void onCreate(ServiceProxy p) {
         Log.e(this.toString(), "ServiceLocator onCreate");
 
 		this.context = p;
-		this.lastPublish = 0;
+
+        logger = ((App)context.getApplication()).getDebugLogger();
+        logger.v(this.toString(), "initialized for ServiceLocator");
+        this.lastPublish = 0;
 		this.waypointDao = App.getWaypointDao();
 		loadWaypoints();
 
@@ -79,10 +86,12 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		};
 		this.sharedPreferences .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
-        Log.v(this.toString(), "Checking if Play Services are available");
+
+
+        logger.v(this.toString(), "Checking if Play Services are available");
         ServiceApplication.checkPlayServices(); // show error notification if  play services were disabled
 
-        Log.v(this.toString(), "Initializing GoogleApiClient");
+        logger.v(this.toString(), "Initializing GoogleApiClient");
         googleApiClient = new GoogleApiClient.Builder(this.context)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -90,8 +99,11 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
                 .build();
 
         if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting() && ServiceApplication.checkPlayServices()) {
-            Log.v(this.toString(), "Connecting GoogleApiClient");
+            logger.v(this.toString(), "Connecting GoogleApiClient");
             this.googleApiClient.connect();
+        } else {
+            logger.v(this.toString(), "play services not available");
+
         }
         this.ready = false;
 
@@ -112,7 +124,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.v(this.toString(), "GoogleApiClient connection suspended");
+        logger.v(this.toString(), "GoogleApiClient connection suspended");
     }
 
 	public GeocodableLocation getLastKnownLocation() {
@@ -125,7 +137,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            Log.v(this.toString(), "mLocationListener onLocationChanged");
+            logger.v(this.toString(), "mLocationListener onLocationChanged");
 
             lastKnownLocation = new GeocodableLocation(location);
 
@@ -136,21 +148,21 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.v(this.toString(), "mLocationListener onStatusChanged: " +provider +" -> " + status);
+            logger.v(this.toString(), "mLocationListener onStatusChanged: " +provider +" -> " + status);
         }
 
         public void onProviderEnabled(String provider) {
-            Log.v(this.toString(), "mLocationListener onProviderEnabled: " +provider);
+            logger.v(this.toString(), "mLocationListener onProviderEnabled: " +provider);
         }
 
         public void onProviderDisabled(String provider) {
-            Log.v(this.toString(), "mLocationListener onProviderDisabled: " +provider);
+            logger.v(this.toString(), "mLocationListener onProviderDisabled: " +provider);
         }
     };
 
 	public void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
-        Log.v(this.toString(), "onFenceTransistion");
+        logger.v(this.toString(), "onFenceTransistion");
         if(event != null){
             if(event.hasError()) {
                 Log.e(this.toString(), "Geofence event has error: " + event.getErrorCode());
@@ -166,7 +178,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
                     Waypoint w = this.waypointDao.queryBuilder().where(Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
 
                     if (w != null) {
-                        Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transition);
+                        logger.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transition);
                         EventBus.getDefault().postSticky(new Events.WaypointTransition(w, transition));
                         publishGeofenceTransitionEvent(w, transition);
                     }
@@ -178,26 +190,26 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 
 	private boolean shouldPublishLocation() {
-        Log.v(this.toString(), "shouldPublishLocation");
+        logger.v(this.toString(), "shouldPublishLocation");
 
         if (this.lastPublish == 0) {
-            Log.v(this.toString(), "shouldPublishLocation: this.lastPublish == 0 -> true");
+            logger.v(this.toString(), "shouldPublishLocation: this.lastPublish == 0 -> true");
             return true;
         }
 
 
-        Log.v(this.toString(), "shouldPublishLocation: time interval -> false");
-        Log.v(this.toString(), "shouldPublishLocation: System time:"+ System.currentTimeMillis());
-        Log.v(this.toString(), "shouldPublishLocation: Last publish time:"+ this.lastPublish);
-        Log.v(this.toString(), "shouldPublishLocation: configured pub interval:"+ TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()));
-        Log.v(this.toString(), "shouldPublishLocation: time since last publish:"+ (System.currentTimeMillis() - this.lastPublish));
+        logger.v(this.toString(), "shouldPublishLocation: time interval -> false");
+        logger.v(this.toString(), "shouldPublishLocation: System time:"+ System.currentTimeMillis());
+        logger.v(this.toString(), "shouldPublishLocation: Last publish time:"+ this.lastPublish);
+        logger.v(this.toString(), "shouldPublishLocation: configured pub interval:"+ TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()));
+        logger.v(this.toString(), "shouldPublishLocation: time since last publish:"+ (System.currentTimeMillis() - this.lastPublish));
 
         if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(Preferences.getPubInterval())) {
-            Log.v(this.toString(), "interval gt configured pub interval?: true");
+            logger.v(this.toString(), "interval gt configured pub interval?: true");
 
             return true;
         } else {
-            Log.v(this.toString(), "interval gt configured pub interval?: false");
+            logger.v(this.toString(), "interval gt configured pub interval?: false");
         }
 		return false;
 	}
@@ -216,31 +228,31 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 
 	private void setupBackgroundLocationRequest() {
-        Log.v(this.toString(), "setupBackgroundLocationRequest");
+        logger.v(this.toString(), "setupBackgroundLocationRequest");
 
         this.mLocationRequest = LocationRequest.create();
 
         if(Preferences.getLocatorAccuracyBackground() == 0) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 1) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 2) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
+        logger.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
 		this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
 		this.mLocationRequest.setFastestInterval(0);
-        Log.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
+        logger.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
 
 		this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorDisplacement());
 	}
@@ -248,27 +260,27 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 	private void setupForegroundLocationRequest() {
 		this.mLocationRequest = LocationRequest.create();
         if(Preferences.getLocatorAccuracyForeground() == 0) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 1) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 2) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
+            logger.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
 
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
+        logger.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
 
 		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
 		this.mLocationRequest.setFastestInterval(0);
-        Log.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
+        logger.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
 
         this.mLocationRequest.setSmallestDisplacement(50);
 	}
@@ -280,18 +292,18 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 	private void disableLocationUpdates() {
 
 		if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
-            Log.v(this.toString(), "disableLocationUpdates");
+            logger.v(this.toString(), "disableLocationUpdates");
 
             PendingResult<Status> r = LocationServices.FusedLocationApi.removeLocationUpdates(this.googleApiClient, mLocationListener);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(Status status) {
                     if (status.isSuccess()) {
-                        Log.v(this.toString(), "removeLocationUpdates successfull");
+                        logger.v(this.toString(), "removeLocationUpdates successfull");
                     } else if (status.hasResolution()) {
-                        Log.v(this.toString(), "removeLocationUpdates failed. HasResolution");
+                        logger.v(this.toString(), "removeLocationUpdates failed. HasResolution");
                     } else {
-                        Log.v(this.toString(), "removeLocationUpdates failed. " + status.getStatusMessage());
+                        logger.v(this.toString(), "removeLocationUpdates failed. " + status.getStatusMessage());
                     }
                 }
             });
@@ -320,18 +332,18 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 		if (this.foreground || Preferences.getPub()) {
             PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
-            Log.v(this.toString(), "Setting up location updates with pending intent " + i);
+            logger.v(this.toString(), "Setting up location updates with pending intent " + i);
 
             PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,mLocationRequest,mLocationListener);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(Status status) {
                     if (status.isSuccess()) {
-                        Log.v(this.toString(), "requestLocationUpdates successfull");
+                        logger.v(this.toString(), "requestLocationUpdates successfull");
                     } else if (status.hasResolution()) {
-                        Log.v(this.toString(), "requestLocationUpdates failed. HasResolution");
+                        logger.v(this.toString(), "requestLocationUpdates failed. HasResolution");
                     } else {
-                        Log.v(this.toString(), "requestLocationUpdates failed. " + status.getStatusMessage());
+                        logger.v(this.toString(), "requestLocationUpdates failed. " + status.getStatusMessage());
                     }
                 }
             });
@@ -342,34 +354,34 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(this.toString(), "onStartCommand");
+        logger.v(this.toString(), "onStartCommand");
 
         if ((intent != null) && (intent.getAction() != null)) {
-            Log.v(this.toString(), "onStartCommand with intent and intent action");
+            logger.v(this.toString(), "onStartCommand with intent and intent action");
 
 			if (intent.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN");
+                logger.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN");
 
                 publishLocationMessage();
 			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_LOCATION_CHANGED");
+                logger.v(this.toString(), "action == INTENT_ACTION_LOCATION_CHANGED");
                 Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
 
 				if (location != null) {
-                    Log.v(this.toString(), "with location");
+                    logger.v(this.toString(), "with location");
                     mLocationListener.onLocationChanged(location);
 
                 } else {
-                    Log.v(this.toString(), "no location");
+                    logger.v(this.toString(), "no location");
                 }
 			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_FENCE_TRANSITION");
+                logger.v(this.toString(), "action == INTENT_ACTION_FENCE_TRANSITION");
 				onFenceTransition(intent);
 			} else {
-				Log.v(this.toString(), "Received unknown intent");
+				logger.v(this.toString(), "Received unknown intent");
 			}
 		} else {
-            Log.v(this.toString(), "onStartCommand without intent or intent action");
+            logger.v(this.toString(), "onStartCommand without intent or intent action");
         }
 
 		return 0;
@@ -378,13 +390,13 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 	public void enableForegroundMode() {
 		this.foreground = true;
-        Log.v(this.toString(), "enableForegroundMode");
+        logger.v(this.toString(), "enableForegroundMode");
 		requestLocationUpdates();
 	}
 
 	public void enableBackgroundMode() {
 		this.foreground = false;
-        Log.v(this.toString(), "enableBackgroundMode");
+        logger.v(this.toString(), "enableBackgroundMode");
 
 		requestLocationUpdates();
 	}

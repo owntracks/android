@@ -333,8 +333,13 @@ public class ServiceBeacon implements
     }
 
     @Override
-    public void onDestroy() {
-        context.unregisterReceiver(bluetoothStateChangeReceiver);
+    public void onDestroy()
+    {
+        try {
+            context.unregisterReceiver(bluetoothStateChangeReceiver);
+        } catch (IllegalArgumentException e) {
+            // Receiver was not registered, ignore
+        }
     }
 
     public static Defaults.State.ServiceBeacon getState() {

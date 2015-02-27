@@ -954,9 +954,6 @@ public class ActivityMain extends ActionBarActivity {
 
             setHasOptionsMenu(true);
 
-
-
-
             onShow();
             return v;
         }

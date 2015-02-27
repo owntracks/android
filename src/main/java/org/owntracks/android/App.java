@@ -1,6 +1,8 @@
 package org.owntracks.android;
 
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import org.owntracks.android.db.DaoMaster.OpenHelper;
 import org.owntracks.android.db.DaoSession;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.support.DebugLogger;
 import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -36,14 +39,21 @@ public class App extends Application {
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
     private static HashMap<String, Contact> contacts;
+    private DebugLogger debugLogger;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
         instance = this;
+        this.debugLogger = new DebugLogger();
+        if(!BuildConfig.DEBUG) {
+            Log.v(this.toString(), "Fabric.io crash reporting enabled");
+            final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
+            Fabric.with(fabric);
 
-        Bugsnag.init(this, Preferences.getBugsnagApiKey());
-        Bugsnag.setNotifyReleaseStages("production", "testing");
+        } else {
+            Log.v(this.toString(), "Fabric.io crash reporting disabled in debug build");
+        }
 
         Preferences.handleFirstStart();
         OpenHelper helper = new OpenHelper(this, "org.owntracks.android.db", null) {
@@ -122,6 +132,10 @@ public class App extends Application {
 		Toast.makeText(App.getContext(), App.getContext()
 						.getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
 	}
+
+    public DebugLogger getDebugLogger(){
+        return this.debugLogger;
+    }
 
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
