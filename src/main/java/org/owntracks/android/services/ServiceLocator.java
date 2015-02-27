@@ -1,11 +1,13 @@
 package org.owntracks.android.services;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
@@ -59,13 +61,35 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 	private List<Waypoint> waypoints;
 	private WaypointDao waypointDao;
 
+    // Debug structures for issue #86
     private DebugLogger logger;
+    private Date debugLocatorServiceStartDate;
+    private Date debugLocationAPIConnectDate;
 
+    private int debugRequestPriority;
+    private float debugRequestDisplaycement;
+    private long debugRequestInterval;
+    private float debugRequestSmallestInterval;
+
+    public JSONObject getDebugData() {
+        JSONObject j = new JSONObject();
+        try {
+            j.put("debugLocatorServiceStartDate", debugLocatorServiceStartDate.toString());
+            j.put("debugLocationAPIConnectDate", debugLocationAPIConnectDate.toString());
+            j.put("debugRequestPriority", debugRequestPriority);
+            j.put("debugRequestDisplaycement", debugRequestDisplaycement);
+            j.put("debugRequestInterval", debugRequestInterval);
+            j.put("debugRequestSmallestInterval", debugRequestSmallestInterval);
+
+        } catch(Exception e) {}
+        return j;
+    }
 
 	@Override
 	public void onCreate(ServiceProxy p) {
         Log.e(this.toString(), "ServiceLocator onCreate");
 
+        this.debugLocatorServiceStartDate = new java.util.Date();
 		this.context = p;
 
         logger = ((App)context.getApplication()).getDebugLogger();
@@ -117,6 +141,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
     @Override
     public void onConnected(Bundle arg0) {
         Log.e(this.toString(), "GoogleApiClient is now connected");
+        debugLocationAPIConnectDate = new Date();
         this.ready = true;
         initLocationRequest();
         initGeofences();
@@ -251,7 +276,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         }
         logger.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
 		this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
-		this.mLocationRequest.setFastestInterval(0);
+		this.mLocationRequest.setFastestInterval(10);
         logger.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
 
 		this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorDisplacement());
@@ -334,7 +359,14 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
             PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
             logger.v(this.toString(), "Setting up location updates with pending intent " + i);
 
-            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,mLocationRequest,mLocationListener);
+
+
+            debugRequestDisplaycement=mLocationRequest.getSmallestDisplacement();
+            debugRequestInterval=mLocationRequest.getInterval();
+            debugRequestSmallestInterval = mLocationRequest.getSmallestDisplacement();
+            debugRequestPriority=mLocationRequest.getPriority();
+
+            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,mLocationRequest,i);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(Status status) {
