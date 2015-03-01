@@ -18,8 +18,12 @@
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
     <string name="preferencesNotificationTickerOnPublish">Ticker on report</string>
+    <string name="preferencesNotificationVibrateOnPublishSummary">Vibrate on successful reports</string>
+    <string name="preferencesNotificationVibrateOnPublish">Vibrate on report</string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
     <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Ticker on waypoint </string>
+    <string name="preferencesNotificationVibrateOnWaypointTransitionSummary">Vibrate on waypoint events </string>
+    <string name="preferencesNotificationVibrateOnWaypointTransitionTitle">Vibrate on waypoint </string>
     <string name="preferencesNotificationOnReceivedWaypointTransitionSummary">Show a notification on received waypoint transitions </string>
     <string name="preferencesNotificationOnReceivedWaypointTransitionTitle">Notification on waypoint transition</string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
@@ -38,8 +42,8 @@
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
     <string name="preferencesQOS">"Publish QOS"</string>
     <string name="preferencesQOSSummary">"QOS for publishes"</string>
-    <string name="preferencesBackgroundUpdatesInterval">Reporting interval</string>
-    <string name="preferencesBackgroundUpdatesIntervalSummary">Minutes between automatic reporting</string>
+    <string name="preferencesBackgroundUpdatesInterval">Fastest reporting interval</string>
+    <string name="preferencesBackgroundUpdatesIntervalSummary">Fastest interval for automatic reporting</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
 
     <string name="valTrackerId">""</string>
@@ -175,7 +179,9 @@
     <string name="keyNotificationGeocoder">notificationGeocoder</string>
     <string name="keyNotificationLocation">notificationLocation</string>
     <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
-    <string name="keyNotificationTickerOnWaypointTransition">tickerOnWaypointTransition</string>
+    <string name="keyNotificationVibrateOnPublish">notificationVibrateOnPublish</string>
+    <string name="keyNotificationVibrateOnWaypointTransition">notificationVibrateOnWaypointTransition</string>
+    <string name="keyNotificationTickerOnWaypointTransition">notificationTickerOnWaypointTransition</string>
     <string name="keyNotificationOnReceivedWaypointTransition">notificationOnReceivedWaypointTransition</string>
     <string name="keySelectedContactTopic">selectedContactTopic</string>
     <string name="keyFollowingSelectedContact">followingSelectedContact</string>

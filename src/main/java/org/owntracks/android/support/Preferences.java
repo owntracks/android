@@ -664,4 +664,13 @@ public class Preferences {
             return false;
         }
     }
+
+    public static boolean getNotificationVibrateOnPublish() {
+        return getBoolean(R.string.keyNotificationVibrateOnPublish, R.bool.valNotificationVibrateOnPublish);
+    }
+
+    public static boolean getNotificationVibrateOnWaypointTransition() {
+        return getBoolean(R.string.keyNotificationVibrateOnWaypointTransition, R.bool.valNotificationVibrateOnWayointTransition);
+    }
+
 }

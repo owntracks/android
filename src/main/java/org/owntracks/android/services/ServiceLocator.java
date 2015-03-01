@@ -276,7 +276,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         }
         logger.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
 		this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
-		this.mLocationRequest.setFastestInterval(10);
+		this.mLocationRequest.setFastestInterval(10000);
         logger.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
 
 		this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorDisplacement());
@@ -304,7 +304,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         logger.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
 
 		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
-		this.mLocationRequest.setFastestInterval(0);
+		this.mLocationRequest.setFastestInterval(10000);
         logger.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
 
         this.mLocationRequest.setSmallestDisplacement(50);
@@ -483,7 +483,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
         ServiceProxy.getServiceBroker().publish(
 				topic + Preferences.getPubTopicPartWaypoints(), r.toString(),
-				false, Preferences.getPubQos(), 20, this, null);
+				false, Preferences.getPubQos(), this, null);
 	}
 
     public void publishManualLocationMessage() {
@@ -532,7 +532,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
             report.setTrigger(trigger);
 
 		ServiceProxy.getServiceBroker().publish(topic, report.toString(),
-				Preferences.getPubRetain(), Preferences.getPubQos(), 20, this,
+				Preferences.getPubRetain(), Preferences.getPubQos(), this,
 				report);
 
 	}

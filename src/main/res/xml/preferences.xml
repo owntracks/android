@@ -21,16 +21,6 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
-        <org.owntracks.android.support.EditIntegerPreference
-            android:defaultValue="@integer/valPubInterval"
-            android:dependency="@string/keyPub"
-            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:hint="@integer/valPubInterval"
-            android:inputType="number"
-            android:key="@string/keyPubInterval"
-            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
-            android:title="@string/preferencesBackgroundUpdatesInterval" />
-
         <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
@@ -78,15 +68,21 @@
             android:summary="@string/preferencesNotificationOnReceivedWaypointTransitionSummary"
             android:title="@string/preferencesNotificationOnReceivedWaypointTransitionTitle" />
         <SwitchPreference
-            android:defaultValue="@bool/valNotificationTickerOnPublish"
-            android:key="@string/keyNotificationTickerOnPublish"
-            android:summary="@string/preferencesNotificationTickerOnPublishSummary"
-            android:title="@string/preferencesNotificationTickerOnPublish" />
+            android:defaultValue="@bool/valNotificationVibrateOnPublish"
+            android:key="@string/keyNotificationVibrateOnPublish"
+            android:summary="@string/preferencesNotificationVibrateOnPublishSummary"
+            android:title="@string/preferencesNotificationVibrateOnPublish" />
+
         <SwitchPreference
             android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
             android:key="@string/keyNotificationTickerOnWaypointTransition"
             android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
             android:title="@string/preferencesNotificationTickerOnWaypointTransitionTitle" />
+        <SwitchPreference
+            android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
+            android:key="@string/keyNotificationVibrateOnWaypointTransition"
+            android:summary="@string/preferencesNotificationVibrateOnWaypointTransitionSummary"
+            android:title="@string/preferencesNotificationVibrateOnWaypointTransitionTitle" />
     </PreferenceScreen>
     <PreferenceScreen
         android:key="advanced"
@@ -135,19 +131,16 @@
 
         <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandReportLocation"
-            android:dependency="@string/keySub"
             android:key="@string/keyRemoteCommandReportLocation"
             android:summary="@string/preferencesRemoteCommandReportLocationSummary"
             android:title="@string/preferencesRemoteCommandReportLocation" />
         <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandDump"
-            android:dependency="@string/keySub"
             android:key="@string/keyRemoteCommandDump"
             android:summary="@string/preferencesRemoteCommandDumpSummary"
             android:title="@string/preferencesRemoteCommandDump" />
         <SwitchPreference
             android:defaultValue="@bool/valRemoteConfiguration"
-            android:dependency="@string/keySub"
             android:key="@string/keyRemoteConfiguration"
             android:summary="@string/preferencesRemoteConfigurationSummary"
             android:title="@string/preferencesRemoteConfiguration" />
@@ -185,6 +178,18 @@
             android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
             android:title="@string/preferencesLocatorAccuracyForeground"
             android:defaultValue="@integer/valLocatorAccuracyForeground"/>
+
+        <org.owntracks.android.support.EditIntegerPreference
+            android:defaultValue="@integer/valPubInterval"
+            android:dependency="@string/keyPub"
+            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
+            android:hint="@integer/valPubInterval"
+            android:inputType="number"
+            android:key="@string/keyPubInterval"
+            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
+            android:title="@string/preferencesBackgroundUpdatesInterval" />
+
+
         </PreferenceCategory>
         <PreferenceCategory android:title="@string/preferencesAdvancedCategoryBeacons">
 

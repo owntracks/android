@@ -15,23 +15,37 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.MqttPingSender;
+import org.eclipse.paho.client.mqttv3.MqttToken;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
@@ -63,21 +77,24 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private static State.ServiceBroker state = State.ServiceBroker.INITIAL;
 
-	private short keepAliveSeconds;
-	private MqttClient mqttClient;
+	private CustomMqttClient mqttClient;
 	private static ServiceBroker instance;
 	private Thread workerThread;
-	private LinkedList<DeferredPublishable> deferredPublishables;
+	private LinkedList<Message> deferredPublishables;
 	private Exception error;
 	private HandlerThread pubThread;
 	private Handler pubHandler;
-
+    private MqttClientPersistence persistenceStore;
 	private BroadcastReceiver netConnReceiver;
 	private BroadcastReceiver pingSender;
 	private ServiceProxy context;
     private LinkedList<String> subscribtions;
     private WakeLock networkWakelock;
     private WakeLock connectionWakelock;
+    private String TAG_WAKELOG = "org.owntracks.android.wakelog.broker";
+
+    private Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<IMqttDeliveryToken, Message>();
+    private List<Message> backlog = new LinkedList<Message>();
 
     @Override
 	public void onCreate(ServiceProxy p) {
@@ -85,11 +102,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		this.workerThread = null;
 		this.error = null;
         this.subscribtions = new LinkedList<String>();
-		this.keepAliveSeconds = 15 * 60;
-		this.deferredPublishables = new LinkedList<DeferredPublishable>();
+		this.deferredPublishables = new LinkedList<Message>();
 		this.pubThread = new HandlerThread("MQTTPUBTHREAD");
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
+        this.persistenceStore = new CustomMemoryPersistence();
         changeState(Defaults.State.ServiceBroker.INITIAL);
         doStart();
 	}
@@ -189,9 +206,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				|| !isConnected();
 	}
 
-	/**
-	 * @category CONNECTION HANDLING
-	 */
 	private void init() {
 		if (this.mqttClient != null) {
 			return;
@@ -202,7 +216,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			String cid = Preferences.getClientId(true);
             Log.v(this.toString(), "Using client id: " + cid);
 
-            this.mqttClient = new MqttClient(prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort(), cid, null);
+            this.mqttClient = new CustomMqttClient(prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort(), cid, persistenceStore, new AlarmPingSender(context));
 			this.mqttClient.setCallback(this);
 
 		} catch (MqttException e) {
@@ -346,8 +360,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             }
 
 			// setWill(options);
-			options.setKeepAliveInterval(this.keepAliveSeconds);
-			options.setConnectionTimeout(10);
+			options.setKeepAliveInterval(Preferences.getKeepalive());
+			options.setConnectionTimeout(30);
 			options.setCleanSession(Preferences.getCleanSession());
 
 			this.mqttClient.connect(options);
@@ -391,16 +405,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		// Establish ping sender
-		if (this.pingSender == null) {
-			this.pingSender = new PingSender();
-			this.context.registerReceiver(this.pingSender, new IntentFilter(
-					Defaults.INTENT_ACTION_PUBLISH_PING));
-		}
+		//if (this.pingSender == null) {
+		//	this.pingSender = new PingSender();
+		//	this.context.registerReceiver(this.pingSender, new IntentFilter(Defaults.INTENT_ACTION_PUBLISH_PING));
+		//}
 
-		scheduleNextPing();
+		//scheduleNextPing();
         resubscribe();
-
-
+        deliverBacklog();
 	}
 
     public void resubscribe(){
@@ -427,6 +439,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         if(!isConnected())
             return;
 
+        Log.v(this.toString(), "Subscribing to: " + topics);
         this.mqttClient.subscribe(topics);
         for (String topic : topics) {
             subscribtions.push(topic);
@@ -502,7 +515,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
         } else {
 			changeState(Defaults.State.ServiceBroker.DISCONNECTED);
-			scheduleNextPing();
+			//scheduleNextPing();
         }
 
         if(connectionWakelock.isHeld())
@@ -604,87 +617,67 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		return Defaults.State.toString(state, c);
 	}
 
-	private void deferPublish(final DeferredPublishable p) {
-		p.wait(this.deferredPublishables, new Runnable() {
-
-			@Override
-			public void run() {
-				if ((ServiceBroker.this.deferredPublishables != null)
-						&& ServiceBroker.this.deferredPublishables.contains(p))
-					ServiceBroker.this.deferredPublishables.remove(p);
-				if (!p.isPublishing())// might happen that the publish is in
-										// progress while the timeout occurs.
-					p.publishFailed();
-			}
-		});
-	}
-
-
 	public void publish(String topic, String payload) {
-		publish(topic, payload, false, 0, 0, null, null);
+		publish(topic, payload, false, 0, null, null);
 	}
 
 	public void publish(String topic, String payload, boolean retained) {
-		publish(topic, payload, retained, 0, 0, null, null);
+		publish(topic, payload, retained, 0, null, null);
 	}
 
 	public void publish(final String topic, final String payload,
-			final boolean retained, final int qos, final int timeout,
+			final boolean retained, final int qos,
 			final ServiceMqttCallbacks callback, final Object extra) {
 
-		publish(new DeferredPublishable(topic, payload, retained, qos, timeout,
-				callback, extra));
+		publish(new Message(topic, payload, retained, qos, callback, extra));
 
 	}
 
-	private void publish(final DeferredPublishable p) {
+	private void publish(final Message p) {
 
 		this.pubHandler.post(new Runnable() {
 
-			@Override
-			public void run() {
+            @Override
+            public void run() {
 
-				if (Looper.getMainLooper().getThread() == Thread
-						.currentThread()) {
-					Log.e("ServiceBroker", "PUB ON MAIN THREAD");
-				}
+                if (Looper.getMainLooper().getThread() == Thread
+                        .currentThread()) {
+                    Log.e("ServiceBroker", "PUB ON MAIN THREAD");
+                }
 
-				if (!isOnline() || !isConnected()) {
-					Log.d("ServiceBroker", "pub deferred");
+                if (mqttClient == null) {
+                    Log.d("ServiceBroker", "no mqttClient initialized");
+                    return;
+                }
 
-					deferPublish(p);
-					doStart();
-					return;
-				}
+                try {
+                    p.publishing();
+                    IMqttDeliveryToken t= ServiceBroker.this.mqttClient.getTopic(p.getTopic()).publish(p);
+                    sendMessages.put(t, p);
+                    Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
+                } catch (MqttException e) {
 
-				try {
-					p.publishing();
-					ServiceBroker.this.mqttClient.getTopic(p.getTopic())
-							.publish(p);
-					p.publishSuccessfull();
-				} catch (MqttException e) {
-					Log.e("ServiceBroker", e.getMessage());
-					e.printStackTrace();
-					p.cancelWait();
-					p.publishFailed();
-				}
-			}
-		});
+                    Log.e("ServiceBroker", e.getMessage());
+                    //e.printStackTrace();
+                    //p.publishFailed();
+                } finally {
+                    if(!backlog.contains(p))
+                        backlog.add(p);
+                }
+            }
+        });
 
 	}
 
 	private void publishDeferrables() {
-		for (Iterator<DeferredPublishable> iter = this.deferredPublishables
+		for (Iterator<Message> iter = this.deferredPublishables
 				.iterator(); iter.hasNext();) {
-			DeferredPublishable p = iter.next();
+			Message p = iter.next();
 			iter.remove();
 			publish(p);
 		}
 	}
 
-    public short getKeepaliveSeconds() {
-        return keepAliveSeconds;
-    }
 
     public Exception getError() {
         return error;
@@ -694,16 +687,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         return deferredPublishables != null ? deferredPublishables.size() : -1;
     }
 
-    private class DeferredPublishable extends MqttMessage {
-		private Handler timeoutHandler;
+    private class Message extends MqttMessage {
 		private ServiceMqttCallbacks callback;
 		private String topic;
-		private int timeout = 0;
 		private boolean isPublishing;
 		private Object extra;
 
-		public DeferredPublishable(String topic, String payload,
-				boolean retained, int qos, int timeout, ServiceMqttCallbacks callback,
+		public Message(String topic, String payload,
+				boolean retained, int qos, ServiceMqttCallbacks callback,
 				Object extra) {
 
 			super(payload.getBytes());
@@ -712,7 +703,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			this.extra = extra;
 			this.callback = callback;
 			this.topic = topic;
-			this.timeout = timeout;
 		}
 
 		public void publishFailed() {
@@ -723,7 +713,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		public void publishSuccessfull() {
 			if (this.callback != null)
 				this.callback.publishSuccessfull(this.extra);
-			cancelWait();
 
 		}
 
@@ -741,34 +730,24 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			return this.topic;
 		}
 
-		public void cancelWait() {
-			if (this.timeoutHandler != null)
-				this.timeoutHandler.removeCallbacksAndMessages(this);
-		}
 
-		public void wait(LinkedList<DeferredPublishable> queue,
-				Runnable onRemove) {
-			if (this.timeoutHandler != null) {
-				Log.d(this.toString(),
-						"This DeferredPublishable already has a timeout set");
-				return;
-			}
 
-			// No need signal waiting for timeouts of 0. The command will be
-			// failed right away
-			if ((this.callback != null) && (this.timeout > 0))
-				this.callback.publishWaiting(this.extra);
+    }
 
-			queue.addLast(this);
-			this.timeoutHandler = new Handler();
-			this.timeoutHandler.postDelayed(onRemove, this.timeout * 1000);
-		}
-	}
+    private void deliverBacklog() {
+        Iterator<Message> i = backlog.iterator();
+        while (i.hasNext()) {
+            Message m = i.next();
+
+
+            publish(m);
+        }
+    }
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message)
 			throws Exception {
-		scheduleNextPing();
+		//scheduleNextPing();
 
 		String msg = new String(message.getPayload());
         Log.v(this.toString(), "Received message: " + topic + " : "  + msg);
@@ -843,9 +822,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 	}
 
-	@Override
-	public void deliveryComplete(IMqttDeliveryToken token) {
-	}
+
+
+    @Override
+	public void deliveryComplete(IMqttDeliveryToken messageToken) {
+        Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
+        Message message = sendMessages.remove(messageToken);
+        backlog.remove(message);
+        message.publishSuccessfull();
+    }
 
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
 
@@ -868,74 +853,197 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
 	}
 
-	public class PingSender extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
 
-			if (isOnline() && !isConnected() && !isConnecting()) {
-				//Log.v(this.toString(), "ping: isOnline()=" + isOnline() + ", isConnected()=" + isConnected());
-				doStart();
-			} else if (!isOnline()) {
-				Log.d(this.toString(), "Ping: Waiting for network to come online again");
-			} else {
-				try {
-					ping();
-				} catch (MqttException e) {
-					// if something goes wrong, it should result in connectionLost  being called, so we will handle it there
-					//Log.e(this.toString(), "ping failed - MQTT exception", e);
-					// assume the client connection is broken - trash it
-					try {
-						ServiceBroker.this.mqttClient.disconnect();
-					} catch (MqttPersistenceException e1) {
-						Log.e(this.toString(),
-								"Disconnect failed - persistence exception", e1);
-					} catch (MqttException e2) {
-						Log.e(this.toString(),
-								"Disconnect failed - mqtt exception", e2);
-					}
-
-					// reconnect
-					//Log.w(this.toString(), "onReceive: MqttException=" + e);
-					doStart();
-				}
-			}
-			scheduleNextPing();
-		}
-	}
-
-	private void scheduleNextPing() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(this.context,
-				0, new Intent(Defaults.INTENT_ACTION_PUBLISH_PING),
-				PendingIntent.FLAG_UPDATE_CURRENT);
-
-		Calendar wakeUpTime = Calendar.getInstance();
-		wakeUpTime.add(Calendar.SECOND, this.keepAliveSeconds);
-
-		AlarmManager aMgr = (AlarmManager) this.context
-				.getSystemService(Context.ALARM_SERVICE);
-		aMgr.set(AlarmManager.RTC_WAKEUP, wakeUpTime.getTimeInMillis(),
-				pendingIntent);
-	}
-
-	private void ping() throws MqttException {
-		MqttTopic topic = this.mqttClient.getTopic("$SYS/keepalive");
-
-		MqttMessage message = new MqttMessage();
-		message.setRetained(false);
-		message.setQos(1);
-		message.setPayload(new byte[] { 0 });
-
-		try {
-            //Log.v(this.toString(), "Sending PING");
-			topic.publish(message);
-		} catch (org.eclipse.paho.client.mqttv3.MqttPersistenceException e) {
-			e.printStackTrace();
-		} catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-			throw new MqttException(e);
-		}
-	}
 
 	public void onEvent(Events.Dummy e) {
 	}
+
+
+
+    // Custom blocking MqttClient that allows to specify a MqttPingSender
+    private static final class CustomMqttClient extends MqttClient {
+        public CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence, MqttPingSender pingSender) throws MqttException {
+            super(serverURI, clientId, persistence);// Have to call do the AsyncClient init twice as there is no other way to setup a client with a ping sender (thanks Paho)
+            aClient = new MqttAsyncClient(serverURI, clientId, persistence, pingSender);
+        }
+    }
+
+    class AlarmPingSender implements MqttPingSender {
+        // Identifier for Intents, log messages, etc..
+        static final String TAG = "AlarmPingSender";
+
+        private ClientComms comms;
+        private Context context;
+        private BroadcastReceiver alarmReceiver;
+        private AlarmPingSender that;
+        private PendingIntent pendingIntent;
+        private volatile boolean hasStarted = false;
+
+        public AlarmPingSender(Context c ) {
+            Log.v(this.toString(), "AlarmPingSender instantiated");
+
+            if (c == null) {
+                throw new IllegalArgumentException( "Neither service nor client can be null.");
+            }
+            this.context = c;
+            that = this;
+        }
+
+        @Override
+        public void init(ClientComms comms) {
+            Log.v(this.toString(), "AlarmPingSender init");
+            this.comms = comms;
+            this.alarmReceiver = new AlarmReceiver();
+        }
+
+        @Override
+        public void start() {
+            Log.v(this.toString(), "AlarmPingSender start");
+            context.registerReceiver(alarmReceiver, new IntentFilter(Defaults.INTENT_ACTION_PUBLISH_PING));
+
+            pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(Defaults.INTENT_ACTION_PUBLISH_PING), PendingIntent.FLAG_UPDATE_CURRENT);
+
+            schedule(comms.getKeepAlive());
+            hasStarted = true;
+        }
+
+        @Override
+        public void stop() {
+            Log.v(this.toString(), "AlarmPingSender stop");
+
+            // Cancel Alarm.
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+
+            Log.d(TAG, "Unregister alarmreceiver to MqttService"+comms.getClient().getClientId());
+            if(hasStarted){
+                hasStarted = false;
+                try{
+                    context.unregisterReceiver(alarmReceiver);
+                }catch(IllegalArgumentException e){
+                    //Ignore unregister errors.
+                }
+            }
+        }
+
+        @Override
+        public void schedule(long delayInMilliseconds) {
+            long nextAlarmInMilliseconds = System.currentTimeMillis()
+                    + delayInMilliseconds;
+            Log.d(TAG, "Schedule next alarm at " + nextAlarmInMilliseconds);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds, pendingIntent);
+        }
+
+        class AlarmReceiver extends BroadcastReceiver {
+            private WakeLock wakelock;
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // According to the docs, "Alarm Manager holds a CPU wake lock as
+                // long as the alarm receiver's onReceive() method is executing.
+                // This guarantees that the phone will not sleep until you have
+                // finished handling the broadcast.", but this class still get
+                // a wake lock to wait for ping finished.
+                int count = intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, -1);
+                Log.d(TAG, "Ping " + count + " times.");
+
+                Log.d(TAG, "Check time :" + System.currentTimeMillis());
+                IMqttToken token = comms.checkForActivity();
+
+                // No ping has been sent.
+                if (token == null) {
+                    return;
+                }
+
+                if (wakelock == null) {
+                    PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
+                    wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG_WAKELOG);
+                }
+                wakelock.acquire();
+                token.setActionCallback(new IMqttActionListener() {
+
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "Success. Release lock(" + TAG_WAKELOG + "):" + System.currentTimeMillis());
+                        if(wakelock != null && wakelock.isHeld()){
+                            wakelock.release();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken,
+                                          Throwable exception) {
+                        Log.d(TAG, "Failure. Release lock(" + TAG_WAKELOG + "):"
+                                + System.currentTimeMillis());
+                        //Release wakelock when it is done.
+                        if(wakelock != null && wakelock.isHeld()){
+                            wakelock.release();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private static final class CustomMemoryPersistence implements MqttClientPersistence {
+        private static Hashtable data;
+
+        private CustomMemoryPersistence(){
+
+        }
+
+        @Override
+        public void open(String s, String s2) throws MqttPersistenceException {
+            if(data == null) {
+                this.data = new Hashtable();
+            }
+        }
+
+        private Integer getSize(){
+            return data.size();
+        }
+
+        @Override
+        public void close() throws MqttPersistenceException {
+
+        }
+
+        @Override
+        public void put(String key, MqttPersistable persistable) throws MqttPersistenceException {
+            Log.v(this.toString(), "put key " + key);
+
+            data.put(key, persistable);
+        }
+
+        @Override
+        public MqttPersistable get(String key) throws MqttPersistenceException {
+            Log.v(this.toString(), "get key " + key);
+            return (MqttPersistable)data.get(key);
+        }
+
+        @Override
+        public void remove(String key) throws MqttPersistenceException {
+            Log.v(this.toString(), "removing key " + key);
+            data.remove(key);
+        }
+
+        @Override
+        public Enumeration keys() throws MqttPersistenceException {
+            return data.keys();
+        }
+
+        @Override
+        public void clear() throws MqttPersistenceException {
+            Log.v(this.toString(), "clearing store");
+
+            data.clear();
+        }
+
+        @Override
+        public boolean containsKey(String key) throws MqttPersistenceException {
+            return data.containsKey(key);
+        }
+    }
 
 }

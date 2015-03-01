@@ -14,8 +14,9 @@ public class Defaults {
 	public static final String INTENT_ACTION_LOCATION_CHANGED = "org.owntracks.android.intent.LOCATION_CHANGED";
 	public static final String INTENT_ACTION_FENCE_TRANSITION = "org.owntracks.android.intent.FENCE_TRANSITION";
 	public static final int NOTIFCATION_ID = 1338;
+    public static final int NOTIFCATION_ID_TICKER = 1339;
 
-	private static class TransitionType {
+    private static class TransitionType {
 		public static String toString(int type, Context c) {
 			int id;
 			switch (type) {
