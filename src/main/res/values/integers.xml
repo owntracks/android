@@ -5,7 +5,7 @@
     <integer name="valTls">1</integer>
     <integer name="valTlsCustom">2</integer>
     <integer name="valPort">8883</integer>
-    <integer name="valPubInterval">30</integer>
+    <integer name="valPubInterval">5</integer>
 
     <integer name="valPubQos">1</integer>
     <integer name="valKeepalive">60</integer>

@@ -46,10 +46,11 @@ public class App extends Application {
 		super.onCreate();
         instance = this;
 
-        Log.v(this.toString(), "Fabric.io crash reporting enabled");
-        final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
-        Fabric.with(fabric);
-
+        if(!BuildConfig.DEBUG) {
+            Log.v(this.toString(), "Fabric.io crash reporting enabled");
+            final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
+            Fabric.with(fabric);
+        }
 
         this.debugLogger = new DebugLogger();
 

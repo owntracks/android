@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.owntracks.android.ActivityLauncher;
 import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.messages.ConfigurationMessage;
@@ -30,6 +31,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -43,28 +45,33 @@ import com.google.android.gms.location.Geofence;
 
 import de.greenrobot.event.EventBus;
 
-//@SuppressLint("NewApi")
 public class ServiceApplication implements ProxyableService,
 		StaticHandlerInterface {
 	private static SharedPreferences sharedPreferences;
 	private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
 	private NotificationManager notificationManager;
 	private static NotificationCompat.Builder notificationBuilder;
-	private static boolean playServicesAvailable;
+    private static NotificationCompat.Builder notificationBuilderTicker;
+
+    private static boolean playServicesAvailable;
 	private GeocodableLocation lastPublishedLocation;
 	private Date lastPublishedLocationTime;
 	private boolean even = false;
 	private Handler handler;
 	//private int mContactCount;
 	private ServiceProxy context;
-
-	@Override
+    private HandlerThread notificationThread;
+    private Handler notificationHandler;
+    @Override
 	public void onCreate(ServiceProxy context) {
 		this.context = context;
 		checkPlayServices();
-
+        this.notificationThread = new HandlerThread("NOTIFICATIONTHREAD");
+        this.notificationThread.start();
+        this.notificationHandler = new Handler(this.notificationThread.getLooper());
 		this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationBuilder = new NotificationCompat.Builder(context);
+        notificationBuilderTicker = new NotificationCompat.Builder(context);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -111,6 +118,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEventMainThread(Events.LocationMessageReceived e) {
+
         org.owntracks.android.model.Contact c = App.getContact(e.getTopic());
 
 
@@ -146,7 +154,7 @@ public class ServiceApplication implements ProxyableService,
                 description = "a location";
             }
 
-            updateTicker(name + " " + context.getString(e.getLocationMessage().getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " "  + description );
+            updateTicker(name + " " + context.getString(e.getLocationMessage().getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " "  + description, false);
 
         }
 
@@ -204,9 +212,7 @@ public class ServiceApplication implements ProxyableService,
 		this.notificationIntent = ServiceProxy.getPendingIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
 				Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
-		notificationBuilder.addAction(R.drawable.ic_action_upload,
-				this.context.getString(R.string.publish),
-				this.notificationIntent);
+		notificationBuilder.addAction(R.drawable.ic_action_upload, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
 	}
 
@@ -216,30 +222,56 @@ public class ServiceApplication implements ProxyableService,
 		NotificationManager nm = (NotificationManager) App.getContext()
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		nb.setContentTitle(App.getContext().getString(R.string.app_name))
-				.setSmallIcon(R.drawable.ic_notification)
-				.setContentText("Google Play Services are not available")
-				.setPriority(android.support.v4.app.NotificationCompat.PRIORITY_MIN);
-		nm.notify(Defaults.NOTIFCATION_ID, nb.build());
+		//nb.setContentTitle(App.getContext().getString(R.string.app_name))
+		//		.setSmallIcon(R.drawable.ic_notification)
+		//		.setContentText("Google Play Services are not available")
+				//.setPriority(NotificationCompat.PRIORITY_MIN);
+		//nm.notify(Defaults.NOTIFCATION_ID, nb.build());
 
 	}
 
-	public void updateTicker(String text) {
-		notificationBuilder.setTicker(text
-				+ ((this.even = !this.even) ? " " : ""));
-		notificationBuilder.setSmallIcon(R.drawable.ic_notification);
-		this.notificationManager.notify(Defaults.NOTIFCATION_ID,
-				notificationBuilder.build());
+	public void updateTicker(String text, boolean vibrate) {
+        Log.v(this.toString(), "updateTicker");
+        if(android.os.Build.VERSION.SDK_INT >= 21) {
+
+            notificationBuilderTicker.setPriority(NotificationCompat.PRIORITY_HIGH);
+            notificationBuilderTicker.setColor(context.getResources().getColor(R.color.primary));
+            notificationBuilderTicker.setSmallIcon(R.drawable.ic_notification);
+            notificationBuilderTicker.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilderTicker.setVisibility(Notification.VISIBILITY_PUBLIC);
+            notificationBuilderTicker.setContentTitle(context.getString(R.string.app_name));
+            notificationBuilderTicker.setContentText(text + ((this.even = !this.even) ? " " : ""));
+            notificationBuilderTicker.setAutoCancel(true);
+
+
+
+        } else {
+            notificationBuilderTicker.setSmallIcon(R.drawable.ic_notification);
+            notificationBuilderTicker.setTicker(text + ((this.even = !this.even) ? " " : ""));
+
+        }
+        if(vibrate) {
+            Log.v(this.toString(),"vibrate");
+            notificationBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
+            notificationBuilderTicker.setVibrate(new long[]{0, 500}); // 0 ms delay, 500 ms vibration
+        }
 
 		// Clear ticker
-		notificationBuilder.setTicker(null);
-		this.notificationManager.notify(Defaults.NOTIFCATION_ID,
-				notificationBuilder.build());
+        this.notificationManager.notify(Defaults.NOTIFCATION_ID_TICKER,  notificationBuilderTicker.build());
 
 		// if the notification is not enabled, the ticker will create an empty
 		// one that we get rid of
-		if (!Preferences.getNotification())
-			this.notificationManager.cancel(Defaults.NOTIFCATION_ID);
+		if (!Preferences.getNotification()) {
+            this.notificationManager.cancel(Defaults.NOTIFCATION_ID_TICKER);
+        } else {
+
+            notificationHandler.postDelayed(new Runnable() {
+
+                public void run() {
+                    notificationManager.cancel(Defaults.NOTIFCATION_ID_TICKER);
+                }}, 1500);
+
+        }
 	}
 
 	public void updateNotification() {
@@ -270,14 +302,11 @@ public class ServiceApplication implements ProxyableService,
         else
             subtitle = ServiceLocator.getStateAsString(this.context) + " | " + ServiceBroker.getStateAsString(this.context);
 
-        notificationBuilder.setContentTitle(title);
-		notificationBuilder
-				.setSmallIcon(R.drawable.ic_notification)
-                .setColor(context.getResources().getColor(R.color.primary))
-				.setPriority(NotificationCompat.PRIORITY_MIN)
-                .setContentText(subtitle);
+        notificationBuilder.setContentTitle(title).setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
 
         if(android.os.Build.VERSION.SDK_INT >= 21) {
+            notificationBuilder.setColor(context.getResources().getColor(R.color.primary));
+            notificationBuilder.setPriority(Notification.PRIORITY_MIN);
             notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
@@ -304,7 +333,7 @@ public class ServiceApplication implements ProxyableService,
 
 	public void onEvent(Events.WaypointTransition e) {
         if(Preferences.getNotificationTickerOnWaypointTransition()) {
-            updateTicker(context.getString(e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " " + e.getWaypoint().getDescription());
+            updateTicker(context.getString(e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving) + " " + e.getWaypoint().getDescription(), Preferences.getNotificationVibrateOnWaypointTransition());
         }
 	}
 
@@ -321,7 +350,7 @@ public class ServiceApplication implements ProxyableService,
 			updateNotification();
 
 			if (Preferences.getNotificationTickerOnPublish() && !l.doesSupressTicker())
-				updateTicker(this.context.getString(R.string.statePublished));
+				updateTicker(this.context.getString(R.string.statePublished), Preferences.getNotificationVibrateOnPublish());
 
 		}
 	}
@@ -424,7 +453,6 @@ public class ServiceApplication implements ProxyableService,
         dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
         dump.setLocatorDebug(ServiceProxy.getServiceLocator().getDebugData());
 
-        dump.setBrokerKeepAliveSeconds(ServiceProxy.getServiceBroker().getKeepaliveSeconds());
         dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
         dump.setBrokerState(ServiceBroker.getState());
         dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());

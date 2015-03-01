@@ -302,7 +302,7 @@ public class ServiceBeacon implements
         }
 
         ServiceProxy.getServiceBroker().publish(topic, r.toString(),
-                Preferences.getPubRetain(), Preferences.getPubQos(), 20, this, r);
+                Preferences.getPubRetain(), Preferences.getPubQos(), this, r);
 
     }
 

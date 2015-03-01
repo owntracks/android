@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preferencesNotificationTickerOnPublishSummary">Show a notification on successful reports</string>
+    <string name="preferencesNotificationTickerOnPublish">Heads-Up notification on report</string>
+    <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a notification on waypoint events </string>
+    <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Heads-Up on waypoint </string>
+</resources>

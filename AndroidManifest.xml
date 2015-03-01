@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="18" /> <!-- For config import/export -->
+    <uses-permission android:name="android.permission.VIBRATE" /> <!-- For notifications -->
 
     <application
         android:name=".App"
