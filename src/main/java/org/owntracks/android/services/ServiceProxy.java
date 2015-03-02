@@ -32,9 +32,10 @@ public class ServiceProxy extends ServiceBindable {
 
 	private static LinkedList<Runnable> runQueue = new LinkedList<Runnable>();
 	private static ServiceProxyConnection connection;
-	private static boolean connectionBoundOnce = false;
+	private static boolean bound = false;
+    private static boolean attemptingToBind = false;
 
-	@Override
+    @Override
 	public void onCreate() {
 		super.onCreate();
 	}
@@ -164,9 +165,11 @@ public class ServiceProxy extends ServiceBindable {
 
 		@Override
 		public void close() {
-			if (connectionBoundOnce) {
+            attemptingToBind = false;
+
+            if (bound) {
 				this.context.unbindService(this.serviceConnection);
-				connectionBoundOnce = false;
+				bound = false;
 			}
 		}
 
@@ -176,9 +179,10 @@ public class ServiceProxy extends ServiceBindable {
 
 	}
 
+    // No bind, only acting on static methods and tearing down service connection anyway
 	public static void closeServiceConnection() {
-		if ((getServiceConnection() != null) && connectionBoundOnce)
-	        connection.close();
+		if ((getServiceConnection() != null) && bound)
+            getServiceConnection().close();
 	}
 
 	public static ServiceProxyConnection getServiceConnection() {
@@ -196,7 +200,7 @@ public class ServiceProxy extends ServiceBindable {
 			ServiceConnection c = new ServiceConnection() {
 				@Override
 				public void onServiceDisconnected(ComponentName name) {
-					connectionBoundOnce = false;
+					bound = false;
 				}
 
 				@Override
@@ -204,7 +208,9 @@ public class ServiceProxy extends ServiceBindable {
 						IBinder binder) {
                     Log.v("ServiceProxy", "serviceConnected, running queue");
 
-                    connectionBoundOnce = true;
+                    bound = true;
+                    attemptingToBind = false;
+
 					for (Runnable r : runQueue)
 						r.run();
 					runQueue.clear();
@@ -218,12 +224,14 @@ public class ServiceProxy extends ServiceBindable {
         Log.v("ServiceProxy", "bindService called");
 
         try {
-            context.bindService(new Intent(context, ServiceProxy.class),
-                    connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
+            if (!attemptingToBind) { // Prevent accidential bind during close
+                attemptingToBind = true;
+                context.bindService(new Intent(context, ServiceProxy.class), connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
+            }
         } catch (Exception e) {
             Log.v("ServiceProxy", "bind exception ");
             e.printStackTrace();
-
+            attemptingToBind = false;
         }
 	}
 }
