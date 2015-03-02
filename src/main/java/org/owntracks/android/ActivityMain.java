@@ -496,14 +496,7 @@ public class ActivityMain extends ActionBarActivity {
 	@Override
 	public void onDestroy() {
 		FragmentHandler.getInstance().removeAll(this);
-		ServiceProxy.runOrBind(this, new Runnable() {
-
-			@Override
-			public void run() {
-				ServiceProxy.closeServiceConnection();
-
-			}
-		});
+		ServiceProxy.closeServiceConnection();
 		super.onDestroy();
 	}
 
