@@ -6,10 +6,9 @@ import org.json.JSONException;
 
 import org.json.JSONObject;
 import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.support.Defaults;
+import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceLocator;
 import org.owntracks.android.support.StringifiedJSONObject;
-
-import java.sql.Date;
 
 public class DumpMessage {
     private LocationMessage location;
@@ -21,11 +20,11 @@ public class DumpMessage {
     private Integer locatorWaypointCount;
     private boolean locatorHasLocationClient;
     private boolean locatorHasLocationRequest;
-    private Defaults.State.ServiceLocator locatorState;
+    private ServiceLocator.State locatorState;
     private Short brokerKeepAliveSeconds;
     private Exception brokerError;
     private Integer brokerDeferredPublishablesCount;
-    private Defaults.State.ServiceBroker brokerState;
+    private ServiceBroker.State brokerState;
     private boolean applicationPlayServicesAvailable;
         private JSONObject locatorDebug;
 
@@ -80,11 +79,11 @@ public class DumpMessage {
         this.applicationPlayServicesAvailable = applicationPlayServicesAvailable;
     }
 
-    public void setLocatorState(Defaults.State.ServiceLocator locatorState) {
+    public void setLocatorState(ServiceLocator.State locatorState) {
         this.locatorState = locatorState;
     }
 
-    public void setBrokerState(Defaults.State.ServiceBroker brokerState) {
+    public void setBrokerState(ServiceBroker.State brokerState) {
         this.brokerState = brokerState;
     }
 

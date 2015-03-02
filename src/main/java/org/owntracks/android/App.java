@@ -13,8 +13,8 @@ import org.owntracks.android.db.DaoMaster.OpenHelper;
 import org.owntracks.android.db.DaoSession;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.support.DebugLogger;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import android.app.Application;
@@ -97,7 +97,7 @@ public class App extends Application {
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-        if(e.getState() == Defaults.State.ServiceBroker.CONNECTING) {
+        if(e.getState() == ServiceBroker.State.CONNECTING) {
             //Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
             instance.contacts.clear();
         }

@@ -14,7 +14,6 @@ import org.owntracks.android.model.Contact;
 import org.owntracks.android.messages.DumpMessage;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
@@ -47,7 +46,10 @@ import de.greenrobot.event.EventBus;
 
 public class ServiceApplication implements ProxyableService,
 		StaticHandlerInterface {
-	private static SharedPreferences sharedPreferences;
+    public static final int NOTIFCATION_ID = 1338;
+    public static final int NOTIFCATION_ID_TICKER = 1339;
+
+    private static SharedPreferences sharedPreferences;
 	private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
 	private NotificationManager notificationManager;
 	private static NotificationCompat.Builder notificationBuilder;
@@ -211,7 +213,7 @@ public class ServiceApplication implements ProxyableService,
 
 		this.notificationIntent = ServiceProxy.getPendingIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
-				Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
+				ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
 		notificationBuilder.addAction(R.drawable.ic_action_upload, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
 	}
@@ -231,9 +233,8 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateTicker(String text, boolean vibrate) {
-        Log.v(this.toString(), "updateTicker");
+        // API >= 21 doesn't have a ticker
         if(android.os.Build.VERSION.SDK_INT >= 21) {
-
             notificationBuilderTicker.setPriority(NotificationCompat.PRIORITY_HIGH);
             notificationBuilderTicker.setColor(context.getResources().getColor(R.color.primary));
             notificationBuilderTicker.setSmallIcon(R.drawable.ic_notification);
@@ -251,24 +252,23 @@ public class ServiceApplication implements ProxyableService,
 
         }
         if(vibrate) {
-            Log.v(this.toString(),"vibrate");
             notificationBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
             notificationBuilderTicker.setVibrate(new long[]{0, 500}); // 0 ms delay, 500 ms vibration
         }
 
 		// Clear ticker
-        this.notificationManager.notify(Defaults.NOTIFCATION_ID_TICKER,  notificationBuilderTicker.build());
+        this.notificationManager.notify(NOTIFCATION_ID_TICKER,  notificationBuilderTicker.build());
 
 		// if the notification is not enabled, the ticker will create an empty
 		// one that we get rid of
 		if (!Preferences.getNotification()) {
-            this.notificationManager.cancel(Defaults.NOTIFCATION_ID_TICKER);
+            this.notificationManager.cancel(NOTIFCATION_ID_TICKER);
         } else {
 
             notificationHandler.postDelayed(new Runnable() {
 
                 public void run() {
-                    notificationManager.cancel(Defaults.NOTIFCATION_ID_TICKER);
+                    notificationManager.cancel(NOTIFCATION_ID_TICKER);
                 }}, 1500);
 
         }
@@ -282,12 +282,10 @@ public class ServiceApplication implements ProxyableService,
 		String subtitle;
 		long time = 0;
 
-		if ((this.lastPublishedLocation != null)
-				&& Preferences.getNotificationLocation()) {
+		if ((this.lastPublishedLocation != null) && Preferences.getNotificationLocation()) {
 			time = this.lastPublishedLocationTime.getTime();
 
-			if ((this.lastPublishedLocation.getGeocoder() != null)
-					&& Preferences.getNotificationGeocoder()) {
+			if ((this.lastPublishedLocation.getGeocoder() != null) && Preferences.getNotificationGeocoder()) {
 				title = this.lastPublishedLocation.toString();
 			} else {
 				title = this.lastPublishedLocation.toLatLonString();
@@ -297,10 +295,7 @@ public class ServiceApplication implements ProxyableService,
 		}
 
 
-        if(ServiceLocator.getState() == Defaults.State.ServiceLocator.INITIAL)
-		    subtitle = ServiceBroker.getStateAsString(this.context);
-        else
-            subtitle = ServiceLocator.getStateAsString(this.context) + " | " + ServiceBroker.getStateAsString(this.context);
+        subtitle = ServiceBroker.getStateAsString(this.context);
 
         notificationBuilder.setContentTitle(title).setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
 
@@ -315,7 +310,7 @@ public class ServiceApplication implements ProxyableService,
 			notificationBuilder.setWhen(this.lastPublishedLocationTime.getTime());
 
 		this.notification = notificationBuilder.build();
-		this.context.startForeground(Defaults.NOTIFCATION_ID, this.notification);
+		this.context.startForeground(NOTIFCATION_ID, this.notification);
 	}
 
 	public void onEventMainThread(Events.StateChanged.ServiceBroker e) {

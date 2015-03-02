@@ -1,61 +1,5 @@
 package org.owntracks.android.services;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManagerFactory;
-
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistable;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.MqttPingSender;
-import org.eclipse.paho.client.mqttv3.MqttToken;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
-
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.owntracks.android.App;
-import org.owntracks.android.R;
-import org.owntracks.android.messages.ConfigurationMessage;
-import org.owntracks.android.messages.LocationMessage;
-import org.owntracks.android.support.Defaults;
-import org.owntracks.android.support.Defaults.State;
-import org.owntracks.android.support.Events;
-import org.owntracks.android.support.ServiceMqttCallbacks;
-import org.owntracks.android.support.Preferences;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -70,12 +14,64 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
-import de.greenrobot.event.EventBus;
+
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistable;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.MqttPingSender;
+import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.owntracks.android.R;
+import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.LocationMessage;
+import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.ServiceMqttCallbacks;
 import org.owntracks.android.support.StringifiedJSONObject;
 
-public class ServiceBroker implements MqttCallback, ProxyableService {
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-	private static State.ServiceBroker state = State.ServiceBroker.INITIAL;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManagerFactory;
+
+import de.greenrobot.event.EventBus;
+
+public class ServiceBroker implements MqttCallback, ProxyableService {
+    public static enum State {
+        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
+    }
+
+
+	private static State state = State.INITIAL;
 
 	private CustomMqttClient mqttClient;
 	private static ServiceBroker instance;
@@ -107,7 +103,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
         this.persistenceStore = new CustomMemoryPersistence();
-        changeState(Defaults.State.ServiceBroker.INITIAL);
+        changeState(State.INITIAL);
         doStart();
 	}
 
@@ -154,7 +150,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
-		if ((state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
+		if ((state == State.DISCONNECTED_USERDISCONNECT)
 				&& !force) {
 			//Log.d(this.toString(), "handleStart: userdisconnect==true");
 			return;
@@ -168,7 +164,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// Respect user's wish to not use data
 		if (!isBackgroundDataEnabled()) {
 			//Log.e(this.toString(), "handleStart: isBackgroundDataEnabled == false");
-			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
+			changeState(State.DISCONNECTED_DATADISABLED);
 			return;
 		}
 
@@ -185,7 +181,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 			} else {
 				//Log.e(this.toString(), "handleStart: isDisconnected() == false");
-				changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
+				changeState(State.DISCONNECTED_DATADISABLED);
 			}
 		} else {
 			//Log.d(this.toString(), "handleStart: isDisconnected() == false");
@@ -195,11 +191,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private boolean isDisconnected() {
 
-		return (state == Defaults.State.ServiceBroker.INITIAL)
-				|| (state == Defaults.State.ServiceBroker.DISCONNECTED)
-				|| (state == Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT)
-				|| (state == Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED)
-				|| (state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR)
+		return (state == State.INITIAL)
+				|| (state == State.DISCONNECTED)
+				|| (state == State.DISCONNECTED_USERDISCONNECT)
+				|| (state == State.DISCONNECTED_DATADISABLED)
+				|| (state == State.DISCONNECTED_ERROR)
 
 				// In some cases the internal state may diverge from the mqtt
 				// client state.
@@ -222,7 +218,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		} catch (MqttException e) {
 			// something went wrong!
 			this.mqttClient = null;
-			changeState(Defaults.State.ServiceBroker.DISCONNECTED);
+			changeState(State.DISCONNECTED);
 		}
 	}
 
@@ -346,7 +342,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		init();
 
 		try {
-			changeState(Defaults.State.ServiceBroker.CONNECTING);
+			changeState(State.CONNECTING);
 			MqttConnectOptions options = new MqttConnectOptions();
 			setWill(options);
 
@@ -365,7 +361,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			options.setCleanSession(Preferences.getCleanSession());
 
 			this.mqttClient.connect(options);
-			changeState(Defaults.State.ServiceBroker.CONNECTED);
+			changeState(State.CONNECTED);
 
 			return true;
 
@@ -490,9 +486,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			}
 
 			if (fromUser)
-				changeState(Defaults.State.ServiceBroker.DISCONNECTED_USERDISCONNECT);
+				changeState(State.DISCONNECTED_USERDISCONNECT);
 			else
-				changeState(Defaults.State.ServiceBroker.DISCONNECTED);
+				changeState(State.DISCONNECTED);
 		}
 	}
 
@@ -512,9 +508,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 
         if (!isOnline()) {
-			changeState(Defaults.State.ServiceBroker.DISCONNECTED_DATADISABLED);
+			changeState(State.DISCONNECTED_DATADISABLED);
         } else {
-			changeState(Defaults.State.ServiceBroker.DISCONNECTED);
+			changeState(State.DISCONNECTED);
 			//scheduleNextPing();
         }
 
@@ -528,20 +524,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	public void onEvent(Events.StateChanged.ServiceBroker event) {
-		if (event.getState() == Defaults.State.ServiceBroker.CONNECTED)
+		if (event.getState() == State.CONNECTED)
 			publishDeferrables();
 	}
 
 	private void changeState(Exception e) {
 		this.error = e;
-		changeState(Defaults.State.ServiceBroker.DISCONNECTED_ERROR, e);
+		changeState(State.DISCONNECTED_ERROR, e);
 	}
 
-	private void changeState(Defaults.State.ServiceBroker newState) {
+	private void changeState(State newState) {
 		changeState(newState, null);
 	}
 
-	private void changeState(Defaults.State.ServiceBroker newState, Exception e) {
+	private void changeState(State newState, Exception e) {
 		//Log.d(this.toString(), "ServiceBroker state changed to: " + newState);
 		state = newState;
 		EventBus.getDefault().postSticky(
@@ -564,8 +560,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		return this.mqttClient != null && this.mqttClient.isConnected(  );
 	}
 
-	public static boolean isErrorState(Defaults.State.ServiceBroker state) {
-		return state == Defaults.State.ServiceBroker.DISCONNECTED_ERROR;
+	public static boolean isErrorState(State state) {
+		return state == State.DISCONNECTED_ERROR;
 	}
 
 	public boolean hasError() {
@@ -574,7 +570,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	public boolean isConnecting() {
 		return (this.mqttClient != null)
-				&& (state == Defaults.State.ServiceBroker.CONNECTING);
+				&& (state == State.CONNECTING);
 	}
 
 	private boolean isBackgroundDataEnabled() {
@@ -590,10 +586,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// disconnect immediately
 		disconnect(false);
 
-		changeState(Defaults.State.ServiceBroker.DISCONNECTED);
+		changeState(State.DISCONNECTED);
 	}
 
-	public static Defaults.State.ServiceBroker getState() {
+	public static State getState() {
 		return state;
 	}
 
@@ -608,14 +604,34 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	}
 
-	public static String getStateAsString(Context c) {
-		return Defaults.State.toString(state, c);
-	}
+	public static String getStateAsString(Context c)
+    {
+        int id;
+        switch (getState()) {
+            case CONNECTED:
+                id = R.string.connectivityConnected;
+                break;
+            case CONNECTING:
+                id = R.string.connectivityConnecting;
+                break;
+            case DISCONNECTING:
+                id = R.string.connectivityDisconnecting;
+                break;
+            case DISCONNECTED_USERDISCONNECT:
+                id = R.string.connectivityDisconnectedUserDisconnect;
+                break;
+            case DISCONNECTED_DATADISABLED:
+                id = R.string.connectivityDisconnectedDataDisabled;
+                break;
+            case DISCONNECTED_ERROR:
+                id = R.string.error;
+                break;
+            default:
+                id = R.string.connectivityDisconnected;
 
-	public static String stateAsString(Defaults.State.ServiceLocator state,
-			Context c) {
-		return Defaults.State.toString(state, c);
-	}
+        }
+        return c.getString(id);
+    }
 
 	public void publish(String topic, String payload) {
 		publish(topic, payload, false, 0, null, null);
@@ -651,7 +667,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 }
 
                 try {
-                    p.publishing();
                     IMqttDeliveryToken t= ServiceBroker.this.mqttClient.getTopic(p.getTopic()).publish(p);
                     sendMessages.put(t, p);
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
@@ -899,9 +914,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         @Override
         public void start() {
             Log.v(this.toString(), "AlarmPingSender start");
-            context.registerReceiver(alarmReceiver, new IntentFilter(Defaults.INTENT_ACTION_PUBLISH_PING));
+            context.registerReceiver(alarmReceiver, new IntentFilter(ServiceProxy.INTENT_ACTION_PUBLISH_PING));
 
-            pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(Defaults.INTENT_ACTION_PUBLISH_PING), PendingIntent.FLAG_UPDATE_CURRENT);
+            pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(ServiceProxy.INTENT_ACTION_PUBLISH_PING), PendingIntent.FLAG_UPDATE_CURRENT);
 
             schedule(comms.getKeepAlive());
             hasStarted = true;

@@ -8,6 +8,9 @@ import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
+import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceLocator;
+
 import android.location.Location;
 
 public class Events {
@@ -250,21 +253,21 @@ public class Events {
 
 	public static class StateChanged {
 		public static class ServiceBroker extends E {
-			private Defaults.State.ServiceBroker state;
+			private org.owntracks.android.services.ServiceBroker.State state;
 			private Object extra;
 
-			public ServiceBroker(Defaults.State.ServiceBroker state) {
+			public ServiceBroker(org.owntracks.android.services.ServiceBroker.State state) {
 				this(state, null);
 			}
 
-			public ServiceBroker(Defaults.State.ServiceBroker state,
+			public ServiceBroker(org.owntracks.android.services.ServiceBroker.State state,
 					Object extra) {
 				super();
 				this.state = state;
 				this.extra = extra;
 			}
 
-			public Defaults.State.ServiceBroker getState() {
+			public org.owntracks.android.services.ServiceBroker.State getState() {
 				return this.state;
 			}
 
@@ -275,26 +278,26 @@ public class Events {
 		}
 
         public static class ServiceLocator extends E {
-            private Defaults.State.ServiceLocator state;
+            private org.owntracks.android.services.ServiceLocator.State state;
 
-            public ServiceLocator(Defaults.State.ServiceLocator state) {
+            public ServiceLocator(org.owntracks.android.services.ServiceLocator.State state) {
                 this.state = state;
             }
 
-            public Defaults.State.ServiceLocator getState() {
+            public org.owntracks.android.services.ServiceLocator.State getState() {
                 return this.state;
             }
 
         }
 
         public static class ServiceBeacon extends E {
-            private Defaults.State.ServiceBeacon state;
+            private org.owntracks.android.services.ServiceBeacon.State state;
 
-            public ServiceBeacon(Defaults.State.ServiceBeacon state) {
+            public ServiceBeacon(org.owntracks.android.services.ServiceBeacon.State state) {
                 this.state = state;
             }
 
-            public Defaults.State.ServiceBeacon getState() {
+            public org.owntracks.android.services.ServiceBeacon.State getState() {
                 return this.state;
             }
 

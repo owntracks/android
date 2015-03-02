@@ -2,6 +2,7 @@ package org.owntracks.android.support;
 
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import android.content.SharedPreferences;
@@ -127,7 +128,7 @@ public class Preferences {
     }
 
     public static void fromJsonObject(StringifiedJSONObject json) {
-        if (!Defaults.isPropperMessageType(json, "configuration"))
+        if (!isPropperMessageType(json, "configuration"))
             return;
         Log.v("Preferences", "fromJsonObject: " +  json.toString());
 
@@ -673,4 +674,18 @@ public class Preferences {
         return getBoolean(R.string.keyNotificationVibrateOnWaypointTransition, R.bool.valNotificationVibrateOnWayointTransition);
     }
 
+
+    public static boolean isPropperMessageType(JSONObject json, String type) {
+        try {
+            if(json == null)
+                Log.e("isPropperMessageType", "Atempt to invoke isPropperMessageType on null object");
+
+            if (!json.getString("_type").equals(type))
+                throw new JSONException("wrong type");
+        } catch (JSONException e) {
+            Log.e("isPropperMessageType", "Unable to deserialize " + type  +" object from JSON " + json.toString());
+            return false;
+        }
+        return true;
+    }
 }

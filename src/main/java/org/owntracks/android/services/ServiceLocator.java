@@ -17,7 +17,6 @@ import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.support.DebugLogger;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.ServiceMqttCallbacks;
 import org.owntracks.android.support.Preferences;
@@ -46,10 +45,14 @@ import com.google.android.gms.location.LocationServices;
 import de.greenrobot.event.EventBus;
 
 public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    public static enum State {
+        INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION
+    }
+    private static ServiceLocator.State state = ServiceLocator.State.INITIAL;
+
     GoogleApiClient googleApiClient;
     private SharedPreferences sharedPreferences;
 	private OnSharedPreferenceChangeListener preferencesChangedListener;
-	private static Defaults.State.ServiceLocator state = Defaults.State.ServiceLocator.INITIAL;
 	private ServiceProxy context;
 
 	private LocationRequest mLocationRequest;
@@ -356,7 +359,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         }
 
 		if (this.foreground || Preferences.getPub()) {
-            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_LOCATION_CHANGED, null);
+            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_LOCATION_CHANGED, null);
             logger.v(this.toString(), "Setting up location updates with pending intent " + i);
 
 
@@ -391,11 +394,11 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         if ((intent != null) && (intent.getAction() != null)) {
             logger.v(this.toString(), "onStartCommand with intent and intent action");
 
-			if (intent.getAction().equals(Defaults.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
+			if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
                 logger.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN");
 
                 publishLocationMessage();
-			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_LOCATION_CHANGED)) {
+			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_LOCATION_CHANGED)) {
                 logger.v(this.toString(), "action == INTENT_ACTION_LOCATION_CHANGED");
                 Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
 
@@ -406,7 +409,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
                 } else {
                     logger.v(this.toString(), "no location");
                 }
-			} else if (intent.getAction().equals(Defaults.INTENT_ACTION_FENCE_TRANSITION)) {
+			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_FENCE_TRANSITION)) {
                 logger.v(this.toString(), "action == INTENT_ACTION_FENCE_TRANSITION");
 				onFenceTransition(intent);
 			} else {
@@ -477,7 +480,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 		String topic = Preferences.getPubTopicBase(true);
 		if (topic == null) {
-			changeState(Defaults.State.ServiceLocator.NOTOPIC);
+			changeState(ServiceLocator.State.NOTOPIC);
 			return;
 		}
 
@@ -509,13 +512,13 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		}
 
 		if ((r == null) && (getLastKnownLocation() == null)) {
-			changeState(Defaults.State.ServiceLocator.NOLOCATION);
+			changeState(ServiceLocator.State.NOLOCATION);
 			return;
 		}
 
 		String topic = Preferences.getPubTopicBase(true);
 		if (topic == null) {
-			changeState(Defaults.State.ServiceLocator.NOTOPIC);
+			changeState(ServiceLocator.State.NOTOPIC);
 			return;
 		}
 
@@ -542,24 +545,40 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		if (extra == null)
 			return;
 
-		changeState(Defaults.State.ServiceLocator.INITIAL);
+		changeState(ServiceLocator.State.INITIAL);
 		EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra));
 	}
 
-	public static Defaults.State.ServiceLocator getState() {
+	public static ServiceLocator.State getState() {
 		return state;
 	}
 
 	public static String getStateAsString(Context c) {
-		return stateAsString(getState(), c);
+        int id;
+        switch (getState()) {
+            case PUBLISHING:
+                id = R.string.statePublishing;
+                break;
+            case PUBLISHING_WAITING:
+                id = R.string.stateWaiting;
+                break;
+            case PUBLISHING_TIMEOUT:
+                id = R.string.statePublishTimeout;
+                break;
+            case NOTOPIC:
+                id = R.string.stateNotopic;
+                break;
+            case NOLOCATION:
+                id = R.string.stateLocatingFail;
+                break;
+            default:
+                id = R.string.stateIdle;
+        }
+
+        return c.getString(id);
 	}
 
-	public static String stateAsString(Defaults.State.ServiceLocator state,
-			Context c) {
-		return Defaults.State.toString(state, c);
-	}
-
-	private void changeState(Defaults.State.ServiceLocator newState) {
+	private void changeState(ServiceLocator.State newState) {
 		Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
 		EventBus.getDefault().postSticky(
 				new Events.StateChanged.ServiceLocator(newState));
@@ -568,17 +587,17 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 
 	@Override
 	public void publishFailed(Object extra) {
-		changeState(Defaults.State.ServiceLocator.PUBLISHING_TIMEOUT);
+		changeState(ServiceLocator.State.PUBLISHING_TIMEOUT);
 	}
 
 	@Override
 	public void publishing(Object extra) {
-		changeState(Defaults.State.ServiceLocator.PUBLISHING);
+		changeState(ServiceLocator.State.PUBLISHING);
 	}
 
 	@Override
 	public void publishWaiting(Object extra) {
-		changeState(Defaults.State.ServiceLocator.PUBLISHING_WAITING);
+		changeState(ServiceLocator.State.PUBLISHING_WAITING);
 	}
 
 	public long getLastPublishDate() {
@@ -656,7 +675,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 		}
 
 		Log.v(this.toString(), "Adding " + fences.size() + " geofences");
-        PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, Defaults.INTENT_ACTION_FENCE_TRANSITION, null));
+        PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_FENCE_TRANSITION, null));
         r.setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(Status status) {
@@ -754,6 +773,8 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
     public boolean hasLocationRequest() {
         return mLocationRequest != null;
     }
+
+
 
 
 

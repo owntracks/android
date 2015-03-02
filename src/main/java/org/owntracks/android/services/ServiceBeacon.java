@@ -30,7 +30,6 @@ import de.greenrobot.event.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.BeaconMessage;
 import org.owntracks.android.support.BluetoothStateChangeReceiver;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ServiceMqttCallbacks;
@@ -43,10 +42,16 @@ public class ServiceBeacon implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
         BootstrapNotifier, RangeNotifier {
+    public static enum State {
+        INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
+    }
+
+
+
 
     private SharedPreferences sharedPreferences;
     private OnSharedPreferenceChangeListener preferencesChangedListener;
-    private static Defaults.State.ServiceBeacon state = Defaults.State.ServiceBeacon.INITIAL;
+    private static ServiceBeacon.State state = ServiceBeacon.State.INITIAL;
     private ServiceProxy context;
     private BluetoothStateChangeReceiver bluetoothStateChangeReceiver;
 
@@ -212,14 +217,14 @@ public class ServiceBeacon implements
         try
         {
             if(!mBeaconManager.checkAvailability()) {
-                changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
+                changeState(ServiceBeacon.State.NOBLUETOOTH);
                 Log.e(this.toString(), "Bluetooth not available");
                 return;
             }
         }
         catch (BleNotAvailableException e)
         {
-            changeState(Defaults.State.ServiceBeacon.NOBLUETOOTH);
+            changeState(ServiceBeacon.State.NOBLUETOOTH);
             Log.e(this.toString(), "Bluetooth not available");
             return;
         }
@@ -297,7 +302,7 @@ public class ServiceBeacon implements
 
         String topic = Preferences.getPubTopicBase(true);
         if (topic == null) {
-            changeState(Defaults.State.ServiceBeacon.NOTOPIC);
+            changeState(ServiceBeacon.State.NOTOPIC);
             return;
         }
 
@@ -342,20 +347,11 @@ public class ServiceBeacon implements
         }
     }
 
-    public static Defaults.State.ServiceBeacon getState() {
+    public static ServiceBeacon.State getState() {
         return state;
     }
 
-    public static String getStateAsString(Context c) {
-        return stateAsString(getState(), c);
-    }
-
-    public static String stateAsString(Defaults.State.ServiceBeacon state,
-                                       Context c) {
-        return Defaults.State.toString(state, c);
-    }
-
-    private void changeState(Defaults.State.ServiceBeacon newState) {
+    private void changeState(ServiceBeacon.State newState) {
         Log.d(this.toString(), "ServiceBeacon state changed to: " + newState);
         EventBus.getDefault().postSticky(
                 new Events.StateChanged.ServiceBeacon(newState));
@@ -377,17 +373,17 @@ public class ServiceBeacon implements
 
     @Override
     public void publishFailed(Object extra) {
-        changeState(Defaults.State.ServiceBeacon.PUBLISHING_TIMEOUT);
+        changeState(ServiceBeacon.State.PUBLISHING_TIMEOUT);
     }
 
     @Override
     public void publishing(Object extra) {
-        changeState(Defaults.State.ServiceBeacon.PUBLISHING);
+        changeState(ServiceBeacon.State.PUBLISHING);
     }
 
     @Override
     public void publishWaiting(Object extra) {
-        changeState(Defaults.State.ServiceBeacon.PUBLISHING_WAITING);
+        changeState(ServiceBeacon.State.PUBLISHING_WAITING);
     }
 
     public long getLastPublishDate() {
@@ -404,5 +400,30 @@ public class ServiceBeacon implements
     @Override
     public Context getApplicationContext() {
         return this.context;
+    }
+
+    public static String getStateAsString(Context c) {
+        int id;
+        switch (getState()) {
+            case PUBLISHING:
+                id = R.string.statePublishing;
+                break;
+            case PUBLISHING_WAITING:
+                id = R.string.stateWaiting;
+                break;
+            case PUBLISHING_TIMEOUT:
+                id = R.string.statePublishTimeout;
+                break;
+            case NOTOPIC:
+                id = R.string.stateNotopic;
+                break;
+            case NOBLUETOOTH:
+                id = R.string.stateBluetoothFail;
+                break;
+            default:
+                id = R.string.stateIdle;
+        }
+
+        return c.getString(id);
     }
 }

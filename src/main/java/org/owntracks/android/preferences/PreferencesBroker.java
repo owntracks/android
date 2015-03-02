@@ -8,7 +8,6 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.Preferences;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -346,8 +345,7 @@ public class PreferencesBroker extends DialogPreference {
 		if (v == null)
 			return;
 
-		if ((ServiceBroker.getState() == Defaults.State.ServiceBroker.CONNECTING)
-				|| (ServiceBroker.getState() == Defaults.State.ServiceBroker.CONNECTED)) {
+		if ((ServiceBroker.getState() == ServiceBroker.State.CONNECTING) || (ServiceBroker.getState() == ServiceBroker.State.CONNECTED)) {
 			v.setEnabled(true);
 		} else {
 			v.setEnabled(false);
