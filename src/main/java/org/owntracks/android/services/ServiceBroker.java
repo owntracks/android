@@ -656,8 +656,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             @Override
             public void run() {
 
-                if (Looper.getMainLooper().getThread() == Thread
-                        .currentThread()) {
+                if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
                     Log.e("ServiceBroker", "PUB ON MAIN THREAD");
                 }
 
@@ -667,17 +666,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 }
 
                 try {
+                    if(!backlog.contains(p))
+                        backlog.add(p);
+
                     IMqttDeliveryToken t= ServiceBroker.this.mqttClient.getTopic(p.getTopic()).publish(p);
                     sendMessages.put(t, p);
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
                 } catch (MqttException e) {
-
                     Log.e("ServiceBroker", e.getMessage());
-                    //e.printStackTrace();
-                    //p.publishFailed();
                 } finally {
-                    if(!backlog.contains(p))
-                        backlog.add(p);
                 }
             }
         });
@@ -708,10 +705,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		private boolean isPublishing;
 		private Object extra;
 
-		public Message(String topic, String payload,
-				boolean retained, int qos, ServiceMqttCallbacks callback,
-				Object extra) {
-
+		public Message(String topic, String payload, boolean retained, int qos, ServiceMqttCallbacks callback, Object extra) {
 			super(payload.getBytes());
 			this.setQos(qos);
 			this.setRetained(retained);
@@ -744,17 +738,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		public String getTopic() {
 			return this.topic;
 		}
-
-
-
     }
 
     private void deliverBacklog() {
         Iterator<Message> i = backlog.iterator();
         while (i.hasNext()) {
             Message m = i.next();
-
-
             publish(m);
         }
     }
