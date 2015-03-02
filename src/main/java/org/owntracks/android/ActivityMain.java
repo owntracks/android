@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.owntracks.android.adapter.ContactAdapter;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Defaults;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -862,7 +862,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+            if(e.getState() == ServiceBroker.State.CONNECTING)
                 clearMap();
 
         }
@@ -1094,7 +1094,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+            if(e.getState() == ServiceBroker.State.CONNECTING)
                 setListAdapter(false); // Ignore cached values. Either they're removed already or are invalid and will be removed soon
 		}
 
@@ -1337,7 +1337,7 @@ public class ActivityMain extends ActionBarActivity {
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             // Contact will be cleared, close this view
-            if(e.getState() == Defaults.State.ServiceBroker.CONNECTING)
+            if(e.getState() == ServiceBroker.State.CONNECTING)
                 FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
 
         }
