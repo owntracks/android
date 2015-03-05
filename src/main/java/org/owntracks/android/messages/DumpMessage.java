@@ -10,7 +10,7 @@ import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceLocator;
 import org.owntracks.android.support.StringifiedJSONObject;
 
-public class DumpMessage {
+public class DumpMessage extends Message {
     private LocationMessage location;
     private ConfigurationMessage configuration;
     private boolean locatorReady;
@@ -26,7 +26,7 @@ public class DumpMessage {
     private Integer brokerDeferredPublishablesCount;
     private ServiceBroker.State brokerState;
     private boolean applicationPlayServicesAvailable;
-        private JSONObject locatorDebug;
+    private JSONObject locatorDebug;
 
     public void setLocation(LocationMessage location) {
         this.location = location;

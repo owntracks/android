@@ -35,6 +35,49 @@ public class GeocodableLocation extends Location {
         this.extra = extra;
     }
 
+    public GeocodableLocation(StringifiedJSONObject json) throws JSONException{
+        super("owntracks-deserialized");
+
+        try {
+            String type = json.getString("_type");
+            if (!type.equals("location"))
+                throw new JSONException("wrong type");
+        } catch (JSONException e) {
+            Log.e("GeocodableLocation", "Unable to deserialize GeocodableLocation object from JSON");
+            throw new JSONException("wrong type");
+        }
+
+        try {
+            setLatitude( json.getDouble("lat"));
+        } catch (Exception e) {
+            setLatitude(0);
+        }
+
+        try {
+            setLongitude( json.getDouble("lon"));
+        } catch (Exception e) {
+            setLongitude(0);
+        }
+        try {
+            setAccuracy(Float.parseFloat(json.getString("acc")));
+        } catch (Exception e) {
+            setAccuracy((float) 0);
+        }
+
+        try {
+            setTime(TimeUnit.SECONDS.toMillis(Long.parseLong(json.getString("tst"))));
+        } catch (Exception e) {
+            setTime(0);
+        }
+
+        try {
+            setAltitude(json.getDouble("alt"));
+        } catch (Exception e) {
+            setAltitude((double) 0);
+        }
+    }
+
+
     public GeocodableLocation(Location location) {
 		this(location, null);
 	}
@@ -64,8 +107,7 @@ public class GeocodableLocation extends Location {
 			if (!type.equals("location"))
 				throw new JSONException("wrong type");
 		} catch (JSONException e) {
-			Log.e("GeocodableLocation",
-					"Unable to deserialize GeocodableLocation object from JSON");
+			Log.e("GeocodableLocation", "Unable to deserialize GeocodableLocation object from JSON");
 			return null;
 		}
 

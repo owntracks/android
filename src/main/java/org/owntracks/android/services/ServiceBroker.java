@@ -32,9 +32,10 @@ import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
+import org.owntracks.android.messages.Message;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.MessageCallbacks;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ServiceMqttCallbacks;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 import java.io.BufferedInputStream;
@@ -44,6 +45,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -66,6 +68,8 @@ import javax.net.ssl.TrustManagerFactory;
 import de.greenrobot.event.EventBus;
 
 public class ServiceBroker implements MqttCallback, ProxyableService {
+
+
     public static enum State {
         INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
     }
@@ -523,11 +527,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		doStart(true);
 	}
 
-	public void onEvent(Events.StateChanged.ServiceBroker event) {
-		if (event.getState() == State.CONNECTED)
-			publishDeferrables();
-	}
-
 	private void changeState(Exception e) {
 		this.error = e;
 		changeState(State.DISCONNECTED_ERROR, e);
@@ -633,23 +632,24 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         return c.getString(id);
     }
 
-	public void publish(String topic, String payload) {
-		publish(topic, payload, false, 0, null, null);
-	}
+    public void publish(String message, String topic, int qos, boolean retained, MessageCallbacks callback, Object extra) {
+        publish(new Message(topic, message, qos, retained, callback, extra));
+    }
 
-	public void publish(String topic, String payload, boolean retained) {
-		publish(topic, payload, retained, 0, null, null);
-	}
+        public void publish(Message message, String topic, int qos, boolean retained, MessageCallbacks callback, Object extra){
+        message.setCallback(callback);
+        message.setExtra(extra);
+        publish(message, topic, qos, retained);
+    }
 
-	public void publish(final String topic, final String payload,
-			final boolean retained, final int qos,
-			final ServiceMqttCallbacks callback, final Object extra) {
+    public void publish(Message message, String topic, int qos, boolean retained){
+        message.setTopic(topic);
+        message.setRetained(retained);
+        message.setQos(qos);
+        publish(message);
+    }
 
-		publish(new Message(topic, payload, retained, qos, callback, extra));
-
-	}
-
-	private void publish(final Message p) {
+	public void publish(final Message message) {
 
 		this.pubHandler.post(new Runnable() {
 
@@ -665,29 +665,31 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     return;
                 }
 
-                try {
-                    if(!backlog.contains(p))
-                        backlog.add(p);
+                // Handle TTL for message to discard it after message.ttl publish attempts
+                if (message.decrementTTL() >= 1) {
+                    if (!backlog.contains(message)) {
+                        backlog.add(message);
+                    }
+                } else if (backlog.contains(message)) {
+                    backlog.remove(message);
+                }
 
-                    IMqttDeliveryToken t= ServiceBroker.this.mqttClient.getTopic(p.getTopic()).publish(p);
-                    sendMessages.put(t, p);
+                message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
+
+                try {
+                    IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
+                    message.publishing();
+                    sendMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
+
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
                 } catch (MqttException e) {
+                    message.publishFailed();
                     Log.e("ServiceBroker", e.getMessage());
                 } finally {
                 }
             }
         });
 
-	}
-
-	private void publishDeferrables() {
-		for (Iterator<Message> iter = this.deferredPublishables
-				.iterator(); iter.hasNext();) {
-			Message p = iter.next();
-			iter.remove();
-			publish(p);
-		}
 	}
 
 
@@ -699,46 +701,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         return deferredPublishables != null ? deferredPublishables.size() : -1;
     }
 
-    private class Message extends MqttMessage {
-		private ServiceMqttCallbacks callback;
-		private String topic;
-		private boolean isPublishing;
-		private Object extra;
 
-		public Message(String topic, String payload, boolean retained, int qos, ServiceMqttCallbacks callback, Object extra) {
-			super(payload.getBytes());
-			this.setQos(qos);
-			this.setRetained(retained);
-			this.extra = extra;
-			this.callback = callback;
-			this.topic = topic;
-		}
-
-		public void publishFailed() {
-			if (this.callback != null)
-				this.callback.publishFailed(this.extra);
-		}
-
-		public void publishSuccessfull() {
-			if (this.callback != null)
-				this.callback.publishSuccessfull(this.extra);
-
-		}
-
-		public void publishing() {
-			this.isPublishing = true;
-			if (this.callback != null)
-				this.callback.publishing(this.extra);
-		}
-
-		public boolean isPublishing() {
-			return this.isPublishing;
-		}
-
-		public String getTopic() {
-			return this.topic;
-		}
-    }
 
     private void deliverBacklog() {
         Iterator<Message> i = backlog.iterator();
@@ -754,7 +717,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		//scheduleNextPing();
 
 		String msg = new String(message.getPayload());
-        Log.v(this.toString(), "Received message: " + topic + " : "  + msg);
+        Log.v(this.toString(), "Received message: " + topic + " : " + msg);
 
 		String type;
 		StringifiedJSONObject json;
@@ -768,21 +731,18 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		if (type.equals("location")) {
-            // GeocodableLocation l = GeocodableLocation.fromJsonObject(json);
-            LocationMessage lm = LocationMessage.fromJsonObject(json);
+            LocationMessage lm = new LocationMessage(json);
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
         } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic())) {
             String action;
             try {
                 action = json.getString("action");
             } catch (Exception e) {
-                //Log.v(this.toString(), "Received cmd message without action");
                 return;
             }
 
             switch (action) {
                 case "dump":
-                    //Log.v(this.toString(), "Received dump cmd message");
                     if (!Preferences.getRemoteCommandDump()) {
                         Log.i(this.toString(), "Dump remote command is disabled");
                         return;
@@ -790,7 +750,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     ServiceProxy.getServiceApplication().dump();
                     break;
                 case "dumpLog":
-                    //Log.v(this.toString(), "Received dump cmd message");
                     if (!Preferences.getRemoteCommandDump()) {
                         Log.i(this.toString(), "Dump remote command is disabled");
                         return;
@@ -798,8 +757,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     ServiceProxy.getServiceApplication().dumpLog();
                     break;
                 case "reportLocation":
-                    //Log.v(this.toString(), "Received reportLocation cmd message");
-
                     if (!Preferences.getRemoteCommandReportLocation()) {
                         Log.i(this.toString(), "ReportLocation remote command is disabled");
                         return;
@@ -833,7 +790,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
         Message message = sendMessages.remove(messageToken);
         backlog.remove(message);
-        message.publishSuccessfull();
+        message.publishSuccessful();
     }
 
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
@@ -993,7 +950,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private static final class CustomMemoryPersistence implements MqttClientPersistence {
         private static Hashtable data;
 
-        private CustomMemoryPersistence(){
+        public CustomMemoryPersistence(){
 
         }
 

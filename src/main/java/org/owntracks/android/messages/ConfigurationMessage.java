@@ -11,11 +11,18 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StringifiedJSONObject;
 
-public class ConfigurationMessage {
+public class ConfigurationMessage extends Message{
     private StringifiedJSONObject json;
     public static enum Includes {CONNECTION, CREDENTIALS, IDENTIFICATION, WAYPOINTS}
 
+    public ConfigurationMessage(StringifiedJSONObject json){
+        super();
+        this.json=json;
+    }
+
     public ConfigurationMessage(EnumSet<Includes> includes) {
+        super();
+
         json = Preferences.toJSONObject();
 
         if(!includes.contains(Includes.CONNECTION))
@@ -91,9 +98,6 @@ public class ConfigurationMessage {
         json.remove(key);
     }
 
-    public ConfigurationMessage(StringifiedJSONObject json){
-        this.json=json;
-    }
 
 
 }
