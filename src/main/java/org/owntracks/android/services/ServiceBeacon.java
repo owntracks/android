@@ -32,13 +32,13 @@ import org.owntracks.android.messages.BeaconMessage;
 import org.owntracks.android.support.BluetoothStateChangeReceiver;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ServiceMqttCallbacks;
+import org.owntracks.android.support.MessageCallbacks;
 
 // Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
 //  -> https://github.com/AltBeacon/spec
 
 public class ServiceBeacon implements
-        ProxyableService, ServiceMqttCallbacks,
+        ProxyableService, MessageCallbacks,
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
         BootstrapNotifier, RangeNotifier {

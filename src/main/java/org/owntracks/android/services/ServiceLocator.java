@@ -18,7 +18,7 @@ import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.support.DebugLogger;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.ServiceMqttCallbacks;
+import org.owntracks.android.support.MessageCallbacks;
 import org.owntracks.android.support.Preferences;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -44,7 +44,7 @@ import com.google.android.gms.location.LocationServices;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ServiceLocator implements ProxyableService, MessageCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public static enum State {
         INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION
     }
@@ -471,7 +471,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         return lm;
     }
 
-	private void publishWaypointMessage(WaypointMessage r) {
+	private void publishWaypointMessage(WaypointMessage message) {
 		if (ServiceProxy.getServiceBroker() == null) {
 			Log.e(this.toString(),
 					"publishWaypointMessage but ServiceMqtt not ready");
@@ -484,9 +484,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
 			return;
 		}
 
-        ServiceProxy.getServiceBroker().publish(
-				topic + Preferences.getPubTopicPartWaypoints(), r.toString(),
-				false, Preferences.getPubQos(), this, null);
+        ServiceProxy.getServiceBroker().publish(message, topic + Preferences.getPubTopicPartWaypoints(), Preferences.getPubQos(), false, this);
 	}
 
     public void publishManualLocationMessage() {
@@ -534,9 +532,7 @@ public class ServiceLocator implements ProxyableService, ServiceMqttCallbacks, G
         if(trigger != null)
             report.setTrigger(trigger);
 
-		ServiceProxy.getServiceBroker().publish(topic, report.toString(),
-				Preferences.getPubRetain(), Preferences.getPubQos(), this,
-				report);
+		ServiceProxy.getServiceBroker().publish(report, topic, Preferences.getPubQos(), Preferences.getPubRetain());
 
 	}
 

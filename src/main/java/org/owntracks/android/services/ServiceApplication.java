@@ -344,7 +344,7 @@ public class ServiceApplication implements ProxyableService,
 
 			updateNotification();
 
-			if (Preferences.getNotificationTickerOnPublish() && !l.doesSupressTicker())
+			if (Preferences.getNotificationTickerOnPublish() && !l.getSupressTicker())
 				updateTicker(this.context.getString(R.string.statePublished), Preferences.getNotificationVibrateOnPublish());
 
 		}
@@ -454,11 +454,11 @@ public class ServiceApplication implements ProxyableService,
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
         Log.v(this.toString(), "Dump data: " + dump.toString());
 
-        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), dump.toString(), false);
+        ServiceProxy.getServiceBroker().publish(dump, Preferences.getPubTopicBase(true), 0, false);
 
     }
 
     public void dumpLog() {
-        ServiceProxy.getServiceBroker().publish(Preferences.getPubTopicBase(true), ((App)context.getApplication()).getDebugLogger().toString(), false);
+        ServiceProxy.getServiceBroker().publish(((App)context.getApplication()).getDebugLogger().toString(), Preferences.getPubTopicBase(true), 0, false, null, null);
     }
 }

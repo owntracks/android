@@ -1,6 +1,6 @@
 package org.owntracks.android.support;
 
-public interface ServiceMqttCallbacks {
+public interface MessageCallbacks {
 	public void publishSuccessfull(Object extra);
 
 	public void publishFailed(Object extra);

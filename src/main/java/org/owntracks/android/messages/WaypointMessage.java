@@ -7,11 +7,13 @@ import java.util.concurrent.TimeUnit;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.StringifiedJSONObject;
 
-public class WaypointMessage {
+public class WaypointMessage extends Message {
 	Waypoint waypoint;
-    	String trackerId;
+    String trackerId;
 	public WaypointMessage(Waypoint w) {
-        	this.waypoint = w;
+        super();
+
+        this.waypoint = w;
     	}
 
 	@Override

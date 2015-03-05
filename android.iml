@@ -9,7 +9,6 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="SELECTED_BUILD_VARIANT" value="debug" />
-        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
@@ -84,26 +83,26 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="greendao-1.3.7" level="project" />
-    <orderEntry type="library" exported="" name="play-services-location-6.5.87" level="project" />
-    <orderEntry type="library" exported="" name="play-services-maps-6.5.87" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="android-beacon-library-2.1.3" level="project" />
-    <orderEntry type="library" exported="" name="crashlytics-2.2.1" level="project" />
-    <orderEntry type="library" exported="" name="library-1.8.2" level="project" />
-    <orderEntry type="library" exported="" name="play-services-base-6.5.87" level="project" />
-    <orderEntry type="library" exported="" name="fabric-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="answers-1.1.1" level="project" />
+    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-base-6.5.87" level="project" />
+    <orderEntry type="library" exported="" name="library-0.7.3" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="bugsnag-android-3.2.5" level="project" />
+    <orderEntry type="library" exported="" name="greendao-1.3.7" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="crashlytics-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="beta-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="library-0.7.3" level="project" />
     <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="library-0.9.6" level="project" />
+    <orderEntry type="library" exported="" name="library-1.8.2" level="project" />
+    <orderEntry type="library" exported="" name="fabric-1.1.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="org.eclipse.paho.android.service-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="bugsnag-android-3.2.5" level="project" />
+    <orderEntry type="library" exported="" name="play-services-maps-6.5.87" level="project" />
+    <orderEntry type="library" exported="" name="android-beacon-library-2.1.3" level="project" />
+    <orderEntry type="library" exported="" name="play-services-location-6.5.87" level="project" />
+    <orderEntry type="library" exported="" name="library-0.9.6" level="project" />
   </component>
 </module>
 
