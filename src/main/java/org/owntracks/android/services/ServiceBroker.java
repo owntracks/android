@@ -636,7 +636,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         publish(new Message(topic, message, qos, retained, callback, extra));
     }
 
-        public void publish(Message message, String topic, int qos, boolean retained, MessageCallbacks callback, Object extra){
+    public void publish(Message message, String topic, int qos, boolean retained, MessageCallbacks callback, Object extra){
         message.setCallback(callback);
         message.setExtra(extra);
         publish(message, topic, qos, retained);
@@ -906,7 +906,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 // This guarantees that the phone will not sleep until you have
                 // finished handling the broadcast.", but this class still get
                 // a wake lock to wait for ping finished.
-                int count = intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, -1);
+                long count = intent.getLongExtra(Intent.EXTRA_ALARM_COUNT, -1);
                 Log.d(TAG, "Ping " + count + " times.");
 
                 Log.d(TAG, "Check time :" + System.currentTimeMillis());

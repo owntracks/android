@@ -2,6 +2,7 @@ package org.owntracks.android.support;
 
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -13,7 +14,11 @@ import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONException;
 
+import de.greenrobot.dao.query.Query;
 import de.greenrobot.event.EventBus;
+
+import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.services.ServiceProxy;
 
 public class Preferences {
@@ -130,6 +135,7 @@ public class Preferences {
     public static void fromJsonObject(StringifiedJSONObject json) {
         if (!isPropperMessageType(json, "configuration"))
             return;
+
         Log.v("Preferences", "fromJsonObject: " +  json.toString());
 
 
@@ -169,6 +175,32 @@ public class Preferences {
         try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
+        try {
+            JSONArray j = json.getJSONArray("waypoints");
+            if (j != null) {
+                waypointsFromJson(j);
+            }
+        } catch(JSONException e){};
+    }
+
+    private static void waypointsFromJson(JSONArray j) {
+        WaypointDao dao = App.getWaypointDao();
+
+       /* for (JSONObject waypointJson : j) {
+
+            try {
+                Waypoint w = new Waypoint();
+                w.setLatitude(waypointJson.getDouble("latitude"));
+                w.setLatitude(waypointJson.getDouble("longitude"));
+                w.setDescription(waypointJson.getString("desc"));
+                w.setShared(waypointJson.getBoolean("shared"));
+                //w.setRadius(waypointJson.getDouble("latitude"));
+
+            } catch (JSONException e) {
+                continue;
+            }
+
+        }*/
 
     }
 
