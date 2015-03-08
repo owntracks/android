@@ -484,7 +484,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 			return;
 		}
 
-        ServiceProxy.getServiceBroker().publish(message, topic + Preferences.getPubTopicPartWaypoints(), Preferences.getPubQos(), false, this);
+        ServiceProxy.getServiceBroker().publish(message, topic + Preferences.getPubTopicPartWaypoints(), Preferences.getPubQos(), false, null, null);
 	}
 
     public void publishManualLocationMessage() {
@@ -532,12 +532,13 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         if(trigger != null)
             report.setTrigger(trigger);
 
-		ServiceProxy.getServiceBroker().publish(report, topic, Preferences.getPubQos(), Preferences.getPubRetain());
+		ServiceProxy.getServiceBroker().publish(report, topic, Preferences.getPubQos(), Preferences.getPubRetain(), this, report);
 
 	}
 
 	@Override
 	public void publishSuccessfull(Object extra) {
+        Log.v(this.toString(), "publish successfull in service locator");
 		if (extra == null)
 			return;
 

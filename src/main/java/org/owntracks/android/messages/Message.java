@@ -1,5 +1,7 @@
 package org.owntracks.android.messages;
 
+import android.util.Log;
+
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.owntracks.android.support.MessageCallbacks;
 
@@ -29,8 +31,11 @@ public class Message extends MqttMessage {
     }
 
     public void publishSuccessful() {
-        if (this.callback != null)
+        if (this.callback != null) {
+            Log.v(this.toString(), "Callback: " + this.callback);
             this.callback.publishSuccessfull(this.extra);
+        } else
+            Log.v(this.toString(), "message has no callback");
 
     }
 

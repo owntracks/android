@@ -306,8 +306,8 @@ public class ServiceBeacon implements
             return;
         }
 
-        ServiceProxy.getServiceBroker().publish(topic, r.toString(),
-                Preferences.getPubRetain(), Preferences.getPubQos(), this, r);
+        ServiceProxy.getServiceBroker().publish(r, topic,Preferences.getPubQos(),
+                Preferences.getPubRetain(), this, null);
 
     }
 

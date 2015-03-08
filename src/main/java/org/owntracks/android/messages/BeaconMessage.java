@@ -7,7 +7,7 @@ import org.owntracks.android.support.StringifiedJSONObject;
 
 import android.util.Log;
 
-public class BeaconMessage {
+public class BeaconMessage extends Message {
 
     private Identifier uuid;
     private Identifier major;
@@ -76,7 +76,7 @@ public class BeaconMessage {
         return json;
     }
 
-    public static LocationMessage fromJsonObject(StringifiedJSONObject json) {
+    public BeaconMessage(StringifiedJSONObject json) throws JSONException{
         // Not implemented
 
         try {
@@ -87,10 +87,9 @@ public class BeaconMessage {
             Log.e("BeaconMessage",
                     "Unable to deserialize LocationMessage object from JSON "
                             + json.toString());
-            return null;
+            throw e;
         }
 
-        return null;
 
     }
 }
