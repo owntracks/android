@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/connect"
+        android:icon="@drawable/ic_done"
+        android:orderInCategory="97"
+        app:showAsAction="ifRoom"
+        android:title="Connect">
+    </item>
+    <item
+        android:id="@+id/disconnect"
+        android:icon="@drawable/ic_close"
+        android:orderInCategory="97"
+        app:showAsAction="ifRoom"
+        android:title="Disconnect">
+    </item>
+</menu>

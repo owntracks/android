@@ -1,5 +1,6 @@
-package org.owntracks.android;
+package org.owntracks.android.activities;
 
+import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
 

@@ -53,7 +53,7 @@
     <color name="pressed">#FFE4E4E4</color>
     <color name="primary">#3f72b5</color>
     <color name="secondary">#305e9f</color>
-    <color name="accent">#ffa540</color>
+    <color name="accent">@color/primary</color>
 
 
 

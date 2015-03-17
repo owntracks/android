@@ -1,4 +1,4 @@
-package org.owntracks.android.preferences;
+package org.owntracks.android.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;

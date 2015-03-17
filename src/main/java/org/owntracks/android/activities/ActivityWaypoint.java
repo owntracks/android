@@ -1,4 +1,4 @@
-package org.owntracks.android;
+package org.owntracks.android.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.location.Geofence;
 
+import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;

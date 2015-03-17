@@ -14,28 +14,27 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 repositories {
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
     mavenCentral()
+
+    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
+    maven { url  "http://jcenter.bintray.com" }
+    maven { url 'https://maven.fabric.io/public' }
+
     flatDir {
         dirs 'libs'
     }
-    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.+'
     compile 'com.google.android.gms:play-services-maps:6.5.87'
     compile 'com.google.android.gms:play-services-location:6.5.87'
     compile 'com.google.android.gms:play-services-base:latest'
-    compile 'com.bugsnag:bugsnag-android:+'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'de.greenrobot:greendao:1.3.7'
     compile 'org.altbeacon:android-beacon-library:2.+@aar'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
 
-    compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
-        exclude module: 'support-v4'
-    }
 
     compile('com.crashlytics.sdk.android:crashlytics:2.2.1@aar') {
         transitive = true;
@@ -46,6 +45,9 @@ dependencies {
     compile('com.mikepenz.materialdrawer:library:0.9.6@aar') {
         transitive = true
     }
+    compile 'com.afollestad:material-dialogs:0.6.4.4'
+
+
 }
 
 android {
@@ -58,7 +60,7 @@ android {
             storePassword '__DEBUG__'
         }
     }
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion '21.1.2'
     defaultConfig {
         minSdkVersion 14

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:baseColor="@color/textPrimary"
+        app:primaryColor="@color/accent"
+        android:id="@+id/host"
+        android:inputType="textVisiblePassword|textNoSuggestions"
+        android:hint="@string/valHost"
+        app:floatingLabel="highlight"
+        app:floatingLabelText="@string/preferencesHost"
+        app:floatingLabelAlwaysShown="true"
+        />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:baseColor="@color/textPrimary"
+        app:primaryColor="@color/accent"
+        android:id="@+id/port"
+        android:inputType="number|textNoSuggestions"
+        android:maxLength="5"
+        android:digits="0123456789"
+        android:hint="@integer/valPort"
+        app:floatingLabel="highlight"
+        app:floatingLabelText="@string/preferencesPort"
+        app:floatingLabelAlwaysShown="true"
+
+        />
+</LinearLayout>

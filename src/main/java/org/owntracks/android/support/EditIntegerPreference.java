@@ -1,26 +1,37 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
-public class EditIntegerPreference extends EditTextPreference{
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;
 
-    public EditIntegerPreference(Context c) {
-        super(c);
+public class EditIntegerPreference extends org.owntracks.android.support.EditTextPreference {
+
+    public EditIntegerPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    public EditIntegerPreference(Context c, AttributeSet attrs) {
-        super(c, attrs);
+    public EditIntegerPreference(Context context) {
+        super(context);
     }
 
-    public EditIntegerPreference(Context c, AttributeSet attrs, int defStyle) {
-        super(c, attrs, defStyle);
-    }
     @Override
     protected boolean persistString(String value) {
+        if(value == null || "".equals(value)) {
+            SharedPreferences.Editor editor = getSharedPreferences().edit();
+            editor.remove(getKey());
+            editor.commit();
+            return true;
+        }
         try {
-            return value != null && persistInt(Integer.valueOf(value));
+            return persistInt(Integer.valueOf(value));
         } catch (NumberFormatException e) {
             return false;
         }
@@ -35,6 +46,5 @@ public class EditIntegerPreference extends EditTextPreference{
             return defaultReturnValue;
         }
     }
-
 
 }

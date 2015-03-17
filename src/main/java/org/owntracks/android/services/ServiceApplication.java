@@ -2,11 +2,9 @@ package org.owntracks.android.services;
 
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.Iterator;
 
-import org.owntracks.android.ActivityLauncher;
+import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.messages.ConfigurationMessage;
@@ -28,7 +26,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -257,7 +254,7 @@ public class ServiceApplication implements ProxyableService,
         }
 
 		// Clear ticker
-        this.notificationManager.notify(NOTIFCATION_ID_TICKER,  notificationBuilderTicker.build());
+        this.notificationManager.notify(NOTIFCATION_ID_TICKER, notificationBuilderTicker.build());
 
 		// if the notification is not enabled, the ticker will create an empty
 		// one that we get rid of
@@ -456,9 +453,5 @@ public class ServiceApplication implements ProxyableService,
 
         ServiceProxy.getServiceBroker().publish(dump, Preferences.getPubTopicBase(true), 0, false);
 
-    }
-
-    public void dumpLog() {
-        ServiceProxy.getServiceBroker().publish(((App)context.getApplication()).getDebugLogger().toString(), Preferences.getPubTopicBase(true), 0, false, null, null);
     }
 }
