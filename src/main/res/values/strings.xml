@@ -13,8 +13,8 @@
     <string name="preferencesCaCrtPath">Custom certificate path</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
-    <string name="preferencesLicenses">"Licenses"</string>
-    <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
+    <string name="preferencesLicenses">"Thanks"</string>
+    <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
 
     <string name="preferencesNotificationTickerOnPublish">Ticker on reports</string>
