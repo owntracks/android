@@ -16,6 +16,7 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -35,14 +36,14 @@ public class Contact {
 	private Bitmap userImage;
     private BitmapDescriptor userImageDescriptor;
 	private static final int userImageHeightScale = (int) convertDpToPixel(48);
-    private static Bitmap defaultUserImage = getRoundedShape(Bitmap
-			.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy
+    private static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy
 					.getInstance().getResources(), R.drawable.noimage),
 					userImageHeightScale, userImageHeightScale, true));
     private static BitmapDescriptor defaultUserImageDescriptor = BitmapDescriptorFactory.fromBitmap(defaultUserImage);
 
 	private Marker marker;
 	private View view;
+	private Drawable imageDrawable;
 
 	public Contact(String topic) {
 		this.topic = topic;
@@ -183,4 +184,7 @@ public class Contact {
 		return output;
 	}
 
+	public Drawable getImageDrawable() {
+		return imageDrawable;
+	}
 }

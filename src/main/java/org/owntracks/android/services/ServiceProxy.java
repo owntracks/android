@@ -20,6 +20,12 @@ public class ServiceProxy extends ServiceBindable {
     public static final String INTENT_ACTION_PUBLISH_PING = "org.owntracks.android.intent.PUB_PING";
     public static final String INTENT_ACTION_LOCATION_CHANGED = "org.owntracks.android.intent.LOCATION_CHANGED";
     public static final String INTENT_ACTION_FENCE_TRANSITION = "org.owntracks.android.intent.FENCE_TRANSITION";
+    public static final String INTENT_ACTION_RECONNECT = "org.owntracks.android.intent.RECONNECT";
+
+    public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
+    public static final String WAKELOCK_TAG_BROKER_NETWORK = "org.owntracks.android.wakelock.broker.network";
+    public static final String WAKELOCK_TAG_BROKER_CONNECTIONLOST = "org.owntracks.android.wakelock.broker.connectionlost";
+
 
 
     public static final String SERVICE_APP = "1:App";
@@ -27,7 +33,7 @@ public class ServiceProxy extends ServiceBindable {
 	public static final String SERVICE_BROKER = "3:Brk";
     public static final String SERVICE_BEACON = "4:Bec";
 	public static final String KEY_SERVICE_ID = "srvID";
-	private static ServiceProxy instance;
+    private static ServiceProxy instance;
 	private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
 
 	private static LinkedList<Runnable> runQueue = new LinkedList<Runnable>();

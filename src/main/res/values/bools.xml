@@ -26,5 +26,6 @@
     <bool name="valRemoteConfiguration">false</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
+    <bool name="valTls">true</bool>
 
 </resources>

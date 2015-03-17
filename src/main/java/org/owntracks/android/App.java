@@ -14,7 +14,6 @@ import org.owntracks.android.db.DaoSession;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.services.ServiceBroker;
-import org.owntracks.android.support.DebugLogger;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import android.app.Application;
@@ -28,7 +27,7 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bugsnag.android.Bugsnag;
+import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
 
@@ -39,7 +38,6 @@ public class App extends Application {
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
     private static HashMap<String, Contact> contacts;
-    private DebugLogger debugLogger;
 
 	@Override
 	public void onCreate() {
@@ -52,7 +50,6 @@ public class App extends Application {
             Fabric.with(fabric);
         }
 
-        this.debugLogger = new DebugLogger();
 
         Preferences.handleFirstStart();
         OpenHelper helper = new OpenHelper(this, "org.owntracks.android.db", null) {
@@ -70,6 +67,9 @@ public class App extends Application {
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
+
+		//Initialize Google Maps and BitmapDescriptorFactory
+		MapsInitializer.initialize(getApplicationContext());
 
 		EventBus.getDefault().register(this);
 
@@ -132,9 +132,6 @@ public class App extends Application {
 						.getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
 	}
 
-    public DebugLogger getDebugLogger(){
-        return this.debugLogger;
-    }
 
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();

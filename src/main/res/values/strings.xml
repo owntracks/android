@@ -3,29 +3,32 @@
 
     <string name="app_name">Owntracks</string>
     <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesServerAddress">"Host*"</string>
-    <string name="preferencesServerPort">"Port"</string>
-    <string name="preferencesUserUsername">"Username*"</string>
-    <string name="preferencesDeviceName">"Device ID*"</string>
+    <string name="preferencesHost">"Host"</string>
+    <string name="preferencesPort">"Port"</string>
+    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesDeviceName">"Device ID"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
-    <string name="preferencesBrokerPassword">"Password*"</string>
-    <string name="preferencesCaCrtPath">Absolute certificate path*</string>
+    <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesCaCrtPath">Custom certificate path</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
     <string name="preferencesLicenses">"Licenses"</string>
     <string name="preferencesLicensesSummary">"Details for included open-source software"</string>
     <string name="preferencesNotification">Notifications</string>
+
+    <string name="preferencesNotificationTickerOnPublish">Ticker on reports</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
-    <string name="preferencesNotificationTickerOnPublish">Ticker on report</string>
+
+    <string name="preferencesNotificationVibrateOnPublish">Vibrate on reports</string>
     <string name="preferencesNotificationVibrateOnPublishSummary">Vibrate on successful reports</string>
-    <string name="preferencesNotificationVibrateOnPublish">Vibrate on report</string>
+
+    <string name="preferencesNotificationTickerOnWaypointTransition">Ticker on waypoints </string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
-    <string name="preferencesNotificationTickerOnWaypointTransitionTitle">Ticker on waypoint </string>
-    <string name="preferencesNotificationVibrateOnWaypointTransitionSummary">Vibrate on waypoint events </string>
-    <string name="preferencesNotificationVibrateOnWaypointTransitionTitle">Vibrate on waypoint </string>
-    <string name="preferencesNotificationOnReceivedWaypointTransitionSummary">Show a notification on received waypoint transitions </string>
-    <string name="preferencesNotificationOnReceivedWaypointTransitionTitle">Notification on waypoint transition</string>
+
+    <string name="preferencesNotificationVibrateOnWaypointTransition">Vibrate on waypoints </string>
+    <string name="preferencesNotificationVibrateOnWaypointTransitionSummary">Vibrate on waypoint events</string>
+
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
@@ -36,8 +39,8 @@
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesTopicSettings">"Reporting"</string>
-    <string name="preferencesTopic">"Base topic"</string>
-    <string name="preferencesTopicSummary">"Base topic to send and receive messages"</string>
+    <string name="preferencesTopic">"Topic"</string>
+    <string name="preferencesTopicSummary">"Topic to send and receive messages"</string>
     <string name="preferencesRetain">"Publish retained"</string>
     <string name="preferencesRetainSummary">"Retained flag for publishes"</string>
     <string name="preferencesQOS">"Publish QOS"</string>
@@ -269,6 +272,18 @@
     <string name="userImage">user image</string>
     <string name="importConfig">Import</string>
     <string name="importWarning">The following preference values will be imported:</string>
-
+    <string name="tls">TLS</string>
+    <string name="tlsCustomCertificate">TLS custom certificate</string>
+    <string name="preferencesSecurity">Security</string>
+    <string name="preferencesAuthentication">Authentication</string>
+    <string name="keyAuthentication">authentication</string>
+    <string name="keySecurity">security</string>
+    <string name="accept">Accept</string>
+    <string name="keyIdentification">identification</string>
+    <string name="preferencesIdentification">Identification</string>
+    <string name="preferencesOptions">Paremeters</string>
+    <string name="keyOptions">options</string>
+    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="seconds">Seconds</string>
 
 </resources>

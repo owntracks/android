@@ -1,4 +1,4 @@
-package org.owntracks.android;
+package org.owntracks.android.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.adapter.WaypointAdapter;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;

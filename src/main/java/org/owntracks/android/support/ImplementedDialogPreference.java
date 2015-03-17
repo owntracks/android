@@ -1,4 +1,4 @@
-package org.owntracks.android.preferences;
+package org.owntracks.android.support;
 
 import android.content.Context;
 import android.preference.DialogPreference;

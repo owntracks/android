@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -70,7 +71,7 @@ import de.greenrobot.event.EventBus;
 public class ServiceBroker implements MqttCallback, ProxyableService {
 
 
-    public static enum State {
+    public enum State {
         INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
     }
 
@@ -78,10 +79,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private static State state = State.INITIAL;
 
 	private CustomMqttClient mqttClient;
-	private static ServiceBroker instance;
 	private Thread workerThread;
 	private LinkedList<Message> deferredPublishables;
-	private Exception error;
+	private static Exception error;
 	private HandlerThread pubThread;
 	private Handler pubHandler;
     private MqttClientPersistence persistenceStore;
@@ -92,21 +92,22 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private WakeLock networkWakelock;
     private WakeLock connectionWakelock;
     private String TAG_WAKELOG = "org.owntracks.android.wakelog.broker";
-
-    private Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<IMqttDeliveryToken, Message>();
-    private List<Message> backlog = new LinkedList<Message>();
+    private ReconnectTimer reconnectTimer;
+    private Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<>();
+    private List<Message> backlog = new LinkedList<>();
 
     @Override
 	public void onCreate(ServiceProxy p) {
 		this.context = p;
 		this.workerThread = null;
 		this.error = null;
-        this.subscribtions = new LinkedList<String>();
+        this.subscribtions = new LinkedList<>();
 		this.deferredPublishables = new LinkedList<Message>();
 		this.pubThread = new HandlerThread("MQTTPUBTHREAD");
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
         this.persistenceStore = new CustomMemoryPersistence();
+        this.reconnectTimer = new ReconnectTimer(context);
         changeState(State.INITIAL);
         doStart();
 	}
@@ -149,8 +150,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         if(!Preferences.canConnect()) {
             //Log.v(this.toString(), "handleStart: canConnect() == false");
             return;
-        } else {
-            //Log.v(this.toString(), "handleStart: canConnect() == true");
         }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
@@ -212,7 +211,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		try {
-			String prefix = Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsNone) ? "tcp" : "ssl";
+			String prefix = Preferences.getTls() ? "ssl" : "tcp";
 			String cid = Preferences.getClientId(true);
             Log.v(this.toString(), "Using client id: " + cid);
 
@@ -355,8 +354,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				options.setUserName(Preferences.getUsername());
 			}
 
-			if (Preferences.getTls() != Preferences.getIntResource(R.integer.valTlsNone)) {
-                options.setSocketFactory(new CustomSocketFactory(Preferences.getTls() == Preferences.getIntResource(R.integer.valTlsCustom)));
+			if (Preferences.getTls()) {
+                options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCrtPath().length() > 0));
             }
 
 			// setWill(options);
@@ -397,11 +396,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		//if (!isConnected())
 		//	Log.e(this.toString(), "onConnect: !isConnected");
 
+        reconnectTimer.stop();
+
 		// Establish observer to monitor wifi and radio connectivity
 		if (this.netConnReceiver == null) {
 			this.netConnReceiver = new NetworkConnectionIntentReceiver();
-			this.context.registerReceiver(this.netConnReceiver,
-					new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+			this.context.registerReceiver(this.netConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		}
 
 		// Establish ping sender
@@ -439,7 +439,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         if(!isConnected())
             return;
 
-        Log.v(this.toString(), "Subscribing to: " + topics);
+        for(String s : topics) {
+            Log.v(this.toString(), "Subscribing to: " + s);
+        }
         this.mqttClient.subscribe(topics);
         for (String topic : topics) {
             subscribtions.push(topic);
@@ -505,7 +507,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// lock - just enough to keep the CPU running until we've finished
 
         if(connectionWakelock == null )
-            connectionWakelock = ((PowerManager) this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Owntracks-ServiceBroker-ConnectionLost");
+            connectionWakelock = ((PowerManager) this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_CONNECTIONLOST);
 
         if (!connectionWakelock.isHeld())
             connectionWakelock.acquire();
@@ -517,6 +519,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			changeState(State.DISCONNECTED);
 			//scheduleNextPing();
         }
+
+        reconnectTimer.start();
 
         if(connectionWakelock.isHeld())
             connectionWakelock.release();
@@ -563,8 +567,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		return state == State.DISCONNECTED_ERROR;
 	}
 
-	public boolean hasError() {
-		return this.error != null;
+	public static boolean hasError() {
+		return error != null;
 	}
 
 	public boolean isConnecting() {
@@ -576,9 +580,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		return isOnline();
 	}
 
-	public static ServiceBroker getInstance() {
-		return instance;
-	}
 
 	@Override
 	public void onDestroy() {
@@ -593,13 +594,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	public static String getErrorMessage() {
-		Exception e = getInstance().error;
-
-		if ((getInstance() != null) && getInstance().hasError()
-				&& (e.getCause() != null))
-			return "Error: " + e.getCause().getLocalizedMessage();
+		if (hasError() && (error.getCause() != null))
+			return "Error: " + error.getCause().getLocalizedMessage();
 		else
-			return "Error: " + getInstance().context.getString(R.string.na);
+			return "Error: " + ServiceProxy.getInstance().getString(R.string.na);
 
 	}
 
@@ -656,13 +654,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             @Override
             public void run() {
 
+                // This should never happen
                 if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
                     Log.e("ServiceBroker", "PUB ON MAIN THREAD");
-                }
-
-                if (mqttClient == null) {
-                    Log.d("ServiceBroker", "no mqttClient initialized");
-                    return;
                 }
 
                 // Handle TTL for message to discard it after message.ttl publish attempts
@@ -672,6 +666,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     }
                 } else if (backlog.contains(message)) {
                     backlog.remove(message);
+                }
+
+                // Check if we can publish
+                if (!isOnline() || !isConnected()) {
+                    Log.d("ServiceBroker", "publish deferred");
+                    doStart();
+                    return;
                 }
 
                 message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
@@ -684,7 +685,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
                 } catch (MqttException e) {
                     message.publishFailed();
-                    Log.e("ServiceBroker", e.getMessage());
+                    Log.e("ServiceBroker", message + ", error:" + e.getMessage());
                 } finally {
                 }
             }
@@ -749,13 +750,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     }
                     ServiceProxy.getServiceApplication().dump();
                     break;
-                case "dumpLog":
-                    if (!Preferences.getRemoteCommandDump()) {
-                        Log.i(this.toString(), "Dump remote command is disabled");
-                        return;
-                    }
-                    ServiceProxy.getServiceApplication().dumpLog();
-                    break;
                 case "reportLocation":
                     if (!Preferences.getRemoteCommandReportLocation()) {
                         Log.i(this.toString(), "ReportLocation remote command is disabled");
@@ -799,7 +793,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		public void onReceive(Context ctx, Intent intent) {
 
             if(networkWakelock == null )
-                networkWakelock = ((PowerManager) ServiceBroker.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Owntracks-ServiceBroker-ConnectionLost");
+                networkWakelock = ((PowerManager) ServiceBroker.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
 
             if (!networkWakelock.isHeld())
                 networkWakelock.acquire();
@@ -809,7 +803,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 doStart();
             }
 
-            if(networkWakelock.isHeld())
+            if(networkWakelock.isHeld());
                 networkWakelock.release();
         }
 	}
@@ -854,7 +848,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         public void init(ClientComms comms) {
             Log.v(this.toString(), "AlarmPingSender init");
             this.comms = comms;
-            this.alarmReceiver = new AlarmReceiver();
+            this.alarmReceiver = new PingTimer();
         }
 
         @Override
@@ -889,14 +883,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
         @Override
         public void schedule(long delayInMilliseconds) {
-            long nextAlarmInMilliseconds = System.currentTimeMillis()
-                    + delayInMilliseconds;
-            Log.d(TAG, "Schedule next alarm at " + nextAlarmInMilliseconds);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds, pendingIntent);
+
+            // With API >= 19 Android may skew ping alarm in a window between 1000 ms and delayInMilliseconds to combine wackup with other alarms
+            // In lower APIs we use a fixed timestamp for wakeup
+            //if(Build.VERSION.SDK_INT >= 19)
+           //     alarmManager.setWindow(AlarmManager.RTC_WAKEUP, 1000, delayInMilliseconds, pendingIntent);
+           // else
+                alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, pendingIntent);
+
         }
 
-        class AlarmReceiver extends BroadcastReceiver {
+
+
+        class PingTimer extends BroadcastReceiver {
             private WakeLock wakelock;
 
             @Override
@@ -919,14 +919,16 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
                 if (wakelock == null) {
                     PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
-                    wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG_WAKELOG);
+                    wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_PING);
                 }
-                wakelock.acquire();
+
+                if(!wakelock.isHeld())
+                    wakelock.acquire();
                 token.setActionCallback(new IMqttActionListener() {
 
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d(TAG, "Success. Release lock(" + TAG_WAKELOG + "):" + System.currentTimeMillis());
+                        Log.d(TAG, "Success. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
                         if(wakelock != null && wakelock.isHeld()){
                             wakelock.release();
                         }
@@ -935,7 +937,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     @Override
                     public void onFailure(IMqttToken asyncActionToken,
                                           Throwable exception) {
-                        Log.d(TAG, "Failure. Release lock(" + TAG_WAKELOG + "):"
+                        Log.d(TAG, "Failure. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):"
                                 + System.currentTimeMillis());
                         //Release wakelock when it is done.
                         if(wakelock != null && wakelock.isHeld()){
@@ -945,6 +947,82 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 });
             }
         }
+
+
+    }
+
+    class ReconnectTimer {
+        private PendingIntent pendingIntent;
+        private ReconnectReceiver alarmReceiver;
+
+        private static final int MAX_INTERVAL_MS = 60 * 60 * 1000; // 60 Minutes in miliseconds
+        private static final int INTERVAL_MS = 5 * 60 * 1000; // 10 minutes in miliseconds;
+        private int backoff = 0;
+
+        private Context context;
+        private boolean hasStarted;
+
+
+        public ReconnectTimer(Context context) {
+            this.context = context;
+            this.alarmReceiver = new ReconnectReceiver();
+
+        }
+
+        public void start() {
+            if(hasStarted)
+                return;
+
+            Log.v(this.toString(), "ReconnectTimer start");
+            context.registerReceiver(alarmReceiver, new IntentFilter(ServiceProxy.INTENT_ACTION_RECONNECT));
+            pendingIntent = PendingIntent.getBroadcast(this.context, 0, new Intent(ServiceProxy.INTENT_ACTION_RECONNECT), PendingIntent.FLAG_UPDATE_CURRENT);
+            schedule();
+            hasStarted = true;
+        }
+
+        public void stop() {
+            Log.v(this.toString(), "ReconnectTimer stop");
+            backoff = 0; // Reset backoff
+
+            // Cancel Alarm.
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+
+            if (hasStarted) {
+                hasStarted = false;
+                try {
+                    context.unregisterReceiver(alarmReceiver);
+                } catch (IllegalArgumentException e) {
+                    //Ignore unregister errors.
+                }
+            }
+        }
+
+        /*
+         * Schedules a reconnect attempt between after 10, 20, 30,...60, 60, 60 minutes.
+         * On APIs >= 19 the OS may skew the time between 5 minutes and 10, 20, 30... minutes
+         * */
+        private void schedule() {
+            backoff++;
+            AlarmManager alarmManager = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
+
+            int delayInMilliseconds = INTERVAL_MS * backoff < MAX_INTERVAL_MS ? INTERVAL_MS * backoff : MAX_INTERVAL_MS;
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, pendingIntent);
+        }
+
+        class ReconnectReceiver extends BroadcastReceiver {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+				Log.v(this.toString(), "onReceive");
+                doStart();
+                schedule();
+            }
+
+
+
+
+        }
+
     }
 
     private static final class CustomMemoryPersistence implements MqttClientPersistence {
@@ -957,7 +1035,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         @Override
         public void open(String s, String s2) throws MqttPersistenceException {
             if(data == null) {
-                this.data = new Hashtable();
+                data = new Hashtable();
             }
         }
 

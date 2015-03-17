@@ -1,4 +1,4 @@
-package org.owntracks.android;
+package org.owntracks.android.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.adapter.ContactAdapter;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
@@ -52,7 +54,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -145,7 +146,6 @@ public class ActivityMain extends ActionBarActivity {
         Log.v(this.toString(), "Fragment show current or root");
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
-        MapsInitializer.initialize(this);
 	}
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -619,7 +619,7 @@ public class ActivityMain extends ActionBarActivity {
 
 			// Check if we were successful in obtaining the map.
 			if (this.mMapView != null) {
-                MapsInitializer.initialize(getActivity());
+                //MapsInitializer.initialize(getActivity());
 				setUpMap();
 			}
 
@@ -772,7 +772,8 @@ public class ActivityMain extends ActionBarActivity {
                 c.getMarker().remove();
             }
 
-			Marker m = this.googleMap.addMarker(new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()));
+			Marker m = this.googleMap.addMarker(
+                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 
@@ -1060,6 +1061,9 @@ public class ActivityMain extends ActionBarActivity {
         public boolean onContextItemSelected(MenuItem item)
         {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            if(info == null)
+                return true;
+
             Contact c = (Contact) listAdapter.getItem(info.position);
 
             switch (item.getItemId()) {

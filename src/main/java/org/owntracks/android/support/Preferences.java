@@ -22,6 +22,8 @@ import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.services.ServiceProxy;
 
 public class Preferences {
+    private static String subTopicFallback;
+
     public static SharedPreferences getSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(App.getContext());
     }
@@ -77,9 +79,8 @@ public class Preferences {
 
     public static boolean canConnect() {
 
-        return  !getHost().trim().equals("")
+        return  !getHost(false).trim().equals("")
                 && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()))
-                && ((getTls() == getIntResource(R.integer.valTls)) || (getTls() == getIntResource(R.integer.valTlsNone) || (getTls() == getIntResource(R.integer.valTlsCustom) && !getTlsCrtPath().trim().equals(""))))
                 ;
     }
 
@@ -122,7 +123,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
-                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId());
+                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true));
 
             Log.v("Preferences", "toJsonObject: " + json.toString());
 
@@ -148,7 +149,7 @@ public class Preferences {
         try { setPubQos(json.getInt(getStringRessource(R.string.keyPubQos))); } catch (JSONException e) {}
         try { setKeepalive(json.getInt(getStringRessource(R.string.keyKeepalive))); } catch (JSONException e) {}
         try { setPubRetain(json.getBoolean(getStringRessource(R.string.keyPubRetain))); } catch (JSONException e) {}
-        try { setTls(json.getInt(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
+        try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
         try { setTlsCrtPath(json.getString(getStringRessource(R.string.keyTlsCrtPath))); } catch (JSONException e) {}
         try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
@@ -278,7 +279,7 @@ public class Preferences {
     // Locator interval is set by the user in minutes and therefore should be exported/imported in minutes.
     // getLocatorIntervalMillis can be used to get the millisec value (e.g as needed by ServiceLocator)
     public static int getLocatorInterval() {
-        return getInt(R.string.keyLocatorInterval,R.integer.valLocatorInterval);
+        return getInt(R.string.keyLocatorInterval, R.integer.valLocatorInterval);
     }
 
     public static String getUsername() {
@@ -315,6 +316,16 @@ public class Preferences {
         return !"".equals(username) ? username+"/"+deviceId : deviceId;
     }
 
+    public static String getTmpClientIdFallback(String username, String deviceId) {
+        String d;
+        if(!"".equals(deviceId))
+            d = deviceId;
+        else
+            d = Preferences.getAndroidId();
+
+        return !"".equals(username) ? username+"/"+d : d;
+    }
+
     public static void setClientId(String clientId) {
         setString(R.string.keyClientId, clientId);
     }
@@ -338,23 +349,38 @@ public class Preferences {
         return getPubTopicBase(true);
     }
 
-    public static String getTrackerId() {
+    public static String getTrackerId(boolean fallback) {
 
-        String tid=getString(R.string.keyTrackerId, R.string.valTrackerId);
+        String tid=getString(R.string.keyTrackerId, R.string.valEmpty);
 
         if(tid==null || tid.isEmpty())
-            return getTrackerIdFallback();
+            return fallback ? getTrackerIdFallback() : "";
         else
             return tid;
     }
 
     public static String getTrackerIdFallback(){
-        String topicText = getPubTopicBase(true);
+        String deviceId = getDeviceId(true);
 
-        if(topicText!=null && topicText.length() >= 2)
-            return topicText.substring(topicText.length() - 2);   // defaults to the last two characters of configured topic.
+        if(deviceId!=null && deviceId.length() >= 2)
+            return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured topic.
         else
-            return "";  // Empty trackerId won't be included in the message. Alternatively, "na" not available could be returned?
+            return "na";  // Empty trackerId won't be included in the message. Alternatively, "na" not available could be returned?
+    }
+
+
+
+    public static String getTmpTrackerIdFallback(String deviceId) {
+        String d;
+        if(!"".equals(deviceId))
+            d = deviceId;
+        else
+            d = Preferences.getAndroidId();
+
+        if(d.length() >= 2)
+            return d.substring(d.length() - 2);
+        else
+            return "na";
     }
 
     public static String getPubTopicPartWaypoints() {
@@ -393,12 +419,25 @@ public class Preferences {
         else {
             if( len >0 && Character.isLetterOrDigit(value.charAt(0)))
                 setString(R.string.keyTrackerId, value);
+            else
+                setString(R.string.keyTrackerId,"");
         }
 
     }
 
-    public static int getPort() {
-        return getInt(R.string.keyPort, R.integer.valPort);
+    public static int getPort(){
+        return getPort(true);
+    }
+    public static int getPort(boolean fallback) {
+
+        int port = getInt(R.string.keyPort, R.integer.valZero);
+        if (port == 0 && fallback)
+            port = getPortFallback();
+        return port;
+    }
+
+    public static int getPortFallback() {
+        return getIntResource(R.integer.valPort);
     }
 
 
@@ -406,6 +445,7 @@ public class Preferences {
         setInt(R.string.keyKeepalive, value);
     }
 
+    //Seconds between ping messages
     public static int getKeepalive() {
         return getInt(R.string.keyKeepalive, R.integer.valKeepalive);
     }
@@ -536,8 +576,8 @@ public class Preferences {
         setBoolean(R.string.keyAuth, auth);
     }
 
-    public static void setTls(int tlsSpecifier) {
-        setInt(R.string.keyTls, tlsSpecifier);
+    public static void setTls(boolean tlsSpecifier) {
+        setBoolean(R.string.keyTls, tlsSpecifier);
     }
 
     public static void setTlsCrtPath(String tlsCrtPath) {
@@ -549,16 +589,23 @@ public class Preferences {
         EventBus.getDefault().post(new Events.BrokerChanged());
     }
 
-    public static String getHost() {
-        return getString(R.string.keyHost, R.string.valHost);
+    public static String getHost(){
+        return getHost(true);
+    }
+    public static String getHost(boolean fallback) {
+
+        String host = getString(R.string.keyHost, R.string.valEmpty);
+        if ("".equals(host) && fallback)
+            host = getStringRessource(R.string.valHost);
+        return host;
     }
 
     public static String getPassword() {
         return getString(R.string.keyPassword, R.string.valEmpty);
     }
 
-    public static int getTls() {
-        return getInt(R.string.keyTls, R.integer.valTls);
+    public static boolean getTls() {
+        return getBoolean(R.string.keyTls, R.bool.valTls);
     }
 
     public static String getTlsCrtPath() {
@@ -719,5 +766,9 @@ public class Preferences {
             return false;
         }
         return true;
+    }
+
+    public static String getSubTopicFallback() {
+        return subTopicFallback;
     }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preferencesNotificationTickerOnPublish">Notify about reports</string>
+    <string name="preferencesNotificationTickerOnPublishSummary">Priority notification for reports</string>
+    <string name="preferencesNotificationTickerOnWaypointTransition">Notify about waypoints</string>
+    <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Priority notification for waypoints</string>
+</resources>

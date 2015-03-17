@@ -161,11 +161,11 @@ ADDED from AndroidManifest.xml:40:9
 		ADDED from AndroidManifest.xml:41:13
 	android:value
 		ADDED from AndroidManifest.xml:42:13
-activity#org.owntracks.android.ActivityMain
+activity#org.owntracks.android.activities.ActivityMain
 ADDED from AndroidManifest.xml:49:9
 	android:name
 		ADDED from AndroidManifest.xml:49:19
-activity#org.owntracks.android.ActivityPreferences
+activity#org.owntracks.android.activities.ActivityPreferences
 ADDED from AndroidManifest.xml:51:9
 	android:label
 		ADDED from AndroidManifest.xml:54:13
@@ -173,7 +173,7 @@ ADDED from AndroidManifest.xml:51:9
 		ADDED from AndroidManifest.xml:53:13
 	android:name
 		ADDED from AndroidManifest.xml:52:13
-activity#org.owntracks.android.preferences.ActivityExport
+activity#org.owntracks.android.activities.ActivityExport
 ADDED from AndroidManifest.xml:56:9
 	android:label
 		ADDED from AndroidManifest.xml:59:13
@@ -205,7 +205,7 @@ ADDED from AndroidManifest.xml:89:9
 		ADDED from AndroidManifest.xml:91:13
 	android:name
 		ADDED from AndroidManifest.xml:90:13
-activity#org.owntracks.android.ActivityLauncher
+activity#org.owntracks.android.activities.ActivityLauncher
 ADDED from AndroidManifest.xml:94:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:99:13
@@ -264,13 +264,13 @@ action#android.intent.action.EDIT
 ADDED from AndroidManifest.xml:128:13
 	android:name
 		ADDED from AndroidManifest.xml:128:21
-activity#org.owntracks.android.ActivityWaypoints
+activity#org.owntracks.android.activities.ActivityWaypoints
 ADDED from AndroidManifest.xml:170:9
 	android:label
 		ADDED from AndroidManifest.xml:172:13
 	android:name
 		ADDED from AndroidManifest.xml:171:13
-activity#org.owntracks.android.ActivityWaypoint
+activity#org.owntracks.android.activities.ActivityWaypoint
 ADDED from AndroidManifest.xml:174:9
 	android:label
 		ADDED from AndroidManifest.xml:176:13

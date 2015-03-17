@@ -5,7 +5,9 @@ import android.content.res.TypedArray;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-public class ListIntegerPreference extends ListPreference
+import com.afollestad.materialdialogs.prefs.MaterialListPreference;
+
+public class ListIntegerPreference extends MaterialListPreference
 {
     public ListIntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
