@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -36,12 +37,15 @@ import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ActivityExport extends ActionBarActivity {
     private static final String TEMP_FILE_NAME = "config.otrc";
-    private CheckBox includePreferences;
-    private CheckBox includeConnection;
-    private CheckBox includeCredentials;
-    private CheckBox includeDeviceIdentification;
-    private CheckBox includeWaypoints;
+    private Switch includeConnection;
+    private Switch includeCredentials;
+    private Switch includeDeviceIdentification;
+    private Switch includeWaypoints;
 
+    boolean includeConnectionVal=true;
+    boolean includeCredentialsVal=false;
+    boolean includeDeviceIdentificationVal=false;
+    boolean includeWaypointsVal=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +57,36 @@ public class ActivityExport extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getResources().getString(R.string.export));
 
-        includeConnection = (CheckBox) findViewById(R.id.includeConnection);
-        includeCredentials = (CheckBox) findViewById(R.id.includeUsernamePassword);
-        includeDeviceIdentification = (CheckBox) findViewById(R.id.includeDeviceIdentification);
-        includeWaypoints = (CheckBox) findViewById(R.id.includeWaypoints);
+        includeConnection = (Switch) findViewById(R.id.includeConnection);
+        includeCredentials = (Switch) findViewById(R.id.includeUsernamePassword);
+        includeDeviceIdentification = (Switch) findViewById(R.id.includeDeviceIdentification);
+        includeWaypoints = (Switch) findViewById(R.id.includeWaypoints);
 
         includeConnection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setUsernameDeviceExport(isChecked);
+                includeConnectionVal = isChecked;
+                setUsernameDeviceExport(includeConnectionVal);
+            }
+        });
+
+        includeCredentials.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                includeCredentialsVal = isChecked;
+            }
+        });
+
+        includeDeviceIdentification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                includeDeviceIdentificationVal = isChecked;
+            }
+        });
+        includeWaypoints.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                includeWaypointsVal = isChecked;
             }
         });
     }
