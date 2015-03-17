@@ -691,7 +691,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             }
         });
 
-	}
+	}   
 
 
     public Exception getError() {
