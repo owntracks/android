@@ -223,8 +223,8 @@
 
     <string name="preferencesImportExport">Import / Export</string>
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
-    <string name="exportIncludeUsernamePassword">Broker username / password</string>
-    <string name="exportIncludeBrokerConnection">Broker connection</string>
+    <string name="exportIncludeUsernamePassword">Username and password</string>
+    <string name="exportIncludeBrokerConnection">Connection</string>
     <string name="exportIncludes">Sensitive information to include in export</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Export preferences</string>

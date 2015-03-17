@@ -22,37 +22,108 @@
             android:text="@string/exportIncludes"
             android:id="@+id/textView"/>
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/exportIncludeBrokerConnection"
-            android:id="@+id/includeConnection"
-            android:checked="true"/>
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/exportIncludeUsernamePassword"
-            android:id="@+id/includeUsernamePassword"
-            android:layout_marginLeft="@dimen/default_spacing"
-            android:layout_marginStart="@dimen/default_spacing"
-            android:checked="false"/>
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            >
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/exportIncludeDeviceIdentiaction"
-            android:layout_marginLeft="@dimen/default_spacing"
-            android:layout_marginStart="@dimen/default_spacing"
-            android:id="@+id/includeDeviceIdentification"
-            android:checked="false"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/exportIncludeBrokerConnection"
+                android:textSize="18sp"
+                />
+            <Switch
+                android:id="@+id/includeConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:checked="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/exportIncludeWaypoints"
-            android:id="@+id/includeWaypoints"
-            android:checked="false"/>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingLeft="@dimen/default_spacing"
+
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/exportIncludeUsernamePassword"
+                android:textSize="18sp"
+                />
+            <Switch
+                android:id="@+id/includeUsernamePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:checked="false"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingLeft="@dimen/default_spacing"
+
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/exportIncludeDeviceIdentiaction"
+                android:textSize="18sp"
+                />
+            <Switch
+                android:id="@+id/includeDeviceIdentification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:checked="false"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/exportIncludeWaypoints"
+                android:textSize="18sp"
+                />
+            <Switch
+                android:id="@+id/includeWaypoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_centerVertical="true"
+                android:checked="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

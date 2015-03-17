@@ -211,7 +211,7 @@ public class ServiceApplication implements ProxyableService,
 		this.notificationIntent = ServiceProxy.getPendingIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
 				ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
-		notificationBuilder.addAction(R.drawable.ic_action_upload, this.context.getString(R.string.publish), this.notificationIntent);
+		notificationBuilder.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
 	}
 
