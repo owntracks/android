@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -46,6 +48,8 @@ public class ActivityExport extends ActionBarActivity {
     boolean includeCredentialsVal=false;
     boolean includeDeviceIdentificationVal=false;
     boolean includeWaypointsVal=true;
+    private TextView exportUsernameLabel;
+    private TextView exportIdentificationLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,11 @@ public class ActivityExport extends ActionBarActivity {
         includeCredentials = (Switch) findViewById(R.id.includeUsernamePassword);
         includeDeviceIdentification = (Switch) findViewById(R.id.includeDeviceIdentification);
         includeWaypoints = (Switch) findViewById(R.id.includeWaypoints);
+
+        exportUsernameLabel = (TextView) findViewById(R.id.exportUsernameLabel);
+        exportIdentificationLabel = (TextView) findViewById(R.id.exportIdentificationLabel);
+
+        setUsernameDeviceExport(true);
 
         includeConnection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -117,11 +126,21 @@ public class ActivityExport extends ActionBarActivity {
     private void setUsernameDeviceExport(boolean isChecked) {
         includeCredentials.setEnabled(isChecked);
         includeDeviceIdentification.setEnabled(isChecked);
+        int primaryColor = getResources().getColor(R.color.textPrimary);
+        int textColor = Color.argb(isChecked? 255 : 128,
+                Color.red(primaryColor),
+                Color.green(primaryColor),
+                Color.blue(primaryColor));
+
+        exportUsernameLabel.setTextColor(textColor);
+        exportIdentificationLabel.setTextColor(textColor);
 
         // Uncheck Credentials and DeviceIdentification if Connection is not checked
         if(!isChecked) {
-            includeCredentials.setChecked(isChecked);
-            includeDeviceIdentification.setChecked(isChecked);
+            includeCredentials.setChecked(false);
+            includeCredentialsVal =false;
+            includeDeviceIdentification.setChecked(false);
+            includeDeviceIdentificationVal = false;
         }
     }
 

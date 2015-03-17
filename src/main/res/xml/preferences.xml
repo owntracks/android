@@ -281,12 +281,48 @@
             android:summary="@string/preferencesTwitterSummary"
             android:title="@string/preferencesTwitter" />
 
-        <org.owntracks.android.support.ImplementedDialogPreference
-            android:dialogLayout="@layout/preferences_licenses"
-            android:negativeButtonText=""
-            android:positiveButtonText="@string/close"
+        <PreferenceScreen
+            android:key="licenses"
             android:summary="@string/preferencesLicensesSummary"
-            android:title="@string/preferencesLicenses" />
+            android:title="@string/preferencesLicenses">
+            <org.owntracks.android.support.ToolbarPreference
+                android:key="licenses"
+                android:title="@string/preferencesLicenses" />
+
+            <Preference
+                android:key="eclipse-paho"
+                android:title="Eclipse Foundation"
+                android:summary="Paho MQTTv3.1 Java Client" />
+            <Preference
+                android:key="greenrobot-eventbus"
+                android:title="Greenrobot"
+                android:summary="EventBus" />
+            <Preference
+                android:key="greenrobot-greendao"
+                android:title="Greenrobot"
+                android:summary="GreenDao" />
+            <Preference
+                android:key="altbeacon-android-beacon-library"
+                android:title="AltBeacon"
+                android:summary="Android-Beacon-Library" />
+            <Preference
+                android:key="rengwuxian-materialedittext"
+                android:title="Rengwuxian"
+                android:summary="MaterialEditText" />
+            <Preference
+                android:key="mikepenz-materialdrawer"
+                android:title="Mikepenz"
+                android:summary="MaterialDrawer" />
+            <Preference
+                android:key="rengwuxian-materialedittext"
+                android:title="Rengwuxian"
+                android:summary="MaterialEditText" />
+            <Preference
+                android:key="afollestad-materialdialogs"
+                android:title="Afollestad"
+                android:summary="Material-Dialogs" />
+
+        </PreferenceScreen>
 
         <Preference
             android:key="versionReadOnly"

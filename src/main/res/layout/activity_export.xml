@@ -57,6 +57,7 @@
             >
 
             <TextView
+                android:id="@+id/exportUsernameLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -75,6 +76,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -83,6 +85,7 @@
             >
 
             <TextView
+                android:id="@+id/exportIdentificationLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
