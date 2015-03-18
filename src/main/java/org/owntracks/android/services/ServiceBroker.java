@@ -341,14 +341,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 	private boolean connect() {
-		this.workerThread = Thread.currentThread(); // We connect, so we're the worker thread
+        this.workerThread = Thread.currentThread(); // We connect, so we're the worker thread
+        changeState(State.CONNECTING);
+
 		error = null; // clear previous error on connect
 		if(!init()) {
             return false;
         }
 
 		try {
-			changeState(State.CONNECTING);
 			MqttConnectOptions options = new MqttConnectOptions();
 			setWill(options);
 
@@ -386,7 +387,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		payload.append(", \"tst\": ")
 				.append("\"")
 				.append((int) (TimeUnit.MILLISECONDS.toSeconds(System
-						.currentTimeMillis()))).append("\"");
+                        .currentTimeMillis()))).append("\"");
 		payload.append("}");
 
 
