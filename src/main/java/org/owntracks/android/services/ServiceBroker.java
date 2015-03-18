@@ -205,9 +205,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				|| !isConnected();
 	}
 
-	private void init() {
+	private boolean init() {
 		if (this.mqttClient != null) {
-			return;
+			return true;
 		}
 
 		try {
@@ -218,11 +218,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             this.mqttClient = new CustomMqttClient(prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort(), cid, persistenceStore, new AlarmPingSender(context));
 			this.mqttClient.setCallback(this);
 
-		} catch (MqttException e) {
+		} catch (Exception e) {
 			// something went wrong!
 			this.mqttClient = null;
-			changeState(State.DISCONNECTED);
+			changeState(e);
+            return false;
 		}
+        return true;
 	}
 
 	private static class CustomSocketFactory extends javax.net.ssl.SSLSocketFactory{
@@ -339,10 +341,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 	private boolean connect() {
-		this.workerThread = Thread.currentThread(); // We connect, so we're the
-													// worker thread
-		this.error = null; // clear previous error on connect
-		init();
+		this.workerThread = Thread.currentThread(); // We connect, so we're the worker thread
+		error = null; // clear previous error on connect
+		if(!init()) {
+            return false;
+        }
 
 		try {
 			changeState(State.CONNECTING);
@@ -386,8 +389,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 						.currentTimeMillis()))).append("\"");
 		payload.append("}");
 
-		m.setWill(this.mqttClient.getTopic(Preferences.getBaseTopic()),
-				payload.toString().getBytes(), 0, false);
+
+		m.setWill(Preferences.getBaseTopic(), payload.toString().getBytes(), 0, false);
 
 	}
 
