@@ -12,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
@@ -39,8 +38,6 @@ import org.owntracks.android.support.MessageCallbacks;
 
 public class ServiceBeacon implements
         ProxyableService, MessageCallbacks,
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,
         BootstrapNotifier, RangeNotifier {
     public static enum State {
         INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
@@ -311,24 +308,6 @@ public class ServiceBeacon implements
 
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(this.toString(), "Failed to connect");
-    }
-
-    @Override
-    public void onConnected(Bundle arg0) {
-        this.ready = true;
-
-        Log.v(this.toString(), "Connected");
-    }
-
-    @Override
-    public void onDisconnected() {
-        this.ready = false;
-        ServiceApplication.checkPlayServices(); // show error notification if
-        // play services were disabled
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

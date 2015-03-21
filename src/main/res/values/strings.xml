@@ -281,7 +281,7 @@
     <string name="accept">Accept</string>
     <string name="keyIdentification">identification</string>
     <string name="preferencesIdentification">Identification</string>
-    <string name="preferencesOptions">Paremeters</string>
+    <string name="preferencesOptions">Parameters</string>
     <string name="keyOptions">options</string>
     <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Seconds</string>

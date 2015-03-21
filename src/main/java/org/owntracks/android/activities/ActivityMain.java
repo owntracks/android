@@ -116,25 +116,25 @@ public class ActivityMain extends ActionBarActivity {
                     case R.string.idWaypoints:
                         mDrawerLayout.closeDrawers();
 
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
+                        //new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
+                         //   @Override
+                         //   public void run() {
                                 Intent intent1 = new Intent(context, ActivityWaypoints.class);
                                 startActivity(intent1);
-                            }
-                        }, 200);
+                         //   }
+                        //}, 200);
 
                         break;
                     case R.string.idSettings:
                         mDrawerLayout.closeDrawers();
 
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
-                                Intent intent1 = new Intent(context, ActivityPreferences.class);
-                                startActivity(intent1);
-                            }
-                        }, 200);
+                       // new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
+                        //    @Override
+                        //    public void run() {
+                                Intent intent2 = new Intent(context, ActivityPreferences.class);
+                                startActivity(intent2);
+                        //    }
+                        //}, 200);
 
                         break;
 
@@ -700,7 +700,7 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("");
 
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, false,  0);
+            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
 
             onCreateOptionsMenu(mMenu, mInflater);
 
@@ -715,7 +715,7 @@ public class ActivityMain extends ActionBarActivity {
 
 			UiSettings s = this.googleMap.getUiSettings();
 			s.setCompassEnabled(false);
-			s.setMyLocationButtonEnabled(false);
+			s.setMyLocationButtonEnabled(true);
 			s.setTiltGesturesEnabled(false);
 			s.setCompassEnabled(false);
 			s.setRotateGesturesEnabled(false);
@@ -1034,7 +1034,7 @@ public class ActivityMain extends ActionBarActivity {
             //((ActivityMain)getActivity()).drawerLayout.setDrawerListener(toggle);
             //toggle.syncState();
 
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, true,  0);
+            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -1223,7 +1223,7 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Details");
 
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, false,  0);
+            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
             onCreateOptionsMenu(mMenu, mInflater);
 		}
 

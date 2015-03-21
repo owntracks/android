@@ -73,6 +73,11 @@ public class Preferences {
         getSharedPreferences().edit().putBoolean(getKey(resId), value).commit();
     }
 
+    public static void clearKey(int resId) {
+        getSharedPreferences().edit().remove(getKey(resId)).commit();
+    }
+
+
     public static String getAndroidId() {
         return App.getAndroidId();
     }
@@ -401,6 +406,10 @@ public class Preferences {
         }
     }
 
+    public static void setPortDefault(int value) {
+        clearKey(R.string.keyPort);
+    }
+
     public static void setPort(int value) {
         if (value != getPort()) {
             setInt(R.string.keyPort, value);
@@ -425,24 +434,32 @@ public class Preferences {
 
     }
 
-    public static int getPort(){
-        return getPort(true);
-    }
-    public static int getPort(boolean fallback) {
 
-        int port = getInt(R.string.keyPort, R.integer.valZero);
-        if (port == 0 && fallback)
-            port = getPortFallback();
-        return port;
+    public static int getPort() {
+        return getInt(R.string.keyPort, R.integer.valPort);
     }
 
-    public static int getPortFallback() {
-        return getIntResource(R.integer.valPort);
+
+    public static String getIntSupportingHint(int key){
+        int i = getInt(key, R.integer.valInvalid);
+        if (i == -1) {
+            return "";
+        } else {
+            return Integer.toString(i);
+        }
     }
 
+    public static String getPortSupportingHint() {
+        return getIntSupportingHint(R.string.keyPort);
+    }
 
     public static void setKeepalive(int value) {
         setInt(R.string.keyKeepalive, value);
+    }
+
+
+    public static String getKeepaliveSupportingHint() {
+        return getIntSupportingHint(R.string.keyKeepalive);
     }
 
     //Seconds between ping messages
@@ -605,7 +622,16 @@ public class Preferences {
     }
 
     public static boolean getTls() {
-        return getBoolean(R.string.keyTls, R.bool.valTls);
+
+
+        try {
+            return getBoolean(R.string.keyTls, R.bool.valTls);
+        } catch (ClassCastException e) { // previous versiones used an int
+            int tls = getInt(R.string.keyTls, R.integer.valZero);
+            getSharedPreferences().edit().remove(getKey(R.string.keyTls)).commit();
+            setTls(tls > 0);
+            return tls > 0;
+        }
     }
 
     public static String getTlsCrtPath() {

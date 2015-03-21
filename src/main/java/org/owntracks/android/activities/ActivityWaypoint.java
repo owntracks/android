@@ -1,5 +1,6 @@
 package org.owntracks.android.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.places.*;
+import com.google.android.gms.location.places.ui.*;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -37,6 +43,7 @@ import de.greenrobot.event.EventBus;
 
 
 public class ActivityWaypoint extends ActionBarActivity implements StaticHandlerInterface {
+    private static final int REQUEST_PLACE_PICKER = 19283;
     private WaypointDao dao;
     private TextWatcher requiredForSave;
     private GeocodableLocation currentLocation;
@@ -232,7 +239,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             visible = false;
         }
 
-        Log.v(this.toString(), "conditionallyShowGeofenceSettings: " +visible);
+        Log.v(this.toString(), "conditionallyShowGeofenceSettings: " + visible);
 
         this.geofenceSettings.setVisibility(visible ? View.VISIBLE : View.GONE);
 
@@ -293,11 +300,61 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             case R.id.useCurrent:
                 useCurrentLocation();
                 return true;
+            case R.id.pick:
+                pickLocation();
+                return true;
             case android.R.id.home:
                 finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_PLACE_PICKER
+                && resultCode == Activity.RESULT_OK) {
+
+            // The user has selected a place. Extract the name and address.
+            final Place place = PlacePicker.getPlace(data, this);
+
+            final CharSequence name = place.getName();
+            final CharSequence address = place.getAddress();
+            String attributions = PlacePicker.getAttributions(data);
+            if (attributions == null) {
+                attributions = "";
+            }
+
+            latitude.setText("" + place.getLatLng().latitude);
+            longitude.setText(""+place.getLatLng().longitude);
+
+            //mViewName.setText(name);
+            //mViewAddress.setText(address);
+            //mViewAttributions.setText(Html.fromHtml(attributions));
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    // not used yet
+    private void pickLocation() {
+        try {
+            PlacePicker.IntentBuilder intentBuilder =  new PlacePicker.IntentBuilder();
+
+            Intent intent = intentBuilder.build(this);
+            // Start the intent by requesting a result,
+            // identified by a request code.
+            startActivityForResult(intent, REQUEST_PLACE_PICKER);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            // ...
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // ...
         }
 
     }

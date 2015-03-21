@@ -16,6 +16,8 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -672,6 +674,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     backlog.remove(message);
                 }
 
+
+
+
                 // Check if we can publish
                 if (!isOnline() || !isConnected()) {
                     Log.d("ServiceBroker", "publish deferred");
@@ -682,12 +687,21 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
 
                 try {
-                    IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
+
+                    if (message.getTopic() == null) {
+                        throw new Exception("message without topic. class:" + message.getClass() + ", msg: " + message.toString());
+
+                    }
+
+                        IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
                     message.publishing();
                     sendMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
 
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
-                } catch (MqttException e) {
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
                     message.publishFailed();
                     Log.e("ServiceBroker", message + ", error:" + e.getMessage());
                 } finally {
