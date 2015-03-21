@@ -65,22 +65,23 @@ public class ActivityPreferences extends ActionBarActivity {
 
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
-                        mDrawerLayout.closeDrawers();
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
+                        //mDrawerLayout.closeDrawers();
+                       // new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
+                        //    @Override
+                        //    public void run() {
                                 goToRoot();
-                            }
-                        }, 200);
+                        //    }
+                        //}, 200);
                         break;
                     case R.string.idWaypoints:
                         mDrawerLayout.closeDrawers();
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
+                        //new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
+                        //    @Override
+                        //    public void run() {
                                 Intent intent = new Intent(context, ActivityWaypoints.class);
-                                startActivity(intent);                            }
-                        }, 200);
+                                startActivity(intent);
+                        //}
+                        //}, 200);
                         break;
                     case R.string.idSettings:
                         break;
@@ -88,7 +89,8 @@ public class ActivityPreferences extends ActionBarActivity {
                 }
             }
         };
-        DrawerFactory.buildDrawer(this, toolbar, drawerListener, false, 2);
+
+        DrawerFactory.buildDrawer(this, toolbar, drawerListener, 2);
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferences()).commit();
 
     }
@@ -302,11 +304,9 @@ public class ActivityPreferences extends ActionBarActivity {
 
                                     host.setText("" + Preferences.getHost(false));
                                     host.setFloatingLabelAlwaysShown(true);
-                                    port.setFloatingLabelAlwaysShown(true);
 
-                                    int portVal = Preferences.getPort(false);
-                                    if (portVal != 0)
-                                        port.setText("" + portVal);
+                                    port.setText(Preferences.getPortSupportingHint());
+                                    port.setFloatingLabelAlwaysShown(true);
 
                                 }
                             })
@@ -318,7 +318,11 @@ public class ActivityPreferences extends ActionBarActivity {
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
 
                                     Preferences.setHost(host.getText().toString());
-                                    try {Preferences.setPort(Integer.parseInt(port.getText().toString())); } catch (NumberFormatException e) {}
+                                    try {
+                                        Preferences.setPort(Integer.parseInt(port.getText().toString()));
+                                    } catch (NumberFormatException e) {
+                                        Preferences.clearKey(R.string.keyPort);
+                                    }
                                 }
                             })
 
@@ -449,6 +453,7 @@ public class ActivityPreferences extends ActionBarActivity {
                                     final MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
                                     tls.setChecked(tlsVal);
                                     tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsCrt.setText(Preferences.getTlsCrtPath());
 
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -496,7 +501,6 @@ public class ActivityPreferences extends ActionBarActivity {
                                     Switch cleansession = (Switch) d.findViewById(R.id.cleanSession);
                                     final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
                                     cleansession.setChecked(cleansessionVal);
-
                                     cleansession.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -504,19 +508,23 @@ public class ActivityPreferences extends ActionBarActivity {
                                         }
                                     });
 
+                                    keepalive.setText(Preferences.getKeepaliveSupportingHint());
 
                                 }
                             })
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
+                                    Log.v(this.toString(), "saving parameters");
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
 
                                     Preferences.setCleanSession(cleansessionVal);
                                     try {
                                         Preferences.setKeepalive(Integer.parseInt(keepalive.getText().toString()));
+
                                     } catch (NumberFormatException e) {
+                                        Preferences.clearKey(R.string.keyKeepalive);
                                     }
 
                                     serverPreferenceToolbar.conditionallyEnableConnectButton();

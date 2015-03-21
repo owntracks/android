@@ -101,7 +101,8 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
                 }
             }
         };
-        DrawerFactory.buildDrawer(this, toolbar, drawerListener, false, 1);
+
+        DrawerFactory.buildDrawer(this, toolbar, drawerListener, 1);
 
 
         this.dao = App.getWaypointDao();
@@ -236,10 +237,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
                 Intent detailIntent = new Intent(this, ActivityWaypoint.class);
                 startActivity(detailIntent);
                 return true;
-            case android.R.id.home:     // If the user hits the toolbar back arrow, go back to ActivityMain, no matter where he came from (same as hitting back)
-                goToRoot();
-                return true;
-            default:
+      default:
                 return super.onOptionsItemSelected(item);
         }
 

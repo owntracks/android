@@ -16,4 +16,12 @@
         app:showAsAction="ifRoom"
         android:title="@string/currentLocation">
     </item>
+    <item
+        android:visible="false"
+        android:id="@+id/pick"
+        android:icon="@drawable/ic_waypoints"
+        android:orderInCategory="96"
+        app:showAsAction="ifRoom"
+        android:title="@string/currentLocation">
+    </item>
 </menu>
