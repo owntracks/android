@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -55,6 +56,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -363,7 +365,7 @@ public class ActivityMain extends ActionBarActivity {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true);
+                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -373,7 +375,7 @@ public class ActivityMain extends ActionBarActivity {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
+                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -382,6 +384,7 @@ public class ActivityMain extends ActionBarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
+            Log.v(this.toString(), "report");
             ServiceProxy.runOrBind(this, new Runnable() {
 
                 @Override
@@ -507,6 +510,8 @@ public class ActivityMain extends ActionBarActivity {
 
 
 	public static class MapFragment extends Fragment implements StaticHandlerInterface {
+        private static final String KEY_POSITION = "+POSITION+";
+        private static final java.lang.String KEY_ZOOM = "+ZOOM+";
         //private GeocodableLocation currentLocation;
 		private MapView mMapView;
 		private GoogleMap googleMap;
@@ -572,10 +577,25 @@ public class ActivityMain extends ActionBarActivity {
 
             Contact c = getSelectedContact();
 
-            if (c != null)
-                selectContact(c, SELECT_CENTER_AND_ZOOM);
-            else if (isFollowingCurrentLocation())
-                selectCurrentLocation(SELECT_CENTER_AND_ZOOM);
+            Bundle extras = FragmentHandler.getInstance().getBundle(MapFragment.class);
+            CameraPosition position = null;
+            float zoom = -1;
+
+            if(extras != null) {
+                position = extras.getParcelable(KEY_POSITION);
+                zoom = position.zoom;
+
+            }
+
+            if (c != null) {
+                selectContact(c, SELECT_UPDATE, true, false, zoom);
+                if(position != null)
+                    centerMap(position.target, SELECT_CENTER, false, zoom);
+
+            } else if (isFollowingCurrentLocation())
+                selectCurrentLocation(SELECT_CENTER, true, false, zoom);
+            else if(position != null)
+                centerMap(position.target, SELECT_CENTER, false, zoom);
         }
 
 		@Override
@@ -664,10 +684,10 @@ public class ActivityMain extends ActionBarActivity {
             Contact c = getSelectedContact();
             switch (item.getItemId()) {
                 case MENU_CONTACT_SHOW:
-                    selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, false);
+                    selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
                     break;
                 case MENU_CONTACT_FOLLOW:
-                    selectContact(c, MapFragment.SELECT_CENTER, true);
+                    selectContact(c, MapFragment.SELECT_CENTER, true, true);
                     break;
                 case MENU_CONTACT_UNFOLLOW:
                     setFollowingSelectedContact(false);
@@ -700,7 +720,7 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("");
 
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
+            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain) getActivity()).toolbar, drawerListener, 0);
 
             onCreateOptionsMenu(mMenu, mInflater);
 
@@ -730,7 +750,7 @@ public class ActivityMain extends ActionBarActivity {
 							Contact c = MapFragment.this.markerToContacts.get(m.getId());
 
 							if (c != null)
-								selectContact(c, SELECT_UPDATE, false);
+								selectContact(c, SELECT_UPDATE, false,true);
 
                             // Event was handled by our code do not launch default behaviour that would center the map on the marker
                             return true;
@@ -740,14 +760,14 @@ public class ActivityMain extends ActionBarActivity {
 			this.mMapView.getMap().setOnMapClickListener(
                     new OnMapClickListener() {
 
-						@Override
-						public void onMapClick(LatLng arg0) {
+                        @Override
+                        public void onMapClick(LatLng arg0) {
                             setFollowingSelectedContact(false);
                             Preferences.setSelectedContactTopic(KEY_NOTOPIC);
 
                             hideSelectedContactDetails();
-						}
-					});
+                        }
+                    });
 		}
 
 
@@ -758,10 +778,22 @@ public class ActivityMain extends ActionBarActivity {
             this.selectedContactDetails.setVisibility(View.GONE);
         }
 
-		public void centerMap(LatLng latlon, int centerMode) {
+        public void centerMap(LatLng latlon, int centerMode, boolean animate) {
+            centerMap(latlon, centerMode, animate, -1);
+        }
+		public void centerMap(LatLng latlon, int centerMode, boolean animate, float zoom) {
             if(centerMode!=SELECT_UPDATE) {
-                CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER ? this.mMapView.getMap().getCameraPosition().zoom : 15f);
-                this.mMapView.getMap().animateCamera(center);
+                CameraUpdate center;
+                if(zoom == -1) {
+                     center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER && zoom != -1? this.mMapView.getMap().getCameraPosition().zoom : 15f);
+                } else {
+                     center = CameraUpdateFactory.newLatLngZoom(latlon, zoom);
+                }
+
+                if(animate)
+                    this.mMapView.getMap().animateCamera(center);
+                else
+                    this.mMapView.getMap().moveCamera(center);
             }
 		}
 
@@ -778,7 +810,7 @@ public class ActivityMain extends ActionBarActivity {
 			c.setMarker(m);
 
 			if (c == getSelectedContact())
-                selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE);
+                selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE, true, true);
 
 		}
 
@@ -796,39 +828,53 @@ public class ActivityMain extends ActionBarActivity {
 			}
 		}
 
-        public void selectCurrentLocation(final int centerMode, final boolean follow) {
-            setFollowingSelectedContact(follow);
-            selectCurrentLocation(centerMode);
+
+        public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate) {
+            selectCurrentLocation(centerMode, follow, animate, -1);
         }
-        public void selectCurrentLocation(final int centerMode) {
+
+        public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate, float zoom) {
+            setFollowingSelectedContact(follow);
+            selectCurrentLocation(centerMode, animate, zoom);
+        }
+        public void selectCurrentLocation(final int centerMode, final boolean animate, final float zoom) {
             ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
                 @Override
                 public void run() {
                     GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+
                     if (l == null)
                         return;
+
                     hideSelectedContactDetails();
                     Preferences.setSelectedContactTopic(KEY_CURRENT_LOCATION);
-                    centerMap(l.getLatLng(), centerMode);
+                    centerMap(l.getLatLng(), centerMode, animate, zoom);
                 }
             });
 
         }
 
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
+            selectContact(c, centerMode, follow, animate, -1);
+        }
 
-        public void selectContact(final Contact c, int centerMode, boolean follow) {
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate, float zoom) {
              setFollowingSelectedContact(follow);
-             selectContact(c, centerMode);
+             selectContact(c, centerMode, animate, zoom);
          }
 
-         public void selectContact(final Contact c, int centerMode) {
+        public void selectContact(final Contact c, int centerMode, boolean animate) {
+            selectContact(c, centerMode, animate, -1);
+        }
+
+        public void selectContact(final Contact c, int centerMode, boolean animate, float zoom) {
 			if (c == null)
 				return;
 
 			Preferences.setSelectedContactTopic(c.getTopic());
 
-            centerMap(c.getLocation().getLatLng(), centerMode);
+            centerMap(c.getLocation().getLatLng(), centerMode, animate, zoom);
 
 			this.selectedContactName.setText(c.toString());
 			this.selectedContactLocation.setText(c.getLocation().toString());
@@ -852,7 +898,7 @@ public class ActivityMain extends ActionBarActivity {
 
         public void onEventMainThread(Events.CurrentLocationUpdated e) {
 			if (isFollowingCurrentLocation())
-				selectCurrentLocation(SELECT_CENTER_AND_ZOOM);
+				selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, true);
 		}
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
@@ -887,6 +933,12 @@ public class ActivityMain extends ActionBarActivity {
             return Preferences.getFollowingSelectedContact();
         }
 
+        @Override
+        public void onSaveInstanceState(Bundle b) {
+            super.onSaveInstanceState(b);
+            b.putParcelable(KEY_POSITION, this.mMapView.getMap().getCameraPosition());
+            FragmentHandler.getInstance().setBundle(MapFragment.class, b);
+        }
     }
 
 	public static class ContactsFragment extends Fragment implements
@@ -1343,7 +1395,7 @@ public class ActivityMain extends ActionBarActivity {
         @Override
 		public void onSaveInstanceState(Bundle b) {
 			super.onSaveInstanceState(b);
-			b.putString(KEY_TOPIC, this.contact.getTopic());
+            b.putString(KEY_TOPIC, this.contact.getTopic());
 			FragmentHandler.getInstance().setBundle(DetailsFragment.class, b);
 		}
 
