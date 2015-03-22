@@ -394,7 +394,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         }
 
         try {
-            w.setRadius(Float.parseFloat(this.radius.getText().toString()));
+            w.setRadius(Integer.parseInt(this.radius.getText().toString()));
         } catch (NumberFormatException e) {
             w.setRadius(null);
         }

@@ -5,10 +5,10 @@ import de.greenrobot.daogenerator.Schema;
 
 // Generates Data Access Objects in src/main/java/org.owntracks.android/db
 // Increase schema version if changes are made
-// To generate files, open gGradle tasks and double click android > :DaoGenerator > run
+// To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 1;
+    private static final int SCHEMA_VERSION = 2;
 
     public static void main(String args[]) throws Exception {
 
@@ -29,7 +29,7 @@ public class DaoGenerator {
         waypoint.addStringProperty("geocoder");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
-        waypoint.addFloatProperty("radius");
+        waypoint.addIntProperty("radius");
         waypoint.addIntProperty("transitionType");
         waypoint.addStringProperty("geofenceId");
 

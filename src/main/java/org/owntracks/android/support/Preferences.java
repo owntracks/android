@@ -1,5 +1,7 @@
 package org.owntracks.android.support;
 
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -10,6 +12,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONException;
@@ -182,31 +185,95 @@ public class Preferences {
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try {
-            JSONArray j = json.getJSONArray("waypoints");
+            StringifiedJSONArray j = json.getStringifiedJSONArray("waypoints");
             if (j != null) {
                 waypointsFromJson(j);
+            } else {
+                Log.v("import", "no valid waypoints");
             }
-        } catch(JSONException e){};
+        } catch(JSONException e){
+            Log.v("import", "waypoints invalid with exception: " + e);
+
+        };
     }
 
-    private static void waypointsFromJson(JSONArray j) {
+    private static void waypointsFromJson(StringifiedJSONArray j) {
+        Log.v("import", "importing " + j.length()+" waypoints");
         WaypointDao dao = App.getWaypointDao();
+        List<Waypoint> deviceWaypoints =  dao.loadAll();
 
-       /* for (JSONObject waypointJson : j) {
-
+        for(int i = 0 ; i < j.length(); i++){
+            Log.v("import", "importing waypoint: " + i);
+            Waypoint newWaypoint;
+            StringifiedJSONObject waypointJson;
             try {
-                Waypoint w = new Waypoint();
-                w.setLatitude(waypointJson.getDouble("latitude"));
-                w.setLatitude(waypointJson.getDouble("longitude"));
-                w.setDescription(waypointJson.getString("desc"));
-                w.setShared(waypointJson.getBoolean("shared"));
-                //w.setRadius(waypointJson.getDouble("latitude"));
+                Log.v("import", "checking for required attributes");
+
+                waypointJson = j.getJSONObject(i);
+                newWaypoint  = new Waypoint();
+                newWaypoint.setLatitude(waypointJson.getDouble("lat"));
+                newWaypoint.setLongitude(waypointJson.getDouble("lon"));
+                newWaypoint.setDescription(waypointJson.getString("desc"));
 
             } catch (JSONException e) {
+                // If the above fails we're missing a required attribute and cannot continue the import
+                Log.v("import", "missing essential waypoint data: " + e);
+
                 continue;
             }
 
-        }*/
+            try {
+                newWaypoint.setShared(waypointJson.getBoolean("shared"));
+            } catch (JSONException e) {
+                Log.v("import", "unable to import shared attribute");
+                newWaypoint.setShared(false);
+            }
+
+            if(newWaypoint.getShared()) {
+                try {
+                    newWaypoint.setRadius(waypointJson.getInt("radius"));
+                    int transition = waypointJson.getInt("transition");
+                    if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT || transition == (Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT))
+                        newWaypoint.setTransitionType(transition);
+                } catch(Exception e) {
+                    Log.v("import", "unable to import radius and/or transition attribute");
+
+                    newWaypoint.setRadius(0);
+                    newWaypoint.setTransitionType(null);
+                }
+            }
+
+            try {
+                newWaypoint.setDate(new java.util.Date(waypointJson.getLong("tst") * 1000));
+            } catch(JSONException e) {
+                Log.v("import", "unable to import date attribute");
+
+                newWaypoint.setDate(new Date());
+            }
+
+            Log.v("import", "Parsing complete. Result: " + newWaypoint);
+            Log.v("import", "searching for exisiting waypoint with date " +newWaypoint.getDate());
+
+            Waypoint existingWaypoint = null;
+            for(Waypoint e : deviceWaypoints) {
+                if(e.getDate().compareTo(newWaypoint.getDate()) == 0) {
+                    existingWaypoint = e;
+                    break;
+                }
+            }
+            if(existingWaypoint != null) {
+                Log.v("Preferences", "found existing waypoint with same date. Deleting it before import");
+                dao.delete(existingWaypoint);
+                EventBus.getDefault().post(new Events.WaypointRemoved(existingWaypoint));
+            } else {
+                Log.v("Preferences", "waypoint does not exist, doing clean import");
+            }
+
+            dao.insert(newWaypoint);
+            EventBus.getDefault().post(new Events.WaypointAdded(newWaypoint));
+
+
+        }
 
     }
 
