@@ -30,10 +30,10 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Geocoder = new Property(4, String.class, "geocoder", false, "GEOCODER");
         public final static Property Shared = new Property(5, Boolean.class, "shared", false, "SHARED");
         public final static Property Date = new Property(6, java.util.Date.class, "date", false, "DATE");
-        public final static Property Radius = new Property(7, Float.class, "radius", false, "RADIUS");
+        public final static Property Radius = new Property(7, Integer.class, "radius", false, "RADIUS");
         public final static Property TransitionType = new Property(8, Integer.class, "transitionType", false, "TRANSITION_TYPE");
         public final static Property GeofenceId = new Property(9, String.class, "geofenceId", false, "GEOFENCE_ID");
-    }
+    };
 
 
     public WaypointDao(DaoConfig config) {
@@ -55,7 +55,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
                 "'GEOCODER' TEXT," + // 4: geocoder
                 "'SHARED' INTEGER," + // 5: shared
                 "'DATE' INTEGER," + // 6: date
-                "'RADIUS' REAL," + // 7: radius
+                "'RADIUS' INTEGER," + // 7: radius
                 "'TRANSITION_TYPE' INTEGER," + // 8: transitionType
                 "'GEOFENCE_ID' TEXT);"); // 9: geofenceId
     }
@@ -106,9 +106,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             stmt.bindLong(7, date.getTime());
         }
  
-        Float radius = entity.getRadius();
+        Integer radius = entity.getRadius();
         if (radius != null) {
-            stmt.bindDouble(8, radius);
+            stmt.bindLong(8, radius);
         }
  
         Integer transitionType = entity.getTransitionType();
@@ -139,7 +139,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // geocoder
             cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // shared
             cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // date
-            cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7), // radius
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // radius
             cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // transitionType
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // geofenceId
         );
@@ -156,7 +156,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         entity.setGeocoder(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setShared(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
         entity.setDate(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
-        entity.setRadius(cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7));
+        entity.setRadius(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
         entity.setTransitionType(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
         entity.setGeofenceId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }

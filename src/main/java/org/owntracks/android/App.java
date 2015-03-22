@@ -11,6 +11,7 @@ import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.DaoMaster;
 import org.owntracks.android.db.DaoMaster.OpenHelper;
 import org.owntracks.android.db.DaoSession;
+import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.services.ServiceBroker;
@@ -56,7 +57,10 @@ public class App extends Application {
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                 Log.v(this.toString(), "Migrating db from " + oldVersion  + " to  " + newVersion);
-                // Add migrations here
+                if(oldVersion == 1 && newVersion == 2) {
+                    DaoMaster.dropAllTables(db, true);
+                    DaoMaster.createAllTables(db, true);
+                }
             }
         };
         SQLiteDatabase db = helper.getWritableDatabase();

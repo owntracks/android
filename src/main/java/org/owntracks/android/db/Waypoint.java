@@ -16,7 +16,7 @@ public class Waypoint {
     private String geocoder;
     private Boolean shared;
     private java.util.Date date;
-    private Float radius;
+    private Integer radius;
     private Integer transitionType;
     private String geofenceId;
 
@@ -30,7 +30,7 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, Double latitude, Double longitude, String geocoder, Boolean shared, java.util.Date date, Float radius, Integer transitionType, String geofenceId) {
+    public Waypoint(Long id, String description, Double latitude, Double longitude, String geocoder, Boolean shared, java.util.Date date, Integer radius, Integer transitionType, String geofenceId) {
         this.id = id;
         this.description = description;
         this.latitude = latitude;
@@ -99,11 +99,11 @@ public class Waypoint {
         this.date = date;
     }
 
-    public Float getRadius() {
+    public Integer getRadius() {
         return radius;
     }
 
-    public void setRadius(Float radius) {
+    public void setRadius(Integer radius) {
         this.radius = radius;
     }
 

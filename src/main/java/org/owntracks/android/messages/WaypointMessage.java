@@ -28,7 +28,7 @@ public class WaypointMessage extends Message {
                     .put("desc", this.waypoint.getDescription())
                     .put("lat", this.waypoint.getLatitude())
                     .put("lon", this.waypoint.getLongitude())
-                    .put("tst", (int) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
+                    .put("tst", (long) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
                     .put("rad", this.waypoint.getRadius() != null ? this.waypoint.getRadius() : 0);
 
             if (this.trackerId != null && !this.trackerId.isEmpty()) 

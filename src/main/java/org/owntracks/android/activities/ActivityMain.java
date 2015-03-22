@@ -805,7 +805,7 @@ public class ActivityMain extends ActionBarActivity {
             }
 
 			Marker m = this.googleMap.addMarker(
-                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()));
+                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()).anchor(0.5F, 0.5F));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 

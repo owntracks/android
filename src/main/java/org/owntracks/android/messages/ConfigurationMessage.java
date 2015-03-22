@@ -9,6 +9,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.StringifiedJSONArray;
 import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ConfigurationMessage extends Message{
@@ -48,10 +49,9 @@ public class ConfigurationMessage extends Message{
     }
     private JSONArray getWaypointJson() {
 
-        JSONArray waypoints = new JSONArray();
+        StringifiedJSONArray waypoints = new StringifiedJSONArray();
         for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
             WaypointMessage wpM = new WaypointMessage(waypoint);
-            wpM.setTrackerId(Preferences.getTrackerId(true));
             StringifiedJSONObject wp = wpM.toJSONObject();
             try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
             try { wp.put("transition", waypoint.getTransitionType()); } catch (JSONException e) { }

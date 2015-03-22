@@ -20,7 +20,15 @@ public class StringifiedJSONObject extends JSONObject {
         return putEverythingAsString(name, value ? "1" : "0");
     }
 
+    public JSONObject put(String name, Boolean value) throws JSONException {
+        return putEverythingAsString(name, value ? "1" : "0");
+    }
+
     public JSONObject put(String name, double value) throws JSONException {
+        return putEverythingAsString(name, value);
+    }
+
+    public JSONObject put(String name, Double value) throws JSONException {
         return putEverythingAsString(name, value);
     }
 
@@ -28,8 +36,30 @@ public class StringifiedJSONObject extends JSONObject {
         return putEverythingAsString(name, value);
     }
 
+    public JSONObject put(String name, Integer value) throws JSONException {
+        return putEverythingAsString(name, value);
+    }
+
+    public JSONObject put(String name, float value) throws JSONException {
+        return putEverythingAsString(name, value);
+    }
+
+    public JSONObject put(String name, Float value) throws JSONException {
+        return putEverythingAsString(name, value);
+    }
+
     public JSONObject put(String name, long value) throws JSONException {
         return putEverythingAsString(name, value);
+    }
+
+    public JSONObject put(String name, Long value) throws JSONException {
+        return putEverythingAsString(name, value);
+    }
+
+
+
+    public StringifiedJSONArray put(String name, StringifiedJSONArray value) throws JSONException {
+        return put(name, value);
     }
 
 
@@ -43,6 +73,18 @@ public class StringifiedJSONObject extends JSONObject {
 
     public boolean getBoolean(String name) throws JSONException {
         return get(name).equals("1");
+    }
+
+    public int getInt(String name) throws JSONException, NumberFormatException {
+        return Integer.parseInt(getString(name));
+    }
+
+    public double getDouble(String name) throws JSONException, NumberFormatException {
+        return Double.parseDouble(getString(name));
+    }
+
+    public float getFloat(String name) throws JSONException, NumberFormatException {
+        return Float.parseFloat(getString(name));
     }
 
     public StringifiedJSONObject putAll(StringifiedJSONObject o) throws JSONException{
@@ -70,4 +112,7 @@ public class StringifiedJSONObject extends JSONObject {
         return true;
     }
 
+    public StringifiedJSONArray getStringifiedJSONArray(String key) throws JSONException{
+        return (StringifiedJSONArray)getJSONArray(key);
+    }
 }
