@@ -4,8 +4,8 @@ import org.json.JSONException;
 
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 public class WaypointMessage extends Message {
 	Waypoint waypoint;
@@ -21,8 +21,8 @@ public class WaypointMessage extends Message {
         	return toJSONObject().toString();
 	}
 
-    public StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
         try {
             json.put("_type", "waypoint")
                     .put("desc", this.waypoint.getDescription())
