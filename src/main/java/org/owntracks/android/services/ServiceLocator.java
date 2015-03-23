@@ -611,7 +611,13 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 	private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
         Log.v(this.toString(), "handleWaypoint: update:" +update + " remove:"+remove );
-		if (!remove && w.getShared()){
+
+        if(update && remove)
+            throw new IllegalArgumentException("update and remove cannot be true at the same time");
+
+        Log.v(this.toString(), "shared: " + w.getShared() );
+
+        if (!remove && w.getShared()){
             WaypointMessage wpM = new WaypointMessage(w);
             wpM.setTrackerId(Preferences.getTrackerId(true));
             publishWaypointMessage(wpM);

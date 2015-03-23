@@ -11,6 +11,7 @@ import org.owntracks.android.R;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TimeUtils;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
@@ -231,7 +232,7 @@ public class Preferences {
 
             if(newWaypoint.getShared()) {
                 try {
-                    newWaypoint.setRadius(waypointJson.getInt("radius"));
+                    newWaypoint.setRadius(waypointJson.getInt("rad"));
                     int transition = waypointJson.getInt("transition");
                     if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT || transition == (Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT))
                         newWaypoint.setTransitionType(transition);
@@ -239,7 +240,6 @@ public class Preferences {
                     Log.v("import", "unable to import radius and/or transition attribute");
 
                     newWaypoint.setRadius(0);
-                    newWaypoint.setTransitionType(null);
                 }
             }
 
@@ -251,13 +251,13 @@ public class Preferences {
                 newWaypoint.setDate(new Date());
             }
 
-            Log.v("import", "Parsing complete. Result: " + newWaypoint);
-            Log.v("import", "searching for exisiting waypoint with date " +newWaypoint.getDate());
 
             Waypoint existingWaypoint = null;
             for(Waypoint e : deviceWaypoints) {
-                Log.v("import", "exisitng waypoint tst: " + e.getDate());
-                if(e.getDate().getTime().compareTo(newWaypoint.getDate()) == 0) {
+                Log.v("import", "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
+                Log.v("import", "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime()));
+
+                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime())) {
                     existingWaypoint = e;
                     break;
                 }

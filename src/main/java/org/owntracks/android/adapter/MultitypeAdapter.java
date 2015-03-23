@@ -112,6 +112,11 @@ public abstract class MultitypeAdapter extends BaseAdapter {
         return delegateAdapters.get(getItemViewType(position)).getView(position, convertView, parent, inflater, getItem(position));
     }
 
+    public void clear() {
+        rows.clear();
+        notifyDataSetChanged();
+    };
+
     public interface DelegateAdapter {
         public View getView(int position, View convertView, ViewGroup parent, LayoutInflater inflater, Object item);
     }
