@@ -199,21 +199,21 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
 
 
-    // These get posted by ActivityWaypoint with a sticky flag, so they're received when this activity
-    // gains focus to update the UI
-    // WaypointAdded and WaypointUpdated are not posted sticky and only handled by ServiceLocator to do the acutal work
-    public void onEventMainThread(Events.WaypointAddedByUser e) {
-        EventBus.getDefault().removeStickyEvent(e);
-        this.listAdapter.addItem(e.getWaypoint());
-        this.listAdapter.notifyDataSetChanged();
-        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
-    }
-    public void onEventMainThread(Events.WaypointUpdatedByUser e) {
-        EventBus.getDefault().removeStickyEvent(e);
-        this.listAdapter.updateItem(e.getWaypoint());
-        this.listAdapter.notifyDataSetChanged();
-        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
-    }
+//    // These get posted by ActivityWaypoint with a sticky flag, so they're received when this activity
+//    // gains focus to update the UI
+//    // WaypointAdded and WaypointUpdated are not posted sticky and only handled by ServiceLocator to do the acutal work
+//    public void onEventMainThread(Events.WaypointAddedByUser e) {
+//        EventBus.getDefault().removeStickyEvent(e);
+//        this.listAdapter.addItem(e.getWaypoint());
+//        this.listAdapter.notifyDataSetChanged();
+//        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
+//    }
+//    public void onEventMainThread(Events.WaypointUpdatedByUser e) {
+//        EventBus.getDefault().removeStickyEvent(e);
+//        this.listAdapter.updateItem(e.getWaypoint());
+//        this.listAdapter.notifyDataSetChanged();
+//        requestWaypointGeocoder(e.getWaypoint(), true); // Resolve Geocoder for Waypoint coordinates and overwrite exisitng Geocoder
+//    }
 
     public void onEventMainThread(Events.WaypointAdded e) {
         this.listAdapter.addItem(e.getWaypoint());
@@ -252,8 +252,12 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
     @Override
     public void onResume() {
         super.onResume();
+
+        listAdapter.clear();
+        listAdapter.set(new ArrayList<>(this.dao.loadAll()));
+
         registerForContextMenu(this.listView);
-        EventBus.getDefault().registerSticky(this);
+        EventBus.getDefault().register(this);
     }
 
     @Override

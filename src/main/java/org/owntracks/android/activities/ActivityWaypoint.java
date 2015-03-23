@@ -264,13 +264,13 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
     protected void add(Waypoint w) {
         this.dao.insert(w);
         EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
-        EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
+        //EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     protected void update(Waypoint w) {
         this.dao.update(w);
         EventBus.getDefault().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
-        EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
+        //EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
 
