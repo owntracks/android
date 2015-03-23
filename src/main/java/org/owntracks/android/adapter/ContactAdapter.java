@@ -18,18 +18,20 @@ public class ContactAdapter extends MultitypeAdapter{
     public ContactAdapter(Context context, ArrayList<Contact> contacts) {
         super(context);
 
-        if(contacts != null)
-            for (Contact c : contacts)
-                addItem(c);
-
-
-        notifyDataSetChanged();
+        set(contacts);
     }
 
     public static class ContactHolder {
         TextView name;
         TextView location;
         ImageView image;
+    }
+
+
+    public void set(ArrayList<Contact> contacts) {
+        if(contacts != null)
+            for (Contact c : contacts)
+                addItem(c);
     }
 
     @Override
