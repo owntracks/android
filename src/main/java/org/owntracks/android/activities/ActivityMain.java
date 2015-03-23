@@ -1210,7 +1210,7 @@ public class ActivityMain extends ActionBarActivity {
 			Bundle extras = FragmentHandler.getInstance().getBundle(DetailsFragment.class);
 
 			this.contact = App.getContact((String) extras.get(KEY_TOPIC));
-			if(this.contact.isLinked())
+			if(this.contact != null && this.contact.isLinked())
                 this.name.setText(this.contact.getName());
             else
                 this.name.setText(getString(R.string.na));
