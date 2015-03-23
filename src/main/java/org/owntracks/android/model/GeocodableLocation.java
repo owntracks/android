@@ -4,13 +4,13 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.location.Location;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.owntracks.android.support.StringifiedJSONObject;
 
 public class GeocodableLocation extends Location {
     private String geocoder;
@@ -35,7 +35,7 @@ public class GeocodableLocation extends Location {
         this.extra = extra;
     }
 
-    public GeocodableLocation(StringifiedJSONObject json) throws JSONException{
+    public GeocodableLocation(JSONObject json) throws JSONException{
         super("owntracks-deserialized");
 
         try {
@@ -59,9 +59,9 @@ public class GeocodableLocation extends Location {
             setLongitude(0);
         }
         try {
-            setAccuracy(Float.parseFloat(json.getString("acc")));
+            setAccuracy(json.getInt("acc"));
         } catch (Exception e) {
-            setAccuracy((float) 0);
+            setAccuracy(0);
         }
 
         try {
@@ -95,10 +95,10 @@ public class GeocodableLocation extends Location {
 					location.getLongitude());
 	}
 
-	public static GeocodableLocation fromJsonObject(StringifiedJSONObject json) {
+	public static GeocodableLocation fromJsonObject(JSONObject json) {
 		Double lat;
 		Double lon;
-		Float acc;
+		Integer acc;
 		Long tst;
 		Double alt;
 
@@ -124,14 +124,13 @@ public class GeocodableLocation extends Location {
 		}
 
 		try {
-			acc = Float.parseFloat(json.getString("acc"));
+			acc = json.getInt("acc");
 		} catch (Exception e) {
-			acc = (float) 0;
+			acc = 0;
 		}
 
 		try {
-			tst = TimeUnit.SECONDS.toMillis(Long.parseLong(json
-					.getString("tst")));
+			tst = TimeUnit.SECONDS.toMillis(json.getLong("tst"));
 
 		} catch (Exception e) {
 			tst = (long) 0;

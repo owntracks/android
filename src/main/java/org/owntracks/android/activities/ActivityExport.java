@@ -35,7 +35,6 @@ import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ActivityExport extends ActionBarActivity {
     private static final String TEMP_FILE_NAME = "config.otrc";

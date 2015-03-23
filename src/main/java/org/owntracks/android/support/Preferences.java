@@ -92,8 +92,8 @@ public class Preferences {
                 ;
     }
 
-    public static StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public static JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
         try {
             json.put("_type", "configuration")
                     .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
@@ -141,7 +141,7 @@ public class Preferences {
         return json;
     }
 
-    public static void fromJsonObject(StringifiedJSONObject json) {
+    public static void fromJsonObject(JSONObject json) {
         if (!isPropperMessageType(json, "configuration"))
             return;
 
@@ -185,7 +185,7 @@ public class Preferences {
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try {
-            StringifiedJSONArray j = json.getStringifiedJSONArray("waypoints");
+            JSONArray j = json.getJSONArray("waypoints");
             if (j != null) {
                 waypointsFromJson(j);
             } else {
@@ -197,7 +197,7 @@ public class Preferences {
         };
     }
 
-    private static void waypointsFromJson(StringifiedJSONArray j) {
+    private static void waypointsFromJson(JSONArray j) {
         Log.v("import", "importing " + j.length()+" waypoints");
         WaypointDao dao = App.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
@@ -205,7 +205,7 @@ public class Preferences {
         for(int i = 0 ; i < j.length(); i++){
             Log.v("import", "importing waypoint: " + i);
             Waypoint newWaypoint;
-            StringifiedJSONObject waypointJson;
+            JSONObject waypointJson;
             try {
                 Log.v("import", "checking for required attributes");
 
@@ -256,7 +256,8 @@ public class Preferences {
 
             Waypoint existingWaypoint = null;
             for(Waypoint e : deviceWaypoints) {
-                if(e.getDate().compareTo(newWaypoint.getDate()) == 0) {
+                Log.v("import", "exisitng waypoint tst: " + e.getDate());
+                if(e.getDate().getTime().compareTo(newWaypoint.getDate()) == 0) {
                     existingWaypoint = e;
                     break;
                 }
