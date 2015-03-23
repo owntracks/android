@@ -24,6 +24,7 @@ import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 import org.owntracks.android.R;
@@ -257,7 +258,7 @@ public class ServiceBeacon implements
         if(!customBeaconlayout.equals(""))
         {
             Log.v(this.toString(), "Got custom parser layout");
-            List<BeaconParser> parsers = mBeaconManager.getBeaconParsers();
+            List<BeaconParser> parsers = new ArrayList<BeaconParser>(mBeaconManager.getBeaconParsers());
             Log.v(this.toString(), "Parser count: " + parsers.size());
 
             if(parsers.size() > 0)
