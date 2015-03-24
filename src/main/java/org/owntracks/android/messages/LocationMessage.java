@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 import android.util.Log;
 
@@ -24,7 +23,7 @@ public class LocationMessage extends Message{
     private boolean supressesTicker;
 
     // For incoming messages
-    public LocationMessage(StringifiedJSONObject json) throws JSONException{
+    public LocationMessage(JSONObject json) throws JSONException{
         this(new GeocodableLocation(json)); // new GeocodableLocation checks if json contains correct type element
 
         try {
@@ -112,8 +111,8 @@ public class LocationMessage extends Message{
 		return this.toJSONObject().toString();
 	}
 
-	public StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+	public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
 
         try {
             json.put("_type", "location")

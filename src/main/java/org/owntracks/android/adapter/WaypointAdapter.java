@@ -3,6 +3,8 @@ package org.owntracks.android.adapter;
 import java.util.ArrayList;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.model.Contact;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,16 +20,18 @@ public class WaypointAdapter extends MultitypeAdapter {
     public WaypointAdapter(Context context, ArrayList<Waypoint> waypoints) {
         super(context);
 
-        if(waypoints != null)
-            for (Waypoint c : waypoints)
-                addItem(c);
-
-        notifyDataSetChanged();
+        set(waypoints);
     }
     public DelegateAdapter getItemDelegateAdapter() {
         return new ItemDelegateAdapter();
     }
 
+
+    public void set(ArrayList<Waypoint> waypoints) {
+        if(waypoints != null)
+            for (Waypoint w : waypoints)
+                addItem(w);
+    }
 
     public static class WaypointHolder {
         TextView description;

@@ -2,8 +2,8 @@ package org.owntracks.android.messages;
 
 import org.altbeacon.beacon.Identifier;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.owntracks.android.support.StringifiedJSONObject;
 
 import android.util.Log;
 
@@ -45,8 +45,8 @@ public class BeaconMessage extends Message {
         return this.toJSONObject().toString();
     }
 
-    public StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
 
         try {
             json.put("_type", "beacon")
@@ -76,7 +76,7 @@ public class BeaconMessage extends Message {
         return json;
     }
 
-    public BeaconMessage(StringifiedJSONObject json) throws JSONException{
+    public BeaconMessage(JSONObject json) throws JSONException{
         // Not implemented
 
         try {

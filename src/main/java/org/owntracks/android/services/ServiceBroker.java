@@ -32,6 +32,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
@@ -39,7 +40,6 @@ import org.owntracks.android.messages.Message;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageCallbacks;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -739,10 +739,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         Log.v(this.toString(), "Received message: " + topic + " : " + msg);
 
 		String type;
-		StringifiedJSONObject json;
+		JSONObject json;
 
 		try {
-			json = new StringifiedJSONObject(msg);
+			json = new JSONObject(msg);
 			type = json.getString("_type");
 		} catch (Exception e) {
 			Log.e(this.toString(), "Received invalid message: " + msg);
