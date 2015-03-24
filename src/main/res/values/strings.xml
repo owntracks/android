@@ -285,5 +285,6 @@
     <string name="keyOptions">options</string>
     <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Seconds</string>
+    <string name="menuContactRequestReportLocation">Request location report</string>
 
 </resources>
