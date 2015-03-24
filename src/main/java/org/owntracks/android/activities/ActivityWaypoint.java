@@ -220,7 +220,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
                     && (this.latitude.getText().toString().length() > 0)
                     && (this.longitude.getText().toString().length() > 0)
                     && ((!((this.radius.getText().toString().length() > 0) // if radius is set, enter or leave are required
-                    && (Float.parseFloat(this.radius.getText().toString()) > 0))) || (enterValue || leaveValue)
+                    && (Integer.parseInt(this.radius.getText().toString()) > 0))) || (enterValue || leaveValue)
             );
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input
@@ -234,7 +234,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
     private void conditionallyShowGeofenceSettings() {
         boolean visible;
         try {
-            visible = (this.radius.getText().toString().length() > 0) && (Float.parseFloat(this.radius.getText().toString()) > 0);
+            visible = (this.radius.getText().toString().length() > 0) && (Integer.parseInt(this.radius.getText().toString()) > 0);
         } catch (Exception e) {
             visible = false;
         }
@@ -264,13 +264,13 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
     protected void add(Waypoint w) {
         this.dao.insert(w);
         EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
-        EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
+        //EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     protected void update(Waypoint w) {
         this.dao.update(w);
         EventBus.getDefault().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
-        EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
+        //EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
 

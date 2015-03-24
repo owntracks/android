@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 public class DumpMessage extends Message {
     private LocationMessage location;
@@ -91,25 +90,25 @@ public class DumpMessage extends Message {
         return toJsonObject().toString();
     }
 
-    public StringifiedJSONObject toJsonObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public JSONObject toJsonObject() {
+        JSONObject json = new JSONObject();
         try {
             json.put("_type", "dump")
                 .put("systemDate", new java.util.Date())
                 .put("location", location.toJSONObject())
                 .put("configuration", configuration.toJSONObject())
-                .put("internal", new StringifiedJSONObject()
+                .put("internal", new JSONObject()
 
-                                .put("broker", new StringifiedJSONObject()
+                                .put("broker", new JSONObject()
                                                 .put("keepAliveSeconds", brokerKeepAliveSeconds)
                                                 .put("error", brokerError != null ? brokerError.toString() : null)
                                                 .put("deferredPublishablesCount", brokerDeferredPublishablesCount)
                                                 .put("state", brokerState)
                                 )
-                                .put("application", new StringifiedJSONObject()
+                                .put("application", new JSONObject()
                                                 .put("playServicesAvailable", applicationPlayServicesAvailable)
                                 )
-                                .put("locator", new StringifiedJSONObject()
+                                .put("locator", new JSONObject()
                                                 .put("ready", locatorReady)
                                                 .put("foreground", locatorForeground)
                                                 .put("lastKnownLocation", locatorLastKnownLocation != null ? locatorLastKnownLocation : null)

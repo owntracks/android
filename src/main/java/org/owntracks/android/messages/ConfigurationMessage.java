@@ -5,18 +5,17 @@ import org.json.JSONException;
 
 import java.util.EnumSet;
 
+import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StringifiedJSONArray;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 public class ConfigurationMessage extends Message{
-    private StringifiedJSONObject json;
+    private JSONObject json;
     public static enum Includes {CONNECTION, CREDENTIALS, IDENTIFICATION, WAYPOINTS}
 
-    public ConfigurationMessage(StringifiedJSONObject json){
+    public ConfigurationMessage(JSONObject json){
         super();
         this.json=json;
     }
@@ -44,15 +43,15 @@ public class ConfigurationMessage extends Message{
     }
 
 
-    private StringifiedJSONObject getPreferencesJson() {
+    private JSONObject getPreferencesJson() {
         return Preferences.toJSONObject();
     }
     private JSONArray getWaypointJson() {
 
-        StringifiedJSONArray waypoints = new StringifiedJSONArray();
+        JSONArray waypoints = new JSONArray();
         for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
             WaypointMessage wpM = new WaypointMessage(waypoint);
-            StringifiedJSONObject wp = wpM.toJSONObject();
+            JSONObject wp = wpM.toJSONObject();
             try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
             try { wp.put("transition", waypoint.getTransitionType()); } catch (JSONException e) { }
             waypoints.put(wp);
@@ -61,7 +60,7 @@ public class ConfigurationMessage extends Message{
     }
 
     public String toString() {return toJSONObject().toString(); }
-    public StringifiedJSONObject toJSONObject() {
+    public JSONObject toJSONObject() {
         return json;
     }
 
