@@ -18,11 +18,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StringifiedJSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,7 +36,7 @@ import java.util.EnumSet;
 public class ActivityImport extends ActionBarActivity {
     private TextView input;
     private MenuItem saveButton;
-    StringifiedJSONObject configJSON = null;
+    JSONObject configJSON = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +127,7 @@ public class ActivityImport extends ActionBarActivity {
                 throw new Error("Unable to read content");
             }
 
-            StringifiedJSONObject j = new StringifiedJSONObject(total.toString());
+            JSONObject j = new JSONObject(total.toString());
             if(j == null) {
                 throw new Error("Unable to parse content");
             }

@@ -11,6 +11,7 @@ import org.owntracks.android.R;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TimeUtils;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
@@ -92,8 +93,8 @@ public class Preferences {
                 ;
     }
 
-    public static StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public static JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
         try {
             json.put("_type", "configuration")
                     .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
@@ -141,7 +142,7 @@ public class Preferences {
         return json;
     }
 
-    public static void fromJsonObject(StringifiedJSONObject json) {
+    public static void fromJsonObject(JSONObject json) {
         if (!isPropperMessageType(json, "configuration"))
             return;
 
@@ -185,7 +186,7 @@ public class Preferences {
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try {
-            StringifiedJSONArray j = json.getStringifiedJSONArray("waypoints");
+            JSONArray j = json.getJSONArray("waypoints");
             if (j != null) {
                 waypointsFromJson(j);
             } else {
@@ -197,7 +198,7 @@ public class Preferences {
         };
     }
 
-    private static void waypointsFromJson(StringifiedJSONArray j) {
+    private static void waypointsFromJson(JSONArray j) {
         Log.v("import", "importing " + j.length()+" waypoints");
         WaypointDao dao = App.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
@@ -205,7 +206,7 @@ public class Preferences {
         for(int i = 0 ; i < j.length(); i++){
             Log.v("import", "importing waypoint: " + i);
             Waypoint newWaypoint;
-            StringifiedJSONObject waypointJson;
+            JSONObject waypointJson;
             try {
                 Log.v("import", "checking for required attributes");
 
@@ -231,7 +232,7 @@ public class Preferences {
 
             if(newWaypoint.getShared()) {
                 try {
-                    newWaypoint.setRadius(waypointJson.getInt("radius"));
+                    newWaypoint.setRadius(waypointJson.getInt("rad"));
                     int transition = waypointJson.getInt("transition");
                     if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT || transition == (Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT))
                         newWaypoint.setTransitionType(transition);
@@ -239,7 +240,6 @@ public class Preferences {
                     Log.v("import", "unable to import radius and/or transition attribute");
 
                     newWaypoint.setRadius(0);
-                    newWaypoint.setTransitionType(null);
                 }
             }
 
@@ -251,12 +251,13 @@ public class Preferences {
                 newWaypoint.setDate(new Date());
             }
 
-            Log.v("import", "Parsing complete. Result: " + newWaypoint);
-            Log.v("import", "searching for exisiting waypoint with date " +newWaypoint.getDate());
 
             Waypoint existingWaypoint = null;
             for(Waypoint e : deviceWaypoints) {
-                if(e.getDate().compareTo(newWaypoint.getDate()) == 0) {
+                Log.v("import", "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
+                Log.v("import", "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime()));
+
+                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime())) {
                     existingWaypoint = e;
                     break;
                 }
