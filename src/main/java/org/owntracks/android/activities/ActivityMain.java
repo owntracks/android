@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.ContactAdapter;
+import org.owntracks.android.messages.CommandMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceBroker;
@@ -67,6 +68,13 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends ActionBarActivity {
     private static final int CONTACT_PICKER_RESULT = 1001;
+    private static final int MENU_CONTACT_SHOW = 0;
+    private static final int MENU_CONTACT_DETAILS = 1;
+    private static final int MENU_CONTACT_NAVIGATE = 2;
+    private static final int MENU_CONTACT_FOLLOW = 3;
+    private static final int MENU_CONTACT_UNFOLLOW = 4;
+    private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
+
     private static Drawer.OnDrawerItemClickListener drawerListener;
     private Toolbar toolbar;
     @Override
@@ -522,11 +530,7 @@ public class ActivityMain extends ActionBarActivity {
 		private Map<String, Contact> markerToContacts;
         private Menu mMenu;
 
-        private static final int MENU_CONTACT_SHOW = 0;
-        private static final int MENU_CONTACT_DETAILS = 1;
-        private static final int MENU_CONTACT_NAVIGATE = 2;
-        private static final int MENU_CONTACT_FOLLOW = 3;
-        private static final int MENU_CONTACT_UNFOLLOW = 4;
+
 
 
         private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
@@ -674,6 +678,9 @@ public class ActivityMain extends ActionBarActivity {
 
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
+                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
+
+
             }
         }
 
@@ -697,6 +704,9 @@ public class ActivityMain extends ActionBarActivity {
                     break;
                 case MENU_CONTACT_NAVIGATE:
                     ((ActivityMain)getActivity()).launchNavigation(c);
+                    break;
+                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
+                    ((ActivityMain)getActivity()).requestReportLocation(c);
                     break;
             }
             return true;
@@ -941,13 +951,21 @@ public class ActivityMain extends ActionBarActivity {
         }
     }
 
-	public static class ContactsFragment extends Fragment implements
+    private void requestReportLocation(final Contact c) {
+        ServiceProxy.runOrBind(this, new Runnable() {
+
+            @Override
+            public void run() {
+
+                    ServiceProxy.getServiceBroker().publish(new CommandMessage("reportLocation"), c.getTopic(), Preferences.getPubQos(), false, null, null);
+            }
+        });
+    }
+
+    public static class ContactsFragment extends Fragment implements
 			StaticHandlerInterface {
 
         private static final String TAG_CURRENTLOCATION = "TAG_CURRENTLOCATION";
-        private static final int MENU_CONTACT_SHOW = 0;
-        private static final int MENU_CONTACT_DETAILS = 1;
-        private static final int MENU_CONTACT_NAVIGATE = 2;
         private static Handler handler;
 
 		private ListView contactsList;
@@ -1103,6 +1121,8 @@ public class ActivityMain extends ActionBarActivity {
                 menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
+                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
+
             }
 
 
@@ -1127,6 +1147,10 @@ public class ActivityMain extends ActionBarActivity {
                     break;
                 case MENU_CONTACT_NAVIGATE:
                     ((ActivityMain)getActivity()).launchNavigation(c);
+                    break;
+                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
+                    ((ActivityMain)getActivity()).requestReportLocation(c);
+
             }
             return true;
         }
