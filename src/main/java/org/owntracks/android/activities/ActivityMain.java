@@ -109,12 +109,6 @@ public class ActivityMain extends ActionBarActivity {
         drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                if(drawerItem == null)
-                    return;
-
-                Log.v(this.toString(), "Drawer item clicked: " + drawerItem.getIdentifier());
-                DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
@@ -125,28 +119,12 @@ public class ActivityMain extends ActionBarActivity {
                         }
                         break;
                     case R.string.idWaypoints:
-                        mDrawerLayout.closeDrawers();
-
-                        //new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                         //   @Override
-                         //   public void run() {
-                                Intent intent1 = new Intent(context, ActivityWaypoints.class);
-                                startActivity(intent1);
-                         //   }
-                        //}, 200);
-
+                        Intent intent1 = new Intent(context, ActivityWaypoints.class);
+                        startActivity(intent1);
                         break;
                     case R.string.idSettings:
-                        mDrawerLayout.closeDrawers();
-
-                       // new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                        //    @Override
-                        //    public void run() {
-                                Intent intent2 = new Intent(context, ActivityPreferences.class);
-                                startActivity(intent2);
-                        //    }
-                        //}, 200);
-
+                        Intent intent2 = new Intent(context, ActivityPreferences.class);
+                        startActivity(intent2);
                         break;
 
                 }
@@ -1118,11 +1096,6 @@ public class ActivityMain extends ActionBarActivity {
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Locations");
-
-            //toggle = new ActionBarDrawerToggle(getActivity(), ((ActivityMain)getActivity()).drawerLayout, toolbar, R.string.na, R.string.close);
-            //toggle.setDrawerIndicatorEnabled(true);
-            //((ActivityMain)getActivity()).drawerLayout.setDrawerListener(toggle);
-            //toggle.syncState();
 
             DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
             onCreateOptionsMenu(mMenu, mInflater);

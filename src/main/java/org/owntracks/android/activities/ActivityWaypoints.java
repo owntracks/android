@@ -77,25 +77,13 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
-                        mDrawerLayout.closeDrawers();
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
-                                goToRoot();
-                            }
-                        }, 200);
+                        goToRoot();
                         break;
                     case R.string.idWaypoints:
                         break;
                     case R.string.idSettings:
-                        mDrawerLayout.closeDrawers();
-                        new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                            @Override
-                            public void run() {
-                                Intent intent = new Intent(context, ActivityPreferences.class);
-                                startActivity(intent);
-                            }
-                        }, 200);
+                        Intent intent = new Intent(context, ActivityPreferences.class);
+                        startActivity(intent);
                         break;
 
                 }
