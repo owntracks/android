@@ -17,6 +17,8 @@ import de.greenrobot.event.EventBus;
 
 public class ServiceProxy extends ServiceBindable {
     public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "org.owntracks.android.intent.PUB_LASTKNOWN";
+    public static final String INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL = "org.owntracks.android.intent.PUB_LASTKNOWN_MANUAL";
+
     public static final String INTENT_ACTION_PUBLISH_PING = "org.owntracks.android.intent.PUB_PING";
     public static final String INTENT_ACTION_LOCATION_CHANGED = "org.owntracks.android.intent.LOCATION_CHANGED";
     public static final String INTENT_ACTION_FENCE_TRANSITION = "org.owntracks.android.intent.FENCE_TRANSITION";

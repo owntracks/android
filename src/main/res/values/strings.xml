@@ -83,7 +83,7 @@
     <string name="close">"Close"</string>
     <string name="statePublished">"Location reported"</string>
     <string name="stateNotopic">"Error: No topic set"</string>
-    <string name="statePublishTimeout">"Error: Timeout"</string>
+    <string name="stateQueued">"Message delivery deferred"</string>
     <string name="stateLocatingFail">"Error: Unable to acquire location"</string>
     <string name="stateBluetoothFail">"Error: Bluetooth is unavailable"</string>
     <string name="statePublishing">"Reporting"</string>

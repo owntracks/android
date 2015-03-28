@@ -11,6 +11,7 @@ public class Message extends MqttMessage {
     private boolean isPublishing;
     private Object extra;
     private int ttl = 5; // Publishes to live. Decremented with each publish. Message is discarded after ptl reaches 0
+    private boolean wasQueued = false;
     public Message() {
         super();
     }
@@ -30,10 +31,17 @@ public class Message extends MqttMessage {
             this.callback.publishFailed(this.extra);
     }
 
+    public void publishQueued() {
+        wasQueued = true;
+        if (this.callback != null)
+            this.callback.publishQueued(this.extra);
+
+    }
+
     public void publishSuccessful() {
         if (this.callback != null) {
             Log.v(this.toString(), "Callback: " + this.callback);
-            this.callback.publishSuccessfull(this.extra);
+            this.callback.publishSuccessfull(this.extra, this.wasQueued);
         } else
             Log.v(this.toString(), "message has no callback");
 
@@ -67,4 +75,6 @@ public class Message extends MqttMessage {
     public void setExtra(Object extra) {
         this.extra = extra;
     }
+
+
 }
