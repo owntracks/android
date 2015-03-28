@@ -54,9 +54,9 @@
     <string name="keyTrackerId">trackerId</string>
     <string name="preferencesTrackerIdSummary">Tracker ID used for reporting</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
-    <string name="preferencesLocatorDisplacement">Locator displacement</string>
+    <string name="preferencesLocatorDisplacement">Locator background  displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
-    <string name="preferencesLocatorInterval">Locator interval</string>
+    <string name="preferencesLocatorInterval">Locator background interval</string>
     <string name="preferencesLocatorIntervalSummary">Minutes between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
@@ -157,6 +157,8 @@
     <string name="transitionBoth">Enter &amp; Leave</string>
     <string name="transitionEntering">Entering</string>
     <string name="transitionLeaving">Leaving</string>
+    <string name="transitionentering">entering</string>
+    <string name="transitionleaving">leaving</string>
     <string name="keyDeviceId">deviceId</string>
     <string name="keyClientId">clientId</string>
     <string name="keyHost">host</string>
@@ -286,5 +288,7 @@
     <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="menuContactRequestReportLocation">Request location report</string>
+    <string name="preferencesNotificationTickerOnReceivedWaypointTransitionSummary">Notify about received waypoints</string>
+    <string name="preferencesNotificationTickerOnReceivedWaypointTransition">Received waypoint events</string>
 
 </resources>

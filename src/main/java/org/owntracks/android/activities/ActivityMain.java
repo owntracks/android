@@ -772,10 +772,7 @@ public class ActivityMain extends ActionBarActivity {
 
                         @Override
                         public void onMapClick(LatLng arg0) {
-                            setFollowingSelectedContact(false);
-                            Preferences.setSelectedContactTopic(KEY_NOTOPIC);
-
-                            hideSelectedContactDetails();
+                            unfollowContact();
                         }
                     });
 		}
@@ -809,10 +806,7 @@ public class ActivityMain extends ActionBarActivity {
 
 		public void updateContactLocation(Contact c) {
 
-			if (c.getMarker() != null) {
-                this.markerToContacts.remove(c.getMarker().getId());
-                c.getMarker().remove();
-            }
+            removeContactMarker(c);
 
 			Marker m = this.googleMap.addMarker(
                     new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()).anchor(0.5F, 0.5F));
@@ -824,6 +818,26 @@ public class ActivityMain extends ActionBarActivity {
 
 		}
 
+        private void removeContactMarker(Contact c) {
+            if (c.getMarker() != null) {
+                this.markerToContacts.remove(c.getMarker().getId());
+                c.getMarker().remove();
+            }
+        }
+
+        private void removeContactLocation(Contact c) {
+            removeContactMarker(c);
+            Log.v(this.toString(), Preferences.getSelectedContactTopic());
+            if(c.getTopic() == Preferences.getSelectedContactTopic()) {
+                unfollowContact();
+            }
+        }
+
+        private void unfollowContact(){
+            setFollowingSelectedContact(false);
+            Preferences.setSelectedContactTopic(KEY_NOTOPIC);
+            hideSelectedContactDetails();
+        }
 
 		@Override
 		public void handleHandlerMessage(Message msg) {
@@ -904,6 +918,11 @@ public class ActivityMain extends ActionBarActivity {
         public void onEventMainThread(Events.ContactAdded e) {
             updateContactLocation(e.getContact());
         }
+
+        public void onEventMainThread(Events.ContactRemoved e) {
+            removeContactLocation(e.getContact());
+        }
+
 
 
         public void onEventMainThread(Events.CurrentLocationUpdated e) {
@@ -1060,18 +1079,18 @@ public class ActivityMain extends ActionBarActivity {
 
 		@Override
 		public void onResume() {
-			super.onResume();
+            super.onResume();
 
             registerForContextMenu(this.contactsList);
 
-			ServiceProxy.runOrBind(getActivity(), new Runnable() {
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
-				@Override
-				public void run() {
-					updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
+                @Override
+                public void run() {
+                    updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
 
-				}
-			});
+                }
+            });
 
 		}
 
@@ -1196,6 +1215,7 @@ public class ActivityMain extends ActionBarActivity {
 
         }
 
+
 		@Override
 		public void handleHandlerMessage(Message msg) {
 
@@ -1215,6 +1235,9 @@ public class ActivityMain extends ActionBarActivity {
             updateContactLocation(e.getContact(), true);
         }
 
+        public void onEventMainThread(Events.ContactRemoved e) {
+            listAdapter.removeItem(e.getContact());
+        }
 
     }
 
@@ -1342,8 +1365,8 @@ public class ActivityMain extends ActionBarActivity {
 				@Override
 				public void run() {
 					ServiceProxy.getServiceApplication().linkContact(
-							DetailsFragment.this.contact,
-							Long.parseLong(contactId));
+                            DetailsFragment.this.contact,
+                            Long.parseLong(contactId));
 
 				}
 			});
@@ -1355,7 +1378,7 @@ public class ActivityMain extends ActionBarActivity {
 				Bundle savedInstanceState) {
 
 			View v = inflater.inflate(R.layout.fragment_details, container,
-					false);
+                    false);
 			this.name = (TextView) v.findViewById(R.id.name);
 			this.topic = (TextView) v.findViewById(R.id.topic);
 			this.location = (TextView) v.findViewById(R.id.location);
@@ -1407,6 +1430,13 @@ public class ActivityMain extends ActionBarActivity {
 			if (e.getContact() == this.contact)
 				onShow();
 		}
+
+        public void onEventMainThread(Events.ContactRemoved e) {
+            // Contact will be cleared, close this view
+            if (e.getContact() == this.contact);
+                FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
+        }
+
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             // Contact will be cleared, close this view

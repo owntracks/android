@@ -44,8 +44,9 @@ public class Contact {
 	private Marker marker;
 	private View view;
 	private Drawable imageDrawable;
+    private Uri lookupURI;
 
-	public Contact(String topic) {
+    public Contact(String topic) {
 		this.topic = topic;
 	}
 
@@ -84,6 +85,14 @@ public class Contact {
 	public String getName() {
 		return this.name;
 	}
+
+    public void setLookupURI(Uri lookupuri) {
+        this.lookupURI = lookupuri;
+    }
+
+    public Uri getLookupUri(){
+        return this.lookupURI;
+    }
 
 	public void setName(String name) {
 		this.name = name;

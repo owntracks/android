@@ -154,9 +154,9 @@ public class ActivityPreferences extends ActionBarActivity {
         private static Preference securityPreference;
         private static Preference optionsPreference;
 
-        private static org.owntracks.android.support.EditTextPreference pubTopicBase;
+        private static org.owntracks.android.support.EditStringPreference pubTopicBase;
         private static org.owntracks.android.support.EditIntegerPreference pubInterval;
-        private static org.owntracks.android.support.EditTextPreference subTopic;
+        private static org.owntracks.android.support.EditStringPreference subTopic;
         private static org.owntracks.android.support.EditIntegerPreference locatorDisplacement;
         private static org.owntracks.android.support.EditIntegerPreference locatorInterval;
         private static org.owntracks.android.support.EditIntegerPreference beaconForegroundScanPeriod;
@@ -192,10 +192,10 @@ public class ActivityPreferences extends ActionBarActivity {
             pubInterval = (org.owntracks.android.support.EditIntegerPreference) findPreference(Preferences.getKey(R.string.keyPubInterval));
             pubInterval.setHint(Integer.toString(Preferences.getIntResource(R.integer.valPubInterval)));
 
-            pubTopicBase = (org.owntracks.android.support.EditTextPreference) findPreference(Preferences.getKey(R.string.keyPubTopicBase));
+            pubTopicBase = (org.owntracks.android.support.EditStringPreference) findPreference(Preferences.getKey(R.string.keyPubTopicBase));
             setPubTopicHint();
 
-            subTopic = (org.owntracks.android.support.EditTextPreference) findPreference(Preferences.getKey(R.string.keySubTopic));
+            subTopic = (org.owntracks.android.support.EditStringPreference) findPreference(Preferences.getKey(R.string.keySubTopic));
             subTopic.setHint(Preferences.getStringRessource(R.string.valSubTopic));
 
             locatorDisplacement = (org.owntracks.android.support.EditIntegerPreference) findPreference(Preferences.getKey(R.string.keyLocatorDisplacement));

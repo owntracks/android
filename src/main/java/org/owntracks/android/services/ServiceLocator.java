@@ -306,9 +306,8 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
 
 		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
-		this.mLocationRequest.setFastestInterval(10000);
+		this.mLocationRequest.setFastestInterval(PendingIntent.FLAG_CANCEL_CURRENT);
         Log.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
-
         this.mLocationRequest.setSmallestDisplacement(50);
 	}
 
@@ -388,7 +387,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
     private PendingIntent getPendingIntentForLocationRequest() {
-        return  ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_LOCATION_CHANGED, null);
+        return ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_LOCATION_CHANGED, null, 0);
     }
 
 	@Override

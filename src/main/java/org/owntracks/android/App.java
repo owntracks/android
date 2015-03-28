@@ -112,6 +112,11 @@ public class App extends Application {
         EventBus.getDefault().post(new Events.ContactAdded(c));
     }
 
+    public static void removeContact(Contact c) {
+        instance.contacts.remove(c.getTopic());
+        EventBus.getDefault().post(new Events.ContactRemoved(c));
+    }
+
 	public static String formatDate(Date d) {
 		return instance.dateFormater.format(d);
 	}
@@ -140,6 +145,7 @@ public class App extends Application {
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
 	}
+
 
 
 }
