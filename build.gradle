@@ -42,11 +42,11 @@ dependencies {
     }
 
     // Material design widget libraries
-    compile 'com.rengwuxian.materialedittext:library:1.8.2'
-    compile('com.mikepenz.materialdrawer:library:2.5.5@aar') {
+    compile 'com.rengwuxian.materialedittext:library:1.8.3'
+    compile('com.mikepenz.materialdrawer:library:2.6.5@aar') {
         transitive = true
     }
-    compile 'com.afollestad:material-dialogs:0.6.4.4'
+    compile 'com.afollestad:material-dialogs:0.6.6.1'
 
 
 }

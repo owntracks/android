@@ -43,6 +43,8 @@ public class LocationMessage extends Message{
                 setTransition(Geofence.GEOFENCE_TRANSITION_ENTER);
             else if (json.getString("event").equals("exit"))
                 setTransition(Geofence.GEOFENCE_TRANSITION_EXIT);
+            else
+                setTransition(-1);
         } catch (Exception e) { }
     }
 

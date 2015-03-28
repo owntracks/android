@@ -33,10 +33,12 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONObject;
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
+import org.owntracks.android.model.Contact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageCallbacks;
 import org.owntracks.android.support.Preferences;
@@ -752,12 +754,25 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			json = new JSONObject(msg);
 			type = json.getString("_type");
 		} catch (Exception e) {
-			Log.e(this.toString(), "Received invalid message: " + msg);
-			return;
+            if(msg.isEmpty()) {
+                Log.v(this.toString(), "Empty message received");
+
+                Contact c = App.getContact(topic);
+                if(c != null) {
+                  Log.v(this.toString(), "Clearing contact location");
+
+                    EventBus.getDefault().postSticky(new Events.ClearLocationMessageReceived(c));
+                    return;
+                }
+            }
+
+            Log.e(this.toString(), "Received invalid message: " + msg);
+            return;
 		}
 
 		if (type.equals("location")) {
             LocationMessage lm = new LocationMessage(json);
+            lm.setRetained(message.isRetained());
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
         } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic()+"/cmd")) {
             String action;
@@ -795,6 +810,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 return;
             }
             ConfigurationMessage cm = new ConfigurationMessage(json);
+            cm.setRetained(message.isRetained());
             EventBus.getDefault().post(new Events.ConfigurationMessageReceived(cm, topic));
 
         } else {

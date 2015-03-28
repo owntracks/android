@@ -304,7 +304,7 @@ public class ServiceBeacon implements
             return;
         }
 
-        ServiceProxy.getServiceBroker().publish(r, topic,Preferences.getPubQos(),
+        ServiceProxy.getServiceBroker().publish(r, topic, Preferences.getPubQos(),
                 Preferences.getPubRetain(), this, null);
 
     }
@@ -347,7 +347,7 @@ public class ServiceBeacon implements
     }
 
     @Override
-    public void publishSuccessfull(Object extra) {
+    public void publishSuccessfull(Object extra, boolean wasQueued) {
 
     }
 
