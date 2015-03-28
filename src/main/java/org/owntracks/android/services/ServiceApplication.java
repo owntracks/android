@@ -210,7 +210,7 @@ public class ServiceApplication implements ProxyableService,
 
 		this.notificationIntent = ServiceProxy.getPendingIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
-				ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN, null);
+				ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
 		notificationBuilder.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
 	}
@@ -330,7 +330,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void onEvent(Events.PublishSuccessfull e) {
-		if ((e.getExtra() != null) && (e.getExtra() instanceof LocationMessage)) {
+		if ((e.getExtra() != null) && (e.getExtra() instanceof LocationMessage) && !e.wasQueued()) {
 			LocationMessage l = (LocationMessage) e.getExtra();
 
 			this.lastPublishedLocation = l.getLocation();

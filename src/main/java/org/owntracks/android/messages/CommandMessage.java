@@ -1,10 +1,7 @@
 package org.owntracks.android.messages;
 
 import org.json.JSONException;
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.support.StringifiedJSONObject;
-
-import java.util.concurrent.TimeUnit;
+import org.json.JSONObject;
 
 public class CommandMessage extends Message {
     String action;
@@ -18,8 +15,8 @@ public class CommandMessage extends Message {
         	return toJSONObject().toString();
 	}
 
-    public StringifiedJSONObject toJSONObject() {
-        StringifiedJSONObject json = new StringifiedJSONObject();
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
         try {
             json.put("_type", "cmd").put("action", this.action);
 

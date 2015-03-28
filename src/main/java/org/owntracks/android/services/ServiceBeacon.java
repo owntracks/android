@@ -362,9 +362,11 @@ public class ServiceBeacon implements
     }
 
     @Override
-    public void publishWaiting(Object extra) {
-        changeState(ServiceBeacon.State.PUBLISHING_WAITING);
+    public void publishQueued(Object extra) {
+
     }
+
+
 
     public long getLastPublishDate() {
         return this.lastPublish;
@@ -391,9 +393,7 @@ public class ServiceBeacon implements
             case PUBLISHING_WAITING:
                 id = R.string.stateWaiting;
                 break;
-            case PUBLISHING_TIMEOUT:
-                id = R.string.statePublishTimeout;
-                break;
+
             case NOTOPIC:
                 id = R.string.stateNotopic;
                 break;
