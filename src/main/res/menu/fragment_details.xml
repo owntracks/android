@@ -13,4 +13,10 @@
         android:icon="@drawable/ic_contact_unlink"
         android:title="@string/unassignContact"/>
 
+    <item
+        android:id="@+id/action_clear"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/clearContact"/>
+
 </menu>
