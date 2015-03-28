@@ -57,35 +57,16 @@ public class ActivityPreferences extends ActionBarActivity {
         Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                if(drawerItem == null)
-                    return;
-
-                Log.v(this.toString(), "Drawer item clicked: " + drawerItem.getIdentifier());
-                DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
-                        //mDrawerLayout.closeDrawers();
-                       // new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                        //    @Override
-                        //    public void run() {
-                                goToRoot();
-                        //    }
-                        //}, 200);
+                        goToRoot();
                         break;
                     case R.string.idWaypoints:
-                        mDrawerLayout.closeDrawers();
-                        //new Handler().postDelayed(new Runnable() { // Give drawer time to close to prevent UI lag
-                        //    @Override
-                        //    public void run() {
-                                Intent intent = new Intent(context, ActivityWaypoints.class);
-                                startActivity(intent);
-                        //}
-                        //}, 200);
+                        Intent intent = new Intent(context, ActivityWaypoints.class);
+                        startActivity(intent);
                         break;
                     case R.string.idSettings:
                         break;
-
                 }
             }
         };
