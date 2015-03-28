@@ -45,7 +45,7 @@ import de.greenrobot.event.EventBus;
 
 public class ServiceLocator implements ProxyableService, MessageCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public static enum State {
-        INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOLOCATION
+        INITIAL, PUBLISHING, PUBLISHING_QUEUED, NOTOPIC, NOLOCATION
     }
     private static ServiceLocator.State state = ServiceLocator.State.INITIAL;
 
@@ -121,13 +121,15 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting() && ServiceApplication.checkPlayServices()) {
-            Log.v(this.toString(), "Connecting GoogleApiClient");
-            this.googleApiClient.connect();
-        } else {
-            Log.v(this.toString(), "play services not available");
-
+        if(ServiceApplication.checkPlayServices()) {
+            if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting()) {
+                Log.v(this.toString(), "Connecting GoogleApiClient");
+                this.googleApiClient.connect();
+            } else {
+                Log.v(this.toString(), "GoogleApiClient is already connected or connecting");
+            }
         }
+
         this.ready = false;
 
     }
@@ -135,6 +137,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(this.toString(), "GoogleApiClient connection failed with result: " + connectionResult);
+        this.ready = false;
     }
 
     @Override
@@ -149,6 +152,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
     @Override
     public void onConnectionSuspended(int i) {
         Log.v(this.toString(), "GoogleApiClient connection suspended");
+        this.ready = false;
     }
 
 	public GeocodableLocation getLastKnownLocation() {
@@ -196,7 +200,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
             int transition = event.getGeofenceTransition();
 
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                String[] geofenceIds = new String[event.getTriggeringGeofences().size()];
                 for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
                     Waypoint w = this.waypointDao.queryBuilder().where(Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
@@ -318,7 +321,9 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
             Log.v(this.toString(), "disableLocationUpdates");
 
-            PendingResult<Status> r = LocationServices.FusedLocationApi.removeLocationUpdates(this.googleApiClient, mLocationListener);
+            final PendingIntent i = getPendingIntentForLocationRequest();
+
+            PendingResult<Status> r = LocationServices.FusedLocationApi.removeLocationUpdates(this.googleApiClient, i);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(Status status) {
@@ -329,6 +334,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
                     } else {
                         Log.v(this.toString(), "removeLocationUpdates failed. " + status.getStatusMessage());
                     }
+                    i.cancel();
                 }
             });
 		}
@@ -355,8 +361,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         }
 
 		if (this.foreground || Preferences.getPub()) {
-            PendingIntent i = ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_LOCATION_CHANGED, null);
-            Log.v(this.toString(), "Setting up location updates with pending intent " + i);
 
 
 
@@ -365,7 +369,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
             debugRequestSmallestInterval = mLocationRequest.getSmallestDisplacement();
             debugRequestPriority=mLocationRequest.getPriority();
 
-            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,mLocationRequest,i);
+            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, getPendingIntentForLocationRequest());
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(Status status) {
@@ -383,6 +387,10 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 	}
 
+    private PendingIntent getPendingIntentForLocationRequest() {
+        return  ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_LOCATION_CHANGED, null);
+    }
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(this.toString(), "onStartCommand");
@@ -392,8 +400,10 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 			if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
                 Log.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN");
-
                 publishLocationMessage();
+            } else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL)) {
+                Log.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL");
+                publishManualLocationMessage();
 			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_LOCATION_CHANGED)) {
                 Log.v(this.toString(), "action == INTENT_ACTION_LOCATION_CHANGED");
                 Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
@@ -533,43 +543,25 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
 	@Override
-	public void publishSuccessfull(Object extra) {
-        Log.v(this.toString(), "publish successfull in service locator");
+	public void publishSuccessfull(Object extra, boolean wasQueued) {
+        Log.v(this.toString(), "publish successful in service locator. Initial try: " + !wasQueued);
 		if (extra == null)
 			return;
 
 		changeState(ServiceLocator.State.INITIAL);
-		EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra));
+		EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra, wasQueued));
 	}
 
-	public static ServiceLocator.State getState() {
+    @Override
+    public void publishFailed(Object extra) {
+
+    }
+
+    public static ServiceLocator.State getState() {
 		return state;
 	}
 
-	public static String getStateAsString(Context c) {
-        int id;
-        switch (getState()) {
-            case PUBLISHING:
-                id = R.string.statePublishing;
-                break;
-            case PUBLISHING_WAITING:
-                id = R.string.stateWaiting;
-                break;
-            case PUBLISHING_TIMEOUT:
-                id = R.string.statePublishTimeout;
-                break;
-            case NOTOPIC:
-                id = R.string.stateNotopic;
-                break;
-            case NOLOCATION:
-                id = R.string.stateLocatingFail;
-                break;
-            default:
-                id = R.string.stateIdle;
-        }
 
-        return c.getString(id);
-	}
 
 	private void changeState(ServiceLocator.State newState) {
 		Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
@@ -579,8 +571,8 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
 	@Override
-	public void publishFailed(Object extra) {
-		changeState(ServiceLocator.State.PUBLISHING_TIMEOUT);
+	public void publishQueued(Object extra) {
+		changeState(ServiceLocator.State.PUBLISHING_QUEUED);
 	}
 
 	@Override
@@ -588,10 +580,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		changeState(ServiceLocator.State.PUBLISHING);
 	}
 
-	@Override
-	public void publishWaiting(Object extra) {
-		changeState(ServiceLocator.State.PUBLISHING_WAITING);
-	}
 
 	public long getLastPublishDate() {
 		return this.lastPublish;

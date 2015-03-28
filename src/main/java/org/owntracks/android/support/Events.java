@@ -128,15 +128,18 @@ public class Events {
 
 	public static class PublishSuccessfull extends E {
 		Object extra;
+        boolean wasQueued;
 
-		public PublishSuccessfull(Object extra) {
+		public PublishSuccessfull(Object extra, boolean wasQueued) {
 			super();
 			this.extra = extra;
+            this.wasQueued = wasQueued;
 		}
 
 		public Object getExtra() {
 			return this.extra;
 		}
+        public boolean wasQueued() {return  this.wasQueued;}
 	}
 
 	public static class CurrentLocationUpdated extends E {

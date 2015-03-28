@@ -62,6 +62,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -95,8 +96,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private WakeLock connectionWakelock;
     private String TAG_WAKELOG = "org.owntracks.android.wakelog.broker";
     private ReconnectTimer reconnectTimer;
-    private Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<>();
-    private List<Message> backlog = new LinkedList<>();
+    private  Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<>();
+    private final Object sendMessagesLock = new Object();
+
+    private LinkedList<Message> backlog = new LinkedList<>();
+    private final Object backlogLock = new Object();
 
     @Override
 	public void onCreate(ServiceProxy p) {
@@ -550,7 +554,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		//Log.d(this.toString(), "ServiceBroker state changed to: " + newState);
 		state = newState;
 		EventBus.getDefault().postSticky(
-				new Events.StateChanged.ServiceBroker(newState, e));
+                new Events.StateChanged.ServiceBroker(newState, e));
 	}
 
 	private boolean isOnline() {
@@ -653,8 +657,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         publish(message);
     }
 
-	public void publish(final Message message) {
-
+    public void publish(final Message message) {
 		this.pubHandler.post(new Runnable() {
 
             @Override
@@ -664,18 +667,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
                     Log.e("ServiceBroker", "PUB ON MAIN THREAD");
                 }
-
-                // Handle TTL for message to discard it after message.ttl publish attempts
-                if (message.decrementTTL() >= 1) {
-                    if (!backlog.contains(message)) {
-                        backlog.add(message);
-                    }
-                } else if (backlog.contains(message)) {
-                    backlog.remove(message);
-                }
-
-
-
 
                 // Check if we can publish
                 if (!isOnline() || !isConnected()) {
@@ -693,16 +684,27 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
                     }
 
-                        IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
+                    IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
                     message.publishing();
-                    sendMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
-
+                    synchronized (sendMessagesLock) {
+                        sendMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
+                    }
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
                 } catch (Exception e) {
 
+                    // Handle TTL for message to discard it after message.ttl publish attempts
+                    if (message.decrementTTL() >= 1) {
+                        synchronized (backlogLock) {
+                            backlog.add(message);
+                        }
+                        message.publishQueued();
+                    } else {
+                        message.publishFailed();
+                    }
+
+
                     e.printStackTrace();
 
-                    message.publishFailed();
                     Log.e("ServiceBroker", message + ", error:" + e.getMessage());
                 } finally {
                 }
@@ -721,11 +723,16 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 
-
+    // After reconnecting, we try to deliver messages for which the publish previously threw an error
+    // Messages are removed from the backlock, a publish is attempted and if the publish the message is added at the end of the backlog again until ttl reaches zero
     private void deliverBacklog() {
         Iterator<Message> i = backlog.iterator();
         while (i.hasNext()) {
-            Message m = i.next();
+            Message m;
+            synchronized (backlogLock) {
+                m = i.next();
+                i.remove();
+            }
             publish(m);
         }
     }
@@ -752,7 +759,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		if (type.equals("location")) {
             LocationMessage lm = new LocationMessage(json);
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
-        } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic())) {
+        } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic()+"/cmd")) {
             String action;
             try {
                 action = json.getString("action");
@@ -800,8 +807,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     @Override
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
         Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
-        Message message = sendMessages.remove(messageToken);
-        backlog.remove(message);
+        Message message;
+        synchronized (sendMessagesLock) {
+            message = sendMessages.remove(messageToken);
+        }
         message.publishSuccessful();
     }
 
