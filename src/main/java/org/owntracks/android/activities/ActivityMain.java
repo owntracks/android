@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.ContactAdapter;
+import org.owntracks.android.messages.ClearMessage;
 import org.owntracks.android.messages.CommandMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
@@ -1420,10 +1421,21 @@ public class ActivityMain extends ActionBarActivity {
                 case R.id.action_unassign:
                     unassignContact(this.contact);
                     return true;
+                case R.id.action_clear:
+                    clearTopic(this.contact);
+                    return true;
             }
             return false;
         }
 
+        private void clearTopic(final Contact contact) {
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+                @Override
+                public void run() {
+                    ServiceProxy.getServiceBroker().publish(new ClearMessage(contact.getTopic()));
+                }
+            });
+        }
 
 
         public void onEventMainThread(Events.ContactUpdated e) {
