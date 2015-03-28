@@ -2,17 +2,10 @@ package org.owntracks.android.support;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.EditTextPreference;
+
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.EditText;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;
-
-public class EditIntegerPreference extends org.owntracks.android.support.EditTextPreference {
+public class EditIntegerPreference extends org.owntracks.android.support.EditStringPreference {
 
     public EditIntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

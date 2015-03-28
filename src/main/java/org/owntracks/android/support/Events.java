@@ -174,7 +174,33 @@ public class Events {
 
 	}
 
-	public static class LocationMessageReceived extends E {
+    public static class ContactRemoved extends E{
+        Contact contact;
+
+        public ContactRemoved(Contact f) {
+            super();
+            this.contact = f;
+        }
+
+        public Contact getContact() {
+            return this.contact;
+        }
+    }
+
+    public static class ClearLocationMessageReceived extends E{
+        Contact c;
+        public ClearLocationMessageReceived(Contact c) {
+            super();
+            this.c = c;
+        }
+
+        public Contact getContact() {
+            return c;
+        }
+    }
+
+
+    public static class LocationMessageReceived extends E {
 		private String t;
 		private LocationMessage m;
 
@@ -306,5 +332,6 @@ public class Events {
 
         }
 	}
+
 
 }
