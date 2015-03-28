@@ -109,6 +109,8 @@ public class ActivityMain extends ActionBarActivity {
         drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                Log.v(this.toString(), "" +drawerItem.getIdentifier());
+
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
