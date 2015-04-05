@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
@@ -144,29 +143,47 @@ public class ServiceApplication implements ProxyableService,
         App.removeContact(e.getContact());
     }
 
-	public void onEventMainThread(Events.LocationMessageReceived e) {
 
-        org.owntracks.android.model.Contact c = App.getContact(e.getTopic());
+    private Contact lazyUpdateContactFromMessage(String topic, GeocodableLocation l, String trackerId) {
+        org.owntracks.android.model.Contact c = App.getContact(topic);
 
-
-		if (c == null) {
-			c = new org.owntracks.android.model.Contact(e.getTopic());
-			resolveContact(c);
-            c.setLocation(e.getGeocodableLocation());
-            c.setTrackerId(e.getLocationMessage().getTrackerId());
+        if (c == null) {
+            c = new org.owntracks.android.model.Contact(topic);
+            resolveContact(c);
+            c.setLocation(l);
+            c.setTrackerId(trackerId);
             App.addContact(c);
-		} else {
-			c.setLocation(e.getGeocodableLocation());
-            c.setTrackerId(e.getLocationMessage().getTrackerId());
+        } else {
+            c.setLocation(l);
+            c.setTrackerId(trackerId);
             EventBus.getDefault().post(new Events.ContactUpdated(c));
         }
+        return c;
+    }
 
+    private String getBaseTopic(String topic) {
+        // That looks scary. Strips /event from the topic to lookup the contact by the base topic
+        if(topic.endsWith(Preferences.getPubTopicEventsPart()))
+            return topic.substring(0, (topic.length() - 1) - Preferences.getPubTopicEventsPart().length());
+        else
+            return topic;
 
-        if(e.getLocationMessage().hasTransition() && !e.getLocationMessage().isRetained() && Preferences.getNotificationOnReceivedWaypointTransition()) {
-            Log.v(this.toString(), "transition: " + e.getLocationMessage().getTransition());
-            addIncomingWaypointTransitionNotification(e, c);
+    }
+
+    public void onEventMainThread(Events.TransitionMessageReceived e) {
+        Contact c = lazyUpdateContactFromMessage(getBaseTopic(e.getTopic()), e.getGeocodableLocation(), e.getTransitionMessage().getTrackerId());
+
+        if(e.getTransitionMessage().isRetained() && Preferences.getNotificationOnTransitionMessage()) {
+            Log.v(this.toString(), "transition: " + e.getTransitionMessage().getTransition());
+            addTransitionMessageNotification(e, c);
         }
 
+
+
+    }
+
+    public void onEventMainThread(Events.LocationMessageReceived e) {
+        lazyUpdateContactFromMessage(getBaseTopic(e.getTopic()), e.getGeocodableLocation(), e.getLocationMessage().getTrackerId());
 	}
 
     public void onEventMainThread(Events.ConfigurationMessageReceived e){
@@ -323,8 +340,8 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 
-    public void addIncomingWaypointTransitionNotification(Events.LocationMessageReceived e, Contact c) {
-        String location = e.getLocationMessage().getDescription();
+    public void addTransitionMessageNotification(Events.TransitionMessageReceived e, Contact c) {
+        String location = e.getTransitionMessage().getDescription();
         if(location == null) {
             location = "a location";
         }
@@ -332,7 +349,7 @@ public class ServiceApplication implements ProxyableService,
         String name = c.getName();
 
         if(name == null) {
-            name = e.getLocationMessage().getTrackerId();
+            name = e.getTransitionMessage().getTrackerId();
         }
 
         if(name == null) {
@@ -340,7 +357,7 @@ public class ServiceApplication implements ProxyableService,
         }
 
         String transition;
-        if(e.getLocationMessage().getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
+        if(e.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
             transition = context.getString(R.string.transitionentering);
         } else {
             transition = context.getString(R.string.transitionleaving);

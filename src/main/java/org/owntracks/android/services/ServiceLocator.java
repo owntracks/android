@@ -13,6 +13,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.WaypointDao.Properties;
+import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.WaypointMessage;
@@ -45,7 +46,7 @@ import de.greenrobot.event.EventBus;
 
 public class ServiceLocator implements ProxyableService, MessageCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public static enum State {
-        INITIAL, PUBLISHING, PUBLISHING_QUEUED, NOTOPIC, NOLOCATION
+        INITIAL, PUBLISHING, PUBLISHING_QUEUED, NOLOCATION
     }
     private static ServiceLocator.State state = ServiceLocator.State.INITIAL;
 
@@ -162,32 +163,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		return this.lastKnownLocation;
 	}
 
-    private LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.v(this.toString(), "mLocationListener onLocationChanged");
-
-            lastKnownLocation = new GeocodableLocation(location);
-
-            EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
-
-            if (shouldPublishLocation())
-                publishLocationMessage();
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.v(this.toString(), "mLocationListener onStatusChanged: " +provider +" -> " + status);
-        }
-
-        public void onProviderEnabled(String provider) {
-            Log.v(this.toString(), "mLocationListener onProviderEnabled: " +provider);
-        }
-
-        public void onProviderDisabled(String provider) {
-            Log.v(this.toString(), "mLocationListener onProviderDisabled: " +provider);
-        }
-    };
-
 	public void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Log.v(this.toString(), "onFenceTransistion");
@@ -207,7 +182,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
                     if (w != null) {
                         Log.v(this.toString(), "Waypoint triggered " + w.getDescription() + " transition: " + transition);
                         EventBus.getDefault().postSticky(new Events.WaypointTransition(w, transition));
-                        publishGeofenceTransitionEvent(w, transition);
+                        publishTransitionMessage(w, event.getTriggeringLocation(), transition);
                     }
                 }
             }
@@ -217,26 +192,22 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 
 	private boolean shouldPublishLocation() {
-        Log.v(this.toString(), "shouldPublishLocation");
-
         if (this.lastPublish == 0) {
-            Log.v(this.toString(), "shouldPublishLocation: this.lastPublish == 0 -> true");
             return true;
         }
 
 
-        Log.v(this.toString(), "shouldPublishLocation: time interval -> false");
-        Log.v(this.toString(), "shouldPublishLocation: System time:"+ System.currentTimeMillis());
-        Log.v(this.toString(), "shouldPublishLocation: Last publish time:"+ this.lastPublish);
-        Log.v(this.toString(), "shouldPublishLocation: configured pub interval:"+ TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()));
-        Log.v(this.toString(), "shouldPublishLocation: time since last publish:"+ (System.currentTimeMillis() - this.lastPublish));
+        //Log.v(this.toString(), "shouldPublishLocation: time interval -> false");
+        //Log.v(this.toString(), "shouldPublishLocation: System time:"+ System.currentTimeMillis());
+        //Log.v(this.toString(), "shouldPublishLocation: Last publish time:"+ this.lastPublish);
+        //Log.v(this.toString(), "shouldPublishLocation: configured pub interval:"+ TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()));
+        //Log.v(this.toString(), "shouldPublishLocation: time since last publish:"+ (System.currentTimeMillis() - this.lastPublish));
 
         if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(Preferences.getPubInterval())) {
-            Log.v(this.toString(), "interval gt configured pub interval?: true");
-
+            //Log.v(this.toString(), "interval gt configured pub interval?: true");
             return true;
         } else {
-            Log.v(this.toString(), "interval gt configured pub interval?: false");
+            //Log.v(this.toString(), "interval gt configured pub interval?: false");
         }
 		return false;
 	}
@@ -255,59 +226,50 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 
 	private void setupBackgroundLocationRequest() {
-        Log.v(this.toString(), "setupBackgroundLocationRequest");
+        //Log.v(this.toString(), "setupBackgroundLocationRequest");
 
         this.mLocationRequest = LocationRequest.create();
 
         if(Preferences.getLocatorAccuracyBackground() == 0) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 1) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 2) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
-		this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
-		this.mLocationRequest.setFastestInterval(10000);
-        Log.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
+        //Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
+        //Log.v(this.toString(), "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
 
+        this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
+		this.mLocationRequest.setFastestInterval(10000);
 		this.mLocationRequest.setSmallestDisplacement(Preferences.getLocatorDisplacement());
 	}
 
 	private void setupForegroundLocationRequest() {
 		this.mLocationRequest = LocationRequest.create();
         if(Preferences.getLocatorAccuracyForeground() == 0) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 1) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 2) {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
-
+            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
-
-		this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
-		this.mLocationRequest.setFastestInterval(PendingIntent.FLAG_CANCEL_CURRENT);
-        Log.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
+        //Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
+        //Log.v(this.toString(), "setupBackgroundLocationRequest displacement: 50");
+        this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
+		this.mLocationRequest.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
         this.mLocationRequest.setSmallestDisplacement(50);
 	}
 
@@ -318,7 +280,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	private void disableLocationUpdates() {
 
 		if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
-            Log.v(this.toString(), "disableLocationUpdates");
+            //Log.v(this.toString(), "disableLocationUpdates");
 
             final PendingIntent i = getPendingIntentForLocationRequest();
 
@@ -353,16 +315,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         else
             setupBackgroundLocationRequest();
 
-        // State may have changed. Check again
-		if (!this.ready) {
-            Log.e(this.toString(), "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
-            return;
-        }
-
 		if (this.foreground || Preferences.getPub()) {
-
-
-
             debugRequestDisplaycement=mLocationRequest.getSmallestDisplacement();
             debugRequestInterval=mLocationRequest.getInterval();
             debugRequestSmallestInterval = mLocationRequest.getSmallestDisplacement();
@@ -392,53 +345,42 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(this.toString(), "onStartCommand");
-
         if ((intent != null) && (intent.getAction() != null)) {
-            Log.v(this.toString(), "onStartCommand with intent and intent action");
 
 			if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN");
                 publishLocationMessage();
             } else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL");
                 publishManualLocationMessage();
 			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_LOCATION_CHANGED)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_LOCATION_CHANGED");
                 Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
 
+                // TODO: check if new location is newer and more accurate than last one
 				if (location != null) {
-                    Log.v(this.toString(), "with location");
-                    mLocationListener.onLocationChanged(location);
+                    lastKnownLocation = new GeocodableLocation(location);
 
-                } else {
-                    Log.v(this.toString(), "no location");
+                    EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
+
+                    if (shouldPublishLocation())
+                        publishLocationMessage();
                 }
 			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_FENCE_TRANSITION)) {
-                Log.v(this.toString(), "action == INTENT_ACTION_FENCE_TRANSITION");
 				onFenceTransition(intent);
 			} else {
 				Log.v(this.toString(), "Received unknown intent");
 			}
-		} else {
-            Log.v(this.toString(), "onStartCommand without intent or intent action");
-        }
+		}
 
 		return 0;
 	}
 
-
 	public void enableForegroundMode() {
 		this.foreground = true;
-        Log.v(this.toString(), "enableForegroundMode");
 		requestLocationUpdates();
 	}
 
 	public void enableBackgroundMode() {
 		this.foreground = false;
-        Log.v(this.toString(), "enableBackgroundMode");
-
-		requestLocationUpdates();
+        requestLocationUpdates();
 	}
 
 	@Override
@@ -446,23 +388,12 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		disableLocationUpdates();
 	}
 
-	private void publishGeofenceTransitionEvent(Waypoint w, int transition) {
-		GeocodableLocation l = new GeocodableLocation("Waypoint");
-		l.setLatitude(w.getLatitude());
-		l.setLongitude(w.getLongitude());
-		l.setAccuracy(w.getRadius());
-		l.getLocation().setTime(System.currentTimeMillis());
-
-		LocationMessage r = getLocationMessage(l);
-
-		r.setTransition(transition);
-		r.setWaypoint(w);
-		r.setSupressesTicker(true);
-
-		publishLocationMessage(r, "c");
-
+	private void publishTransitionMessage(Waypoint w, Location triggeringLocation, int transition) {
+        ServiceProxy.getServiceBroker().publish(new TransitionMessage(w, triggeringLocation, transition), Preferences.getPubTopicEvents(), Preferences.getPubQosEvents(), Preferences.getPubRetainEvents(), null, null);
 	}
 
+    // gets the current location if we have one
+    // queries the current location otherwise
     public LocationMessage getLocationMessage(GeocodableLocation l) {
         LocationMessage lm;
 
@@ -471,25 +402,15 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         else
             lm = new LocationMessage(getLastKnownLocation());
 
-        lm.setTrackerId(Preferences.getTrackerId(true));
-
         return lm;
     }
 
 	private void publishWaypointMessage(WaypointMessage message) {
 		if (ServiceProxy.getServiceBroker() == null) {
-			Log.e(this.toString(),
-					"publishWaypointMessage but ServiceMqtt not ready");
-			return;
+			Log.e(this.toString(), "publishWaypointMessage but ServiceMqtt not ready");
 		}
 
-		String topic = Preferences.getPubTopicBase(true);
-		if (topic == null) {
-			changeState(ServiceLocator.State.NOTOPIC);
-			return;
-		}
-
-        ServiceProxy.getServiceBroker().publish(message, topic + Preferences.getPubTopicPartWaypoints(), Preferences.getPubQos(), false, null, null);
+        ServiceProxy.getServiceBroker().publish(message, Preferences.getPubTopicWaypoints(), Preferences.getPubQosWaypoints(), Preferences.getPubRetainWaypoints(), null, null);
 	}
 
     public void publishManualLocationMessage() {
@@ -508,20 +429,12 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	private void publishLocationMessage(LocationMessage r, String trigger) {
 		this.lastPublish = System.currentTimeMillis();
 
-		// Safety checks
 		if (ServiceProxy.getServiceBroker() == null) {
-			Log.e(this.toString(), "publishLocationMessage but ServiceMqtt not ready");
 			return;
 		}
 
 		if ((r == null) && (getLastKnownLocation() == null)) {
 			changeState(ServiceLocator.State.NOLOCATION);
-			return;
-		}
-
-		String topic = Preferences.getPubTopicBase(true);
-		if (topic == null) {
-			changeState(ServiceLocator.State.NOTOPIC);
 			return;
 		}
 
@@ -531,13 +444,10 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		else
 			report = r;
 
-		if (Preferences.getPubIncludeBattery())
-			report.setBattery(App.getBatteryLevel());
-
         if(trigger != null)
             report.setTrigger(trigger);
 
-		ServiceProxy.getServiceBroker().publish(report, topic, Preferences.getPubQos(), Preferences.getPubRetain(), this, report);
+		ServiceProxy.getServiceBroker().publish(report, Preferences.getPubTopicLocations(), Preferences.getPubQosLocations(), Preferences.getPubRetainLocations(), this, report);
 
 	}
 
@@ -564,8 +474,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 	private void changeState(ServiceLocator.State newState) {
 		Log.d(this.toString(), "ServiceLocator state changed to: " + newState);
-		EventBus.getDefault().postSticky(
-				new Events.StateChanged.ServiceLocator(newState));
+		EventBus.getDefault().postSticky( new Events.StateChanged.ServiceLocator(newState));
 		state = newState;
 	}
 
@@ -602,23 +511,17 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         if(update && remove)
             throw new IllegalArgumentException("update and remove cannot be true at the same time");
 
-        Log.v(this.toString(), "shared: " + w.getShared() );
-
+        // We've an update and the waypoint is shared. Send out the new waypoint
         if (!remove && w.getShared()){
             WaypointMessage wpM = new WaypointMessage(w);
             wpM.setTrackerId(Preferences.getTrackerId(true));
             publishWaypointMessage(wpM);
         }
 
-		if (!isWaypointWithValidGeofence(w)) {
-            Log.v(this.toString(), "!isWaypointWithValidGeofence");
-            return;
-        }
-
 		if (update || remove)
 			removeGeofence(w);
 
-		if (!remove && w.getRadius() != null && w.getRadius() > 0) {
+		if (!remove && isWaypointWithValidGeofence(w)) {
 			requestGeofences();
 		}
 	}
@@ -642,9 +545,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 			} else {
 				continue;
 			}
-
-            Log.v(this.toString(), "getTransitionType: " + w.getTransitionType());
-            Log.v(this.toString(), "getGeofenceId: " + w.getGeofenceId());
 
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
@@ -729,15 +629,8 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
-        Log.v(this.toString(), "isWaypointWithValidGeofence: " + w);
-        Log.v(this.toString(), "getRadius: " + w.getRadius());
-        Log.v(this.toString(), "getLat: " + w.getLatitude());
-        Log.v(this.toString(), "getLon: " + w.getLongitude());
-
 		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null) && (w.getTransitionType() != null);
 	}
-
-
 
     public boolean isReady() {
         return ready;
@@ -751,7 +644,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         return waypoints != null ? waypoints.size() : -1;
     }
 
-
     public boolean hasLocationClient() {
         return googleApiClient != null;
     }
@@ -759,9 +651,4 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
     public boolean hasLocationRequest() {
         return mLocationRequest != null;
     }
-
-
-
-
-
 }

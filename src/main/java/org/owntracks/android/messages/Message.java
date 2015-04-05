@@ -10,7 +10,7 @@ public class Message extends MqttMessage {
     private String topic;
     private boolean isPublishing;
     private Object extra;
-    private int ttl = 5; // Publishes to live. Decremented with each publish. Message is discarded after ptl reaches 0
+    protected int ttl = 5; // Publishes to live. Decremented with each publish. Message is discarded after ptl reaches 0
     private boolean wasQueued = false;
     public Message() {
         super();
