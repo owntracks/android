@@ -1,13 +1,15 @@
 package org.owntracks.android.messages;
 
+import android.location.Location;
+
 import com.google.android.gms.location.Geofence;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.support.Preferences;
 
-import java.sql.Date;
 import java.util.concurrent.TimeUnit;
 
 public class TransitionMessage extends Message{
@@ -18,12 +20,32 @@ public class TransitionMessage extends Message{
     private String trigger;
     private int transition;
     private boolean supressesTicker;
+    private long tst;
+    private long wtst;
 
     // For incoming messages
     public TransitionMessage(JSONObject json) throws JSONException{
+        location = new GeocodableLocation("transition");
+        try {
+            location.setLatitude(json.getDouble("lat"));
+            location.setLongitude(json.getDouble("lon"));
+            location.setAccuracy(json.getInt("acc"));
+
+        } catch (JSONException e ) {
+
+        }
+
 
         try {
             setDescription(json.getString("desc"));
+        } catch (Exception e) { }
+
+        try {
+            setTst(json.getLong("tst"));
+        } catch (Exception e) { }
+
+        try {
+            setWtst(json.getLong("wtst"));
         } catch (Exception e) { }
 
         try {
@@ -37,18 +59,22 @@ public class TransitionMessage extends Message{
                 setTransition(Geofence.GEOFENCE_TRANSITION_EXIT);
             else
                 setTransition(-1);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            setTransition(-1);
+        }
     }
 
     // For outgoing messages
-    public TransitionMessage(Waypoint w) {
+    public TransitionMessage(Waypoint w, Location l, int transition) {
         super();
 		this.transition = -1;
 		this.supressesTicker = false;
-        this.trackerId = null;
-        this.trigger = null;
-        this.waypoint = w;
-	}
+        this.trackerId = Preferences.getTrackerId(true);
+        this.location = new GeocodableLocation(l);
+        this.transition = transition;
+        this.wtst  = TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime());
+        this.tst = TimeUnit.MILLISECONDS.toSeconds((new java.util.Date()).getTime());
+    }
 
 	public boolean getSupressTicker() {
 		return this.supressesTicker;
@@ -111,23 +137,40 @@ public class TransitionMessage extends Message{
 
         try {
             json.put("_type", "transition")
-            .put("lat", this.waypoint.getLatitude())
-            .put("lon", this.waypoint.getLongitude())
-            .put("tst", (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-                    .put("rad", Math.round(this.location.getLocation().getAccuracy() * 100) / 100.0d);
+            .put("lat", this.location.getLatitude())
+            .put("lon", this.location.getLongitude())
+            .put("lon", this.location.getLongitude())
+            .put("acc", this.location.getAccuracy())
+            .put("tst", this.tst)
+            .put("wtst", this.wtst);
 
             if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
-                if (this.waypoint.getShared())
-                    json.put("desc", this.waypoint.getDescription());
-                    json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
-                }
+                json.put("desc", this.waypoint.getDescription());
+                json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
+            }
 
             if (this.trackerId != null && !this.trackerId.isEmpty())
-                 json.put("tid", this.trackerId);
+                json.put("tid", this.trackerId);
 
         } catch (JSONException e) {
 
         }
         return json;
+    }
+
+    public void setTst(long tst) {
+        this.tst = tst;
+    }
+
+    public long getWtst() {
+        return wtst;
+    }
+
+    public long getTst() {
+        return tst;
+    }
+
+    public void setWtst(long tst) {
+        this.wtst = tst;
     }
 }

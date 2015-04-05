@@ -203,10 +203,8 @@
     <string name="keyBeaconForegroundScanPeriod">beaconForegroundScanPeriod</string>
     <string name="valEmpty">""</string>
     <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
-    <string name="valPubTopicPartWaypoints">/waypoints</string>
-    <string name="valSubTopic">owntracks/+/+</string>
+    <string name="valSubTopic">owntracks/#</string>
     <string name="valHost">127.0.0.1</string>
-    <string name="valBugsnagApiKey">d7074409bf76697384a454b611917336</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">issues@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>

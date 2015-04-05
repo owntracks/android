@@ -4,6 +4,11 @@ package org.owntracks.android.db;
 
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
+
+import android.location.Location;
+
+import org.owntracks.android.model.GeocodableLocation;
+
 /**
  * Entity mapped to table WAYPOINT.
  */
@@ -124,6 +129,14 @@ public class Waypoint {
     }
 
     // KEEP METHODS - put your custom methods here
+    public GeocodableLocation getLocation() {
+        GeocodableLocation l= new GeocodableLocation("waypoint");
+        l.setGeocoder(getGeocoder());
+        l.setLatitude(getLatitude());
+        l.setLongitude(getLongitude());
+        l.setAccuracy(getRadius());
+        return l;
+    }
     // KEEP METHODS END
 
 }

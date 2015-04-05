@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.GeocodableLocation;
@@ -261,6 +262,33 @@ public class Events {
         }
     }
 
+    public static class TransitionMessageReceived extends E {
+        private String t;
+        private TransitionMessage m;
+
+        public TransitionMessageReceived(TransitionMessage m, String t) {
+            super();
+            this.t = t;
+            this.m = m;
+        }
+
+        public String getTopic() {
+            return this.t;
+        }
+
+        public TransitionMessage getTransitionMessage() {
+            return this.m;
+        }
+        public GeocodableLocation getGeocodableLocation() {
+            return this.m.getLocation();
+        }
+
+        public int getTransition() {
+            return this.m.getTransition();
+        }
+
+    }
+
 
     public static class ContactUpdated extends E {
 		private Contact c;
@@ -332,6 +360,4 @@ public class Events {
 
         }
 	}
-
-
 }

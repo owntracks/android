@@ -5,12 +5,10 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 
 import org.json.JSONObject;
+import org.owntracks.android.App;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.GeocodableLocation;
-
-import android.util.Log;
-
-import com.google.android.gms.location.Geofence;
+import org.owntracks.android.support.Preferences;
 
 public class LocationMessage extends Message{
     private GeocodableLocation location;
@@ -18,7 +16,6 @@ public class LocationMessage extends Message{
     private String description;
     private String trackerId;
     private String trigger;
-    private int transition;
     private int battery;
     private boolean supressesTicker;
 
@@ -38,26 +35,18 @@ public class LocationMessage extends Message{
            setTrackerId(json.getString("tid"));
         } catch (Exception e) { }
 
-        try {
-            if (json.getString("event").equals("enter"))
-                setTransition(Geofence.GEOFENCE_TRANSITION_ENTER);
-            else if (json.getString("event").equals("exit"))
-                setTransition(Geofence.GEOFENCE_TRANSITION_EXIT);
-            else
-                setTransition(-1);
-        } catch (Exception e) { }
     }
 
     // For outgoing messages
     public LocationMessage(GeocodableLocation l) {
         super();
 		this.location = l;
-		this.transition = -1;
-		this.battery = -1;
+		this.battery = Preferences.getPubLocationIncludeBattery() ? App.getBatteryLevel() : -1;;
 		this.waypoint = null;
 		this.supressesTicker = false;
         this.trackerId = null;
         this.trigger = null;
+        this.trackerId = Preferences.getTrackerId(true);
 	}
 
 	public boolean getSupressTicker() {
@@ -67,22 +56,6 @@ public class LocationMessage extends Message{
 		this.supressesTicker = supressesTicker;
 	}
 
-    public Waypoint getWaypoint() {
-        return this.waypoint;
-    }
-    public void setWaypoint(Waypoint waypoint) {
-		this.waypoint = waypoint;
-	}
-
-    public void setTransition(int transition) {
-        this.transition = transition;
-    }
-    public int getTransition() {
-        return this.transition;
-    }
-    public boolean hasTransition() {
-		return this.transition != -1;
-	}
 
 	public void setTrackerId(String tid) { this.trackerId = tid; }
 	public String getTrackerId() { return this.trackerId; }
@@ -126,14 +99,8 @@ public class LocationMessage extends Message{
             if (this.battery != -1)
                 json.put("batt", this.battery);
 
-            if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
-                if (this.waypoint.getShared())
-                    json.put("desc", this.waypoint.getDescription());
-                    json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
-                }
-
-                if(trigger != null)
-                    json.put("t", trigger);
+            if(trigger != null)
+                json.put("t", trigger);
 
             if (this.trackerId != null && !this.trackerId.isEmpty())
                  json.put("tid", this.trackerId);

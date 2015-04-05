@@ -76,14 +76,14 @@ public class ActivityMain extends ActionBarActivity {
     private static final int MENU_CONTACT_UNFOLLOW = 4;
     private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
 
-    private static Drawer.OnDrawerItemClickListener drawerListener;
+    private static Drawer.OnDrawerItemClickListener drawerClickListener;
+    private static Drawer.OnDrawerNavigationListener drawerNavigationListener;
+
     private Toolbar toolbar;
+    private Drawer.Result drawerResult;
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
-
-        Log.v(this.toString(), "onCreate");
-
-		startService(new Intent(this, ServiceProxy.class));
+        startService(new Intent(this, ServiceProxy.class));
 		ServiceProxy.runOrBind(this, new Runnable() {
 			@Override
 			public void run() {
@@ -93,20 +93,20 @@ public class ActivityMain extends ActionBarActivity {
 
 		// delete previously stored fragments after orientation change
 		if (savedInstanceState != null) {
-            Log.v(this.toString(), "clearing android:support:fragments");
-
             savedInstanceState.remove("android:support:fragments");
         }
+
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
-
         setSupportActionBar(toolbar);
 
 
-        final Context context = this;
-        drawerListener = new Drawer.OnDrawerItemClickListener() {
+
+
+        final ActivityMain context = this;
+        drawerClickListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                 Log.v(this.toString(), "" +drawerItem.getIdentifier());
@@ -117,7 +117,6 @@ public class ActivityMain extends ActionBarActivity {
                             // We're showing the root and rolling back the complete back stack so we discard it
                             FragmentHandler.getInstance().clearBackStack();
                             FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (ActionBarActivity) context, FragmentHandler.DIRECTION_BACK);
-
                         }
                         break;
                     case R.string.idWaypoints:
@@ -132,8 +131,21 @@ public class ActivityMain extends ActionBarActivity {
                 }
             }
         };
+        drawerNavigationListener = new Drawer.OnDrawerNavigationListener() {
+            @Override
+            public boolean onNavigationClickListener(View view) {
+                if(!FragmentHandler.getInstance().atRoot()) {
+                    FragmentHandler.getInstance().back(context);
+                    return true;
+                }
+                return false;
+            }
+        };
 
-        FragmentHandler.getInstance().init(ContactsFragment.class);
+        drawerResult = DrawerFactory.buildDrawer(this, toolbar, drawerClickListener, drawerNavigationListener, 0);
+
+
+        FragmentHandler.getInstance().init(ContactsFragment.class, drawerResult);
         Log.v(this.toString(), "Fragment show current or root");
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
@@ -151,6 +163,7 @@ public class ActivityMain extends ActionBarActivity {
 	public static class FragmentHandler extends Fragment {
 		private Class<?> current;
 		private Class<?> root;
+        private Drawer.Result drawer;
         public static final int DIRECTION_NONE = 0;
         public static final int DIRECTION_FORWARD = 1;
         public static final int DIRECTION_BACK = 2;
@@ -165,7 +178,7 @@ public class ActivityMain extends ActionBarActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			setRetainInstance(true);
+			setRetainInstance(false/);
 		}
 
 		public static FragmentHandler getInstance() {
@@ -208,9 +221,16 @@ public class ActivityMain extends ActionBarActivity {
 			else
 				ft.add(R.id.main, f, "f:tag:" + c.getName());
 
+
+
 			ft.commitAllowingStateLoss();
 			fa.getSupportFragmentManager().executePendingTransactions();
 
+            // Disable drawer indicator if we're not showing the root fragment
+            // Instead, this shows the back arrow and calls the drawer navigation listener where we can handle back
+            // or show the drawer manually
+            if(drawer != null && drawer.getActionBarDrawerToggle() != null)
+                drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(c == getRoot());
 
             this.current = c;
 
@@ -227,8 +247,9 @@ public class ActivityMain extends ActionBarActivity {
 			return showFragment(c, extras, fa, DIRECTION_FORWARD);
 		}
 
-		public void init(Class<?> c) {
+		public void init(Class<?> c, Drawer.Result drawer) {
 			this.root = c;
+            this.drawer = drawer;
 		}
 
 		public void showCurrentOrRoot(ActionBarActivity fa) {
@@ -402,12 +423,8 @@ public class ActivityMain extends ActionBarActivity {
             return true;
 
         } else if( itemId == android.R.id.home) {
-            if(!FragmentHandler.getInstance().atRoot()) {
-                FragmentHandler.getInstance().back(this);
-                return true;
-            } else {
-                return false;
-            }
+            FragmentHandler.getInstance().back(this);
+            return true;
         } else {
 			return false;
 		}
@@ -498,11 +515,17 @@ public class ActivityMain extends ActionBarActivity {
 	}
 
 
-	public static class MapFragment extends Fragment implements StaticHandlerInterface {
-        private static final String KEY_POSITION = "+POSITION+";
-        private static final java.lang.String KEY_ZOOM = "+ZOOM+";
-        //private GeocodableLocation currentLocation;
-		private MapView mMapView;
+	public static class  MapFragment extends Fragment implements StaticHandlerInterface {
+        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
+        private static final String KEY_NOTOPIC =          "+NOTOPIC+";
+        private static final String KEY_POSITION =         "+POSITION+";
+        private static final String KEY_ZOOM =              "+ZOOM+";
+        private static final int SELECT_UPDATE = 0;
+        private static final int SELECT_CENTER = 1;
+        private static final int SELECT_CENTER_AND_ZOOM = 2;
+
+
+        private MapView mMapView;
 		private GoogleMap googleMap;
 		private LinearLayout selectedContactDetails;
 		private TextView selectedContactName;
@@ -510,21 +533,8 @@ public class ActivityMain extends ActionBarActivity {
 		private ImageView selectedContactImage;
 		private Map<String, Contact> markerToContacts;
         private Menu mMenu;
-
-
-
-
-        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
-        private static final String KEY_NOTOPIC = "+NOTOPIC+";
-
-        private static final int SELECT_UPDATE = 0;
-        private static final int SELECT_CENTER = 1;
-        private static final int SELECT_CENTER_AND_ZOOM = 2;
-
-
         private static Handler handler;
         private MenuInflater mInflater;
-
 
         public static MapFragment getInstance(Bundle extras) {
 			MapFragment instance = new MapFragment();
@@ -673,24 +683,24 @@ public class ActivityMain extends ActionBarActivity {
             switch (item.getItemId()) {
                 case MENU_CONTACT_SHOW:
                     selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
-                    break;
+                    return true;
                 case MENU_CONTACT_FOLLOW:
                     selectContact(c, MapFragment.SELECT_CENTER, true, true);
-                    break;
+                    return true;
                 case MENU_CONTACT_UNFOLLOW:
                     setFollowingSelectedContact(false);
-                    break;
+                    return true;
                 case MENU_CONTACT_DETAILS:
                     ((ActivityMain)getActivity()).transitionToContactDetails(c);
-                    break;
+                    return true;
                 case MENU_CONTACT_NAVIGATE:
                     ((ActivityMain)getActivity()).launchNavigation(c);
-                    break;
+                    return true;
                 case MENU_CONTACT_REQUEST_REPORT_LOCATION:
                     ((ActivityMain)getActivity()).requestReportLocation(c);
-                    break;
+                    return true;
             }
-            return true;
+            return false;
 
         }
 
@@ -706,13 +716,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		private void onShow() {
-
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("");
-
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain) getActivity()).toolbar, drawerListener, 0);
-
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -956,8 +960,7 @@ public class ActivityMain extends ActionBarActivity {
 
             @Override
             public void run() {
-
-                    ServiceProxy.getServiceBroker().publish(new CommandMessage("reportLocation"), c.getTopic(), Preferences.getPubQos(), false, null, null);
+            ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
             }
         });
     }
@@ -1094,12 +1097,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		private void onShow() {
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Locations");
-
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -1291,14 +1289,13 @@ public class ActivityMain extends ActionBarActivity {
                 this.name.setText(getString(R.string.na));
             this.topic.setText(this.contact.getTopic());
 			this.location.setText(this.contact.getLocation().toString());
-			this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
+            this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
 			this.time.setText(App.formatDate(this.contact.getLocation().getDate()));
 
             ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Details");
 
-            DrawerFactory.buildDrawer(getActivity(), ((ActivityMain)getActivity()).toolbar, drawerListener, 0);
+
             onCreateOptionsMenu(mMenu, mInflater);
 		}
 
