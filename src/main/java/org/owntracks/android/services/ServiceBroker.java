@@ -38,6 +38,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
+import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageCallbacks;
@@ -433,8 +434,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         try {
             unsubscribe();
 
+            // owntracks/user/device/# - Preferences.getBaseTopic()
+
+            //owntracks/+/+ for everybody's location   -
+            //owntracks/+/+/events                     -
+            //owntracks/user/device/cmd
+
             if (Preferences.getSub())
-                subscribe(new String[]{Preferences.getSubTopic(true), Preferences.getBaseTopic()});
+                subscribe(new String[]{Preferences.getSubTopic(true), Preferences.getBaseTopic(), Preferences.getPubTopicCommands()});
             else
                 subscribe(new String[]{Preferences.getBaseTopic()});
 
@@ -774,7 +781,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             LocationMessage lm = new LocationMessage(json);
             lm.setRetained(message.isRetained());
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
-        } else if(type.equals("cmd") && topic.equals(Preferences.getBaseTopic()+"/cmd")) {
+        }else if (type.equals("transition")) {
+            TransitionMessage tm = new TransitionMessage(json);
+            tm.setRetained(message.isRetained());
+            EventBus.getDefault().postSticky(new Events.TransitionMessageReceived(tm, topic));
+        } else if(type.equals("cmd") && topic.equals(Preferences.getPubTopicCommands())) {
             String action;
             try {
                 action = json.getString("action");
@@ -803,7 +814,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     break;
             }
 
-        } else if (type.equals("configuration") ) {
+        } else if (type.equals("configuration") && topic.equals(Preferences.getPubTopicCommands()) ) {
             // read configuration message and post event only if Remote Configuration is enabled
             if (!Preferences.getRemoteConfiguration()) {
                 Log.i(this.toString(), "Remote Configuration is disabled");

@@ -4,10 +4,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CommandMessage extends Message {
+    public static final String ACTION_REPORT_LOCATION = "reportLocation";
     String action;
 	public CommandMessage(String action) {
         super();
         this.action = action;
+        this.ttl = 1; // if publish fails once, don't retry it
     }
 
 	@Override

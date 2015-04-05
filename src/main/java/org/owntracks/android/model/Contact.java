@@ -5,6 +5,8 @@ import java.io.InputStream;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.Preferences;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
@@ -153,6 +155,10 @@ public class Contact {
 	public String getTopic() {
 		return this.topic;
 	}
+
+    public String getCommandTopic() {
+        return this.topic+ Preferences.getPubTopicCommandsPart();
+    }
 
 	public BitmapDescriptor getMarkerImageDescriptor() {
 		return this.userImage != null ? BitmapDescriptorFactory

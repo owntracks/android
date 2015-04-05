@@ -11,19 +11,16 @@ import org.owntracks.android.R;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TimeUtils;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONException;
 
-import de.greenrobot.dao.query.Query;
 import de.greenrobot.event.EventBus;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.services.ServiceProxy;
 
 public class Preferences {
     private static String subTopicFallback;
@@ -111,7 +108,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
                     .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
                     .put(getStringRessource(R.string.keyAuth), getAuth())
-                    .put(getStringRessource(R.string.keyPubIncludeBattery), getPubIncludeBattery())
+                    .put(getStringRessource(R.string.keyPubIncludeBattery), getPubLocationIncludeBattery())
                     .put(getStringRessource(R.string.keyConnectionAdvancedMode), getConnectionAdvancedMode())
                     .put(getStringRessource(R.string.keySub), getSub())
                     .put(getStringRessource(R.string.keyPub), getPub())
@@ -313,7 +310,7 @@ public class Preferences {
         return getBoolean(R.string.keyConnectionAdvancedMode, R.bool.valConnectionAdvancedMode);
     }
 
-    public static boolean getPubIncludeBattery() {
+    public static boolean getPubLocationIncludeBattery() {
         return getBoolean(R.string.keyPubIncludeBattery,
                 R.bool.valPubIncludeBattery);
     }
@@ -418,6 +415,32 @@ public class Preferences {
         return topic;
     }
 
+    public static String getPubTopicLocations() {
+        return getPubTopicBase(true);
+    }
+
+    public static String getPubTopicWaypoints() {
+        return getPubTopicBase(true)+getPubTopicWaypointsPart();
+    }
+
+    public static String getPubTopicWaypointsPart() {
+        return "/waypoint";
+    }
+
+    public static String getPubTopicEvents() {
+        return getPubTopicBase(true)+getPubTopicEventsPart();
+    }
+
+    public static String getPubTopicEventsPart() {
+        return "/events";
+    }
+    public static String getPubTopicCommands() {
+        return getPubTopicBase(true)+getPubTopicCommandsPart();
+    }
+    public static String getPubTopicCommandsPart() {
+        return "/cmd";
+    }
+
     public static String getBaseTopic() {
         return getPubTopicBase(true);
     }
@@ -456,9 +479,7 @@ public class Preferences {
             return "na";
     }
 
-    public static String getPubTopicPartWaypoints() {
-        return getStringRessource(R.string.valPubTopicPartWaypoints);
-    }
+
 
     public static String getPubTopicFallback() {
         String deviceId = getDeviceId(true);
@@ -754,10 +775,6 @@ public class Preferences {
                 R.bool.valAutostartOnBoot);
     }
 
-    public static String getBugsnagApiKey() {
-        return App.getContext().getString(R.string.valBugsnagApiKey);
-    }
-
     public static String getRepoUrl() {
         return App.getContext().getString(R.string.valRepoUrl);
 
@@ -816,7 +833,7 @@ public class Preferences {
         return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
     }
 
-    public static Boolean getNotificationOnReceivedWaypointTransition() {
+    public static Boolean getNotificationOnTransitionMessage() {
         return getBoolean(R.string.keyNotificationOnReceivedWaypointTransition, R.bool.valNotificationOnReceivedWaypointTransition);
     }
 
@@ -864,5 +881,39 @@ public class Preferences {
 
     public static String getSubTopicFallback() {
         return subTopicFallback;
+    }
+
+    // Maybe make this configurable
+    // For now it makes thins easier to change
+    public static int getPubQosEvents() {
+        return getPubQos();
+    }
+
+    public static boolean getPubRetainEvents() {
+        return false;
+    }
+
+    public static int getPubQosCommands() {
+        return getPubQos();
+    }
+
+    public static boolean getPubRetainCommands() {
+        return false;
+    }
+
+    public static int getPubQosWaypoints() {
+        return 0;
+    }
+
+    public static boolean getPubRetainWaypoints() {
+        return false;
+    }
+
+    public static int getPubQosLocations() {
+        return getPubQos();
+    }
+
+    public static boolean getPubRetainLocations() {
+        return getPubRetain();
     }
 }
