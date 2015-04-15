@@ -55,6 +55,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Enumeration;
@@ -67,6 +68,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
@@ -241,23 +243,23 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         public CustomSocketFactory(boolean sideloadCa) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException {
             Log.v(this.toString(), "initializing CustomSocketFactory");
 
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
 
             if(sideloadCa) {
                 Log.v(this.toString(), "CA sideload: true");
 
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                keyStore.load(null, null);
+                KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                caKeyStore.load(null, null);
 
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCrtPath()));
-                Log.v(this.toString(), "Using custom tls cert from : " + Preferences.getTlsCrtPath());
+                CertificateFactory caCF = CertificateFactory.getInstance("X.509");
+                InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCAPath()));
+                Log.v(this.toString(), "Using custom tls cert from : " + Preferences.getTlsCAPath());
                 java.security.cert.Certificate ca;
                 try {
-                    ca = cf.generateCertificate(caInput);
-                    keyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
+                    ca = caCF.generateCertificate(caInput);
+                    caKeyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
 
                 } catch (Exception e) {
                     Log.e(this.toString(), e.toString());
@@ -265,16 +267,31 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     caInput.close();
                 }
 
+                // load client cert
+                //String clientFile = "/sdcard/Download/Brads-Android.p12";
+
+                KeyStore clientKeyStore = null;
+                clientKeyStore = KeyStore.getInstance("PKCS12");
+
+
+                InputStream clientIn = new BufferedInputStream(new FileInputStream(Preferences.getTlsClientCertPath()));
+                clientKeyStore.load(clientIn, "".toCharArray());
+                try {
+                    kmf.init(clientKeyStore, "".toCharArray());
+                } catch (UnrecoverableKeyException e) {
+                    e.printStackTrace();
+                }
+
 
                 Log.v(this.toString(), "Keystore content: ");
-                Enumeration<String> aliases = keyStore.aliases();
+                Enumeration<String> aliases = caKeyStore.aliases();
 
                 for (; aliases.hasMoreElements();) {
                     String o = aliases.nextElement();
                     Log.v(this.toString(), "Alias: " + o);
                 }
 
-                tmf.init(keyStore);
+                tmf.init(caKeyStore);
 
             } else {
                 Log.v(this.toString(), "CA sideload: false, using system keystore");
@@ -289,7 +306,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
             // Create an SSLContext that uses our TrustManager
             SSLContext context = SSLContext.getInstance("TLSv1.2");
-            context.init(null, tmf.getTrustManagers(), null);
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             this.factory= context.getSocketFactory();
 
         }
@@ -367,7 +384,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			}
 
 			if (Preferences.getTls()) {
-                options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCrtPath().length() > 0));
+                options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCAPath().length() > 0));
             }
 
 			// setWill(options);

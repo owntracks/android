@@ -107,7 +107,8 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyKeepalive), getKeepalive())
                     .put(getStringRessource(R.string.keyPubRetain), getPubRetain())
                     .put(getStringRessource(R.string.keyTls), getTls())
-                    .put(getStringRessource(R.string.keyTlsCrtPath), getTlsCrtPath())
+                    .put(getStringRessource(R.string.keyTlsCAPath), getTlsCAPath())
+                    .put(getStringRessource(R.string.keyTlsClientCertPath), getTlsClientCertPath())
                     .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
                     .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
                     .put(getStringRessource(R.string.keyAuth), getAuth())
@@ -159,7 +160,8 @@ public class Preferences {
         try { setKeepalive(json.getInt(getStringRessource(R.string.keyKeepalive))); } catch (JSONException e) {}
         try { setPubRetain(json.getBoolean(getStringRessource(R.string.keyPubRetain))); } catch (JSONException e) {}
         try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
-        try { setTlsCrtPath(json.getString(getStringRessource(R.string.keyTlsCrtPath))); } catch (JSONException e) {}
+        try { setTlsCAPath(json.getString(getStringRessource(R.string.keyTlsCAPath))); } catch (JSONException e) {}
+        try { setTlsClientCertPath(json.getString(getStringRessource(R.string.keyTlsClientCertPath))); } catch (JSONException e) {}
         try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
@@ -665,8 +667,12 @@ public class Preferences {
         setBoolean(R.string.keyTls, tlsSpecifier);
     }
 
-    public static void setTlsCrtPath(String tlsCrtPath) {
-        setString(R.string.keyTlsCrtPath, tlsCrtPath);
+    public static void setTlsCAPath(String tlsCAPath) {
+        setString(R.string.keyTlsCAPath, tlsCAPath);
+    }
+
+    public static void setTlsClientCertPath(String tlsClientCertPath) {
+        setString(R.string.keyTlsClientCertPath, tlsClientCertPath);
     }
 
     private static void brokerChanged() {
@@ -702,8 +708,12 @@ public class Preferences {
         }
     }
 
-    public static String getTlsCrtPath() {
-        return getString(R.string.keyTlsCrtPath, R.string.valEmpty);
+    public static String getTlsCAPath() {
+        return getString(R.string.keyTlsCAPath, R.string.valEmpty);
+    }
+
+    public static String getTlsClientCertPath() {
+        return getString(R.string.keyTlsClientCertPath, R.string.valEmpty);
     }
 
     public static boolean getNotification() {
