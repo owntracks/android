@@ -36,15 +36,28 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tlsCrt"
+        android:id="@+id/tlsCA"
         android:inputType="textNoSuggestions"
         android:hint=""
         app:baseColor="@color/textPrimary"
         app:primaryColor="@color/accent"
         app:floatingLabel="highlight"
         app:floatingLabelAlwaysShown="true"
-        app:floatingLabelText="@string/preferencesCaCrtPath"
+        app:floatingLabelText="@string/preferencesCACrtPath"
 
         />
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tlsClientP12"
+        android:inputType="textNoSuggestions"
+        android:hint=""
+        app:baseColor="@color/textPrimary"
+        app:primaryColor="@color/accent"
+        app:floatingLabel="highlight"
+        app:floatingLabelAlwaysShown="true"
+        app:floatingLabelText="@string/preferencesClientCrtPath"
+
+        />
 </LinearLayout>

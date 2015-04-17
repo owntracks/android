@@ -82,7 +82,8 @@ public class ConfigurationMessage extends Message{
         json.remove(Preferences.getStringRessource(R.string.keyPort));
         json.remove(Preferences.getStringRessource(R.string.keyAuth));
         json.remove(Preferences.getStringRessource(R.string.keyTls));
-        json.remove(Preferences.getStringRessource(R.string.keyTlsCrtPath));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsCAPath));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsClientCertPath));
         json.remove(Preferences.getStringRessource(R.string.keyConnectionAdvancedMode));
         json.remove(Preferences.getStringRessource(R.string.keyCleanSession));
         return this;

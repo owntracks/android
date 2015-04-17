@@ -431,16 +431,21 @@ public class ActivityPreferences extends ActionBarActivity {
                                 public void onShow(DialogInterface dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     Switch tls = (Switch) d.findViewById(R.id.tls);
-                                    final MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+                                    final MaterialEditText tlsCA = (MaterialEditText) d.findViewById(R.id.tlsCA);
                                     tls.setChecked(tlsVal);
-                                    tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
-                                    tlsCrt.setText(Preferences.getTlsCrtPath());
+                                    tlsCA.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsCA.setText(Preferences.getTlsCAPath());
+                                    final MaterialEditText tlsClientP12 = (MaterialEditText) d.findViewById(R.id.tlsClientP12);
+                                    tlsClientP12.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsClientP12.setText(Preferences.getTlsClientCertPath());
+
 
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                             tlsVal = isChecked;
-                                            tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                            tlsCA.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                            tlsClientP12.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
                                         }
                                     });
 
@@ -451,10 +456,12 @@ public class ActivityPreferences extends ActionBarActivity {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+                                    MaterialEditText tlsCACrt = (MaterialEditText) d.findViewById(R.id.tlsCA);
+                                    MaterialEditText tlsClientP12 = (MaterialEditText) d.findViewById(R.id.tlsClientP12);
 
                                     Preferences.setTls(tlsVal);
-                                    Preferences.setTlsCrtPath(tlsCrt.getText().toString());
+                                    Preferences.setTlsCAPath(tlsCACrt.getText().toString());
+                                    Preferences.setTlsClientCertPath(tlsClientP12.getText().toString());
 
                                     serverPreferenceToolbar.conditionallyEnableConnectButton();
 
