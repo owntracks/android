@@ -1,11 +1,5 @@
 package org.owntracks.android.activities;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import android.os.Environment;
-import android.app.Dialog;
-import android.app.AlertDialog;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -424,10 +418,10 @@ public class ActivityPreferences extends ActionBarActivity {
             });
 
             tlsVal = Preferences.getTls();
-             securityPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            securityPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                     new MaterialDialog.Builder(a)
+                    new MaterialDialog.Builder(a)
                             .customView(R.layout.preferences_security, true)
                             .title(R.string.preferencesSecurity)
                             .positiveText(R.string.accept)
