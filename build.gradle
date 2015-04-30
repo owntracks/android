@@ -64,6 +64,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion '21.1.2'
     defaultConfig {
+        applicationId "debug.org.owntracks.android"
         minSdkVersion 14
         targetSdkVersion 21
     }
