@@ -55,9 +55,9 @@ public class ContactAdapter extends MultitypeAdapter{
                 holder = (ContactHolder)convertView.getTag();
             }
             convertView.setTag(holder);
-            holder.name.setText(((Contact)item).toString());
+            holder.name.setText(((Contact)item).getDisplayName());
             holder.location.setText(((Contact)item).getLocation().toString());
-            holder.image.setImageBitmap(((Contact)item).getUserImage());
+            holder.image.setImageBitmap(((Contact)item).getFace());
 
             return convertView;
         }

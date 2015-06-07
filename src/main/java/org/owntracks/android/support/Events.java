@@ -2,7 +2,9 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
+import org.owntracks.android.App;
 import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.messages.WaypointMessage;
@@ -16,7 +18,15 @@ import android.location.Location;
 
 public class Events {
 
-
+    public static class ModeChanged extends E {
+        int modeId;
+        public ModeChanged(int anInt) {
+            modeId = anInt;
+        }
+        public int getModeId() {
+            return modeId;
+        }
+    }
 
 	public static class WaypointTransition extends E {
 		Waypoint w;
@@ -199,6 +209,26 @@ public class Events {
             return c;
         }
     }
+    public static class CardMessageReceived extends E{
+        String topic;
+        CardMessage message;
+        public CardMessageReceived(CardMessage m, String topic) {
+            super();
+            this.message = m;
+            this.topic = topic;
+
+        }
+
+        public String getTopic() {
+            return this.topic;
+        }
+
+        public CardMessage getCardMessage() {
+            return this.message;
+        }
+    }
+
+
 
 
     public static class LocationMessageReceived extends E {
@@ -359,5 +389,9 @@ public class Events {
             }
 
         }
-	}
+
+
+
+    }
+
 }

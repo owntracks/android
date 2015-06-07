@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Owntracks</string>
     <string name="preferencesServer">"Connection"</string>
     <string name="preferencesHost">"Host"</string>
@@ -16,19 +15,14 @@
     <string name="preferencesLicenses">"Thanks"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
-
     <string name="preferencesNotificationTickerOnPublish">Ticker on reports</string>
     <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
-
     <string name="preferencesNotificationVibrateOnPublish">Vibrate on reports</string>
     <string name="preferencesNotificationVibrateOnPublishSummary">Vibrate on successful reports</string>
-
     <string name="preferencesNotificationTickerOnWaypointTransition">Ticker on waypoints </string>
     <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
-
     <string name="preferencesNotificationVibrateOnWaypointTransition">Vibrate on waypoints </string>
     <string name="preferencesNotificationVibrateOnWaypointTransitionSummary">Vibrate on waypoint events</string>
-
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
@@ -48,10 +42,7 @@
     <string name="preferencesBackgroundUpdatesInterval">Fastest reporting interval</string>
     <string name="preferencesBackgroundUpdatesIntervalSummary">Fastest interval for automatic reporting</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
-
-    <string name="valTrackerId">""</string>
     <string name="preferencesTrackerId">Tracker ID</string>
-    <string name="keyTrackerId">trackerId</string>
     <string name="preferencesTrackerIdSummary">Tracker ID used for reporting</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator background  displacement</string>
@@ -67,6 +58,12 @@
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesMail">Mail</string>
     <string name="preferencesMailSummary">issues@owntracks.org</string>
+
+    <string name="preferencesDeviceTopic">Device topic</string>
+    <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>
+    <string name="preferencesBaseTopic">Base topic</string>
+    <string name="preferencesBaseTopicSummary">The topic base for subscriptions</string>
+
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
     <string name="connectivityDisconnecting">"Disconnecting"</string>
@@ -89,13 +86,7 @@
     <string name="statePublishing">"Reporting"</string>
     <string name="stateWaiting">"Waiting for connection"</string>
     <string name="stateIdle">"Idle"</string>
-    <string name="preferencesContactsEnabled">Subscribe</string>
-    <string name="preferencesContactsEnabledSummary">Subscribe custom topic</string>
-    <string name="preferencesContactsTopic">Subscribe topic</string>
-    <string name="preferencesContactsTopicSummary">Custom topic to receive messages</string>
-
     <string name="preferencesCleanSessionEnabled">Clean Session</string>
-
     <string name="publish">Report</string>
     <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
     <string name="preferencesIncludeBattery">Include battery</string>
@@ -105,19 +96,16 @@
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
     <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the foreground</string>
-
     <string name="preferencesBeaconForegroundPeriod">Foreground beacon scanning period</string>
     <string name="preferencesBeaconForegroundPeriodSummary">Seconds between foreground beacon scans</string>
     <string name="preferencesBeaconBackgroundPeriod">Background beacon scannning period</string>
     <string name="preferencesBeaconBackgroundPeriodSummary">Seconds between background beacon scans</string>
-
     <string name="preferencesRemoteCommandDump">Remote dump command</string>
     <string name="preferencesRemoteCommandDumpSummary">Respond to dump command</string>
     <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
     <string name="preferencesRemoteCommandReportLocationSummary">Respond to report location command</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Allow remote configuration </string>
-
     <string name="description">Description</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -125,33 +113,6 @@
     <string name="currentLocationNotAvailable">The current location is not available</string>
     <string name="addWaypoint">Add waypoint</string>
     <string name="waypoints">Waypoints</string>
-
-    <string-array name="connect_options_security">
-        <item>None</item>
-        <item>TLS</item>
-        <item>TLS (Custom Certificate)</item>
-    </string-array>
-    <string-array name="connect_options_auth">
-        <item>Anonymous</item>
-        <item>Username / Password</item>
-    </string-array>
-    <string-array name="connect_clientid_negotiation">
-        <item>Manual</item>
-        <item>Auto (Requires MQTT 3.1.1 Broker)</item>
-    </string-array>
-    <string-array name="qos_readable">
-        <item>"0"</item>
-        <item>"1"</item>
-        <item>"2"</item>
-    </string-array>
-    <string-array name="locatorAccuracy_readable">
-        <item>High power</item>
-        <item>Balanced power</item>
-        <item>Low power</item>
-        <item>No power</item>
-    </string-array>
-
-
     <string name="transitionEnter">Enter</string>
     <string name="transitionLeave">Leave</string>
     <string name="transitionBoth">Enter &amp; Leave</string>
@@ -159,68 +120,6 @@
     <string name="transitionLeaving">Leaving</string>
     <string name="transitionentering">entering</string>
     <string name="transitionleaving">leaving</string>
-    <string name="keyDeviceId">deviceId</string>
-    <string name="keyClientId">clientId</string>
-    <string name="keyHost">host</string>
-    <string name="keyPort">port</string>
-    <string name="keyPassword">password</string>
-    <string name="keyUsername">username</string>
-    <string name="keyPubQos">pubQos</string>
-    <string name="keyKeepalive">keepalive</string>
-    <string name="keyPubRetain">pubRetain</string>
-    <string name="keyCleanSession">cleanSession</string>
-    <string name="keyTls">tls</string>
-    <string name="keyTlsCrtPath">tlsCrtPath</string>
-    <string name="keyLocatorDisplacement">locatorDisplacement</string>
-    <string name="keyLocatorInterval">locatorInterval</string>
-    <string name="keyAuth">auth</string>
-    <string name="keyPubIncludeBattery">pubIncludeBattery</string>
-    <string name="keyConnectionAdvancedMode">connectionAdvancedMode</string>
-    <string name="keySub">sub</string>
-    <string name="keyPub">pub</string>
-    <string name="keyPubInterval">pubInterval</string>
-    <string name="keyPubTopicBase">pubTopicBase</string>
-    <string name="keyNotification">notification</string>
-    <string name="keyNotificationGeocoder">notificationGeocoder</string>
-    <string name="keyNotificationLocation">notificationLocation</string>
-    <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
-    <string name="keyNotificationVibrateOnPublish">notificationVibrateOnPublish</string>
-    <string name="keyNotificationVibrateOnWaypointTransition">notificationVibrateOnWaypointTransition</string>
-    <string name="keyNotificationTickerOnWaypointTransition">notificationTickerOnWaypointTransition</string>
-    <string name="keyNotificationOnReceivedWaypointTransition">notificationOnReceivedWaypointTransition</string>
-    <string name="keySelectedContactTopic">selectedContactTopic</string>
-    <string name="keyFollowingSelectedContact">followingSelectedContact</string>
-    <string name="keySubTopic">subTopic</string>
-    <string name="keyAutostartOnBoot">autostartOnBoot</string>
-    <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
-    <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
-    <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
-    <string name="keyRemoteCommandDump">remoteCommandDump</string>
-    <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
-    <string name="keyRemoteConfiguration">remoteConfiguration</string>
-    <string name="keyCustomBeaconLayout">customBeaconLayout</string>
-    <string name="keyBeaconBackgroundScanPeriod">beaconBackgroundScanPeriod</string>
-    <string name="keyBeaconForegroundScanPeriod">beaconForegroundScanPeriod</string>
-    <string name="valEmpty">""</string>
-    <string name="valPubTopicBase" formatted="false">owntracks/%s/%s</string>
-    <string name="valSubTopic">owntracks/#</string>
-    <string name="valHost">127.0.0.1</string>
-    <string name="valRepoUrl">https://github.com/owntracks</string>
-    <string name="valIssuesMail">issues@owntracks.org</string>
-    <string name="valTwitterUrl">https://twitter.com/owntracks</string>
-
-    <string-array name="locatorAccuracy">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-    <string-array name="qos">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
     <string name="preferencesImportExport">Import / Export</string>
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
     <string name="exportIncludeUsernamePassword">Username and password</string>
@@ -239,7 +138,6 @@
     <string name="preferencesAdvancedCategoryBeacons">Beacons</string>
     <string name="preferencesCustomBeaconLayout">Custom beacon layout</string>
     <string name="preferencesCustomBeaconLayoutSummary">Custom layout to detect beacons</string>
-    <string name="keyBeaconRangingEnabled">ranging</string>
     <string name="beaconRangingEnabledSummary">Enable ranging for BLE beacons</string>
     <string name="beaconRangingEnabled">Ranging</string>
     <string name="menuContactShow">Show</string>
@@ -264,7 +162,6 @@
     <string name="idSettings">drawer.id.settings</string>
     <string name="leave">Leave</string>
     <string name="enter">Enter</string>
-    <string name="keyFistStart">firstStart</string>
     <string name="clientId">Client ID</string>
     <string name="eventbusLicense">License for file eventbus.jar</string>
     <string name="pahoLicense">License for file paho.jar</string>
@@ -276,18 +173,30 @@
     <string name="tlsCustomCertificate">TLS custom certificate</string>
     <string name="preferencesSecurity">Security</string>
     <string name="preferencesAuthentication">Authentication</string>
-    <string name="keyAuthentication">authentication</string>
-    <string name="keySecurity">security</string>
     <string name="accept">Accept</string>
-    <string name="keyIdentification">identification</string>
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesOptions">Parameters</string>
-    <string name="keyOptions">options</string>
     <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="menuContactRequestReportLocation">Request location report</string>
     <string name="preferencesNotificationTickerOnReceivedWaypointTransitionSummary">Notify about received waypoints</string>
     <string name="preferencesNotificationTickerOnReceivedWaypointTransition">Received waypoint events</string>
     <string name="clearContact">Clear</string>
-
+    <string name="preferencesProfileId">Mode</string>
+    <string-array name="qos_readable">
+       p <item>"0"</item>
+        <item>"1"</item>
+        <item>"2"</item>
+    </string-array>
+    <string-array name="locatorAccuracy_readable">
+        <item>High power</item>
+        <item>Balanced power</item>
+        <item>Low power</item>
+        <item>No power</item>
+    </string-array>
+    <string-array name="profileIds_readable">
+        <item>Private</item>
+        <item>Hosted</item>
+        <item>Public</item>
+    </string-array>
 </resources>

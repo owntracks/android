@@ -23,18 +23,23 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.WaypointAdapter;
+import org.owntracks.android.db.ContactLink;
+import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
 import java.util.ArrayList;
 
+import de.greenrobot.dao.query.Query;
+import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 
 
@@ -242,7 +247,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
         super.onResume();
 
         listAdapter.clear();
-        listAdapter.set(new ArrayList<>(this.dao.loadAll()));
+        listAdapter.set(new ArrayList<>(this.dao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId())).build().list()));
 
         registerForContextMenu(this.listView);
         EventBus.getDefault().register(this);

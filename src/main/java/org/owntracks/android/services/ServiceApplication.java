@@ -10,6 +10,7 @@ import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
+import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.messages.DumpMessage;
@@ -47,6 +48,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.Geofence;
 
+import de.greenrobot.dao.query.Query;
+import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 
 public class ServiceApplication implements ProxyableService,
@@ -145,10 +148,19 @@ public class ServiceApplication implements ProxyableService,
 
 
     private Contact lazyUpdateContactFromMessage(String topic, GeocodableLocation l, String trackerId) {
+        Log.v(this.toString(), "lazyUpdateContactFromMessage for " +topic);
         org.owntracks.android.model.Contact c = App.getContact(topic);
 
         if (c == null) {
-            c = new org.owntracks.android.model.Contact(topic);
+            c = App.getInitializingContact(topic);
+
+
+            if(c == null) {
+                Log.v(this.toString(), "creating new contact without card" + topic);
+                c = new org.owntracks.android.model.Contact(topic);
+            } else {
+                Log.v(this.toString(), "creating unintialized contact with card" + topic);
+            }
             resolveContact(c);
             c.setLocation(l);
             c.setTrackerId(trackerId);
@@ -161,17 +173,23 @@ public class ServiceApplication implements ProxyableService,
         return c;
     }
 
-    private String getBaseTopic(String topic) {
-        // That looks scary. Strips /event from the topic to lookup the contact by the base topic
-        if(topic.endsWith(Preferences.getPubTopicEventsPart()))
-            return topic.substring(0, (topic.length() - 1) - Preferences.getPubTopicEventsPart().length());
+    private String getBaseTopic(String forStr, String topic) {
+        if(topic.endsWith(forStr))
+            return topic.substring(0, (topic.length() - 1) - forStr.length());
         else
             return topic;
+    }
 
+    private String getBaseTopicForEvent(String topic) {
+        return getBaseTopic(Preferences.getPubTopicEventsPart(), topic);
+    }
+
+    private String getBaseTopicForInfo(String topic) {
+        return getBaseTopic(Preferences.getPubTopicInfoPart(), topic);
     }
 
     public void onEventMainThread(Events.TransitionMessageReceived e) {
-        Contact c = lazyUpdateContactFromMessage(getBaseTopic(e.getTopic()), e.getGeocodableLocation(), e.getTransitionMessage().getTrackerId());
+        Contact c = lazyUpdateContactFromMessage(getBaseTopicForEvent(e.getTopic()), e.getGeocodableLocation(), e.getTransitionMessage().getTrackerId());
 
         if(e.getTransitionMessage().isRetained() && Preferences.getNotificationOnTransitionMessage()) {
             Log.v(this.toString(), "transition: " + e.getTransitionMessage().getTransition());
@@ -182,8 +200,34 @@ public class ServiceApplication implements ProxyableService,
 
     }
 
+
+    public void onEventMainThread(Events.CardMessageReceived e) {
+        String topic = getBaseTopicForInfo(e.getTopic());
+        Contact c = App.getContact(topic);
+
+        if(App.getInitializingContact(topic) != null) {
+                Log.v(this.toString(), "ignoring second card for uninitialized contact " + topic);
+                return;
+        }
+        if(c == null) {
+            Log.v(this.toString(), "initializing card for " + topic);
+
+            c = new Contact(topic);
+            c.setCardFace(e.getCardMessage().getFace());
+            c.setCardName(e.getCardMessage().getName());
+
+            App.addUninitializedContact(c);
+         } else {
+
+            Log.v(this.toString(), "updating card for existing contact" + topic);
+            c.setCardFace(e.getCardMessage().getFace());
+            c.setCardName(e.getCardMessage().getName());
+            EventBus.getDefault().post(new Events.ContactUpdated(c));
+        }
+    }
+
     public void onEventMainThread(Events.LocationMessageReceived e) {
-        lazyUpdateContactFromMessage(getBaseTopic(e.getTopic()), e.getGeocodableLocation(), e.getLocationMessage().getTrackerId());
+        lazyUpdateContactFromMessage(e.getTopic(), e.getGeocodableLocation(), e.getLocationMessage().getTrackerId());
 	}
 
     public void onEventMainThread(Events.ConfigurationMessageReceived e){
@@ -346,7 +390,7 @@ public class ServiceApplication implements ProxyableService,
             location = "a location";
         }
 
-        String name = c.getName();
+        String name = c.getDisplayName();
 
         if(name == null) {
             name = e.getTransitionMessage().getTrackerId();
@@ -368,8 +412,8 @@ public class ServiceApplication implements ProxyableService,
 
         contactTransitionNotifications.push(message);
 
-        if(c.getLookupUri() != null)
-            this.contactTransitionNotificationsContactUris.add(c.getLookupUri());
+        if(c.getLinkLookupUri() != null)
+            this.contactTransitionNotificationsContactUris.add(c.getLinkLookupUri());
 
         if(transitionCancelIntent != null)
             transitionCancelIntent.cancel();
@@ -487,6 +531,7 @@ public class ServiceApplication implements ProxyableService,
 
 		if (contactId <= 0) {
 			setContactImageAndName(c, null, null);
+            c.setHasLink(false);
 			return;
 		}
 
@@ -499,36 +544,48 @@ public class ServiceApplication implements ProxyableService,
 				String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-                c.setName(displayName);
-				c.setUserImage(image);
-
-                c.setLookupURI(ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactId));
+                setContactImageAndName(c, image, displayName);
+                c.setHasLink(true);
+                c.setLinkLookupURI(ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactId));
 				found = true;
 				break;
 			}
 		}
 
-		if (!found)
-			setContactImageAndName(c, null, null);
-
+		if (!found) {
+            setContactImageAndName(c, null, null);
+            c.setHasLink(false);
+        }
 		cursor.close();
 
 	}
 
 	void setContactImageAndName(Contact c, Bitmap image, String name) {
-		c.setName(name);
-		c.setUserImage(image);
+		c.setLinkName(name);
+		c.setLinkFace(image);
 	}
 
 	private long getContactId(Contact c) {
-		ContactLink cl = App.getContactLinkDao().load(c.getTopic());
 
+        ContactLink cl = queryContactLink(c);
         return cl != null ? cl.getContactId() : 0;
 	}
+    private ContactLink queryContactLink(Contact c) {
+        QueryBuilder qb = App.getContactLinkDao().queryBuilder();
+
+        Query query = qb.where(
+                qb.and(
+                        ContactLinkDao.Properties.Topic.eq(c.getTopic()),
+                        ContactLinkDao.Properties.ModeId.eq(Preferences.getModeId())
+                )
+        ).build();
+
+        return (ContactLink)query.unique();
+    }
 
 
 	public void linkContact(Contact c, long contactId) {
-		ContactLink cl = new ContactLink(c.getTopic(), contactId);
+		ContactLink cl = new ContactLink(null, c.getTopic(), contactId, Preferences.getModeId());
 		App.getContactLinkDao().insertOrReplace(cl);
 
 		resolveContact(c);
@@ -536,9 +593,12 @@ public class ServiceApplication implements ProxyableService,
 	}
 
     public void unlinkContact(Contact c) {
-        App.getContactLinkDao().deleteByKey(c.getTopic());
-        c.setName(null);
-        c.setUserImage(null);
+        ContactLink cl = queryContactLink(c);
+        if(cl != null)
+            App.getContactLinkDao().delete(cl);
+        c.setLinkName(null);
+        c.setLinkFace(null);
+        c.setHasLink(false);
         EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
     }
 
@@ -565,7 +625,7 @@ public class ServiceApplication implements ProxyableService,
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
         Log.v(this.toString(), "Dump data: " + dump.toString());
 
-        ServiceProxy.getServiceBroker().publish(dump, Preferences.getPubTopicBase(true), 0, false);
+        ServiceProxy.getServiceBroker().publish(dump, Preferences.getDeviceTopic(true), 0, false);
 
     }
 }

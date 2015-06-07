@@ -298,7 +298,7 @@ public class ServiceBeacon implements
             return;
         }
 
-        String topic = Preferences.getPubTopicBase(true);
+        String topic = Preferences.getPubTopicEvents();
         if (topic == null) {
             changeState(ServiceBeacon.State.NOTOPIC);
             return;

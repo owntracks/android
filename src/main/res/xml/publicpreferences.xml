@@ -7,23 +7,18 @@
         <org.owntracks.android.support.ConnectionToolbarPreference
             android:key="brokerPreference"
             android:title="@string/preferencesServer" />
+        <org.owntracks.android.support.ListIntegerPreference
+            android:defaultValue="@integer/valModeId"
+            android:entries="@array/profileIds_readable"
+            android:entryValues="@array/modeIds"
+            android:key="@string/keyModeId"
+            android:title="@string/preferencesProfileId"
+            />
 
-        <Preference
-            android:key="@string/keyHost"
-            android:title="@string/preferencesHost" />
-
-        <Preference
-            android:key="@string/keyIdentification"
-            android:title="@string/preferencesIdentification" />
-
-        <Preference
-            android:key="@string/keySecurity"
-            android:title="@string/preferencesSecurity" />
-        <Preference
-            android:key="@string/keyOptions"
-            android:title="@string/preferencesOptions"/>
 
     </PreferenceScreen>
+
+
     <PreferenceScreen
         android:key="topicSettingsScreen"
         android:title="@string/preferencesTopicSettings" >
@@ -120,40 +115,6 @@
             android:key="advanced"
             android:title="@string/preferencesAdvanced" />
 
-        <PreferenceCategory android:title="Publish and subscribe">
-
-        <org.owntracks.android.support.EditStringPreference
-            android:key="@string/keyPubTopicBase"
-            android:summary="@string/preferencesTopicSummary"
-            android:title="@string/preferencesTopic" />
-
-        <org.owntracks.android.support.ListIntegerPreference
-            android:defaultValue="@integer/valPubQos"
-            android:entries="@array/qos_readable"
-            android:entryValues="@array/qos"
-            android:key="@string/keyPubQos"
-            android:summary="@string/preferencesQOSSummary"
-            android:title="@string/preferencesQOS" />
-
-        <SwitchPreference
-            android:defaultValue="@bool/valPubRetain"
-            android:key="@string/keyPubRetain"
-            android:summary="@string/preferencesRetainSummary"
-            android:title="@string/preferencesRetain" />
-        <SwitchPreference
-            android:defaultValue="@bool/valSub"
-            android:key="@string/keySub"
-            android:summary="@string/preferencesContactsEnabledSummary"
-            android:title="@string/preferencesContactsEnabled" />
-
-        <org.owntracks.android.support.EditStringPreference
-            android:dependency="@string/keySub"
-            android:dialogTitle="@string/preferencesContactsTopic"
-            android:key="@string/keySubTopic"
-            android:dialogMessage="The app always subscribes to the base topic regardless of the one specified here."
-            android:summary="@string/preferencesContactsTopicSummary"
-            android:title="@string/preferencesContactsTopic" />
-        </PreferenceCategory>
         <PreferenceCategory android:title="Remote commands">
 
         <SwitchPreference
@@ -172,6 +133,7 @@
             android:summary="@string/preferencesRemoteConfigurationSummary"
             android:title="@string/preferencesRemoteConfiguration" />
         </PreferenceCategory>
+
         <PreferenceCategory android:title="Locator">
 
             <org.owntracks.android.support.ListIntegerPreference

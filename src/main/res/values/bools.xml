@@ -1,31 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <bool name="valTrue">true</bool>
     <bool name="valFalse">false</bool>
-
-
-    <bool name="valPub">false</bool>
-    <bool name="valSub">true</bool>
-    <bool name="valCleanSession">false</bool>
-    <bool name="valPubIncludeBattery">false</bool>
-    <bool name="valNotification">true</bool>
-    <bool name="valNotificationGeocoder">true</bool>
-    <bool name="valNotificationLocation">true</bool>
-    <bool name="valNotificationTickerOnWaypointTransition">true</bool>
-    <bool name="valNotificationTickerOnPublish">true</bool>
-    <bool name="valNotificationVibrateOnWayointTransition">true</bool>
-    <bool name="valNotificationVibrateOnPublish">true</bool>
-    <bool name="valPubRetain">true</bool>
-    <bool name="valAutostartOnBoot">false</bool>
-    <bool name="valConnectionAdvancedMode">false</bool>
-    <bool name="valZeroLenghClientIdEnabled">false</bool>
-    <bool name="valAuth">true</bool>
-    <bool name="valRemoteCommandReportLocation">false</bool>
-    <bool name="valRemoteCommandDump">false</bool>
-    <bool name="valRemoteConfiguration">false</bool>
-    <bool name="valBeaconRangingEnabled">false</bool>
-    <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
-    <bool name="valTls">true</bool>
-
 </resources>
