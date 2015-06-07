@@ -148,7 +148,7 @@ public class ServiceApplication implements ProxyableService,
 
 
     private Contact lazyUpdateContactFromMessage(String topic, GeocodableLocation l, String trackerId) {
-        Log.v(this.toString(), "lazyUpdateContactFromMessage for " +topic);
+        Log.v(this.toString(), "lazyUpdateContactFromMessage for: " +topic);
         org.owntracks.android.model.Contact c = App.getContact(topic);
 
         if (c == null) {
@@ -156,10 +156,10 @@ public class ServiceApplication implements ProxyableService,
 
 
             if(c == null) {
-                Log.v(this.toString(), "creating new contact without card" + topic);
+                Log.v(this.toString(), "creating new contact without card: " + topic);
                 c = new org.owntracks.android.model.Contact(topic);
             } else {
-                Log.v(this.toString(), "creating unintialized contact with card" + topic);
+                Log.v(this.toString(), "creating unintialized contact with card: " + topic);
             }
             resolveContact(c);
             c.setLocation(l);
@@ -175,7 +175,7 @@ public class ServiceApplication implements ProxyableService,
 
     private String getBaseTopic(String forStr, String topic) {
         if(topic.endsWith(forStr))
-            return topic.substring(0, (topic.length() - 1) - forStr.length());
+            return topic.substring(0, (topic.length()  - forStr.length()));
         else
             return topic;
     }
@@ -204,13 +204,14 @@ public class ServiceApplication implements ProxyableService,
     public void onEventMainThread(Events.CardMessageReceived e) {
         String topic = getBaseTopicForInfo(e.getTopic());
         Contact c = App.getContact(topic);
+        Log.v(this.toString(), "card message received for: " + topic);
 
         if(App.getInitializingContact(topic) != null) {
                 Log.v(this.toString(), "ignoring second card for uninitialized contact " + topic);
                 return;
         }
         if(c == null) {
-            Log.v(this.toString(), "initializing card for " + topic);
+            Log.v(this.toString(), "initializing card for: " + topic);
 
             c = new Contact(topic);
             c.setCardFace(e.getCardMessage().getFace());
@@ -219,7 +220,7 @@ public class ServiceApplication implements ProxyableService,
             App.addUninitializedContact(c);
          } else {
 
-            Log.v(this.toString(), "updating card for existing contact" + topic);
+            Log.v(this.toString(), "updating card for existing contact: " + topic);
             c.setCardFace(e.getCardMessage().getFace());
             c.setCardName(e.getCardMessage().getName());
             EventBus.getDefault().post(new Events.ContactUpdated(c));

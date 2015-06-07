@@ -221,9 +221,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		try {
 			String prefix = Preferences.getTls() ? "ssl" : "tcp";
 			String cid = Preferences.getClientId(true);
+            Log.v(this.toString(), "Connection mode public: " + Preferences.isModePublic());
             Log.v(this.toString(), "Using client id: " + cid);
-
-            this.mqttClient = new CustomMqttClient(prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort(), cid, persistenceStore, new AlarmPingSender(context));
+            String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
+            Log.v(this.toString(), "Using connect string: " + connectString);
+            this.mqttClient = new CustomMqttClient(connectString, cid, persistenceStore, new AlarmPingSender(context));
 			this.mqttClient.setCallback(this);
 
 		} catch (Exception e) {
@@ -456,9 +458,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
     private void subscribe(String[] topics) throws MqttException{
-        if(!isConnected())
+        if(!isConnected()) {
+            Log.e(this.toString(), "subscribe when not connected");
             return;
-
+        }
         for(String s : topics) {
             Log.v(this.toString(), "Subscribing to: " + s);
         }
