@@ -34,6 +34,7 @@ import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
@@ -201,6 +202,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
                     this.enter.setChecked(false);
                     this.leave.setChecked(false);
                 }
+                // Shared waypoints are disabled in public mode to protect user's privacy
+                findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
 
                 this.share.setChecked(this.waypoint.getShared());
 
@@ -380,6 +383,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         boolean update;
         if (this.waypoint == null) {
             w = new Waypoint();
+            w.setModeId(Preferences.getModeId());
             update = false;
         } else {
             w = this.waypoint;
@@ -399,7 +403,10 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             w.setRadius(null);
         }
 
-        w.setShared(shareValue);
+        if(!Preferences.isModePublic())
+            w.setShared(shareValue);
+        else
+            w.setShared(false);
 
         if(this.enterValue && !this.leaveValue) {
             w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);

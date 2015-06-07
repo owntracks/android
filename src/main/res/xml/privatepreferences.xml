@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="root">
+    <PreferenceScreen
+        android:key="brokerPreferenceScreen"
+        android:title="@string/preferencesServer">
+        <org.owntracks.android.support.ConnectionToolbarPreference
+            android:key="brokerPreference"
+            android:title="@string/preferencesServer" />
+        <org.owntracks.android.support.ListIntegerPreference
+            android:defaultValue="@integer/valModeId"
+            android:entries="@array/profileIds_readable"
+            android:entryValues="@array/modeIds"
+            android:key="@string/keyModeId"
+            android:title="@string/preferencesProfileId"
+            />
+
+        <Preference
+            android:key="@string/keyHost"
+            android:title="@string/preferencesHost" />
+
+        <Preference
+            android:key="@string/keyIdentification"
+            android:title="@string/preferencesIdentification" />
+
+        <Preference
+            android:key="@string/keySecurity"
+            android:title="@string/preferencesSecurity" />
+        <Preference
+            android:key="@string/keyOptions"
+            android:title="@string/preferencesOptions"/>
+
+    </PreferenceScreen>
+
+
+    <PreferenceScreen
+        android:key="topicSettingsScreen"
+        android:title="@string/preferencesTopicSettings" >
+
+        <org.owntracks.android.support.ToolbarPreference
+            android:key="topicSettings"
+            android:title="@string/preferencesTopicSettings" />
+
+        <SwitchPreference
+            android:defaultValue="@bool/valPub"
+            android:key="@string/keyPub"
+            android:summary="@string/preferencesBackgroundUpdatesSummary"
+            android:title="@string/preferencesBackroundUpdates" />
+
+        <SwitchPreference
+            android:defaultValue="@bool/valPubIncludeBattery"
+            android:key="@string/keyPubIncludeBattery"
+            android:summary="@string/preferencesIncludeBatterySummary"
+            android:title="@string/preferencesIncludeBattery" />
+
+
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="preferencesNotificationScreen"
+        android:title="@string/preferencesNotification" >
+        <org.owntracks.android.support.ToolbarPreference
+            android:key="preferencesNotification"
+            android:title="@string/preferencesNotification" />
+
+        <PreferenceCategory android:title="Ongoing notification">
+
+            <SwitchPreference
+                android:defaultValue="@bool/valNotification"
+                android:key="@string/keyNotification"
+                android:summary="@string/preferencesNotificationSummary"
+                android:title="@string/preferencesNotification" />
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationLocation"
+                android:dependency="@string/keyNotification"
+                android:key="@string/keyNotificationLocation"
+                android:summary="@string/preferencesNotificationLocationSummary"
+                android:title="@string/preferencesNotificationLocation" />
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationGeocoder"
+                android:dependency="@string/keyNotificationLocation"
+                android:key="@string/keyNotificationGeocoder"
+                android:summary="@string/preferencesNotificationGeocoderSummary"
+                android:title="@string/preferencesNotificationGeocoder" />
+        </PreferenceCategory>
+        <PreferenceCategory android:title="Background notifications">
+
+
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationTickerOnPublish"
+                android:key="@string/keyNotificationTickerOnPublish"
+                android:summary="@string/preferencesNotificationTickerOnPublishSummary"
+                android:title="@string/preferencesNotificationTickerOnPublish" />
+
+            <SwitchPreference
+                android:dependency="@string/keyNotificationTickerOnPublish"
+                android:defaultValue="@bool/valNotificationVibrateOnPublish"
+                android:key="@string/keyNotificationVibrateOnPublish"
+                android:summary="@string/preferencesNotificationVibrateOnPublishSummary"
+                android:title="@string/preferencesNotificationVibrateOnPublish" />
+
+
+        <SwitchPreference
+            android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
+            android:key="@string/keyNotificationTickerOnWaypointTransition"
+            android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
+            android:title="@string/preferencesNotificationTickerOnWaypointTransition" />
+
+        <SwitchPreference
+            android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
+            android:dependency="@string/keyNotificationTickerOnWaypointTransition"
+            android:key="@string/keyNotificationVibrateOnWaypointTransition"
+            android:summary="@string/preferencesNotificationVibrateOnWaypointTransitionSummary"
+            android:title="@string/preferencesNotificationVibrateOnWaypointTransition" />
+
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
+                android:dependency="@string/keyNotificationTickerOnWaypointTransition"
+                android:key="@string/keyNotificationOnReceivedWaypointTransition"
+                android:summary="@string/preferencesNotificationTickerOnReceivedWaypointTransitionSummary"
+                android:title="@string/preferencesNotificationTickerOnReceivedWaypointTransition" />
+
+
+        </PreferenceCategory>
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="advancedScreen"
+        android:title="@string/preferencesAdvanced" >
+        <org.owntracks.android.support.ToolbarPreference
+            android:key="advanced"
+            android:title="@string/preferencesAdvanced" />
+
+        <PreferenceCategory android:title="Publish and subscribe">
+
+        <org.owntracks.android.support.EditStringPreference
+            android:key="@string/keyDeviceTopic"
+            android:summary="@string/preferencesDeviceTopicSummary"
+            android:title="@string/preferencesTopic" />
+
+        <org.owntracks.android.support.EditStringPreference
+                android:dialogTitle="@string/preferencesBaseTopic"
+                android:key="@string/keyBaseTopic"
+                android:summary="@string/preferencesBaseTopicSummary"
+                android:title="@string/preferencesBaseTopic" />
+
+        <org.owntracks.android.support.ListIntegerPreference
+            android:defaultValue="@integer/valPubQos"
+            android:entries="@array/qos_readable"
+            android:entryValues="@array/qos"
+            android:key="@string/keyPubQos"
+            android:summary="@string/preferencesQOSSummary"
+            android:title="@string/preferencesQOS" />
+
+        <SwitchPreference
+            android:defaultValue="@bool/valPubRetain"
+            android:key="@string/keyPubRetain"
+            android:summary="@string/preferencesRetainSummary"
+            android:title="@string/preferencesRetain" />
+
+        </PreferenceCategory>
+
+
+        <PreferenceCategory android:title="Remote commands">
+
+        <SwitchPreference
+            android:defaultValue="@bool/valRemoteCommandReportLocation"
+            android:key="@string/keyRemoteCommandReportLocation"
+            android:summary="@string/preferencesRemoteCommandReportLocationSummary"
+            android:title="@string/preferencesRemoteCommandReportLocation" />
+        <SwitchPreference
+            android:defaultValue="@bool/valRemoteCommandDump"
+            android:key="@string/keyRemoteCommandDump"
+            android:summary="@string/preferencesRemoteCommandDumpSummary"
+            android:title="@string/preferencesRemoteCommandDump" />
+        <SwitchPreference
+            android:defaultValue="@bool/valRemoteConfiguration"
+            android:key="@string/keyRemoteConfiguration"
+            android:summary="@string/preferencesRemoteConfigurationSummary"
+            android:title="@string/preferencesRemoteConfiguration" />
+        </PreferenceCategory>
+        <PreferenceCategory android:title="Locator">
+
+            <org.owntracks.android.support.ListIntegerPreference
+                android:entries="@array/locatorAccuracy_readable"
+                android:entryValues="@array/locatorAccuracy"
+                android:key="@string/keyLocatorAccuracyForeground"
+                android:summary="@string/preferencesLocatorAccuracyForegroundSummary"
+                android:title="@string/preferencesLocatorAccuracyForeground"
+                android:defaultValue="@integer/valLocatorAccuracyForeground"/>
+            <org.owntracks.android.support.ListIntegerPreference
+                android:entries="@array/locatorAccuracy_readable"
+                android:entryValues="@array/locatorAccuracy"
+                android:key="@string/keyLocatorAccuracyBackground"
+                android:summary="@string/preferencesLocatorAccuracyBackgroundSummary"
+                android:title="@string/preferencesLocatorAccuracyBackground"
+                android:defaultValue="@integer/valLocatorAccuracyBackground"/>
+
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dialogTitle="@string/preferencesLocatorDisplacement"
+            android:inputType="number"
+            android:key="@string/keyLocatorDisplacement"
+            android:summary="@string/preferencesLocatorDisplacementSummary"
+            android:title="@string/preferencesLocatorDisplacement" />
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dialogTitle="@string/preferencesLocatorInterval"
+            android:inputType="numberDecimal"
+            android:key="@string/keyLocatorInterval"
+            android:summary="@string/preferencesLocatorIntervalSummary"
+            android:title="@string/preferencesLocatorInterval" />
+
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dependency="@string/keyPub"
+            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
+            android:inputType="number"
+            android:key="@string/keyPubInterval"
+            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
+            android:title="@string/preferencesBackgroundUpdatesInterval" />
+
+
+        </PreferenceCategory>
+        <PreferenceCategory android:title="@string/preferencesAdvancedCategoryBeacons">
+
+        <SwitchPreference
+            android:defaultValue="@bool/valBeaconRangingEnabled"
+            android:key="@string/keyBeaconRangingEnabled"
+            android:summary="@string/beaconRangingEnabledSummary"
+            android:title="@string/beaconRangingEnabled" />
+
+
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dialogTitle="@string/preferencesBeaconForegroundPeriod"
+            android:inputType="numberDecimal"
+            android:key="@string/keyBeaconForegroundScanPeriod"
+            android:summary="@string/preferencesBeaconForegroundPeriodSummary"
+            android:title="@string/preferencesBeaconForegroundPeriod"
+            android:dependency="@string/keyBeaconRangingEnabled" />
+
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dialogTitle="@string/preferencesBeaconBackgroundPeriod"
+            android:inputType="numberDecimal"
+            android:key="@string/keyBeaconBackgroundScanPeriod"
+            android:summary="@string/preferencesBeaconBackgroundPeriodSummary"
+            android:title="@string/preferencesBeaconBackgroundPeriod"
+            android:dependency="@string/keyBeaconRangingEnabled" />
+
+        <org.owntracks.android.support.EditStringPreference
+            android:defaultValue="@string/valEmpty"
+            android:dialogTitle="@string/preferencesCustomBeaconLayout"
+            android:key="@string/keyCustomBeaconLayout"
+            android:summary="@string/preferencesCustomBeaconLayoutSummary"
+            android:title="@string/preferencesCustomBeaconLayout"
+            android:dependency="@string/keyBeaconRangingEnabled"/>
+        </PreferenceCategory>
+
+        <PreferenceCategory android:title="Misc">
+
+
+        <SwitchPreference
+            android:defaultValue="@bool/valAutostartOnBoot"
+            android:key="@string/keyAutostartOnBoot"
+            android:summary="@string/preferencesAutostartSummary"
+            android:title="@string/preferencesAutostart" />
+
+      </PreferenceCategory>
+    </PreferenceScreen>
+
+    <Preference
+        android:title="@string/preferencesExport">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="org.owntracks.android"
+            android:targetClass="org.owntracks.android.activities.ActivityExport"
+            />
+    </Preference>
+
+    <PreferenceScreen
+        android:key="activityInfoScreen"
+        android:title="@string/preferencesInfo" >
+        <org.owntracks.android.support.ToolbarPreference
+            android:key="activityInfo"
+            android:title="@string/preferencesInfo" />
+
+        <Preference
+            android:key="documentation"
+            android:summary="@string/preferencesDocumentationSummary"
+            android:title="@string/preferencesDocumentation" />
+        <Preference
+            android:key="mail"
+            android:summary="@string/preferencesMailSummary"
+            android:title="@string/preferencesMail" />
+        <Preference
+            android:key="repo"
+            android:summary="@string/preferencesRepositorySummary"
+            android:title="@string/preferencesRepository" />
+        <Preference
+            android:key="twitter"
+            android:summary="@string/preferencesTwitterSummary"
+            android:title="@string/preferencesTwitter" />
+
+        <PreferenceScreen
+            android:key="licenses"
+            android:summary="@string/preferencesLicensesSummary"
+            android:title="@string/preferencesLicenses">
+            <org.owntracks.android.support.ToolbarPreference
+                android:key="licenses"
+                android:title="@string/preferencesLicenses" />
+
+            <Preference
+                android:key="eclipse-paho"
+                android:title="Eclipse Foundation"
+                android:summary="Paho MQTTv3.1 Java Client" />
+            <Preference
+                android:key="greenrobot-eventbus"
+                android:title="Greenrobot"
+                android:summary="EventBus" />
+            <Preference
+                android:key="greenrobot-greendao"
+                android:title="Greenrobot"
+                android:summary="GreenDao" />
+            <Preference
+                android:key="altbeacon-android-beacon-library"
+                android:title="AltBeacon"
+                android:summary="Android-Beacon-Library" />
+            <Preference
+                android:key="rengwuxian-materialedittext"
+                android:title="Rengwuxian"
+                android:summary="MaterialEditText" />
+            <Preference
+                android:key="mikepenz-materialdrawer"
+                android:title="Mikepenz"
+                android:summary="MaterialDrawer" />
+            <Preference
+                android:key="rengwuxian-materialedittext"
+                android:title="Rengwuxian"
+                android:summary="MaterialEditText" />
+            <Preference
+                android:key="afollestad-materialdialogs"
+                android:title="Afollestad"
+                android:summary="Material-Dialogs" />
+
+        </PreferenceScreen>
+
+        <Preference
+            android:key="versionReadOnly"
+            android:title="@string/preferencesVersion" />
+    </PreferenceScreen>
+
+</PreferenceScreen>

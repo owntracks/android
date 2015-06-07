@@ -6,6 +6,7 @@ import io.fabric.sdk.android.Fabric;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.DaoMaster;
@@ -39,25 +40,34 @@ public class App extends Application {
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
     private static HashMap<String, Contact> contacts;
+    private static HashMap<String, Contact> initializingContacts;
+
+    public static final int MODE_ID_PRIVATE=0;
+    public static final int MODE_ID_HOSTED=1;
+    public static final int MODE_ID_PUBLIC=2;
+
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
         instance = this;
+        Preferences preferences = new Preferences(this);
 
         if(!BuildConfig.DEBUG) {
             Log.v(this.toString(), "Fabric.io crash reporting enabled");
-            final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
-            Fabric.with(fabric);
+            Fabric.with(this, new Crashlytics());
+            //final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
         }
 
 
-        Preferences.handleFirstStart();
         OpenHelper helper = new OpenHelper(this, "org.owntracks.android.db", null) {
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                 Log.v(this.toString(), "Migrating db from " + oldVersion  + " to  " + newVersion);
                 if(oldVersion == 1 && newVersion == 2) {
+                    DaoMaster.dropAllTables(db, true);
+                    DaoMaster.createAllTables(db, true);
+                } else if (oldVersion == 2 && newVersion == 3) {
                     DaoMaster.dropAllTables(db, true);
                     DaoMaster.createAllTables(db, true);
                 }
@@ -71,6 +81,7 @@ public class App extends Application {
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
+        this.initializingContacts = new HashMap<String, Contact>();
 
 		//Initialize Google Maps and BitmapDescriptorFactory
 		MapsInitializer.initialize(getApplicationContext());
@@ -107,9 +118,25 @@ public class App extends Application {
         }
     }
 
+
+
+    public void onEvent(Events.ModeChanged e) {
+        instance.contacts.clear();
+    }
+
     public static void addContact(Contact c) {
         instance.contacts.put(c.getTopic(), c);
+        initializingContacts.remove(c.getTopic());
+
         EventBus.getDefault().post(new Events.ContactAdded(c));
+    }
+
+    public static void addUninitializedContact(Contact c) {
+        instance.initializingContacts.put(c.getTopic(), c);
+    }
+
+    public static Contact getInitializingContact(String topic) {
+        return instance.initializingContacts.get(topic);
     }
 
     public static void removeContact(Contact c) {
@@ -146,6 +173,15 @@ public class App extends Application {
 		contacts.clear();
 	}
 
+    public static void changeProfilePublic(){
+        //TODO:
+        // Set profile
+        // send event
+    }
 
-
+    public static void changeProfilePrivate(){
+        //TODO:
+        // Set profile
+        // send event
+    }
 }

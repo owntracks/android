@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import org.owntracks.android.R;
 
-// This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences screens
+// This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences_private screens
 public class ToolbarPreference extends Preference {
     Toolbar toolbar;
 

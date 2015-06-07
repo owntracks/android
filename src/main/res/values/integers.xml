@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="valTlsNone">0</integer>
-    <integer name="valTls">1</integer>
-    <integer name="valTlsCustom">2</integer>
-    <integer name="valPort">8883</integer>
-    <integer name="valPubInterval">5</integer>
-
-    <integer name="valPubQos">1</integer>
-    <integer name="valKeepalive">3600</integer>
-    <integer name="valLocatorDisplacement">500</integer>
-    <integer name="valLocatorInterval">15</integer>
-    <integer name="valLocatorAccuracyBackground">1</integer>
-    <integer name="valLocatorAccuracyForeground">0</integer>
-
-    <integer name="valBeaconBackgroundScanPeriod">30</integer>
-    <integer name="valBeaconForegroundScanPeriod">0</integer>
-    <integer name="valZero">0</integer>
     <integer name="valInvalid">-1</integer>
 
 </resources>

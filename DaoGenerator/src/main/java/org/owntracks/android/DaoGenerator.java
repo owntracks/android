@@ -1,6 +1,8 @@
 package org.owntracks.android;
 
 import de.greenrobot.daogenerator.Entity;
+import de.greenrobot.daogenerator.Index;
+import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
 
 // Generates Data Access Objects in src/main/java/org.owntracks.android/db
@@ -8,7 +10,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 2;
+    private static final int SCHEMA_VERSION = 3;
 
     public static void main(String args[]) throws Exception {
 
@@ -17,12 +19,21 @@ public class DaoGenerator {
 
 
         Entity contactLink = schema.addEntity("ContactLink");
-        contactLink.addStringProperty("topic").primaryKey().unique();
+        contactLink.addIdProperty();
+        Property topic = contactLink.addStringProperty("topic").notNull().getProperty();
         contactLink.addLongProperty("contactId");
+        Property modeId = contactLink.addIntProperty("modeId").notNull().getProperty();
+
+        // GreenDao does not yet support compound primary keys. We create a unique index on the two columns instead
+        Index compoundPk = new Index();
+        compoundPk.addProperty(topic);
+        compoundPk.addProperty(modeId);
+        compoundPk.makeUnique();
+        contactLink.addIndex(compoundPk);
 
 
         Entity waypoint = schema.addEntity("Waypoint");
-        waypoint.addLongProperty("id").primaryKey();
+        waypoint.addIdProperty();
         waypoint.addStringProperty("description");
         waypoint.addDoubleProperty("latitude");
         waypoint.addDoubleProperty("longitude");
@@ -32,6 +43,8 @@ public class DaoGenerator {
         waypoint.addIntProperty("radius");
         waypoint.addIntProperty("transitionType");
         waypoint.addStringProperty("geofenceId");
+        waypoint.addStringProperty("ssid");
+        waypoint.addIntProperty("modeId").notNull();
 
         new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, args[0]);
     }
