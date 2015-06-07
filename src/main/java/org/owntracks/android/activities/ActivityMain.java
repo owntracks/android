@@ -22,18 +22,15 @@ import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -178,7 +175,7 @@ public class ActivityMain extends ActionBarActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			setRetainInstance(false/);
+			setRetainInstance(false);
 		}
 
 		public static FragmentHandler getInstance() {
@@ -794,7 +791,7 @@ public class ActivityMain extends ActionBarActivity {
             removeContactMarker(c);
 
 			Marker m = this.googleMap.addMarker(
-                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getMarkerImageDescriptor()).anchor(0.5F, 0.5F));
+                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getFaceDescriptor()).anchor(0.5F, 0.5F));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 
@@ -885,9 +882,9 @@ public class ActivityMain extends ActionBarActivity {
 
             centerMap(c.getLocation().getLatLng(), centerMode, animate, zoom);
 
-			this.selectedContactName.setText(c.toString());
+			this.selectedContactName.setText(c.getDisplayName());
 			this.selectedContactLocation.setText(c.getLocation().toString());
-            this.selectedContactImage.setImageBitmap(c.getUserImage());
+            this.selectedContactImage.setImageBitmap(c.getFace());
 
             showSelectedContactDetails();
 
@@ -919,6 +916,10 @@ public class ActivityMain extends ActionBarActivity {
             if(e.getState() == ServiceBroker.State.CONNECTING)
                 clearMap();
 
+        }
+
+        public void onEventMainThread(Events.ModeChanged e) {
+            clearMap();
         }
 
         public void clearMap() {
@@ -1164,7 +1165,12 @@ public class ActivityMain extends ActionBarActivity {
                 setListAdapter(false); // Ignore cached values. Either they're removed already or are invalid and will be removed soon
 		}
 
-		public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
+        public void onEventMainThread(Events.ModeChanged e) {
+            setListAdapter(false);
+        }
+
+
+        public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
 			if (l == null)
 				return;
 
@@ -1244,7 +1250,7 @@ public class ActivityMain extends ActionBarActivity {
 		@Override
 		public void onStart() {
 			super.onStart();
-			EventBus.getDefault().registerSticky(this);
+			EventBus.getDefault().register(this);
 		}
 
 
@@ -1283,8 +1289,8 @@ public class ActivityMain extends ActionBarActivity {
 			Bundle extras = FragmentHandler.getInstance().getBundle(DetailsFragment.class);
 
 			this.contact = App.getContact((String) extras.get(KEY_TOPIC));
-			if(this.contact != null && this.contact.isLinked())
-                this.name.setText(this.contact.getName());
+			if(this.contact != null )
+                this.name.setText(this.contact.getDisplayName() );
             else
                 this.name.setText(getString(R.string.na));
             this.topic.setText(this.contact.getTopic());
@@ -1378,8 +1384,8 @@ public class ActivityMain extends ActionBarActivity {
             mMenu.clear();
             mInflater.inflate(R.menu.fragment_details, mMenu);
 
-            mMenu.findItem(R.id.action_assign).setVisible(!this.contact.isLinked());
-            mMenu.findItem(R.id.action_unassign).setVisible(this.contact.isLinked());
+            mMenu.findItem(R.id.action_assign).setVisible(!this.contact.hasLink());
+            mMenu.findItem(R.id.action_unassign).setVisible(this.contact.hasLink());
 
 
         }
@@ -1411,7 +1417,7 @@ public class ActivityMain extends ActionBarActivity {
 
 
         public void onEventMainThread(Events.ContactUpdated e) {
-			if (e.getContact() == this.contact)
+			if (e.getContact() == this.contact && isVisible())
 				onShow();
 		}
 
@@ -1419,6 +1425,10 @@ public class ActivityMain extends ActionBarActivity {
             // Contact will be cleared, close this view
             if (e.getContact() == this.contact);
                 FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
+        }
+
+        public void onEventMainThread(Events.ModeChanged e) {
+            FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
         }
 
 

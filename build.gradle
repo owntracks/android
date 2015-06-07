@@ -37,16 +37,16 @@ dependencies {
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
 
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:+@aar') {
         transitive = true;
     }
 
     // Material design widget libraries
     compile 'com.rengwuxian.materialedittext:library:1.8.3'
-    compile('com.mikepenz.materialdrawer:library:2.6.8@aar') {
+    compile('com.mikepenz.materialdrawer:library:2.9.7@aar') {
         transitive = true
     }
-    compile 'com.afollestad:material-dialogs:0.6.6.1'
+    compile 'com.afollestad:material-dialogs:0.7.4.1'
 
 
 }

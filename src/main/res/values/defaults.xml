@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="valModeId">0</integer>
+
+
+
+    <string name="valDeviceTopicPublic" formatted="false">public/%s/%s</string>
+    <string name="valBaseTopicPublic">public/+/+</string>
+    <string name="valUsernamePublic">user</string>
+    <string name="valHostPublic">public.owntracks.org</string>
+    <integer name="valPortPublic">8889</integer>
+    <bool name="valCleanSessionPublic">true</bool>
+    <bool name="valAuthPublic">false</bool>
+    <bool name="valTlsPublic">true</bool>
+    <bool name="valRemoteConfigurationPublic">false</bool>
+    <bool name="valPubRetainPublic">false</bool>
+    <bool name="valRemoteCommandDumpPublic">true</bool>
+    <integer name="valKeepalivePublic">3600</integer>
+    <integer name="valPubQosPublic">0</integer>
+
+
+    <string name="valDeviceTopicHosted" formatted="false">owntracks/%s/%s</string>
+    <string name="valBaseTopicHosted">owntracks/+/+</string>
+    <string name="valHostHosted">hosted.owntracks.org</string>
+    <integer name="valPortHosted">8883</integer>
+    <bool name="valCleanSessionHosted">false</bool>
+    <bool name="valAuthHosted">true</bool>
+    <bool name="valTlsHosted">true</bool>
+    <bool name="valRemoteConfigurationHosted">false</bool>
+    <bool name="valRemoteCommandDumpHosted">true</bool>
+    <bool name="valPubRetainHosted">true</bool>
+    <integer name="valPubQosHosted">0</integer>
+
+
+
+    <integer name="valKeepaliveHosted">3600</integer>
+
+
+    <string name="valDeviceTopic" formatted="false">owntracks/%s/%s</string>
+    <string name="valBaseTopic">owntracks/+/+</string>
+
+    <string name="valHost">127.0.0.1</string>
+    <string name="valRepoUrl">https://github.com/owntracks</string>
+    <string name="valIssuesMail">issues@owntracks.org</string>
+    <string name="valTwitterUrl">https://twitter.com/owntracks</string>
+    <string name="valTrackerId">""</string>
+
+    <integer name="valPort">8883</integer>
+    <integer name="valPubInterval">5</integer>
+
+    <integer name="valPubQos">1</integer>
+    <integer name="valKeepalive">3600</integer>
+    <integer name="valLocatorDisplacement">500</integer>
+    <integer name="valLocatorInterval">15</integer>
+    <integer name="valLocatorAccuracyBackground">1</integer>
+    <integer name="valLocatorAccuracyForeground">0</integer>
+
+    <integer name="valBeaconBackgroundScanPeriod">30</integer>
+    <integer name="valBeaconForegroundScanPeriod">0</integer>
+    <integer name="valZero">0</integer>
+
+    <bool name="valPub">false</bool>
+    <bool name="valCleanSession">false</bool>
+    <bool name="valCleanSessionPrivate">false</bool>
+    <bool name="valPubIncludeBattery">false</bool>
+    <bool name="valNotification">true</bool>
+    <bool name="valNotificationGeocoder">true</bool>
+    <bool name="valNotificationLocation">true</bool>
+    <bool name="valNotificationTickerOnWaypointTransition">true</bool>
+    <bool name="valNotificationTickerOnPublish">true</bool>
+    <bool name="valNotificationVibrateOnWayointTransition">true</bool>
+    <bool name="valNotificationVibrateOnPublish">true</bool>
+    <bool name="valPubRetain">true</bool>
+    <bool name="valAutostartOnBoot">false</bool>
+    <bool name="valConnectionAdvancedMode">false</bool>
+    <bool name="valZeroLenghClientIdEnabled">false</bool>
+    <bool name="valAuth">true</bool>
+    <bool name="valRemoteCommandReportLocation">false</bool>
+    <bool name="valRemoteCommandDump">false</bool>
+    <bool name="valRemoteConfiguration">false</bool>
+    <bool name="valBeaconRangingEnabled">false</bool>
+    <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
+    <bool name="valTls">true</bool>
+
+    <string-array name="modeIds">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="locatorAccuracy">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="qos">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>

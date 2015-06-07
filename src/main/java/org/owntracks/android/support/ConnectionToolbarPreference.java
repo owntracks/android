@@ -15,7 +15,7 @@ import org.owntracks.android.services.ServiceBroker;
 
 import de.greenrobot.event.EventBus;
 
-// This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences screens
+// This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences_private screens
 public class ConnectionToolbarPreference extends ToolbarPreference {
     MenuItem connect;
     MenuItem disconnect;

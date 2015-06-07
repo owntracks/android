@@ -8,15 +8,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
-
-import com.crashlytics.android.Crashlytics;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -32,9 +29,11 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
@@ -58,6 +57,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -65,7 +65,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -352,6 +351,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private boolean connect() {
         this.workerThread = Thread.currentThread(); // We connect, so we're the worker thread
         changeState(State.CONNECTING);
+        Log.v(this.toString(), "Connecting in mode: " + Preferences.getModeId());
 
 		error = null; // clear previous error on connect
 		if(!init()) {
@@ -363,11 +363,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			setWill(options);
 
 			if (Preferences.getAuth()) {
+                Log.v(this.toString(), "MqttConnectOptions auth: true");
 				options.setPassword(Preferences.getPassword().toCharArray());
 				options.setUserName(Preferences.getUsername());
 			}
 
 			if (Preferences.getTls()) {
+                Log.v(this.toString(), "MqttConnectOptions tls: true");
                 options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCrtPath().length() > 0));
             }
 
@@ -390,17 +392,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void setWill(MqttConnectOptions m) {
-		StringBuilder payload = new StringBuilder();
-		payload.append("{");
-		payload.append("\"_type\": ").append("\"").append("lwt").append("\"");
-		payload.append(", \"tst\": ")
-				.append("\"")
-				.append((int) (TimeUnit.MILLISECONDS.toSeconds(System
-                        .currentTimeMillis()))).append("\"");
-		payload.append("}");
+        try {
+            JSONObject lwt = new JSONObject();
+            lwt.put("_type", "lwt");
+            lwt.put("tst", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-
-		m.setWill(Preferences.getBaseTopic(), payload.toString().getBytes(), 0, false);
+            m.setWill(Preferences.getDeviceTopic(true), lwt.toString().getBytes(), 0, false);
+        } catch(JSONException e) {}
 
 	}
 
@@ -429,21 +427,24 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
     public void resubscribe(){
-        //Log.v(this.toString(), "Resubscribing");
 
         try {
+
+            List<String> topics =new ArrayList<String>();
+
+            topics.add(Preferences.getBaseTopic());
+            topics.add(Preferences.getBaseTopic() + "/info");
+
+            if(Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
+                topics.add(Preferences.getDeviceTopic(true)+"/cmd");
+
+            if(!Preferences.isModePublic()) {
+                topics.add(Preferences.getBaseTopic()+"/event");
+                topics.add(Preferences.getBaseTopic() + "/waypoint");
+            }
+
             unsubscribe();
-
-            // owntracks/user/device/# - Preferences.getBaseTopic()
-
-            //owntracks/+/+ for everybody's location   -
-            //owntracks/+/+/events                     -
-            //owntracks/user/device/cmd
-
-            if (Preferences.getSub())
-                subscribe(new String[]{Preferences.getSubTopic(true), Preferences.getBaseTopic(), Preferences.getPubTopicCommands()});
-            else
-                subscribe(new String[]{Preferences.getBaseTopic()});
+            subscribe(topics.toArray(new String[topics.size()]));
 
         } catch (MqttException e) {
             e.printStackTrace();
@@ -781,7 +782,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             LocationMessage lm = new LocationMessage(json);
             lm.setRetained(message.isRetained());
             EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
-        }else if (type.equals("transition")) {
+        } else if (type.equals("card")) {
+            CardMessage card = new CardMessage(json);
+            EventBus.getDefault().postSticky(new Events.CardMessageReceived(card, topic));
+        } else if (type.equals("transition")) {
             TransitionMessage tm = new TransitionMessage(json);
             tm.setRetained(message.isRetained());
             EventBus.getDefault().postSticky(new Events.TransitionMessageReceived(tm, topic));
@@ -795,7 +799,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
             switch (action) {
                 case "dump":
-                    if (!Preferences.getRemoteCommandDump()) {
+                    if (!Preferences.getRemoteCommandDump() || Preferences.isModePublic()) {
                         Log.i(this.toString(), "Dump remote command is disabled");
                         return;
                     }
@@ -815,8 +819,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             }
 
         } else if (type.equals("configuration") && topic.equals(Preferences.getPubTopicCommands()) ) {
-            // read configuration message and post event only if Remote Configuration is enabled
-            if (!Preferences.getRemoteConfiguration()) {
+            // read configuration message and post event only if Remote Configuration is enabled and this is a private broker
+            if (!Preferences.getRemoteConfiguration() || Preferences.isModePublic()) {
                 Log.i(this.toString(), "Remote Configuration is disabled");
                 return;
             }
@@ -837,8 +841,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         Message message;
         synchronized (sendMessagesLock) {
             message = sendMessages.remove(messageToken);
+            message.publishSuccessful();
         }
-        message.publishSuccessful();
     }
 
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
@@ -867,7 +871,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void onEvent(Events.Dummy e) {
 	}
 
-
+    public void onEvent(Events.ModeChanged e) {
+        disconnect(false);
+    }
 
     // Custom blocking MqttClient that allows to specify a MqttPingSender
     private static final class CustomMqttClient extends MqttClient {

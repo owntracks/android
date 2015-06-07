@@ -23,7 +23,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, Long.class, "id", true, "ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Description = new Property(1, String.class, "description", false, "DESCRIPTION");
         public final static Property Latitude = new Property(2, Double.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(3, Double.class, "longitude", false, "LONGITUDE");
@@ -33,6 +33,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Radius = new Property(7, Integer.class, "radius", false, "RADIUS");
         public final static Property TransitionType = new Property(8, Integer.class, "transitionType", false, "TRANSITION_TYPE");
         public final static Property GeofenceId = new Property(9, String.class, "geofenceId", false, "GEOFENCE_ID");
+        public final static Property Ssid = new Property(10, String.class, "ssid", false, "SSID");
+        public final static Property ModeId = new Property(11, int.class, "modeId", false, "MODE_ID");
     };
 
 
@@ -48,7 +50,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'WAYPOINT' (" + //
-                "'ID' INTEGER PRIMARY KEY ," + // 0: id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'DESCRIPTION' TEXT," + // 1: description
                 "'LATITUDE' REAL," + // 2: latitude
                 "'LONGITUDE' REAL," + // 3: longitude
@@ -57,7 +59,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
                 "'DATE' INTEGER," + // 6: date
                 "'RADIUS' INTEGER," + // 7: radius
                 "'TRANSITION_TYPE' INTEGER," + // 8: transitionType
-                "'GEOFENCE_ID' TEXT);"); // 9: geofenceId
+                "'GEOFENCE_ID' TEXT," + // 9: geofenceId
+                "'SSID' TEXT," + // 10: ssid
+                "'MODE_ID' INTEGER NOT NULL );"); // 11: modeId
     }
 
     /** Drops the underlying database table. */
@@ -120,6 +124,12 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         if (geofenceId != null) {
             stmt.bindString(10, geofenceId);
         }
+ 
+        String ssid = entity.getSsid();
+        if (ssid != null) {
+            stmt.bindString(11, ssid);
+        }
+        stmt.bindLong(12, entity.getModeId());
     }
 
     /** @inheritdoc */
@@ -141,7 +151,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // date
             cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // radius
             cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // transitionType
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // geofenceId
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // geofenceId
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // ssid
+            cursor.getInt(offset + 11) // modeId
         );
         return entity;
     }
@@ -159,6 +171,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         entity.setRadius(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
         entity.setTransitionType(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
         entity.setGeofenceId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setSsid(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setModeId(cursor.getInt(offset + 11));
      }
     
     /** @inheritdoc */

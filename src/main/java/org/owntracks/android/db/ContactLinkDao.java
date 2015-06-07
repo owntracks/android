@@ -14,7 +14,7 @@ import org.owntracks.android.db.ContactLink;
 /** 
  * DAO for table CONTACT_LINK.
 */
-public class ContactLinkDao extends AbstractDao<ContactLink, String> {
+public class ContactLinkDao extends AbstractDao<ContactLink, Long> {
 
     public static final String TABLENAME = "CONTACT_LINK";
 
@@ -23,8 +23,10 @@ public class ContactLinkDao extends AbstractDao<ContactLink, String> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Topic = new Property(0, String.class, "topic", true, "TOPIC");
-        public final static Property ContactId = new Property(1, Long.class, "contactId", false, "CONTACT_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Topic = new Property(1, String.class, "topic", false, "TOPIC");
+        public final static Property ContactId = new Property(2, Long.class, "contactId", false, "CONTACT_ID");
+        public final static Property ModeId = new Property(3, int.class, "modeId", false, "MODE_ID");
     };
 
 
@@ -40,8 +42,13 @@ public class ContactLinkDao extends AbstractDao<ContactLink, String> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'CONTACT_LINK' (" + //
-                "'TOPIC' TEXT PRIMARY KEY NOT NULL UNIQUE ," + // 0: topic
-                "'CONTACT_ID' INTEGER);"); // 1: contactId
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
+                "'TOPIC' TEXT NOT NULL ," + // 1: topic
+                "'CONTACT_ID' INTEGER," + // 2: contactId
+                "'MODE_ID' INTEGER NOT NULL );"); // 3: modeId
+        // Add Indexes
+        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_CONTACT_LINK_TOPIC_MODE_ID ON CONTACT_LINK" +
+                " (TOPIC,MODE_ID);");
     }
 
     /** Drops the underlying database table. */
@@ -55,29 +62,33 @@ public class ContactLinkDao extends AbstractDao<ContactLink, String> {
     protected void bindValues(SQLiteStatement stmt, ContactLink entity) {
         stmt.clearBindings();
  
-        String topic = entity.getTopic();
-        if (topic != null) {
-            stmt.bindString(1, topic);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
+        stmt.bindString(2, entity.getTopic());
  
         Long contactId = entity.getContactId();
         if (contactId != null) {
-            stmt.bindLong(2, contactId);
+            stmt.bindLong(3, contactId);
         }
+        stmt.bindLong(4, entity.getModeId());
     }
 
     /** @inheritdoc */
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public ContactLink readEntity(Cursor cursor, int offset) {
         ContactLink entity = new ContactLink( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // topic
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1) // contactId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.getString(offset + 1), // topic
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // contactId
+            cursor.getInt(offset + 3) // modeId
         );
         return entity;
     }
@@ -85,21 +96,24 @@ public class ContactLinkDao extends AbstractDao<ContactLink, String> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, ContactLink entity, int offset) {
-        entity.setTopic(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setContactId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setTopic(cursor.getString(offset + 1));
+        entity.setContactId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setModeId(cursor.getInt(offset + 3));
      }
     
     /** @inheritdoc */
     @Override
-    protected String updateKeyAfterInsert(ContactLink entity, long rowId) {
-        return entity.getTopic();
+    protected Long updateKeyAfterInsert(ContactLink entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public String getKey(ContactLink entity) {
+    public Long getKey(ContactLink entity) {
         if(entity != null) {
-            return entity.getTopic();
+            return entity.getId();
         } else {
             return null;
         }

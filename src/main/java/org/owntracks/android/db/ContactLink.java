@@ -9,8 +9,11 @@ package org.owntracks.android.db;
  */
 public class ContactLink {
 
+    private Long id;
+    /** Not-null value. */
     private String topic;
     private Long contactId;
+    private int modeId;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -18,19 +21,31 @@ public class ContactLink {
     public ContactLink() {
     }
 
-    public ContactLink(String topic) {
-        this.topic = topic;
+    public ContactLink(Long id) {
+        this.id = id;
     }
 
-    public ContactLink(String topic, Long contactId) {
+    public ContactLink(Long id, String topic, Long contactId, int modeId) {
+        this.id = id;
         this.topic = topic;
         this.contactId = contactId;
+        this.modeId = modeId;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /** Not-null value. */
     public String getTopic() {
         return topic;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setTopic(String topic) {
         this.topic = topic;
     }
@@ -41,6 +56,14 @@ public class ContactLink {
 
     public void setContactId(Long contactId) {
         this.contactId = contactId;
+    }
+
+    public int getModeId() {
+        return modeId;
+    }
+
+    public void setModeId(int modeId) {
+        this.modeId = modeId;
     }
 
     // KEEP METHODS - put your custom methods here

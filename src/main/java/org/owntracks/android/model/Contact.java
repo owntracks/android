@@ -21,6 +21,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -29,24 +30,25 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
 public class Contact {
-
 	private int uid;
-	private String name;
-	private String topic;
+    private String topic;
     private String trackerId;
     private GeocodableLocation location;
-	private Bitmap userImage;
-    private BitmapDescriptor userImageDescriptor;
-	private static final int userImageHeightScale = (int) convertDpToPixel(48);
-    private static Bitmap defaultUserImage = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(ServiceProxy
-					.getInstance().getResources(), R.drawable.noimage),
-					userImageHeightScale, userImageHeightScale, true));
-    private static BitmapDescriptor defaultUserImageDescriptor = BitmapDescriptorFactory.fromBitmap(defaultUserImage);
+    private Uri linkLookupURI;
+    private Marker marker;
+    private View view;
 
-	private Marker marker;
-	private View view;
-	private Drawable imageDrawable;
-    private Uri lookupURI;
+    private boolean hasLink;
+    private String linkName;
+    private Bitmap linkFace;
+
+    private String cardName;
+    private Bitmap cardFace;
+
+
+	private static final int faceHeightScale = (int) convertDpToPixel(48);
+    private static Bitmap defaultFace = getRoundedFace(BitmapFactory.decodeResource(ServiceProxy.getInstance().getResources(), R.drawable.noimage));
+
 
     public Contact(String topic) {
 		this.topic = topic;
@@ -68,37 +70,41 @@ public class Contact {
 		return this.marker;
 	}
 
-	public void updateMarkerPosition() {
-		if ((this.marker != null) && (this.location.getLatLng() != null))
-			this.marker.setPosition(this.location.getLatLng());
-		else
-			Log.e(this.toString(),
-					"update of marker position requested, but no marker set");
-	}
+    public String getDisplayName() {
+        if(getLinkName() != null)
+            return getLinkName();
 
-	public int getUid() {
-		return this.uid;
-	}
+        if(getCardName() != null)
+            return getCardName();
 
-	public void setUid(int uid) {
-		this.uid = uid;
-	}
+        if(getTrackerId() != null)
+            return "Device-"+getTrackerId();
 
-	public String getName() {
-		return this.name;
-	}
-
-    public void setLookupURI(Uri lookupuri) {
-        this.lookupURI = lookupuri;
+        return getTopic();
     }
 
-    public Uri getLookupUri(){
-        return this.lookupURI;
+	public String getLinkName() {
+		return this.linkName;
+	}
+
+    public String getCardName() {
+        return this.cardName;
     }
 
-	public void setName(String name) {
-		this.name = name;
+    public void setLinkLookupURI(Uri lookupuri) {
+        this.linkLookupURI = lookupuri;
+    }
+
+    public Uri getLinkLookupUri(){
+        return this.linkLookupURI;
+    }
+
+	public void setLinkName(String name) {
+		this.linkName = name;
 	}
+    public void setCardName(String name) {
+        this.cardName = name;
+    }
 
     public String getTrackerId() {
         return trackerId;
@@ -114,63 +120,83 @@ public class Contact {
 
 	public void setLocation(GeocodableLocation location) {
 		this.location = location;
-		location.setTag(this.topic);// to find according contact once geocoder
-									// resolving returns
+		location.setTag(this.topic);// to find according contact once geocoder  resolving returns
 	}
 
-    public boolean isLinked() {
-        return this.name != null;
+    public String getTopic() {
+        return this.topic;
     }
 
-	@Override
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+
+    public String getCommandTopic() {
+        return this.topic+ Preferences.getPubTopicCommandsPart();
+    }
+
+    @Override
 	public String toString() {
-		if (getName() != null)
-			return this.name;
-		else
-			return this.topic;
+        return getDisplayName();
 	}
 
-	public void setUserImage(Bitmap image) {
-		this.userImage = image != null ? getRoundedShape(Bitmap.createScaledBitmap(image, userImageHeightScale, userImageHeightScale, true)) : null;
-        this.userImageDescriptor = image != null ? BitmapDescriptorFactory.fromBitmap(userImage) : null;
+	public void setLinkFace(Bitmap image) {
+        if(image == null)
+            this.linkFace = null;
+        else
+            this.linkFace = getRoundedFace(image);
 	}
 
-	public Bitmap getUserImage() {
-		return this.userImage != null ? this.userImage : defaultUserImage;
+
+
+    public void setCardFace(String base64Image) {
+        if(base64Image == null)
+            this.cardFace = null;
+        else {
+            byte[] imageAsBytes = Base64.decode(base64Image.getBytes(), Base64.DEFAULT);
+            this.cardFace = getRoundedFace(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+        }
+    }
+
+    private static Bitmap getRoundedFace(Bitmap image) {
+        return getRoundedShape(Bitmap.createScaledBitmap(image, faceHeightScale, faceHeightScale, true));
+    }
+
+	public Bitmap getFace() {
+
+        if (this.linkFace != null) {
+            Log.v(this.toString(), "using linkFace for  " + this.getTopic());
+            return this.linkFace;
+        }
+
+        if (this.cardFace != null) {
+            Log.v(this.toString(), "using cardFace for  " + this.getTopic());
+            return this.cardFace;
+        }
+
+        Log.v(this.toString(), "using defaultFace for  " + this.getTopic());
+        return defaultFace;
 	}
 
-	public BitmapDescriptor getUserImageDescriptor() {
-		return this.userImage != null ? userImageDescriptor : defaultUserImageDescriptor;
-	}
+    public BitmapDescriptor getFaceDescriptor() {
+        return BitmapDescriptorFactory.fromBitmap(getFace());
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+
+
 
 	private static float convertDpToPixel(float dp) {
 		return dp
 				* (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
 	}
 
-	public String getTopic() {
-		return this.topic;
-	}
 
-    public String getCommandTopic() {
-        return this.topic+ Preferences.getPubTopicCommandsPart();
-    }
 
-	public BitmapDescriptor getMarkerImageDescriptor() {
-		return this.userImage != null ? BitmapDescriptorFactory
-				.fromBitmap(getUserImage()) : BitmapDescriptorFactory
-				.fromBitmap(defaultUserImage);
-	}
 
 	public static Bitmap resolveImage(ContentResolver cr, long id) {
-		Uri uri = ContentUris.withAppendedId(
-				ContactsContract.Contacts.CONTENT_URI, id);
-		InputStream input = ContactsContract.Contacts
-				.openContactPhotoInputStream(cr, uri);
+		Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
+		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
 		if (input == null) {
 			return null;
 		}
@@ -178,8 +204,7 @@ public class Contact {
 	}
 
 	private static Bitmap getRoundedShape(Bitmap bitmap) {
-		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Config.ARGB_8888);
+		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
 
 		final int color = 0xff424242;
@@ -199,7 +224,13 @@ public class Contact {
 		return output;
 	}
 
-	public Drawable getImageDrawable() {
-		return imageDrawable;
-	}
+    public boolean hasLink() {
+        return hasLink;
+    }
+
+    public void setHasLink(boolean hasLink) {
+        this.hasLink = hasLink;
+    }
+
+
 }

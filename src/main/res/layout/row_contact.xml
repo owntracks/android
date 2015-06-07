@@ -43,6 +43,8 @@
             android:layout_height="wrap_content"
             android:text="@string/na"
             android:textSize="16sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:textColor="#212121"
             />
 
@@ -52,6 +54,8 @@
             android:layout_height="wrap_content"
             android:text="@string/na"
             android:textSize="14sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:textColor="#757575"
             />
 
