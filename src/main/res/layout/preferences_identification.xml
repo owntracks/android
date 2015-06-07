@@ -39,9 +39,9 @@
         android:id="@+id/username"
         android:inputType="textVisiblePassword|textNoSuggestions"
 
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
-        app:floatingLabel="highlight"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
         android:hint="@string/preferencesUserUsername"
 
         />
@@ -51,10 +51,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/password"
         android:inputType="textPassword"
-        app:floatingLabel="highlight"
+        app:met_floatingLabel="highlight"
 
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
         android:hint="@string/preferencesBrokerPassword"
     />
 
@@ -63,11 +63,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/deviceId"
         android:inputType="textNoSuggestions"
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
-        app:floatingLabel="highlight"
-        app:floatingLabelText="@string/preferencesDeviceName"
-        app:floatingLabelAlwaysShown="true"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesDeviceName"
+        app:met_floatingLabelAlwaysShown="true"
         />
 
 
@@ -76,11 +76,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/clientId"
         android:inputType="textNoSuggestions"
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
-        app:floatingLabel="highlight"
-        app:floatingLabelText="@string/clientId"
-        app:floatingLabelAlwaysShown="true"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/clientId"
+        app:met_floatingLabelAlwaysShown="true"
         />
 
     <com.rengwuxian.materialedittext.MaterialEditText
@@ -88,11 +88,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/trackerId"
         android:inputType="textNoSuggestions"
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
-        app:floatingLabel="highlight"
-        app:floatingLabelText="@string/preferencesTrackerId"
-        app:floatingLabelAlwaysShown="true"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesTrackerId"
+        app:met_floatingLabelAlwaysShown="true"
         android:maxLength="2"
          />
 

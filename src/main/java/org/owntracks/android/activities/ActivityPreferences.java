@@ -57,18 +57,19 @@ public class ActivityPreferences extends ActionBarActivity {
 
         Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         goToRoot();
-                        break;
+                        return true;
                     case R.string.idWaypoints:
                         Intent intent = new Intent(context, ActivityWaypoints.class);
                         startActivity(intent);
-                        break;
+                        return true;
                     case R.string.idSettings:
-                        break;
+                        return true;
                 }
+                return false;
             }
         };
 

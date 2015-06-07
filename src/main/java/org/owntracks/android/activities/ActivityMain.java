@@ -77,7 +77,7 @@ public class ActivityMain extends ActionBarActivity {
     private static Drawer.OnDrawerNavigationListener drawerNavigationListener;
 
     private Toolbar toolbar;
-    private Drawer.Result drawerResult;
+    private Drawer drawer;
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -105,7 +105,7 @@ public class ActivityMain extends ActionBarActivity {
         final ActivityMain context = this;
         drawerClickListener = new Drawer.OnDrawerItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                 Log.v(this.toString(), "" +drawerItem.getIdentifier());
 
                 switch (drawerItem.getIdentifier()) {
@@ -115,17 +115,18 @@ public class ActivityMain extends ActionBarActivity {
                             FragmentHandler.getInstance().clearBackStack();
                             FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (ActionBarActivity) context, FragmentHandler.DIRECTION_BACK);
                         }
-                        break;
+                        return true;
                     case R.string.idWaypoints:
                         Intent intent1 = new Intent(context, ActivityWaypoints.class);
                         startActivity(intent1);
-                        break;
+                        return true;
                     case R.string.idSettings:
                         Intent intent2 = new Intent(context, ActivityPreferences.class);
                         startActivity(intent2);
-                        break;
+                        return true;
 
                 }
+                return false;
             }
         };
         drawerNavigationListener = new Drawer.OnDrawerNavigationListener() {
@@ -139,10 +140,10 @@ public class ActivityMain extends ActionBarActivity {
             }
         };
 
-        drawerResult = DrawerFactory.buildDrawer(this, toolbar, drawerClickListener, drawerNavigationListener, 0);
+        drawer = DrawerFactory.buildDrawer(this, toolbar, drawerClickListener, drawerNavigationListener, 0);
 
 
-        FragmentHandler.getInstance().init(ContactsFragment.class, drawerResult);
+        FragmentHandler.getInstance().init(ContactsFragment.class, drawer);
         Log.v(this.toString(), "Fragment show current or root");
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
@@ -160,7 +161,7 @@ public class ActivityMain extends ActionBarActivity {
 	public static class FragmentHandler extends Fragment {
 		private Class<?> current;
 		private Class<?> root;
-        private Drawer.Result drawer;
+        private Drawer drawer;
         public static final int DIRECTION_NONE = 0;
         public static final int DIRECTION_FORWARD = 1;
         public static final int DIRECTION_BACK = 2;
@@ -244,7 +245,7 @@ public class ActivityMain extends ActionBarActivity {
 			return showFragment(c, extras, fa, DIRECTION_FORWARD);
 		}
 
-		public void init(Class<?> c, Drawer.Result drawer) {
+		public void init(Class<?> c, Drawer drawer) {
 			this.root = c;
             this.drawer = drawer;
 		}
