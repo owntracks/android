@@ -27,6 +27,8 @@ repositories {
 
 dependencies {
     compile 'com.android.support:support-v4:22.+'
+    compile 'com.android.support:appcompat-v7:22.+'
+
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.google.android.gms:play-services-location:7.+'
     compile 'com.google.android.gms:play-services-base:7.+'
@@ -42,11 +44,11 @@ dependencies {
     }
 
     // Material design widget libraries
-    compile 'com.rengwuxian.materialedittext:library:1.8.3'
-    compile('com.mikepenz.materialdrawer:library:2.9.7@aar') {
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile('com.mikepenz:materialdrawer:3.0.6@aar') {
         transitive = true
     }
-    compile 'com.afollestad:material-dialogs:0.7.4.1'
+    compile 'com.afollestad:material-dialogs:0.7.5.2'
 
 
 }

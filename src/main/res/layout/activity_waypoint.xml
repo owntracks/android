@@ -8,7 +8,7 @@
     >
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,9 +29,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/description"
-                app:floatingLabel="normal"
-                app:baseColor="#FFF"
-                app:primaryColor="@color/accent"
+                app:met_floatingLabel="normal"
+                app:met_baseColor="#FFF"
+                app:met_primaryColor="@color/accent"
                 android:gravity="bottom"
                 android:inputType="textFilter|textNoSuggestions"
                 android:textSize="24sp"
@@ -62,47 +62,47 @@
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_marginLeft="@dimen/default_spacing"
                 android:layout_marginStart="@dimen/default_spacing"
-                app:iconLeft="@drawable/ic_location"
+                app:met_iconLeft="@drawable/ic_location"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/latitude"
-                app:floatingLabel="normal"
-                app:baseColor="@color/textPrimary"
-                app:primaryColor="@color/accent"
+                app:met_floatingLabel="normal"
+                app:met_baseColor="@color/textPrimary"
+                app:met_primaryColor="@color/accent"
                 android:id="@+id/latitude"
                 android:digits="-0123456789."
                 android:inputType="numberDecimal"
-                app:helperText="" />
+                app:met_helperText="" />
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_marginLeft="@dimen/default_spacing"
                 android:layout_marginStart="@dimen/default_spacing"
-                app:iconLeft="@drawable/ic_location"
+                app:met_iconLeft="@drawable/ic_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/longitude"
-                app:floatingLabel="normal"
-                app:baseColor="@color/textPrimary"
-                app:primaryColor="@color/accent"
+                app:met_floatingLabel="normal"
+                app:met_baseColor="@color/textPrimary"
+                app:met_primaryColor="@color/accent"
                 android:id="@+id/longitude"
                 android:digits="-0123456789."
                 android:inputType="numberDecimal"
-                app:helperText=""/>
+                app:met_helperText=""/>
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_marginLeft="@dimen/default_spacing"
                 android:layout_marginStart="@dimen/default_spacing"
-                app:iconLeft="@drawable/ic_radius"
+                app:met_iconLeft="@drawable/ic_radius"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/radius"
-                app:helperText="Meters"
-                app:floatingLabel="normal"
-                app:baseColor="@color/textPrimary"
-                app:primaryColor="@color/accent"
+                app:met_helperText="Meters"
+                app:met_floatingLabel="normal"
+                app:met_baseColor="@color/textPrimary"
+                app:met_primaryColor="@color/accent"
                 android:id="@+id/radius"
                 android:digits="0123456789"
                 android:inputType="numberDecimal"

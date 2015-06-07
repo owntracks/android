@@ -73,9 +73,9 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
         final Context context = this;
         Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                 if (drawerItem == null)
-                    return;
+                    return false;
 
                 Log.v(this.toString(), "Drawer item clicked: " + drawerItem.getIdentifier());
                 DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -83,15 +83,15 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         goToRoot();
-                        break;
+                        return true;
                     case R.string.idWaypoints:
-                        break;
+                        return true;
                     case R.string.idSettings:
                         Intent intent = new Intent(context, ActivityPreferences.class);
                         startActivity(intent);
-                        break;
-
+                        return true;
                 }
+                return false;
             }
         };
 

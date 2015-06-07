@@ -39,12 +39,12 @@
         android:id="@+id/keepalive"
         android:hint="@integer/valKeepalive"
         android:inputType="textNoSuggestions"
-        app:baseColor="@color/textPrimary"
-        app:primaryColor="@color/accent"
-        app:floatingLabel="highlight"
-        app:floatingLabelAlwaysShown="true"
-        app:floatingLabelText="@string/preferencesKeepalive"
-        app:helperText="@string/seconds"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelAlwaysShown="true"
+        app:met_floatingLabelText="@string/preferencesKeepalive"
+        app:met_helperText="@string/seconds"
         android:digits="0123456789"
         />
 

@@ -125,7 +125,7 @@ public class Preferences {
     }
     public static int getInt(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, boolean forceDefIdHosted, boolean forceDefIdPublic) {
         if (isModePublic()) {
-            return forceDefIdPublic ? getIntResource(defIdPrivate) :  publicSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
+            return forceDefIdPublic ? getIntResource(defIdPublic) :  publicSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
         } else if(isModeHosted()) {
             return forceDefIdHosted ? getIntResource(defIdHosted) :  hostedSharedPreferences.getInt(getKey(resId), getIntResource(defIdHosted));
         }
