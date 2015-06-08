@@ -622,7 +622,6 @@ public class ServiceApplication implements ProxyableService,
 
         dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
         dump.setBrokerState(ServiceBroker.getState());
-        dump.setBrokerDeferredPublishablesCount(ServiceProxy.getServiceBroker().getDeferredPublishablesCound());
         dump.setApplicationPlayServicesAvailable(playServicesAvailable);
         Log.v(this.toString(), "Dump data: " + dump.toString());
 

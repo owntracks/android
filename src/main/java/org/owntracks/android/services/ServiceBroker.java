@@ -85,7 +85,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	private CustomMqttClient mqttClient;
 	private Thread workerThread;
-	private LinkedList<Message> deferredPublishables;
 	private static Exception error;
 	private HandlerThread pubThread;
 	private Handler pubHandler;
@@ -98,8 +97,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private WakeLock connectionWakelock;
     private String TAG_WAKELOG = "org.owntracks.android.wakelog.broker";
     private ReconnectTimer reconnectTimer;
-    private  Map<IMqttDeliveryToken, Message> sendMessages = new HashMap<>();
-    private final Object sendMessagesLock = new Object();
+
+    private  Map<IMqttDeliveryToken, Message> inflightMessages = new HashMap<>();
+    private final Object inflightMessagesLock = new Object();
 
     private LinkedList<Message> backlog = new LinkedList<>();
     private final Object backlogLock = new Object();
@@ -110,7 +110,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		this.workerThread = null;
 		this.error = null;
         this.subscribtions = new LinkedList<>();
-		this.deferredPublishables = new LinkedList<Message>();
 		this.pubThread = new HandlerThread("MQTTPUBTHREAD");
 		this.pubThread.start();
 		this.pubHandler = new Handler(this.pubThread.getLooper());
@@ -699,8 +698,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
                     IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
                     message.publishing();
-                    synchronized (sendMessagesLock) {
-                        sendMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
+                    synchronized (inflightMessagesLock) {
+                        inflightMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
                     }
                     Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
                 } catch (Exception e) {
@@ -731,10 +730,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         return error;
     }
 
-    public Integer getDeferredPublishablesCound() {
-        return deferredPublishables != null ? deferredPublishables.size() : -1;
-    }
-
 
     // After reconnecting, we try to deliver messages for which the publish previously threw an error
     // Messages are removed from the backlock, a publish is attempted and if the publish the message is added at the end of the backlog again until ttl reaches zero
@@ -746,6 +741,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 m = i.next();
                 i.remove();
             }
+            mqttClient.getPendingDeliveryTokens();
             publish(m);
         }
     }
@@ -842,8 +838,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
         Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
         Message message;
-        synchronized (sendMessagesLock) {
-            message = sendMessages.remove(messageToken);
+        synchronized (inflightMessagesLock) {
+            message = inflightMessages.remove(messageToken);
             message.publishSuccessful();
         }
     }
