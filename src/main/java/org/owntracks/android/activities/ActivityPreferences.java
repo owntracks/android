@@ -161,13 +161,76 @@ public class ActivityPreferences extends ActionBarActivity {
         private static boolean cleansessionVal;
         private static boolean authenticationVal;
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            final Activity a = getActivity();
-            PackageManager pm = a.getPackageManager();
+        private void loadHostPreferences(final Activity a) {
+            Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_host, true)
+                            .title(R.string.preferencesHost)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
+                                    final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
 
+                                    host.setText(Preferences.getHost());
+                                    host.setFloatingLabelAlwaysShown(true);
 
+                                    port.setText(Preferences.getPortWithHintSupport());
+                                    port.setFloatingLabelAlwaysShown(true);
+
+                                }
+                            })
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
+                                    final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
+
+                                    Preferences.setHost(host.getText().toString());
+                                    try {
+                                        Preferences.setPort(Integer.parseInt(port.getText().toString()));
+                                    } catch (NumberFormatException e) {
+                                        Preferences.clearKey(R.string.keyPort);
+                                    }
+                                }
+                            })
+
+                            .show();
+
+                    return true;
+                }
+            };
+
+            deviceTopic = (EditStringPreference) findPreference(Preferences.getKey(R.string.keyDeviceTopic));
+            setDeviceTopicHint();
+            // Sets the pubTopic hint value when username or deviceId changes
+            deviceTopicListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+                @Override
+                public void onSharedPreferenceChanged(
+                        SharedPreferences sharedPreferences, String key) {
+                    if (key.equals(Preferences.getKey(R.string.keyUsername)) || key.equals(Preferences.getKey(R.string.keyDeviceId))) {
+                        setDeviceTopicHint();
+                    }
+                }
+            };
+            PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(deviceTopicListener);
+
+            baseTopic = (EditStringPreference) findPreference(Preferences.getKey(R.string.keyBaseTopic));
+            baseTopic.setHint(Preferences.getStringRessource(R.string.valBaseTopic));
+
+            hostPreference = findPreference(getString(R.string.keyHost));
+            hostPreference.setOnPreferenceClickListener(hostClickListener);
+
+        }
+
+        private void loadIdentificationPreferences(final Activity a) {
             Preference.OnPreferenceClickListener identificationClickListener = new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -187,6 +250,9 @@ public class ActivityPreferences extends ActionBarActivity {
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
                                     final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
 
+                                    d.findViewById(R.id.authenticationWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
+                                    clientId.setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
+                                    trackerId.setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
 
                                     authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -237,190 +303,159 @@ public class ActivityPreferences extends ActionBarActivity {
                 }
             };
 
+            authenticationVal = Preferences.getAuth();
+            identificationPreference = findPreference(getString(R.string.keyIdentification));
+            identificationPreference.setOnPreferenceClickListener(identificationClickListener);
+
+        }
+
+        private void loadSecurityPreferences(final Activity a) {
+
+        }
+
+        private void loadOptionsPreferences(final Activity a) {
+
+            Preference.OnPreferenceClickListener optionsClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_options, true)
+                            .title(R.string.preferencesOptions)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    Switch cleansession = (Switch) d.findViewById(R.id.cleanSession);
+                                    final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
+                                    cleansession.setChecked(cleansessionVal);
+                                    cleansession.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                            cleansessionVal = isChecked;
+                                        }
+                                    });
+
+                                    keepalive.setText(Preferences.getKeepaliveWithHintSupport());
+
+                                }
+                            })
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    Log.v(this.toString(), "saving parameters");
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
+
+                                    Preferences.setCleanSession(cleansessionVal);
+                                    try {
+                                        Preferences.setKeepalive(Integer.parseInt(keepalive.getText().toString()));
+
+                                    } catch (NumberFormatException e) {
+                                        Preferences.clearKey(R.string.keyKeepalive);
+                                    }
+
+                                    serverPreferenceToolbar.conditionallyEnableConnectButton();
+
+                                }
+                            })
+                            .show();
+
+                    return true;
+                }
+            };
+
+            cleansessionVal = Preferences.getCleanSession();
+            optionsPreference = findPreference(getString(R.string.keyOptions));
+            optionsPreference.setOnPreferenceClickListener(optionsClickListener);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            final Activity a = getActivity();
+            PackageManager pm = a.getPackageManager();
+
+
+
+
+
+
+            Preference.OnPreferenceClickListener securityListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_security, true)
+                            .title(R.string.preferencesSecurity)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    Switch tls = (Switch) d.findViewById(R.id.tls);
+                                    final MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+                                    tls.setChecked(tlsVal);
+                                    tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsCrt.setText(Preferences.getTlsCrtPath());
+
+                                    tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                            tlsVal = isChecked;
+                                            tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                        }
+                                    });
+
+
+                                }
+                            })
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+
+                                    Preferences.setTls(tlsVal);
+                                    Preferences.setTlsCrtPath(tlsCrt.getText().toString());
+
+                                    serverPreferenceToolbar.conditionallyEnableConnectButton();
+
+                                }
+                            })
+                            .show();
+
+                    return true;
+                }
+            };
+
 
             if (Preferences.isModePrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.privatepreferences);
 
 
-                deviceTopic = (EditStringPreference) findPreference(Preferences.getKey(R.string.keyDeviceTopic));
-                setDeviceTopicHint();
 
-                baseTopic = (EditStringPreference) findPreference(Preferences.getKey(R.string.keyBaseTopic));
-                baseTopic.setHint(Preferences.getStringRessource(R.string.valBaseTopic));
 
-                hostPreference = findPreference(getString(R.string.keyHost));
-                securityPreference = findPreference(getString(R.string.keySecurity));
-                optionsPreference = findPreference(getString(R.string.keyOptions));
-                identificationPreference = findPreference(getString(R.string.keyIdentification));
+                loadHostPreferences(a);
 
-                // Sets the pubTopic hint value when username or deviceId changes
-                deviceTopicListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-
-                    @Override
-                    public void onSharedPreferenceChanged(
-                            SharedPreferences sharedPreferences, String key) {
-                        if (key.equals(Preferences.getKey(R.string.keyUsername)) || key.equals(Preferences.getKey(R.string.keyDeviceId))) {
-                            setDeviceTopicHint();
-                        }
-                    }
-                };
-                PreferenceManager.getDefaultSharedPreferences(a).registerOnSharedPreferenceChangeListener(deviceTopicListener);
-
-                hostPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        MaterialDialog dialog = new MaterialDialog.Builder(a)
-                                .customView(R.layout.preferences_host, true)
-                                .title(R.string.preferencesHost)
-                                .positiveText(R.string.accept)
-                                .negativeText(R.string.cancel)
-                                .showListener(new DialogInterface.OnShowListener() {
-                                    @Override
-                                    public void onShow(DialogInterface dialog) {
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
-                                        final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
-
-                                        host.setText(Preferences.getHost());
-                                        host.setFloatingLabelAlwaysShown(true);
-
-                                        port.setText(Preferences.getPortWithHintSupport());
-                                        port.setFloatingLabelAlwaysShown(true);
-
-                                    }
-                                })
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
-                                        final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
-
-                                        Preferences.setHost(host.getText().toString());
-                                        try {
-                                            Preferences.setPort(Integer.parseInt(port.getText().toString()));
-                                        } catch (NumberFormatException e) {
-                                            Preferences.clearKey(R.string.keyPort);
-                                        }
-                                    }
-                                })
-
-                                .show();
-
-                        return true;
-                    }
-                });
-
-                cleansessionVal = Preferences.getCleanSession();
-                optionsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        new MaterialDialog.Builder(a)
-                                .customView(R.layout.preferences_options, true)
-                                .title(R.string.preferencesOptions)
-                                .positiveText(R.string.accept)
-                                .negativeText(R.string.cancel)
-                                .showListener(new DialogInterface.OnShowListener() {
-                                    @Override
-                                    public void onShow(DialogInterface dialog) {
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        Switch cleansession = (Switch) d.findViewById(R.id.cleanSession);
-                                        final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
-                                        cleansession.setChecked(cleansessionVal);
-                                        cleansession.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                            @Override
-                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                cleansessionVal = isChecked;
-                                            }
-                                        });
-
-                                        keepalive.setText(Preferences.getKeepaliveWithHintSupport());
-
-                                    }
-                                })
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        Log.v(this.toString(), "saving parameters");
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
-
-                                        Preferences.setCleanSession(cleansessionVal);
-                                        try {
-                                            Preferences.setKeepalive(Integer.parseInt(keepalive.getText().toString()));
-
-                                        } catch (NumberFormatException e) {
-                                            Preferences.clearKey(R.string.keyKeepalive);
-                                        }
-
-                                        serverPreferenceToolbar.conditionallyEnableConnectButton();
-
-                                    }
-                                })
-                                .show();
-
-                        return true;
-                    }
-                });
-
+                loadSecurityPreferences(a);
                 tlsVal = Preferences.getTls();
-                securityPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        new MaterialDialog.Builder(a)
-                                .customView(R.layout.preferences_security, true)
-                                .title(R.string.preferencesSecurity)
-                                .positiveText(R.string.accept)
-                                .negativeText(R.string.cancel)
-                                .showListener(new DialogInterface.OnShowListener() {
-                                    @Override
-                                    public void onShow(DialogInterface dialog) {
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        Switch tls = (Switch) d.findViewById(R.id.tls);
-                                        final MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
-                                        tls.setChecked(tlsVal);
-                                        tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
-                                        tlsCrt.setText(Preferences.getTlsCrtPath());
-
-                                        tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                            @Override
-                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                tlsVal = isChecked;
-                                                tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
-                                            }
-                                        });
+                securityPreference = findPreference(getString(R.string.keySecurity));
+                securityPreference.setOnPreferenceClickListener(securityListener);
 
 
-                                    }
-                                })
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                        MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
 
-                                        Preferences.setTls(tlsVal);
-                                        Preferences.setTlsCrtPath(tlsCrt.getText().toString());
+                loadOptionsPreferences(a);
 
-                                        serverPreferenceToolbar.conditionallyEnableConnectButton();
-
-                                    }
-                                })
-                                .show();
-
-                        return true;
-                    }
-                });
-
-                identificationPreference.setOnPreferenceClickListener(identificationClickListener);
-
+                loadIdentificationPreferences(a);
 
             } else if(Preferences.isModeHosted()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HOSTED);
                 addPreferencesFromResource(R.xml.hostedpreferences);
-                identificationPreference = findPreference(getString(R.string.keyIdentification));
-                identificationPreference.setOnPreferenceClickListener(identificationClickListener);
+
+                loadIdentificationPreferences(a);
 
             } else {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
@@ -428,7 +463,6 @@ public class ActivityPreferences extends ActionBarActivity {
             }
 
             if(ActivityPreferences.modeSwitch) {
-                Log.v(this.toString(), "simulating click");
                 PreferenceScreen screen = getPreferenceScreen(); // gets the main preference screen
                 screen.onItemClick(null, null, 0 , 0); // click on the item
 
@@ -436,10 +470,8 @@ public class ActivityPreferences extends ActionBarActivity {
 
 
             mode = findPreference(Preferences.getKey(R.string.keyModeId));
-
             String[] modesReadable = getResources().getStringArray(R.array.profileIds_readable);
             mode.setSummary(modesReadable[Preferences.getModeId()]);
-
             mode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -533,7 +565,6 @@ public class ActivityPreferences extends ActionBarActivity {
 
 
 
-            authenticationVal = Preferences.getAuth();
 
 
         }
