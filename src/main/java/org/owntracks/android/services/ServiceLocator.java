@@ -302,7 +302,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
 	private void requestLocationUpdates() {
-        if (!this.ready) {
+        if (!this.ready || googleApiClient == null || !googleApiClient.isConnected()) {
             Log.e(this.toString(), "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;
         }
