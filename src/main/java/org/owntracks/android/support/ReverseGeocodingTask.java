@@ -49,7 +49,7 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
 
 					r = GEOCODER_RESULT;
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				r = GEOCODER_NORESULT;
 			}
 		} else {
