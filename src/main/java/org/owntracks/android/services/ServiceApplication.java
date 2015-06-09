@@ -6,12 +6,17 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
+import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.messages.DumpMessage;
 import org.owntracks.android.model.GeocodableLocation;
@@ -627,5 +632,91 @@ public class ServiceApplication implements ProxyableService,
 
         ServiceProxy.getServiceBroker().publish(dump, Preferences.getDeviceTopic(true), 0, false);
 
+    }
+
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        String msg = new String(message.getPayload());
+        Log.v(this.toString(), "Received message: " + topic + " : " + msg);
+
+        String type;
+        JSONObject json;
+
+        try {
+            json = new JSONObject(msg);
+            type = json.getString("_type");
+        } catch (Exception e) {
+            if(msg.isEmpty()) {
+                Log.v(this.toString(), "Empty message received");
+
+                Contact c = App.getContact(topic);
+                if(c != null) {
+                    Log.v(this.toString(), "Clearing contact location");
+
+                    EventBus.getDefault().postSticky(new Events.ClearLocationMessageReceived(c));
+                    return;
+                }
+            }
+
+            Log.e(this.toString(), "Received invalid message: " + msg);
+            return;
+        }
+
+        if (type.equals("location")) {
+            try {
+                LocationMessage lm = new LocationMessage(json);
+                lm.setRetained(message.isRetained());
+                EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
+            } catch (Exception e) {
+                Log.e(this.toString(), "Message hat correct type but could not be handled. Message was: " + msg + ", error was: " + e.getMessage());
+            }
+        } else if (type.equals("card")) {
+            CardMessage card = new CardMessage(json);
+            EventBus.getDefault().postSticky(new Events.CardMessageReceived(card, topic));
+        } else if (type.equals("transition")) {
+            TransitionMessage tm = new TransitionMessage(json);
+            tm.setRetained(message.isRetained());
+            EventBus.getDefault().postSticky(new Events.TransitionMessageReceived(tm, topic));
+        } else if(type.equals("cmd") && topic.equals(Preferences.getPubTopicCommands())) {
+            String action;
+            try {
+                action = json.getString("action");
+            } catch (Exception e) {
+                return;
+            }
+
+            switch (action) {
+                case "dump":
+                    if (!Preferences.getRemoteCommandDump() || Preferences.isModePublic()) {
+                        Log.i(this.toString(), "Dump remote command is disabled");
+                        return;
+                    }
+                    ServiceProxy.getServiceApplication().dump();
+                    break;
+                case "reportLocation":
+                    if (!Preferences.getRemoteCommandReportLocation()) {
+                        Log.i(this.toString(), "ReportLocation remote command is disabled");
+                        return;
+                    }
+                    ServiceProxy.getServiceLocator().publishResponseLocationMessage();
+
+                    break;
+                default:
+                    Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
+                    break;
+            }
+
+        } else if (type.equals("configuration") && topic.equals(Preferences.getPubTopicCommands()) ) {
+            // read configuration message and post event only if Remote Configuration is enabled and this is a private broker
+            if (!Preferences.getRemoteConfiguration() || Preferences.isModePublic()) {
+                Log.i(this.toString(), "Remote Configuration is disabled");
+                return;
+            }
+            ConfigurationMessage cm = new ConfigurationMessage(json);
+            cm.setRetained(message.isRetained());
+            EventBus.getDefault().post(new Events.ConfigurationMessageReceived(cm, topic));
+
+        } else {
+            Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
+        }
     }
 }
