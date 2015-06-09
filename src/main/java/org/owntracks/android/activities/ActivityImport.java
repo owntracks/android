@@ -115,9 +115,13 @@ public class ActivityImport extends ActionBarActivity {
             BufferedReader r = new BufferedReader(new InputStreamReader(stream));
             StringBuilder total = new StringBuilder();
 
-            String content;
-            while ((content = r.readLine()) != null) {
-                total.append(content);
+            try {
+                String content;
+                while ((content = r.readLine()) != null) {
+                    total.append(content);
+                }
+            } catch (OutOfMemoryError e) {
+                throw new Error("Unable to load content into memory");
             }
 
             Log.v(this.toString(), "file content: " + total);
