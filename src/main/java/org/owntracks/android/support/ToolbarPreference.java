@@ -48,7 +48,8 @@ public class ToolbarPreference extends Preference {
 
     public void goUp(){
         PreferenceScreen prefScreen = (PreferenceScreen) getPreferenceManager().findPreference(getKey() + "Screen");
-        prefScreen.getDialog().dismiss();
+        if(prefScreen != null && prefScreen.getDialog() != null)
+            prefScreen.getDialog().dismiss();
     }
 
     public Toolbar getToolbar(){
