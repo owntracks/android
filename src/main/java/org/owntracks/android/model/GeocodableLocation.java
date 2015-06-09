@@ -83,7 +83,7 @@ public class GeocodableLocation extends Location {
 	}
 
 	public GeocodableLocation(String provider) {
-		super(provider ? provider : "unknown");
+		super(provider != null ? provider : "unknown");
 		this.geocoder = null;
 	}
 
