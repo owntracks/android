@@ -9,6 +9,11 @@
     <string name="preferencesConnectionSecurity">"Connection security"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
+
+    <string name="preferencesUserUsernameHosted">"User"</string>
+    <string name="preferencesBrokerPasswordHosted">"Token"</string>
+    <string name="preferencesDeviceNameHosted">"Device"</string>
+
     <string name="preferencesCaCrtPath">Custom certificate path</string>
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>

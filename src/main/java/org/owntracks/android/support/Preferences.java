@@ -55,9 +55,9 @@ public class Preferences {
     public Preferences(Context c){
         Log.v(this.toString(), "preferences initializing");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
-        privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, 0);
-        hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, 0);
-        publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, 0);
+        privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
+        hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, Context.MODE_PRIVATE);
+        publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
         handleFirstStart();
         deviceUUID = sharedPreferences.getString("deviceUUID", "undefined-uuid");
@@ -91,6 +91,8 @@ public class Preferences {
         privateSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         hostedSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         publicSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
+
+        Log.v("Preferences", "Active preferences for mode " + modeId +" are " + activeSharedPreferences);
 
         if(!init) {
             EventBus.getDefault().post(new Events.ModeChanged(modeId));
@@ -141,7 +143,7 @@ public class Preferences {
     // This is a quick fix as an empty string does not return the default value
     private static String getStringWithFallback(SharedPreferences preferences, int resId, int defId) {
         String s = preferences.getString(getKey(resId), "");
-        return ("".equals("")) ? getStringRessource(defId) : s;
+        return ("".equals(s)) ? getStringRessource(defId) : s;
     }
 
     public static String getString(int resId,  int defId) {
@@ -149,8 +151,10 @@ public class Preferences {
     }
     public static String getString(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, boolean forceDefIdHosted, boolean forceDefIdPublic) {
         if (isModePublic()) {
+
             return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, resId, defIdPublic);
         } else if(isModeHosted()) {
+
             return forceDefIdHosted ? getStringRessource(defIdHosted) : getStringWithFallback(hostedSharedPreferences, resId, defIdHosted);
         }
 
@@ -162,6 +166,7 @@ public class Preferences {
     }
 
     public static void setString(int resId, String value) {
+        Log.v("Preferences", "setString: key:" + getKey(resId)+ ", value:" + value + ", prefs: " + activeSharedPreferences);
         activeSharedPreferences.edit().putString(getKey(resId), value).commit();
     }
 
@@ -190,7 +195,10 @@ public class Preferences {
         if(isModePrivate()) {
             return !getHost().trim().equals("") && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()));
         } else if(isModeHosted()) {
-            return !getUsername().trim().equals("") && !getPassword().trim().equals("");
+            Log.v("Preferences", getUsername());
+            Log.v("Preferences", getPassword());
+            Log.v("Preferences", getDeviceId(false));
+            return !getUsername().trim().equals("") && !getPassword().trim().equals("") && !getDeviceId(false).trim().equals("");
         } else if(isModePublic()) {
             return true;
         }

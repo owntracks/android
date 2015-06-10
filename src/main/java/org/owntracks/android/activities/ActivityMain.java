@@ -305,6 +305,7 @@ public class ActivityMain extends ActionBarActivity {
 			for (Fragment f : fragments.values())
 				ft.remove(f);
 
+
 			ft.commitAllowingStateLoss();
 			fa.getSupportFragmentManager().executePendingTransactions();
 		}

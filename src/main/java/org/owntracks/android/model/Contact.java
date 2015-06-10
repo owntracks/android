@@ -74,10 +74,10 @@ public class Contact {
         if(getLinkName() != null)
             return getLinkName();
 
-        if(getCardName() != null)
+        if(getCardName() != null & getCardName() != "")
             return getCardName();
 
-        if(getTrackerId() != null)
+        if(getTrackerId() != null && getTrackerId() != "")
             return "Device-"+getTrackerId();
 
         return getTopic();
