@@ -29,6 +29,7 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
@@ -85,7 +86,6 @@ public class App extends Application {
 
 		//Initialize Google Maps and BitmapDescriptorFactory
 		MapsInitializer.initialize(getApplicationContext());
-
 		EventBus.getDefault().register(this);
 
     }

@@ -363,20 +363,25 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 			MqttConnectOptions options = new MqttConnectOptions();
-			setWill(options);
 
-			if (Preferences.getAuth()) {
-                Log.v(this.toString(), "MqttConnectOptions auth: true");
-				options.setPassword(Preferences.getPassword().toCharArray());
-				options.setUserName(Preferences.getUsername());
-			}
+            if(Preferences.isModeHosted()) {
+                options.setPassword(Preferences.getPassword().toCharArray());
+                options.setUserName(String.format("%s|%s", Preferences.getUsername(), Preferences.getDeviceId(false)));
+                options.setSocketFactory(new CustomSocketFactory(false));
+            } else {
+                if (Preferences.getAuth()) {
+                    Log.v(this.toString(), "MqttConnectOptions auth: true");
+                    options.setPassword(Preferences.getPassword().toCharArray());
+                    options.setUserName(Preferences.getUsername());
+                }
 
-			if (Preferences.getTls()) {
-                Log.v(this.toString(), "MqttConnectOptions tls: true");
-                options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCrtPath().length() > 0));
+                if (Preferences.getTls()) {
+                    Log.v(this.toString(), "MqttConnectOptions tls: true");
+                    options.setSocketFactory(new CustomSocketFactory(Preferences.getTlsCrtPath().length() > 0));
+                }
             }
 
-			// setWill(options);
+            setWill(options);
 			options.setKeepAliveInterval(Preferences.getKeepalive());
 			options.setConnectionTimeout(30);
 			options.setCleanSession(Preferences.getCleanSession());
@@ -684,7 +689,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
             @Override
             public void run() {
-
+                Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
                 // This should never happen
                 if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
                     Log.e("ServiceBroker", "PUB ON MAIN THREAD");
@@ -770,7 +775,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         Message message;
         synchronized (inflightMessagesLock) {
             message = inflightMessages.remove(messageToken);
-            message.publishSuccessful();
+            if(message != null)
+                message.publishSuccessful();
 
         }
     }
