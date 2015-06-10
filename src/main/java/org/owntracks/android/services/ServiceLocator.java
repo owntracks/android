@@ -447,6 +447,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         if(trigger != null)
             report.setTrigger(trigger);
 
+
 		ServiceProxy.getServiceBroker().publish(report, Preferences.getPubTopicLocations(), Preferences.getPubQosLocations(), Preferences.getPubRetainLocations(), this, report);
 
 	}

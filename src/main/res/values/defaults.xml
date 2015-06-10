@@ -41,7 +41,7 @@
 
     <string name="valHost">127.0.0.1</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
-    <string name="valIssuesMail">issues@owntracks.org</string>
+    <string name="valIssuesMail">support@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
     <string name="valTrackerId">""</string>
 
