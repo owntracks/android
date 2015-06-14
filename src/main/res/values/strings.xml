@@ -58,11 +58,11 @@
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary">github.com/owntracks/owntracks/wiki/android</string>
+    <string name="preferencesDocumentationSummary">owntracks.org/booklet/</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesMail">Mail</string>
-    <string name="preferencesMailSummary">issues@owntracks.org</string>
+    <string name="preferencesMailSummary">support@owntracks.org</string>
 
     <string name="preferencesDeviceTopic">Device topic</string>
     <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>

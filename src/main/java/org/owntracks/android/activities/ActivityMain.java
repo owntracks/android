@@ -31,7 +31,7 @@ import android.os.Message;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -64,7 +64,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityMain extends ActionBarActivity {
+public class ActivityMain extends AppCompatActivity {
     private static final int CONTACT_PICKER_RESULT = 1001;
     private static final int MENU_CONTACT_SHOW = 0;
     private static final int MENU_CONTACT_DETAILS = 1;
@@ -113,7 +113,7 @@ public class ActivityMain extends ActionBarActivity {
                         if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
                             // We're showing the root and rolling back the complete back stack so we discard it
                             FragmentHandler.getInstance().clearBackStack();
-                            FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (ActionBarActivity) context, FragmentHandler.DIRECTION_BACK);
+                            FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (AppCompatActivity) context, FragmentHandler.DIRECTION_BACK);
                         }
                         return true;
                     case R.string.idWaypoints:
@@ -198,7 +198,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		public Fragment showFragment(Class<?> c, Bundle extras,
-				ActionBarActivity fa, int direction) {
+                                     AppCompatActivity fa, int direction) {
 			Fragment f = getFragment(c);
 			Fragment prev = getFragment(this.current);
 
@@ -236,11 +236,11 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		// Shows the previous fragment
-		public Fragment back(ActionBarActivity fa) {
+		public Fragment back(AppCompatActivity fa) {
 			return showFragment(popBackStack(), null, fa, DIRECTION_BACK);
 		}
 
-		public Fragment forward(Class<?> c, Bundle extras, ActionBarActivity fa) {
+		public Fragment forward(Class<?> c, Bundle extras, AppCompatActivity fa) {
 			pushBackStack(this.current);
 			return showFragment(c, extras, fa, DIRECTION_FORWARD);
 		}
@@ -250,7 +250,7 @@ public class ActivityMain extends ActionBarActivity {
             this.drawer = drawer;
 		}
 
-		public void showCurrentOrRoot(ActionBarActivity fa) {
+		public void showCurrentOrRoot(AppCompatActivity fa) {
 			if (this.current != null)
 				showFragment(this.current, null, fa, DIRECTION_NONE);
 			else
@@ -295,7 +295,7 @@ public class ActivityMain extends ActionBarActivity {
 
 		}
 
-		public void removeAll(ActionBarActivity fa) {
+		public void removeAll(AppCompatActivity fa) {
 			if(fa == null)
 				return;
 
@@ -370,7 +370,7 @@ public class ActivityMain extends ActionBarActivity {
     }
 
     private void transitionToCurrentLocationMap() {
-        final ActionBarActivity that = this;
+        final AppCompatActivity that = this;
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
@@ -380,7 +380,7 @@ public class ActivityMain extends ActionBarActivity {
     }
 
     private void transitionToContactMap(final Contact c) {
-        final ActionBarActivity that = this;
+        final AppCompatActivity that = this;
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
@@ -715,7 +715,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		private void onShow() {
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -1100,7 +1100,7 @@ public class ActivityMain extends ActionBarActivity {
 		}
 
 		private void onShow() {
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Locations");
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Locations");
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -1300,8 +1300,8 @@ public class ActivityMain extends ActionBarActivity {
             this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
 			this.time.setText(App.formatDate(this.contact.getLocation().getDate()));
 
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-            ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Details");
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Details");
 
 
             onCreateOptionsMenu(mMenu, mInflater);
@@ -1426,18 +1426,18 @@ public class ActivityMain extends ActionBarActivity {
         public void onEventMainThread(Events.ContactRemoved e) {
             // Contact will be cleared, close this view
             if (e.getContact() == this.contact);
-                FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
+                FragmentHandler.getInstance().back((AppCompatActivity)getActivity());
         }
 
         public void onEventMainThread(Events.ModeChanged e) {
-            FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
+            FragmentHandler.getInstance().back((AppCompatActivity)getActivity());
         }
 
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             // Contact will be cleared, close this view
             if(e.getState() == ServiceBroker.State.CONNECTING)
-                FragmentHandler.getInstance().back((ActionBarActivity)getActivity());
+                FragmentHandler.getInstance().back((AppCompatActivity)getActivity());
 
         }
 
