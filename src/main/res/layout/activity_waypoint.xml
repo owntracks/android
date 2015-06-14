@@ -108,73 +108,14 @@
                 android:inputType="numberDecimal"
                 />
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/waypointGeofenceSettings"
-                    android:layout_marginLeft="72dp"
-                    android:layout_marginStart="72dp"
-                    android:visibility="gone">
-
-                    <RelativeLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:text="@string/enter"
-                            android:textSize="18sp"
-
-                            android:id="@+id/enterDesc"/>
-                        <Switch
-                            android:id="@+id/enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:layout_centerVertical="true"
-
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true"/>
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:text="@string/leave"
-                            android:textSize="18sp"
-                            android:id="@+id/descLeave"/>
-                        <Switch
-
-                            android:id="@+id/leave"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:layout_centerVertical="true"
-
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true"/>
-                    </RelativeLayout>
-
-
-                </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/shareWrapper"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginLeft="72dp"
-                android:layout_marginStart="72dp">
+                android:layout_marginLeft="82dp"
+                android:layout_marginStart="82dp">
 
                 <TextView
                     android:layout_width="wrap_content"

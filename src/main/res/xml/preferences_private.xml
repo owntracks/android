@@ -1,45 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="root">
-    <PreferenceScreen
-        android:key="brokerPreferenceScreen"
+    <Preference
+        android:key="connectionScreen"
         android:title="@string/preferencesServer">
-        <org.owntracks.android.support.ConnectionToolbarPreference
-            android:key="brokerPreference"
-            android:title="@string/preferencesServer" />
-        <org.owntracks.android.support.ListIntegerPreference
-            android:defaultValue="@integer/valModeId"
-            android:entries="@array/profileIds_readable"
-            android:entryValues="@array/modeIds"
-            android:key="@string/keyModeId"
-            android:title="@string/preferencesProfileId"
-            />
 
-        <Preference
-            android:key="@string/keyHost"
-            android:title="@string/preferencesHost" />
 
-        <Preference
-            android:key="@string/keyIdentification"
-            android:title="@string/preferencesIdentification" />
-
-        <Preference
-            android:key="@string/keySecurity"
-            android:title="@string/preferencesSecurity" />
-        <Preference
-            android:key="@string/keyOptions"
-            android:title="@string/preferencesOptions"/>
-
-    </PreferenceScreen>
+    </Preference>
 
 
     <PreferenceScreen
-        android:key="topicSettingsScreen"
+        android:key="reportingScreen"
         android:title="@string/preferencesTopicSettings" >
-
-        <org.owntracks.android.support.ToolbarPreference
-            android:key="topicSettings"
-            android:title="@string/preferencesTopicSettings" />
 
         <SwitchPreference
             android:defaultValue="@bool/valPub"
@@ -56,11 +28,8 @@
 
     </PreferenceScreen>
     <PreferenceScreen
-        android:key="preferencesNotificationScreen"
+        android:key="notificationScreen"
         android:title="@string/preferencesNotification" >
-        <org.owntracks.android.support.ToolbarPreference
-            android:key="preferencesNotification"
-            android:title="@string/preferencesNotification" />
 
         <PreferenceCategory android:title="Ongoing notification">
 
@@ -125,9 +94,6 @@
     <PreferenceScreen
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced" >
-        <org.owntracks.android.support.ToolbarPreference
-            android:key="advanced"
-            android:title="@string/preferencesAdvanced" />
 
         <PreferenceCategory android:title="Publish and subscribe">
 
@@ -242,11 +208,8 @@
     </Preference>
 
     <PreferenceScreen
-        android:key="activityInfoScreen"
+        android:key="informationScreen"
         android:title="@string/preferencesInfo" >
-        <org.owntracks.android.support.ToolbarPreference
-            android:key="activityInfo"
-            android:title="@string/preferencesInfo" />
 
         <Preference
             android:key="documentation"

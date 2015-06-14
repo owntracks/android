@@ -12,15 +12,14 @@ public class Waypoint {
 
     private Long id;
     private String description;
+    private String geocoder;
     private Double latitude;
     private Double longitude;
-    private String geocoder;
+    private Integer radius;
+    private String ssid;
     private Boolean shared;
     private java.util.Date date;
-    private Integer radius;
-    private Integer transitionType;
     private String geofenceId;
-    private String ssid;
     private int modeId;
 
     // KEEP FIELDS - put your custom fields here
@@ -33,18 +32,17 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, Double latitude, Double longitude, String geocoder, Boolean shared, java.util.Date date, Integer radius, Integer transitionType, String geofenceId, String ssid, int modeId) {
+    public Waypoint(Long id, String description, String geocoder, Double latitude, Double longitude, Integer radius, String ssid, Boolean shared, java.util.Date date, String geofenceId, int modeId) {
         this.id = id;
         this.description = description;
+        this.geocoder = geocoder;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.geocoder = geocoder;
+        this.radius = radius;
+        this.ssid = ssid;
         this.shared = shared;
         this.date = date;
-        this.radius = radius;
-        this.transitionType = transitionType;
         this.geofenceId = geofenceId;
-        this.ssid = ssid;
         this.modeId = modeId;
     }
 
@@ -64,6 +62,14 @@ public class Waypoint {
         this.description = description;
     }
 
+    public String getGeocoder() {
+        return geocoder;
+    }
+
+    public void setGeocoder(String geocoder) {
+        this.geocoder = geocoder;
+    }
+
     public Double getLatitude() {
         return latitude;
     }
@@ -80,12 +86,20 @@ public class Waypoint {
         this.longitude = longitude;
     }
 
-    public String getGeocoder() {
-        return geocoder;
+    public Integer getRadius() {
+        return radius;
     }
 
-    public void setGeocoder(String geocoder) {
-        this.geocoder = geocoder;
+    public void setRadius(Integer radius) {
+        this.radius = radius;
+    }
+
+    public String getSsid() {
+        return ssid;
+    }
+
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
 
     public Boolean getShared() {
@@ -104,36 +118,12 @@ public class Waypoint {
         this.date = date;
     }
 
-    public Integer getRadius() {
-        return radius;
-    }
-
-    public void setRadius(Integer radius) {
-        this.radius = radius;
-    }
-
-    public Integer getTransitionType() {
-        return transitionType;
-    }
-
-    public void setTransitionType(Integer transitionType) {
-        this.transitionType = transitionType;
-    }
-
     public String getGeofenceId() {
         return geofenceId;
     }
 
     public void setGeofenceId(String geofenceId) {
         this.geofenceId = geofenceId;
-    }
-
-    public String getSsid() {
-        return ssid;
-    }
-
-    public void setSsid(String ssid) {
-        this.ssid = ssid;
     }
 
     public int getModeId() {
