@@ -549,7 +549,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
-					.setTransitionTypes(w.getTransitionType())
+					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
 					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
@@ -630,7 +630,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	}
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
-		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null) && (w.getTransitionType() != null);
+		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
 	}
 
     public boolean isReady() {

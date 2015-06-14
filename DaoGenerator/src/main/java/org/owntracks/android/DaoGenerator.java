@@ -10,7 +10,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 3;
+    private static final int SCHEMA_VERSION = 4;
 
     public static void main(String args[]) throws Exception {
 
@@ -35,15 +35,14 @@ public class DaoGenerator {
         Entity waypoint = schema.addEntity("Waypoint");
         waypoint.addIdProperty();
         waypoint.addStringProperty("description");
+        waypoint.addStringProperty("geocoder");
         waypoint.addDoubleProperty("latitude");
         waypoint.addDoubleProperty("longitude");
-        waypoint.addStringProperty("geocoder");
+        waypoint.addIntProperty("radius");
+        waypoint.addStringProperty("ssid");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
-        waypoint.addIntProperty("radius");
-        waypoint.addIntProperty("transitionType");
         waypoint.addStringProperty("geofenceId");
-        waypoint.addStringProperty("ssid");
         waypoint.addIntProperty("modeId").notNull();
 
         new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, args[0]);

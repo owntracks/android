@@ -14,7 +14,7 @@ public class WaypointMessage extends Message {
         super();
 
         this.waypoint = w;
-    	}
+    }
 
 	@Override
 	public String toString() {

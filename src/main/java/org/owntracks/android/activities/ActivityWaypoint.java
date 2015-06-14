@@ -65,15 +65,10 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
     private EditText longitude;
     private EditText latitude;
     private EditText radius;
-    private LinearLayout geofenceSettings;
-    private Switch enter;
-    private Switch leave;
     private Switch share;
     private MenuItem saveButton;
 
     // Thanks Google for not providing a getter for the value of switches.
-    private boolean enterValue = false;
-    private boolean leaveValue = false;
     private boolean shareValue = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,19 +93,6 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             public void afterTextChanged(Editable s) {  conditionallyEnableSaveButton(); }
         };
 
-        TextWatcher requiredForGeofence = new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start,  int before, int count) { }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start,  int count, int after) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                conditionallyShowGeofenceSettings();
-            }
-        };
-
         setContentView(R.layout.activity_waypoint);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -123,27 +105,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         this.latitude = (EditText) findViewById(R.id.latitude);
         this.longitude = (EditText) findViewById(R.id.longitude);
         this.radius = (EditText) findViewById(R.id.radius);
-        this.radius.addTextChangedListener(requiredForGeofence);
 
-        this.geofenceSettings = (LinearLayout) findViewById(R.id.waypointGeofenceSettings);
-        this.enter = (Switch) findViewById(R.id.enter);
-        this.enter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enterValue = isChecked;
-                if(saveButton != null)
-                    conditionallyEnableSaveButton();
-            }
-        });
-        this.leave = (Switch) findViewById(R.id.leave);
-        this.leave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                leaveValue = isChecked;
-                if(saveButton != null)
-                    conditionallyEnableSaveButton();
-            }
-        });
+
         this.share = (Switch) findViewById(R.id.share);
         this.share.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -176,32 +139,8 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
                 if (this.waypoint.getRadius() != null && this.waypoint.getRadius() > 0) {
                     this.radius.setText(this.waypoint.getRadius().toString());
 
-                    switch (this.waypoint.getTransitionType()) {
-                        case Geofence.GEOFENCE_TRANSITION_ENTER:
-                            this.enter.setChecked(true);
-                            this.enterValue = true;
-                            this.leave.setChecked(false);
-                            this.leaveValue = false;
-                            break;
-                        case Geofence.GEOFENCE_TRANSITION_EXIT:
-                            this.enter.setChecked(false);
-                            this.enterValue = false;
-                            this.leave.setChecked(true);
-                            this.leaveValue = true;
-                            break;
-                        default:
-                            this.enter.setChecked(true);
-                            this.enterValue = true;
-                            this.leave.setChecked(true);
-                            this.leaveValue = true;
-                            break;
-                    }
-
-                } else {
-                    this.geofenceSettings.setVisibility(View.GONE);
-                    this.enter.setChecked(false);
-                    this.leave.setChecked(false);
                 }
+
                 // Shared waypoints are disabled in public mode to protect user's privacy
                 findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
 
@@ -213,7 +152,6 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
             }
 
         }
-        conditionallyShowGeofenceSettings();
     }
     private void conditionallyEnableSaveButton() {
 
@@ -221,30 +159,13 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         try {
             enabled = (this.description.getText().toString().length() > 0)
                     && (this.latitude.getText().toString().length() > 0)
-                    && (this.longitude.getText().toString().length() > 0)
-                    && ((!((this.radius.getText().toString().length() > 0) // if radius is set, enter or leave are required
-                    && (Integer.parseInt(this.radius.getText().toString()) > 0))) || (enterValue || leaveValue)
-            );
+                    && (this.longitude.getText().toString().length() > 0);
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input
         }
         Log.v(this.toString(), "conditionallyEnableSaveButton: " +enabled);
         saveButton.setEnabled(enabled);
         saveButton.getIcon().setAlpha(enabled ? 255 : 130);
-
-    }
-
-    private void conditionallyShowGeofenceSettings() {
-        boolean visible;
-        try {
-            visible = (this.radius.getText().toString().length() > 0) && (Integer.parseInt(this.radius.getText().toString()) > 0);
-        } catch (Exception e) {
-            visible = false;
-        }
-
-        Log.v(this.toString(), "conditionallyShowGeofenceSettings: " + visible);
-
-        this.geofenceSettings.setVisibility(visible ? View.VISIBLE : View.GONE);
 
     }
 
@@ -408,15 +329,7 @@ public class ActivityWaypoint extends ActionBarActivity implements StaticHandler
         else
             w.setShared(false);
 
-        if(this.enterValue && !this.leaveValue) {
-            w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER);
-        } else if(!this.enterValue && this.leaveValue) {
-            w.setTransitionType(Geofence.GEOFENCE_TRANSITION_EXIT);
-        } else if(this.enterValue && this.leaveValue) {
-            w.setTransitionType(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
-        } else {
 
-        }
         if (update)
             update(w);
         else {

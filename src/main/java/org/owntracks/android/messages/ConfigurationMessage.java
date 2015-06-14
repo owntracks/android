@@ -53,7 +53,6 @@ public class ConfigurationMessage extends Message{
             WaypointMessage wpM = new WaypointMessage(waypoint);
             JSONObject wp = wpM.toJSONObject();
             try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
-            try { wp.put("transition", waypoint.getTransitionType()); } catch (JSONException e) { }
             waypoints.put(wp);
         }
         return waypoints;

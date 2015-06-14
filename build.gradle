@@ -28,6 +28,7 @@ repositories {
 dependencies {
     compile 'com.android.support:support-v4:22.+'
     compile 'com.android.support:appcompat-v7:22.+'
+    compile 'com.android.support:design:22.+'
 
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.google.android.gms:play-services-location:7.+'

@@ -345,9 +345,7 @@ public class Preferences {
             if(newWaypoint.getShared()) {
                 try {
                     newWaypoint.setRadius(waypointJson.getInt("rad"));
-                    int transition = waypointJson.getInt("transition");
-                    if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT || transition == (Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT))
-                        newWaypoint.setTransitionType(transition);
+
                 } catch(Exception e) {
                     Log.v("import", "unable to import radius and/or transition attribute");
 
