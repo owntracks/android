@@ -68,6 +68,7 @@
     <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>
     <string name="preferencesBaseTopic">Base topic</string>
     <string name="preferencesBaseTopicSummary">The topic base for subscriptions</string>
+    <string name="bookletModes "><a href="https://www.google.pl/">Google</a></string>
 
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
@@ -188,6 +189,11 @@
     <string name="preferencesNotificationTickerOnReceivedWaypointTransition">Received waypoint events</string>
     <string name="clearContact">Clear</string>
     <string name="preferencesProfileId">Mode</string>
+    <string name="snackbarConnecting">Connecting</string>
+    <string name="snackbarDisconnecting">Disconnecting</string>
+    <string name="snackbarConnected">Connected</string>
+    <string name="snackbarDisconnected">Disconnected</string>
+    <string name="snackbarDisconnectedError">Disconnected with error</string>
     <string-array name="qos_readable">
        p <item>"0"</item>
         <item>"1"</item>

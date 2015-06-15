@@ -19,13 +19,20 @@ import android.location.Location;
 public class Events {
 
     public static class ModeChanged extends E {
-        int modeId;
-        public ModeChanged(int anInt) {
-            modeId = anInt;
+        int newModeId;
+        int oldModeId;
+
+        public ModeChanged(int oldModeId, int newModeId) {
+            this.newModeId = newModeId;
+            this.oldModeId = oldModeId;
         }
-        public int getModeId() {
-            return modeId;
+        public int getNewModeId() {
+            return newModeId;
         }
+        public int getOldModeId() {
+            return oldModeId;
+        }
+
     }
 
 	public static class WaypointTransition extends E {

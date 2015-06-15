@@ -620,7 +620,6 @@ public class ServiceApplication implements ProxyableService,
         dump.setLocatorForeground(ServiceProxy.getServiceLocator().isForeground());
         dump.setLocatorLastKnownLocation(ServiceProxy.getServiceLocator().getLastKnownLocation());
         dump.setLocatorLastPublishDate(ServiceProxy.getServiceLocator().getLastPublishDate());
-        dump.setLocatorWaypointCount(ServiceProxy.getServiceLocator().getWaypointCount());
         dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
         dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
         dump.setLocatorDebug(ServiceProxy.getServiceLocator().getDebugData());

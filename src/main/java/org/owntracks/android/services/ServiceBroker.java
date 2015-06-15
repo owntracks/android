@@ -485,13 +485,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 	public void disconnect(boolean fromUser) {
-		//Log.v(this.toString(), "disconnect. from user: " + fromUser);
+		Log.v(this.toString(), "disconnect. from user: " + fromUser);
 
-		if (isConnecting()) // throws
-							// MqttException.REASON_CODE_CONNECT_IN_PROGRESS
-							// when disconnecting while connect is in progress.
-			return;
-
+		if (isConnecting()) { // throws
+            // MqttException.REASON_CODE_CONNECT_IN_PROGRESS
+            // when disconnecting while connect is in progress.
+            return;
+        }
 		try {
 			if (this.netConnReceiver != null) {
 				this.context.unregisterReceiver(this.netConnReceiver);
@@ -508,7 +508,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 			if (isConnected()) {
-				//Log.v(this.toString(), "Disconnecting");
+				Log.v(this.toString(), "Disconnecting");
 				this.mqttClient.disconnect(0);
 			}
 		} catch (Exception e) {
