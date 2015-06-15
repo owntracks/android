@@ -19,3 +19,4 @@ Added support for hosted and public mode
 [NEW] Added hosted mode support 
 [NEW] Updated external libraries to current versions
 [NEW] Reworked navigation sidebar
+[NEW] Fixed toolbars in preferences

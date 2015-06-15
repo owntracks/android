@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="root"
+        android:title="@string/preferencesServer">
+
+        <org.owntracks.android.support.ListIntegerPreference
+            android:defaultValue="@integer/valModeId"
+            android:entries="@array/profileIds_readable"
+            android:entryValues="@array/modeIds"
+            android:key="@string/keyModeId"
+            android:title="@string/preferencesProfileId"
+            />
+        <Preference
+            android:key="@string/keyIdentification"
+            android:title="@string/preferencesIdentification" />
+
+</PreferenceScreen>

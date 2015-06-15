@@ -8,7 +8,6 @@
         android:orderInCategory="97"
         app:showAsAction="ifRoom"
         android:title="Connect"
-        android:actionViewClass="android.widget.ImageButton"
         >
     </item>
     <item
@@ -17,7 +16,6 @@
         android:orderInCategory="97"
         app:showAsAction="ifRoom"
         android:title="Disconnect"
-        android:actionViewClass="android.widget.ImageButton"
         >
     </item>
 </menu>

@@ -61,7 +61,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 	private GeocodableLocation lastKnownLocation;
 	private long lastPublish;
-	private List<Waypoint> waypoints;
 	private WaypointDao waypointDao;
 
     // Debug structures for issue #86
@@ -96,7 +95,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         Log.v(this.toString(), "initialized for ServiceLocator");
         this.lastPublish = 0;
 		this.waypointDao = App.getWaypointDao();
-		loadWaypoints();
+
 
 		this.sharedPreferences = PreferenceManager .getDefaultSharedPreferences(this.context);
 
@@ -147,7 +146,8 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         debugLocationAPIConnectDate = new Date();
         this.ready = true;
         initLocationRequest();
-        initGeofences();
+        removeGeofences();
+        requestGeofences();
     }
 
     @Override
@@ -214,10 +214,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
 
 
-    private void initGeofences() {
-		removeGeofences();
-		requestGeofences();
-	}
 
 	private void initLocationRequest() {
 		requestLocationUpdates();
@@ -506,7 +502,13 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		handleWaypoint(e.getWaypoint(), false, true);
 	}
 
-	private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
+    public void onEvent(Events.ModeChanged e) {
+        removeGeofencesByWaypoint(loadWaypointsForModeId(e.getOldModeId()));
+        requestGeofences();
+    }
+
+
+    private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
         Log.v(this.toString(), "handleWaypoint: update:" +update + " remove:"+remove );
 
         if(update && remove)
@@ -531,13 +533,11 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		if (!this.ready)
 			return;
 
-		loadWaypoints();
+
 
 		List<Geofence> fences = new ArrayList<Geofence>();
 
-		for (Waypoint w : this.waypoints) {
-			if (!isWaypointWithValidGeofence(w))
-				continue;
+		for (Waypoint w : loadWaypointsForCurrentModeWithValidGeofence()) {
 
 			// if id is null, waypoint is not added yet
 			if (w.getGeofenceId() == null) {
@@ -553,6 +553,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
+            Log.v(this.toString(), "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId());
 			fences.add(geofence);
 		}
 
@@ -591,7 +592,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		ArrayList<String> l = new ArrayList<String>();
 
 		// Either removes waypoints from the provided list or all waypoints
-		for (Waypoint w : list == null ? loadWaypoints() : list) {
+		for (Waypoint w : list == null ? loadWaypointsForCurrentMode() : list) {
 			if (w.getGeofenceId() == null)
 				continue;
 			Log.v(this.toString(), "adding " + w.getGeofenceId() + " for removal");
@@ -625,9 +626,23 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 	public void onEvent(Object event) {
 	}
 
-	private List<Waypoint> loadWaypoints() {
-		return this.waypoints = this.waypointDao.loadAll();
+    private List<Waypoint> loadWaypointsForCurrentMode() {
+        return loadWaypointsForModeId(Preferences.getModeId());
+    }
+
+    private List<Waypoint> loadWaypointsForModeId(int modeId) {
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId)).build().list();
 	}
+
+    private List<Waypoint> loadWaypointsForCurrentModeWithValidGeofence() {
+        return loadWaypointsForModeIdWithValidGeofence(Preferences.getModeId());
+    }
+
+    private List<Waypoint> loadWaypointsForModeIdWithValidGeofence(int modeId) {
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId), Properties.Latitude.isNotNull(), Properties.Longitude.isNotNull(), Properties.Radius.isNotNull(), Properties.Radius.gt(0)).build().list();
+    }
+
+
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
 		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
@@ -641,9 +656,6 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         return foreground;
     }
 
-    public Integer getWaypointCount() {
-        return waypoints != null ? waypoints.size() : -1;
-    }
 
     public boolean hasLocationClient() {
         return googleApiClient != null;

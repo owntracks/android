@@ -73,6 +73,7 @@ public class Preferences {
         setMode(active, false);
     }
     private static void setMode(int active, boolean init){
+        int oldModeId = modeId;
         Log.v("Preferences", "setting mode to: " + active);
         modeId = active;
         switch (modeId) {
@@ -95,7 +96,7 @@ public class Preferences {
         Log.v("Preferences", "Active preferences for mode " + modeId +" are " + activeSharedPreferences);
 
         if(!init) {
-            EventBus.getDefault().post(new Events.ModeChanged(modeId));
+            EventBus.getDefault().post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
 
