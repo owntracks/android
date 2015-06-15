@@ -12,6 +12,8 @@ Added support for hosted and public mode
 [FIX] #178 - Crash in org.owntracks.android.activities.ActivityImport.extractPreferences
 [FIX] #143 - t parameter missing when reporting location from notification bar
 [FIX] Map zoom on orientation change
+[FIX] Geofences were not respecting the currently set mode
+[FIX] Connect and disconnect button was not working correctly
 [NEW] Added wtst to waypoint transition messages
 [NEW] removed enter or leave from waypoint definitions
 [NEW] Added mode switcher 
