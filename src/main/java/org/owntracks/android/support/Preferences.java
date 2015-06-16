@@ -215,9 +215,7 @@ public class Preferences {
         if(isModePrivate()) {
             return !getHost().trim().equals("") && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()));
         } else if(isModeHosted()) {
-            Log.v("Preferences", getUsername());
-            Log.v("Preferences", getPassword());
-            Log.v("Preferences", getDeviceId(false));
+
             return !getUsername().trim().equals("") && !getPassword().trim().equals("") && !getDeviceId(false).trim().equals("");
         } else if(isModePublic()) {
             return true;
@@ -281,7 +279,7 @@ public class Preferences {
 
         Log.v("Preferences", "fromJsonObject: " +  json.toString());
 
-
+        try { setMode(json.getInt(getStringRessource(R.string.keyModeId))); } catch (JSONException e) {}
         try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
         try { setClientId(json.getString(getStringRessource(R.string.keyClientId))); } catch (JSONException e) {}
         try { setHost(json.getString(getStringRessource(R.string.keyHost))); } catch (JSONException e) {}
@@ -792,7 +790,7 @@ public class Preferences {
 
 
     public static void setDeviceId(String deviceId) {
-        setString(R.string.keyDeviceId, deviceId, false, false);
+        setString(R.string.keyDeviceId, deviceId, true, false);
     }
 
     public static void setAuth(boolean auth) {
