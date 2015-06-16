@@ -71,7 +71,7 @@
     <bool name="valNotificationVibrateOnWayointTransition">true</bool>
     <bool name="valNotificationVibrateOnPublish">true</bool>
     <bool name="valPubRetain">true</bool>
-    <bool name="valAutostartOnBoot">false</bool>
+    <bool name="valAutostartOnBoot">true</bool>
     <bool name="valConnectionAdvancedMode">false</bool>
     <bool name="valZeroLenghClientIdEnabled">false</bool>
     <bool name="valAuth">true</bool>

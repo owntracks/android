@@ -1291,10 +1291,10 @@ public class ActivityMain extends AppCompatActivity {
 			Bundle extras = FragmentHandler.getInstance().getBundle(DetailsFragment.class);
 
 			this.contact = App.getContact((String) extras.get(KEY_TOPIC));
-			if(this.contact != null )
-                this.name.setText(this.contact.getDisplayName() );
-            else
-                this.name.setText(getString(R.string.na));
+            if(this.contact == null)
+                FragmentHandler.getInstance().back((AppCompatActivity)getActivity());
+
+            this.name.setText(this.contact.getDisplayName() );
             this.topic.setText(this.contact.getTopic());
 			this.location.setText(this.contact.getLocation().toString());
             this.accuracy.setText("± " + this.contact.getLocation().getAccuracy() + "m");
@@ -1445,7 +1445,8 @@ public class ActivityMain extends AppCompatActivity {
         @Override
 		public void onSaveInstanceState(Bundle b) {
 			super.onSaveInstanceState(b);
-            b.putString(KEY_TOPIC, this.contact.getTopic());
+            if(this.contact != null)
+                b.putString(KEY_TOPIC, this.contact.getTopic());
 			FragmentHandler.getInstance().setBundle(DetailsFragment.class, b);
 		}
 

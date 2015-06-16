@@ -1,8 +1,11 @@
 OwnTracks Android App Release Notes
 ===================================
 ## OwnTracks 0.5.13
->Release date: 2015-06-16 for alpha testers
+>Release date: 2015-06-XX for alpha testers
+* [FIX] #192 - Autostart on boot should be default
 
+## OwnTracks 0.5.13
+>Release date: 2015-06-16 for alpha testers
 * [FIX] #191 - First launch after clean install should be in Public mode
 * [FIX] #193 - Battery level not included in location pubs 
 * [FIX] #195 - Preferences were not loaded correctly after mode change
@@ -13,7 +16,6 @@ OwnTracks Android App Release Notes
 
 ## OwnTracks 0.5.12
 >Release date: 2015-06-15 for alpha testers
-
 * [FIX] Recursive entries to multiple views
 * [FIX] #184 - Crash in org.owntracks.android.services.ServiceLocator.requestGeofences  
 * [FIX] #180 - Crash if the received lat value is >90 or lon >180 
