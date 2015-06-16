@@ -74,6 +74,7 @@ public class TransitionMessage extends Message{
         this.transition = transition;
         this.wtst  = TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime());
         this.tst = TimeUnit.MILLISECONDS.toSeconds((new java.util.Date()).getTime());
+        this.waypoint = w;
     }
 
 	public boolean getSupressTicker() {

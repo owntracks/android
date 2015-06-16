@@ -45,4 +45,17 @@
         app:met_floatingLabelText="@string/preferencesBrokerPasswordHosted"
         android:hint="@string/preferencesBrokerPasswordHosted"
         />
+    
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/trackerId"
+        android:inputType="textNoSuggestions"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesTrackerId"
+        app:met_floatingLabelAlwaysShown="true"
+        android:maxLength="2"
+        />
 </LinearLayout>

@@ -260,6 +260,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                     final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.usernameHosted);
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.passwordHosted);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
+                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
                                     Log.v(this.toString(), Preferences.getUsername());
                                     Log.v(this.toString(), Preferences.getPassword());
@@ -267,6 +268,9 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                     username.setText(Preferences.getUsername());
                                     password.setText(Preferences.getPassword());
                                     deviceId.setText(Preferences.getDeviceId(false));
+                                    trackerId.setText(Preferences.getTrackerId(false));
+                                    trackerId.setHint(Preferences.getTrackerIdDefault());
+
                                 }
                             })
                             .callback(new MaterialDialog.ButtonCallback() {
@@ -276,12 +280,12 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                     final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.usernameHosted);
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.passwordHosted);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
-
-                                    Log.v(this.toString(), "SAVING PREFS: Text is  " + username.getText().toString());
+                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
                                     Preferences.setUsername(username.getText().toString());
                                     Preferences.setPassword(password.getText().toString());
                                     Preferences.setDeviceId(deviceId.getText().toString());
+                                    Preferences.setTrackerId(trackerId.getText().toString());
 
                                     updateConnectButton();
 

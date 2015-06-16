@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.owntracks.android"
-          android:versionCode="0513"
-          android:versionName="0.5.13" >
+          android:versionCode="0514"
+          android:versionName="0.5.14" >
 
     <meta-data android:name="com.crashlytics.ApiKey" android:value="d0b0c708e43f69036ebedad1766ad086074d30f6"/>
 
