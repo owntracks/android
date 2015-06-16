@@ -87,6 +87,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
     }
 
     private void handleBack() {
+        Log.v("ConnectionPReferences", "handleBack. MOdeChange: " + modeSwitch);
         Intent resultIntent = new Intent();
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         resultIntent.putExtra(KEY_MODE_CHANGED, modeSwitch); // signal preferences activity if it has to reload the preferences tree after a mode switch

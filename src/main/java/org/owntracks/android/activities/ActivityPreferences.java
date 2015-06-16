@@ -39,10 +39,12 @@ public class ActivityPreferences extends AppCompatActivity {
     static Preference connectionPreferenceScreen;
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
+
     // Return from ActivityPreferencesConnection to see if we need to reload the preferences because a mode change occured
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
+        Log.v(this.toString(), "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
             case (REQUEST_CODE_CONNECTION) : {
                 Log.v(this.toString(), "onActivityResult with REQUEST_CODE_CONNECTION");
@@ -55,7 +57,6 @@ public class ActivityPreferences extends AppCompatActivity {
             }
         }
     }
-
 
 
     @Override
@@ -162,6 +163,8 @@ public class ActivityPreferences extends AppCompatActivity {
 
         static String ver;
 
+
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -261,7 +264,7 @@ public class ActivityPreferences extends AppCompatActivity {
                     Log.v(this.toString(), "startActivityForResult ActivityPreferencesConnection");
                     Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivityForResult(intent, REQUEST_CODE_CONNECTION);
+                    getActivity().startActivityForResult(intent, REQUEST_CODE_CONNECTION);
                     return true;
                 }
             };
