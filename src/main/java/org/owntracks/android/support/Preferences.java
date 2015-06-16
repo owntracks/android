@@ -39,7 +39,7 @@ public class Preferences {
     private static SharedPreferences hostedSharedPreferences;
     private static SharedPreferences publicSharedPreferences;
 
-    private static int modeId = 0;
+    private static int modeId = App.MODE_ID_PRIVATE;
     private static String deviceUUID = "";
 
     public static boolean isModePrivate(){ return modeId == App.MODE_ID_PRIVATE; }
@@ -167,15 +167,34 @@ public class Preferences {
     }
 
     public static void setString(int resId, String value) {
-        Log.v("Preferences", "setString: key:" + getKey(resId)+ ", value:" + value + ", prefs: " + activeSharedPreferences);
+        setString(resId, value, true, true);
+    }
+    public static void setString(int resId, String value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
+        if((isModeHosted() && !allowSetWhenHosted || isModePublic() && !allowSetWhenPublic)) {
+            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            return;
+        }
         activeSharedPreferences.edit().putString(getKey(resId), value).commit();
     }
 
     public static void setInt(int resId, int value) {
+        setInt(resId, value, true, true);
+    }
+    public static void setInt(int resId, int value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
+        if((isModeHosted() && !allowSetWhenHosted || isModePublic() && !allowSetWhenPublic)) {
+            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            return;
+        }
         activeSharedPreferences.edit().putInt(getKey(resId), value).commit();
     }
-
     public static void setBoolean(int resId, boolean value) {
+        setBoolean(resId, value, true, true);
+    }
+    public static void setBoolean(int resId, boolean value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
+        if((isModeHosted() && !allowSetWhenHosted) || (isModePublic() && !allowSetWhenPublic)) {
+            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            return;
+        }
         activeSharedPreferences.edit().putBoolean(getKey(resId), value).commit();
     }
 
@@ -278,7 +297,6 @@ public class Preferences {
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
         try { setPubIncludeBattery(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
-        try { setConnectionAdvancedMode(json.getBoolean(getStringRessource(R.string.keyConnectionAdvancedMode))); } catch (JSONException e) {}
         try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
         try { setPubInterval(json.getInt(getStringRessource(R.string.keyPubInterval))); } catch (JSONException e) {}
         try { setDeviceTopic(json.getString(getStringRessource(R.string.keyDeviceTopic))); } catch (JSONException e) {}
@@ -402,19 +420,19 @@ public class Preferences {
     }
 
     public static void setRemoteConfiguration(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteConfiguration, aBoolean);
+        setBoolean(R.string.keyRemoteConfiguration, aBoolean, false, false);
     }
 
     public static void setRemoteCommandReportLocation(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteCommandReportLocation, aBoolean);
+        setBoolean(R.string.keyRemoteCommandReportLocation, aBoolean, true, true);
     }
 
     public static void setRemoteCommandDump(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteCommandDump, aBoolean);
+        setBoolean(R.string.keyRemoteCommandDump, aBoolean, false, false);
     }
 
     public static void setCleanSession(boolean aBoolean) {
-        setBoolean(R.string.keyCleanSession, aBoolean);
+        setBoolean(R.string.keyCleanSession, aBoolean, false, false);
     }
     public static boolean getCleanSession() {
         return getBoolean(R.string.keyCleanSession, R.bool.valCleanSession, R.bool.valCleanSessionHosted,R.bool.valCleanSessionPublic, true, true );
@@ -422,7 +440,7 @@ public class Preferences {
 
 
     public static boolean getPubLocationIncludeBattery() {
-        return getBoolean(R.string.keyPubIncludeBattery, R.bool.valPubIncludeBattery, R.bool.valPubIncludeBattery, R.bool.valPubIncludeBattery, true, true);
+        return getBoolean(R.string.keyPubIncludeBattery, R.bool.valPubIncludeBattery, R.bool.valPubIncludeBattery, R.bool.valPubIncludeBattery, false, false);
     }
 
     public static boolean getFollowingSelectedContact() {
@@ -512,7 +530,7 @@ public class Preferences {
     }
 
     public static void setDeviceTopic(String deviceTopic) {
-        setString(R.string.keyDeviceTopic, deviceTopic);
+        setString(R.string.keyDeviceTopic, deviceTopic, false, false);
     }
 
     public static String getPubTopicLocations() {
@@ -602,7 +620,7 @@ public class Preferences {
 
     public static void setHost(String value) {
         if (!value.equals(getHost())) {
-            setString(R.string.keyHost, value);
+            setString(R.string.keyHost, value, false, false);
             brokerChanged();
         }
     }
@@ -613,7 +631,7 @@ public class Preferences {
 
     public static void setPort(int value) {
         if (value != getPort()) {
-            setInt(R.string.keyPort, value);
+            setInt(R.string.keyPort, value, false, false);
             brokerChanged();
         }
     }
@@ -655,7 +673,7 @@ public class Preferences {
     }
 
     public static void setKeepalive(int value) {
-        setInt(R.string.keyKeepalive, value);
+        setInt(R.string.keyKeepalive, value, false, false);
     }
 
 
@@ -680,10 +698,6 @@ public class Preferences {
         setBoolean(R.string.keyPubIncludeBattery, aBoolean);
     }
 
-    private static void setConnectionAdvancedMode(boolean aBoolean) {
-        setBoolean(R.string.keyConnectionAdvancedMode, aBoolean);
-
-    }
 
     private static void setPub(boolean aBoolean) {
         setBoolean(R.string.keyPub, aBoolean);
@@ -714,7 +728,7 @@ public class Preferences {
     }
 
     private static void setBaseTopic(String string) {
-        setString(R.string.keyBaseTopic, string);
+        setString(R.string.keyBaseTopic, string, false, false);
 
     }
 
@@ -758,12 +772,12 @@ public class Preferences {
     }
 
     private static void setPubRetain(boolean aBoolean) {
-        setBoolean(R.string.keyPubRetain, aBoolean);
+        setBoolean(R.string.keyPubRetain, aBoolean, false, false);
 
     }
 
     private static void setPubQos(int anInt) {
-        setInt(R.string.keyPubQos, anInt);
+        setInt(R.string.keyPubQos, anInt, false, false);
     }
 
 
@@ -778,19 +792,19 @@ public class Preferences {
 
 
     public static void setDeviceId(String deviceId) {
-        setString(R.string.keyDeviceId, deviceId);
+        setString(R.string.keyDeviceId, deviceId, false, false);
     }
 
     public static void setAuth(boolean auth) {
-        setBoolean(R.string.keyAuth, auth);
+        setBoolean(R.string.keyAuth, auth ,false, false);
     }
 
     public static void setTls(boolean tlsSpecifier) {
-        setBoolean(R.string.keyTls, tlsSpecifier);
+        setBoolean(R.string.keyTls, tlsSpecifier, false, false);
     }
 
     public static void setTlsCrtPath(String tlsCrtPath) {
-        setString(R.string.keyTlsCrtPath, tlsCrtPath);
+        setString(R.string.keyTlsCrtPath, tlsCrtPath, false, false);
     }
 
     private static void brokerChanged() {

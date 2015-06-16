@@ -18,6 +18,14 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dependency="@string/keyPub"
+            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
+            android:inputType="number"
+            android:key="@string/keyPubInterval"
+            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
+            android:title="@string/preferencesBackgroundUpdatesInterval" />
+
         <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
@@ -95,21 +103,12 @@
 
         <PreferenceCategory android:title="Remote commands">
 
-        <SwitchPreference
-            android:defaultValue="@bool/valRemoteCommandReportLocation"
-            android:key="@string/keyRemoteCommandReportLocation"
-            android:summary="@string/preferencesRemoteCommandReportLocationSummary"
-            android:title="@string/preferencesRemoteCommandReportLocation" />
-        <SwitchPreference
-            android:defaultValue="@bool/valRemoteCommandDump"
-            android:key="@string/keyRemoteCommandDump"
-            android:summary="@string/preferencesRemoteCommandDumpSummary"
-            android:title="@string/preferencesRemoteCommandDump" />
-        <SwitchPreference
-            android:defaultValue="@bool/valRemoteConfiguration"
-            android:key="@string/keyRemoteConfiguration"
-            android:summary="@string/preferencesRemoteConfigurationSummary"
-            android:title="@string/preferencesRemoteConfiguration" />
+            <SwitchPreference
+                android:defaultValue="@bool/valRemoteCommandReportLocation"
+                android:key="@string/keyRemoteCommandReportLocation"
+                android:summary="@string/preferencesRemoteCommandReportLocationSummary"
+                android:title="@string/preferencesRemoteCommandReportLocation" />
+
         </PreferenceCategory>
 
         <PreferenceCategory android:title="Locator">
@@ -142,13 +141,7 @@
             android:summary="@string/preferencesLocatorIntervalSummary"
             android:title="@string/preferencesLocatorInterval" />
 
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dependency="@string/keyPub"
-            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:inputType="number"
-            android:key="@string/keyPubInterval"
-            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
-            android:title="@string/preferencesBackgroundUpdatesInterval" />
+
 
 
         </PreferenceCategory>

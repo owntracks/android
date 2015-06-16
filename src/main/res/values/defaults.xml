@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="valModeId">0</integer>
+    <integer name="valModeId">2</integer>
 
 
 
@@ -14,7 +14,7 @@
     <bool name="valTlsPublic">true</bool>
     <bool name="valRemoteConfigurationPublic">false</bool>
     <bool name="valPubRetainPublic">false</bool>
-    <bool name="valRemoteCommandDumpPublic">true</bool>
+    <bool name="valRemoteCommandDumpPublic">false</bool>
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
 
@@ -27,7 +27,7 @@
     <bool name="valAuthHosted">true</bool>
     <bool name="valTlsHosted">true</bool>
     <bool name="valRemoteConfigurationHosted">false</bool>
-    <bool name="valRemoteCommandDumpHosted">true</bool>
+    <bool name="valRemoteCommandDumpHosted">false</bool>
     <bool name="valPubRetainHosted">true</bool>
     <integer name="valPubQosHosted">0</integer>
 
