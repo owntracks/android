@@ -19,11 +19,22 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
+        <org.owntracks.android.support.EditIntegerPreference
+            android:dependency="@string/keyPub"
+            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
+            android:inputType="number"
+            android:key="@string/keyPubInterval"
+            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
+            android:title="@string/preferencesBackgroundUpdatesInterval" />
+
+
         <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
+            android:dependency="@string/keyPub"
             android:summary="@string/preferencesIncludeBatterySummary"
             android:title="@string/preferencesIncludeBattery" />
+
 
 
     </PreferenceScreen>
@@ -103,10 +114,10 @@
             android:title="@string/preferencesTopic" />
 
         <org.owntracks.android.support.EditStringPreference
-                android:dialogTitle="@string/preferencesBaseTopic"
-                android:key="@string/keyBaseTopic"
-                android:summary="@string/preferencesBaseTopicSummary"
-                android:title="@string/preferencesBaseTopic" />
+            android:dialogTitle="@string/preferencesBaseTopic"
+            android:key="@string/keyBaseTopic"
+            android:summary="@string/preferencesBaseTopicSummary"
+            android:title="@string/preferencesBaseTopic" />
 
         <org.owntracks.android.support.ListIntegerPreference
             android:defaultValue="@integer/valPubQos"
@@ -115,6 +126,8 @@
             android:key="@string/keyPubQos"
             android:summary="@string/preferencesQOSSummary"
             android:title="@string/preferencesQOS" />
+
+
 
         <SwitchPreference
             android:defaultValue="@bool/valPubRetain"
@@ -160,30 +173,20 @@
                 android:title="@string/preferencesLocatorAccuracyBackground"
                 android:defaultValue="@integer/valLocatorAccuracyBackground"/>
 
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dialogTitle="@string/preferencesLocatorDisplacement"
-            android:inputType="number"
-            android:key="@string/keyLocatorDisplacement"
-            android:summary="@string/preferencesLocatorDisplacementSummary"
-            android:title="@string/preferencesLocatorDisplacement" />
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dialogTitle="@string/preferencesLocatorInterval"
-            android:inputType="numberDecimal"
-            android:key="@string/keyLocatorInterval"
-            android:summary="@string/preferencesLocatorIntervalSummary"
-            android:title="@string/preferencesLocatorInterval" />
-
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dependency="@string/keyPub"
-            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:inputType="number"
-            android:key="@string/keyPubInterval"
-            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
-            android:title="@string/preferencesBackgroundUpdatesInterval" />
-
+            <org.owntracks.android.support.EditIntegerPreference
+                android:dialogTitle="@string/preferencesLocatorDisplacement"
+                android:inputType="number"
+                android:key="@string/keyLocatorDisplacement"
+                android:summary="@string/preferencesLocatorDisplacementSummary"
+                android:title="@string/preferencesLocatorDisplacement" />
+            <org.owntracks.android.support.EditIntegerPreference
+                android:dialogTitle="@string/preferencesLocatorInterval"
+                android:inputType="numberDecimal"
+                android:key="@string/keyLocatorInterval"
+                android:summary="@string/preferencesLocatorIntervalSummary"
+                android:title="@string/preferencesLocatorInterval" />
 
         </PreferenceCategory>
-
 
         <PreferenceCategory android:title="Misc">
 

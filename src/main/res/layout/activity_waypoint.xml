@@ -9,7 +9,6 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
@@ -30,10 +29,16 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/description"
                 app:met_floatingLabel="normal"
-                app:met_baseColor="#FFF"
-                app:met_primaryColor="@color/accent"
+
+                app:met_underlineColor="#82FFFFFF"
+                app:met_floatingLabelTextColor="#82FFFFFF"
+                app:met_primaryColor="#FFFFFF"
+                app:met_textColor="#FFFFFF"
+                app:met_textColorHint="#82FFFFFF"
+                android:background="@android:color/transparent"
+                android:textCursorDrawable="@drawable/cursor_white"
                 android:gravity="bottom"
-                android:inputType="textFilter|textNoSuggestions"
+                android:inputType="textVisiblePassword"
                 android:textSize="24sp"
                 android:id="@+id/description"
                 android:layout_alignParentBottom="true"
@@ -60,8 +65,8 @@
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:layout_marginLeft="@dimen/default_spacing"
-                android:layout_marginStart="@dimen/default_spacing"
+                android:layout_marginLeft="@dimen/default_spacing_half"
+                android:layout_marginStart="@dimen/default_spacing_half"
                 app:met_iconLeft="@drawable/ic_location"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
@@ -71,14 +76,13 @@
                 app:met_baseColor="@color/textPrimary"
                 app:met_primaryColor="@color/accent"
                 android:id="@+id/latitude"
-                android:digits="-0123456789."
-                android:inputType="numberDecimal"
-                app:met_helperText="" />
+                android:inputType="numberDecimal|numberSigned"
+                app:met_helperText=""/>
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:layout_marginLeft="@dimen/default_spacing"
-                android:layout_marginStart="@dimen/default_spacing"
+                android:layout_marginLeft="@dimen/default_spacing_half"
+                android:layout_marginStart="@dimen/default_spacing_half"
                 app:met_iconLeft="@drawable/ic_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,8 +97,8 @@
 
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:layout_marginLeft="@dimen/default_spacing"
-                android:layout_marginStart="@dimen/default_spacing"
+                android:layout_marginLeft="@dimen/default_spacing_half"
+                android:layout_marginStart="@dimen/default_spacing_half"
                 app:met_iconLeft="@drawable/ic_radius"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,8 +118,8 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginLeft="82dp"
-                android:layout_marginStart="82dp">
+                android:layout_marginLeft="76dp"
+                android:layout_marginStart="76dp">
 
                 <TextView
                     android:layout_width="wrap_content"

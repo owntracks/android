@@ -100,10 +100,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private String TAG_WAKELOG = "org.owntracks.android.wakelog.broker";
     private ReconnectTimer reconnectTimer;
 
-    private  Map<IMqttDeliveryToken, Message> inflightMessages = new HashMap<>();
+    private  Map<IMqttDeliveryToken, Message> inflightMessages = new HashMap<>(); // keeps track of sent messages for delivery callbacks
     private final Object inflightMessagesLock = new Object();
 
-    private LinkedList<Message> backlog = new LinkedList<>();
+    private LinkedList<Message> backlog = new LinkedList<>(); // keeps track of messages that failed to send
     private final Object backlogLock = new Object();
 
     @Override
@@ -439,16 +439,22 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         try {
 
             List<String> topics =new ArrayList<String>();
+            String baseTopic = Preferences.getBaseTopic();
 
-            topics.add(Preferences.getBaseTopic());
-            topics.add(Preferences.getBaseTopic() + "/info");
+            if(baseTopic.endsWith("#")) { // wildcard sub will match everything anyway
+                topics.add(baseTopic);
+            } else {
 
-            if(Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
-                topics.add(Preferences.getDeviceTopic(true)+"/cmd");
+                topics.add(baseTopic);
+                topics.add(baseTopic + "/info");
 
-            if(!Preferences.isModePublic()) {
-                topics.add(Preferences.getBaseTopic()+"/event");
-                topics.add(Preferences.getBaseTopic() + "/waypoint");
+                if (Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
+                    topics.add(Preferences.getDeviceTopic(true) + "/cmd");
+
+                if (!Preferences.isModePublic()) {
+                    topics.add(baseTopic + "/event");
+                    topics.add(baseTopic + "/waypoint");
+                }
             }
 
             unsubscribe();
@@ -520,13 +526,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				this.workerThread.interrupt();
 			}
 
-            synchronized (inflightMessagesLock) {
-                inflightMessages.clear();
-            }
 
-            synchronized (backlogLock) {
-                backlog.clear();
-            }
 
 			if (fromUser)
 				changeState(State.DISCONNECTED_USERDISCONNECT);
@@ -711,14 +711,16 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
                     }
 
-                    IMqttDeliveryToken t = ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message);
+                    //IMqttDeliveryToken t = ;
                     message.publishing();
                     synchronized (inflightMessagesLock) {
-                        inflightMessages.put(t, message); // if we reach this point, the previous publish did not throw an exception and the message went out
+                        inflightMessages.put(ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message), message); // if we reach this point, the previous publish did not throw an exception and the message went out
                     }
-                    Log.v(this.toString(), "queued message for delivery: " + t.getMessageId());
+                    Log.v(this.toString(), "queued message for delivery on thread: " +Thread.currentThread().getId());
                 } catch (Exception e) {
-
+                    synchronized (inflightMessagesLock) {
+                        inflightMessages.remove(message);
+                    }
                     // Handle TTL for message to discard it after message.ttl publish attempts or discard right away if message qos is 0
                     if (message.getQos() != 0 && message.decrementTTL() >= 1) {
                         synchronized (backlogLock) {
@@ -771,13 +773,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
     @Override
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
-        Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
+        Log.v(this.toString(), "delivery complete thread " + Thread.currentThread().getId());
+
         Message message;
         synchronized (inflightMessagesLock) {
             message = inflightMessages.remove(messageToken);
-            if(message != null)
-                message.publishSuccessful();
+            Log.v(this.toString(), "Delivery complete of " + messageToken.getMessageId());
 
+            if(message != null) {
+                Log.v(this.toString(), "Message received from inflight messages");
+                message.publishSuccessful();
+            }
         }
     }
 
@@ -807,9 +813,26 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void onEvent(Events.Dummy e) {
 	}
 
+    public void clearQueues() {
+        synchronized (inflightMessagesLock) {
+            inflightMessages.clear();
+        }
+
+        synchronized (backlogLock) {
+            backlog.clear();
+        }
+    }
+
     public void onEvent(Events.ModeChanged e) {
         disconnect(false);
+        clearQueues();
     }
+
+    public void onEvent(Events.BrokerChanged e) {
+        clearQueues();
+    }
+
+
 
     // Custom blocking MqttClient that allows to specify a MqttPingSender
     private static final class CustomMqttClient extends MqttClient {

@@ -71,6 +71,9 @@ public class App extends Application {
                 } else if (oldVersion == 2 && newVersion == 3) {
                     DaoMaster.dropAllTables(db, true);
                     DaoMaster.createAllTables(db, true);
+                } else if (oldVersion == 3 && newVersion == 4) {
+                    DaoMaster.dropAllTables(db, true);
+                    DaoMaster.createAllTables(db, true);
                 }
             }
         };
