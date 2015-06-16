@@ -1,8 +1,12 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.5.13
+## OwnTracks 0.5.14
 >Release date: 2015-06-XX for alpha testers
 * [FIX] #192 - Autostart on boot should be default
+* [FIX] #198 - Desc attribute not present in transition event
+* [FIX] #196 - Tid not configurable in hosted mode
+* [FIX] Unable to save username
+* [NEW] More granular resolving of Geocoder
 
 ## OwnTracks 0.5.13
 >Release date: 2015-06-16 for alpha testers
