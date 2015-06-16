@@ -146,7 +146,7 @@ public class TransitionMessage extends Message{
 
             if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
                 json.put("desc", this.waypoint.getDescription());
-                json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
+                    json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
             }
 
             if (this.trackerId != null && !this.trackerId.isEmpty())

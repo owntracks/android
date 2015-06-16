@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -43,7 +44,7 @@ import de.greenrobot.dao.query.Query;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoint extends ActionBarActivity implements StaticHandlerInterface {
+public class ActivityWaypoint extends AppCompatActivity implements StaticHandlerInterface {
     private static final int REQUEST_PLACE_PICKER = 19283;
     private WaypointDao dao;
     private TextWatcher requiredForSave;
