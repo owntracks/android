@@ -141,7 +141,7 @@ public class TransitionMessage extends Message{
             .put("lat", this.location.getLatitude())
             .put("lon", this.location.getLongitude())
             .put("lon", this.location.getLongitude())
-            .put("acc", this.location.getAccuracy())
+            .put("acc", Math.floor(this.location.getAccuracy()))
             .put("tst", this.tst)
             .put("wtst", this.wtst);
 

@@ -94,7 +94,7 @@ public class LocationMessage extends Message{
             .put("lat", this.location.getLatitude())
             .put("lon", this.location.getLongitude())
             .put("tst", (TimeUnit.MILLISECONDS.toSeconds(this.location.getTime())))
-            .put("acc", Math.round(this.location.getLocation().getAccuracy() * 100) / 100.0d);
+            .put("acc", Math.floor(this.location.getLocation().getAccuracy()));
 
             if (this.battery != -1)
                 json.put("batt", this.battery);
