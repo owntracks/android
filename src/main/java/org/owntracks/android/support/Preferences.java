@@ -229,6 +229,7 @@ public class Preferences {
         JSONObject json = new JSONObject();
         try {
             json.put("_type", "configuration")
+                    .put(getStringRessource(R.string.keyModeId), getModeId())
                     .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
                     .put(getStringRessource(R.string.keyClientId), getClientId(true))
                     .put(getStringRessource(R.string.keyHost), getHost())

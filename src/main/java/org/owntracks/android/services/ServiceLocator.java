@@ -227,16 +227,16 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
         this.mLocationRequest = LocationRequest.create();
 
         if(Preferences.getLocatorAccuracyBackground() == 0) {
-            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 1) {
-            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 2) {
-            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
+            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            //Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
+            Log.v(this.toString(), "setupBackgroundLocationRequest PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
         //Log.v(this.toString(), "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
