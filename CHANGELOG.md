@@ -1,6 +1,6 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.5.14
+## OwnTracks 0.5.15
 >Release date: 2015-06-18
 * [FIX] Messages in hosted mode were not queued because they defaulted to QoS 0. Changed that to QoS 1. 
 * [FIX] Messages were not inserted into the queue (derp!)
