@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import java.lang.ref.WeakReference;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -11,7 +12,8 @@ public abstract class ServiceBindable extends Service {
 	protected boolean started;
 	protected ServiceBinder binder;
 
-	@Override
+
+    @Override
 	public void onCreate() {
 		super.onCreate();
 		this.binder = new ServiceBinder(this);

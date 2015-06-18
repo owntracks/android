@@ -166,16 +166,13 @@ public class Contact {
 	public Bitmap getFace() {
 
         if (this.linkFace != null) {
-            Log.v(this.toString(), "using linkFace for  " + this.getTopic());
             return this.linkFace;
         }
 
         if (this.cardFace != null) {
-            Log.v(this.toString(), "using cardFace for  " + this.getTopic());
             return this.cardFace;
         }
 
-        Log.v(this.toString(), "using defaultFace for  " + this.getTopic());
         return defaultFace;
 	}
 

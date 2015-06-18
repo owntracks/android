@@ -73,7 +73,7 @@ public class ServiceProxy extends ServiceBindable {
 
 	}
 
-	@Override
+    @Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int r = super.onStartCommand(intent, flags, startId); // Invokes
 																// onStartOnce(...)

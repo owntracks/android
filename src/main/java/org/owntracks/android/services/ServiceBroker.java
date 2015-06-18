@@ -696,11 +696,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 }
 
                 // Check if we can publish
-                if (!isOnline() || !isConnected()) {
-                    Log.d("ServiceBroker", "publish deferred");
-                    doStart();
-                    return;
-                }
+                //if (!isOnline() || !isConnected()) {
+                //    Log.d("ServiceBroker", "publish deferred");
+                //    doStart();
+                //    return;
+                //}
 
                 message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
 
@@ -714,6 +714,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     //IMqttDeliveryToken t = ;
                     message.publishing();
                     synchronized (inflightMessagesLock) {
+                        // either works if client is connected or throws Exception if not.
+                        // If Client is initialized but not connected, it throws a paho exception and we have to remove the message in the catch
+                        // if client is not initialized and NullpointerException is thrown
+                        Log.v(this.toString(), "queueing message for delivery");
                         inflightMessages.put(ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message), message); // if we reach this point, the previous publish did not throw an exception and the message went out
                     }
                     Log.v(this.toString(), "queued message for delivery on thread: " +Thread.currentThread().getId());
@@ -723,18 +727,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                     }
                     // Handle TTL for message to discard it after message.ttl publish attempts or discard right away if message qos is 0
                     if (message.getQos() != 0 && message.decrementTTL() >= 1) {
+                        Log.v(this.toString(), "failed qos 1|2 message added to backlog");
                         synchronized (backlogLock) {
                             backlog.add(message);
                         }
                         message.publishQueued();
                     } else {
+                        Log.v(this.toString(), "failed qos 0 message dumped");
+
                         message.publishFailed();
                     }
 
-
+                    Log.e(this.toString(), "cought delivery exception. backlog size is: " + backlog.size());
                     e.printStackTrace();
-
-                    Log.e("ServiceBroker", message + ", error:" + e.getMessage());
                 } finally {
                 }
             }
@@ -751,6 +756,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     // After reconnecting, we try to deliver messages for which the publish previously threw an error
     // Messages are removed from the backlock, a publish is attempted and if the publish the message is added at the end of the backlog again until ttl reaches zero
     private void deliverBacklog() {
+        Log.v(this.toString(), "delivering backlog");
         Iterator<Message> i = backlog.iterator();
         while (i.hasNext() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
             Message m;
