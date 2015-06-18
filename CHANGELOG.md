@@ -1,7 +1,15 @@
 OwnTracks Android App Release Notes
 ===================================
 ## OwnTracks 0.5.14
->Release date: 2015-06-XX for alpha testers
+>Release date: 2015-06-18
+* [FIX] Messages in hosted mode were not queued because they defaulted to QoS 0. Changed that to QoS 1. 
+* [FIX] Messages were not inserted into the queue (derp!)
+* [FIX] Messages were not queued correctly when the MQTT client was not initialized previously
+* [NEW] Implemented a Broadcast Receiver for Geofence events to check whether it gives more reliable results
+* [NEW] Removed some anoying logging that flooded LogCat output
+
+## OwnTracks 0.5.14
+>Release date: 2015-06-17 for alpha testers
 * [FIX] #192 - Autostart on boot should be default
 * [FIX] #198 - Desc attribute not present in transition event
 * [FIX] #196 - Tid not configurable in hosted mode
