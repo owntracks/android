@@ -323,6 +323,11 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
                 public void onResult(Status status) {
                     if (status.isSuccess()) {
                         Log.v(this.toString(), "requestLocationUpdates successfull");
+
+                        //Log.e(this.toString(), "DEBUG: ADDING GEOFENCES AGAIN AFTER LOCATION REQUEST");
+                        //removeGeofences();
+                        //requestGeofences();
+
                     } else if (status.hasResolution()) {
                         Log.v(this.toString(), "requestLocationUpdates failed. HasResolution");
                     } else {
@@ -348,6 +353,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
             } else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL)) {
                 publishManualLocationMessage();
 			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_LOCATION_CHANGED)) {
+                Log.v(this.toString(), "handling INTENT_ACTION_LOCATION_CHANGED");
                 Location location = intent.getParcelableExtra(  LocationServices.FusedLocationApi.KEY_LOCATION_CHANGED);
 
                 // TODO: check if new location is newer and more accurate than last one
@@ -358,9 +364,13 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 
                     if (shouldPublishLocation())
                         publishLocationMessage();
+                } else {
+                    Log.e(this.toString(), "INTENT_ACTION_LOCATION_CHANGED without location");
                 }
-			} else if (intent.getAction().equals(ServiceProxy.INTENT_ACTION_FENCE_TRANSITION)) {
-				onFenceTransition(intent);
+			} else if (intent.getAction().equals("org.owntracks.android.geofence.ACTION_RECEIVE_GEOFENCE")) {
+                Log.v(this.toString(), "handling INTENT_ACTION_FENCE_TRANSITION");
+
+                onFenceTransition(intent);
 			} else {
 				Log.v(this.toString(), "Received unknown intent");
 			}
@@ -553,7 +563,7 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Log.v(this.toString(), "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId());
+            Log.v(this.toString(), "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId() );
 			fences.add(geofence);
 		}
 
@@ -563,7 +573,17 @@ public class ServiceLocator implements ProxyableService, MessageCallbacks, Googl
 		}
 
 		Log.v(this.toString(), "Adding " + fences.size() + " geofences");
-        PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_FENCE_TRANSITION, null));
+        //PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceProxy.INTENT_ACTION_FENCE_TRANSITION, null));
+
+
+
+        Intent intent = new Intent("org.ownracks.android.geofence.ACTION_RECEIVE_GEOFENCE"); // name for broadcast receiver filter
+        intent.setAction("org.owntracks.android.geofence.ACTION_RECEIVE_GEOFENCE"); // action for code path inside onStartCommand
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, pendingIntent);
+
         r.setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(Status status) {
