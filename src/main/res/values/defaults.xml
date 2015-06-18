@@ -29,7 +29,7 @@
     <bool name="valRemoteConfigurationHosted">false</bool>
     <bool name="valRemoteCommandDumpHosted">false</bool>
     <bool name="valPubRetainHosted">true</bool>
-    <integer name="valPubQosHosted">0</integer>
+    <integer name="valPubQosHosted">1</integer>
 
 
 
