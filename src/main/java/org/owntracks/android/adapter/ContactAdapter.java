@@ -14,6 +14,7 @@ import org.owntracks.android.model.Contact;
 
 
 public class ContactAdapter extends MultitypeAdapter{
+    private static final String TAG = "ContactAdapter";
 
     public ContactAdapter(Context context, ArrayList<Contact> contacts) {
         super(context);

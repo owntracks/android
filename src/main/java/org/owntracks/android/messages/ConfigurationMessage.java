@@ -12,6 +12,8 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.Preferences;
 
 public class ConfigurationMessage extends Message{
+    private static final String TAG = "ConfigurationMessage";
+
     private JSONObject json;
     public static enum Includes {CONNECTION, CREDENTIALS, IDENTIFICATION, WAYPOINTS}
 
@@ -81,8 +83,8 @@ public class ConfigurationMessage extends Message{
         json.remove(Preferences.getStringRessource(R.string.keyPort));
         json.remove(Preferences.getStringRessource(R.string.keyAuth));
         json.remove(Preferences.getStringRessource(R.string.keyTls));
-        json.remove(Preferences.getStringRessource(R.string.keyTlsCrtPath));
-        json.remove(Preferences.getStringRessource(R.string.keyConnectionAdvancedMode));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsClientCrtPath));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsCaCrtPath));
         json.remove(Preferences.getStringRessource(R.string.keyCleanSession));
         return this;
     }

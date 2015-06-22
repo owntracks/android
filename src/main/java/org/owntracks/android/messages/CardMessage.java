@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CardMessage extends Message {
+    private static final String TAG = "CardMessage";
+
     private String name;
     private String face;
 	public CardMessage(JSONObject json) {

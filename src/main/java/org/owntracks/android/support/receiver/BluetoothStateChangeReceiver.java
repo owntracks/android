@@ -1,4 +1,4 @@
-package org.owntracks.android.support;
+package org.owntracks.android.support.receiver;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -8,6 +8,8 @@ import android.content.Intent;
 import org.owntracks.android.services.ServiceProxy;
 
 public class BluetoothStateChangeReceiver extends BroadcastReceiver{
+    private static final String TAG = "BluetoothStateChangeReceiver";
+
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
 

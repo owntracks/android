@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class BeaconMessage extends Message {
+    private static final String TAG = "BeaconMessage";
 
     private Identifier uuid;
     private Identifier major;

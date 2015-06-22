@@ -13,10 +13,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.owntracks.android.support.receiver.ReceiverProxy;
+
 import de.greenrobot.event.EventBus;
 
 public class ServiceProxy extends ServiceBindable {
-    public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "org.owntracks.android.intent.PUB_LASTKNOWN";
+	private static final String TAG = "ServiceProxy";
+
+	public static final String INTENT_ACTION_PUBLISH_LASTKNOWN = "org.owntracks.android.intent.PUB_LASTKNOWN";
     public static final String INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL = "org.owntracks.android.intent.PUB_LASTKNOWN_MANUAL";
     public static final String INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION";
 
@@ -84,7 +88,6 @@ public class ServiceProxy extends ServiceBindable {
 		ProxyableService s = getServiceForIntent(intent);
 		if (s != null)
 			s.onStartCommand(intent, flags, startId);
-
 		return r;
 	}
 
@@ -142,6 +145,24 @@ public class ServiceProxy extends ServiceBindable {
 			return null;
 
 	}
+
+	public static PendingIntent getBroadcastIntentForService(Context c,  String targetServiceId, String action, Bundle extras) {
+		return getBroadcastIntentForService(c, targetServiceId, action, extras, -1);
+	}
+
+	public static PendingIntent getBroadcastIntentForService(Context c,  String targetServiceId, String action, Bundle extras, int flags) {
+		Intent i = new Intent().setClass(c, ReceiverProxy.class);
+		i.setAction(action);
+
+		if (extras != null)
+			i.putExtras(extras);
+		i.putExtra(KEY_SERVICE_ID, targetServiceId);
+
+		return PendingIntent.getBroadcast(c, 0, i, flags != -1 ? flags : PendingIntent.FLAG_CANCEL_CURRENT);
+	}
+
+
+
 
 	public static PendingIntent getPendingIntentForService(Context c,
 			String targetServiceId, String action, Bundle extras) {

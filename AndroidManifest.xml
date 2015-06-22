@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="18" /> <!-- For config import/export -->
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- For notifications -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- To trigger waypoints when entering a WIFI network -->
 
     <application
         android:name=".App"
@@ -35,12 +36,42 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
 
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="d0b0c708e43f69036ebedad1766ad086074d30f6" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name=".activities.ActivityLauncher"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activities.ActivityMain" >
+        </activity>
+        <activity
+            android:name=".activities.ActivityWaypoints"
+            android:label="@string/waypoints" >
+        </activity>
+        <activity
+            android:name=".activities.ActivityWaypoint"
+            android:label="Waypoint"
+            android:parentActivityName=".activities.ActivityWaypoints" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ActivityWaypoints" />
+        </activity>
+        <activity
+            android:name=".activities.ActivityMessages"
+            android:label="@string/pager" >
         </activity>
         <activity
             android:name=".activities.ActivityPreferences"
@@ -63,7 +94,6 @@
             android:name=".activities.ActivityImport"
             android:configChanges="orientation"
             android:label="@string/app_name" >
-
             <!-- Support two dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -91,48 +121,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
-
-
-
         </activity>
-
-
-        <service
-            android:name=".services.ServiceProxy"
-            android:exported="false" >
-        </service>
-
-        <activity
-            android:name=".activities.ActivityLauncher"
-            android:configChanges="orientation|keyboardHidden"
-            android:label="@string/app_name"
-            android:noHistory="true"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <receiver
-            android:name=".support.BootCompleteReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".support.LocationReceiver"
-                  android:enabled="true"
-                  android:exported="true">
-            <intent-filter >
-                <action android:name="org.owntracks.android.geofence.ACTION_RECEIVE_GEOFENCE"/>
-            </intent-filter>
-        </receiver>
-
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -144,21 +133,29 @@
         </provider>
 
 
-        <activity
-            android:name=".activities.ActivityWaypoints"
-            android:label="@string/waypoints" >
-        </activity>
-        <activity
-            android:name=".activities.ActivityWaypoint"
-            android:label="Waypoint"
-            android:parentActivityName=".activities.ActivityWaypoints" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.ActivityWaypoints" />
-        </activity>
-        <meta-data
-            android:name="com.crashlytics.ApiKey"
-            android:value="d0b0c708e43f69036ebedad1766ad086074d30f6" />
-    </application>
+        <service
+            android:name=".services.ServiceProxy"
+            android:enabled="true"
+            android:exported="false">
+        </service>
 
+        <receiver
+            android:name=".support.receiver.BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".support.receiver.ReceiverProxy"
+                  android:enabled="true">
+            <intent-filter >
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_RECONNECT"/>
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_PING"/>
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION"/>
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN"/>
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>

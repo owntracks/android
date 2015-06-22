@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import org.owntracks.android.R;
 
 public abstract class MultitypeAdapter extends BaseAdapter {
+    private static final String TAG = "MultitypeAdapter";
 
     public static final int ROW_TYPE_HEADER = 0;
     public static final int ROW_TYPE_ITEM = 1;

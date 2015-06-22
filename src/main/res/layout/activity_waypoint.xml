@@ -111,6 +111,20 @@
                 android:digits="0123456789"
                 android:inputType="numberDecimal"
                 />
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:visibility="gone"
+                android:layout_marginLeft="@dimen/default_spacing_half"
+                android:layout_marginStart="@dimen/default_spacing_half"
+                app:met_iconLeft="@drawable/ic_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ssid"
+                app:met_floatingLabel="normal"
+                app:met_baseColor="@color/textPrimary"
+                app:met_primaryColor="@color/accent"
+                android:id="@+id/ssid"
+                android:inputType="textVisiblePassword"
+                />
 
 
             <RelativeLayout

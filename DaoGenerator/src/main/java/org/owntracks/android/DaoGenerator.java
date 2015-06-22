@@ -10,7 +10,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 4;
+    private static final int SCHEMA_VERSION = 6;
 
     public static void main(String args[]) throws Exception {
 
@@ -19,7 +19,7 @@ public class DaoGenerator {
 
 
         Entity contactLink = schema.addEntity("ContactLink");
-        contactLink.addIdProperty();
+        contactLink.addIdProperty().columnName("_id");
         Property topic = contactLink.addStringProperty("topic").notNull().getProperty();
         contactLink.addLongProperty("contactId");
         Property modeId = contactLink.addIntProperty("modeId").notNull().getProperty();
@@ -42,8 +42,22 @@ public class DaoGenerator {
         waypoint.addStringProperty("ssid");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
+        waypoint.addDateProperty("lastTriggered");
         waypoint.addStringProperty("geofenceId");
         waypoint.addIntProperty("modeId").notNull();
+
+
+        Entity message = schema.addEntity("Message");
+        message.addStringProperty("id").primaryKey().columnName("_id");;
+        message.addLongProperty("tst");
+        message.addStringProperty("channel");
+        message.addStringProperty("sender");
+        message.addStringProperty("title");
+        message.addStringProperty("description");
+        message.addStringProperty("icon");
+        message.addIntProperty("priority");
+        message.addStringProperty("iconUrl");
+        message.addStringProperty("url");
 
         new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, args[0]);
     }

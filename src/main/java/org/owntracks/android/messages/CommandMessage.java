@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CommandMessage extends Message {
+    private static final String TAG = "CommandMessage";
+
     public static final String ACTION_REPORT_LOCATION = "reportLocation";
     String action;
 	public CommandMessage(String action) {

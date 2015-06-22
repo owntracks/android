@@ -36,15 +36,28 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tlsCrt"
+        android:id="@+id/tlsClientCrt"
         android:inputType="textNoSuggestions"
-        android:hint=""
+        android:hint="@string/preferencesClientCrtPath"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
-        app:met_floatingLabelAlwaysShown="true"
-        app:met_floatingLabelText="@string/preferencesCaCrtPath"
+        app:met_floatingLabelAlwaysShown="false"
+        app:met_floatingLabelText="@string/preferencesClientCrtPath"/>
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tlsCaCrt"
+        android:inputType="textNoSuggestions"
+        android:hint="@string/preferencesCaCrtPath"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelAlwaysShown="false"
+        app:met_floatingLabelText="@string/preferencesCaCrtPath"
         />
+
+
 
 </LinearLayout>

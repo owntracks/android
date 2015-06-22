@@ -32,8 +32,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Ssid = new Property(6, String.class, "ssid", false, "SSID");
         public final static Property Shared = new Property(7, Boolean.class, "shared", false, "SHARED");
         public final static Property Date = new Property(8, java.util.Date.class, "date", false, "DATE");
-        public final static Property GeofenceId = new Property(9, String.class, "geofenceId", false, "GEOFENCE_ID");
-        public final static Property ModeId = new Property(10, int.class, "modeId", false, "MODE_ID");
+        public final static Property LastTriggered = new Property(9, java.util.Date.class, "lastTriggered", false, "LAST_TRIGGERED");
+        public final static Property GeofenceId = new Property(10, String.class, "geofenceId", false, "GEOFENCE_ID");
+        public final static Property ModeId = new Property(11, int.class, "modeId", false, "MODE_ID");
     };
 
 
@@ -58,8 +59,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
                 "'SSID' TEXT," + // 6: ssid
                 "'SHARED' INTEGER," + // 7: shared
                 "'DATE' INTEGER," + // 8: date
-                "'GEOFENCE_ID' TEXT," + // 9: geofenceId
-                "'MODE_ID' INTEGER NOT NULL );"); // 10: modeId
+                "'LAST_TRIGGERED' INTEGER," + // 9: lastTriggered
+                "'GEOFENCE_ID' TEXT," + // 10: geofenceId
+                "'MODE_ID' INTEGER NOT NULL );"); // 11: modeId
     }
 
     /** Drops the underlying database table. */
@@ -118,11 +120,16 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             stmt.bindLong(9, date.getTime());
         }
  
+        java.util.Date lastTriggered = entity.getLastTriggered();
+        if (lastTriggered != null) {
+            stmt.bindLong(10, lastTriggered.getTime());
+        }
+ 
         String geofenceId = entity.getGeofenceId();
         if (geofenceId != null) {
-            stmt.bindString(10, geofenceId);
+            stmt.bindString(11, geofenceId);
         }
-        stmt.bindLong(11, entity.getModeId());
+        stmt.bindLong(12, entity.getModeId());
     }
 
     /** @inheritdoc */
@@ -144,8 +151,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // ssid
             cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0, // shared
             cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)), // date
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // geofenceId
-            cursor.getInt(offset + 10) // modeId
+            cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)), // lastTriggered
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // geofenceId
+            cursor.getInt(offset + 11) // modeId
         );
         return entity;
     }
@@ -162,8 +170,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         entity.setSsid(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setShared(cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0);
         entity.setDate(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
-        entity.setGeofenceId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setModeId(cursor.getInt(offset + 10));
+        entity.setLastTriggered(cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)));
+        entity.setGeofenceId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setModeId(cursor.getInt(offset + 11));
      }
     
     /** @inheritdoc */

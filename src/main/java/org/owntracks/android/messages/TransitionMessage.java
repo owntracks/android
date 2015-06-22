@@ -13,6 +13,8 @@ import org.owntracks.android.support.Preferences;
 import java.util.concurrent.TimeUnit;
 
 public class TransitionMessage extends Message{
+    private static final String TAG = "TransitionMessage";
+
     private GeocodableLocation location;
     private Waypoint waypoint;
     private String description;
@@ -22,6 +24,7 @@ public class TransitionMessage extends Message{
     private boolean supressesTicker;
     private long tst;
     private long wtst;
+    private boolean  ssidTransition = false;
 
     // For incoming messages
     public TransitionMessage(JSONObject json) throws JSONException{
@@ -77,7 +80,22 @@ public class TransitionMessage extends Message{
         this.waypoint = w;
     }
 
-	public boolean getSupressTicker() {
+    // For outgoing messages by ssid
+    public TransitionMessage(Waypoint w) {
+        super();
+        ssidTransition = true;
+        this.transition = -1;
+        this.supressesTicker = false;
+        this.trackerId = Preferences.getTrackerId(true);
+        this.location = new GeocodableLocation(w.getLocation());
+        this.transition = Geofence.GEOFENCE_TRANSITION_ENTER;
+        this.wtst  = TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime());
+        this.tst = TimeUnit.MILLISECONDS.toSeconds((new java.util.Date()).getTime());
+        this.waypoint = w;
+    }
+
+
+    public boolean getSupressTicker() {
 		return this.supressesTicker;
 	}
 	public void setSupressesTicker(boolean supressesTicker) {
@@ -147,7 +165,9 @@ public class TransitionMessage extends Message{
 
             if ((this.waypoint != null) && ((this.transition == Geofence.GEOFENCE_TRANSITION_EXIT) || (this.transition == Geofence.GEOFENCE_TRANSITION_ENTER))) {
                 json.put("desc", this.waypoint.getDescription());
-                    json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
+                json.put("event", this.transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "leave");
+                if(ssidTransition)
+                    json.put("t", "w"); // attribute for wifi transitions
             }
 
             if (this.trackerId != null && !this.trackerId.isEmpty())

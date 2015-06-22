@@ -227,7 +227,7 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:103:17
 	android:name
 		ADDED from AndroidManifest.xml:103:27
-receiver#org.owntracks.android.support.BootCompleteReceiver
+receiver#org.owntracks.android.support.receiver.BootCompleteReceiver
 ADDED from AndroidManifest.xml:107:9
 	android:exported
 		ADDED from AndroidManifest.xml:110:13

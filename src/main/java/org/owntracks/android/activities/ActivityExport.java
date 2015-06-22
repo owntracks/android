@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +37,9 @@ import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
 
-public class ActivityExport extends ActionBarActivity {
+public class ActivityExport extends AppCompatActivity {
+    private static final String TAG = "ActivityExport";
+
     private static final String TEMP_FILE_NAME = "config.otrc";
     private Switch includeConnection;
     private Switch includeCredentials;
@@ -159,7 +162,7 @@ public class ActivityExport extends ActionBarActivity {
         if (includeWaypoints.isChecked())
             includes.add(ConfigurationMessage.Includes.WAYPOINTS);
 
-        Log.v(this.toString(), "Export includes: " + includes);
+        Log.v(TAG, "Export includes: " + includes);
 
         ConfigurationMessage config = new ConfigurationMessage(includes);
         Log.v("Export", "Config: \n" + config.toString());
@@ -176,7 +179,7 @@ public class ActivityExport extends ActionBarActivity {
             writer.write(config.toString());
             writer.close();
 
-            Log.v(this.toString(), "Saved temporary config file for export to " + tempFile.getPath());
+            Log.v(TAG, "Saved temporary config file for export to " + tempFile.getPath());
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ To build a development version of the app from source, follow the instructions o
 4. Click on Sync Project with Gradle files to download all the dependencies
 5. Open the SDK manager to install the required Android SDK Tools and Android SDK Build-tools
 6. The project contains a preconfigured keystore to sign debug builds. If you already have a custom keystore you can specify it in build.gradle android.signingConfigs.debug
-7. Copy the file ```src/main/res/values/keys.xml``` to ```src/main/res/values-1/keys.xml```. If the ```src/main/res/values-1``` directory does not exist, create it. 
+7. Copy the file ```src/main/res/values/keys.xml``` to ```src/main/res/values-v1/keys.xml```. If the ```src/main/res/values-v1``` directory does not exist, create it. 
 8. Required: Create a custom Google Maps API Key
 	1. Go go to https://developers.google.com/maps/documentation/android/start
 	2. Scroll down to Obtain a Google Maps API key and follow the instructions
