@@ -65,6 +65,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends AppCompatActivity {
+    private static final String TAG = "ActivityMain";
+
     private static final int CONTACT_PICKER_RESULT = 1001;
     private static final int MENU_CONTACT_SHOW = 0;
     private static final int MENU_CONTACT_DETAILS = 1;
@@ -106,7 +108,7 @@ public class ActivityMain extends AppCompatActivity {
         drawerClickListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                Log.v(this.toString(), "" +drawerItem.getIdentifier());
+                Log.v(TAG, "" +drawerItem.getIdentifier());
 
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
@@ -115,6 +117,10 @@ public class ActivityMain extends AppCompatActivity {
                             FragmentHandler.getInstance().clearBackStack();
                             FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (AppCompatActivity) context, FragmentHandler.DIRECTION_BACK);
                         }
+                        return true;
+                    case R.string.idPager:
+                        Intent intent3 = new Intent(context, ActivityMessages.class);
+                        startActivity(intent3);
                         return true;
                     case R.string.idWaypoints:
                         Intent intent1 = new Intent(context, ActivityWaypoints.class);
@@ -144,7 +150,7 @@ public class ActivityMain extends AppCompatActivity {
 
 
         FragmentHandler.getInstance().init(ContactsFragment.class, drawer);
-        Log.v(this.toString(), "Fragment show current or root");
+        Log.v(TAG, "Fragment show current or root");
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
 	}
@@ -393,7 +399,7 @@ public class ActivityMain extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
-            Log.v(this.toString(), "report");
+            Log.v(TAG, "report");
             ServiceProxy.runOrBind(this, new Runnable() {
 
                 @Override
@@ -811,7 +817,7 @@ public class ActivityMain extends AppCompatActivity {
 
         private void removeContactLocation(Contact c) {
             removeContactMarker(c);
-            Log.v(this.toString(), Preferences.getSelectedContactTopic());
+            Log.v(TAG, Preferences.getSelectedContactTopic());
             if(c.getTopic() == Preferences.getSelectedContactTopic()) {
                 unfollowContact();
             }

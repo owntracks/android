@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="?android:attr/selectableItemBackground"
+
+    android:layout_height="wrap_content"
+    android:minHeight="72dp">
+
+
+    <org.owntracks.android.support.MaskingFrameLayout
+        android:id="@+id/imageMask"
+        android:layout_width="40dp"
+        app:porterduffxfermode="DST_IN"
+        app:mask="@drawable/mask_round"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+
+        android:layout_marginTop="16dp">
+
+        <IconTextView
+        android:id="@+id/image"
+        android:text="{fa-android}"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:background="@color/primary"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+
+        />
+    </org.owntracks.android.support.MaskingFrameLayout>
+
+    <LinearLayout
+        android:id="@+id/textview_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_toRightOf="@+id/imageMask"
+        android:layout_toEndOf="@+id/imageMask"
+
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#212121"
+            />
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#757575"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

@@ -6,13 +6,11 @@ import io.fabric.sdk.android.Fabric;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.DaoMaster;
-import org.owntracks.android.db.DaoMaster.OpenHelper;
 import org.owntracks.android.db.DaoSession;
-import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.services.ServiceBroker;
@@ -29,59 +27,49 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
 
 public class App extends Application {
-	private static App instance;
+    private static final String TAG = "App";
+
+    private static App instance;
 	private SimpleDateFormat dateFormater;
 
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
+    private MessageDao messageDao;
+
     private static HashMap<String, Contact> contacts;
     private static HashMap<String, Contact> initializingContacts;
 
     public static final int MODE_ID_PRIVATE=0;
     public static final int MODE_ID_HOSTED=1;
     public static final int MODE_ID_PUBLIC=2;
+    private SQLiteDatabase db;
 
 
-	@Override
+    @Override
 	public void onCreate() {
 		super.onCreate();
         instance = this;
         Preferences preferences = new Preferences(this);
 
         if(!BuildConfig.DEBUG) {
-            Log.v(this.toString(), "Fabric.io crash reporting enabled");
+            Log.v(TAG, "Fabric.io crash reporting enabled");
             Fabric.with(this, new Crashlytics());
             //final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
         }
 
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "org.owntracks.android.db", null);
 
-        OpenHelper helper = new OpenHelper(this, "org.owntracks.android.db", null) {
-            @Override
-            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                Log.v(this.toString(), "Migrating db from " + oldVersion  + " to  " + newVersion);
-                if(oldVersion == 1 && newVersion == 2) {
-                    DaoMaster.dropAllTables(db, true);
-                    DaoMaster.createAllTables(db, true);
-                } else if (oldVersion == 2 && newVersion == 3) {
-                    DaoMaster.dropAllTables(db, true);
-                    DaoMaster.createAllTables(db, true);
-                } else if (oldVersion == 3 && newVersion == 4) {
-                    DaoMaster.dropAllTables(db, true);
-                    DaoMaster.createAllTables(db, true);
-                }
-            }
-        };
-        SQLiteDatabase db = helper.getWritableDatabase();
+        db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
 		this.contactLinkDao = daoSession.getContactLinkDao();
 		this.waypointDao = daoSession.getWaypointDao();
+        this.messageDao = daoSession.getMessageDao();
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
@@ -93,9 +81,14 @@ public class App extends Application {
 
     }
 
-	public static WaypointDao getWaypointDao() {
-		return instance.waypointDao;
+	public static MessageDao getMessageDao() {
+		return instance.messageDao;
 	}
+
+    public static SQLiteDatabase getDb() { return instance.db; }
+    public static WaypointDao getWaypointDao() {
+        return instance.waypointDao;
+    }
 
 	public static ContactLinkDao getContactLinkDao() {
 		return instance.contactLinkDao;
@@ -116,7 +109,7 @@ public class App extends Application {
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if(e.getState() == ServiceBroker.State.CONNECTING) {
-            //Log.v(this.toString(), "State changed to connecting. Clearing cached contacts");
+            //Log.v(TAG, "State changed to connecting. Clearing cached contacts");
             instance.contacts.clear();
         }
     }
@@ -175,16 +168,4 @@ public class App extends Application {
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
 	}
-
-    public static void changeProfilePublic(){
-        //TODO:
-        // Set profile
-        // send event
-    }
-
-    public static void changeProfilePrivate(){
-        //TODO:
-        // Set profile
-        // send event
-    }
 }

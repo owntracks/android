@@ -1,5 +1,6 @@
 package org.owntracks.android.messages;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
@@ -11,6 +12,8 @@ import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Preferences;
 
 public class LocationMessage extends Message{
+    private static final String TAG = "LocationMessage";
+
     private GeocodableLocation location;
     private Waypoint waypoint;
     private String description;
@@ -93,7 +96,7 @@ public class LocationMessage extends Message{
             json.put("_type", "location")
             .put("lat", this.location.getLatitude())
             .put("lon", this.location.getLongitude())
-            .put("tst", (TimeUnit.MILLISECONDS.toSeconds(this.location.getTime())))
+            .put("tst", (TimeUnit.MILLISECONDS.toSeconds((new Date()).getTime())))
             .put("acc", Math.floor(this.location.getLocation().getAccuracy()));
 
             if (this.battery != -1)

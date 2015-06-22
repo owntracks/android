@@ -12,12 +12,10 @@
         <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
+        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
         <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
-        <afterSyncTasks>
-          <task>generateDebugAndroidTestSources</task>
-          <task>generateDebugSources</task>
-        </afterSyncTasks>
+        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
         <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
@@ -87,27 +85,30 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="play-services-maps-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="greendao-1.3.7" level="project" />
-    <orderEntry type="library" exported="" name="design-22.2.0" level="project" />
-    <orderEntry type="library" exported="" name="iconics-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="crashlytics-core-2.3.2" level="project" />
-    <orderEntry type="library" exported="" name="material-dialogs-0.7.5.2" level="project" />
-    <orderEntry type="library" exported="" name="play-services-base-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-22.2.0" level="project" />
-    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="library-2.1.4" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.2.0" level="project" />
+    <orderEntry type="library" exported="" name="greendao-1.3.7" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-22.2.0" level="project" />
+    <orderEntry type="library" exported="" name="android-beacon-library-2.3" level="project" />
     <orderEntry type="library" exported="" name="materialdrawer-3.0.6" level="project" />
-    <orderEntry type="library" exported="" name="answers-1.2.2" level="project" />
-    <orderEntry type="library" exported="" name="android-beacon-library-2.1.4" level="project" />
-    <orderEntry type="library" exported="" name="beta-1.1.2" level="project" />
-    <orderEntry type="library" exported="" name="fabric-1.3.3" level="project" />
-    <orderEntry type="library" exported="" name="crashlytics-2.3.2" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-22.2.0" level="project" />
-    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-7.5.0" level="project" />
+    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.0.2" level="project" />
+    <orderEntry type="library" exported="" name="play-services-base-7.5.0" level="project" />
+    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="library-2.1.4" level="project" />
+    <orderEntry type="library" exported="" name="iconics-1.0.2" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-22.2.0" level="project" />
+    <orderEntry type="library" exported="" name="crashlytics-2.3.2" level="project" />
+    <orderEntry type="library" exported="" name="fabric-1.3.3" level="project" />
+    <orderEntry type="library" exported="" name="crashlytics-core-2.3.2" level="project" />
+    <orderEntry type="library" exported="" name="beta-1.1.2" level="project" />
+    <orderEntry type="library" exported="" name="android-iconify-1.0.9" level="project" />
+    <orderEntry type="library" exported="" name="android-section-adapter-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="geohash-1.1.0" level="project" />
+    <orderEntry type="library" exported="" name="design-22.2.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-maps-7.5.0" level="project" />
+    <orderEntry type="library" exported="" name="answers-1.2.2" level="project" />
+    <orderEntry type="library" exported="" name="material-dialogs-0.7.5.2" level="project" />
   </component>
 </module>

@@ -14,7 +14,9 @@
     <string name="preferencesBrokerPasswordHosted">"Token"</string>
     <string name="preferencesDeviceNameHosted">"Device"</string>
 
-    <string name="preferencesCaCrtPath">Custom certificate path</string>
+    <string name="preferencesCaCrtPath">Custom .crt certificate path</string>
+    <string name="preferencesClientCrtPath">Custom .p12 key pair path</string>
+
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
     <string name="preferencesLicenses">"Thanks"</string>
@@ -106,8 +108,6 @@
     <string name="preferencesBeaconForegroundPeriodSummary">Seconds between foreground beacon scans</string>
     <string name="preferencesBeaconBackgroundPeriod">Background beacon scannning period</string>
     <string name="preferencesBeaconBackgroundPeriodSummary">Seconds between background beacon scans</string>
-    <string name="preferencesRemoteCommandDump">Remote dump command</string>
-    <string name="preferencesRemoteCommandDumpSummary">Respond to dump command</string>
     <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
     <string name="preferencesRemoteCommandReportLocationSummary">Respond to report location command</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
@@ -194,6 +194,12 @@
     <string name="snackbarConnected">Connected</string>
     <string name="snackbarDisconnected">Disconnected</string>
     <string name="snackbarDisconnectedError">Disconnected with error</string>
+    <string name="geofenceLastTransition">Last transition:</string>
+    <string name="ssid">SSID</string>
+    <string name="idPager">Messages</string>
+    <string name="pager">Messages</string>
+    <string name="keyCurrentGeohash">currentGeohash</string>
+    <string name="keyCurrentGeohashChannels">currentGeohashChannels</string>
     <string-array name="qos_readable">
        p <item>"0"</item>
         <item>"1"</item>

@@ -19,6 +19,7 @@ public class Waypoint {
     private String ssid;
     private Boolean shared;
     private java.util.Date date;
+    private java.util.Date lastTriggered;
     private String geofenceId;
     private int modeId;
 
@@ -32,7 +33,7 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, String geocoder, Double latitude, Double longitude, Integer radius, String ssid, Boolean shared, java.util.Date date, String geofenceId, int modeId) {
+    public Waypoint(Long id, String description, String geocoder, Double latitude, Double longitude, Integer radius, String ssid, Boolean shared, java.util.Date date, java.util.Date lastTriggered, String geofenceId, int modeId) {
         this.id = id;
         this.description = description;
         this.geocoder = geocoder;
@@ -42,6 +43,7 @@ public class Waypoint {
         this.ssid = ssid;
         this.shared = shared;
         this.date = date;
+        this.lastTriggered = lastTriggered;
         this.geofenceId = geofenceId;
         this.modeId = modeId;
     }
@@ -118,6 +120,14 @@ public class Waypoint {
         this.date = date;
     }
 
+    public java.util.Date getLastTriggered() {
+        return lastTriggered;
+    }
+
+    public void setLastTriggered(java.util.Date lastTriggered) {
+        this.lastTriggered = lastTriggered;
+    }
+
     public String getGeofenceId() {
         return geofenceId;
     }
@@ -140,7 +150,7 @@ public class Waypoint {
         l.setGeocoder(getGeocoder());
         l.setLatitude(getLatitude());
         l.setLongitude(getLongitude());
-        l.setAccuracy(getRadius());
+        l.setAccuracy(getRadius() != null ? getRadius() : 0);
         return l;
     }
     // KEEP METHODS END

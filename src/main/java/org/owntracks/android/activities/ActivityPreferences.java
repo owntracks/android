@@ -36,6 +36,8 @@ import org.owntracks.android.support.Preferences;
 import de.greenrobot.event.EventBus;
 
 public class ActivityPreferences extends AppCompatActivity {
+    private static final String TAG = "ActivityPreferences";
+
     static Preference connectionPreferenceScreen;
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
@@ -44,12 +46,12 @@ public class ActivityPreferences extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
-        Log.v(this.toString(), "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
+        Log.v(TAG, "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
             case (REQUEST_CODE_CONNECTION) : {
-                Log.v(this.toString(), "onActivityResult with REQUEST_CODE_CONNECTION");
+                Log.v(TAG, "onActivityResult with REQUEST_CODE_CONNECTION");
                 if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
-                    Log.v(this.toString(),"recreating ActivityPreferences due to mode change");
+                    Log.v(TAG,"recreating ActivityPreferences due to mode change");
                     this.recreate();
                 }
 
@@ -77,6 +79,10 @@ public class ActivityPreferences extends AppCompatActivity {
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         goToRoot();
+                        return true;
+                    case R.string.idPager:
+                        Intent intent1 = new Intent(context, ActivityMessages.class);
+                        startActivity(intent1);
                         return true;
                     case R.string.idWaypoints:
                         Intent intent = new Intent(context, ActivityWaypoints.class);
@@ -172,7 +178,7 @@ public class ActivityPreferences extends AppCompatActivity {
             PackageManager pm = a.getPackageManager();
             modesReadable = getResources().getStringArray(R.array.profileIds_readable);
 
-            Log.v(this.toString(), "Prepping preferences: " + Preferences.getModeId());
+            Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
             if (Preferences.isModePrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
@@ -261,7 +267,7 @@ public class ActivityPreferences extends AppCompatActivity {
 
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Log.v(this.toString(), "startActivityForResult ActivityPreferencesConnection");
+                    Log.v(TAG, "startActivityForResult ActivityPreferencesConnection");
                     Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getActivity().startActivityForResult(intent, REQUEST_CODE_CONNECTION);

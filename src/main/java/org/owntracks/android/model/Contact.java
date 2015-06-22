@@ -30,7 +30,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
 public class Contact {
-	private int uid;
+    private static final String TAG = "Contact";
+
+    private int uid;
     private String topic;
     private String trackerId;
     private GeocodableLocation location;

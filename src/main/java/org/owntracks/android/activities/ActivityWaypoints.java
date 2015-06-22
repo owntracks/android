@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -23,8 +23,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.WaypointAdapter;
-import org.owntracks.android.db.ContactLink;
-import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
@@ -38,12 +36,12 @@ import org.owntracks.android.support.StaticHandlerInterface;
 
 import java.util.ArrayList;
 
-import de.greenrobot.dao.query.Query;
-import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoints extends ActionBarActivity implements StaticHandlerInterface {
+public class ActivityWaypoints extends AppCompatActivity implements StaticHandlerInterface {
+    private static final String TAG = "ActivityWaypoints";
+
     private ListView listView;
     private WaypointAdapter listAdapter;
     private WaypointDao dao;
@@ -77,12 +75,16 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
                 if (drawerItem == null)
                     return false;
 
-                Log.v(this.toString(), "Drawer item clicked: " + drawerItem.getIdentifier());
+                Log.v(TAG, "Drawer item clicked: " + drawerItem.getIdentifier());
                 DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         goToRoot();
+                        return true;
+                    case R.string.idPager:
+                        Intent intent1 = new Intent(context, ActivityMessages.class);
+                        startActivity(intent1);
                         return true;
                     case R.string.idWaypoints:
                         return true;
@@ -167,7 +169,7 @@ public class ActivityWaypoints extends ActionBarActivity implements StaticHandle
 
     protected void remove(Waypoint w) {
         this.dao.delete(w);
-        Log.v(this.toString(), "Waypoint " +w + " removed ");
+        Log.v(TAG, "Waypoint " +w + " removed ");
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
     }
 

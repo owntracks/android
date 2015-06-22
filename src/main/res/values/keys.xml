@@ -12,7 +12,9 @@
     <string name="keyPubRetain">pubRetain</string>
     <string name="keyCleanSession">cleanSession</string>
     <string name="keyTls">tls</string>
-    <string name="keyTlsCrtPath">tlsCrtPath</string>
+    <string name="keyTlsCaCrtPath">tlsCaCrtPath</string>
+    <string name="keyTlsClientCrtPath">tlsClientCrtPath</string>
+
     <string name="keyLocatorDisplacement">locatorDisplacement</string>
     <string name="keyLocatorInterval">locatorInterval</string>
     <string name="keyAuth">auth</string>
@@ -38,7 +40,6 @@
     <string name="keyLocatorAccuracyBackground">locatorAccuracyBackground</string>
     <string name="keyLocatorAccuracyForeground">locatorAccuracyForeground</string>
     <string name="keyZeroLenghClientIdEnabled">zeroLenghClientIdEnabled</string>
-    <string name="keyRemoteCommandDump">remoteCommandDump</string>
     <string name="keyRemoteCommandReportLocation">remoteCommandReportLocation</string>
     <string name="keyRemoteConfiguration">remoteConfiguration</string>
     <string name="keyCustomBeaconLayout">customBeaconLayout</string>

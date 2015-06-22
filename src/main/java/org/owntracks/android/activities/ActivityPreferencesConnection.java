@@ -1,51 +1,39 @@
 package org.owntracks.android.activities;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
-import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerFactory;
-import org.owntracks.android.support.EditIntegerPreference;
-import org.owntracks.android.support.EditStringPreference;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
 import de.greenrobot.event.EventBus;
 
 public class ActivityPreferencesConnection extends AppCompatActivity {
+    private static final String TAG = "ActivityPreferencesCon";
+
     private static boolean modeSwitch = false;
     public static final String KEY_MODE_CHANGED = "modeChanged";
 
@@ -77,7 +65,6 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:     // If the user hits the toolbar back arrow, go back to ActivityMain, no matter where he came from (same as hitting back)
-                Log.v(this.toString(), "onOptionsItemSelected: android.R.id.home");
                 handleBack();
                 return true;
             default:
@@ -87,7 +74,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
     }
 
     private void handleBack() {
-        Log.v("ConnectionPReferences", "handleBack. MOdeChange: " + modeSwitch);
+        Log.v("ConnectionPReferences", "handleBack. ModeChange: " + modeSwitch);
         Intent resultIntent = new Intent();
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         resultIntent.putExtra(KEY_MODE_CHANGED, modeSwitch); // signal preferences activity if it has to reload the preferences tree after a mode switch
@@ -262,9 +249,9 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
-                                    Log.v(this.toString(), Preferences.getUsername());
-                                    Log.v(this.toString(), Preferences.getPassword());
-                                    Log.v(this.toString(), Preferences.getDeviceId(false));
+                                    Log.v(TAG, Preferences.getUsername());
+                                    Log.v(TAG, Preferences.getPassword());
+                                    Log.v(TAG, Preferences.getDeviceId(false));
                                     username.setText(Preferences.getUsername());
                                     password.setText(Preferences.getPassword());
                                     deviceId.setText(Preferences.getDeviceId(false));
@@ -319,16 +306,22 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                 public void onShow(DialogInterface dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     Switch tls = (Switch) d.findViewById(R.id.tls);
-                                    final MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+                                    final MaterialEditText tlsCaCrt = (MaterialEditText) d.findViewById(R.id.tlsCaCrt);
+                                    final MaterialEditText tlsClientCrt = (MaterialEditText) d.findViewById(R.id.tlsClientCrt);
+
                                     tls.setChecked(tlsVal);
-                                    tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
-                                    tlsCrt.setText(Preferences.getTlsCrtPath());
+                                    tlsCaCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsCaCrt.setText(Preferences.getTlsCaCrtPath());
+
+                                    tlsClientCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                    tlsClientCrt.setText(Preferences.getTlsCaCrtPath());
 
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
                                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                             tlsVal = isChecked;
-                                            tlsCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                            tlsCaCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
+                                            tlsClientCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
                                         }
                                     });
 
@@ -339,10 +332,12 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    MaterialEditText tlsCrt = (MaterialEditText) d.findViewById(R.id.tlsCrt);
+                                    MaterialEditText tlsCaCrt = (MaterialEditText) d.findViewById(R.id.tlsCaCrt);
+                                    MaterialEditText tlsClientCrt = (MaterialEditText) d.findViewById(R.id.tlsClientCrt);
 
                                     Preferences.setTls(tlsVal);
-                                    Preferences.setTlsCrtPath(tlsCrt.getText().toString());
+                                    Preferences.setTlsCaCrtPath(tlsCaCrt.getText().toString());
+                                    Preferences.setTlsCaCrtPath(tlsClientCrt.getText().toString());
 
                                     updateConnectButton();
                                 }
@@ -390,7 +385,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
-                                    Log.v(this.toString(), "saving parameters");
+                                    Log.v(TAG, "saving parameters");
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
 
@@ -425,7 +420,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
             setHasOptionsMenu(true);
 
 
-            Log.v(this.toString(), "Prepping preferences: " + Preferences.getModeId());
+            Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
 
             if (Preferences.isModePrivate()) {
@@ -439,7 +434,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                 loadIdentificationPreferences(a);
 
             } else if (Preferences.isModeHosted()) {
-                Log.v(this.toString(), "Prepping hosted preferences");
+                Log.v(TAG, "Prepping hosted preferences");
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HOSTED);
                 addPreferencesFromResource(R.xml.preferences_hosted_connection);
 
@@ -469,13 +464,13 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
         @Override
         public void onStart() {
             super.onStart();
-            Log.v(this.toString(), "onStart registerSticky");
+            Log.v(TAG, "onStart registerSticky");
             EventBus.getDefault().registerSticky(this);
         }
 
         @Override
         public void onStop() {
-            Log.v(this.toString(), "onStop unregister");
+            Log.v(TAG, "onStop unregister");
 
             EventBus.getDefault().unregister(this);
             super.onStop();
@@ -487,7 +482,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
         }
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            Log.v(this.toString(), "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
+            Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
             if(cachedState != null) {
                 if(e.getState() == ServiceBroker.State.CONNECTED) {
                     Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnected, Snackbar.LENGTH_LONG).show(); // Don’t forget to show!
@@ -509,7 +504,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            Log.v(this.toString(), "onCreateOptionsMenu");
+            Log.v(TAG, "onCreateOptionsMenu");
             if(menu != null) {
                 mMenu = menu;
                 mInflater = inflater;

@@ -6,12 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import com.google.android.gms.common.ConnectionResult;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
@@ -29,17 +26,19 @@ import java.util.ArrayList;
 import de.greenrobot.event.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.BeaconMessage;
-import org.owntracks.android.support.BluetoothStateChangeReceiver;
+import org.owntracks.android.support.receiver.BluetoothStateChangeReceiver;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.MessageCallbacks;
+import org.owntracks.android.support.MessageLifecycleCallbacks;
 
 // Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
 //  -> https://github.com/AltBeacon/spec
 
 public class ServiceBeacon implements
-        ProxyableService, MessageCallbacks,
+        ProxyableService, MessageLifecycleCallbacks,
         BootstrapNotifier, RangeNotifier {
+    private static final String TAG = "ServiceBeacon";
+
     public static enum State {
         INITIAL, PUBLISHING, PUBLISHING_WAITING, PUBLISHING_TIMEOUT, NOTOPIC, NOBLUETOOTH
     }
@@ -56,20 +55,20 @@ public class ServiceBeacon implements
     public void setBluetoothMode(int state) {
         switch (state) {
             case BluetoothAdapter.STATE_OFF:
-                Log.v(this.toString(), "Bluetooth turned off");
+                Log.v(TAG, "Bluetooth turned off");
                 stopBeaconScanning();
                 break;
             case BluetoothAdapter.STATE_TURNING_OFF:
-                Log.v(this.toString(), "Bluetooth is turning off");
+                Log.v(TAG, "Bluetooth is turning off");
                 stopBeaconScanning();
                 break;
             case BluetoothAdapter.STATE_ON:
-                Log.v(this.toString(), "Bluetooth on");
+                Log.v(TAG, "Bluetooth on");
                 if(Preferences.getBeaconRangingEnabled())
                     initializeBeaconScanning();
                 break;
             case BluetoothAdapter.STATE_TURNING_ON:
-                Log.v(this.toString(), "Bluetooth is turning on");
+                Log.v(TAG, "Bluetooth is turning on");
                 break;
         }
     }
@@ -89,18 +88,18 @@ public class ServiceBeacon implements
 
     @Override
     public void didDetermineStateForRegion(int arg0, Region arg1) {
-        Log.v(this.toString(), "didDetermineStateForRegion: " + arg1.getUniqueId() + ", " + arg1.toString());
+        Log.v(TAG, "didDetermineStateForRegion: " + arg1.getUniqueId() + ", " + arg1.toString());
     }
 
     @Override
     public void didEnterRegion(Region arg0) {
-        Log.d(this.toString(), "Region entered: " + arg0.getUniqueId() + ", " + arg0.toString());
+        Log.d(TAG, "Region entered: " + arg0.getUniqueId() + ", " + arg0.toString());
         try {
-            Log.v(this.toString(), "Beginning ranging");
+            Log.v(TAG, "Beginning ranging");
             mBeaconManager.startRangingBeaconsInRegion(region);
             mBeaconManager.setRangeNotifier(this);
         } catch (RemoteException e) {
-            Log.e(this.toString(), "Cannot start ranging");
+            Log.e(TAG, "Cannot start ranging");
         }
 
 
@@ -108,14 +107,14 @@ public class ServiceBeacon implements
 
     @Override
     public void didExitRegion(Region arg0) {
-        Log.v(this.toString(), "didExitRegion: " + arg0.getUniqueId() + ", " + arg0.toString());
+        Log.v(TAG, "didExitRegion: " + arg0.getUniqueId() + ", " + arg0.toString());
     }
 
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> arg0, Region arg1) {
         for(Beacon beacon : arg0)
         {
-            Log.d(this.toString(), "Found beacon: " + beacon.getId1());
+            Log.d(TAG, "Found beacon: " + beacon.getId1());
 
             int proximity = 0;
             double distance = beacon.getDistance();
@@ -175,17 +174,17 @@ public class ServiceBeacon implements
         region = new Region("all beacons", null, null, null);
 
         if(Preferences.getBeaconRangingEnabled()) {
-            Log.v(this.toString(), "Ranging enabled on startup");
+            Log.v(TAG, "Ranging enabled on startup");
             initializeBeaconScanning();
         } else
-            Log.v(this.toString(), "Ranging disabled on startup");
+            Log.v(TAG, "Ranging disabled on startup");
     }
 
     private void handlePreferences(String key)
     {
         if (key.equals(Preferences.getKey(R.string.keyBeaconRangingEnabled)))
         {
-            Log.v(this.toString(), "Beacon ranging toggle");
+            Log.v(TAG, "Beacon ranging toggle");
             if(Preferences.getBeaconRangingEnabled())
                 initializeBeaconScanning();
             else
@@ -193,46 +192,46 @@ public class ServiceBeacon implements
         }
         else if(key.equals(Preferences.getKey(R.string.keyCustomBeaconLayout)))
         {
-            Log.v(this.toString(), "Setting custom beacon layout");
+            Log.v(TAG, "Setting custom beacon layout");
             refreshCustomParser();
         }
         else if(key.equals(Preferences.getKey(R.string.keyBeaconBackgroundScanPeriod)))
         {
-            Log.v(this.toString(), "Setting background beacon scan period");
+            Log.v(TAG, "Setting background beacon scan period");
             setBeaconScanningIntervals();
         }
         else if(key.equals(Preferences.getKey(R.string.keyBeaconForegroundScanPeriod)))
         {
-            Log.v(this.toString(), "Setting foreground beacon scan period");
+            Log.v(TAG, "Setting foreground beacon scan period");
             setBeaconScanningIntervals();
         }
     }
 
     private void initializeBeaconScanning()
     {
-        Log.v(this.toString(), "Initializing beacon scanning");
+        Log.v(TAG, "Initializing beacon scanning");
 
         try
         {
             if(!mBeaconManager.checkAvailability()) {
                 changeState(ServiceBeacon.State.NOBLUETOOTH);
-                Log.e(this.toString(), "Bluetooth not available");
+                Log.e(TAG, "Bluetooth not available");
                 return;
             }
         }
         catch (BleNotAvailableException e)
         {
             changeState(ServiceBeacon.State.NOBLUETOOTH);
-            Log.e(this.toString(), "Bluetooth not available");
+            Log.e(TAG, "Bluetooth not available");
             return;
         }
 
-        Log.v(this.toString(), "Beacon scanning should be available");
+        Log.v(TAG, "Beacon scanning should be available");
         setBeaconScanningIntervals();
 
         refreshCustomParser();
 
-        Log.v(this.toString(), "Setting up RegionBootstrap");
+        Log.v(TAG, "Setting up RegionBootstrap");
         regionBootstrap = new RegionBootstrap(this, region);
 
         scanningState = ScanningState.ENABLED;
@@ -257,9 +256,9 @@ public class ServiceBeacon implements
         String customBeaconlayout = Preferences.getCustomBeaconLayout();
         if(!customBeaconlayout.equals(""))
         {
-            Log.v(this.toString(), "Got custom parser layout");
+            Log.v(TAG, "Got custom parser layout");
             List<BeaconParser> parsers = new ArrayList<BeaconParser>(mBeaconManager.getBeaconParsers());
-            Log.v(this.toString(), "Parser count: " + parsers.size());
+            Log.v(TAG, "Parser count: " + parsers.size());
 
             if(parsers.size() > 0)
                 parsers.remove(parsers.get(parsers.size() - 1)); // Remove last parser
@@ -270,7 +269,7 @@ public class ServiceBeacon implements
 
     private void stopBeaconScanning()
     {
-        Log.v(this.toString(), "Stopping beacon scanning");
+        Log.v(TAG, "Stopping beacon scanning");
 
         if(scanningState != ScanningState.ENABLED)
             return;
@@ -285,7 +284,7 @@ public class ServiceBeacon implements
         }
         catch (RemoteException e)
         {
-            Log.e(this.toString(), e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -294,7 +293,7 @@ public class ServiceBeacon implements
 
         // Safety checks
         if (ServiceProxy.getServiceBroker() == null) {
-            Log.e(this.toString(), "publishLocationMessage but ServiceMqtt not ready");
+            Log.e(TAG, "publishLocationMessage but ServiceMqtt not ready");
             return;
         }
 
@@ -312,7 +311,7 @@ public class ServiceBeacon implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(this.toString(), "Received an intent");
+        Log.v(TAG, "Received an intent");
 
         return 0;
     }
@@ -332,7 +331,7 @@ public class ServiceBeacon implements
     }
 
     private void changeState(ServiceBeacon.State newState) {
-        Log.d(this.toString(), "ServiceBeacon state changed to: " + newState);
+        Log.d(TAG, "ServiceBeacon state changed to: " + newState);
         EventBus.getDefault().postSticky(
                 new Events.StateChanged.ServiceBeacon(newState));
         state = newState;
@@ -347,22 +346,22 @@ public class ServiceBeacon implements
     }
 
     @Override
-    public void publishSuccessfull(Object extra, boolean wasQueued) {
+    public void onMessagePublishSuccessful(Object extra, boolean wasQueued) {
 
     }
 
     @Override
-    public void publishFailed(Object extra) {
+    public void onMessagePublishFailed(Object extra) {
         changeState(ServiceBeacon.State.PUBLISHING_TIMEOUT);
     }
 
     @Override
-    public void publishing(Object extra) {
+    public void onMesssagePublishing(Object extra) {
         changeState(ServiceBeacon.State.PUBLISHING);
     }
 
     @Override
-    public void publishQueued(Object extra) {
+    public void onMessagePublishQueued(Object extra) {
 
     }
 

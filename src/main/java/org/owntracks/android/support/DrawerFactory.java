@@ -20,6 +20,8 @@ import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityPreferences;
 
 public class DrawerFactory {
+    private static final String TAG = "DrawerFactory";
+
     public static Drawer buildDrawer(Activity activity, Toolbar toolbar, final Drawer.OnDrawerItemClickListener listener, int selection) {
         return buildDrawer(activity, toolbar, listener, null, selection);
     }
@@ -38,6 +40,7 @@ public class DrawerFactory {
             .addDrawerItems(
                     //                    new DividerDrawerItem(),
                     new PrimaryDrawerItem().withName("Locations").withIdentifier(R.string.idLocations).withTag("loc").withIcon(FontAwesome.Icon.faw_map_marker),
+                    new PrimaryDrawerItem().withName("Messages").withIdentifier(R.string.idPager).withTag("pag").withIcon(FontAwesome.Icon.faw_bell),
                     new PrimaryDrawerItem().withName("Waypoints").withIdentifier(R.string.idWaypoints).withTag("way").withIcon(FontAwesome.Icon.faw_street_view)
             )
             .addStickyDrawerItems(new SecondaryDrawerItem().withName("Preferences").withIdentifier(R.string.idSettings).withTag("set").withIcon(FontAwesome.Icon.faw_cog))

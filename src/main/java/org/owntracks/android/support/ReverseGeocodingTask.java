@@ -14,6 +14,7 @@ import android.os.Message;
 
 // AsyncTask encapsulating the reverse-geocoding API
 public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
+	private static final String TAG = "ReverseGeocodingTask";
 
     private Context mContext;
     private Handler mHandler;

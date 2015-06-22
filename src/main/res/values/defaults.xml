@@ -14,7 +14,6 @@
     <bool name="valTlsPublic">true</bool>
     <bool name="valRemoteConfigurationPublic">false</bool>
     <bool name="valPubRetainPublic">false</bool>
-    <bool name="valRemoteCommandDumpPublic">false</bool>
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
 
@@ -27,7 +26,6 @@
     <bool name="valAuthHosted">true</bool>
     <bool name="valTlsHosted">true</bool>
     <bool name="valRemoteConfigurationHosted">false</bool>
-    <bool name="valRemoteCommandDumpHosted">false</bool>
     <bool name="valPubRetainHosted">true</bool>
     <integer name="valPubQosHosted">1</integer>
 
@@ -76,7 +74,6 @@
     <bool name="valZeroLenghClientIdEnabled">false</bool>
     <bool name="valAuth">true</bool>
     <bool name="valRemoteCommandReportLocation">false</bool>
-    <bool name="valRemoteCommandDump">false</bool>
     <bool name="valRemoteConfiguration">false</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valNotificationOnReceivedWaypointTransition">true</bool>

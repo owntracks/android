@@ -146,11 +146,6 @@
             android:summary="@string/preferencesRemoteCommandReportLocationSummary"
             android:title="@string/preferencesRemoteCommandReportLocation" />
         <SwitchPreference
-            android:defaultValue="@bool/valRemoteCommandDump"
-            android:key="@string/keyRemoteCommandDump"
-            android:summary="@string/preferencesRemoteCommandDumpSummary"
-            android:title="@string/preferencesRemoteCommandDump" />
-        <SwitchPreference
             android:defaultValue="@bool/valRemoteConfiguration"
             android:key="@string/keyRemoteConfiguration"
             android:summary="@string/preferencesRemoteConfigurationSummary"
