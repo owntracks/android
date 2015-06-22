@@ -1,6 +1,8 @@
 package org.owntracks.android.adapter;
 
 import java.util.ArrayList;
+
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.Contact;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class WaypointAdapter extends MultitypeAdapter {
+    private static final String TAG = "WaypointAdapter";
 
     public WaypointAdapter(Context context) {
         super(context);
@@ -60,7 +63,12 @@ public class WaypointAdapter extends MultitypeAdapter {
             holder.location.setText(((Waypoint) item).getGeocoder() != null ? ((Waypoint) item).getGeocoder()  :(((Waypoint) item).getLatitude() + " : " + ((Waypoint) item).getLongitude()));
             if(((Waypoint) item).getRadius() != null && ((Waypoint) item).getRadius()  > 0) {
                 holder.details.setVisibility(View.VISIBLE);
-                holder.details.setText(context.getString(R.string.geofenceActive));
+                if(((Waypoint) item).getLastTriggered() != null) {
+                    holder.details.setText(context.getString(R.string.geofenceLastTransition) + " " +  App.formatDate(((Waypoint) item).getLastTriggered()));
+
+                } else {
+                    holder.details.setText(context.getString(R.string.geofenceActive));
+                }
             }else {
                 holder.details.setVisibility(View.GONE);
             }

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -33,7 +34,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.EnumSet;
 
-public class ActivityImport extends ActionBarActivity {
+public class ActivityImport extends AppCompatActivity {
+    private static final String TAG = "ActivityImport";
+
     private TextView input;
     private MenuItem saveButton;
     JSONObject configJSON = null;
@@ -51,17 +54,17 @@ public class ActivityImport extends ActionBarActivity {
 
         input = (TextView) findViewById(R.id.input);
 
-        Log.v(this.toString(), "checking for import intent");
+        Log.v(TAG, "checking for import intent");
         // Look for Import Preference File Intent
         final Intent intent = getIntent();
         final String action = intent.getAction();
-        Log.v(this.toString(), "action: " + intent.getAction());
+        Log.v(TAG, "action: " + intent.getAction());
 
         if(Intent.ACTION_VIEW.equals(action)) {
-            Log.v(this.toString(), "action ok, getting data uri");
+            Log.v(TAG, "action ok, getting data uri");
 
             Uri uri = intent.getData();
-            Log.v(this.toString(), "uri: " + uri);
+            Log.v(TAG, "uri: " + uri);
 
             if (uri != null) {
                 extractPreferences(uri);
@@ -98,7 +101,7 @@ public class ActivityImport extends ActionBarActivity {
     }
 
     private void importAction() {
-        Log.v(this.toString(), "Importing configuration. Brace for impact.");
+        Log.v(TAG, "Importing configuration. Brace for impact.");
         Preferences.fromJsonObject(configJSON);
 
         importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
@@ -124,7 +127,7 @@ public class ActivityImport extends ActionBarActivity {
                 throw new Error("Unable to load content into memory");
             }
 
-            Log.v(this.toString(), "file content: " + total);
+            Log.v(TAG, "file content: " + total);
 
 
             if(total == null) {
@@ -137,10 +140,10 @@ public class ActivityImport extends ActionBarActivity {
             }
 
 
-            //            Log.v(this.toString(), "parsing to JSON");
+            //            Log.v(TAG, "parsing to JSON");
 //            StringifiedJSONObject j = new StringifiedJSONObject(fileContent);
 
-//            Log.v(this.toString(), "json: " + j.toString());
+//            Log.v(TAG, "json: " + j.toString());
 
 
             configJSON = j;

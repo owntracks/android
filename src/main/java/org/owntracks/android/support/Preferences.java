@@ -16,18 +16,16 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationRequest;
-
 import org.json.JSONException;
 
 import de.greenrobot.event.EventBus;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.services.ServiceProxy;
 
 public class Preferences {
+    private static final String TAG = "Preferences";
+
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     public static final String FILENAME_HOSTED = "org.owntracks.android.preferences.hosted";
     public static final String FILENAME_PUBLIC = "org.owntracks.android.preferences.public";
@@ -53,7 +51,7 @@ public class Preferences {
     }
 
     public Preferences(Context c){
-        Log.v(this.toString(), "preferences initializing");
+        Log.v(TAG, "preferences initializing");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
         hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, Context.MODE_PRIVATE);
@@ -74,7 +72,7 @@ public class Preferences {
     }
     private static void setMode(int active, boolean init){
         int oldModeId = modeId;
-        Log.v("Preferences", "setting mode to: " + active);
+        Log.v(TAG, "setting mode to: " + active);
         modeId = active;
         switch (modeId) {
             case App.MODE_ID_PRIVATE:
@@ -93,7 +91,7 @@ public class Preferences {
         hostedSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         publicSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
 
-        Log.v("Preferences", "Active preferences for mode " + modeId +" are " + activeSharedPreferences);
+        Log.v(TAG, "Active preferences for mode " + modeId + " are " + activeSharedPreferences);
 
         if(!init) {
             EventBus.getDefault().post(new Events.ModeChanged(oldModeId,modeId));
@@ -171,7 +169,7 @@ public class Preferences {
     }
     public static void setString(int resId, String value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
         if((isModeHosted() && !allowSetWhenHosted || isModePublic() && !allowSetWhenPublic)) {
-            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
             return;
         }
         activeSharedPreferences.edit().putString(getKey(resId), value).commit();
@@ -182,7 +180,7 @@ public class Preferences {
     }
     public static void setInt(int resId, int value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
         if((isModeHosted() && !allowSetWhenHosted || isModePublic() && !allowSetWhenPublic)) {
-            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
             return;
         }
         activeSharedPreferences.edit().putInt(getKey(resId), value).commit();
@@ -192,7 +190,7 @@ public class Preferences {
     }
     public static void setBoolean(int resId, boolean value, boolean allowSetWhenHosted, boolean allowSetWhenPublic) {
         if((isModeHosted() && !allowSetWhenHosted) || (isModePublic() && !allowSetWhenPublic)) {
-            Log.e("Preferences", "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
             return;
         }
         activeSharedPreferences.edit().putBoolean(getKey(resId), value).commit();
@@ -240,7 +238,8 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyKeepalive), getKeepalive())
                     .put(getStringRessource(R.string.keyPubRetain), getPubRetain())
                     .put(getStringRessource(R.string.keyTls), getTls())
-                    .put(getStringRessource(R.string.keyTlsCrtPath), getTlsCrtPath())
+                    .put(getStringRessource(R.string.keyTlsCaCrtPath), getTlsCaCrtPath())
+                    .put(getStringRessource(R.string.keyTlsClientCrtPath), getTlsClientCrtPath())
                     .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
                     .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
                     .put(getStringRessource(R.string.keyAuth), getAuth())
@@ -259,26 +258,24 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
                     .put(getStringRessource(R.string.keyBeaconBackgroundScanPeriod), getBeaconBackgroundScanPeriod())
                     .put(getStringRessource(R.string.keyBeaconForegroundScanPeriod), getBeaconForegroundScanPeriod())
-                    .put(getStringRessource(R.string.keyRemoteCommandDump), getRemoteCommandDump())
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
                     .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true));
 
-            Log.v("Preferences", "toJsonObject: " + json.toString());
+            Log.v(TAG, "toJsonObject: " + json.toString());
 
         } catch (JSONException e) {
-            Log.e("Preferences", e.toString());
+            Log.e(TAG, e.toString());
         }
         return json;
     }
 
-    // TODO: fix for traction
     public static void fromJsonObject(JSONObject json) {
         if (!isPropperMessageType(json, "configuration"))
             return;
 
-        Log.v("Preferences", "fromJsonObject: " +  json.toString());
+        Log.v(TAG, "fromJsonObject: " +  json.toString());
 
         try { setMode(json.getInt(getStringRessource(R.string.keyModeId))); } catch (JSONException e) {}
         try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
@@ -291,7 +288,8 @@ public class Preferences {
         try { setKeepalive(json.getInt(getStringRessource(R.string.keyKeepalive))); } catch (JSONException e) {}
         try { setPubRetain(json.getBoolean(getStringRessource(R.string.keyPubRetain))); } catch (JSONException e) {}
         try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
-        try { setTlsCrtPath(json.getString(getStringRessource(R.string.keyTlsCrtPath))); } catch (JSONException e) {}
+        try { setTlsCaCrtPath(json.getString(getStringRessource(R.string.keyTlsCaCrtPath))); } catch (JSONException e) {}
+        try { setTlsClientCrtPath(json.getString(getStringRessource(R.string.keyTlsClientCrtPath))); } catch (JSONException e) {}
         try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
@@ -308,7 +306,6 @@ public class Preferences {
         try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
         try { setLocatorAccuracyBackground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyBackground))); } catch (JSONException e) {}
         try { setLocatorAccuracyForeground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyForeground))); } catch (JSONException e) {}
-        try { setRemoteCommandDump(json.getBoolean(getStringRessource(R.string.keyRemoteCommandDump))); } catch (JSONException e) {}
         try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
         try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
         try { setCleanSession(json.getBoolean(getStringRessource(R.string.keyCleanSession))); } catch (JSONException e) {}
@@ -320,35 +317,55 @@ public class Preferences {
             if (j != null) {
                 waypointsFromJson(j);
             } else {
-                Log.v("import", "no valid waypoints");
+                Log.v(TAG, "no valid waypoints");
             }
         } catch(JSONException e){
-            Log.v("import", "waypoints invalid with exception: " + e);
+            Log.v(TAG, "waypoints invalid with exception: " + e);
 
         };
     }
 
     private static void waypointsFromJson(JSONArray j) {
-        Log.v("import", "importing " + j.length()+" waypoints");
+        Log.v(TAG, "importing " + j.length()+" waypoints");
         WaypointDao dao = App.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
         for(int i = 0 ; i < j.length(); i++){
-            Log.v("import", "importing waypoint: " + i);
+            Log.v(TAG, "importing waypoint: " + i);
             Waypoint newWaypoint;
             JSONObject waypointJson;
             try {
-                Log.v("import", "checking for required attributes");
+                Log.v(TAG, "checking for required attributes");
 
                 waypointJson = j.getJSONObject(i);
                 newWaypoint  = new Waypoint();
                 newWaypoint.setLatitude(waypointJson.getDouble("lat"));
                 newWaypoint.setLongitude(waypointJson.getDouble("lon"));
-                newWaypoint.setDescription(waypointJson.getString("desc"));
+
+
+                String descRaw = waypointJson.getString("desc");
+                if (descRaw.contains(":")) {
+                    Log.v(TAG, "Beacon payload in waypoint desc attribute is not yet supported");
+                    newWaypoint.setDescription(descRaw.split(":")[0]);
+                } else if(descRaw.contains("$")) {
+                    String[] a = descRaw.split("$");
+                    if(a.length == 0) {
+                        Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID no data was found before the sign");
+                        continue;
+                    }
+
+                    newWaypoint.setDescription(a[0]);
+                    if(a.length > 1)
+                        newWaypoint.setSsid(a[1]);
+                    else
+                        Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID but no data was found after the sign");
+
+                }
+
 
             } catch (JSONException e) {
                 // If the above fails we're missing a required attribute and cannot continue the import
-                Log.v("import", "missing essential waypoint data: " + e);
+                Log.v(TAG, "missing essential waypoint data: " + e);
 
                 continue;
             }
@@ -356,25 +373,26 @@ public class Preferences {
             try {
                 newWaypoint.setShared(waypointJson.getBoolean("shared"));
             } catch (JSONException e) {
-                Log.v("import", "unable to import shared attribute");
+                Log.v(TAG, "unable to import shared attribute");
                 newWaypoint.setShared(false);
             }
 
-            if(newWaypoint.getShared()) {
-                try {
-                    newWaypoint.setRadius(waypointJson.getInt("rad"));
 
-                } catch(Exception e) {
-                    Log.v("import", "unable to import radius and/or transition attribute");
+            try {
+                newWaypoint.setRadius(waypointJson.getInt("rad"));
 
-                    newWaypoint.setRadius(0);
-                }
+            } catch(Exception e) {
+                Log.v(TAG, "unable to import radius and/or transition attribute");
+
+                newWaypoint.setRadius(0);
             }
+
+
 
             try {
                 newWaypoint.setDate(new java.util.Date(waypointJson.getLong("tst") * 1000));
             } catch(JSONException e) {
-                Log.v("import", "unable to import date attribute");
+                Log.v(TAG, "unable to import date attribute");
 
                 newWaypoint.setDate(new Date());
             }
@@ -382,8 +400,8 @@ public class Preferences {
 
             Waypoint existingWaypoint = null;
             for(Waypoint e : deviceWaypoints) {
-                Log.v("import", "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
-                Log.v("import", "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime()));
+                Log.v(TAG, "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
+                Log.v(TAG, "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime()));
 
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime())) {
                     existingWaypoint = e;
@@ -391,11 +409,11 @@ public class Preferences {
                 }
             }
             if(existingWaypoint != null) {
-                Log.v("Preferences", "found existing waypoint with same date. Deleting it before import");
+                Log.v(TAG, "found existing waypoint with same date. Deleting it before import");
                 dao.delete(existingWaypoint);
                 EventBus.getDefault().post(new Events.WaypointRemoved(existingWaypoint));
             } else {
-                Log.v("Preferences", "waypoint does not exist, doing clean import");
+                Log.v(TAG, "waypoint does not exist, doing clean import");
             }
 
             dao.insert(newWaypoint);
@@ -414,9 +432,6 @@ public class Preferences {
         return getBoolean(R.string.keyRemoteCommandReportLocation, R.bool.valRemoteCommandReportLocation);
     }
 
-    public static boolean getRemoteCommandDump() {
-        return getBoolean(R.string.keyRemoteCommandDump, R.bool.valRemoteCommandDump, R.bool.valRemoteCommandDumpHosted, R.bool.valRemoteCommandDumpPublic, true, true);
-    }
 
     public static void setRemoteConfiguration(boolean aBoolean) {
         setBoolean(R.string.keyRemoteConfiguration, aBoolean, false, false);
@@ -424,10 +439,6 @@ public class Preferences {
 
     public static void setRemoteCommandReportLocation(boolean aBoolean) {
         setBoolean(R.string.keyRemoteCommandReportLocation, aBoolean, true, true);
-    }
-
-    public static void setRemoteCommandDump(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteCommandDump, aBoolean, false, false);
     }
 
     public static void setCleanSession(boolean aBoolean) {
@@ -451,13 +462,13 @@ public class Preferences {
     }
 
     public static String getSelectedContactTopic() {
-        Log.v("preferences", "get selected " + getString(R.string.keySelectedContactTopic, R.string.valEmpty));
+        Log.v(TAG, "get selected " + getString(R.string.keySelectedContactTopic, R.string.valEmpty));
 
         return getString(R.string.keySelectedContactTopic, R.string.valEmpty);
     }
 
     public static void setSelectedContactTopic(String topic) {
-        Log.v("preferences", "selecting " + topic);
+        Log.v(TAG, "selecting " + topic);
         setString(R.string.keySelectedContactTopic, topic);
     }
 
@@ -795,19 +806,23 @@ public class Preferences {
     }
 
     public static void setAuth(boolean auth) {
-        setBoolean(R.string.keyAuth, auth ,false, false);
+        setBoolean(R.string.keyAuth, auth, false, false);
     }
 
     public static void setTls(boolean tlsSpecifier) {
         setBoolean(R.string.keyTls, tlsSpecifier, false, false);
     }
 
-    public static void setTlsCrtPath(String tlsCrtPath) {
-        setString(R.string.keyTlsCrtPath, tlsCrtPath, false, false);
+    public static void setTlsCaCrtPath(String tlsCrtPath) {
+        setString(R.string.keyTlsCaCrtPath, tlsCrtPath, false, false);
+    }
+    public static void setTlsClientCrtPath(String tlsCrtPath) {
+        setString(R.string.keyTlsClientCrtPath, tlsCrtPath, false, false);
     }
 
+
     private static void brokerChanged() {
-        Log.v("Preferences", "broker changed");
+        Log.v(TAG, "broker changed");
         EventBus.getDefault().post(new Events.BrokerChanged());
     }
 
@@ -824,16 +839,21 @@ public class Preferences {
         return getBoolean(R.string.keyTls, R.bool.valTls, R.bool.valTlsHosted, R.bool.valTlsPublic, true, true);
     }
 
-    public static String getTlsCrtPath() {
-        return getString(R.string.keyTlsCrtPath, R.string.valEmpty,R.string.valEmpty,R.string.valEmpty, true, true );
+    public static String getTlsCaCrtPath() {
+        return getString(R.string.keyTlsCaCrtPath, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, true);
     }
+
+    public static String getTlsClientCrtPath() {
+        return getString(R.string.keyTlsClientCrtPath, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, true);
+    }
+
 
     public static boolean getNotification() {
         return getBoolean(R.string.keyNotification, R.bool.valNotification);
     }
 
     public static boolean getNotificationTickerOnWaypointTransition() {
-        return getBoolean(R.string.keyNotificationTickerOnWaypointTransition,  R.bool.valNotificationTickerOnWaypointTransition);
+        return getBoolean(R.string.keyNotificationTickerOnWaypointTransition, R.bool.valNotificationTickerOnWaypointTransition);
     }
 
     public static boolean getNotificationTickerOnPublish() {
@@ -917,19 +937,20 @@ public class Preferences {
     }
 
 
+
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
     // This has no use yet but may be useful later
     public boolean handleFirstStart() {
         if(sharedPreferences.getBoolean(getKey(R.string.keyFistStart), true)) {
-            Log.v("Preferences", "Initial application launch");
+            Log.v(TAG, "Initial application launch");
             sharedPreferences.edit().putBoolean(getKey(R.string.keyFistStart), false).commit();
             String uuid = UUID.randomUUID().toString().toUpperCase();
             sharedPreferences.edit().putString("deviceUUID", "A"+uuid.substring(1)).commit();
 
             return true;
         } else {
-            Log.v("Preferences", "Consecutive application launch");
+            Log.v(TAG, "Consecutive application launch");
             return false;
         }
     }
@@ -948,12 +969,12 @@ public class Preferences {
     public static boolean isPropperMessageType(JSONObject json, String type) {
         try {
             if(json == null)
-                Log.e("isPropperMessageType", "Attempt to invoke isPropperMessageType on null object");
+                Log.e(TAG, "Attempt to invoke isPropperMessageType on null object");
 
             if (!json.getString("_type").equals(type))
                 throw new JSONException("wrong type");
         } catch (JSONException e) {
-            Log.e("isPropperMessageType", "Unable to deserialize " + type  +" object from JSON " + json.toString());
+            Log.e(TAG, "Unable to deserialize " + type  +" object from JSON " + json.toString());
             return false;
         }
         return true;
@@ -993,4 +1014,34 @@ public class Preferences {
     public static boolean getPubRetainLocations() {
         return getPubRetain();
     }
+
+    public static boolean getLocationBasedServicesEnabled() {
+        return true;
+    }
+
+    public static void setPersistentGeohash (String hash) {
+        setString(R.string.keyCurrentGeohash, hash);
+    }
+    public static String getPersistentGeohash () {
+        return getString(R.string.keyCurrentGeohash, R.string.valEmpty);
+    }
+
+    public static void setPersistentGeohashChannels (String[] channels) {
+        setString(R.string.keyCurrentGeohashChannels, android.text.TextUtils.join("$", channels));
+    }
+
+    public static String[] getPersistentGeohashChannels () {
+        return getString(R.string.keyCurrentGeohashChannels, R.string.valEmpty).split("$");
+    }
+
+    public static void clearPersistedGeohash() {
+        clearKey(R.string.keyCurrentGeohash);
+        clearKey(R.string.keyCurrentGeohashChannels);
+
+    }
+
+    public static String[] getGeohashChannels() {
+        return new String[]{"Weather", "Test1", "Test2"};
+    }
+
 }

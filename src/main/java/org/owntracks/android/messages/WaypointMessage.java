@@ -8,7 +8,9 @@ import org.json.JSONObject;
 import org.owntracks.android.db.Waypoint;
 
 public class WaypointMessage extends Message {
-	Waypoint waypoint;
+    private static final String TAG = "WaypointMessage";
+
+    Waypoint waypoint;
     String trackerId;
 	public WaypointMessage(Waypoint w) {
         super();
@@ -25,7 +27,6 @@ public class WaypointMessage extends Message {
         JSONObject json = new JSONObject();
         try {
             json.put("_type", "waypoint")
-                    .put("desc", this.waypoint.getDescription())
                     .put("lat", this.waypoint.getLatitude())
                     .put("lon", this.waypoint.getLongitude())
                     .put("tst", (long) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
@@ -33,6 +34,17 @@ public class WaypointMessage extends Message {
 
             if (this.trackerId != null && !this.trackerId.isEmpty()) 
                 json.put("tid", this.trackerId);
+
+            String desc = this.waypoint.getDescription();
+
+            if(this.waypoint.getSsid() != null && !this.waypoint.getSsid().isEmpty())
+                desc += "$"+this.waypoint.getSsid();
+
+
+            json.put("desc", desc);
+
+
+
 
         }catch (JSONException e) {
         }

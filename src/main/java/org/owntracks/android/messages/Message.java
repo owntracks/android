@@ -3,10 +3,12 @@ package org.owntracks.android.messages;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.owntracks.android.support.MessageCallbacks;
+import org.owntracks.android.support.MessageLifecycleCallbacks;
 
 public class Message extends MqttMessage {
-    private MessageCallbacks callback;
+    private static final String TAG = "Message";
+
+    private MessageLifecycleCallbacks callback;
     private String topic;
     private boolean isPublishing;
     private Object extra;
@@ -16,7 +18,7 @@ public class Message extends MqttMessage {
         super();
     }
 
-    public Message(String topic, String payload, int qos, boolean retained, MessageCallbacks callback, Object extra) {
+    public Message(String topic, String payload, int qos, boolean retained, MessageLifecycleCallbacks callback, Object extra) {
         super(payload.getBytes());
         this.setQos(qos);
         this.setRetained(retained);
@@ -28,36 +30,36 @@ public class Message extends MqttMessage {
 
     public void publishFailed() {
         if (this.callback != null)
-            this.callback.publishFailed(this.extra);
+            this.callback.onMessagePublishFailed(this.extra);
     }
 
     public void publishQueued() {
         wasQueued = true;
         if (this.callback != null)
-            this.callback.publishQueued(this.extra);
+            this.callback.onMessagePublishQueued(this.extra);
 
     }
 
     public void publishSuccessful() {
         if (this.callback != null) {
-            Log.v(this.toString(), "Callback: " + this.callback);
-            this.callback.publishSuccessfull(this.extra, this.wasQueued);
+            Log.v(TAG, "Callback: " + this.callback);
+            this.callback.onMessagePublishSuccessful(this.extra, this.wasQueued);
         } else
-            Log.v(this.toString(), "message has no callback");
+            Log.v(TAG, "message has no callback");
 
     }
 
     public void publishing() {
         this.isPublishing = true;
         if (this.callback != null)
-            this.callback.publishing(this.extra);
+            this.callback.onMesssagePublishing(this.extra);
     }
 
     public boolean isPublishing() {
         return this.isPublishing;
     }
 
-    public void setCallback(MessageCallbacks c) {this.callback = c;}
+    public void setCallback(MessageLifecycleCallbacks c) {this.callback = c;}
     public String getTopic() {
         return this.topic;
     }

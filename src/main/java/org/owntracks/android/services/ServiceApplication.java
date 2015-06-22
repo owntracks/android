@@ -2,12 +2,11 @@ package org.owntracks.android.services;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
@@ -16,9 +15,9 @@ import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.MsgMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.Contact;
-import org.owntracks.android.messages.DumpMessage;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.support.Events;
@@ -59,6 +58,8 @@ import de.greenrobot.event.EventBus;
 
 public class ServiceApplication implements ProxyableService,
 		StaticHandlerInterface {
+    private static final String TAG = "ServiceApplication";
+
     public static final int NOTIFCATION_ID = 1338;
     public static final int NOTIFCATION_ID_TICKER = 1339;
     public static final int NOTIFCATION_ID_CONTACT_TRANSITION = 1340;
@@ -151,9 +152,31 @@ public class ServiceApplication implements ProxyableService,
         App.removeContact(e.getContact());
     }
 
+    public void onEventMainThread(Events.MsgMessageReceived e) {
+        org.owntracks.android.db.Message m = new org.owntracks.android.db.Message();
+        MsgMessage mm = e.getMessage();
+        m.setId(mm.getTopic() + "$" + mm.getTst());
+        m.setDescription(mm.getDesc());
+        m.setTitle(mm.getTitle());
+        try { // Extract channel from topic
+            m.setChannel(e.getTopic().split("/")[1]); //Uh oh...
+        } catch (IndexOutOfBoundsException exception) {
+            m.setChannel("undefined");
+        }
+        m.setTst(mm.getTst());
+        m.setIcon(mm.getIcon());
+        m.setPriority(mm.getPrio());
+        m.setIcon(mm.getIcon());
+        m.setIconUrl(mm.getIconUrl());
+        m.setUrl(mm.getUrl());
+        App.getMessageDao().insertOrReplace(m);
+        EventBus.getDefault().post(new Events.MessageAdded(m));
+    }
+
+
 
     private Contact lazyUpdateContactFromMessage(String topic, GeocodableLocation l, String trackerId) {
-        Log.v(this.toString(), "lazyUpdateContactFromMessage for: " +topic);
+        Log.v(TAG, "lazyUpdateContactFromMessage for: " +topic);
         org.owntracks.android.model.Contact c = App.getContact(topic);
 
         if (c == null) {
@@ -161,10 +184,10 @@ public class ServiceApplication implements ProxyableService,
 
 
             if(c == null) {
-                Log.v(this.toString(), "creating new contact without card: " + topic);
+                Log.v(TAG, "creating new contact without card: " + topic);
                 c = new org.owntracks.android.model.Contact(topic);
             } else {
-                Log.v(this.toString(), "creating unintialized contact with card: " + topic);
+                Log.v(TAG, "creating unintialized contact with card: " + topic);
             }
             resolveContact(c);
             c.setLocation(l);
@@ -197,7 +220,7 @@ public class ServiceApplication implements ProxyableService,
         Contact c = lazyUpdateContactFromMessage(getBaseTopicForEvent(e.getTopic()), e.getGeocodableLocation(), e.getTransitionMessage().getTrackerId());
 
         if(e.getTransitionMessage().isRetained() && Preferences.getNotificationOnTransitionMessage()) {
-            Log.v(this.toString(), "transition: " + e.getTransitionMessage().getTransition());
+            Log.v(TAG, "transition: " + e.getTransitionMessage().getTransition());
             addTransitionMessageNotification(e, c);
         }
 
@@ -209,14 +232,14 @@ public class ServiceApplication implements ProxyableService,
     public void onEventMainThread(Events.CardMessageReceived e) {
         String topic = getBaseTopicForInfo(e.getTopic());
         Contact c = App.getContact(topic);
-        Log.v(this.toString(), "card message received for: " + topic);
+        Log.v(TAG, "card message received for: " + topic);
 
         if(App.getInitializingContact(topic) != null) {
-                Log.v(this.toString(), "ignoring second card for uninitialized contact " + topic);
+                Log.v(TAG, "ignoring second card for uninitialized contact " + topic);
                 return;
         }
         if(c == null) {
-            Log.v(this.toString(), "initializing card for: " + topic);
+            Log.v(TAG, "initializing card for: " + topic);
 
             c = new Contact(topic);
             c.setCardFace(e.getCardMessage().getFace());
@@ -225,7 +248,7 @@ public class ServiceApplication implements ProxyableService,
             App.addUninitializedContact(c);
          } else {
 
-            Log.v(this.toString(), "updating card for existing contact: " + topic);
+            Log.v(TAG, "updating card for existing contact: " + topic);
             c.setCardFace(e.getCardMessage().getFace());
             c.setCardName(e.getCardMessage().getName());
             EventBus.getDefault().post(new Events.ContactUpdated(c));
@@ -286,9 +309,9 @@ public class ServiceApplication implements ProxyableService,
 
 		notificationBuilder.setContentIntent(resultPendingIntent);
 
-		this.notificationIntent = ServiceProxy.getPendingIntentForService(
+		this.notificationIntent = ServiceProxy.getBroadcastIntentForService(
 				this.context, ServiceProxy.SERVICE_LOCATOR,
-				ServiceProxy.INTENT_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
+				ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
 		notificationBuilder.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
 	}
@@ -308,7 +331,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateTicker(String text, boolean vibrate) {
-        Log.v(this.toString(), "vibrate: " + vibrate);
+        Log.v(TAG, "vibrate: " + vibrate);
         // API >= 21 doesn't have a ticker
         if(android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderTicker.setPriority(NotificationCompat.PRIORITY_HIGH);
@@ -449,7 +472,7 @@ public class ServiceApplication implements ProxyableService,
                 .setDeleteIntent(this.transitionCancelIntent);
 
         for(Uri uri : this.contactTransitionNotificationsContactUris) {
-            Log.v(this.toString(), "adding persion uri: " + uri.toString());
+            Log.v(TAG, "adding persion uri: " + uri.toString());
             builder.addPerson(uri.toString());
         }
 
@@ -471,10 +494,6 @@ public class ServiceApplication implements ProxyableService,
     }
 
 	public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-		updateNotification();
-	}
-
-	public void onEventMainThread(Events.StateChanged.ServiceLocator e) {
 		updateNotification();
 	}
 
@@ -608,34 +627,9 @@ public class ServiceApplication implements ProxyableService,
         EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
     }
 
-
-    public void dump() {
-        Log.v(this.toString(), "Initiating dump procedure");
-        DumpMessage dump = new DumpMessage();
-        dump.setLocation(ServiceProxy.getServiceLocator().getLocationMessage(null));
-        dump.setConfiguration(new ConfigurationMessage(EnumSet.of(ConfigurationMessage.Includes.CONNECTION, ConfigurationMessage.Includes.IDENTIFICATION)));
-
-        dump.setLocatorReady(ServiceProxy.getServiceLocator().isReady());
-        dump.setLocatorState(ServiceLocator.getState());
-        dump.setLocatorForeground(ServiceProxy.getServiceLocator().isForeground());
-        dump.setLocatorLastKnownLocation(ServiceProxy.getServiceLocator().getLastKnownLocation());
-        dump.setLocatorLastPublishDate(ServiceProxy.getServiceLocator().getLastPublishDate());
-        dump.setLocatorHasLocationClient(ServiceProxy.getServiceLocator().hasLocationClient());
-        dump.setLocatorHasLocationRequest(ServiceProxy.getServiceLocator().hasLocationRequest());
-        dump.setLocatorDebug(ServiceProxy.getServiceLocator().getDebugData());
-
-        dump.setBrokerError(ServiceProxy.getServiceBroker().getError());
-        dump.setBrokerState(ServiceBroker.getState());
-        dump.setApplicationPlayServicesAvailable(playServicesAvailable);
-        Log.v(this.toString(), "Dump data: " + dump.toString());
-
-        ServiceProxy.getServiceBroker().publish(dump, Preferences.getDeviceTopic(true), 0, false);
-
-    }
-
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         String msg = new String(message.getPayload());
-        Log.v(this.toString(), "Received message: " + topic + " : " + msg);
+        Log.v(TAG, "Received message: " + topic + " : " + msg);
 
         String type;
         JSONObject json;
@@ -645,18 +639,18 @@ public class ServiceApplication implements ProxyableService,
             type = json.getString("_type");
         } catch (Exception e) {
             if(msg.isEmpty()) {
-                Log.v(this.toString(), "Empty message received");
+                Log.v(TAG, "Empty message received");
 
                 Contact c = App.getContact(topic);
                 if(c != null) {
-                    Log.v(this.toString(), "Clearing contact location");
+                    Log.v(TAG, "Clearing contact location");
 
                     EventBus.getDefault().postSticky(new Events.ClearLocationMessageReceived(c));
                     return;
                 }
             }
 
-            Log.e(this.toString(), "Received invalid message: " + msg);
+            Log.e(TAG, "Received invalid message: " + msg);
             return;
         }
 
@@ -666,7 +660,7 @@ public class ServiceApplication implements ProxyableService,
                 lm.setRetained(message.isRetained());
                 EventBus.getDefault().postSticky(new Events.LocationMessageReceived(lm, topic));
             } catch (Exception e) {
-                Log.e(this.toString(), "Message hat correct type but could not be handled. Message was: " + msg + ", error was: " + e.getMessage());
+                Log.e(TAG, "Message hat correct type but could not be handled. Message was: " + msg + ", error was: " + e.getMessage());
             }
         } else if (type.equals("card")) {
             CardMessage card = new CardMessage(json);
@@ -675,6 +669,9 @@ public class ServiceApplication implements ProxyableService,
             TransitionMessage tm = new TransitionMessage(json);
             tm.setRetained(message.isRetained());
             EventBus.getDefault().postSticky(new Events.TransitionMessageReceived(tm, topic));
+        } else if (type.equals("msg")) {
+            MsgMessage mm = new MsgMessage(json);
+            EventBus.getDefault().post(new Events.MsgMessageReceived(mm, topic));
         } else if(type.equals("cmd") && topic.equals(Preferences.getPubTopicCommands())) {
             String action;
             try {
@@ -684,30 +681,23 @@ public class ServiceApplication implements ProxyableService,
             }
 
             switch (action) {
-                case "dump":
-                    if (!Preferences.getRemoteCommandDump() || Preferences.isModePublic()) {
-                        Log.i(this.toString(), "Dump remote command is disabled");
-                        return;
-                    }
-                    ServiceProxy.getServiceApplication().dump();
-                    break;
                 case "reportLocation":
                     if (!Preferences.getRemoteCommandReportLocation()) {
-                        Log.i(this.toString(), "ReportLocation remote command is disabled");
+                        Log.i(TAG, "ReportLocation remote command is disabled");
                         return;
                     }
                     ServiceProxy.getServiceLocator().publishResponseLocationMessage();
 
                     break;
                 default:
-                    Log.v(this.toString(), "Received cmd message with unsupported action (" + action + ")");
+                    Log.v(TAG, "Received cmd message with unsupported action (" + action + ")");
                     break;
             }
 
         } else if (type.equals("configuration") && topic.equals(Preferences.getPubTopicCommands()) ) {
             // read configuration message and post event only if Remote Configuration is enabled and this is a private broker
             if (!Preferences.getRemoteConfiguration() || Preferences.isModePublic()) {
-                Log.i(this.toString(), "Remote Configuration is disabled");
+                Log.i(TAG, "Remote Configuration is disabled");
                 return;
             }
             ConfigurationMessage cm = new ConfigurationMessage(json);
@@ -715,7 +705,7 @@ public class ServiceApplication implements ProxyableService,
             EventBus.getDefault().post(new Events.ConfigurationMessageReceived(cm, topic));
 
         } else {
-            Log.d(this.toString(), "Ignoring message (" + type + ") received on topic " + topic);
+            Log.d(TAG, "Ignoring message (" + type + ") received on topic " + topic);
         }
     }
 }

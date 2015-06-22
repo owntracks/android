@@ -3,9 +3,11 @@ package org.owntracks.android.support;
 import java.util.Date;
 
 import org.owntracks.android.App;
+import org.owntracks.android.db.Message;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.MsgMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.model.Contact;
@@ -216,6 +218,25 @@ public class Events {
             return c;
         }
     }
+
+    public static class MsgMessageReceived {
+        MsgMessage message;
+        String topic;
+        public MsgMessageReceived(MsgMessage message, String topic) {
+            super();
+            this.message = message;
+            this.topic = topic;
+
+        }
+        public MsgMessage getMessage() {
+            return this.message;
+        }
+        public String getTopic() {
+            return this.topic;
+        }
+
+    }
+
     public static class CardMessageReceived extends E{
         String topic;
         CardMessage message;
@@ -340,6 +361,16 @@ public class Events {
 		}
 
 	}
+
+    public static class MessageAdded extends E{
+        private Message m;
+        public MessageAdded(Message m) {
+            this.m = m;
+        }
+        public Message getMessage(){
+            return m;
+        }
+    }
 	
 	public static class BrokerChanged extends E {
 		public BrokerChanged() {}
@@ -371,18 +402,6 @@ public class Events {
 
 		}
 
-        public static class ServiceLocator extends E {
-            private org.owntracks.android.services.ServiceLocator.State state;
-
-            public ServiceLocator(org.owntracks.android.services.ServiceLocator.State state) {
-                this.state = state;
-            }
-
-            public org.owntracks.android.services.ServiceLocator.State getState() {
-                return this.state;
-            }
-
-        }
 
         public static class ServiceBeacon extends E {
             private org.owntracks.android.services.ServiceBeacon.State state;
@@ -400,5 +419,7 @@ public class Events {
 
 
     }
+
+
 
 }

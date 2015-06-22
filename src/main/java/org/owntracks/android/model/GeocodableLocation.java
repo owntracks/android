@@ -13,7 +13,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 public class GeocodableLocation extends Location {
-    private String geocoder;
+	private static final String TAG = "GeocodableLocation";
+
+	private String geocoder;
     private LatLng latlng;
     private String tag;
     private Object extra;

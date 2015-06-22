@@ -7,6 +7,8 @@ import android.content.Context;
 import android.widget.BaseAdapter;
 
 public abstract class MapAdapter<K, T> extends BaseAdapter {
+	private static final String TAG = "MapAdapter";
+
 	protected Map<K, T> map;
 	protected Context context;
 

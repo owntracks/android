@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class ActivityLauncher extends FragmentActivity {
+	private static final String TAG = "ActivityLauncher";
+
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	private boolean autostart = false;
 
@@ -50,7 +52,7 @@ public class ActivityLauncher extends FragmentActivity {
 
 		@Override
 		public void onCancel(DialogInterface dialog) {
-			Log.e(this.toString(), "Killing application");
+			Log.e(TAG, "Killing application");
 			getActivity().finish();
 		}
 	}
@@ -96,7 +98,7 @@ public class ActivityLauncher extends FragmentActivity {
 								CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
 				if (errorDialog != null) {
-					// Log.v(this.toString(), "Showing error recovery dialog");
+					// Log.v(TAG, "Showing error recovery dialog");
 					ErrorDialogFragment errorFragment = new ErrorDialogFragment();
 					errorFragment.setDialog(errorDialog);
 
@@ -135,14 +137,14 @@ public class ActivityLauncher extends FragmentActivity {
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		Log.v(this.toString(), "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
+		Log.v(TAG, "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
 		if (requestCode == CONNECTION_FAILURE_RESOLUTION_REQUEST) {
 			if (resultCode != RESULT_OK) {
 				Toast.makeText(this, "Google Play Services must be installed.",
 						Toast.LENGTH_SHORT).show();
 				checkPlayServices();
 			} else {
-				Log.v(this.toString(), "Play services activated successfully");
+				Log.v(TAG, "Play services activated successfully");
 			}
 			return;
 		}
@@ -151,12 +153,12 @@ public class ActivityLauncher extends FragmentActivity {
 	}
 
 	private void quitApplication() {
-		Log.e(this.toString(), "Killing application");
+		Log.e(TAG, "Killing application");
 		finish();
 	}
 
 	private void launchChecksComplete() {
-		Log.v(this.toString(), "Launch checks complete");
+		Log.v(TAG, "Launch checks complete");
 		Intent i = new Intent(this, ServiceProxy.class);
 		startService(i);
 		this.serviceApplicationConnection = new ServiceConnection() {

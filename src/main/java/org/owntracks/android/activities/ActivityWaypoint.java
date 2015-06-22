@@ -45,6 +45,8 @@ import de.greenrobot.event.EventBus;
 
 
 public class ActivityWaypoint extends AppCompatActivity implements StaticHandlerInterface {
+    private static final String TAG = "ActivityWaypoint";
+
     private static final int REQUEST_PLACE_PICKER = 19283;
     private WaypointDao dao;
     private TextWatcher requiredForSave;
@@ -66,6 +68,8 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
     private EditText longitude;
     private EditText latitude;
     private EditText radius;
+    private EditText ssid;
+
     private Switch share;
     private MenuItem saveButton;
 
@@ -106,6 +110,7 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
         this.latitude = (EditText) findViewById(R.id.latitude);
         this.longitude = (EditText) findViewById(R.id.longitude);
         this.radius = (EditText) findViewById(R.id.radius);
+        this.ssid = (EditText) findViewById(R.id.ssid);
 
 
         this.share = (Switch) findViewById(R.id.share);
@@ -141,6 +146,7 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
                     this.radius.setText(this.waypoint.getRadius().toString());
 
                 }
+                this.ssid.setText(this.waypoint.getSsid());
 
                 // Shared waypoints are disabled in public mode to protect user's privacy
                 findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
@@ -164,7 +170,7 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input
         }
-        Log.v(this.toString(), "conditionallyEnableSaveButton: " +enabled);
+        Log.v(TAG, "conditionallyEnableSaveButton: " +enabled);
         saveButton.setEnabled(enabled);
         saveButton.getIcon().setAlpha(enabled ? 255 : 130);
 
@@ -323,6 +329,11 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
             w.setRadius(Integer.parseInt(this.radius.getText().toString()));
         } catch (NumberFormatException e) {
             w.setRadius(null);
+        }
+
+        try {
+            w.setSsid(this.ssid.getText().toString());
+        } catch (NumberFormatException e) {
         }
 
         if(!Preferences.isModePublic())

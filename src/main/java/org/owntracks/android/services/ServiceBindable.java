@@ -9,6 +9,8 @@ import android.os.Binder;
 import android.os.IBinder;
 
 public abstract class ServiceBindable extends Service {
+	private static final String TAG = "ServiceBindable";
+
 	protected boolean started;
 	protected ServiceBinder binder;
 
@@ -19,7 +21,7 @@ public abstract class ServiceBindable extends Service {
 		this.binder = new ServiceBinder(this);
 	}
 
-	abstract protected void onStartOnce();
+	abstract protected void 	onStartOnce();
 
 	@Override
 	public IBinder onBind(Intent intent) {
