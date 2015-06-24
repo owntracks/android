@@ -16,6 +16,7 @@
     <bool name="valPubRetainPublic">false</bool>
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
+    <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
 
 
     <string name="valDeviceTopicHosted" formatted="false">owntracks/%s/%s</string>
@@ -28,6 +29,7 @@
     <bool name="valRemoteConfigurationHosted">false</bool>
     <bool name="valPubRetainHosted">true</bool>
     <integer name="valPubQosHosted">1</integer>
+    <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
 
 
 
@@ -36,6 +38,7 @@
 
     <string name="valDeviceTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valBaseTopic">owntracks/+/+</string>
+    <string name="valGeohashMsgTopic" formatted="false">msg/+/%s</string>
 
     <string name="valHost">127.0.0.1</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
