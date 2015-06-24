@@ -1,24 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
 android:layout_width="match_parent"
 android:layout_height="wrap_content" >
 
 <include layout="@layout/toolbar" />
 
-<ListView
-    android:visibility="gone"
+<android.support.v7.widget.RecyclerView
     android:id="@+id/listView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:layout_below="@+id/fragmentToolbar" />
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    />
 
 
-<TextView android:id="@+id/placeholder"
-    android:gravity="center"
-    android:visibility="gone"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:text="@string/messageListPlaceholder" />
-
-</RelativeLayout>
+</LinearLayout>

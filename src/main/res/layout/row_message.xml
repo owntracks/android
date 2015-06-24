@@ -15,7 +15,7 @@
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
+        android:layout_centerVertical="false"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp">
@@ -43,8 +43,9 @@
         android:layout_toEndOf="@+id/imageMask"
 
         android:orientation="vertical"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        >
 
 
         <TextView
@@ -64,19 +65,19 @@
             android:layout_height="wrap_content"
             android:text="@string/na"
             android:textSize="14sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="#757575" />
+            android:ellipsize="none"
+            android:singleLine="false"
+            android:textColor="#212121" />
 
         <com.github.curioustechizen.ago.RelativeTimeTextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/na"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="#757575" />
+            android:textColor="#858585" />
 
     </LinearLayout>
 </RelativeLayout>
