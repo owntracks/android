@@ -49,7 +49,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     }
 
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.row_pager, parent, false);
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.row_message, parent, false);
         return new SimpleViewHolder(view);
     }
 

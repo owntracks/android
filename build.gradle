@@ -41,19 +41,20 @@ dependencies {
     compile 'ch.hsr:geohash:1.1.0'
 
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
-    compile 'com.github.monxalo:android-section-adapter:1.0.1@jar'
     compile('com.crashlytics.sdk.android:crashlytics:+@aar') {
         transitive = true;
     }
 
 
-    // Material design widget libraries
+    // Widget libraries
+    compile 'com.github.curioustechizen.android-ago:library:1.3.0'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile('com.mikepenz:materialdrawer:3.0.6@aar') {
         transitive = true
     }
     compile 'com.afollestad:material-dialogs:0.7.5.2'
     compile 'com.joanzapata.android:android-iconify:1.0.9'
+    compile 'com.github.monxalo:android-section-adapter:1.0.1@jar'
 
 }
 

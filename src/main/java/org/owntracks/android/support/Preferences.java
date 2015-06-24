@@ -467,6 +467,10 @@ public class Preferences {
         return getString(R.string.keySelectedContactTopic, R.string.valEmpty);
     }
 
+    public static String getGeohashMsgTopic() {
+        return getString(R.string.keyGeohashTopic, R.string.valGeohashMsgTopic, R.string.valGeohashMsgTopicHosted, R.string.valGeohashMsgTopicPublic, true, true);
+    }
+
     public static void setSelectedContactTopic(String topic) {
         Log.v(TAG, "selecting " + topic);
         setString(R.string.keySelectedContactTopic, topic);
@@ -857,7 +861,7 @@ public class Preferences {
     }
 
     public static boolean getNotificationTickerOnPublish() {
-        return getBoolean(R.string.keyNotificationTickerOnPublish,  R.bool.valNotificationTickerOnPublish);
+        return getBoolean(R.string.keyNotificationTickerOnPublish, R.bool.valNotificationTickerOnPublish);
     }
 
     public static boolean getNotificationGeocoder() {
@@ -1022,26 +1026,11 @@ public class Preferences {
     public static void setPersistentGeohash (String hash) {
         setString(R.string.keyCurrentGeohash, hash);
     }
-    public static String getPersistentGeohash () {
-        return getString(R.string.keyCurrentGeohash, R.string.valEmpty);
-    }
-
-    public static void setPersistentGeohashChannels (String[] channels) {
-        setString(R.string.keyCurrentGeohashChannels, android.text.TextUtils.join("$", channels));
-    }
-
-    public static String[] getPersistentGeohashChannels () {
-        return getString(R.string.keyCurrentGeohashChannels, R.string.valEmpty).split("$");
-    }
-
-    public static void clearPersistedGeohash() {
+    public static String getAndClearPersistentGeohash () {
+        String h = getString(R.string.keyCurrentGeohash, R.string.valEmpty);
         clearKey(R.string.keyCurrentGeohash);
-        clearKey(R.string.keyCurrentGeohashChannels);
-
+        return h;
     }
 
-    public static String[] getGeohashChannels() {
-        return new String[]{"Weather", "Test1", "Test2"};
-    }
 
 }

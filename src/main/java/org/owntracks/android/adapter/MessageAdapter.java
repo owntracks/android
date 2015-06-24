@@ -9,17 +9,17 @@ import android.view.ViewGroup;
 import android.widget.IconTextView;
 import android.widget.TextView;
 
-import com.github.monxalo.android.widget.SectionCursorAdapter;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 
 import org.owntracks.android.R;
 import org.owntracks.android.db.MessageDao;
 
 
-public class MessageAdapter extends SectionCursorAdapter {
+public class MessageAdapter extends LoaderSectionCursorAdapter {
     private int[] priorities = new int[3];
 
-    public MessageAdapter(Context context, Cursor c, int headerLayout, int groupColumn) {
-        super(context, c, headerLayout, groupColumn);
+    public MessageAdapter(Context context, int headerLayout, String groupColumn) {
+        super(context, headerLayout, groupColumn);
 
         priorities[0] = context.getResources().getColor(R.color.priority0);
         priorities[1] = context.getResources().getColor(R.color.priority1);
@@ -31,13 +31,16 @@ public class MessageAdapter extends SectionCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.row_pager, null);
-        IconTextView ic = (IconTextView) view.findViewById(R.id.image);
-        TextView tv = (TextView) view.findViewById(R.id.title);
-        TextView iv = (TextView) view.findViewById(R.id.subtitle);
-        view.setTag(R.id.image, ic);
-        view.setTag(R.id.title, tv);
-        view.setTag(R.id.subtitle, iv);
+        View view = LayoutInflater.from(context).inflate(R.layout.row_message, null);
+        IconTextView icon = (IconTextView) view.findViewById(R.id.image);
+        TextView title = (TextView) view.findViewById(R.id.title);
+        TextView description = (TextView) view.findViewById(R.id.description);
+        RelativeTimeTextView time = (RelativeTimeTextView) view.findViewById(R.id.time);
+
+        view.setTag(R.id.image, icon);
+        view.setTag(R.id.title, title);
+        view.setTag(R.id.description, description);
+        view.setTag(R.id.time, time);
 
         return view;    }
 
@@ -47,6 +50,8 @@ public class MessageAdapter extends SectionCursorAdapter {
         ((IconTextView) view.getTag(R.id.image)).setBackgroundColor(priorities[cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.Priority.columnName))]);
 
         ((TextView) view.getTag(R.id.title)).setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Title.columnName)));
-        ((TextView) view.getTag(R.id.subtitle)).setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Description.columnName)));
+        ((TextView) view.getTag(R.id.description)).setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Description.columnName)));
+        ((RelativeTimeTextView) view.getTag(R.id.time)).setReferenceTime(cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Tst.columnName))*1000);
+
     }
 }
