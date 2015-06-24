@@ -59,9 +59,9 @@
     <color name="accent">@color/primary</color>
     <color name="drawerStatusbar">#CCCC</color>
 
-    <color name="priority0">#9e9e9e</color>
-    <color name="priority1">#ffc107</color>
-    <color name="priority2">#ff5722</color>
+    <color name="priority0">#B0BEC5</color>
+    <color name="priority1">#FFB74D</color>
+    <color name="priority2">#ef5350</color>
 
 
     <style name="listItemPrimary">

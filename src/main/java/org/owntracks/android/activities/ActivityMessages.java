@@ -12,10 +12,16 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -31,7 +37,9 @@ import org.owntracks.android.adapter.LoaderSectionCursorAdapter;
 import org.owntracks.android.adapter.MessageAdapter;
 import org.owntracks.android.db.Message;
 import org.owntracks.android.db.MessageDao;
+import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.DividerItemDecoration;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
@@ -41,12 +49,12 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityMessages extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "ActivityMessages";
-    public static final String CURSOR_ORDER = String.format("%s ASC, %s DESC", MessageDao.Properties.Channel.columnName, MessageDao.Properties.Tst.columnName );
+    public static final String CURSOR_ORDER = String.format("%s DESC", MessageDao.Properties.Tst.columnName );
 
     private Cursor cursor;
 
     private Toolbar toolbar;
-    private ListView listView;
+    private RecyclerView listView;
     private int LOADER_ID = 1;
     private MessageAdapter listAdapter;
     private TextView messageListPlaceholder;
@@ -75,9 +83,6 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
                 if (drawerItem == null)
                     return false;
 
-                Log.v(TAG, "Drawer item clicked: " + drawerItem.getIdentifier());
-                DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
                         goToRoot();
@@ -100,21 +105,92 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
         DrawerFactory.buildDrawer(this, toolbar, drawerListener, 1);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.scrollToPosition(0);
 
-        listAdapter = new MessageAdapter(this, R.layout.section, MessageDao.Properties.Channel.columnName);
-        listView = (ListView) findViewById(R.id.listView);
+        listAdapter = new MessageAdapter(this);
+        listView = (RecyclerView) findViewById(R.id.listView);
+        listView.setLayoutManager(layoutManager);
         listView.setAdapter(listAdapter);
-        this.messageListPlaceholder = (TextView) findViewById(R.id.placeholder);
-        this.listView.setEmptyView(messageListPlaceholder);
+        listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        listView.setItemAnimator(new DefaultItemAnimator());
 
-        Log.v(TAG, "initLoader");
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                if (!(viewHolder instanceof MessageAdapter.ItemViewHolder)) return 0;
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                Log.v(TAG, "onSwiped: " +viewHolder.getItemId() + " " + swipeDir);
+                if(swipeDir == ItemTouchHelper.LEFT) {
+                    Log.v(TAG, "deleting message " + ((MessageAdapter.ItemViewHolder) viewHolder).objectId);
+                    App.getMessageDao().deleteByKey(((MessageAdapter.ItemViewHolder) viewHolder).objectId);
+                    listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                }
+
+
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(listView);
+
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_messages, menu);
+        return true;
     }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.remove:
+                Log.v(TAG, "removing all messages");
+                App.getMessageDao().deleteAll();
+                //listAdapter.notifyItemRangeRemoved(0,listAdapter.getItemCount());
+                getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+//        if (v.getId()==R.id.listView) {
+//            menu.add(Menu.NONE, MENU_WAYPOINT_REMOVE, 1,getString(R.string.remove));
+//        }
+//    }
+//
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item)
+//    {
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        Log.v("menu", "position: " + info.position);
+//        switch (item.getItemId()) {
+//            case MENU_WAYPOINT_REMOVE:
+//                remove( (Waypoint) this.listAdapter.getItem(info.position));
+//                break;
+//        }
+//        return true;
+//    }
 
     private void goToRoot() {
         Intent intent1 = new Intent(this, ActivityMain.class);
@@ -146,8 +222,6 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
-        Log.v(TAG, "onLoaderReset()");
-
         listAdapter.swapCursor(null);
     }
     @Override
@@ -163,6 +237,7 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
     }
 
     public void onEvent(Events.MessageAdded e){
+
         getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 

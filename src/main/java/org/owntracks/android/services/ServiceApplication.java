@@ -155,11 +155,16 @@ public class ServiceApplication implements ProxyableService,
     public void onEventMainThread(Events.MsgMessageReceived e) {
         org.owntracks.android.db.Message m = new org.owntracks.android.db.Message();
         MsgMessage mm = e.getMessage();
-        m.setId(mm.getTopic() + "$" + mm.getTst());
+        m.setId(e.getTopic() + "$" + mm.getTst());
         m.setDescription(mm.getDesc());
         m.setTitle(mm.getTitle());
         try { // Extract channel from topic
-            m.setChannel(e.getTopic().split("/")[1]); //Uh oh...
+            if(e.getTopic() == Preferences.getBroadcastMessageTopic())
+                m.setChannel("broadcast");
+            else if(e.getTopic().startsWith(Preferences.getDeviceTopic(true)))
+                m.setChannel("direct");
+            else
+                m.setChannel(e.getTopic().split("/")[1]); //Uh oh...
         } catch (IndexOutOfBoundsException exception) {
             m.setChannel("undefined");
         }

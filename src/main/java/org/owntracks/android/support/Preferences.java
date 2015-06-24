@@ -940,6 +940,17 @@ public class Preferences {
         setBoolean(R.string.keyNotificationOnReceivedWaypointTransition, val);
     }
 
+    public static String getBroadcastMessageTopic() {
+        return "/msg"; // for now
+    }
+
+    public static boolean getBroadcastMessageEnabled() {
+        return true; // for now
+    }
+
+    public static boolean getDirectMessageEnable() {
+        return true; // for now
+    }
 
 
     // Checks if the app is started for the first time.
