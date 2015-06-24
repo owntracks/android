@@ -2,15 +2,9 @@ package org.owntracks.android.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,26 +12,20 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.github.monxalo.android.widget.SectionCursorAdapter;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.adapter.LoaderSectionCursorAdapter;
 import org.owntracks.android.adapter.MessageAdapter;
-import org.owntracks.android.db.Message;
 import org.owntracks.android.db.MessageDao;
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DividerItemDecoration;
 import org.owntracks.android.support.DrawerFactory;
@@ -54,10 +42,9 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
     private Cursor cursor;
 
     private Toolbar toolbar;
-    private RecyclerView listView;
+    private org.owntracks.android.support.RecyclerView listView;
     private int LOADER_ID = 1;
     private MessageAdapter listAdapter;
-    private TextView messageListPlaceholder;
 
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -70,7 +57,7 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_pager);
+        setContentView(R.layout.activity_messages);
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -110,11 +97,12 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
         layoutManager.scrollToPosition(0);
 
         listAdapter = new MessageAdapter(this);
-        listView = (RecyclerView) findViewById(R.id.listView);
+        listView = (org.owntracks.android.support.RecyclerView) findViewById(R.id.listView);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(listAdapter);
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         listView.setItemAnimator(new DefaultItemAnimator());
+        listView.setEmptyView(findViewById(R.id.messageListPlaceholder));
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
