@@ -333,7 +333,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		subscribToInitialTopics();
 
 		if (Preferences.getLocationBasedServicesEnabled() && pendingGeohash != null) {
-			updateGeohashSubscriptions();
+				updateGeohashSubscriptions();
 		}
 	}
 
@@ -422,11 +422,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			if (Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
 				topics.add(Preferences.getDeviceTopic(true) + "/cmd");
 
+			if (Preferences.getDirectMessageEnable() && !Preferences.isModePublic())
+				topics.add(baseTopic + "/msg");
+
 			if (!Preferences.isModePublic()) {
 				topics.add(baseTopic + "/event");
 				topics.add(baseTopic + "/waypoint");
 			}
+
+
 		}
+
+		if(Preferences.getBroadcastMessageEnabled())
+			topics.add(Preferences.getBroadcastMessageTopic());
+
 
 		subscribe(topics.toArray(new String[topics.size()]));
 
