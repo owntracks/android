@@ -164,6 +164,8 @@ public class ServiceApplication implements ProxyableService,
             m.setChannel("undefined");
         }
         m.setTst(mm.getTst());
+
+
         m.setIcon(mm.getIcon());
         m.setPriority(mm.getPrio());
         m.setIcon(mm.getIcon());

@@ -33,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.Message;
-import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
 import org.owntracks.android.support.Preferences;
@@ -41,6 +40,7 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -92,8 +92,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private static final int MIN_GEOHASH_PRECISION = 3 ;
 	private static final int MAX_GEOHASH_PRECISION = 6;
 
-	String[] geohashTopics = new String[MAX_GEOHASH_PRECISION-MIN_GEOHASH_PRECISION+1];
-	String[] geohashChannels = Preferences.getGeohashChannels();
+	private static final int GEOHASH_SLOTS = MAX_GEOHASH_PRECISION-MIN_GEOHASH_PRECISION+1;
+	String[] activeGeohashTopics = new String[GEOHASH_SLOTS];
+	private static final String[] NO_GEOHASHES = new String[GEOHASH_SLOTS];
+	String pendingGeohash;
 
 	@Override
 	public void onCreate(ServiceProxy p) {
@@ -276,6 +278,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			this.mqttClient.connect(options);
 			changeState(State.CONNECTED);
 
+			activeGeohashTopics = NO_GEOHASHES;
 			return true;
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
@@ -307,103 +310,95 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			this.context.registerReceiver(this.netConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		}
 
-		subscribToInitialTopics();
-		subscribeToGeohashTopics();
+		if (connectedWithCleanSession)
+			onCleanSessionConnect();
+		else
+			onUncleanSessionConnect();
 
-        deliverBacklog();
+		onSessionConnect();
+	}
+
+
+	private void onCleanSessionConnect() {
+		Log.v(TAG, "onCleanSessionConnect()");
+	}
+
+	private void onUncleanSessionConnect() {
+		Log.v(TAG, "onUncleanSessionConnect()");
+
+		activeGeohashTopics  = hashToSubPrecisionTopics(Preferences.getAndClearPersistentGeohash());
+	}
+
+	private void onSessionConnect() {
+		subscribToInitialTopics();
+
+		if (Preferences.getLocationBasedServicesEnabled() && pendingGeohash != null) {
+			updateGeohashSubscriptions();
+		}
 	}
 
 	public void onEvent(Events.CurrentLocationUpdated e) {
 		Log.v(TAG, "onEvent() - CurrentLocationUpdated ");
 
 		if(Preferences.getLocationBasedServicesEnabled()) {
-			updateGeohashTopics(GeoHash.geoHashStringWithCharacterPrecision(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude(), MAX_GEOHASH_PRECISION));
-			subscribeToGeohashTopics();
-		}
-
-	}
-
-	private void subscribeToGeohashTopics() {
-		if (isConnected() && connectedWithCleanSession)
-			clearPersistedGeohashTopics();
-
-		if (isConnected() && Preferences.getLocationBasedServicesEnabled()) {
-
-
-			String[] channels = Preferences.getGeohashChannels();
-			String[] factor = new String[channels.length*geohashTopics.length];
-			int i = 0;
-			for(int tl = 0; tl < geohashTopics.length; tl++) {
-				for(int cl = 0; cl < channels.length; cl++) {
-					factor[i++] = "msg/"+channels[cl]+"/"+geohashTopics[tl];
-				}
-			}
-
-			subscribe(factor);
-
+			pendingGeohash = GeoHash.geoHashStringWithCharacterPrecision(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude(), MAX_GEOHASH_PRECISION);
+			if(isConnected())
+				updateGeohashSubscriptions();
 		}
 	}
 
-	private void persistGeohashTopic() {
-		Preferences.setPersistentGeohash(geohashTopics[MAX_GEOHASH_PRECISION-MIN_GEOHASH_PRECISION]); // save highest precision geohash to clear it later
-		Preferences.setPersistentGeohashChannels(geohashChannels);
+	private String[] hashToSubPrecisionTopics(String maxPrecision) {
+		if("".equals(maxPrecision))
+			return NO_GEOHASHES;
+
+		String[] r = new String[GEOHASH_SLOTS];
+		String format = Preferences.getGeohashMsgTopic();
+		for(int i = MIN_GEOHASH_PRECISION; i <= MAX_GEOHASH_PRECISION; i++) {
+			int j = i - MIN_GEOHASH_PRECISION;
+			r[j]= String.format(format, maxPrecision.substring(0, i-1));
+		}
+		return r;
 	}
 
-	private void clearPersistedGeohashTopics() {
-		if(connectedWithCleanSession)
-			return;
+	public void updateGeohashSubscriptions() {
+		Log.v(TAG, "updateGeohashSubscriptions() with hash " + pendingGeohash);
+		String[] newGeohashTopics = hashToSubPrecisionTopics(pendingGeohash);
 
-		String hash = Preferences.getPersistentGeohash();
-		String[] channels = Preferences.getPersistentGeohashChannels();
-
-		if(hash.equals("") || channels.length == 0) {
+		if(activeGeohashTopics[0] == null) {
+			activeGeohashTopics = newGeohashTopics;
+			subscribe(activeGeohashTopics);
+			handleGeohashForUnCleanSession();
 			return;
 		}
 
-		String[] remove = new String[MIN_GEOHASH_PRECISION-MAX_GEOHASH_PRECISION+1];
-
+		int newGeohashIndex = -1;
+		int activeGeohashIndex;
 		for(int i = MIN_GEOHASH_PRECISION; i <= MAX_GEOHASH_PRECISION; i++) {
-			int j = i - MIN_GEOHASH_PRECISION; // index in geohash topic storage
-			remove[j]=hash.substring(0, i-1);
-		}
-
-		int i = 0;
-		String[] factor = new String[channels.length*remove.length];
-		for(int cl = 0; cl < channels.length; cl++) {
-
-			for(int rl = 0; rl < remove.length; rl++) {
-				factor[i++] = "msg/"+channels[cl]+"/"+remove[rl];
+			activeGeohashIndex = i - MIN_GEOHASH_PRECISION; // index in geohash topic storage
+			Log.v(TAG, "updateGeohashSubscriptions() - comparing activeGeohashIndex: " + activeGeohashIndex+ ". New: " + newGeohashTopics[activeGeohashIndex] + ", active: " + activeGeohashTopics[activeGeohashIndex]);
+			if(!newGeohashTopics[activeGeohashIndex].equals(activeGeohashTopics[activeGeohashIndex])) {
+				newGeohashIndex = activeGeohashIndex;
+				Log.v(TAG, "updateGeohashSubscriptions()  - compare difference at index " + newGeohashIndex);
+				break;
 			}
 		}
+		Log.v(TAG, "updateGeohashSubscriptions() - newGeohashIndex == " + newGeohashIndex);
 
-		unsubscribe(factor);
-		Preferences.clearPersistedGeohash();
 
+		if(newGeohashIndex >= 0) {
+			Log.v(TAG, "updateGeohashSubscriptions() - newGeohashIndex > 0");
+			unsubscribe(Arrays.copyOfRange(activeGeohashTopics, newGeohashIndex, activeGeohashTopics.length - 1)); // unsubscribe from match to end
+			subscribe(Arrays.copyOfRange(newGeohashTopics, newGeohashIndex, newGeohashTopics.length - 1));
+			activeGeohashTopics = newGeohashTopics;
+			handleGeohashForUnCleanSession();
+		}
 	}
 
-	public void updateGeohashTopics(String hash) {
-
-		List<String> remove = new ArrayList<>();
-
-		for(int i = MIN_GEOHASH_PRECISION; i <= MAX_GEOHASH_PRECISION; i++) {
-			int j = i - MIN_GEOHASH_PRECISION; // index in geohash topic storage
-
-			// 3  u0q
-			// 4  u0qu
-			// 5  u0qu9
-			// 6  u0qu9x
-			String precision = hash.substring(0, i-1);
-			if(!precision.equals(geohashTopics[j])) {
-				remove.add(geohashTopics[j]);
-				geohashTopics[j] = precision;
-			} else {
-				break; // if a precision already matches, we're done
-			}
-		}
-
-		if(remove.size() > 0) // remove different subscriptions if there are any
-			unsubscribe(remove.toArray(new String[remove.size()]));
-
+	private void handleGeohashForUnCleanSession() {
+		if(!connectedWithCleanSession)
+			Preferences.setPersistentGeohash(pendingGeohash);
+		else
+			Preferences.getAndClearPersistentGeohash();
 	}
 
 
@@ -515,7 +510,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			else
 				changeState(State.DISCONNECTED);
 		}
-		persistGeohashTopic();
 	}
 
 	@Override
@@ -540,8 +534,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         } else {
 			changeState(State.DISCONNECTED);
         }
-
-		persistGeohashTopic();
 
         reconnectHandler.start();
 

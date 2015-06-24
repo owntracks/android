@@ -200,6 +200,9 @@
     <string name="pager">Messages</string>
     <string name="keyCurrentGeohash">currentGeohash</string>
     <string name="keyCurrentGeohashChannels">currentGeohashChannels</string>
+    <string name="keyGeohashTopic">geohashTopic</string>
+    <string name="clearMessage">Clear</string>
+    <string name="messageListPlaceholder">No messages received yet</string>
     <string-array name="qos_readable">
        p <item>"0"</item>
         <item>"1"</item>

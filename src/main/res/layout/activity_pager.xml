@@ -1,12 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/toolbar" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/listView"
-        android:divider="@drawable/inset"/>
-</LinearLayout>
+android:layout_width="match_parent"
+android:layout_height="wrap_content" >
+
+<include layout="@layout/toolbar" />
+
+<ListView
+    android:visibility="gone"
+    android:id="@+id/listView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:layout_below="@+id/fragmentToolbar" />
+
+
+<TextView android:id="@+id/placeholder"
+    android:gravity="center"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:text="@string/messageListPlaceholder" />
+
+</RelativeLayout>
