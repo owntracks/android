@@ -5,11 +5,17 @@ android:layout_height="wrap_content" >
 
 <include layout="@layout/toolbar" />
 
-<android.support.v7.widget.RecyclerView
+<org.owntracks.android.support.RecyclerView
     android:id="@+id/listView"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     />
+<TextView android:id="@+id/messageListPlaceholder"
+    android:gravity="center"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:text="@string/messageListPlaceholder" />
 
 
 </LinearLayout>
