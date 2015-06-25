@@ -1,5 +1,17 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.5.17
+>Release date: 2015-06-25
+* [FIX] Fixed disorted message image backgrounds on higher DPI devices
+* [FIX] #212 - Open browser when message with URL attribute is clicked
+* [FIX] Message view was not updated correctly if a message was deleted
+* [FIX] AdapterCursorLoader did not use stable IDs
+* [NEW] Messages now indicate if they have an URL attribute
+* [NEW] ServiceLocator does no longer throttle publishes
+* [NEW] Exposing internal statistics counter in new activity
+* [NEW] Refactored ActivityWaypoints to use RecyclerView
+* [NEW] Waypoints list now updates in realtime
+
 ## OwnTracks 0.5.16
 >Release date: 2015-06-24
 * [NEW] Added support for GehHash based messages
