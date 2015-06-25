@@ -10,7 +10,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 6;
+    private static final int SCHEMA_VERSION = 8;
 
     public static void main(String args[]) throws Exception {
 
@@ -33,7 +33,7 @@ public class DaoGenerator {
 
 
         Entity waypoint = schema.addEntity("Waypoint");
-        waypoint.addIdProperty();
+        waypoint.addIdProperty(); // For stable ids of cursor adapter
         waypoint.addStringProperty("description");
         waypoint.addStringProperty("geocoder");
         waypoint.addDoubleProperty("latitude");
@@ -42,13 +42,14 @@ public class DaoGenerator {
         waypoint.addStringProperty("ssid");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
-        waypoint.addDateProperty("lastTriggered");
+        waypoint.addLongProperty("lastTriggered");
         waypoint.addStringProperty("geofenceId");
         waypoint.addIntProperty("modeId").notNull();
 
 
         Entity message = schema.addEntity("Message");
-        message.addStringProperty("id").primaryKey().columnName("_id");;
+        message.addIdProperty(); // For stable ids of cursor adapter
+        message.addStringProperty("externalId").unique();
         message.addLongProperty("tst");
         message.addStringProperty("channel");
         message.addStringProperty("sender");

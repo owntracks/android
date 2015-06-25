@@ -90,6 +90,11 @@ public class ActivityPreferences extends AppCompatActivity {
                         return true;
                     case R.string.idSettings:
                         return true;
+                    case R.string.idStatistics:
+                        Intent intent2 = new Intent(context, ActivityStatistics.class);
+                        startActivity(intent2);
+                        return true;
+
                 }
                 return false;
             }

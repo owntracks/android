@@ -9,7 +9,8 @@ package org.owntracks.android.db;
  */
 public class Message {
 
-    private String id;
+    private Long id;
+    private String externalId;
     private Long tst;
     private String channel;
     private String sender;
@@ -26,12 +27,13 @@ public class Message {
     public Message() {
     }
 
-    public Message(String id) {
+    public Message(Long id) {
         this.id = id;
     }
 
-    public Message(String id, Long tst, String channel, String sender, String title, String description, String icon, Integer priority, String iconUrl, String url) {
+    public Message(Long id, String externalId, Long tst, String channel, String sender, String title, String description, String icon, Integer priority, String iconUrl, String url) {
         this.id = id;
+        this.externalId = externalId;
         this.tst = tst;
         this.channel = channel;
         this.sender = sender;
@@ -43,12 +45,20 @@ public class Message {
         this.url = url;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public Long getTst() {

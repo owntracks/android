@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import java.io.Closeable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -11,8 +12,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.owntracks.android.support.Statistics;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
@@ -55,6 +58,8 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	protected void onStartOnce() {
+		Statistics.setTime(this, Statistics.SERVICE_PROXY_START);
+
 		instantiateService(SERVICE_APP);
 		instantiateService(SERVICE_BROKER);
         instantiateService(SERVICE_LOCATOR);
