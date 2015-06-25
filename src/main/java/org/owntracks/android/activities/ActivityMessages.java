@@ -3,6 +3,7 @@ package org.owntracks.android.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.MessageAdapter;
 import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.services.ServiceProxy;
@@ -35,9 +37,10 @@ import org.owntracks.android.support.SimpleCursorLoader;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityMessages extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ActivityMessages extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<MessageAdapter.ItemViewHolder> {
     private static final String TAG = "ActivityMessages";
     public static final String CURSOR_ORDER = String.format("%s DESC", MessageDao.Properties.Tst.columnName );
+    private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";
 
     private Cursor cursor;
 
@@ -64,6 +67,7 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
 
         final Context context = this;
+
         Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
@@ -84,6 +88,11 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
                         Intent intent = new Intent(context, ActivityPreferences.class);
                         startActivity(intent);
                         return true;
+                    case R.string.idStatistics:
+                        Intent intent3 = new Intent(context, ActivityStatistics.class);
+                        startActivity(intent3);
+                        return true;
+
                 }
                 return false;
             }
@@ -97,13 +106,14 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
         layoutManager.scrollToPosition(0);
 
         listAdapter = new MessageAdapter(this);
+
         listView = (org.owntracks.android.support.RecyclerView) findViewById(R.id.listView);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(listAdapter);
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setEmptyView(findViewById(R.id.messageListPlaceholder));
-
+        listAdapter.setOnViewHolderClickListener(this);
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -119,11 +129,17 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
             @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                Log.v(TAG, "onSwiped: " +viewHolder.getItemId() + " " + swipeDir);
+                Log.v(TAG, "onSwiped: " + viewHolder);
                 if(swipeDir == ItemTouchHelper.LEFT) {
-                    Log.v(TAG, "deleting message " + ((MessageAdapter.ItemViewHolder) viewHolder).objectId);
-                    App.getMessageDao().deleteByKey(((MessageAdapter.ItemViewHolder) viewHolder).objectId);
-                    listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                    Log.v(TAG, "deleting message " + viewHolder.getItemId());
+                    Log.v(TAG, "oldPosition " + viewHolder.getOldPosition());
+                    Log.v(TAG, "layoutPositon " + viewHolder.getLayoutPosition());
+                    Log.v(TAG, "adapterPosition " + viewHolder.getAdapterPosition());
+
+                    App.getMessageDao().deleteByKey(viewHolder.getItemId());
+                    //listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                    //listAdapter.notifyDataSetChanged();
+                    requery();
                 }
 
 
@@ -133,6 +149,9 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(listView);
 
+    }
+    public void requery() {
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,6 +224,7 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+        Log.v(TAG, "onLoadFinished() - swapping cursor");
         listAdapter.swapCursor(data);
     }
 
@@ -218,6 +238,16 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
         EventBus.getDefault().registerSticky(this);
     }
 
+
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        Log.v(TAG, "restarting loader");
+        requery();
+    }
+
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
@@ -225,8 +255,16 @@ public class ActivityMessages extends AppCompatActivity implements LoaderManager
     }
 
     public void onEvent(Events.MessageAdded e){
-
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+        requery();
     }
 
+
+    @Override
+    public void onViewHolderClick(View rootView, MessageAdapter.ItemViewHolder viewHolder) {
+        Log.v(TAG, "onViewHolderClick " + viewHolder.objectId);
+        if(viewHolder.url != null) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(viewHolder.url));
+            startActivity(browserIntent);
+        }
+    }
 }

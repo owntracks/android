@@ -16,25 +16,28 @@ import org.owntracks.android.R;
 import org.owntracks.android.db.MessageDao;
 
 
-public class MessageAdapter extends LoaderSectionCursorAdapter {
+public class MessageAdapter extends AdapterCursorLoader {
     private int[] priorities = new int[3];
 
     public MessageAdapter(Context context) {
         super(context);
 
-        priorities[0] = context.getResources().getColor(R.color.priority0);
-        priorities[1] = context.getResources().getColor(R.color.priority1);
-        priorities[2] = context.getResources().getColor(R.color.priority2);
+        priorities[0] = R.drawable.circle_priority0;
+        priorities[1] = R.drawable.circle_priority1;
+        priorities[2] = R.drawable.circle_priority2;
 
     }
 
 
-    public static class ItemViewHolder extends RecyclerView.ViewHolder {
+
+    public static class ItemViewHolder extends ClickableViewHolder {
         public TextView mTitle;
         public TextView mDescription;
         public IconTextView mIcon;
         public RelativeTimeTextView  mTime;
         public String objectId;
+        public String url;
+        public View mUrlIndicator;
         public int position;
 
         public ItemViewHolder(View view) {
@@ -43,12 +46,13 @@ public class MessageAdapter extends LoaderSectionCursorAdapter {
             mDescription =  (TextView)view.findViewById(R.id.description);
             mIcon =  (IconTextView)view.findViewById(R.id.image);
             mTime =  (RelativeTimeTextView)view.findViewById(R.id.time);
+            mUrlIndicator = (IconTextView)view.findViewById(R.id.mUrlIndicator);
         }
     }
 
 
     @Override
-    public RecyclerView.ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
+    public ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_message, parent, false);
         ItemViewHolder vh = new ItemViewHolder(itemView);
         return vh;
@@ -56,45 +60,18 @@ public class MessageAdapter extends LoaderSectionCursorAdapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position) {
-        ((ItemViewHolder)viewHolder).mIcon.setText("{" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Icon.columnName)) + "}");
-        ((ItemViewHolder)viewHolder).mIcon.setBackgroundColor(priorities[cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.Priority.columnName))]);
+        ((ItemViewHolder) viewHolder).mIcon.setText("{" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Icon.columnName)) + "}");
 
-        ((ItemViewHolder)viewHolder).mTitle.setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Title.columnName)));
-        ((ItemViewHolder)viewHolder).mDescription.setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Description.columnName)));
+        ((ItemViewHolder) viewHolder).mIcon.setBackgroundResource(priorities[cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.Priority.columnName))]);
+        ((ItemViewHolder) viewHolder).mTitle.setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Title.columnName)));
+        ((ItemViewHolder) viewHolder).mDescription.setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Description.columnName)));
         ((ItemViewHolder) viewHolder).mTime.setReferenceTime(cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Tst.columnName)) * 1000);
        //((ItemViewHolder) viewHolder).mTime.setPrefix("#" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Channel.columnName)) + ", ");
         ((ItemViewHolder) viewHolder).mTime.setSuffix(" in #" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Channel.columnName)));
 
-        ((ItemViewHolder) viewHolder).objectId= cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Id.columnName));
-
+        ((ItemViewHolder) viewHolder).url= cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Url.columnName));
+        if(((ItemViewHolder) viewHolder).url != null) {
+            ((ItemViewHolder) viewHolder).mUrlIndicator.setVisibility(View.VISIBLE);
+        }
     }
-
-/*
-
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.row_message, null);
-        IconTextView icon = (IconTextView) view.findViewById(R.id.image);
-        TextView title = (TextView) view.findViewById(R.id.title);
-        TextView description = (TextView) view.findViewById(R.id.description);
-        RelativeTimeTextView time = (RelativeTimeTextView) view.findViewById(R.id.time);
-
-        view.setTag(R.id.image, icon);
-        view.setTag(R.id.title, title);
-        view.setTag(R.id.description, description);
-        view.setTag(R.id.time, time);
-
-        return view;    }*/
-
-  /*  @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ((IconTextView) view.getTag(R.id.image)).setText("{"+cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Icon.columnName))+"}");
-        ((IconTextView) view.getTag(R.id.image)).setBackgroundColor(priorities[cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.Priority.columnName))]);
-
-        ((TextView) view.getTag(R.id.title)).setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Title.columnName)));
-        ((TextView) view.getTag(R.id.description)).setText(cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Description.columnName)));
-        ((RelativeTimeTextView) view.getTag(R.id.time)).setReferenceTime(cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Tst.columnName))*1000);
-
-    }*/
 }

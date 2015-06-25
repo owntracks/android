@@ -43,6 +43,8 @@ public class DrawerFactory {
                     new PrimaryDrawerItem().withName("Messages").withIdentifier(R.string.idPager).withTag("pag").withIcon(FontAwesome.Icon.faw_bell),
                     new PrimaryDrawerItem().withName("Waypoints").withIdentifier(R.string.idWaypoints).withTag("way").withIcon(FontAwesome.Icon.faw_street_view)
             )
+            .addStickyDrawerItems(new SecondaryDrawerItem().withName("Statistics").withIdentifier(R.string.idStatistics).withTag("stat").withIcon(FontAwesome.Icon.faw_bar_chart))
+
             .addStickyDrawerItems(new SecondaryDrawerItem().withName("Preferences").withIdentifier(R.string.idSettings).withTag("set").withIcon(FontAwesome.Icon.faw_cog))
             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                 @Override
