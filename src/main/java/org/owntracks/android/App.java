@@ -16,6 +16,8 @@ import org.owntracks.android.model.Contact;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Statistics;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -49,20 +51,25 @@ public class App extends Application {
     public static final int MODE_ID_PUBLIC=2;
     private SQLiteDatabase db;
 
-
     @Override
 	public void onCreate() {
 		super.onCreate();
         instance = this;
         Preferences preferences = new Preferences(this);
-
+        Statistics.setTime(this, Statistics.APP_START);
         if(!BuildConfig.DEBUG) {
             Log.v(TAG, "Fabric.io crash reporting enabled");
             Fabric.with(this, new Crashlytics());
             //final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
         }
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "org.owntracks.android.db", null);
+        DaoMaster.OpenHelper helper = new DaoMaster.OpenHelper(this, "org.owntracks.android.db", null) {
+            @Override
+            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                DaoMaster.dropAllTables(db, true);
+                onCreate(db);
+            }
+        };
 
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);

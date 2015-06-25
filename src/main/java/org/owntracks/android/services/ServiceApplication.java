@@ -13,6 +13,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
+import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.messages.CardMessage;
 import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.MsgMessage;
@@ -153,31 +154,32 @@ public class ServiceApplication implements ProxyableService,
     }
 
     public void onEventMainThread(Events.MsgMessageReceived e) {
-        org.owntracks.android.db.Message m = new org.owntracks.android.db.Message();
         MsgMessage mm = e.getMessage();
-        m.setId(e.getTopic() + "$" + mm.getTst());
-        m.setDescription(mm.getDesc());
-        m.setTitle(mm.getTitle());
-        try { // Extract channel from topic
+        String externalId = e.getTopic() + "$" + mm.getTst();
+
+        org.owntracks.android.db.Message m = App.getMessageDao().queryBuilder().where(MessageDao.Properties.ExternalId.eq(externalId)).unique();
+        if(m == null) {
+            m = new org.owntracks.android.db.Message();
+            m.setIcon(mm.getIcon());
+            m.setPriority(mm.getPrio());
+            m.setIcon(mm.getIcon());
+            m.setIconUrl(mm.getIconUrl());
+            m.setUrl(mm.getUrl());
+            m.setExternalId(externalId);
+            m.setDescription(mm.getDesc());
+            m.setTitle(mm.getTitle());
+            m.setTst(mm.getTst());
+
             if(e.getTopic() == Preferences.getBroadcastMessageTopic())
                 m.setChannel("broadcast");
             else if(e.getTopic().startsWith(Preferences.getDeviceTopic(true)))
                 m.setChannel("direct");
             else
-                m.setChannel(e.getTopic().split("/")[1]); //Uh oh...
-        } catch (IndexOutOfBoundsException exception) {
-            m.setChannel("undefined");
+                try { m.setChannel(e.getTopic().split("/")[1]); } catch (IndexOutOfBoundsException exception) {  m.setChannel("undefined");  }
+
+            App.getMessageDao().insert(m);
+            EventBus.getDefault().post(new Events.MessageAdded(m));
         }
-        m.setTst(mm.getTst());
-
-
-        m.setIcon(mm.getIcon());
-        m.setPriority(mm.getPrio());
-        m.setIcon(mm.getIcon());
-        m.setIconUrl(mm.getIconUrl());
-        m.setUrl(mm.getUrl());
-        App.getMessageDao().insertOrReplace(m);
-        EventBus.getDefault().post(new Events.MessageAdded(m));
     }
 
 

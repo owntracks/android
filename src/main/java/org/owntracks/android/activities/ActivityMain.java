@@ -126,9 +126,14 @@ public class ActivityMain extends AppCompatActivity {
                         Intent intent1 = new Intent(context, ActivityWaypoints.class);
                         startActivity(intent1);
                         return true;
-                    case R.string.idSettings:
-                        Intent intent2 = new Intent(context, ActivityPreferences.class);
+                    case R.string.idStatistics:
+                        Intent intent2 = new Intent(context, ActivityStatistics.class);
                         startActivity(intent2);
+                        return true;
+
+                    case R.string.idSettings:
+                        Intent intent4 = new Intent(context, ActivityPreferences.class);
+                        startActivity(intent4);
                         return true;
 
                 }

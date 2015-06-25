@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.owntracks.android"
-          android:versionCode="0516"
-          android:versionName="0.5.16cat " >
+    package="org.owntracks.android"
+    android:versionCode="0517"
+    android:versionName="0.5.17" >
 
-    <meta-data android:name="com.crashlytics.ApiKey" android:value="d0b0c708e43f69036ebedad1766ad086074d30f6"/>
+    <meta-data
+        android:name="com.crashlytics.ApiKey"
+        android:value="d0b0c708e43f69036ebedad1766ad086074d30f6" />
 
-    <uses-feature  android:glEsVersion="0x00020000"  android:required="true" />
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- To access the network -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To handle connectivity changes and reconnect -->
@@ -21,25 +25,24 @@
     <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="18" /> <!-- For config import/export -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" /> <!-- For config import/export -->
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- For notifications -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- To trigger waypoints when entering a WIFI network -->
-
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- To trigger waypoints when entering a WIFI network -->
     <application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Owntracks" >
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
-
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="d0b0c708e43f69036ebedad1766ad086074d30f6" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -52,6 +55,7 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -76,14 +80,14 @@
         <activity
             android:name=".activities.ActivityPreferences"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:label="Preferences" >
+            android:label="Preferences"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activities.ActivityPreferencesConnection"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:label="@string/preferencesServer" >
+            android:label="@string/preferencesServer"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activities.ActivityExport"
@@ -94,34 +98,54 @@
             android:name=".activities.ActivityImport"
             android:configChanges="orientation"
             android:label="@string/app_name" >
+
             <!-- Support two dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="*" android:pathPattern=".*\\..*\\.otrc" android:mimeType="*/*" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\..*\\.otrc"
+                    android:scheme="content" />
             </intent-filter>
             <!-- Support three dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="*" android:pathPattern=".*\\..*\\..*\\.otrc" android:mimeType="*/*" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\..*\\..*\\.otrc"
+                    android:scheme="content" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/otrc" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -132,11 +156,10 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-
         <service
             android:name=".services.ServiceProxy"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
         </service>
 
         <receiver
@@ -147,15 +170,21 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name=".support.receiver.ReceiverProxy"
-                  android:enabled="true">
-            <intent-filter >
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_RECONNECT"/>
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_PING"/>
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION"/>
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN"/>
+        <receiver
+            android:name=".support.receiver.ReceiverProxy"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_RECONNECT" />
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_PING" />
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION" />
+                <action android:name="org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".activities.ActivityStatistics"
+            android:label="@string/title_activity_activity_statistics" >
+        </activity>
     </application>
+
 </manifest>

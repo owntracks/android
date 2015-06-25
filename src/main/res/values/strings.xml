@@ -219,4 +219,11 @@
         <item>Hosted</item>
         <item>Public</item>
     </string-array>
+    <string name="title_activity_activity_statistics">Statistics</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="clear">Reset</string>
+    <string name="idStatistics">statistics</string>
+    <string name="refresh">Refresh</string>
 </resources>

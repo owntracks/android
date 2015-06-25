@@ -11,6 +11,7 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 // AsyncTask encapsulating the reverse-geocoding API
 public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
@@ -30,6 +31,11 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
 	@Override
 	protected Void doInBackground(GeocodableLocation... params) {
 		Geocoder geocoder = new Geocoder(this.mContext, Locale.getDefault());
+		if(params.length == 0 ) {
+			Log.e(TAG, "no parameters provided for doInBackground()");
+			return null;
+		}
+
 		GeocodableLocation l = params[0];
 		int r = GEOCODER_NORESULT;
 

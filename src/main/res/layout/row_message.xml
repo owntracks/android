@@ -7,56 +7,63 @@
     android:layout_height="wrap_content"
     android:minHeight="72dp">
 
-    <org.owntracks.android.support.MaskingFrameLayout
-        android:id="@+id/imageMask"
-        android:layout_width="40dp"
-        app:porterduffxfermode="DST_IN"
-        app:mask="@drawable/mask_round"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="false"
+    <IconTextView
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp">
-
-        <IconTextView
-            android:id="@+id/image"
-            android:text="{fa-android}"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
-            android:gravity="center"
-            android:background="@color/primary"
-            android:layout_width="40sp"
-            android:layout_height="40sp" />
-    </org.owntracks.android.support.MaskingFrameLayout>
+        android:id="@+id/image"
+        android:text="{fa-android}"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
 
     <LinearLayout
         android:id="@+id/textview_container"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_toRightOf="@+id/imageMask"
-        android:layout_toEndOf="@+id/imageMask"
+        android:layout_toRightOf="@+id/image"
+        android:layout_toEndOf="@+id/image"
 
         android:orientation="vertical"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         >
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="#212121" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="#212121" />
+            <IconTextView
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+
+                android:visibility="visible"
+                android:id="@+id/mUrlIndicator"
+                android:text="{fa-link}"
+                android:textSize="14sp"
+                android:paddingLeft="8dp"
+
+                android:textColor="#858585"
+                android:gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
 
 
         <TextView

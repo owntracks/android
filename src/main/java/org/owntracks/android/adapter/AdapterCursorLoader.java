@@ -2,46 +2,58 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.owntracks.android.R;
 import org.owntracks.android.db.Message;
-import org.owntracks.android.db.MessageDao;
-
-import java.security.Key;
-import java.util.HashMap;
 
 
-public abstract class LoaderSectionCursorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final String TAG = "LoaderSectionCursorAdap";
+    private static final String TAG = "AdapterCursorLoader";
+    private static final String ID_COLUMN = "_id";
+    protected final Context mContext;
+    protected OnViewHolderClickListener onViewHolderClickListener;
 
-   // private static final int TYPE_HEADER =     private static final int TYPE_COUNT = 2;
-    private SparseArray<String> mSectionsIndexer;
-
-    public static class SectionViewHolder extends RecyclerView.ViewHolder {
+    public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView mTextView;
-        public SectionViewHolder(View view) {
+        public View rootView;
+        private OnViewHolderClickListener<ClickableViewHolder> onClickListener;
+        public ClickableViewHolder(View view) {
             super(view);
+            this.rootView = view;
             mTextView = (TextView)view.findViewById(R.id.section_text);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(onClickListener != null)
+                this.onClickListener.onViewHolderClick(v, this);
+
+        }
+
+        public void setOnViewHolderClickListener(OnViewHolderClickListener listener) {
+            this.onClickListener = listener;
         }
     }
+
 
     private Cursor mCursor;
     private boolean mDataValid;
 
 
-    public LoaderSectionCursorAdapter(Context context) {
-
+    public AdapterCursorLoader(Context context) {
+        mContext = context;
         mCursor = null;
         mDataValid = false;
+        setHasStableIds(true);
+
     }
 
 
@@ -57,11 +69,6 @@ public abstract class LoaderSectionCursorAdapter extends RecyclerView.Adapter<Re
 
     public Cursor getCursor() {
         return mCursor;
-    }
-
-    @Override
-    public void setHasStableIds(boolean hasStableIds) {
-        super.setHasStableIds(true);
     }
 
     public abstract void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position);
@@ -80,18 +87,31 @@ public abstract class LoaderSectionCursorAdapter extends RecyclerView.Adapter<Re
         onBindViewHolder(viewHolder, mCursor, position);
     }
 
-    public abstract RecyclerView.ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
+    public abstract ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateItemViewHolder(parent,viewType);
+        ClickableViewHolder v = onCreateItemViewHolder(parent,viewType);
+        if(onViewHolderClickListener != null)
+            v.setOnViewHolderClickListener(onViewHolderClickListener);
+        return v;
     }
 
+    public interface OnViewHolderClickListener<T extends ClickableViewHolder> {
+        void onViewHolderClick(View rootView, T viewHolder);
+    }
+
+
+    public void setOnViewHolderClickListener(OnViewHolderClickListener l) {
+        this.onViewHolderClickListener = l;
+    }
 
 
     @Override
     public long getItemId(int position) {
-        return super.getItemId(position);
+        Cursor cursor = getCursor();
+        getCursor().moveToPosition(position);
+        return cursor.getLong(getCursor().getColumnIndex(ID_COLUMN));
     }
 
     @Override
@@ -107,17 +127,11 @@ public abstract class LoaderSectionCursorAdapter extends RecyclerView.Adapter<Re
         }
     }
 
-
     /**
      * Swap in a new Cursor, returning the old Cursor.  Unlike
      * {@link #changeCursor(Cursor)}, the returned old Cursor is <em>not</em>
      * closed.
      */
-
-    public void itemAdded(Message m) {
-
-    }
-
     public Cursor swapCursor(Cursor newCursor) {
         if (newCursor == mCursor) {
             return null;

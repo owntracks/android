@@ -19,7 +19,7 @@ public class Waypoint {
     private String ssid;
     private Boolean shared;
     private java.util.Date date;
-    private java.util.Date lastTriggered;
+    private Long lastTriggered;
     private String geofenceId;
     private int modeId;
 
@@ -33,7 +33,7 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, String geocoder, Double latitude, Double longitude, Integer radius, String ssid, Boolean shared, java.util.Date date, java.util.Date lastTriggered, String geofenceId, int modeId) {
+    public Waypoint(Long id, String description, String geocoder, Double latitude, Double longitude, Integer radius, String ssid, Boolean shared, java.util.Date date, Long lastTriggered, String geofenceId, int modeId) {
         this.id = id;
         this.description = description;
         this.geocoder = geocoder;
@@ -120,11 +120,11 @@ public class Waypoint {
         this.date = date;
     }
 
-    public java.util.Date getLastTriggered() {
+    public Long getLastTriggered() {
         return lastTriggered;
     }
 
-    public void setLastTriggered(java.util.Date lastTriggered) {
+    public void setLastTriggered(Long lastTriggered) {
         this.lastTriggered = lastTriggered;
     }
 

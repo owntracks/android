@@ -131,32 +131,26 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
 
 
         Bundle extras = getIntent().getExtras();
-        if(extras == null || extras.getString("keyId") == null) {
+        ;
 
+
+        if(getIntent().getExtras() == null || (this.waypoint = this.dao.loadByRowId(extras.getLong("keyId"))) == null) {
+            this.waypoint = null;
         } else {
-            Query query = this.dao.queryBuilder().where( WaypointDao.Properties.Id.eq(extras.getString("keyId"))).build();
-            try {
-                this.waypoint = (Waypoint) query.unique();
+            this.description.setText(this.waypoint.getDescription());
+            this.latitude.setText(this.waypoint.getLatitude().toString());
+            this.longitude.setText(this.waypoint.getLongitude().toString());
 
-                this.description.setText(this.waypoint.getDescription());
-                this.latitude.setText(this.waypoint.getLatitude().toString());
-                this.longitude.setText(this.waypoint.getLongitude().toString());
-
-                if (this.waypoint.getRadius() != null && this.waypoint.getRadius() > 0) {
-                    this.radius.setText(this.waypoint.getRadius().toString());
-
-                }
-                this.ssid.setText(this.waypoint.getSsid());
-
-                // Shared waypoints are disabled in public mode to protect user's privacy
-                findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
-
-                this.share.setChecked(this.waypoint.getShared());
-
-            } catch(DaoException e) { // No result found or id not unique (both shouldn't happen)
-                finish();
-                return;
+            if (this.waypoint.getRadius() != null && this.waypoint.getRadius() > 0) {
+                this.radius.setText(this.waypoint.getRadius().toString());
             }
+
+            this.ssid.setText(this.waypoint.getSsid());
+
+            // Shared waypoints are disabled in public mode to protect user's privacy
+            findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
+
+            this.share.setChecked(this.waypoint.getShared());
 
         }
     }
@@ -193,7 +187,8 @@ public class ActivityWaypoint extends AppCompatActivity implements StaticHandler
 
 
     protected void add(Waypoint w) {
-        this.dao.insert(w);
+        long id = this.dao.insert(w);
+        Log.v(TAG, "added waypoint with id: " + id);
         EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
         //EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
