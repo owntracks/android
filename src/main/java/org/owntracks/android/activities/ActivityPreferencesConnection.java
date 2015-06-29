@@ -314,7 +314,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
                                     tlsCaCrt.setText(Preferences.getTlsCaCrtPath());
 
                                     tlsClientCrt.setVisibility(tlsVal ? View.VISIBLE : View.GONE);
-                                    tlsClientCrt.setText(Preferences.getTlsCaCrtPath());
+                                    tlsClientCrt.setText(Preferences.getTlsClientCrtPath());
 
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -337,7 +337,7 @@ public class ActivityPreferencesConnection extends AppCompatActivity {
 
                                     Preferences.setTls(tlsVal);
                                     Preferences.setTlsCaCrtPath(tlsCaCrt.getText().toString());
-                                    Preferences.setTlsCaCrtPath(tlsClientCrt.getText().toString());
+                                    Preferences.setTlsClientCrtPath(tlsClientCrt.getText().toString());
 
                                     updateConnectButton();
                                 }
