@@ -10,6 +10,8 @@
     <IconTextView
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+
         android:id="@+id/image"
         android:text="{fa-android}"
         android:textSize="20sp"

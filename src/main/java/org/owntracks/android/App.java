@@ -14,6 +14,7 @@ import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Statistics;
@@ -175,4 +176,28 @@ public class App extends Application {
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
 	}
+
+    public static void onEnterForeground() {
+        Log.v(TAG, "onEnterForeground");
+        ServiceProxy.runOrBind(getContext(), new Runnable() {
+
+            @Override
+            public void run() {
+                ServiceProxy.getServiceLocator().enableForegroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(false);
+            }
+        });
+    }
+
+    public static void onEnterBackground() {
+        Log.v(TAG, "onEnterBackground");
+        ServiceProxy.runOrBind(getContext(), new Runnable() {
+
+            @Override
+            public void run() {
+                ServiceProxy.getServiceLocator().enableBackgroundMode();
+                ServiceProxy.getServiceBeacon().setBackgroundMode(true);
+            }
+        });
+    }
 }

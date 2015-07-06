@@ -44,7 +44,7 @@ import de.greenrobot.dao.query.Query;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoint extends AppCompatActivity implements StaticHandlerInterface {
+public class ActivityWaypoint extends ActivityBase implements StaticHandlerInterface {
     private static final String TAG = "ActivityWaypoint";
 
     private static final int REQUEST_PLACE_PICKER = 19283;

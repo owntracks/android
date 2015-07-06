@@ -37,7 +37,7 @@ import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
 
-public class ActivityExport extends AppCompatActivity {
+public class ActivityExport extends ActivityBase {
     private static final String TAG = "ActivityExport";
 
     private static final String TEMP_FILE_NAME = "config.otrc";
