@@ -22,7 +22,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Statistics;
 
-public class ActivityStatistics extends AppCompatActivity {
+public class ActivityStatistics extends ActivityBase {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

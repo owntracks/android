@@ -43,7 +43,7 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoints extends AppCompatActivity implements StaticHandlerInterface, LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
+public class ActivityWaypoints extends ActivityBase implements StaticHandlerInterface, LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
     private static final String TAG = "ActivityWaypoints";
     private Handler handler;
     public static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );

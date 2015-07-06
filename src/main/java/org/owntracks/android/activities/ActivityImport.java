@@ -34,7 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.EnumSet;
 
-public class ActivityImport extends AppCompatActivity {
+public class ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
 
     private TextView input;
