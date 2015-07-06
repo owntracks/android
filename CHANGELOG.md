@@ -1,5 +1,14 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.5.18
+>Release date: 2015-07-06
+* [FIX] ReconnectHandler was not started correctly 
+* [FIX] Queued messages were not send after a reconnect
+* [FIX] ServiceLocator onLocationChange statistics counter was not reset correctly
+* [NEW] ReconnectHandler now uses an exponential backoff time between 1 and 64 minutes
+* [NEW] Global background mode for location requests instead of new requests when switching activities
+* [NEW] Added a marker that display the current location on the map 
+
 ## OwnTracks 0.5.17
 >Release date: 2015-06-25
 * [FIX] Fixed disorted message image backgrounds on higher DPI devices
