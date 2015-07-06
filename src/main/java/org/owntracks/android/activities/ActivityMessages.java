@@ -37,7 +37,7 @@ import org.owntracks.android.support.SimpleCursorLoader;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityMessages extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<MessageAdapter.ItemViewHolder> {
+public class ActivityMessages extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<MessageAdapter.ItemViewHolder> {
     private static final String TAG = "ActivityMessages";
     public static final String CURSOR_ORDER = String.format("%s DESC", MessageDao.Properties.Tst.columnName );
     private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";

@@ -96,7 +96,7 @@ public class LocationMessage extends Message{
             json.put("_type", "location")
             .put("lat", this.location.getLatitude())
             .put("lon", this.location.getLongitude())
-            .put("tst", (TimeUnit.MILLISECONDS.toSeconds((new Date()).getTime())))
+            .put("tst", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()))
             .put("acc", Math.floor(this.location.getLocation().getAccuracy()));
 
             if (this.battery != -1)

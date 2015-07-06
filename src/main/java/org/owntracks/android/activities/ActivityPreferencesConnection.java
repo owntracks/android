@@ -31,7 +31,7 @@ import org.owntracks.android.support.Preferences;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityPreferencesConnection extends AppCompatActivity {
+public class ActivityPreferencesConnection extends ActivityBase {
     private static final String TAG = "ActivityPreferencesCon";
 
     private static boolean modeSwitch = false;

@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class ActivityLauncher extends FragmentActivity {
+public class ActivityLauncher extends ActivityBase {
 	private static final String TAG = "ActivityLauncher";
 
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;

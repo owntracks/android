@@ -54,7 +54,8 @@ public class Statistics {
 
     public static void clearCounters(Context c) {
         setTime(c, REFERENCE);
-        setInt(c, SERVICE_BROKER_LOCATION_PUBLISH_INIT, 0);
+        setInt(c,SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES, 0);
+        setInt(c,SERVICE_BROKER_LOCATION_PUBLISH_INIT, 0);
         setInt(c,SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP, 0);
         setInt(c,SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE, 0);
         setInt(c,SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS, 0);

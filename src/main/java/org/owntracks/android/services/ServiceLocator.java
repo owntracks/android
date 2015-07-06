@@ -191,7 +191,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 	private boolean shouldPublishLocation() {
-        if (this.lastPublish == 0) {
+        if (!this.foreground) {
             return true;
         }
 
@@ -202,7 +202,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         //Log.v(TAG, "shouldPublishLocation: configured pub interval:"+ TimeUnit.MINUTES.toMillis(Preferences.getPubInterval()));
         //Log.v(TAG, "shouldPublishLocation: time since last publish:"+ (System.currentTimeMillis() - this.lastPublish));
 
-        if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(Preferences.getPubInterval())) {
+        if ((System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(1)) {
             //Log.v(TAG, "interval gt configured pub interval?: true");
             return true;
         } else {
@@ -355,8 +355,8 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
         EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
 
-       // if (shouldPublishLocation())
-        publishLocationMessage();
+        if (shouldPublishLocation())
+            publishLocationMessage();
     }
 
 	public void enableForegroundMode() {

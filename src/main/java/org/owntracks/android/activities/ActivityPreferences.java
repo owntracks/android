@@ -35,7 +35,7 @@ import org.owntracks.android.support.Preferences;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityPreferences extends AppCompatActivity {
+public class ActivityPreferences extends ActivityBase {
     private static final String TAG = "ActivityPreferences";
 
     static Preference connectionPreferenceScreen;

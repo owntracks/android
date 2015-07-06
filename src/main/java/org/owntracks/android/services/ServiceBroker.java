@@ -120,7 +120,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			return 0;
 
 		if(ServiceBroker.RECEIVER_ACTION_RECONNECT.equals(intent.getAction()) && !isConnected()) {
-			doStart();
+			Log.v(TAG,	 "onStartCommand ServiceBroker.RECEIVER_ACTION_RECONNECT");
+			if(reconnectHandler != null)
+				doStart();
+
 		} else if(ServiceBroker.RECEIVER_ACTION_PING.equals(intent.getAction())) {
 			if(pingHandler != null)
 				pingHandler.ping(intent);
@@ -135,19 +138,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void doStart(final boolean force) {
-
+		Log.v(TAG, "doStart " + force);
 
 		Thread thread1 = new Thread() {
 			@Override
 			public void run() {
+				Log.v(TAG, "running thread");
 				handleStart(force);
 				if (this == ServiceBroker.this.workerThread) // Clean up worker
-																// thread
 					ServiceBroker.this.workerThread = null;
 			}
 
 			@Override
 			public void interrupt() {
+				Log.v(TAG, "worker thread interrupt");
 				if (this == ServiceBroker.this.workerThread) // Clean up worker
 																// thread
 					ServiceBroker.this.workerThread = null;
@@ -158,7 +162,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	void handleStart(boolean force) {
-		//Log.v(TAG, "handleStart: force == " + force);
+
+		Log.v(TAG, "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
             //Log.v(TAG, "handleStart: canConnect() == false");
             return;
@@ -172,14 +177,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		}
 
 		if (isConnecting()) {
-			//Log.d(TAG, "handleStart: isConnecting == true");
+			Log.d(TAG, "handleStart: isConnecting == true");
 			return;
 		}
 
 		// Respect user's wish to not use data
 		if (!isBackgroundDataEnabled()) {
-			//Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
+			Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
 			changeState(State.DISCONNECTED_DATADISABLED);
+			reconnectHandler.schedule(); // we will try again to connect after some time
 			return;
 		}
 
@@ -189,17 +195,18 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			//Log.v(TAG, "handleStart: isDisconnected() == true");
 			// Check if there is a data connection
 			if (isOnline()) {
-				//Log.v(TAG, "handleStart: isOnline() == true");
+				Log.v(TAG, "handleStart: isOnline() == true");
 
 				if (connect())
 					onConnect();
 
 			} else {
-				//Log.e(TAG, "handleStart: isDisconnected() == false");
+				Log.e(TAG, "handleStart: isDisconnected() == false");
 				changeState(State.DISCONNECTED_DATADISABLED);
+				reconnectHandler.schedule(); // we will try again to connect after some time
 			}
 		} else {
-			//Log.d(TAG, "handleStart: isDisconnected() == false");
+			Log.d(TAG, "handleStart: isDisconnected() == false");
 
 		}
 	}
@@ -339,6 +346,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		if (Preferences.getLocationBasedServicesEnabled() && pendingGeohash != null) {
 				updateGeohashSubscriptions();
 		}
+
+		deliverBacklog();
 	}
 
 	public void onEvent(Events.CurrentLocationUpdated e) {
@@ -802,10 +811,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
+		private static final String TAG = "NetworkConnectionIntent";
 
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
-
+			Log.v(TAG, "onReceive");
             if(networkWakelock == null )
                 networkWakelock = ((PowerManager) ServiceBroker.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
 
@@ -939,12 +949,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
     class ReconnectHandler {
 		private static final String TAG = "ReconnectHandler";
-		private static final int MAX_INTERVAL_MS = 60 * 60 * 1000; // 60 Minutes in miliseconds
-		private static final int INTERVAL_MS = 5 * 60 * 1000; // 10 minutes in miliseconds;
+		private static final int BACKOFF_INTERVAL_MAX = 64; // Will try to reconnect after 1, 2, 4, 8, 16, 32, 64 minutes
+		private int backoff = 0;
 
 		private Context context;
-		private PendingIntent pendingIntent;
-        private int backoff = 0;
         private boolean hasStarted;
 
 
@@ -964,9 +972,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
         public void stop() {
             Log.v(TAG, "stop");
-
-            backoff = 0; // Reset backoff
-
+			backoff = 0;
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
             alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
 
@@ -976,12 +982,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
 
         private void schedule() {
-            backoff++;
-            AlarmManager alarmManager = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
 
-            int delayInMilliseconds = INTERVAL_MS * backoff < MAX_INTERVAL_MS ? INTERVAL_MS * backoff : MAX_INTERVAL_MS;
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
-        }
+            AlarmManager alarmManager = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
+			 long next = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
+			Log.v(TAG, "scheduling next reconnect in " +  next);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +  next, ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
+			if(backoff <= BACKOFF_INTERVAL_MAX)
+				backoff++;
+
+		}
     }
 
     private static final class CustomMemoryPersistence implements MqttClientPersistence {

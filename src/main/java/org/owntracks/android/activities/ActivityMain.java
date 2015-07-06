@@ -24,6 +24,10 @@ import org.owntracks.android.support.StaticHandlerInterface;
 
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +35,7 @@ import android.os.Message;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -55,7 +60,11 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -64,7 +73,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityMain extends AppCompatActivity {
+public class ActivityMain extends ActivityBase {
     private static final String TAG = "ActivityMain";
 
     private static final int CONTACT_PICKER_RESULT = 1001;
@@ -484,8 +493,8 @@ public class ActivityMain extends AppCompatActivity {
             public void run() {
                 Log.v("ActivityMain", "runOrBind onStart");
 
-                ServiceProxy.getServiceLocator().enableForegroundMode();
-                ServiceProxy.getServiceBeacon().setBackgroundMode(false);
+               // ServiceProxy.getServiceLocator().enableForegroundMode();
+                //ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
         });
 	}
@@ -499,8 +508,8 @@ public class ActivityMain extends AppCompatActivity {
             public void run() {
                 Log.v("ActivityMain", "runOrBind onStop");
 
-                ServiceProxy.getServiceLocator().enableBackgroundMode();
-                ServiceProxy.getServiceBeacon().setBackgroundMode(true);
+                //  ServiceProxy.getServiceLocator().enableBackgroundMode();
+                //ServiceProxy.getServiceBeacon().setBackgroundMode(true);
             }
         });
 
@@ -545,6 +554,9 @@ public class ActivityMain extends AppCompatActivity {
         private Menu mMenu;
         private static Handler handler;
         private MenuInflater mInflater;
+        private BitmapDescriptor currentLocationMarkerBitmap;
+        private Marker currentLocationMarker;
+        private Circle currentLocationPrecision;
 
         public static MapFragment getInstance(Bundle extras) {
 			MapFragment instance = new MapFragment();
@@ -627,6 +639,7 @@ public class ActivityMain extends AppCompatActivity {
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
 
 
+
             this.markerToContacts = new HashMap<String, Contact>();
 			this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
             registerForContextMenu(this.selectedContactDetails);
@@ -634,6 +647,14 @@ public class ActivityMain extends AppCompatActivity {
             this.selectedContactName = (TextView) v.findViewById(R.id.name);
 			this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
 			this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
+
+
+            Drawable markerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.current_location_marker);
+            Bitmap bitmap = Bitmap.createBitmap(markerDrawable.getIntrinsicWidth(), markerDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            markerDrawable.draw(canvas);
+            this.currentLocationMarkerBitmap = BitmapDescriptorFactory.fromBitmap(bitmap);
 
             hideSelectedContactDetails();
 
@@ -737,10 +758,11 @@ public class ActivityMain extends AppCompatActivity {
 		private void setUpMap() {
 			this.googleMap.setIndoorEnabled(false);
             this.googleMap.setBuildingsEnabled(true);
+            this.googleMap.setMyLocationEnabled(false);
 
 			UiSettings s = this.googleMap.getUiSettings();
 			s.setCompassEnabled(false);
-			s.setMyLocationButtonEnabled(true);
+			s.setMyLocationButtonEnabled(false);
 			s.setTiltGesturesEnabled(false);
 			s.setCompassEnabled(false);
 			s.setRotateGesturesEnabled(false);
@@ -921,7 +943,20 @@ public class ActivityMain extends AppCompatActivity {
 
 
         public void onEventMainThread(Events.CurrentLocationUpdated e) {
-			if (isFollowingCurrentLocation())
+            Log.v(TAG,"CurrentLocationUpdated" );
+            if(currentLocationMarker != null)
+                this.currentLocationMarker.remove();
+
+            if(currentLocationPrecision != null)
+                this.currentLocationPrecision.remove();
+            this.currentLocationMarker = this.googleMap.addMarker(new MarkerOptions().position(e.getGeocodableLocation().getLatLng()).icon(this.currentLocationMarkerBitmap).draggable(false).flat(true).anchor(0.5F, 0.5F));
+//.zIndex(10000).fillColor(R.color.currentLocationRadiusFill).strokeColor(R.color.currentLocationRadiusStroke).
+            CircleOptions circleOptions = new CircleOptions().center(e.getGeocodableLocation().getLatLng()).radius(e.getGeocodableLocation().getAccuracy()).strokeWidth(2).strokeColor(0x883f72b5).fillColor(0x110000FF);
+            this.currentLocationPrecision = this.googleMap.addCircle(circleOptions);
+
+
+
+            if (isFollowingCurrentLocation())
 				selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, true);
 		}
 
