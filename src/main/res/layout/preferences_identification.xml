@@ -38,7 +38,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/username"
         android:inputType="textVisiblePassword|textNoSuggestions"
-
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
@@ -62,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/deviceId"
-        android:inputType="textNoSuggestions"
+        android:inputType="textVisiblePassword"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
@@ -74,21 +73,10 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/clientId"
-        android:inputType="textNoSuggestions"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
-        app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="@string/clientId"
-        app:met_floatingLabelAlwaysShown="true"
-        />
-
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/trackerId"
-        android:inputType="textNoSuggestions"
+        android:inputType="textVisiblePassword"
         app:met_baseColor="@color/textPrimary"
+        app:met_maxCharacters="2"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesTrackerId"

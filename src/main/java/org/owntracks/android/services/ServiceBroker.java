@@ -199,6 +199,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 				if (connect())
 					onConnect();
+				else
+					reconnectHandler.schedule();
 
 			} else {
 				Log.e(TAG, "handleStart: isDisconnected() == false");

@@ -22,15 +22,6 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dependency="@string/keyPub"
-            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:inputType="number"
-            android:key="@string/keyPubInterval"
-            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
-            android:title="@string/preferencesBackgroundUpdatesInterval" />
-
-
         <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
@@ -66,7 +57,6 @@
         </PreferenceCategory>
         <PreferenceCategory android:title="Background notifications">
 
-
             <SwitchPreference
                 android:defaultValue="@bool/valNotificationTickerOnPublish"
                 android:key="@string/keyNotificationTickerOnPublish"
@@ -80,19 +70,18 @@
                 android:summary="@string/preferencesNotificationVibrateOnPublishSummary"
                 android:title="@string/preferencesNotificationVibrateOnPublish" />
 
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
+                android:key="@string/keyNotificationTickerOnWaypointTransition"
+                android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
+                android:title="@string/preferencesNotificationTickerOnWaypointTransition" />
 
-        <SwitchPreference
-            android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
-            android:key="@string/keyNotificationTickerOnWaypointTransition"
-            android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
-            android:title="@string/preferencesNotificationTickerOnWaypointTransition" />
-
-        <SwitchPreference
-            android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
-            android:dependency="@string/keyNotificationTickerOnWaypointTransition"
-            android:key="@string/keyNotificationVibrateOnWaypointTransition"
-            android:summary="@string/preferencesNotificationVibrateOnWaypointTransitionSummary"
-            android:title="@string/preferencesNotificationVibrateOnWaypointTransition" />
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
+                android:dependency="@string/keyNotificationTickerOnWaypointTransition"
+                android:key="@string/keyNotificationVibrateOnWaypointTransition"
+                android:summary="@string/preferencesNotificationVibrateOnWaypointTransitionSummary"
+                android:title="@string/preferencesNotificationVibrateOnWaypointTransition" />
 
             <SwitchPreference
                 android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
@@ -101,6 +90,12 @@
                 android:summary="@string/preferencesNotificationTickerOnReceivedWaypointTransitionSummary"
                 android:title="@string/preferencesNotificationTickerOnReceivedWaypointTransition" />
 
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationOnMessageHosted"
+                android:key="@string/keyNotificationOnMessage"
+                android:summary="@string/preferencesNotificationOnMessageSummary"
+                android:title="@string/preferencesNotificationOnMessage" />
+
 
         </PreferenceCategory>
     </PreferenceScreen>
@@ -108,7 +103,12 @@
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced" >
 
-        <PreferenceCategory android:title="Remote commands">
+        <PreferenceCategory android:title="Services">
+            <SwitchPreference
+                android:defaultValue="@bool/valMessagesHosted"
+                android:key="@string/keyMessaging"
+                android:summary="@string/preferencesMessagesSummary"
+                android:title="@string/preferencesMessages" />
 
         <SwitchPreference
             android:defaultValue="@bool/valRemoteCommandReportLocation"

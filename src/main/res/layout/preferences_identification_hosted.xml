@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/deviceIdHosted"
-        android:inputType="textNoSuggestions"
+        android:inputType="textVisiblePassword"
         android:hint="@string/preferencesDeviceNameHosted"
 
         app:met_baseColor="@color/textPrimary"
@@ -50,12 +50,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/trackerId"
-        android:inputType="textNoSuggestions"
+        android:inputType="textVisiblePassword"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesTrackerId"
         app:met_floatingLabelAlwaysShown="true"
+        app:met_maxCharacters="2"
         android:maxLength="2"
         />
 </LinearLayout>

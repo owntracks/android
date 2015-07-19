@@ -19,15 +19,6 @@
             android:summary="@string/preferencesBackgroundUpdatesSummary"
             android:title="@string/preferencesBackroundUpdates" />
 
-        <org.owntracks.android.support.EditIntegerPreference
-            android:dependency="@string/keyPub"
-            android:dialogTitle="@string/preferencesBackgroundUpdatesInterval"
-            android:inputType="number"
-            android:key="@string/keyPubInterval"
-            android:summary="@string/preferencesBackgroundUpdatesIntervalSummary"
-            android:title="@string/preferencesBackgroundUpdatesInterval" />
-
-
         <SwitchPreference
             android:defaultValue="@bool/valPubIncludeBattery"
             android:key="@string/keyPubIncludeBattery"
@@ -63,6 +54,11 @@
                 android:title="@string/preferencesNotificationGeocoder" />
         </PreferenceCategory>
         <PreferenceCategory android:title="Background notifications">
+            <SwitchPreference
+                android:defaultValue="@bool/valNotificationOnMessage"
+                android:key="@string/keyNotificationOnMessage"
+                android:summary="@string/preferencesNotificationOnMessageSummary"
+                android:title="@string/preferencesNotificationOnMessage" />
 
 
             <SwitchPreference
@@ -108,16 +104,6 @@
 
         <PreferenceCategory android:title="Publish and subscribe">
 
-        <org.owntracks.android.support.EditStringPreference
-            android:key="@string/keyDeviceTopic"
-            android:summary="@string/preferencesDeviceTopicSummary"
-            android:title="@string/preferencesTopic" />
-
-        <org.owntracks.android.support.EditStringPreference
-            android:dialogTitle="@string/preferencesBaseTopic"
-            android:key="@string/keyBaseTopic"
-            android:summary="@string/preferencesBaseTopicSummary"
-            android:title="@string/preferencesBaseTopic" />
 
         <org.owntracks.android.support.ListIntegerPreference
             android:defaultValue="@integer/valPubQos"
@@ -138,18 +124,25 @@
         </PreferenceCategory>
 
 
-        <PreferenceCategory android:title="Remote commands">
 
-        <SwitchPreference
-            android:defaultValue="@bool/valRemoteCommandReportLocation"
-            android:key="@string/keyRemoteCommandReportLocation"
-            android:summary="@string/preferencesRemoteCommandReportLocationSummary"
-            android:title="@string/preferencesRemoteCommandReportLocation" />
-        <SwitchPreference
-            android:defaultValue="@bool/valRemoteConfiguration"
-            android:key="@string/keyRemoteConfiguration"
-            android:summary="@string/preferencesRemoteConfigurationSummary"
-            android:title="@string/preferencesRemoteConfiguration" />
+        <PreferenceCategory android:title="Services">
+            <SwitchPreference
+                android:defaultValue="@bool/valMessages"
+                android:key="@string/keyMessaging"
+                android:summary="@string/preferencesMessagesSummary"
+                android:title="@string/preferencesMessages" />
+
+            <SwitchPreference
+                android:defaultValue="@bool/valRemoteCommandReportLocation"
+                android:key="@string/keyRemoteCommandReportLocation"
+                android:summary="@string/preferencesRemoteCommandReportLocationSummary"
+                android:title="@string/preferencesRemoteCommandReportLocation" />
+
+            <SwitchPreference
+                android:defaultValue="@bool/valRemoteConfiguration"
+                android:key="@string/keyRemoteConfiguration"
+                android:summary="@string/preferencesRemoteConfigurationSummary"
+                android:title="@string/preferencesRemoteConfiguration" />
         </PreferenceCategory>
         <PreferenceCategory android:title="Locator">
 

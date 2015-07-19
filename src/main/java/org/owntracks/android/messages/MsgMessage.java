@@ -14,6 +14,7 @@ public class MsgMessage extends Message {
     private String url;
     private String channel;
 
+
     private int prio = 0;
     private int mttl = 0;
     private long tst;
