@@ -1,6 +1,6 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.5.9
+## OwnTracks 0.5.19
 >Release date: 2015-07-19
 * [FIX] ReconnectHandler was not started correctly when a connection error occured
 * [FIX] DeviceId field default was not updated correctly 
