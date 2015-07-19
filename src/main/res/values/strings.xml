@@ -35,6 +35,9 @@
     <string name="preferencesNotificationLocation">"Last reported location"</string>
     <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
     <string name="preferencesNotificationGeocoder">"Geocoder"</string>
+    <string name="preferencesNotificationOnMessageSummary">Notify about received messages</string>
+    <string name="preferencesNotificationOnMessage" >Messages</string>
+
     <string name="preferencesConnectionAdvancedModeSummary">"Show advanced connection preferences"</string>
     <string name="preferencesConnectionAdvancedMode">"Advanced connection preferences"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
@@ -226,4 +229,6 @@
     <string name="clear">Reset</string>
     <string name="idStatistics">statistics</string>
     <string name="refresh">Refresh</string>
+    <string name="preferencesMessagesSummary">Receive messages</string>
+    <string name="preferencesMessages">Messaging</string>
 </resources>

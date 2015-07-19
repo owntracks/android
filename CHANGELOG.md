@@ -1,5 +1,14 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.5.9
+>Release date: 2015-07-19
+* [FIX] ReconnectHandler was not started correctly when a connection error occured
+* [FIX] DeviceId field default was not updated correctly 
+* [NEW] Added notifications for received messages
+* [NEW] Simplified and improved several preferences
+* [NEW] Added preference to enable or disable messaging
+
+
 ## OwnTracks 0.5.18
 >Release date: 2015-07-06
 * [FIX] ReconnectHandler was not started correctly 

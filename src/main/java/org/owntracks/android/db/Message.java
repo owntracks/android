@@ -12,6 +12,7 @@ public class Message {
     private Long id;
     private String externalId;
     private Long tst;
+    private Long expiresTst;
     private String channel;
     private String sender;
     private String title;
@@ -31,10 +32,11 @@ public class Message {
         this.id = id;
     }
 
-    public Message(Long id, String externalId, Long tst, String channel, String sender, String title, String description, String icon, Integer priority, String iconUrl, String url) {
+    public Message(Long id, String externalId, Long tst, Long expiresTst, String channel, String sender, String title, String description, String icon, Integer priority, String iconUrl, String url) {
         this.id = id;
         this.externalId = externalId;
         this.tst = tst;
+        this.expiresTst = expiresTst;
         this.channel = channel;
         this.sender = sender;
         this.title = title;
@@ -67,6 +69,14 @@ public class Message {
 
     public void setTst(Long tst) {
         this.tst = tst;
+    }
+
+    public Long getExpiresTst() {
+        return expiresTst;
+    }
+
+    public void setExpiresTst(Long expiresTst) {
+        this.expiresTst = expiresTst;
     }
 
     public String getChannel() {

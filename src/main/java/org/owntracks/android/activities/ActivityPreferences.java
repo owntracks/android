@@ -161,9 +161,6 @@ public class ActivityPreferences extends ActivityBase {
     public static class FragmentPreferences extends PreferenceFragment {
         String[] modesReadable;
 
-        private static org.owntracks.android.support.EditStringPreference deviceTopic;
-        private static org.owntracks.android.support.EditIntegerPreference pubInterval;
-        private static org.owntracks.android.support.EditStringPreference baseTopic;
         private static org.owntracks.android.support.EditIntegerPreference locatorDisplacement;
         private static org.owntracks.android.support.EditIntegerPreference locatorInterval;
 
@@ -212,23 +209,6 @@ public class ActivityPreferences extends ActivityBase {
 
             try { ver = pm.getPackageInfo(a.getPackageName(), 0).versionName; } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
             version.setSummary(ver);
-
-            pubInterval = (EditIntegerPreference) findPreference(Preferences.getKey(R.string.keyPubInterval));
-            pubInterval.setHint(Integer.toString(Preferences.getIntResource(R.integer.valPubInterval)));
-            pubInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(
-                        Preference preference, Object newValue) {
-                    Log.v("ActivityPreferences", newValue.toString());
-                    if (newValue.toString().equals("0")) {
-                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(a).edit();
-                        editor.putString(preference.getKey(), "1");
-                        editor.commit();
-                        return false;
-                    }
-                    return true;
-                }
-            });
 
             repo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -351,10 +331,6 @@ public class ActivityPreferences extends ActivityBase {
 
 
             ((BaseAdapter) ((PreferenceScreen) f.findPreference("root")).getRootAdapter()).notifyDataSetChanged(); //Have to redraw the list to reflect summary change
-        }
-
-        private static void setDeviceTopicHint() {
-            deviceTopic.setHint(Preferences.getDeviceTopic(true));
         }
 
     }

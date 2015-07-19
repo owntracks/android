@@ -17,6 +17,8 @@
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
     <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
+    <bool name="valNotificationOnMessagePublic" >true</bool>
+    <bool name="valMessagesPublic" >true</bool>
 
 
     <string name="valDeviceTopicHosted" formatted="false">owntracks/%s/%s</string>
@@ -30,6 +32,8 @@
     <bool name="valPubRetainHosted">true</bool>
     <integer name="valPubQosHosted">1</integer>
     <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
+    <bool name="valNotificationOnMessageHosted" >true</bool>
+    <bool name="valMessagesHosted" >true</bool>
 
 
 
@@ -40,7 +44,6 @@
     <string name="valBaseTopic">owntracks/+/+</string>
     <string name="valGeohashMsgTopic" formatted="false">msg/+/%s</string>
 
-    <string name="valHost">127.0.0.1</string>
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">support@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
@@ -60,7 +63,7 @@
     <integer name="valBeaconForegroundScanPeriod">0</integer>
     <integer name="valZero">0</integer>
 
-    <bool name="valPub">false</bool>
+    <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
     <bool name="valCleanSessionPrivate">false</bool>
     <bool name="valPubIncludeBattery">false</bool>
@@ -81,6 +84,8 @@
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
     <bool name="valTls">true</bool>
+    <bool name="valMessages" >true</bool>
+    <bool name="valNotificationOnMessage" >true</bool>
 
     <string-array name="modeIds">
         <item>0</item>

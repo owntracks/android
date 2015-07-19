@@ -261,7 +261,9 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
                     .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
-                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true));
+                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true))
+                    .put(getStringRessource(R.string.keyMessaging), getMessaging());
+
 
             Log.v(TAG, "toJsonObject: " + json.toString());
 
@@ -312,6 +314,8 @@ public class Preferences {
         try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
+        try { setMessaging(json.getBoolean(getStringRessource(R.string.keyMessaging))); } catch (JSONException e) {}
+
         try {
             JSONArray j = json.getJSONArray("waypoints");
             if (j != null) {
@@ -629,7 +633,7 @@ public class Preferences {
         if(deviceId!=null && deviceId.length() >= 2)
             return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured deviceId.
         else
-            return "";  // Empty trackerId won't be included in the message.
+            return "na";  // Empty trackerId won't be included in the message.
     }
 
     public static void setHost(String value) {
@@ -832,7 +836,7 @@ public class Preferences {
 
 
     public static String getHost() {
-        return getString(R.string.keyHost, R.string.valHost, R.string.valHostHosted, R.string.valHostPublic, true, true);
+        return getString(R.string.keyHost, R.string.valEmpty, R.string.valHostHosted, R.string.valHostPublic, true, true);
     }
 
     public static String getPassword() {
@@ -941,15 +945,24 @@ public class Preferences {
     }
 
     public static String getBroadcastMessageTopic() {
-        return "/msg"; // for now
+        return "/msg";
     }
 
     public static boolean getBroadcastMessageEnabled() {
-        return true; // for now
+        return getMessaging();
     }
 
     public static boolean getDirectMessageEnable() {
-        return true; // for now
+        return getMessaging(); // for now
+    }
+
+    public static boolean getMessaging() {
+        return getBoolean(R.string.keyMessaging, R.bool.valMessages, R.bool.valMessagesHosted, R.bool.valMessagesPublic, false, false);
+    }
+
+
+    public static void setMessaging(boolean messaging) {
+        setBoolean(R.string.keyMessaging, messaging);
     }
 
 

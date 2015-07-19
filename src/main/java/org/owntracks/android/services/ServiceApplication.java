@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityMessages;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.MessageDao;
@@ -30,6 +31,7 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +46,7 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -64,8 +67,15 @@ public class ServiceApplication implements ProxyableService,
     public static final int NOTIFCATION_ID = 1338;
     public static final int NOTIFCATION_ID_TICKER = 1339;
     public static final int NOTIFCATION_ID_CONTACT_TRANSITION = 1340;
+    public static final int NOTIFCATION_ID_MESSAGE = 1341;
 
     final static String NOTIFCATION_ID_CONTACT_TRANSITION_GROUP = "org.owntracks.android.group.transition";
+    final static String NOTIFCATION_ID_MESSAGE_GROUP = "org.owntracks.android.group.message";
+
+    public static final String INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION";
+    public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION";
+
+
 
     private static SharedPreferences sharedPreferences;
 	private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener;
@@ -85,6 +95,8 @@ public class ServiceApplication implements ProxyableService,
     private SimpleDateFormat transitionDateFormater;
 
     private LinkedList<Spannable> contactTransitionNotifications;
+    private LinkedList<Spannable> messageNotifications;
+
     private HashSet<Uri> contactTransitionNotificationsContactUris;
 
     @Override
@@ -96,6 +108,8 @@ public class ServiceApplication implements ProxyableService,
         this.notificationHandler = new Handler(this.notificationThread.getLooper());
 		this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.contactTransitionNotifications = new LinkedList<Spannable>();
+        this.messageNotifications = new LinkedList<Spannable>();
+
         this.contactTransitionNotificationsContactUris = new HashSet<>();
 		notificationBuilder = new NotificationCompat.Builder(context);
         notificationBuilderTicker = new NotificationCompat.Builder(context);
@@ -132,8 +146,10 @@ public class ServiceApplication implements ProxyableService,
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-        if ((intent != null) && (intent.getAction() != null) && intent.getAction().equals(ServiceProxy.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION)) {
+        if (ServiceApplication.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION.equals(intent.getAction())) {
             clearTransitionNotifications();
+        } else if(ServiceApplication.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION.equals(intent.getAction())) {
+            clearMessageNotifications();
         }
         return 0;
     }
@@ -153,7 +169,7 @@ public class ServiceApplication implements ProxyableService,
         App.removeContact(e.getContact());
     }
 
-    public void onEventMainThread(Events.MsgMessageReceived e) {
+    public void onEvent(Events.MsgMessageReceived e) {
         MsgMessage mm = e.getMessage();
         String externalId = e.getTopic() + "$" + mm.getTst();
 
@@ -169,6 +185,8 @@ public class ServiceApplication implements ProxyableService,
             m.setDescription(mm.getDesc());
             m.setTitle(mm.getTitle());
             m.setTst(mm.getTst());
+            if(mm.getMttl() != 0)
+            m.setExpiresTst(mm.getTst()+mm.getMttl());
 
             if(e.getTopic() == Preferences.getBroadcastMessageTopic())
                 m.setChannel("broadcast");
@@ -182,6 +200,71 @@ public class ServiceApplication implements ProxyableService,
         }
     }
 
+
+    public void onEvent(Events.MessageAdded e) {
+        if(App.isInForeground())
+            return;
+
+        String channel = "#"+e.getMessage().getChannel();
+        Spannable message = new SpannableString(channel + ": "+ e.getMessage().getDescription());
+        message.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, channel.length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        messageNotifications.push(message);
+
+
+        if(messageCancelIntent != null)
+            messageCancelIntent.cancel();
+
+        this.messageCancelIntent = ServiceProxy.getPendingIntentForService(
+                this.context, ServiceProxy.SERVICE_APP,
+                ServiceApplication.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION, null);
+
+        NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+        for (Spannable text : this.messageNotifications ) {
+            style.addLine(text);
+        }
+
+
+        String title = "Messages";
+        style.setBigContentTitle(title);
+
+
+
+        Intent resultIntent = new Intent(this.context, ActivityMessages.class);
+
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(
+                this.context, 0, resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationBuilder.setContentIntent(resultPendingIntent);
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.context)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setStyle(style)
+                .setContentText(this.messageNotifications.getFirst()) // InboxStyle doesn't show text when only one line is added. In this case ContentText is shown
+                .setContentTitle(title) // InboxStyle doesn't show title only one line is added. In this case ContentTitle is shown
+                .setGroup(NOTIFCATION_ID_MESSAGE_GROUP)
+                .setAutoCancel(true)
+                .setShowWhen(true)
+                .setNumber(messageNotifications.size())
+                .setWhen(e.getMessage().getTst()*1000)
+                .setContentIntent(resultPendingIntent)
+                .setDeleteIntent(this.messageCancelIntent);
+
+
+        if(android.os.Build.VERSION.SDK_INT >= 21) {
+            builder.setColor(context.getResources().getColor(R.color.primary));
+            builder.setPriority(Notification.PRIORITY_MIN);
+            builder.setCategory(Notification.CATEGORY_SERVICE);
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+
+        notificationManager.notify(NOTIFCATION_ID_MESSAGE, builder.build());
+
+    }
 
 
     private Contact lazyUpdateContactFromMessage(String topic, GeocodableLocation l, String trackerId) {
@@ -288,6 +371,7 @@ public class ServiceApplication implements ProxyableService,
 	private PendingIntent notificationIntent;
 
     private PendingIntent transitionCancelIntent;
+    private PendingIntent messageCancelIntent;
 
 	/**
 	 * @category NOTIFICATION HANDLING
@@ -458,7 +542,7 @@ public class ServiceApplication implements ProxyableService,
 
         this.transitionCancelIntent = ServiceProxy.getPendingIntentForService(
                 this.context, ServiceProxy.SERVICE_APP,
-                ServiceProxy.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION, null);
+                ServiceApplication.INTENT_ACTION_CANCEL_TRANSITION_NOTIFICATION, null);
 
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
         for (Spannable text : this.contactTransitionNotifications) {
@@ -466,7 +550,7 @@ public class ServiceApplication implements ProxyableService,
         }
 
 
-        String title = "New waypoint transitions";
+        String title = "Waypoint transitions";
         style.setBigContentTitle(title);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this.context)
@@ -493,16 +577,25 @@ public class ServiceApplication implements ProxyableService,
         }
 
         notificationManager.notify(NOTIFCATION_ID_CONTACT_TRANSITION, builder.build());
-
-
     }
+
+
+
 
     private void clearTransitionNotifications() {
         this.contactTransitionNotifications.clear(); // no need for synchronized, both add and clear are run on main thread
         this.contactTransitionNotificationsContactUris.clear();
+        notificationManager.cancel(NOTIFCATION_ID_CONTACT_TRANSITION);
+
     }
 
-	public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+    public void clearMessageNotifications() {
+        this.messageNotifications.clear(); // no need for synchronized, both add and clear are run on main thread
+        notificationManager.cancel(NOTIFCATION_ID_MESSAGE);
+    }
+
+
+    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
 		updateNotification();
 	}
 

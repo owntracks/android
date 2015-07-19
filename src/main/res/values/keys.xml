@@ -29,6 +29,8 @@
     <string name="keyNotification">notification</string>
     <string name="keyNotificationGeocoder">notificationGeocoder</string>
     <string name="keyNotificationLocation">notificationLocation</string>
+    <string name="keyNotificationOnMessage">notificationOnMessage</string>
+
     <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
     <string name="keyNotificationVibrateOnPublish">notificationVibrateOnPublish</string>
     <string name="keyNotificationVibrateOnWaypointTransition">notificationVibrateOnWaypointTransition</string>
@@ -53,4 +55,6 @@
     <string name="keySecurity">security</string>
     <string name="keyIdentification">identification</string>
     <string name="keyOptions">options</string>
+    <string name="keyMessaging">messaging</string>
+
 </resources>

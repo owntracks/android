@@ -38,7 +38,8 @@ public class App extends Application {
     private static final String TAG = "App";
 
     private static App instance;
-	private SimpleDateFormat dateFormater;
+    private static boolean inForeground;
+    private SimpleDateFormat dateFormater;
 
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
@@ -179,6 +180,7 @@ public class App extends Application {
 
     public static void onEnterForeground() {
         Log.v(TAG, "onEnterForeground");
+        inForeground = true; 
         ServiceProxy.runOrBind(getContext(), new Runnable() {
 
             @Override
@@ -191,6 +193,7 @@ public class App extends Application {
 
     public static void onEnterBackground() {
         Log.v(TAG, "onEnterBackground");
+        inForeground = false;
         ServiceProxy.runOrBind(getContext(), new Runnable() {
 
             @Override
@@ -199,5 +202,9 @@ public class App extends Application {
                 ServiceProxy.getServiceBeacon().setBackgroundMode(true);
             }
         });
+    }
+
+    public static boolean isInForeground() {
+        return inForeground;
     }
 }

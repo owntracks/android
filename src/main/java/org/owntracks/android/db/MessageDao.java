@@ -26,14 +26,15 @@ public class MessageDao extends AbstractDao<Message, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property ExternalId = new Property(1, String.class, "externalId", false, "EXTERNAL_ID");
         public final static Property Tst = new Property(2, Long.class, "tst", false, "TST");
-        public final static Property Channel = new Property(3, String.class, "channel", false, "CHANNEL");
-        public final static Property Sender = new Property(4, String.class, "sender", false, "SENDER");
-        public final static Property Title = new Property(5, String.class, "title", false, "TITLE");
-        public final static Property Description = new Property(6, String.class, "description", false, "DESCRIPTION");
-        public final static Property Icon = new Property(7, String.class, "icon", false, "ICON");
-        public final static Property Priority = new Property(8, Integer.class, "priority", false, "PRIORITY");
-        public final static Property IconUrl = new Property(9, String.class, "iconUrl", false, "ICON_URL");
-        public final static Property Url = new Property(10, String.class, "url", false, "URL");
+        public final static Property ExpiresTst = new Property(3, Long.class, "expiresTst", false, "EXPIRES_TST");
+        public final static Property Channel = new Property(4, String.class, "channel", false, "CHANNEL");
+        public final static Property Sender = new Property(5, String.class, "sender", false, "SENDER");
+        public final static Property Title = new Property(6, String.class, "title", false, "TITLE");
+        public final static Property Description = new Property(7, String.class, "description", false, "DESCRIPTION");
+        public final static Property Icon = new Property(8, String.class, "icon", false, "ICON");
+        public final static Property Priority = new Property(9, Integer.class, "priority", false, "PRIORITY");
+        public final static Property IconUrl = new Property(10, String.class, "iconUrl", false, "ICON_URL");
+        public final static Property Url = new Property(11, String.class, "url", false, "URL");
     };
 
 
@@ -52,14 +53,15 @@ public class MessageDao extends AbstractDao<Message, Long> {
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'EXTERNAL_ID' TEXT UNIQUE ," + // 1: externalId
                 "'TST' INTEGER," + // 2: tst
-                "'CHANNEL' TEXT," + // 3: channel
-                "'SENDER' TEXT," + // 4: sender
-                "'TITLE' TEXT," + // 5: title
-                "'DESCRIPTION' TEXT," + // 6: description
-                "'ICON' TEXT," + // 7: icon
-                "'PRIORITY' INTEGER," + // 8: priority
-                "'ICON_URL' TEXT," + // 9: iconUrl
-                "'URL' TEXT);"); // 10: url
+                "'EXPIRES_TST' INTEGER," + // 3: expiresTst
+                "'CHANNEL' TEXT," + // 4: channel
+                "'SENDER' TEXT," + // 5: sender
+                "'TITLE' TEXT," + // 6: title
+                "'DESCRIPTION' TEXT," + // 7: description
+                "'ICON' TEXT," + // 8: icon
+                "'PRIORITY' INTEGER," + // 9: priority
+                "'ICON_URL' TEXT," + // 10: iconUrl
+                "'URL' TEXT);"); // 11: url
     }
 
     /** Drops the underlying database table. */
@@ -88,44 +90,49 @@ public class MessageDao extends AbstractDao<Message, Long> {
             stmt.bindLong(3, tst);
         }
  
+        Long expiresTst = entity.getExpiresTst();
+        if (expiresTst != null) {
+            stmt.bindLong(4, expiresTst);
+        }
+ 
         String channel = entity.getChannel();
         if (channel != null) {
-            stmt.bindString(4, channel);
+            stmt.bindString(5, channel);
         }
  
         String sender = entity.getSender();
         if (sender != null) {
-            stmt.bindString(5, sender);
+            stmt.bindString(6, sender);
         }
  
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(6, title);
+            stmt.bindString(7, title);
         }
  
         String description = entity.getDescription();
         if (description != null) {
-            stmt.bindString(7, description);
+            stmt.bindString(8, description);
         }
  
         String icon = entity.getIcon();
         if (icon != null) {
-            stmt.bindString(8, icon);
+            stmt.bindString(9, icon);
         }
  
         Integer priority = entity.getPriority();
         if (priority != null) {
-            stmt.bindLong(9, priority);
+            stmt.bindLong(10, priority);
         }
  
         String iconUrl = entity.getIconUrl();
         if (iconUrl != null) {
-            stmt.bindString(10, iconUrl);
+            stmt.bindString(11, iconUrl);
         }
  
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(11, url);
+            stmt.bindString(12, url);
         }
     }
 
@@ -142,14 +149,15 @@ public class MessageDao extends AbstractDao<Message, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // externalId
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // tst
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // channel
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // sender
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // title
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // description
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // icon
-            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // priority
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // iconUrl
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // url
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // expiresTst
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // channel
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // sender
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // title
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // description
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // icon
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // priority
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // iconUrl
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // url
         );
         return entity;
     }
@@ -160,14 +168,15 @@ public class MessageDao extends AbstractDao<Message, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setExternalId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setTst(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setChannel(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setSender(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setTitle(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setDescription(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setIcon(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setPriority(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
-        entity.setIconUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setExpiresTst(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setChannel(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setSender(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setDescription(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setIcon(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setPriority(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setIconUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setUrl(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
      }
     
     /** @inheritdoc */
