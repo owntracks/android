@@ -51,6 +51,7 @@ public class DaoGenerator {
         message.addIdProperty(); // For stable ids of cursor adapter
         message.addStringProperty("externalId").unique();
         message.addLongProperty("tst");
+        message.addLongProperty("expiresTst");
         message.addStringProperty("channel");
         message.addStringProperty("sender");
         message.addStringProperty("title");

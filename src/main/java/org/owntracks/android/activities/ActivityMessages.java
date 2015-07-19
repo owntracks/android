@@ -28,6 +28,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.MessageAdapter;
 import org.owntracks.android.db.MessageDao;
+import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DividerItemDecoration;
 import org.owntracks.android.support.DrawerFactory;
@@ -235,6 +236,12 @@ public class ActivityMessages extends ActivityBase implements LoaderManager.Load
     @Override
     public void onStart() {
         super.onStart();
+        ServiceProxy.runOrBind(this, new Runnable() {
+            @Override
+            public void run() {
+                ServiceProxy.getServiceApplication().clearMessageNotifications();
+            }
+        });
         EventBus.getDefault().registerSticky(this);
     }
 

@@ -12,6 +12,8 @@ import android.preference.PreferenceFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -173,7 +175,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
-                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
 
                                     authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -189,10 +190,28 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
                                     deviceId.setHint(Preferences.getDeviceIdDefault());
                                     deviceId.setText(Preferences.getDeviceId(false));
-                                    clientId.setHint(Preferences.getClientIdDefault());
-                                    clientId.setText(Preferences.getClientId(false));
                                     trackerId.setText(Preferences.getTrackerId(false));
                                     trackerId.setHint(Preferences.getTrackerIdDefault());
+
+                                    deviceId.addTextChangedListener(new TextWatcher() {
+                                        @Override
+                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                        }
+
+                                        @Override
+                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                            if (s.length() >= 2)
+                                                trackerId.setHint(s.toString().substring(deviceId.length() - 2));
+                                            else
+                                                trackerId.setHint(Preferences.getTrackerIdDefault());
+                                        }
+
+                                        @Override
+                                        public void afterTextChanged(Editable s) {
+
+                                        }
+                                    });
 
                                 }
                             })
@@ -204,13 +223,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
-                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
 
                                     Preferences.setAuth(authenticationVal);
                                     Preferences.setUsername(username.getText().toString());
                                     Preferences.setPassword(password.getText().toString());
                                     Preferences.setDeviceId(deviceId.getText().toString());
-                                    Preferences.setClientId(clientId.getText().toString());
                                     Preferences.setTrackerId(trackerId.getText().toString());
 
                                     updateConnectButton();
@@ -249,14 +266,32 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
-                                    Log.v(TAG, Preferences.getUsername());
-                                    Log.v(TAG, Preferences.getPassword());
-                                    Log.v(TAG, Preferences.getDeviceId(false));
+
                                     username.setText(Preferences.getUsername());
                                     password.setText(Preferences.getPassword());
                                     deviceId.setText(Preferences.getDeviceId(false));
                                     trackerId.setText(Preferences.getTrackerId(false));
                                     trackerId.setHint(Preferences.getTrackerIdDefault());
+
+                                    deviceId.addTextChangedListener(new TextWatcher() {
+                                        @Override
+                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                        }
+
+                                        @Override
+                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                            if(s.length() >= 2)
+                                                trackerId.setHint(s.toString().substring(deviceId.length() - 2));
+                                            else
+                                                trackerId.setHint(Preferences.getTrackerIdDefault());
+                                        }
+
+                                        @Override
+                                        public void afterTextChanged(Editable s) {
+
+                                        }
+                                    });
 
                                 }
                             })

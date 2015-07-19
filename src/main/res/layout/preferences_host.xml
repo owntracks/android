@@ -14,10 +14,9 @@
         app:met_primaryColor="@color/accent"
         android:id="@+id/host"
         android:inputType="textVisiblePassword|textNoSuggestions"
-        android:hint="@string/valHost"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesHost"
-        app:met_floatingLabelAlwaysShown="true"
+        android:hint="@string/preferencesHost"
         />
 
     <com.rengwuxian.materialedittext.MaterialEditText
