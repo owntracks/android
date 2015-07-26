@@ -29,6 +29,8 @@ public class Preferences {
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     public static final String FILENAME_HOSTED = "org.owntracks.android.preferences.hosted";
     public static final String FILENAME_PUBLIC = "org.owntracks.android.preferences.public";
+    public static final String FILENAME_FREEFORM = "org.owntracks.android.preferences.freeform";
+
 
     private static SharedPreferences activeSharedPreferences;
     private static SharedPreferences sharedPreferences;
@@ -36,6 +38,8 @@ public class Preferences {
     private static SharedPreferences privateSharedPreferences;
     private static SharedPreferences hostedSharedPreferences;
     private static SharedPreferences publicSharedPreferences;
+    private static SharedPreferences freeformSharedPreferences;
+
 
     private static int modeId = App.MODE_ID_PRIVATE;
     private static String deviceUUID = "";
@@ -45,6 +49,9 @@ public class Preferences {
     public static boolean isModeHosted(){ return modeId == App.MODE_ID_HOSTED; }
 
     public static boolean isModePublic(){ return modeId == App.MODE_ID_PUBLIC; }
+
+    public static boolean isModeFreeform(){ return modeId == App.MODE_ID_FREEFORM; }
+
 
     public static String getDeviceUUID() {
         return deviceUUID;
@@ -56,6 +63,8 @@ public class Preferences {
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
         hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, Context.MODE_PRIVATE);
         publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
+        freeformSharedPreferences = c.getSharedPreferences(FILENAME_FREEFORM, Context.MODE_PRIVATE);
+
 
         handleFirstStart();
         deviceUUID = sharedPreferences.getString("deviceUUID", "undefined-uuid");
@@ -84,12 +93,16 @@ public class Preferences {
             case App.MODE_ID_PUBLIC:
                 activeSharedPreferences = publicSharedPreferences;
                 break;
+            case App.MODE_ID_FREEFORM:
+                activeSharedPreferences = freeformSharedPreferences;
+                break;
         }
         sharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
         privateSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         hostedSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         publicSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
+        freeformSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
 
         Log.v(TAG, "Active preferences for mode " + modeId + " are " + activeSharedPreferences);
 
@@ -103,17 +116,25 @@ public class Preferences {
     }
 
     public static boolean getBoolean(int resId,  int defId) {
-        return getBoolean(resId, defId, defId, defId, false, false);
+        return getBoolean(resId, defId, defId, defId, defId, false, false);
     }
 
     public static boolean getBoolean(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, boolean forceDefIdHosted, boolean forceDefIdPublic) {
+        return getBoolean(resId,   defIdPrivate,  defIdHosted,  defIdPublic, defIdPrivate,  forceDefIdHosted, forceDefIdPublic);
+    }
+
+
+    public static boolean getBoolean(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, int defIdFreeform, boolean forceDefIdHosted, boolean forceDefIdPublic) {
         if (isModePublic()) {
             return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  publicSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdPublic));
         } else if(isModeHosted()) {
-            return forceDefIdPublic ? getBooleanRessource(defIdHosted) :  hostedSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdHosted));
+            return forceDefIdHosted ? getBooleanRessource(defIdHosted) :  hostedSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdHosted));
+        } else if (isModePrivate()) {
+            return privateSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdPrivate));
         }
 
-        return privateSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdPrivate));
+        return freeformSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdFreeform));
+
     }
 
     public static boolean getBooleanRessource(int resId) {
@@ -122,16 +143,23 @@ public class Preferences {
 
     // For keys that do not need overrides in any modes
     public static int getInt(int resId,  int defId) {
-        return getInt(resId, defId, defId, defId, false, false);
+        return getInt(resId, defId, defId, defId, defId, false, false);
     }
     public static int getInt(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, boolean forceDefIdHosted, boolean forceDefIdPublic) {
+        return getInt( resId,  defIdPrivate, defIdHosted, defIdPublic, defIdPrivate, forceDefIdHosted, forceDefIdPublic);
+    }
+
+        public static int getInt(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, int defIdFreeform, boolean forceDefIdHosted, boolean forceDefIdPublic) {
         if (isModePublic()) {
             return forceDefIdPublic ? getIntResource(defIdPublic) :  publicSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
         } else if(isModeHosted()) {
             return forceDefIdHosted ? getIntResource(defIdHosted) :  hostedSharedPreferences.getInt(getKey(resId), getIntResource(defIdHosted));
+        } else if (isModePrivate()) {
+            return privateSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
         }
 
-        return privateSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
+        return freeformSharedPreferences.getInt(getKey(resId), getIntResource(defIdFreeform));
+
     }
     public static int getIntResource(int resId) {
         return App.getContext().getResources().getInteger(resId);
@@ -149,15 +177,24 @@ public class Preferences {
         return getString(resId, defId, defId, defId, false, false);
     }
     public static String getString(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, boolean forceDefIdHosted, boolean forceDefIdPublic) {
+        return getString( resId,   defIdPrivate,  defIdHosted,  defIdPublic,  defIdPrivate,  forceDefIdHosted,  forceDefIdPublic);
+
+    }
+
+    public static String getString(int resId,  int defIdPrivate, int defIdHosted, int defIdPublic, int defIdFreeform, boolean forceDefIdHosted, boolean forceDefIdPublic) {
         if (isModePublic()) {
 
             return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, resId, defIdPublic);
         } else if(isModeHosted()) {
 
             return forceDefIdHosted ? getStringRessource(defIdHosted) : getStringWithFallback(hostedSharedPreferences, resId, defIdHosted);
+        } else if (isModePrivate()) {
+            return getStringWithFallback(privateSharedPreferences, resId, defIdPrivate);
         }
 
-        return getStringWithFallback(privateSharedPreferences, resId, defIdPrivate);
+        return  getStringWithFallback(freeformSharedPreferences, resId, defIdFreeform);
+
+
     }
 
     public static String getStringRessource(int resId) {
@@ -210,7 +247,7 @@ public class Preferences {
     }
 
     public static boolean canConnect() {
-        if(isModePrivate()) {
+        if(isModePrivate()||isModeFreeform()) {
             return !getHost().trim().equals("") && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()));
         } else if(isModeHosted()) {
 
@@ -513,6 +550,7 @@ public class Preferences {
         if(Preferences.isModePublic())
             return deviceUUID;
 
+
         String deviceId = getString(R.string.keyDeviceId, R.string.valEmpty);
         if ("".equals(deviceId) && fallbackToDefault)
             return getDeviceIdDefault();
@@ -532,6 +570,8 @@ public class Preferences {
         if(isModeHosted())
             return getHostedUsername();
 
+
+        //!!!! doesn't save in private mode from UI. because in UI we input Device ID, not client id
 
         String clientId = getString(R.string.keyClientId, R.string.valEmpty);
         if ("".equals(clientId) && fallbackToDefault)
@@ -582,6 +622,13 @@ public class Preferences {
 
 
     public static String getDeviceTopicDefault() {
+
+        if (isModeFreeform()) {
+            return getStringRessource(R.string.valDeviceTopicFreeform);
+        }
+
+
+
         String formatString;
         String username;
         String deviceId = getDeviceId(true); // will use App.SESSION_UUID on public
@@ -603,7 +650,7 @@ public class Preferences {
     }
 
     public static String getDeviceTopic(boolean fallbackToDefault) {
-        if(!isModePrivate()) {
+        if(isModeHosted()||isModePublic()) {
             return getDeviceTopicDefault();
         }
         String topic = getString(R.string.keyDeviceTopic, R.string.valEmpty);
