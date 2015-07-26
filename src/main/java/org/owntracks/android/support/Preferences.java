@@ -624,7 +624,7 @@ public class Preferences {
     public static String getDeviceTopicDefault() {
 
         if (isModeFreeform()) {
-            return getStringRessource(R.string.valDeviceTopic);
+            return getStringRessource(R.string.valDeviceTopicFreeform);
         }
 
 
@@ -650,7 +650,7 @@ public class Preferences {
     }
 
     public static String getDeviceTopic(boolean fallbackToDefault) {
-        if(!isModePrivate()) {
+        if(isModeHosted()||isModePublic()) {
             return getDeviceTopicDefault();
         }
         String topic = getString(R.string.keyDeviceTopic, R.string.valEmpty);

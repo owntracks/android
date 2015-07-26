@@ -330,6 +330,78 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         }
 
+        private void loadIdentificationPreferencesFreeform(final Activity a) {
+            Preference.OnPreferenceClickListener identificationClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_identification_freeform, true)
+                            .title(R.string.preferencesIdentification)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    Switch authentication = (Switch) d.findViewById(R.id.authentication);
+                                    final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.username);
+                                    final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
+                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
+                                    final MaterialEditText deviceTopic = (MaterialEditText) d.findViewById(R.id.deviceTopic);
+
+
+                                    authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                            authenticationVal = isChecked;
+                                            password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
+                                        }
+                                    });
+
+                                    authentication.setChecked(authenticationVal);
+                                    username.setText(Preferences.getUsername());
+                                    password.setText(Preferences.getPassword());
+                                    password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
+                                    clientId.setText(Preferences.getClientId(false));
+                                    clientId.setHint(Preferences.getClientIdDefault());
+                                    deviceTopic.setText(Preferences.getDeviceTopic(false));
+                                    deviceTopic.setHint(Preferences.getDeviceTopicDefault());
+
+
+                                }
+                            })
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.username);
+                                    final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
+                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
+                                    final MaterialEditText deviceTopic = (MaterialEditText) d.findViewById(R.id.deviceTopic);
+
+                                    Preferences.setAuth(authenticationVal);
+                                    Preferences.setUsername(username.getText().toString());
+                                    Preferences.setPassword(password.getText().toString());
+                                    Preferences.setClientId(clientId.getText().toString());
+                                    Preferences.setDeviceTopic(deviceTopic.getText().toString());
+
+                                    updateConnectButton();
+                                }
+                            })
+
+                            .show();
+
+                    return true;
+                }
+            };
+
+            authenticationVal = Preferences.getAuth();
+            identificationPreference = findPreference(getString(R.string.keyIdentification));
+            identificationPreference.setOnPreferenceClickListener(identificationClickListener);
+
+        }
+
+
 
 
         private void loadSecurityPreferences(final Activity a) {
@@ -463,7 +535,17 @@ public class ActivityPreferencesConnection extends ActivityBase {
             Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
 
-            if (Preferences.isModePrivate()) {
+            if (Preferences.isModeFreeform()) {
+                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_FREEFORM);
+                addPreferencesFromResource(R.xml.preferences_private_connection);
+
+
+                loadHostPreferences(a);
+                loadSecurityPreferences(a);
+                loadOptionsPreferences(a);
+                loadIdentificationPreferencesFreeform(a);
+
+            }else if (Preferences.isModePrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.preferences_private_connection);
 

@@ -182,7 +182,10 @@ public class ActivityPreferences extends ActivityBase {
 
             Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
-            if (Preferences.isModePrivate()) {
+            if (Preferences.isModeFreeform()) {
+                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_FREEFORM);
+                addPreferencesFromResource(R.xml.preferences_private);
+            } else if (Preferences.isModePrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.preferences_private);
             } else if(Preferences.isModeHosted()) {

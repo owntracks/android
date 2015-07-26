@@ -222,6 +222,7 @@
         <item>Private</item>
         <item>Hosted</item>
         <item>Public</item>
+        <item>Freeform</item>
     </string-array>
     <string name="title_activity_activity_statistics">Statistics</string>
 

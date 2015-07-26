@@ -3,6 +3,7 @@
     <integer name="valModeId">2</integer>
 
 
+    <string name="valDeviceTopicFreeform" formatted="false">owntracks</string>
 
     <string name="valDeviceTopicPublic" formatted="false">public/%s/%s</string>
     <string name="valBaseTopicPublic">public/+/+</string>
@@ -91,6 +92,7 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     <string-array name="locatorAccuracy">
         <item>0</item>

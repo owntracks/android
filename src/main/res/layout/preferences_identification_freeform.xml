@@ -60,27 +60,29 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/deviceId"
+        android:id="@+id/deviceTopic"
         android:inputType="textVisiblePassword"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="@string/preferencesDeviceName"
+        app:met_floatingLabelText="@string/preferencesDeviceTopic"
         app:met_floatingLabelAlwaysShown="true"
         />
+
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/trackerId"
+        android:id="@+id/clientId"
         android:inputType="textVisiblePassword"
         app:met_baseColor="@color/textPrimary"
-        app:met_maxCharacters="2"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="@string/preferencesTrackerId"
+        app:met_floatingLabelText="@string/preferencesClientName"
         app:met_floatingLabelAlwaysShown="true"
-        android:maxLength="2"
-         />
+        />
+
+
+
 
 </LinearLayout>
