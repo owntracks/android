@@ -40,9 +40,7 @@
     <integer name="valKeepaliveHosted">3600</integer>
 
 
-    <!--<string name="valDeviceTopic" formatted="false">/users/%s/owntracks</string>-->
-    <string name="valDeviceTopic" formatted="false">/orgs/total-exposure/location</string>
-
+    <string name="valDeviceTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valBaseTopic">owntracks/+/+</string>
     <string name="valGeohashMsgTopic" formatted="false">msg/+/%s</string>
 

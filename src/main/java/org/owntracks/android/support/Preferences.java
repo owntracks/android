@@ -540,7 +540,7 @@ public class Preferences {
     }
 
     public static String getClientIdDefault() {
-        return "1592";//hendrik
+        return getDeviceIdDefault();
     }
 
     public static void setClientId(String clientId) {
@@ -599,7 +599,7 @@ public class Preferences {
             formatString = getStringRessource(R.string.valDeviceTopic);
         }
 
-        return String.format(formatString, username);//removed device id
+        return String.format(formatString, username, deviceId);
     }
 
     public static String getDeviceTopic(boolean fallbackToDefault) {

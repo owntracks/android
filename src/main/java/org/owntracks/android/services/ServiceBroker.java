@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -279,12 +280,11 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 }
             }
 
-            //setWill(options);
+            setWill(options);
 			options.setKeepAliveInterval(Preferences.getKeepalive());
 			options.setConnectionTimeout(30);
 			connectedWithCleanSession = Preferences.getCleanSession();
 			options.setCleanSession(connectedWithCleanSession);
-
 
 			this.mqttClient.connect(options);
 			changeState(State.CONNECTED);
@@ -736,7 +736,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                         Log.v(TAG, "failed qos 1|2 message added to backlog");
                         synchronized (backlogLock) {
                             backlog.add(message);
-                          }
+                        }
 						if(message instanceof LocationMessage)
 							Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE);
 
