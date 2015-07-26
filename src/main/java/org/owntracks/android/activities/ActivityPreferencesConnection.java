@@ -174,7 +174,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.username);
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
-
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
                                     authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -229,7 +228,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     Preferences.setUsername(username.getText().toString());
                                     Preferences.setPassword(password.getText().toString());
                                     Preferences.setDeviceId(deviceId.getText().toString());
-                                     Preferences.setTrackerId(trackerId.getText().toString());
+                                    Preferences.setTrackerId(trackerId.getText().toString());
 
                                     updateConnectButton();
                                 }
@@ -344,7 +343,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
                                     final MaterialEditText deviceTopic = (MaterialEditText) d.findViewById(R.id.deviceTopic);
-
 
                                     authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
