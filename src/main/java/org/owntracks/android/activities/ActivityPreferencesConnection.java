@@ -174,6 +174,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.username);
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
+                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
                                     authentication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -190,6 +191,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
                                     deviceId.setHint(Preferences.getDeviceIdDefault());
                                     deviceId.setText(Preferences.getDeviceId(false));
+                                    clientId.setHint(Preferences.getClientIdDefault());
+                                    clientId.setText(Preferences.getClientId(false));
                                     trackerId.setText(Preferences.getTrackerId(false));
                                     trackerId.setHint(Preferences.getTrackerIdDefault());
 
@@ -222,12 +225,14 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.username);
                                     final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.password);
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
+                                    final MaterialEditText clientId = (MaterialEditText) d.findViewById(R.id.clientId);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
                                     Preferences.setAuth(authenticationVal);
                                     Preferences.setUsername(username.getText().toString());
                                     Preferences.setPassword(password.getText().toString());
                                     Preferences.setDeviceId(deviceId.getText().toString());
+                                    Preferences.setClientId(clientId.getText().toString());
                                     Preferences.setTrackerId(trackerId.getText().toString());
 
                                     updateConnectButton();

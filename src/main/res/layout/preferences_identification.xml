@@ -69,6 +69,17 @@
         app:met_floatingLabelAlwaysShown="true"
         />
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/clientId"
+        android:inputType="textVisiblePassword"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesClientName"
+        app:met_floatingLabelAlwaysShown="true"
+        />
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"

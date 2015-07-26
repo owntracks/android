@@ -51,6 +51,8 @@ public class App extends Application {
     public static final int MODE_ID_PRIVATE=0;
     public static final int MODE_ID_HOSTED=1;
     public static final int MODE_ID_PUBLIC=2;
+    public static final int MODE_ID_FREEFORM=3;
+
     private SQLiteDatabase db;
 
     @Override
