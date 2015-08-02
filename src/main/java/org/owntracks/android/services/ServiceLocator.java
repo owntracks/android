@@ -25,17 +25,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 
-import com.google.android.gms.common.ConnectionResult;
 import com.mapzen.android.lost.api.LostApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.mapzen.android.lost.api.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.mapzen.android.lost.api.LocationListener;
@@ -59,7 +53,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	private ServiceProxy context;
 
 	private LocationRequest mLocationRequest;
-	private boolean ready = false;
     private boolean foreground = false;
 	private GeocodableLocation lastKnownLocation;
 	private long lastPublish;
@@ -89,25 +82,25 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 		};
 		this.sharedPreferences .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
 
-
-
-        Log.v(TAG, "Checking if Play Services are available");
-        ServiceApplication.checkPlayServices(); // show error notification if  play services were disabled
-
         Log.v(TAG, "Initializing LostApiClient");
         lostApiClient = new LostApiClient.Builder(this.context)
                 .build();
 
-        if(ServiceApplication.checkPlayServices()) {
+
             if (!this.lostApiClient.isConnected() ) {
                 Log.v(TAG, "Connecting LostApiClient");
                 this.lostApiClient.connect();
+
+                Statistics.setTime(context, Statistics.SERVICE_LOCATOR_PLAY_CONNECTED);
+
+                initLocationRequest();
+                removeGeofences();
+                requestGeofences();
             } else {
                 Log.v(TAG, "LostApiClient is already connected or connecting");
             }
-        }
 
-        this.ready = false;
+
     }
 
 	public GeocodableLocation getLastKnownLocation() {
@@ -247,7 +240,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 	protected void handlePreferences() {
 		requestLocationUpdates();
-	}
+    }
 
 	private void disableLocationUpdates() {
 
@@ -261,7 +254,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 	private void requestLocationUpdates() {
-        if (!this.ready || lostApiClient == null || !lostApiClient.isConnected()) {
+        if (lostApiClient == null || !lostApiClient.isConnected()) {
             Log.e(TAG, "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;
         }
@@ -287,7 +280,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent == null)
             return 0;
 
@@ -316,7 +309,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             publishLocationMessage();
     }
 
-	public void enableForegroundMode() {
+    public void enableForegroundMode() {
 		this.foreground = true;
 		requestLocationUpdates();
 	}
@@ -351,8 +344,8 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     }
 
 	private void publishWaypointMessage(WaypointMessage message) {
-		if (ServiceProxy.getServiceBroker() == null) {
-			Log.e(TAG, "publishWaypointMessage called without a broker instance");
+        if (ServiceProxy.getServiceBroker() == null) {
+            Log.e(TAG, "publishWaypointMessage called without a broker instance");
             return;
 		}
 
@@ -385,12 +378,12 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 		}
 
 		LocationMessage report;
-		if (r == null)
-			report = getLocationMessage(null);
-		else
-			report = r;
+        if (r == null)
+            report = getLocationMessage(null);
+        else
+            report = r;
 
-        if(trigger != null)
+        if (trigger != null)
             report.setTrigger(trigger);
 
 
@@ -418,9 +411,9 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
     public void onEvent(Events.WaypointAdded e) {
 		handleWaypoint(e.getWaypoint(), false, false);
-	}
+    }
 
-	public void onEvent(Events.WaypointUpdated e) {
+    public void onEvent(Events.WaypointUpdated e) {
 		handleWaypoint(e.getWaypoint(), true, false);
 	}
 
@@ -454,8 +447,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void requestGeofences() {
-		if (!this.ready)
-			return;
 
 		List<Geofence> fences = new ArrayList<Geofence>();
 
@@ -475,13 +466,13 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId() );
-			fences.add(geofence);
-		}
+            Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId());
+            fences.add(geofence);
+        }
 
-		if (fences.isEmpty()) {
-			return;
-		}
+        if (fences.isEmpty()) {
+            return;
+        }
 
         LocationServices.GeofencingApi.addGeofences(fences, ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION, null));
 	}
@@ -541,10 +532,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
 		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
 	}
-
-    public boolean isReady() {
-        return ready;
-    }
 
     public boolean isForeground() {
         return foreground;
