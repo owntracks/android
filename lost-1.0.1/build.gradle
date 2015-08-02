@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('lost-1.0.1.jar'))

@@ -654,7 +654,6 @@ public class ActivityMain extends ActivityBase {
             Canvas canvas = new Canvas(bitmap);
             markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             markerDrawable.draw(canvas);
-            this.currentLocationMarkerBitmap = BitmapDescriptorFactory.fromBitmap(bitmap);
 
             hideSelectedContactDetails();
 
@@ -664,7 +663,9 @@ public class ActivityMain extends ActivityBase {
 			this.googleMap = this.mMapView.getMap();
 
 			// Check if we were successful in obtaining the map.
-			if (this.mMapView != null) {
+			if (this.mMapView != null && this.googleMap!= null) {
+                this.currentLocationMarkerBitmap = BitmapDescriptorFactory.fromBitmap(bitmap);
+
                 //MapsInitializer.initialize(getActivity());
 				setUpMap();
 			}
@@ -684,8 +685,8 @@ public class ActivityMain extends ActivityBase {
                     return;
                 }
 
-                mMenu.clear();
-                mInflater.inflate(R.menu.fragment_map, mMenu);
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_map, mMenu);
         }
 
         @Override
@@ -826,7 +827,11 @@ public class ActivityMain extends ActivityBase {
             removeContactMarker(c);
 
 			Marker m = this.googleMap.addMarker(
-                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getFaceDescriptor()).anchor(0.5F, 0.5F));
+                    new MarkerOptions()
+                            .position(c.getLocation()
+                                    .getLatLng())
+              //              .icon(c.getFaceDescriptor())
+                            .anchor(0.5F, 0.5F));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 

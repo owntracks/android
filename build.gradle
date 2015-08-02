@@ -56,6 +56,8 @@ dependencies {
     compile 'com.joanzapata.android:android-iconify:1.0.9'
     compile 'com.github.monxalo:android-section-adapter:1.0.1@jar'
 
+    compile 'com.mapzen.android:lost:1.0.1'
+
 }
 
 android {

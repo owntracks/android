@@ -81,6 +81,9 @@ public class ActivityLauncher extends ActivityBase {
 
 	private void checkPlayServices() {
 
+
+		this.playServicesOk = true;
+/*
 		if (ServiceApplication.checkPlayServices()) {
 			this.playServicesOk = true;
 
@@ -112,6 +115,7 @@ public class ActivityLauncher extends ActivityBase {
 				showQuitError();
 			}
 		}
+		*/
 	}
 
 	private void showQuitError() {
