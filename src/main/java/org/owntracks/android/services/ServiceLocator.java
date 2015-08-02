@@ -460,14 +460,20 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 				continue;
 			}
 
-            Geofence geofence = new Geofence.Builder()
-					.setRequestId(w.getGeofenceId())
-					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
-					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
+            try {
 
-            Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId());
-            fences.add(geofence);
+                Geofence geofence = new Geofence.Builder()
+                        .setRequestId(w.getGeofenceId())
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build();
+
+                Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId());
+                fences.add(geofence);
+
+            } catch (RuntimeException e){
+                Log.v(TAG, "adding geofence not possible for waypoint " + w.getDescription() + " mode: " + w.getModeId());
+            }
         }
 
         if (fences.isEmpty()) {
@@ -503,10 +509,15 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void removeGeofencesById(List<String> ids) {
-		if (ids.isEmpty())
-			return;
+		if (ids.isEmpty()) {
+            return;
+        }
 
-        LocationServices.GeofencingApi.removeGeofences( ids);
+        try {
+            LocationServices.GeofencingApi.removeGeofences(ids);
+        } catch (RuntimeException e) {
+            Log.v(TAG, "removing geofences not implemented in LOST");
+        }
 
 	}
 
