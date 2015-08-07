@@ -86,8 +86,7 @@ public class ActivityLauncher extends ActivityBase {
 
 		} else {
 			this.playServicesOk = false;
-			int resultCode = GooglePlayServicesUtil
-					.isGooglePlayServicesAvailable(this);
+			int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
 			Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
 
