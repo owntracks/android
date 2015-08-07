@@ -1,6 +1,13 @@
 OwnTracks Android App Release Notes
 ===================================
 ## OwnTracks 0.5.19
+>Release date: 2015-XX-XX
+* [FIX] #219 - UserID and DeviceID must be mandatory
+* [FIX] #222 - Manual Entry of Waypoints not allowing negative sign
+* [FIX] #225 - Waypoint description does not get imported
+* [NEW] Notification now indicates that the app cannot connect due to missing config parameters
+
+## OwnTracks 0.5.19
 >Release date: 2015-07-19
 * [FIX] ReconnectHandler was not started correctly when a connection error occured
 * [FIX] DeviceId field default was not updated correctly 

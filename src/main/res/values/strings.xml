@@ -14,8 +14,9 @@
     <string name="preferencesBrokerPasswordHosted">"Token"</string>
     <string name="preferencesDeviceNameHosted">"Device"</string>
 
-    <string name="preferencesCaCrtPath">Custom .crt certificate path</string>
-    <string name="preferencesClientCrtPath">Custom .p12 key pair path</string>
+    <string name="preferencesCaCrtPath">CA certificate</string>
+    <string name="preferencesClientCrtPath">Client certificate</string>
+    <string name="preferencesClientCrtPassword">Client certificate password</string>
 
     <string name="preferencesServerCancel">"Disconnect"</string>
     <string name="preferencesServerConnect">"Connect"</string>
@@ -231,4 +232,12 @@
     <string name="refresh">Refresh</string>
     <string name="preferencesMessagesSummary">Receive messages</string>
     <string name="preferencesMessages">Messaging</string>
+    <string name="connectivityDisconnectedConfigIncomplete">Disconnected: Configuration incomplete</string>
+    <string name="none">None</string>
+
+    <string-array name="filepicker">
+        <item>Select</item>
+        <item>Clear</item>
+    </string-array>
+
 </resources>
