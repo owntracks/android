@@ -5,7 +5,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
@@ -53,8 +53,10 @@ dependencies {
         transitive = true
     }
     compile 'com.afollestad:material-dialogs:0.7.5.2'
-    compile 'com.joanzapata.android:android-iconify:1.0.9'
+    compile 'com.joanzapata.android:android-iconify:1.0.10'
     compile 'com.github.monxalo:android-section-adapter:1.0.1@jar'
+    compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
+
 
 }
 
