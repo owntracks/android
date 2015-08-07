@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -708,16 +709,24 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
             if (cachedState != null) {
+                Snackbar snackbar = null;
                 if (e.getState() == ServiceBroker.State.CONNECTED) {
-                    Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnected, Snackbar.LENGTH_LONG).show(); // Don’t forget to show!
+                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnected, Snackbar.LENGTH_LONG); // Don’t forget to show!
                 } else if (e.getState() == ServiceBroker.State.CONNECTING) {
-                    Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnecting, Snackbar.LENGTH_LONG).show(); // Don’t forget to show!
+                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnecting, Snackbar.LENGTH_LONG); // Don’t forget to show!
 
                 } else if (e.getState() == ServiceBroker.State.DISCONNECTED || e.getState() == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
-                    Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnected, Snackbar.LENGTH_LONG).show(); // Don’t forget to show!
+                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnected, Snackbar.LENGTH_LONG); // Don’t forget to show!
                 } else if (e.getState() == ServiceBroker.State.DISCONNECTED_ERROR) {
-                    Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnectedError, Snackbar.LENGTH_LONG).show(); // Don’t forget to show!
+                    snackbar =  Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnectedError, Snackbar.LENGTH_LONG); // Don’t forget to show!
+                }
 
+                // Fix snackbar text color and show
+                if(snackbar != null) {
+                    View view = snackbar.getView();
+                    TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    snackbar.show();
                 }
 
             }

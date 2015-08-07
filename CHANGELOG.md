@@ -1,11 +1,13 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.5.19
->Release date: 2015-XX-XX
+## OwnTracks 0.5.20
+>Release date: 2015-08-07
 * [FIX] #219 - UserID and DeviceID must be mandatory
 * [FIX] #222 - Manual Entry of Waypoints not allowing negative sign
 * [FIX] #225 - Waypoint description does not get imported
 * [NEW] Notification now indicates that the app cannot connect due to missing config parameters
+* [NEW] Support for password protected client certificates
+* [NEW] File picker for broker CA and client certificates
 
 ## OwnTracks 0.5.19
 >Release date: 2015-07-19
