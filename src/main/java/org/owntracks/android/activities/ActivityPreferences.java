@@ -327,7 +327,7 @@ public class ActivityPreferences extends ActivityBase {
         }
 
         private  void setServerPreferenceSummary(PreferenceFragment f, String s) {
-            f.findPreference("connectionScreen").setSummary(modesReadable[Preferences.getModeId()] + ": "+ s);
+            f.findPreference("connectionScreen").setSummary(modesReadable[Preferences.getModeId()] + " - "+ s);
 
 
             ((BaseAdapter) ((PreferenceScreen) f.findPreference("root")).getRootAdapter()).notifyDataSetChanged(); //Have to redraw the list to reflect summary change
