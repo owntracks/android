@@ -565,7 +565,6 @@ public class ServiceApplication implements ProxyableService,
                 .setDeleteIntent(this.transitionCancelIntent);
 
         for(Uri uri : this.contactTransitionNotificationsContactUris) {
-            Log.v(TAG, "adding persion uri: " + uri.toString());
             builder.addPerson(uri.toString());
         }
 

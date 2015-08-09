@@ -64,7 +64,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     private static final int MAX_INFLIGHT_MESSAGES = 10;
 
     public enum State {
-        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_ERROR
+        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, DISCONNECTED_ERROR
     }
 
 
@@ -166,7 +166,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		Log.v(TAG, "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
             //Log.v(TAG, "handleStart: canConnect() == false");
-            return;
+			changeState(State.DISCONNECTED_CONFIGINCOMPLETE);
+
+			return;
         }
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
@@ -664,6 +666,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             case DISCONNECTED_ERROR:
                 id = R.string.error;
                 break;
+			case DISCONNECTED_CONFIGINCOMPLETE:
+				id = R.string.connectivityDisconnectedConfigIncomplete;
+				break;
             default:
                 id = R.string.connectivityDisconnected;
 

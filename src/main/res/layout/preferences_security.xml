@@ -4,7 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
 
     <RelativeLayout
@@ -27,37 +30,57 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_centerVertical="true"
-
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tlsClientCrt"
-        android:inputType="textNoSuggestions"
-        android:hint="@string/preferencesClientCrtPath"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
-        app:met_floatingLabel="highlight"
-        app:met_floatingLabelAlwaysShown="false"
-        app:met_floatingLabelText="@string/preferencesClientCrtPath"/>
-
-    <com.rengwuxian.materialedittext.MaterialEditText
+        android:cursorVisible="false"
+        android:windowSoftInputMode="stateAlwaysHidden"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tlsCaCrt"
-        android:inputType="textNoSuggestions"
+        android:inputType="textVisiblePassword"
         android:hint="@string/preferencesCaCrtPath"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelAlwaysShown="false"
+        android:focusableInTouchMode="false"
         app:met_floatingLabelText="@string/preferencesCaCrtPath"
+
         />
 
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tlsClientCrt"
+        android:hint="@string/preferencesClientCrtPath"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        android:cursorVisible="false"
+        app:met_floatingLabel="highlight"
+        android:focusableInTouchMode="false"
+        app:met_floatingLabelAlwaysShown="false"
+        android:windowSoftInputMode="stateAlwaysHidden"
+        android:inputType="textVisiblePassword"
+        app:met_floatingLabelText="@string/preferencesClientCrtPath"
+        />
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tlsClientCrtPassword"
+        android:inputType="textPassword"
+        app:met_floatingLabel="highlight"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        android:hint="@string/preferencesClientCrtPassword"
+        app:met_singleLineEllipsis="true"
+
+        />
 
 </LinearLayout>

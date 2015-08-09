@@ -211,7 +211,7 @@ public class Preferences {
 
     public static boolean canConnect() {
         if(isModePrivate()) {
-            return !getHost().trim().equals("") && ((getAuth() && !getUsername().trim().equals("") && !getPassword().trim().equals("")) || (!getAuth()));
+            return !getHost().trim().equals("") && getAuth() && !getUsername().trim().equals("") && ((getAuth() &&  !getPassword().trim().equals("")) || (!getAuth()));
         } else if(isModeHosted()) {
 
             return !getUsername().trim().equals("") && !getPassword().trim().equals("") && !getDeviceId(false).trim().equals("");
@@ -240,6 +240,7 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyTls), getTls())
                     .put(getStringRessource(R.string.keyTlsCaCrtPath), getTlsCaCrtPath())
                     .put(getStringRessource(R.string.keyTlsClientCrtPath), getTlsClientCrtPath())
+                    .put(getStringRessource(R.string.keyTlsClientCrtPassword), getTlsClientCrtPassword())
                     .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
                     .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
                     .put(getStringRessource(R.string.keyAuth), getAuth())
@@ -292,6 +293,8 @@ public class Preferences {
         try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
         try { setTlsCaCrtPath(json.getString(getStringRessource(R.string.keyTlsCaCrtPath))); } catch (JSONException e) {}
         try { setTlsClientCrtPath(json.getString(getStringRessource(R.string.keyTlsClientCrtPath))); } catch (JSONException e) {}
+        try { setTlsClientCrtPassword(json.getString(getStringRessource(R.string.keyTlsClientCrtPassword))); } catch (JSONException e) {}
+
         try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
@@ -361,9 +364,12 @@ public class Preferences {
                     newWaypoint.setDescription(a[0]);
                     if(a.length > 1)
                         newWaypoint.setSsid(a[1]);
-                    else
+                    else {
                         Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID but no data was found after the sign");
 
+                    }
+                } else {
+                    newWaypoint.setDescription(descRaw);
                 }
 
 
@@ -964,6 +970,14 @@ public class Preferences {
     public static void setMessaging(boolean messaging) {
         setBoolean(R.string.keyMessaging, messaging);
     }
+
+    public static String getTlsClientCrtPassword() {
+        return getString(R.string.keyTlsClientCrtPassword, R.string.valEmpty);
+    }
+    public static void setTlsClientCrtPassword(String password) {
+        setString(R.string.keyTlsClientCrtPassword, password);
+    }
+
 
 
     // Checks if the app is started for the first time.
