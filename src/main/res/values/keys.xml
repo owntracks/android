@@ -14,6 +14,8 @@
     <string name="keyTls">tls</string>
     <string name="keyTlsCaCrtPath">tlsCaCrtPath</string>
     <string name="keyTlsClientCrtPath">tlsClientCrtPath</string>
+    <string name="keyTlsClientCrtPassword">tlsClientCrtPassword</string>
+
 
     <string name="keyLocatorDisplacement">locatorDisplacement</string>
     <string name="keyLocatorInterval">locatorInterval</string>
