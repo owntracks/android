@@ -68,6 +68,8 @@ public class ConfigurationMessage extends Message{
     public ConfigurationMessage stripCredentials() {
         json.remove(Preferences.getStringRessource(R.string.keyUsername));
         json.remove(Preferences.getStringRessource(R.string.keyPassword));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword));
+
         return this;
     }
 
@@ -85,6 +87,7 @@ public class ConfigurationMessage extends Message{
         json.remove(Preferences.getStringRessource(R.string.keyTls));
         json.remove(Preferences.getStringRessource(R.string.keyTlsClientCrtPath));
         json.remove(Preferences.getStringRessource(R.string.keyTlsCaCrtPath));
+        json.remove(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword));
         json.remove(Preferences.getStringRessource(R.string.keyCleanSession));
         return this;
     }
