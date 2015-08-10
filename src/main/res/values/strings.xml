@@ -74,7 +74,7 @@
     <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>
     <string name="preferencesBaseTopic">Base topic</string>
     <string name="preferencesBaseTopicSummary">The topic base for subscriptions</string>
-    <string name="bookletModes "><a href="https://www.google.pl/">Google</a></string>
+    <string name="bookletModes"><a href="https://www.google.pl/">Google</a></string>
 
     <string name="connectivityConnecting">"Connecting"</string>
     <string name="connectivityConnected">"Connected"</string>
