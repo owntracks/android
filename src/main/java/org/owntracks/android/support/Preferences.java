@@ -505,10 +505,6 @@ public class Preferences {
         return getString(R.string.keyUsername, R.string.valEmpty, R.string.valEmpty, R.string.valUsernamePublic, false, true);
     }
 
-    public static String getHostedUsername() {
-        return getUsername()+"|"+getDeviceId(true);
-    }
-
     public static boolean getAuth() {
 
         return getBoolean(R.string.keyAuth, R.bool.valAuth, R.bool.valAuthHosted, R.bool.valAuthPublic, true, true);
@@ -534,10 +530,6 @@ public class Preferences {
     public static String getClientId(boolean fallbackToDefault) {
         if(isModePublic())
             return MqttAsyncClient.generateClientId();
-
-        if(isModeHosted())
-            return getHostedUsername();
-
 
         String clientId = getString(R.string.keyClientId, R.string.valEmpty);
         if ("".equals(clientId) && fallbackToDefault)
