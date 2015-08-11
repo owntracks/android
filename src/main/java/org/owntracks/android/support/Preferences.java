@@ -546,10 +546,8 @@ public class Preferences {
     }
 
     public static String getClientIdDefault() {
-        String clientID=getDeviceUUID(); //alternative
-        clientID=getDeviceIdDefault();
-        clientID+="-"+getUsername()+"-"+getDeviceId(true);
-        return clientID.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+","").toLowerCase();
+        String clientID=getUsername()+"/"+getDeviceId(true);
+        return clientID.replaceAll("[^a-zA-Z0-9/]+","").toLowerCase();
     }
 
     public static void setClientId(String clientId) {
