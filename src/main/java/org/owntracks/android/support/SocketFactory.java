@@ -75,11 +75,11 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
             InputStream clientIn = new BufferedInputStream(new FileInputStream(Preferences.getTlsClientCrtPath()));
             Log.v(this.toString(), "Using custom tls client cert from : " + Preferences.getTlsClientCrtPath());
-            clientKeyStore.load(clientIn, "".toCharArray());
+            clientKeyStore.load(clientIn, Preferences.getTlsClientCrtPassword().toCharArray());
             try {
                 kmf.init(clientKeyStore, Preferences.getTlsClientCrtPassword().toCharArray());
             } catch (UnrecoverableKeyException e) {
-                Log.e(this.toString(), e.toString());
+                Log.e(  this.toString(), e.toString());
             } finally {
                 clientIn.close();
             }

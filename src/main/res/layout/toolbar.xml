@@ -8,7 +8,7 @@
 
     android:layout_width="match_parent"
     android:minHeight="?attr/actionBarSize"
-    android:layout_height="?actionBarSize"
+    android:layout_height="?attr/actionBarSize"
 
     android:background="?attr/colorPrimary"
     app:navigationIcon="?attr/homeAsUpIndicator"
