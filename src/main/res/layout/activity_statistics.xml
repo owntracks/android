@@ -6,12 +6,12 @@
     android:layout_height="wrap_content">
 
     <include layout="@layout/toolbar"
-        android:id="@+id/include" />
+        android:id="@+id/fragmentToolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/include">
+        android:layout_below="@+id/fragmentToolbar">
         <LinearLayout
             android:orientation="vertical"
             xmlns:android="http://schemas.android.com/apk/res/android"
