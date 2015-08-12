@@ -211,9 +211,8 @@ public class Preferences {
 
     public static boolean canConnect() {
         if(isModePrivate()) {
-            return !getHost().trim().equals("") && getAuth() && !getUsername().trim().equals("") && ((getAuth() &&  !getPassword().trim().equals("")) || (!getAuth()));
+            return !getHost().trim().equals("") && !getUsername().trim().equals("")  && ((getAuth() &&  !getPassword().trim().equals("")) || !getAuth());
         } else if(isModeHosted()) {
-
             return !getUsername().trim().equals("") && !getPassword().trim().equals("") && !getDeviceId(false).trim().equals("");
         } else if(isModePublic()) {
             return true;
@@ -230,30 +229,19 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyModeId), getModeId())
                     .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
                     .put(getStringRessource(R.string.keyClientId), getClientId(true))
-                    .put(getStringRessource(R.string.keyHost), getHost())
-                    .put(getStringRessource(R.string.keyPort), getPort())
                     .put(getStringRessource(R.string.keyPassword), getPassword())
                     .put(getStringRessource(R.string.keyUsername), getUsername())
-                    .put(getStringRessource(R.string.keyPubQos), getPubQos())
-                    .put(getStringRessource(R.string.keyKeepalive), getKeepalive())
-                    .put(getStringRessource(R.string.keyPubRetain), getPubRetain())
-                    .put(getStringRessource(R.string.keyTls), getTls())
-                    .put(getStringRessource(R.string.keyTlsCaCrtPath), getTlsCaCrtPath())
-                    .put(getStringRessource(R.string.keyTlsClientCrtPath), getTlsClientCrtPath())
-                    .put(getStringRessource(R.string.keyTlsClientCrtPassword), getTlsClientCrtPassword())
+
                     .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
                     .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
-                    .put(getStringRessource(R.string.keyAuth), getAuth())
                     .put(getStringRessource(R.string.keyPubIncludeBattery), getPubLocationIncludeBattery())
                     .put(getStringRessource(R.string.keyPub), getPub())
                     .put(getStringRessource(R.string.keyPubInterval), getPubInterval())
-                    .put(getStringRessource(R.string.keyDeviceTopic), getDeviceTopic(true))
                     .put(getStringRessource(R.string.keyNotification), getNotification())
                     .put(getStringRessource(R.string.keyNotificationGeocoder), getNotificationGeocoder())
                     .put(getStringRessource(R.string.keyNotificationLocation), getNotificationLocation())
                     .put(getStringRessource(R.string.keyNotificationTickerOnPublish), getNotificationTickerOnPublish())
                     .put(getStringRessource(R.string.keyNotificationTickerOnWaypointTransition), getNotificationTickerOnWaypointTransition())
-                    .put(getStringRessource(R.string.keyBaseTopic), getBaseTopic())
                     .put(getStringRessource(R.string.keyAutostartOnBoot), getAutostartOnBoot())
                     .put(getStringRessource(R.string.keyLocatorAccuracyBackground), getLocatorAccuracyBackground())
                     .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
@@ -261,10 +249,24 @@ public class Preferences {
                     .put(getStringRessource(R.string.keyBeaconForegroundScanPeriod), getBeaconForegroundScanPeriod())
                     .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
                     .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
-                    .put(getStringRessource(R.string.keyCleanSession), getCleanSession())
                     .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true))
                     .put(getStringRessource(R.string.keyMessaging), getMessaging());
 
+            if(isModePrivate()) {
+                json.put(getStringRessource(R.string.keyHost), getHost())
+                .put(getStringRessource(R.string.keyPort), getPort())
+                .put(getStringRessource(R.string.keyPubQos), getPubQos())
+                .put(getStringRessource(R.string.keyKeepalive), getKeepalive())
+                .put(getStringRessource(R.string.keyPubRetain), getPubRetain())
+                .put(getStringRessource(R.string.keyTls), getTls())
+                .put(getStringRessource(R.string.keyTlsCaCrtPath), getTlsCaCrtPath())
+                .put(getStringRessource(R.string.keyTlsClientCrtPath), getTlsClientCrtPath())
+                .put(getStringRessource(R.string.keyTlsClientCrtPassword), getTlsClientCrtPassword())
+                .put(getStringRessource(R.string.keyAuth), getAuth())
+                .put(getStringRessource(R.string.keyDeviceTopic), getDeviceTopic(true))
+                .put(getStringRessource(R.string.keyBaseTopic), getBaseTopic())
+                .put(getStringRessource(R.string.keyCleanSession), getCleanSession());
+            }
 
             Log.v(TAG, "toJsonObject: " + json.toString());
 
@@ -318,6 +320,9 @@ public class Preferences {
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try { setMessaging(json.getBoolean(getStringRessource(R.string.keyMessaging))); } catch (JSONException e) {}
+
+
+
 
         try {
             JSONArray j = json.getJSONArray("waypoints");
