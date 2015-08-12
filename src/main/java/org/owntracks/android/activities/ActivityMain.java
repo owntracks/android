@@ -90,6 +90,8 @@ public class ActivityMain extends ActivityBase {
     private Toolbar toolbar;
     private Drawer drawer;
 
+    static private Class mapMode = MapFragment.class;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -171,7 +173,6 @@ public class ActivityMain extends ActivityBase {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // toggle.syncState();
     }
 
     @Override
@@ -209,7 +210,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((GoogleMapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(mapMode, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -219,7 +220,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((GoogleMapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(mapMode, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -434,9 +435,6 @@ public class ActivityMain extends ActivityBase {
         }
 
         public Fragment forward(Class<?> c, Bundle extras, AppCompatActivity fa) {
-            if (c == MapFragment.class) { //inject new GoogleMapFragment
-                c = GoogleMapFragment.class;
-            }
             pushBackStack(this.current);
             return showFragment(c, extras, fa, DIRECTION_FORWARD);
         }
@@ -648,6 +646,7 @@ public class ActivityMain extends ActivityBase {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            super.onCreateContextMenu(menu, v, menuInfo);
             if (v.getId() == R.id.contactDetails) {
                 menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
 
@@ -655,12 +654,6 @@ public class ActivityMain extends ActivityBase {
                     menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
                 else
                     menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
-
-                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
-                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
-                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
-
-
             }
         }
 
@@ -809,7 +802,8 @@ public class ActivityMain extends ActivityBase {
         }
 
         public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate) {
-            selectCurrentLocation(centerMode, follow, animate, -1);
+            super. selectCurrentLocation (centerMode,follow,animate);
+                selectCurrentLocation(centerMode, follow, animate, -1);
         }
 
         public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate, float zoom) {
@@ -835,7 +829,9 @@ public class ActivityMain extends ActivityBase {
 
         }
 
+        @Override
         public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
+            super.selectContact(c,centerMode,follow,animate);
             selectContact(c, centerMode, follow, animate, -1);
         }
 
@@ -891,7 +887,6 @@ public class ActivityMain extends ActivityBase {
             if (currentLocationPrecision != null)
                 this.currentLocationPrecision.remove();
             this.currentLocationMarker = this.googleMap.addMarker(new MarkerOptions().position(e.getGeocodableLocation().getLatLng()).icon(this.currentLocationMarkerBitmap).draggable(false).flat(true).anchor(0.5F, 0.5F));
-//.zIndex(10000).fillColor(R.color.currentLocationRadiusFill).strokeColor(R.color.currentLocationRadiusStroke).
             CircleOptions circleOptions = new CircleOptions().center(e.getGeocodableLocation().getLatLng()).radius(e.getGeocodableLocation().getAccuracy()).strokeWidth(2).strokeColor(0x883f72b5).fillColor(0x110000FF);
             this.currentLocationPrecision = this.googleMap.addCircle(circleOptions);
 
@@ -986,6 +981,15 @@ public class ActivityMain extends ActivityBase {
 
             mMenu.clear();
             mInflater.inflate(R.menu.fragment_map, mMenu);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            if (v.getId() == R.id.contactDetails) {
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
+                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
+            }
         }
 
 
@@ -1084,6 +1088,12 @@ public class ActivityMain extends ActivityBase {
             super.onSaveInstanceState(b);
         }
 
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
+
+        }
+
+        public void selectCurrentLocation(int centerMode, boolean follow, boolean animate) {
+        }
     }
 
     public static class ContactsFragment extends Fragment implements
@@ -1220,7 +1230,9 @@ public class ActivityMain extends ActivityBase {
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
             if (v.getId() == R.id.contactsList) {
-                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+                if(mapMode==GoogleMapFragment.class){
+                    menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+                }
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
                 menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
