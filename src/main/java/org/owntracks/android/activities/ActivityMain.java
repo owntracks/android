@@ -90,8 +90,6 @@ public class ActivityMain extends ActivityBase {
     private Toolbar toolbar;
     private Drawer drawer;
 
-    static private Class mapMode = MapFragment.class;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -210,7 +208,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(mapMode, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(App.mapFragmentClass, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -220,7 +218,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(mapMode, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(App.mapFragmentClass, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -1230,7 +1228,7 @@ public class ActivityMain extends ActivityBase {
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
             if (v.getId() == R.id.contactsList) {
-                if(mapMode==GoogleMapFragment.class){
+                if(App.mapFragmentClass ==GoogleMapFragment.class){
                     menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
                 }
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);

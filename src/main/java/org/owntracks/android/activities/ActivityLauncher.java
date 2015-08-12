@@ -1,5 +1,6 @@
 package org.owntracks.android.activities;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
@@ -83,16 +84,15 @@ public class ActivityLauncher extends ActivityBase {
 
 
 		this.playServicesOk = true;
-/*
 		if (ServiceApplication.checkPlayServices()) {
 			this.playServicesOk = true;
-
+			App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
 		} else {
-			this.playServicesOk = false;
 			int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-
 			Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
+			this.playServicesOk = true;
 
+/*
 			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 
 				Dialog errorDialog = GooglePlayServicesUtil
@@ -113,8 +113,9 @@ public class ActivityLauncher extends ActivityBase {
 			} else {
 				showQuitError();
 			}
+			*/
 		}
-		*/
+
 	}
 
 	private void showQuitError() {
