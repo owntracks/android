@@ -58,7 +58,7 @@ public class Preferences {
         publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
         handleFirstStart();
-        deviceUUID = sharedPreferences.getString("deviceUUID", "undefined-uuid");
+        deviceUUID = sharedPreferences.getString(getKey(R.string.keyDeviceUUID), "undefined-uuid");
         initMode(sharedPreferences.getInt(getStringRessource(R.string.keyModeId), getIntResource(R.integer.valModeId)));
     }
 
@@ -510,10 +510,6 @@ public class Preferences {
         return getString(R.string.keyUsername, R.string.valEmpty, R.string.valEmpty, R.string.valUsernamePublic, false, true);
     }
 
-    public static String getHostedUsername() {
-        return getUsername()+"|"+getDeviceId(true);
-    }
-
     public static boolean getAuth() {
 
         return getBoolean(R.string.keyAuth, R.bool.valAuth, R.bool.valAuthHosted, R.bool.valAuthPublic, true, true);
@@ -522,7 +518,7 @@ public class Preferences {
 
     public static String getDeviceId(boolean fallbackToDefault) {
         if(Preferences.isModePublic())
-            return deviceUUID;
+            return getDeviceUUID();
 
         String deviceId = getString(R.string.keyDeviceId, R.string.valEmpty);
         if ("".equals(deviceId) && fallbackToDefault)
@@ -540,10 +536,6 @@ public class Preferences {
         if(isModePublic())
             return MqttAsyncClient.generateClientId();
 
-        if(isModeHosted())
-            return getHostedUsername();
-
-
         String clientId = getString(R.string.keyClientId, R.string.valEmpty);
         if ("".equals(clientId) && fallbackToDefault)
             clientId = getClientIdDefault();
@@ -551,7 +543,8 @@ public class Preferences {
     }
 
     public static String getClientIdDefault() {
-        return getDeviceIdDefault();
+        String clientID=getUsername()+"/"+getDeviceId(true);
+        return clientID.replaceAll("[^a-zA-Z0-9/]+","").toLowerCase();
     }
 
     public static void setClientId(String clientId) {
@@ -688,7 +681,7 @@ public class Preferences {
     }
 
 
-    public static String getIntWithHintSupport(int key){
+    public static String getIntWithHintSupport(int key) {
         int i = getInt(key, R.integer.valInvalid);
         if (i == -1) {
             return "";
@@ -993,7 +986,7 @@ public class Preferences {
             Log.v(TAG, "Initial application launch");
             sharedPreferences.edit().putBoolean(getKey(R.string.keyFistStart), false).commit();
             String uuid = UUID.randomUUID().toString().toUpperCase();
-            sharedPreferences.edit().putString("deviceUUID", "A"+uuid.substring(1)).commit();
+            sharedPreferences.edit().putString(getKey(R.string.keyDeviceUUID), "A"+uuid.substring(1)).commit();
 
             return true;
         } else {
