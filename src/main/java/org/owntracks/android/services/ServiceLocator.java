@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.WaypointDao.Properties;
@@ -27,7 +28,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 
@@ -92,16 +92,17 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
         Log.v(TAG, "Checking if Play Services are available");
-        ServiceApplication.checkPlayServices(); // show error notification if  play services were disabled
+        if(ActivityLauncher.checkPlayServices(null)) {
+            ; // show error notification if  play services were disabled
 
-        Log.v(TAG, "Initializing GoogleApiClient");
-        googleApiClient = new GoogleApiClient.Builder(this.context)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        if(ServiceApplication.checkPlayServices()) {
+            Log.v(TAG, "Initializing GoogleApiClient");
+            googleApiClient = new GoogleApiClient.Builder(this.context)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        if(ActivityLauncher.checkPlayServices(null)) {
             if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting()) {
                 Log.v(TAG, "Connecting GoogleApiClient");
                 this.googleApiClient.connect();

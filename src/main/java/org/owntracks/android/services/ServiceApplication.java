@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
@@ -31,7 +30,6 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -46,14 +44,11 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.Geofence;
 
 import de.greenrobot.dao.query.Query;
@@ -83,7 +78,6 @@ public class ServiceApplication implements ProxyableService,
 	private static NotificationCompat.Builder notificationBuilder;
     private static NotificationCompat.Builder notificationBuilderTicker;
 
-    private static boolean playServicesAvailable;
 	private GeocodableLocation lastPublishedLocation;
 	private Date lastPublishedLocationTime;
 	private boolean even = false;
@@ -102,7 +96,7 @@ public class ServiceApplication implements ProxyableService,
     @Override
 	public void onCreate(ServiceProxy context) {
 		this.context = context;
-		checkPlayServices();
+		ActivityLauncher.checkPlayServices(null);
         this.notificationThread = new HandlerThread("NOTIFICATIONTHREAD");
         this.notificationThread.start();
         this.notificationHandler = new Handler(this.notificationThread.getLooper());
@@ -382,7 +376,7 @@ public class ServiceApplication implements ProxyableService,
 		if (this.notificationManager != null)
 			this.notificationManager.cancelAll();
 
-		if (Preferences.getNotification() || !playServicesAvailable)
+		if (Preferences.getNotification() || !ActivityLauncher.playServicesAvailable)
 			createNotification();
 
 	}
@@ -407,20 +401,6 @@ public class ServiceApplication implements ProxyableService,
 				ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
 		notificationBuilder.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntent);
 		updateNotification();
-	}
-
-	private static void showPlayServicesNotAvilableNotification() {
-		NotificationCompat.Builder nb = new NotificationCompat.Builder(
-				App.getContext());
-		NotificationManager nm = (NotificationManager) App.getContext()
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		//nb.setContentTitle(App.getContext().getString(R.string.app_name))
-		//		.setSmallIcon(R.drawable.ic_notification)
-		//		.setContentText("Google Play Services are not available")
-				//.setPriority(NotificationCompat.PRIORITY_MIN);
-		//nm.notify(Defaults.NOTIFCATION_ID, nb.build());
-
 	}
 
 	public void updateTicker(String text, boolean vibrate) {
@@ -467,7 +447,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateNotification() {
-		if (!Preferences.getNotification() || !playServicesAvailable)
+		if (!Preferences.getNotification() || !ActivityLauncher.playServicesAvailable)
 			return;
 
 		String title;
@@ -625,16 +605,6 @@ public class ServiceApplication implements ProxyableService,
 				updateTicker(this.context.getString(R.string.statePublished), Preferences.getNotificationVibrateOnPublish());
 
 		}
-	}
-
-	public static boolean checkPlayServices() {
-		playServicesAvailable = ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
-
-		if (!playServicesAvailable)
-			showPlayServicesNotAvilableNotification();
-
-		return playServicesAvailable;
-
 	}
 
 	public void updateAllContacts() {

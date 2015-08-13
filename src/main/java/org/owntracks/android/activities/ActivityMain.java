@@ -1,32 +1,9 @@
 package org.owntracks.android.activities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.owntracks.android.App;
-import org.owntracks.android.R;
-import org.owntracks.android.adapter.ContactAdapter;
-import org.owntracks.android.messages.ClearMessage;
-import org.owntracks.android.messages.CommandMessage;
-import org.owntracks.android.model.Contact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceBroker;
-import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerFactory;
-import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ReverseGeocodingTask;
-import org.owntracks.android.support.StaticHandler;
-import org.owntracks.android.support.StaticHandlerInterface;
-
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -53,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -73,6 +49,28 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import org.owntracks.android.App;
+import org.owntracks.android.R;
+import org.owntracks.android.adapter.ContactAdapter;
+import org.owntracks.android.messages.ClearMessage;
+import org.owntracks.android.messages.CommandMessage;
+import org.owntracks.android.model.Contact;
+import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.DrawerFactory;
+import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.ReverseGeocodingTask;
+import org.owntracks.android.support.StaticHandler;
+import org.owntracks.android.support.StaticHandlerInterface;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import de.greenrobot.event.EventBus;
 
 public class ActivityMain extends ActivityBase {
@@ -91,6 +89,7 @@ public class ActivityMain extends ActivityBase {
 
     private Toolbar toolbar;
     private Drawer drawer;
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -111,8 +110,6 @@ public class ActivityMain extends ActivityBase {
 		setContentView(R.layout.activity_main);
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-
-
 
 
         final ActivityMain context = this;
@@ -170,6 +167,7 @@ public class ActivityMain extends ActivityBase {
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
 	}
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -368,7 +366,6 @@ public class ActivityMain extends ActivityBase {
 			FragmentHandler.getInstance().back(this);
 	}
 
-
     private void launchNavigation(Contact c) {
         if(c.getLocation() != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + c.getLocation().getLatitude() + "," + c.getLocation().getLongitude()));
@@ -451,7 +448,6 @@ public class ActivityMain extends ActivityBase {
 		}
 	}
 
-
     public void share(View view) {
 		ServiceProxy.runOrBind(this, new Runnable() {
 
@@ -479,8 +475,6 @@ public class ActivityMain extends ActivityBase {
         });
 
 	}
-
-
 
 	@Override
 	public void onStart() {
@@ -639,7 +633,6 @@ public class ActivityMain extends ActivityBase {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
-
 
 
             this.markerToContacts = new HashMap<String, Contact>();
@@ -810,6 +803,7 @@ public class ActivityMain extends ActivityBase {
         public void centerMap(LatLng latlon, int centerMode, boolean animate) {
             centerMap(latlon, centerMode, animate, -1);
         }
+
 		public void centerMap(LatLng latlon, int centerMode, boolean animate, float zoom) {
             if(centerMode!=SELECT_UPDATE) {
                 CameraUpdate center;
@@ -874,7 +868,6 @@ public class ActivityMain extends ActivityBase {
 			}
 		}
 
-
         public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate) {
             selectCurrentLocation(centerMode, follow, animate, -1);
         }
@@ -883,6 +876,7 @@ public class ActivityMain extends ActivityBase {
             setFollowingSelectedContact(follow);
             selectCurrentLocation(centerMode, animate, zoom);
         }
+
         public void selectCurrentLocation(final int centerMode, final boolean animate, final float zoom) {
             ServiceProxy.runOrBind(getActivity(), new Runnable() {
 
@@ -945,8 +939,6 @@ public class ActivityMain extends ActivityBase {
             removeContactLocation(e.getContact());
         }
 
-
-
         public void onEventMainThread(Events.CurrentLocationUpdated e) {
             Log.v(TAG,"CurrentLocationUpdated" );
             if(currentLocationMarker != null)
@@ -958,7 +950,6 @@ public class ActivityMain extends ActivityBase {
 //.zIndex(10000).fillColor(R.color.currentLocationRadiusFill).strokeColor(R.color.currentLocationRadiusStroke).
             CircleOptions circleOptions = new CircleOptions().center(e.getGeocodableLocation().getLatLng()).radius(e.getGeocodableLocation().getAccuracy()).strokeWidth(2).strokeColor(0x883f72b5).fillColor(0x110000FF);
             this.currentLocationPrecision = this.googleMap.addCircle(circleOptions);
-
 
 
             if (isFollowingCurrentLocation())
@@ -1126,10 +1117,8 @@ public class ActivityMain extends ActivityBase {
                 @Override
                 public void run() {
                     updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
-
                 }
             });
-
 		}
 
         @Override
@@ -1139,7 +1128,6 @@ public class ActivityMain extends ActivityBase {
             super.onPause();
 
         }
-
 
 
         @Override
@@ -1161,7 +1149,6 @@ public class ActivityMain extends ActivityBase {
 		}
 
 
-
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
             if (v.getId()==R.id.contactsList) {
@@ -1169,16 +1156,11 @@ public class ActivityMain extends ActivityBase {
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
                 menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
-
             }
-
-
-
         }
 
         @Override
-        public boolean onContextItemSelected(MenuItem item)
-        {
+        public boolean onContextItemSelected(MenuItem item) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             if(info == null)
                 return true;
@@ -1197,11 +1179,9 @@ public class ActivityMain extends ActivityBase {
                     break;
                 case MENU_CONTACT_REQUEST_REPORT_LOCATION:
                     ((ActivityMain)getActivity()).requestReportLocation(c);
-
             }
             return true;
         }
-
 
 
         @Override
@@ -1226,7 +1206,6 @@ public class ActivityMain extends ActivityBase {
         public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
 			if (l == null)
 				return;
-
 
 
 			if ((l.getGeocoder() == null) && resolveGeocoder) {
@@ -1262,6 +1241,7 @@ public class ActivityMain extends ActivityBase {
 		public void onEventMainThread(Events.ContactUpdated e) {
             updateContactLocation(e.getContact(), true);
 		}
+
         public void onEventMainThread(Events.ContactAdded e) {
 
             listAdapter.addItem(e.getContact());
@@ -1273,7 +1253,6 @@ public class ActivityMain extends ActivityBase {
         }
 
     }
-
 
 
     public static class DetailsFragment extends Fragment  {
@@ -1416,7 +1395,6 @@ public class ActivityMain extends ActivityBase {
 			this.location = (TextView) v.findViewById(R.id.location);
 			this.accuracy = (TextView) v.findViewById(R.id.accuracy);
 			this.time = (TextView) v.findViewById(R.id.time);
-
 
 
             setHasOptionsMenu(true);
