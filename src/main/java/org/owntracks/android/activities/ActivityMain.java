@@ -174,191 +174,7 @@ public class ActivityMain extends ActivityBase {
        // toggle.syncState();
     }
 
-
-
-
-
-	public static class FragmentHandler extends Fragment {
-		private Class<?> current;
-		private Class<?> root;
-        private Drawer drawer;
-        public static final int DIRECTION_NONE = 0;
-        public static final int DIRECTION_FORWARD = 1;
-        public static final int DIRECTION_BACK = 2;
-
-        static FragmentHandler instance;
-
-		private static HashMap<Class<?>, Bundle> store = new HashMap<>();
-		private static ConcurrentHashMap<Class<?>, Fragment> fragments = new ConcurrentHashMap<>();
-
-		private static LinkedList<Class<?>> backStack = new LinkedList<>();
-
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setRetainInstance(false);
-		}
-
-		public static FragmentHandler getInstance() {
-			if (instance == null)
-				instance = new FragmentHandler();
-			return instance;
-		}
-
-        public Class<?> getCurrentFragmentClass() {
-            return current;
-        }
-
-		public Class<?> getRoot() {
-			return this.root;
-		}
-
-		public boolean atRoot() {
-			return getBackStackSize() == 0;
-		}
-
-		public Fragment showFragment(Class<?> c, Bundle extras,
-                                     AppCompatActivity fa, int direction) {
-			Fragment f = getFragment(c);
-			Fragment prev = getFragment(this.current);
-
-
-			handleFragmentArguments(c, extras);
-			FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
-
-            if(direction == DIRECTION_FORWARD)
-                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out  );
-            else if(direction == DIRECTION_BACK)
-                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
-
-            if ((prev != null) && prev.isAdded() && prev.isVisible())
-				ft.hide(prev);
-
-			if (f.isAdded())
-				ft.show(f);
-			else
-				ft.add(R.id.main, f, "f:tag:" + c.getName());
-
-
-
-			ft.commitAllowingStateLoss();
-			fa.getSupportFragmentManager().executePendingTransactions();
-
-            // Disable drawer indicator if we're not showing the root fragment
-            // Instead, this shows the back arrow and calls the drawer navigation listener where we can handle back
-            // or show the drawer manually
-            if(drawer != null && drawer.getActionBarDrawerToggle() != null)
-                drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(c == getRoot());
-
-            this.current = c;
-
-			return f;
-		}
-
-		// Shows the previous fragment
-		public Fragment back(AppCompatActivity fa) {
-			return showFragment(popBackStack(), null, fa, DIRECTION_BACK);
-		}
-
-		public Fragment forward(Class<?> c, Bundle extras, AppCompatActivity fa) {
-			pushBackStack(this.current);
-			return showFragment(c, extras, fa, DIRECTION_FORWARD);
-		}
-
-		public void init(Class<?> c, Drawer drawer) {
-			this.root = c;
-            this.drawer = drawer;
-		}
-
-		public void showCurrentOrRoot(AppCompatActivity fa) {
-			if (this.current != null)
-				showFragment(this.current, null, fa, DIRECTION_NONE);
-			else
-				showFragment(getRoot(), null, fa, DIRECTION_NONE);
-
-		}
-
-		private Bundle handleFragmentArguments(Class<?> c, Bundle extras) {
-			Bundle oldExtras = getBundle(c);
-
-			// overwrite old extras
-			if (extras != null) {
-				setBundle(c, extras);
-				return extras;
-
-				// return previously set extras
-			} else if (oldExtras != null) {
-				return oldExtras;
-			} else {
-				return null;
-			}
-		}
-
-		public Fragment getFragment(Class<?> c) {
-			if (c == null)
-				return null;
-
-			Object f = fragments.get(c);
-
-			if (f == null) {
-				try {
-					f = c.newInstance();
-				} catch (java.lang.InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				fragments.put(c, (Fragment) f);
-			}
-
-			return (Fragment) f;
-
-		}
-
-		public void removeAll(AppCompatActivity fa) {
-			if(fa == null)
-				return;
-
-			FragmentTransaction ft = fa.getSupportFragmentManager()
-					.beginTransaction();
-
-			for (Fragment f : fragments.values())
-				ft.remove(f);
-
-
-			ft.commitAllowingStateLoss();
-			fa.getSupportFragmentManager().executePendingTransactions();
-		}
-
-		public void setBundle(Class<?> c, Bundle b) {
-			store.put(c, b);
-		}
-
-		public Bundle getBundle(Class<?> c) {
-			return store.get(c);
-		}
-
-		public void pushBackStack(Class<?> c) {
-            if(backStack != null && backStack.size() > 0 && backStack.getLast() == c)
-                return;
-
-            backStack.addLast(c);
-		}
-        public void clearBackStack() {
-            backStack.clear();
-            return;
-        }
-		public Class<?> popBackStack() {
-            return backStack.removeLast();
-		}
-
-		public Integer getBackStackSize() {
-			return backStack.size();
-		}
-
-	}
-
-	@Override
 	public void onBackPressed() {
 		if (FragmentHandler.getInstance().atRoot())
 			super.onBackPressed();
@@ -393,7 +209,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(App.mapFragmentClass, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -403,7 +219,7 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapFragment) FragmentHandler.getInstance().forward(App.mapFragmentClass, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
     }
@@ -529,53 +345,223 @@ public class ActivityMain extends ActivityBase {
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
+    private void requestReportLocation(final Contact c) {
+        ServiceProxy.runOrBind(this, new Runnable() {
 
-	public static class  MapFragment extends Fragment implements StaticHandlerInterface {
-        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
-        private static final String KEY_NOTOPIC =          "+NOTOPIC+";
-        private static final String KEY_POSITION =         "+POSITION+";
-        private static final String KEY_ZOOM =              "+ZOOM+";
-        private static final int SELECT_UPDATE = 0;
-        private static final int SELECT_CENTER = 1;
-        private static final int SELECT_CENTER_AND_ZOOM = 2;
+            @Override
+            public void run() {
+                ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
+            }
+        });
+    }
+
+    public static class FragmentHandler extends Fragment {
+        public static final int DIRECTION_NONE = 0;
+        public static final int DIRECTION_FORWARD = 1;
+        public static final int DIRECTION_BACK = 2;
+        static FragmentHandler instance;
+        private static HashMap<Class<?>, Bundle> store = new HashMap<>();
+        private static ConcurrentHashMap<Class<?>, Fragment> fragments = new ConcurrentHashMap<>();
+        private static LinkedList<Class<?>> backStack = new LinkedList<>();
+        private Class<?> current;
+        private Class<?> root;
+        private Drawer drawer;
+
+        public static FragmentHandler getInstance() {
+            if (instance == null)
+                instance = new FragmentHandler();
+            return instance;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(false);
+        }
+
+        public Class<?> getCurrentFragmentClass() {
+            return current;
+        }
+
+        public Class<?> getRoot() {
+            return this.root;
+        }
+
+        public boolean atRoot() {
+            return getBackStackSize() == 0;
+        }
+
+        public Fragment showFragment(Class<?> c, Bundle extras,
+                                     AppCompatActivity fa, int direction) {
+            Fragment f = getFragment(c);
+            Fragment prev = getFragment(this.current);
 
 
-        private MapView mMapView;
-		private GoogleMap googleMap;
-		private LinearLayout selectedContactDetails;
+            handleFragmentArguments(c, extras);
+            FragmentTransaction ft = fa.getSupportFragmentManager().beginTransaction();
+
+            if (direction == DIRECTION_FORWARD)
+                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
+            else if (direction == DIRECTION_BACK)
+                ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
+
+            if ((prev != null) && prev.isAdded() && prev.isVisible())
+                ft.hide(prev);
+
+            if (f.isAdded())
+                ft.show(f);
+            else
+                ft.add(R.id.main, f, "f:tag:" + c.getName());
+
+
+            ft.commitAllowingStateLoss();
+            fa.getSupportFragmentManager().executePendingTransactions();
+
+            // Disable drawer indicator if we're not showing the root fragment
+            // Instead, this shows the back arrow and calls the drawer navigation listener where we can handle back
+            // or show the drawer manually
+            if (drawer != null && drawer.getActionBarDrawerToggle() != null)
+                drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(c == getRoot());
+
+            this.current = c;
+
+            return f;
+        }
+
+        // Shows the previous fragment
+        public Fragment back(AppCompatActivity fa) {
+            return showFragment(popBackStack(), null, fa, DIRECTION_BACK);
+        }
+
+        public Fragment forward(Class<?> c, Bundle extras, AppCompatActivity fa) {
+            pushBackStack(this.current);
+            return showFragment(c, extras, fa, DIRECTION_FORWARD);
+        }
+
+        public void init(Class<?> c, Drawer drawer) {
+            this.root = c;
+            this.drawer = drawer;
+        }
+
+        public void showCurrentOrRoot(AppCompatActivity fa) {
+            if (this.current != null)
+                showFragment(this.current, null, fa, DIRECTION_NONE);
+            else
+                showFragment(getRoot(), null, fa, DIRECTION_NONE);
+
+        }
+
+        private Bundle handleFragmentArguments(Class<?> c, Bundle extras) {
+            Bundle oldExtras = getBundle(c);
+
+            // overwrite old extras
+            if (extras != null) {
+                setBundle(c, extras);
+                return extras;
+
+                // return previously set extras
+            } else if (oldExtras != null) {
+                return oldExtras;
+            } else {
+                return null;
+            }
+        }
+
+        public Fragment getFragment(Class<?> c) {
+            if (c == null)
+                return null;
+
+            Object f = fragments.get(c);
+
+            if (f == null) {
+                try {
+                    f = c.newInstance();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                fragments.put(c, (Fragment) f);
+            }
+
+            return (Fragment) f;
+
+        }
+
+        public void removeAll(AppCompatActivity fa) {
+            if (fa == null)
+                return;
+
+            FragmentTransaction ft = fa.getSupportFragmentManager()
+                    .beginTransaction();
+
+            for (Fragment f : fragments.values())
+                ft.remove(f);
+
+
+            ft.commitAllowingStateLoss();
+            fa.getSupportFragmentManager().executePendingTransactions();
+        }
+
+        public void setBundle(Class<?> c, Bundle b) {
+            store.put(c, b);
+        }
+
+        public Bundle getBundle(Class<?> c) {
+            return store.get(c);
+        }
+
+        public void pushBackStack(Class<?> c) {
+            if (backStack != null && backStack.size() > 0 && backStack.getLast() == c)
+                return;
+
+            backStack.addLast(c);
+        }
+
+        public void clearBackStack() {
+            backStack.clear();
+            return;
+        }
+
+        public Class<?> popBackStack() {
+            return backStack.removeLast();
+        }
+
+        public Integer getBackStackSize() {
+            return backStack.size();
+        }
+
+    }
+
+    public static class GoogleMapFragment extends MapFragment {
+
 		private TextView selectedContactName;
 		private TextView selectedContactLocation;
 		private ImageView selectedContactImage;
+
+        private MapView mMapView;
+        private GoogleMap googleMap;
 		private Map<String, Contact> markerToContacts;
-        private Menu mMenu;
-        private static Handler handler;
-        private MenuInflater mInflater;
         private BitmapDescriptor currentLocationMarkerBitmap;
         private Marker currentLocationMarker;
         private Circle currentLocationPrecision;
 
-        public static MapFragment getInstance(Bundle extras) {
-			MapFragment instance = new MapFragment();
-			instance.setArguments(extras);
-			return instance;
+		@Override
+        public void onPause() {
+            this.mMapView.onPause();
+            super.onPause();
 		}
 
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			handler = new StaticHandler(this);
+        public void onDestroy() {
+            this.mMapView.onDestroy();
+            super.onDestroy();
 		}
 
 		@Override
-		public void onStart() {
-			super.onStart();
-			EventBus.getDefault().registerSticky(this);
-		}
-
-		@Override
-		public void onStop() {
-			EventBus.getDefault().unregister(this);
-			super.onStop();
+        public void onLowMemory() {
+            this.mMapView.onLowMemory();
+            super.onLowMemory();
 		}
 
 		@Override
@@ -612,24 +598,6 @@ public class ActivityMain extends ActivityBase {
         }
 
 		@Override
-		public void onPause() {
-			this.mMapView.onPause();
-			super.onPause();
-		}
-
-		@Override
-		public void onDestroy() {
-			this.mMapView.onDestroy();
-			super.onDestroy();
-		}
-
-		@Override
-		public void onLowMemory() {
-			this.mMapView.onLowMemory();
-			super.onLowMemory();
-		}
-
-		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 			View v = inflater.inflate(R.layout.fragment_map, container, false);
@@ -662,7 +630,9 @@ public class ActivityMain extends ActivityBase {
 			this.googleMap = this.mMapView.getMap();
 
 			// Check if we were successful in obtaining the map.
-			if (this.mMapView != null) {
+            if (this.mMapView != null && this.googleMap != null) {
+                this.currentLocationMarkerBitmap = BitmapDescriptorFactory.fromBitmap(bitmap);
+
                 //MapsInitializer.initialize(getActivity());
 				setUpMap();
 			}
@@ -674,20 +644,8 @@ public class ActivityMain extends ActivityBase {
 		}
 
         @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-                if(menu != null) {
-                    mMenu = menu;
-                    mInflater = inflater;
-                } else if(mMenu == null || mInflater == null) {
-                    return;
-                }
-
-                mMenu.clear();
-                mInflater.inflate(R.menu.fragment_map, mMenu);
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            super.onCreateContextMenu(menu, v, menuInfo);
             if (v.getId()==R.id.contactDetails) {
                 menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
 
@@ -695,63 +653,8 @@ public class ActivityMain extends ActivityBase {
                     menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
                 else
                     menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
-
-                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
-                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
-                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
-
-
             }
         }
-
-
-        @Override
-        public boolean onContextItemSelected(MenuItem item)
-        {
-            Contact c = getSelectedContact();
-            switch (item.getItemId()) {
-                case MENU_CONTACT_SHOW:
-                    selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
-                    return true;
-                case MENU_CONTACT_FOLLOW:
-                    selectContact(c, MapFragment.SELECT_CENTER, true, true);
-                    return true;
-                case MENU_CONTACT_UNFOLLOW:
-                    setFollowingSelectedContact(false);
-                    return true;
-                case MENU_CONTACT_DETAILS:
-                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
-                    return true;
-                case MENU_CONTACT_NAVIGATE:
-                    ((ActivityMain)getActivity()).launchNavigation(c);
-                    return true;
-                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
-                    ((ActivityMain)getActivity()).requestReportLocation(c);
-                    return true;
-            }
-            return false;
-
-        }
-
-
-		@Override
-		public void onHiddenChanged(boolean hidden) {
-			super.onHiddenChanged(hidden);
-			if (hidden)
-				onHide();
-			else
-				onShow();
-			super.onHiddenChanged(hidden);
-		}
-
-		private void onShow() {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-            onCreateOptionsMenu(mMenu, mInflater);
-
-        }
-
-		private void onHide() {
-		}
 
 		private void setUpMap() {
 			this.googleMap.setIndoorEnabled(false);
@@ -772,7 +675,7 @@ public class ActivityMain extends ActivityBase {
 						@Override
 						public boolean onMarkerClick(Marker m) {
                             setFollowingSelectedContact(false);
-							Contact c = MapFragment.this.markerToContacts.get(m.getId());
+                            Contact c = GoogleMapFragment.this.markerToContacts.get(m.getId());
 
 							if (c != null)
 								selectContact(c, SELECT_UPDATE, false,true);
@@ -791,14 +694,6 @@ public class ActivityMain extends ActivityBase {
                         }
                     });
 		}
-
-
-        public void showSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.VISIBLE);
-        }
-        public void hideSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.GONE);
-        }
 
         public void centerMap(LatLng latlon, int centerMode, boolean animate) {
             centerMap(latlon, centerMode, animate, -1);
@@ -825,7 +720,11 @@ public class ActivityMain extends ActivityBase {
             removeContactMarker(c);
 
 			Marker m = this.googleMap.addMarker(
-                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getFaceDescriptor()).anchor(0.5F, 0.5F));
+                    new MarkerOptions()
+                            .position(c.getLocation()
+                                    .getLatLng())
+                                    //              .icon(c.getFaceDescriptor())
+                            .anchor(0.5F, 0.5F));
 			this.markerToContacts.put(m.getId(), c);
 			c.setMarker(m);
 
@@ -855,7 +754,40 @@ public class ActivityMain extends ActivityBase {
             hideSelectedContactDetails();
         }
 
+        public void clearMap() {
+            markerToContacts.clear();
+            mMapView.getMap().clear();
+            hideSelectedContactDetails();
+        }
+
 		@Override
+        public void onSaveInstanceState(Bundle b) {
+            super.onSaveInstanceState(b);
+            b.putParcelable(KEY_POSITION, this.mMapView.getMap().getCameraPosition());
+            FragmentHandler.getInstance().setBundle(MapFragment.class, b);
+        }
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item) {
+            if (super.onContextItemSelected(item)) { //has been handled already in the superclass
+                return true;
+            }
+            Contact c = getSelectedContact();
+            switch (item.getItemId()) {
+                case MENU_CONTACT_SHOW:
+                    selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
+                    return true;
+                case MENU_CONTACT_FOLLOW:
+                    selectContact(c, MapFragment.SELECT_CENTER, true, true);
+                    return true;
+                case MENU_CONTACT_UNFOLLOW:
+                    setFollowingSelectedContact(false);
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
 		public void handleHandlerMessage(Message msg) {
 
 			if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null)) {
@@ -869,6 +801,7 @@ public class ActivityMain extends ActivityBase {
 		}
 
         public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate) {
+            super. selectCurrentLocation (centerMode,follow,animate);
             selectCurrentLocation(centerMode, follow, animate, -1);
         }
 
@@ -895,7 +828,9 @@ public class ActivityMain extends ActivityBase {
 
         }
 
+        @Override
         public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
+            super.selectContact(c,centerMode,follow,animate);
             selectContact(c, centerMode, follow, animate, -1);
         }
 
@@ -927,18 +862,22 @@ public class ActivityMain extends ActivityBase {
 
 		}
 
+        @Override
 		public void onEventMainThread(Events.ContactUpdated e) {
             updateContactLocation(e.getContact());
 		}
 
+        @Override
         public void onEventMainThread(Events.ContactAdded e) {
             updateContactLocation(e.getContact());
         }
 
+        @Override
         public void onEventMainThread(Events.ContactRemoved e) {
             removeContactLocation(e.getContact());
         }
 
+        @Override
         public void onEventMainThread(Events.CurrentLocationUpdated e) {
             Log.v(TAG,"CurrentLocationUpdated" );
             if(currentLocationMarker != null)
@@ -956,20 +895,176 @@ public class ActivityMain extends ActivityBase {
 				selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, true);
 		}
 
+        @Override
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             if(e.getState() == ServiceBroker.State.CONNECTING)
                 clearMap();
 
         }
 
+        @Override
         public void onEventMainThread(Events.ModeChanged e) {
             clearMap();
         }
+    }
 
-        public void clearMap() {
-                markerToContacts.clear();
-                mMapView.getMap().clear();
-                hideSelectedContactDetails();
+    public static class MapFragment extends Fragment implements StaticHandlerInterface {
+        protected static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
+        protected static final String KEY_NOTOPIC = "+NOTOPIC+";
+        protected static final String KEY_POSITION = "+POSITION+";
+        protected static final String KEY_ZOOM = "+ZOOM+";
+        protected static final int SELECT_UPDATE = 0;
+        protected static final int SELECT_CENTER = 1;
+        protected static final int SELECT_CENTER_AND_ZOOM = 2;
+        protected static Handler handler;
+        protected LinearLayout selectedContactDetails;
+        private Menu mMenu;
+        private MenuInflater mInflater;
+
+        public static MapFragment getInstance(Bundle extras) {
+            MapFragment instance = new MapFragment();
+            instance.setArguments(extras);
+            return instance;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            handler = new StaticHandler(this);
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().registerSticky(this);
+        }
+
+        @Override
+        public void onStop() {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+        }
+
+        @Override
+        public void onLowMemory() {
+            super.onLowMemory();
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            return super.onCreateView(inflater, container, savedInstanceState);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            if (menu != null) {
+                mMenu = menu;
+                mInflater = inflater;
+            } else if (mMenu == null || mInflater == null) {
+                return;
+            }
+
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_map, mMenu);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            if (v.getId() == R.id.contactDetails) {
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
+                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
+            }
+        }
+
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item) {
+            Contact c = getSelectedContact();
+            switch (item.getItemId()) {
+                case MENU_CONTACT_UNFOLLOW:
+                    setFollowingSelectedContact(false);
+                    return true;
+                case MENU_CONTACT_DETAILS:
+                    ((ActivityMain) getActivity()).transitionToContactDetails(c);
+                    return true;
+                case MENU_CONTACT_NAVIGATE:
+                    ((ActivityMain) getActivity()).launchNavigation(c);
+                    return true;
+                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
+                    ((ActivityMain) getActivity()).requestReportLocation(c);
+                    return true;
+            }
+            return false;
+
+        }
+
+
+        @Override
+        public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            if (hidden)
+                onHide();
+            else
+                onShow();
+            super.onHiddenChanged(hidden);
+        }
+
+        protected void onShow() {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            onCreateOptionsMenu(mMenu, mInflater);
+
+        }
+
+        private void onHide() {
+        }
+
+
+        public void showSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.VISIBLE);
+        }
+
+        public void hideSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void handleHandlerMessage(Message msg) {
+
+        }
+
+
+        public void onEventMainThread(Events.ContactUpdated e) {
+        }
+
+        public void onEventMainThread(Events.ContactAdded e) {
+        }
+
+        public void onEventMainThread(Events.ContactRemoved e) {
+        }
+
+        public void onEventMainThread(Events.CurrentLocationUpdated e) {
+        }
+
+        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+        }
+
+        public void onEventMainThread(Events.ModeChanged e) {
         }
 
         public Contact getSelectedContact() {
@@ -980,34 +1075,25 @@ public class ActivityMain extends ActivityBase {
             return Preferences.getSelectedContactTopic().equals(KEY_CURRENT_LOCATION);
         }
 
-//		public boolean hasCurrentLocation() {
-//            return this.currentLocation != null;
-//		}
+        public boolean isFollowingSelectedContact() {
+            return Preferences.getFollowingSelectedContact();
+        }
 
         public void setFollowingSelectedContact(boolean followingSelectedContact) {
             Preferences.setFollowingSelectedContact(followingSelectedContact);
         }
 
-        public boolean isFollowingSelectedContact() {
-            return Preferences.getFollowingSelectedContact();
-        }
-
         @Override
         public void onSaveInstanceState(Bundle b) {
             super.onSaveInstanceState(b);
-            b.putParcelable(KEY_POSITION, this.mMapView.getMap().getCameraPosition());
-            FragmentHandler.getInstance().setBundle(MapFragment.class, b);
         }
-    }
 
-    private void requestReportLocation(final Contact c) {
-        ServiceProxy.runOrBind(this, new Runnable() {
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
 
-            @Override
-            public void run() {
-            ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
             }
-        });
+
+        public void selectCurrentLocation(int centerMode, boolean follow, boolean animate) {
+        }
     }
 
     public static class ContactsFragment extends Fragment implements
@@ -1152,7 +1238,9 @@ public class ActivityMain extends ActivityBase {
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
             if (v.getId()==R.id.contactsList) {
+                if(App.mapFragmentClass ==GoogleMapFragment.class){
                 menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+                }
                 menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 2, R.string.menuContactDetails);
                 menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 3, R.string.menuContactNavigate);
                 menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);

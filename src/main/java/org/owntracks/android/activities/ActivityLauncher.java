@@ -73,9 +73,7 @@ public class ActivityLauncher extends ActivityBase {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
 		playServicesAvailable = ConnectionResult.SUCCESS == resultCode;
 		if (playServicesAvailable) {
-//            App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
-			App.mapFragmentClass=ActivityMain.MapFragment.class;
-
+            App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
 		} else {
             Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
             showPlayServicesNotAvilableNotification();
