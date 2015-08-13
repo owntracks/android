@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityMain;
 import org.owntracks.android.activities.ActivityMessages;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
@@ -28,6 +29,7 @@ import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -415,11 +417,11 @@ public class ServiceApplication implements ProxyableService,
 		NotificationManager nm = (NotificationManager) App.getContext()
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		//nb.setContentTitle(App.getContext().getString(R.string.app_name))
-		//		.setSmallIcon(R.drawable.ic_notification)
-		//		.setContentText("Google Play Services are not available")
-				//.setPriority(NotificationCompat.PRIORITY_MIN);
-		//nm.notify(Defaults.NOTIFCATION_ID, nb.build());
+		nb.setContentTitle(App.getContext().getString(R.string.app_name))
+				.setSmallIcon(R.drawable.ic_notification)
+				.setContentText("Google Play Services are not available")
+				.setPriority(NotificationCompat.PRIORITY_MIN);
+		nm.notify(NOTIFCATION_ID, nb.build());
 
 	}
 
@@ -628,13 +630,45 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public static boolean checkPlayServices() {
-		playServicesAvailable = ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
+		playServicesAvailable = ConnectionResult.SUCCESS == resultCode;
+		if (playServicesAvailable) {
+            App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
+        } else {
+            Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
+            showPlayServicesNotAvilableNotification();
 
-		if (!playServicesAvailable)
-			showPlayServicesNotAvilableNotification();
 
-		return playServicesAvailable;
+			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                Log.v(TAG, "Showing error recovery dialog");
 
+/*
+				Dialog errorDialog = GooglePlayServicesUtil
+						.getErrorDialog(resultCode, this,
+                                ActivityLauncher.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+
+				if (errorDialog != null) {
+					// Log.v(TAG, "Showing error recovery dialog");
+					ErrorDialogFragment errorFragment = new ErrorDialogFragment();
+					errorFragment.setDialog(errorDialog);
+
+					FragmentTransaction transaction = getSupportFragmentManager()
+							.beginTransaction();
+					transaction.add(errorFragment,
+							"playServicesErrorFragmentEnable");
+					transaction.commitAllowingStateLoss();
+				}
+				*/
+			} else {
+	//			showQuitError();
+			}
+
+
+        }
+
+        playServicesAvailable=true;
+
+        return playServicesAvailable;
 	}
 
 	public void updateAllContacts() {

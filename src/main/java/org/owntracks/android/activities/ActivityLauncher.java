@@ -26,12 +26,11 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class ActivityLauncher extends ActivityBase {
 	private static final String TAG = "ActivityLauncher";
 
-	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+	public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	private boolean autostart = false;
 
 	private ServiceConnection serviceApplicationConnection;
 	private Context context;
-	private boolean playServicesOk = false;
 
 
 	public static class ErrorDialogFragment extends DialogFragment {
@@ -74,48 +73,8 @@ public class ActivityLauncher extends ActivityBase {
 	protected void onResume() {
 		super.onResume();
 
-		checkPlayServices();
-
-		if (this.playServicesOk)
+		if (ServiceApplication.checkPlayServices())
 			launchChecksComplete();
-	}
-
-	private void checkPlayServices() {
-
-
-		this.playServicesOk = true;
-		if (ServiceApplication.checkPlayServices()) {
-			this.playServicesOk = true;
-			App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
-		} else {
-			int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-			Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
-			this.playServicesOk = true;
-
-/*
-			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-
-				Dialog errorDialog = GooglePlayServicesUtil
-						.getErrorDialog(resultCode, this,
-								CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-				if (errorDialog != null) {
-					// Log.v(TAG, "Showing error recovery dialog");
-					ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-					errorFragment.setDialog(errorDialog);
-
-					FragmentTransaction transaction = getSupportFragmentManager()
-							.beginTransaction();
-					transaction.add(errorFragment,
-							"playServicesErrorFragmentEnable");
-					transaction.commitAllowingStateLoss();
-				}
-			} else {
-				showQuitError();
-			}
-			*/
-		}
-
 	}
 
 	private void showQuitError() {
@@ -146,7 +105,7 @@ public class ActivityLauncher extends ActivityBase {
 			if (resultCode != RESULT_OK) {
 				Toast.makeText(this, "Google Play Services must be installed.",
 						Toast.LENGTH_SHORT).show();
-				checkPlayServices();
+				ServiceApplication.checkPlayServices();
 			} else {
 				Log.v(TAG, "Play services activated successfully");
 			}
