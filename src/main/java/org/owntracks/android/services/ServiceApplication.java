@@ -78,7 +78,7 @@ public class ServiceApplication implements ProxyableService,
 	private static NotificationCompat.Builder notificationBuilder;
     private static NotificationCompat.Builder notificationBuilderTicker;
 
-    private GeocodableLocation lastPublishedLocation;
+	private GeocodableLocation lastPublishedLocation;
 	private Date lastPublishedLocationTime;
 	private boolean even = false;
 	private Handler handler;
@@ -607,7 +607,7 @@ public class ServiceApplication implements ProxyableService,
 		}
 	}
 
-    public void updateAllContacts() {
+	public void updateAllContacts() {
         for (Contact c : App.getCachedContacts().values()) {
             resolveContact(c);
             EventBus.getDefault().post(new Events.ContactUpdated(c));
