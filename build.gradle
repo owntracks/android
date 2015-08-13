@@ -58,6 +58,8 @@ dependencies {
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
 
 
+    compile 'com.mapzen.android:lost:1.0.1'
+
 }
 
 android {

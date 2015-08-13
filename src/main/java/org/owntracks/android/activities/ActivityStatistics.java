@@ -31,6 +31,7 @@ public class ActivityStatistics extends ActivityBase {
         Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
