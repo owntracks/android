@@ -6,12 +6,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityMain;
 import org.owntracks.android.activities.ActivityMessages;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
@@ -29,11 +27,9 @@ import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -48,14 +44,11 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.Geofence;
 
 import de.greenrobot.dao.query.Query;
@@ -85,8 +78,7 @@ public class ServiceApplication implements ProxyableService,
 	private static NotificationCompat.Builder notificationBuilder;
     private static NotificationCompat.Builder notificationBuilderTicker;
 
-    private static boolean playServicesAvailable;
-	private GeocodableLocation lastPublishedLocation;
+    private GeocodableLocation lastPublishedLocation;
 	private Date lastPublishedLocationTime;
 	private boolean even = false;
 	private Handler handler;
@@ -104,7 +96,7 @@ public class ServiceApplication implements ProxyableService,
     @Override
 	public void onCreate(ServiceProxy context) {
 		this.context = context;
-		checkPlayServices();
+		ActivityLauncher.checkPlayServices(null);
         this.notificationThread = new HandlerThread("NOTIFICATIONTHREAD");
         this.notificationThread.start();
         this.notificationHandler = new Handler(this.notificationThread.getLooper());
@@ -384,7 +376,7 @@ public class ServiceApplication implements ProxyableService,
 		if (this.notificationManager != null)
 			this.notificationManager.cancelAll();
 
-		if (Preferences.getNotification() || !playServicesAvailable)
+		if (Preferences.getNotification() || !ActivityLauncher.playServicesAvailable)
 			createNotification();
 
 	}
@@ -411,21 +403,7 @@ public class ServiceApplication implements ProxyableService,
 		updateNotification();
 	}
 
-	private static void showPlayServicesNotAvilableNotification() {
-		NotificationCompat.Builder nb = new NotificationCompat.Builder(
-				App.getContext());
-		NotificationManager nm = (NotificationManager) App.getContext()
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		nb.setContentTitle(App.getContext().getString(R.string.app_name))
-				.setSmallIcon(R.drawable.ic_notification)
-				.setContentText("Google Play Services are not available")
-				.setPriority(NotificationCompat.PRIORITY_MIN);
-		nm.notify(NOTIFCATION_ID, nb.build());
-
-	}
-
-	public void updateTicker(String text, boolean vibrate) {
+    public void updateTicker(String text, boolean vibrate) {
         Log.v(TAG, "vibrate: " + vibrate);
         // API >= 21 doesn't have a ticker
         if(android.os.Build.VERSION.SDK_INT >= 21) {
@@ -469,7 +447,7 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateNotification() {
-		if (!Preferences.getNotification() || !playServicesAvailable)
+		if (!Preferences.getNotification() || !ActivityLauncher.playServicesAvailable)
 			return;
 
 		String title;
@@ -629,49 +607,7 @@ public class ServiceApplication implements ProxyableService,
 		}
 	}
 
-	public static boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
-		playServicesAvailable = ConnectionResult.SUCCESS == resultCode;
-		if (playServicesAvailable) {
-            App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
-        } else {
-            Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
-            showPlayServicesNotAvilableNotification();
-
-
-			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                Log.v(TAG, "Showing error recovery dialog");
-
-/*
-				Dialog errorDialog = GooglePlayServicesUtil
-						.getErrorDialog(resultCode, this,
-                                ActivityLauncher.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-				if (errorDialog != null) {
-					// Log.v(TAG, "Showing error recovery dialog");
-					ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-					errorFragment.setDialog(errorDialog);
-
-					FragmentTransaction transaction = getSupportFragmentManager()
-							.beginTransaction();
-					transaction.add(errorFragment,
-							"playServicesErrorFragmentEnable");
-					transaction.commitAllowingStateLoss();
-				}
-				*/
-			} else {
-	//			showQuitError();
-			}
-
-
-        }
-
-        playServicesAvailable=true;
-
-        return playServicesAvailable;
-	}
-
-	public void updateAllContacts() {
+    public void updateAllContacts() {
         for (Contact c : App.getCachedContacts().values()) {
             resolveContact(c);
             EventBus.getDefault().post(new Events.ContactUpdated(c));

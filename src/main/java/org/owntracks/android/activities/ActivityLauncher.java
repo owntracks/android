@@ -7,6 +7,7 @@ import org.owntracks.android.services.ServiceProxy;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,21 +17,84 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class ActivityLauncher extends ActivityBase {
 	private static final String TAG = "ActivityLauncher";
 
 	public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+	public static boolean playServicesAvailable;
 	private boolean autostart = false;
 
 	private ServiceConnection serviceApplicationConnection;
 	private Context context;
+
+	private static void showPlayServicesNotAvilableNotification() {
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(
+				App.getContext());
+		NotificationManager nm = (NotificationManager) App.getContext()
+				.getSystemService(NOTIFICATION_SERVICE);
+
+		nb.setContentTitle(App.getContext().getString(R.string.app_name))
+				.setSmallIcon(R.drawable.ic_notification)
+				.setContentText("Google Play Services are not available")
+				.setPriority(NotificationCompat.PRIORITY_MIN);
+		nm.notify(ServiceApplication.NOTIFCATION_ID, nb.build());
+
+	}
+
+	public void showGooglePlayServicesError(int resultCode){
+		Dialog errorDialog = GooglePlayServicesUtil
+				.getErrorDialog(resultCode, this,
+						ActivityLauncher.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+
+		if (errorDialog != null) {
+			// Log.v(TAG, "Showing error recovery dialog");
+			ErrorDialogFragment errorFragment = new ErrorDialogFragment();
+			errorFragment.setDialog(errorDialog);
+
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+			transaction.add(errorFragment,
+					"playServicesErrorFragmentEnable");
+			transaction.commitAllowingStateLoss();
+		}
+	}
+
+
+
+	public static boolean checkPlayServices(ActivityLauncher caller) {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(App.getContext());
+		playServicesAvailable = ConnectionResult.SUCCESS == resultCode;
+		if (playServicesAvailable) {
+            App.mapFragmentClass=ActivityMain.GoogleMapFragment.class;
+        } else {
+            Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
+            showPlayServicesNotAvilableNotification();
+
+			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                Log.v(TAG, "Showing error recovery dialog");
+				if(caller!=null){
+					caller.showGooglePlayServicesError(resultCode);
+				}
+			} else {
+				if(caller!=null) {
+
+					caller.showQuitError();
+				}
+			}
+        }
+
+        playServicesAvailable=true;
+
+        return playServicesAvailable;
+	}
 
 
 	public static class ErrorDialogFragment extends DialogFragment {
@@ -73,7 +137,7 @@ public class ActivityLauncher extends ActivityBase {
 	protected void onResume() {
 		super.onResume();
 
-		if (ServiceApplication.checkPlayServices())
+		if (checkPlayServices(this))
 			launchChecksComplete();
 	}
 
@@ -105,7 +169,7 @@ public class ActivityLauncher extends ActivityBase {
 			if (resultCode != RESULT_OK) {
 				Toast.makeText(this, "Google Play Services must be installed.",
 						Toast.LENGTH_SHORT).show();
-				ServiceApplication.checkPlayServices();
+				checkPlayServices(this);
 			} else {
 				Log.v(TAG, "Play services activated successfully");
 			}
