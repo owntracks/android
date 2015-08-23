@@ -1,16 +1,17 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.5.20
->Release date: 2015-08-XX
+## OwnTracks 0.5.21
+>Release date: 2015-XX-XX
 * [FIX] #214 - Hosted .otrc file not associated with OwnTracks app
 * [FIX] #235 - Notification vibrate switch ignored
 * [FIX] #234 - Removed statistics page when not a debug build
 * [FIX] #209 - Added restart button after importing preferences
-* [FIX] #232 - Statistics page layout
-* [FIX] #233 - Export page layout
+* [FIX] #236 - Disconnection with similar devices due to equal MQTT client IDs. Reported and fixed by @friesenkiwi. 
+* [FIX] #232 - Statistics page layout could overflow on Android 4.4.x. Reported by @stylpen.
+* [FIX] #233 - Export page layout could overflow on Android 4.4.x. Reported by @stylpen.
 
-## OwnTracks 0.5.20
->Release date: 2015-08-07
+## OwnTracks 0.5.20 
+>Release date: 2015-08-07 for beta testers
 * [FIX] #219 - UserID and DeviceID must be mandatory
 * [FIX] #222 - Manual Entry of Waypoints not allowing negative sign
 * [FIX] #225 - Waypoint description does not get imported
@@ -18,8 +19,8 @@ OwnTracks Android App Release Notes
 * [NEW] Support for password protected client certificates
 * [NEW] File picker for broker CA and client certificates
 
-## OwnTracks 0.5.19
->Release date: 2015-07-19
+## OwnTracks 0.5.19 
+>Release date: 2015-07-19for alpha testers
 * [FIX] ReconnectHandler was not started correctly when a connection error occured
 * [FIX] DeviceId field default was not updated correctly 
 * [NEW] Added notifications for received messages
@@ -28,7 +29,7 @@ OwnTracks Android App Release Notes
 
 
 ## OwnTracks 0.5.18
->Release date: 2015-07-06
+>Release date: 2015-07-06 for alpha testers
 * [FIX] ReconnectHandler was not started correctly 
 * [FIX] Queued messages were not send after a reconnect
 * [FIX] ServiceLocator onLocationChange statistics counter was not reset correctly
@@ -37,7 +38,7 @@ OwnTracks Android App Release Notes
 * [NEW] Added a marker that display the current location on the map 
 
 ## OwnTracks 0.5.17
->Release date: 2015-06-25
+>Release date: 2015-06-25 for alpha testers
 * [FIX] Fixed disorted message image backgrounds on higher DPI devices
 * [FIX] #212 - Open browser when message with URL attribute is clicked
 * [FIX] Message view was not updated correctly if a message was deleted
@@ -49,14 +50,14 @@ OwnTracks Android App Release Notes
 * [NEW] Waypoints list now updates in realtime
 
 ## OwnTracks 0.5.16
->Release date: 2015-06-24
+>Release date: 2015-06-24 for alpha testers
 * [NEW] Added support for GehHash based messages
 * [NEW] Added support for broadcast messages 
 * [NEW] Added support for direct messages
 * [NEW] Added support client certificates in private mode
 
 ## OwnTracks 0.5.15
->Release date: 2015-06-18
+>Release date: 2015-06-18 for alpha testers
 * [FIX] Messages in hosted mode were not queued because they defaulted to QoS 0. Changed that to QoS 1. 
 * [FIX] Messages were not inserted into the queue (derp!)
 * [FIX] Messages were not queued correctly when the MQTT client was not initialized previously
