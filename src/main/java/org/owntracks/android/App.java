@@ -30,6 +30,8 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
@@ -57,13 +59,17 @@ public class App extends Application {
 	public void onCreate() {
 		super.onCreate();
         instance = this;
+
+        if(BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+        } else {
+            Fabric.with(this, new Crashlytics(), new Answers());
+        }
+
         Preferences preferences = new Preferences(this);
         Statistics.setTime(this, Statistics.APP_START);
-        if(!BuildConfig.DEBUG) {
-            Log.v(TAG, "Fabric.io crash reporting enabled");
-            Fabric.with(this, new Crashlytics());
-            //final Fabric fabric = new Fabric.Builder(this).kits(new Crashlytics()).build();
-        }
+
+        Answers.getInstance().logCustom(new CustomEvent("App started").putCustomAttribute("mode", Preferences.getModeId()));
 
         DaoMaster.OpenHelper helper = new DaoMaster.OpenHelper(this, "org.owntracks.android.db", null) {
             @Override

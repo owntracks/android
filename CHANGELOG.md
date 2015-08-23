@@ -1,6 +1,15 @@
 OwnTracks Android App Release Notes
 ===================================
 ## OwnTracks 0.5.20
+>Release date: 2015-08-XX
+* [FIX] #214 - Hosted .otrc file not associated with OwnTracks app
+* [FIX] #235 - Notification vibrate switch ignored
+* [FIX] #234 - Removed statistics page when not a debug build
+* [FIX] #209 - Added restart button after importing preferences
+* [FIX] #232 - Statistics page layout
+* [FIX] #233 - Export page layout
+
+## OwnTracks 0.5.20
 >Release date: 2015-08-07
 * [FIX] #219 - UserID and DeviceID must be mandatory
 * [FIX] #222 - Manual Entry of Waypoints not allowing negative sign

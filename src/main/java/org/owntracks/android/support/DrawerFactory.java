@@ -16,6 +16,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityPreferences;
 
@@ -42,10 +43,13 @@ public class DrawerFactory {
                     new PrimaryDrawerItem().withName("Locations").withIdentifier(R.string.idLocations).withTag("loc").withIcon(FontAwesome.Icon.faw_map_marker),
                     new PrimaryDrawerItem().withName("Messages").withIdentifier(R.string.idPager).withTag("pag").withIcon(FontAwesome.Icon.faw_bell),
                     new PrimaryDrawerItem().withName("Waypoints").withIdentifier(R.string.idWaypoints).withTag("way").withIcon(FontAwesome.Icon.faw_street_view)
-            )
-            .addStickyDrawerItems(new SecondaryDrawerItem().withName("Statistics").withIdentifier(R.string.idStatistics).withTag("stat").withIcon(FontAwesome.Icon.faw_bar_chart))
+            );
 
-            .addStickyDrawerItems(new SecondaryDrawerItem().withName("Preferences").withIdentifier(R.string.idSettings).withTag("set").withIcon(FontAwesome.Icon.faw_cog))
+            if( BuildConfig.DEBUG) {
+                builder.addStickyDrawerItems(new SecondaryDrawerItem().withName("Statistics").withIdentifier(R.string.idStatistics).withTag("stat").withIcon(FontAwesome.Icon.faw_bar_chart));
+            }
+
+            builder.addStickyDrawerItems(new SecondaryDrawerItem().withName("Preferences").withIdentifier(R.string.idSettings).withTag("set").withIcon(FontAwesome.Icon.faw_cog))
             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                 @Override
                 public boolean onItemClick(final AdapterView<?> parent, final View view, final int position, final long id, final IDrawerItem drawerItem) {
