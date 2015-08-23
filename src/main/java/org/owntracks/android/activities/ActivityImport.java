@@ -1,11 +1,15 @@
 package org.owntracks.android.activities;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -104,7 +109,22 @@ public class ActivityImport extends ActivityBase {
         Log.v(TAG, "Importing configuration. Brace for impact.");
         Preferences.fromJsonObject(configJSON);
 
-        importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
+       // importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
+        Snackbar s = Snackbar.make(findViewById(R.id.frame), R.string.snackbarImportCompleted, Snackbar.LENGTH_LONG);
+        s.setAction("Restart", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.e(TAG, "restarting app");
+                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0, i, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                AlarmManager manager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                manager.set(AlarmManager.RTC, System.currentTimeMillis() + 1, intent);
+                System.exit(2);
+
+            }
+        });
+        s.show();
 
 
     }

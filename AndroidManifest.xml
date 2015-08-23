@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0520"
-    android:versionName="0.5.20" >
+    android:versionCode="0521"
+    android:versionName="0.5.21" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -126,6 +126,12 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/json" />
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

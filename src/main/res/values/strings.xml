@@ -134,7 +134,7 @@
     <string name="exportIncludeDeviceIdentiaction">Device identification</string>
     <string name="exportIncludeUsernamePassword">Username and password</string>
     <string name="exportIncludeBrokerConnection">Connection</string>
-    <string name="exportIncludes">Sensitive information to include in export</string>
+    <string name="exportIncludes">Select data to include in the export</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Export preferences</string>
     <string name="exportIncludeWaypoints">Waypoints</string>
@@ -234,6 +234,10 @@
     <string name="preferencesMessages">Messaging</string>
     <string name="connectivityDisconnectedConfigIncomplete">Disconnected: Configuration incomplete</string>
     <string name="none">None</string>
+    <string name="exportPlaceholder">To export your preferences, hit the button above</string>
+    <string name="snackbarExportCompleted">Preferences exported</string>
+    <string name="snackbarExportFailed">Preferences export failed</string>
+    <string name="snackbarImportCompleted">Preferences imported</string>
 
     <string-array name="filepicker">
         <item>Select</item>

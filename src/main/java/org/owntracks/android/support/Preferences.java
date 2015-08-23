@@ -16,12 +16,16 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+
 import org.json.JSONException;
 
 import de.greenrobot.event.EventBus;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.messages.WaypointMessage;
 
 public class Preferences {
     private static final String TAG = "Preferences";
@@ -94,6 +98,8 @@ public class Preferences {
         Log.v(TAG, "Active preferences for mode " + modeId + " are " + activeSharedPreferences);
 
         if(!init) {
+            Answers.getInstance().logCustom(new CustomEvent("Mode changed")
+                    .putCustomAttribute("mode", modeId));
             EventBus.getDefault().post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
@@ -221,60 +227,6 @@ public class Preferences {
     }
 
 
-    // TODO: fix for traction
-    public static JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("_type", "configuration")
-                    .put(getStringRessource(R.string.keyModeId), getModeId())
-                    .put(getStringRessource(R.string.keyDeviceId), getDeviceId(true))
-                    .put(getStringRessource(R.string.keyClientId), getClientId(true))
-                    .put(getStringRessource(R.string.keyPassword), getPassword())
-                    .put(getStringRessource(R.string.keyUsername), getUsername())
-
-                    .put(getStringRessource(R.string.keyLocatorDisplacement), getLocatorDisplacement())
-                    .put(getStringRessource(R.string.keyLocatorInterval), getLocatorInterval())
-                    .put(getStringRessource(R.string.keyPubIncludeBattery), getPubLocationIncludeBattery())
-                    .put(getStringRessource(R.string.keyPub), getPub())
-                    .put(getStringRessource(R.string.keyPubInterval), getPubInterval())
-                    .put(getStringRessource(R.string.keyNotification), getNotification())
-                    .put(getStringRessource(R.string.keyNotificationGeocoder), getNotificationGeocoder())
-                    .put(getStringRessource(R.string.keyNotificationLocation), getNotificationLocation())
-                    .put(getStringRessource(R.string.keyNotificationTickerOnPublish), getNotificationTickerOnPublish())
-                    .put(getStringRessource(R.string.keyNotificationTickerOnWaypointTransition), getNotificationTickerOnWaypointTransition())
-                    .put(getStringRessource(R.string.keyAutostartOnBoot), getAutostartOnBoot())
-                    .put(getStringRessource(R.string.keyLocatorAccuracyBackground), getLocatorAccuracyBackground())
-                    .put(getStringRessource(R.string.keyLocatorAccuracyForeground), getLocatorAccuracyForeground())
-                    .put(getStringRessource(R.string.keyBeaconBackgroundScanPeriod), getBeaconBackgroundScanPeriod())
-                    .put(getStringRessource(R.string.keyBeaconForegroundScanPeriod), getBeaconForegroundScanPeriod())
-                    .put(getStringRessource(R.string.keyRemoteCommandReportLocation), getRemoteCommandReportLocation())
-                    .put(getStringRessource(R.string.keyRemoteConfiguration), getRemoteConfiguration())
-                    .put(getStringRessource(R.string.keyTrackerId), getTrackerId(true))
-                    .put(getStringRessource(R.string.keyMessaging), getMessaging());
-
-            if(isModePrivate()) {
-                json.put(getStringRessource(R.string.keyHost), getHost())
-                .put(getStringRessource(R.string.keyPort), getPort())
-                .put(getStringRessource(R.string.keyPubQos), getPubQos())
-                .put(getStringRessource(R.string.keyKeepalive), getKeepalive())
-                .put(getStringRessource(R.string.keyPubRetain), getPubRetain())
-                .put(getStringRessource(R.string.keyTls), getTls())
-                .put(getStringRessource(R.string.keyTlsCaCrtPath), getTlsCaCrtPath())
-                .put(getStringRessource(R.string.keyTlsClientCrtPath), getTlsClientCrtPath())
-                .put(getStringRessource(R.string.keyTlsClientCrtPassword), getTlsClientCrtPassword())
-                .put(getStringRessource(R.string.keyAuth), getAuth())
-                .put(getStringRessource(R.string.keyDeviceTopic), getDeviceTopic(true))
-                .put(getStringRessource(R.string.keyBaseTopic), getBaseTopic())
-                .put(getStringRessource(R.string.keyCleanSession), getCleanSession());
-            }
-
-            Log.v(TAG, "toJsonObject: " + json.toString());
-
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-        }
-        return json;
-    }
 
     public static void fromJsonObject(JSONObject json) {
         if (!isPropperMessageType(json, "configuration"))
@@ -302,7 +254,6 @@ public class Preferences {
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
         try { setPubIncludeBattery(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
         try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
-        try { setPubInterval(json.getInt(getStringRessource(R.string.keyPubInterval))); } catch (JSONException e) {}
         try { setDeviceTopic(json.getString(getStringRessource(R.string.keyDeviceTopic))); } catch (JSONException e) {}
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
         try { setNotificationGeocoder(json.getBoolean(getStringRessource(R.string.keyNotificationGeocoder))); } catch (JSONException e) {}
@@ -336,6 +287,19 @@ public class Preferences {
 
         };
     }
+
+    private static JSONArray waypointsToJSON() {
+
+        JSONArray waypoints = new JSONArray();
+        for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
+            WaypointMessage wpM = new WaypointMessage(waypoint);
+            JSONObject wp = wpM.toJSONObject();
+            try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
+            waypoints.put(wp);
+        }
+        return waypoints;
+    }
+
 
     private static void waypointsFromJson(JSONArray j) {
         Log.v(TAG, "importing " + j.length()+" waypoints");
@@ -725,11 +689,6 @@ public class Preferences {
         setBoolean(R.string.keyPub, aBoolean);
     }
 
-    private static void setPubInterval(int anInt) {
-        setInt(R.string.keyPubInterval, anInt);
-
-    }
-
     private static void setNotification(boolean aBoolean) {
         setBoolean(R.string.keyNotification, aBoolean);
 
@@ -889,10 +848,6 @@ public class Preferences {
         return getBoolean(R.string.keyPubRetain, R.bool.valPubRetain, R.bool.valPubRetainHosted, R.bool.valPubRetainPublic, false, true);
     }
 
-    public static int getPubInterval() {
-        return getInt(R.string.keyPubInterval, R.integer.valPubInterval);
-    }
-
     public static boolean getPub() {
         return getBoolean(R.string.keyPub, R.bool.valPub);
     }
@@ -987,7 +942,7 @@ public class Preferences {
             sharedPreferences.edit().putBoolean(getKey(R.string.keyFistStart), false).commit();
             String uuid = UUID.randomUUID().toString().toUpperCase();
             sharedPreferences.edit().putString(getKey(R.string.keyDeviceUUID), "A"+uuid.substring(1)).commit();
-
+            Answers.getInstance().logCustom(new CustomEvent("App installed"));
             return true;
         } else {
             Log.v(TAG, "Consecutive application launch");
@@ -1069,4 +1024,74 @@ public class Preferences {
     }
 
 
+    public static JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
+
+        // Header
+        try {json.put("_type", "configuration");} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyModeId), Preferences.getModeId());} catch(JSONException e) {};
+
+        // Misc settings
+        try {json.put(Preferences.getStringRessource(R.string.keyLocatorDisplacement), Preferences.getLocatorDisplacement());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyLocatorInterval), Preferences.getLocatorInterval());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyPubIncludeBattery), Preferences.getPubLocationIncludeBattery());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyPub), Preferences.getPub());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotification), Preferences.getNotification());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationGeocoder), Preferences.getNotificationGeocoder());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationLocation), Preferences.getNotificationLocation());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationTickerOnPublish), Preferences.getNotificationTickerOnPublish());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationTickerOnWaypointTransition), Preferences.getNotificationTickerOnWaypointTransition());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyAutostartOnBoot), Preferences.getAutostartOnBoot());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyBackground), Preferences.getLocatorAccuracyBackground());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyForeground), Preferences.getLocatorAccuracyForeground());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyBeaconBackgroundScanPeriod), Preferences.getBeaconBackgroundScanPeriod());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyBeaconForegroundScanPeriod), Preferences.getBeaconForegroundScanPeriod());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyRemoteCommandReportLocation), Preferences.getRemoteCommandReportLocation());} catch(JSONException e) {};
+
+        // Mode specific settings
+        switch (getModeId()) {
+            case App.MODE_ID_PUBLIC:
+                try {json.put(Preferences.getStringRessource(R.string.keyWaypoints), Preferences.waypointsToJSON());} catch(JSONException e) {};
+                break;
+
+            case App.MODE_ID_HOSTED:
+                try {json.put(Preferences.getStringRessource(R.string.keyUsername), Preferences.getUsername());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPassword), Preferences.getPassword());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyDeviceId), Preferences.getDeviceId(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyClientId), Preferences.getClientId(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTrackerId), Preferences.getTrackerId(true));} catch(JSONException e) {};
+
+                try {json.put(Preferences.getStringRessource(R.string.keyMessaging), Preferences.getMessaging());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyRemoteConfiguration), Preferences.getRemoteConfiguration());} catch(JSONException e) {};
+
+                break;
+            case App.MODE_ID_PRIVATE:
+                try {json.put(Preferences.getStringRessource(R.string.keyHost), Preferences.getHost());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPort), Preferences.getPort());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyAuth), Preferences.getAuth());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyUsername), Preferences.getUsername());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPassword), Preferences.getPassword());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyDeviceId), Preferences.getDeviceId(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyClientId), Preferences.getClientId(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTrackerId), Preferences.getTrackerId(true));} catch(JSONException e) {};
+
+                try {json.put(Preferences.getStringRessource(R.string.keyMessaging), Preferences.getMessaging());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPubQos), Preferences.getPubQos()) ;} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyKeepalive), Preferences.getKeepalive());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPubRetain), Preferences.getPubRetain());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTls), Preferences.getTls());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrtPath), Preferences.getTlsCaCrtPath());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPath), Preferences.getTlsClientCrtPath());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword), Preferences.getTlsClientCrtPassword());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyDeviceTopic), Preferences.getDeviceTopic(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyBaseTopic), Preferences.getBaseTopic());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyCleanSession), Preferences.getCleanSession());;} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyRemoteConfiguration), Preferences.getRemoteConfiguration());} catch(JSONException e) {};
+
+                break;
+        }
+
+
+        return json;
+    }
 }

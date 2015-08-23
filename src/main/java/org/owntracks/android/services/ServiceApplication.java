@@ -424,7 +424,6 @@ public class ServiceApplication implements ProxyableService,
 	}
 
 	public void updateTicker(String text, boolean vibrate) {
-        Log.v(TAG, "vibrate: " + vibrate);
         // API >= 21 doesn't have a ticker
         if(android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderTicker.setPriority(NotificationCompat.PRIORITY_HIGH);
@@ -443,9 +442,11 @@ public class ServiceApplication implements ProxyableService,
             notificationBuilderTicker.setTicker(text + ((this.even = !this.even) ? " " : ""));
 
         }
-        if(vibrate) {
-            notificationBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
+        Log.v(TAG, "vibrate: " + vibrate);
+        if(vibrate == true) {
             notificationBuilderTicker.setVibrate(new long[]{0, 500}); // 0 ms delay, 500 ms vibration
+        } else {
+            notificationBuilderTicker.setVibrate(new long[]{0, 0}); // 0 ms delay, 500 ms vibration
         }
 
 		// Clear ticker
@@ -453,7 +454,7 @@ public class ServiceApplication implements ProxyableService,
 
 		// if the notification is not enabled, the ticker will create an empty
 		// one that we get rid of
-		if (!Preferences.getNotification()) {
+        if (!Preferences.getNotification()) {
             this.notificationManager.cancel(NOTIFCATION_ID_TICKER);
         } else {
 
