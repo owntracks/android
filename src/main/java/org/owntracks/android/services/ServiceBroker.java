@@ -696,73 +696,73 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     public void publish(final Message message) {
 		this.pubHandler.post(new Runnable() {
 
-            @Override
-            public void run() {
-                Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
-				if(message instanceof LocationMessage)
+			@Override
+			public void run() {
+				Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
+				if (message instanceof LocationMessage)
 					Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT);
 
 				// This should never happen
-                if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
-                    Log.e(TAG, "PUB ON MAIN THREAD");
-                }
+				if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+					Log.e(TAG, "PUB ON MAIN THREAD");
+				}
 
-                // Check if we can publish
-                //if (!isOnline() || !isConnected()) {
-                //    Log.d("ServiceBroker", "publish deferred");
-                //    doStart();
-                //    return;
-                //}
+				// Check if we can publish
+				//if (!isOnline() || !isConnected()) {
+				//    Log.d("ServiceBroker", "publish deferred");
+				//    doStart();
+				//    return;
+				//}
 
-                message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
+				message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
 
-                try {
+				try {
 
-                    if (message.getTopic() == null) {
-                        throw new Exception("message without topic. class:" + message.getClass() + ", msg: " + message.toString());
-                    }
+					if (message.getTopic() == null) {
+						throw new Exception("message without topic. class:" + message.getClass() + ", msg: " + message.toString());
+					}
 
-                    //IMqttDeliveryToken t = ;
-                    message.publishing();
-                    synchronized (inflightMessagesLock) {
-                        // either works if client is connected or throws Exception if not.
-                        // If Client is initialized but not connected, it throws a paho exception and we have to remove the message in the catch
-                        // if client is not initialized and NullpointerException is thrown
-                        Log.v(TAG, "queueing message for delivery");
-                        inflightMessages.put(ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message), message); // if we reach this point, the previous publish did not throw an exception and the message went out
-                    }
-                    Log.v(TAG, "queued message for delivery on thread: " +Thread.currentThread().getId());
-                } catch (Exception e) {
-                    synchronized (inflightMessagesLock) {
-                        inflightMessages.remove(message);
-                    }
-                    // Handle TTL for message to discard it after message.ttl publish attempts or discard right away if message qos is 0
-                    if (message.getQos() != 0 && message.decrementTTL() >= 1) {
-                        Log.v(TAG, "failed qos 1|2 message added to backlog");
-                        synchronized (backlogLock) {
-                            backlog.add(message);
-                        }
-						if(message instanceof LocationMessage)
+					//IMqttDeliveryToken t = ;
+					message.publishing();
+					synchronized (inflightMessagesLock) {
+						// either works if client is connected or throws Exception if not.
+						// If Client is initialized but not connected, it throws a paho exception and we have to remove the message in the catch
+						// if client is not initialized and NullpointerException is thrown
+						Log.v(TAG, "queueing message for delivery");
+						inflightMessages.put(ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message), message); // if we reach this point, the previous publish did not throw an exception and the message went out
+					}
+					Log.v(TAG, "queued message for delivery on thread: " + Thread.currentThread().getId());
+				} catch (Exception e) {
+					synchronized (inflightMessagesLock) {
+						inflightMessages.remove(message);
+					}
+					// Handle TTL for message to discard it after message.ttl publish attempts or discard right away if message qos is 0
+					if (message.getQos() != 0 && message.decrementTTL() >= 1) {
+						Log.v(TAG, "failed qos 1|2 message added to backlog");
+						synchronized (backlogLock) {
+							backlog.add(message);
+						}
+						if (message instanceof LocationMessage)
 							Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE);
 
 						Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_QUEUE_LENGTH);
 
 						message.publishQueued();
-                    } else {
-						if(message instanceof LocationMessage)
+					} else {
+						if (message instanceof LocationMessage)
 							Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP);
 
 						Log.v(TAG, "failed qos 0 message dumped");
 
-                        message.publishFailed();
-                    }
+						message.publishFailed();
+					}
 
-                    Log.e(TAG, "cought delivery exception. backlog size is: " + backlog.size());
-                    e.printStackTrace();
-                } finally {
-                }
-            }
-        });
+					Log.e(TAG, "cought delivery exception. backlog size is: " + backlog.size());
+					e.printStackTrace();
+				} finally {
+				}
+			}
+		});
 
 	}
 
@@ -776,16 +776,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     // Messages are removed from the backlock, a publish is attempted and if the publish the message is added at the end of the backlog again until ttl reaches zero
     private void deliverBacklog() {
         Log.v(TAG, "delivering backlog");
-        Iterator<Message> i = backlog.iterator();
-        while (i.hasNext() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
+		synchronized (backlogLock) {
+
+			Iterator<Message> i = backlog.iterator();
+			while (i.hasNext() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
             Message m;
-            synchronized (backlogLock) {
                 m = i.next();
                 i.remove();
-            }
+           	 	publish(m);
+		  	}
+		}
 
-            publish(m);
-        }
 		Statistics.setInt(context, Statistics.SERVICE_BROKER_QUEUE_LENGTH, backlog.size());
 
 	}

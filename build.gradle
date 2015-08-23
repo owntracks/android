@@ -81,4 +81,13 @@ android {
             manifest.srcFile 'AndroidManifest.xml'
         }
     }
+    buildTypes {
+        release {
+            ext.enableCrashlytics = true
+        }
+        debug {
+            ext.enableCrashlytics = false
+        }
+    }
+
 }

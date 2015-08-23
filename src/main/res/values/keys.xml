@@ -3,6 +3,7 @@
     <string name="keyDeviceUUID">deviceUUID</string>
     <string name="keyTrackerId">trackerId</string>
     <string name="keyDeviceId">deviceId</string>
+
     <string name="keyClientId">clientId</string>
     <string name="keyHost">host</string>
     <string name="keyPort">port</string>
@@ -16,7 +17,7 @@
     <string name="keyTlsCaCrtPath">tlsCaCrtPath</string>
     <string name="keyTlsClientCrtPath">tlsClientCrtPath</string>
     <string name="keyTlsClientCrtPassword">tlsClientCrtPassword</string>
-
+    <string name="keyWaypoints">waypoints</string>
 
     <string name="keyLocatorDisplacement">locatorDisplacement</string>
     <string name="keyLocatorInterval">locatorInterval</string>
