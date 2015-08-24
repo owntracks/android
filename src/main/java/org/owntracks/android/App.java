@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.owntracks.android.activities.ActivityMain;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.DaoMaster;
 import org.owntracks.android.db.DaoSession;
@@ -41,6 +42,7 @@ public class App extends Application {
 
     private static App instance;
     private static boolean inForeground;
+    public static Class mapFragmentClass = ActivityMain.MapFragment.class;
     private SimpleDateFormat dateFormater;
 
     private ContactLinkDao contactLinkDao;
