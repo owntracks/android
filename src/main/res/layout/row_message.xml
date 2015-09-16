@@ -36,36 +36,15 @@
         android:layout_marginBottom="16dp"
         >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/na"
-                android:textSize="16sp"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textColor="#212121" />
-
-            <IconTextView
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-
-                android:visibility="visible"
-                android:id="@+id/mUrlIndicator"
-                android:text="{fa-link}"
-                android:textSize="14sp"
-                android:paddingLeft="8dp"
-
-                android:textColor="#858585"
-                android:gravity="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </RelativeLayout>
-
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/na"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#212121" />
 
 
         <TextView
@@ -78,6 +57,10 @@
             android:singleLine="false"
             android:textColor="#212121" />
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
         <com.github.curioustechizen.ago.RelativeTimeTextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
@@ -87,6 +70,22 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="#858585" />
+
+        <IconTextView
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+
+            android:visibility="visible"
+            android:id="@+id/mUrlIndicator"
+            android:text="{fa-link}"
+            android:textSize="12sp"
+            android:paddingLeft="8dp"
+
+            android:textColor="#858585"
+            android:gravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </RelativeLayout>
 
     </LinearLayout>
 </RelativeLayout>

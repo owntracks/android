@@ -54,7 +54,7 @@ public class Preferences {
         return deviceUUID;
     }
 
-    public Preferences(Context c){
+    public static void initialize(Context c){
         Log.v(TAG, "preferences initializing");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -936,7 +936,7 @@ public class Preferences {
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
     // This has no use yet but may be useful later
-    public boolean handleFirstStart() {
+    public static boolean handleFirstStart() {
         if(sharedPreferences.getBoolean(getKey(R.string.keyFistStart), true)) {
             Log.v(TAG, "Initial application launch");
             sharedPreferences.edit().putBoolean(getKey(R.string.keyFistStart), false).commit();

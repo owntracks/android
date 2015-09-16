@@ -91,3 +91,13 @@ android {
     }
 
 }
+def crashlyticsUploadStoredDeobsDebug = "crashlyticsUploadStoredDeobsDebug"
+def crashlyticsUploadDeobsDebug = "crashlyticsUploadDeobsDebug"
+tasks.whenTaskAdded { task ->
+    if (crashlyticsUploadStoredDeobsDebug.equals(task.name) ||
+            crashlyticsUploadDeobsDebug.equals(task.name)) {
+
+        println "Disabling $task.name."
+        task.enabled = false
+    }
+}
