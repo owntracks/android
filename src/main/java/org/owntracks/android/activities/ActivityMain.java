@@ -19,6 +19,7 @@ import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
+import org.owntracks.android.support.SnackbarFactory;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
@@ -175,7 +176,6 @@ public class ActivityMain extends ActivityBase {
         super.onPostCreate(savedInstanceState);
        // toggle.syncState();
     }
-
 
 
 
@@ -518,10 +518,7 @@ public class ActivityMain extends ActivityBase {
 		super.onStop();
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-	}
+
 
 	@Override
 	public void onDestroy() {

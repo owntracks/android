@@ -19,7 +19,7 @@ import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Statistics;
+import org.owntracks.android.support.StatisticsProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +27,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 
@@ -122,7 +121,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     @Override
     public void onConnected(Bundle arg0) {
         Log.e(TAG, "GoogleApiClient is now connected");
-        Statistics.setTime(context, Statistics.SERVICE_LOCATOR_PLAY_CONNECTED);
+        StatisticsProvider.setTime(context, StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
 
         this.ready = true;
         initLocationRequest();
@@ -348,8 +347,8 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     @Override
     public void onLocationChanged(Location location) {
         if(!isForeground()) {
-            Statistics.setTime(context, Statistics.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
-            Statistics.incrementCounter(context, Statistics.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES);
+            StatisticsProvider.setTime(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
+            StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES);
         }
         lastKnownLocation = new GeocodableLocation(location);
 
@@ -447,7 +446,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 		if (extra == null)
 			return;
 
-		EventBus.getDefault().postSticky(new Events.PublishSuccessfull(extra, wasQueued));
+		EventBus.getDefault().postSticky(new Events.PublishSuccessful(extra, wasQueued));
 	}
 
     @Override

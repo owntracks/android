@@ -233,11 +233,15 @@
     <string name="preferencesMessagesSummary">Receive messages</string>
     <string name="preferencesMessages">Messaging</string>
     <string name="connectivityDisconnectedConfigIncomplete">Disconnected: Configuration incomplete</string>
+
     <string name="none">None</string>
     <string name="exportPlaceholder">To export your preferences, hit the button above</string>
     <string name="snackbarExportCompleted">Preferences exported</string>
     <string name="snackbarExportFailed">Preferences export failed</string>
     <string name="snackbarImportCompleted">Preferences imported</string>
+    <string name="snackbarConfigIncomplete">Configuration incomplete</string>
+    <string name="snackbarConfigIncompleteFix">Fix</string>
+    <string name="snackbarDisconnectedReconnect">Reconnect</string>
 
     <string-array name="filepicker">
         <item>Select</item>

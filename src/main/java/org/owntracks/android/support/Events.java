@@ -146,11 +146,11 @@ public class Events {
 		}
 	}
 
-	public static class PublishSuccessfull extends E {
+	public static class PublishSuccessful extends E {
 		Object extra;
         boolean wasQueued;
 
-		public PublishSuccessfull(Object extra, boolean wasQueued) {
+		public PublishSuccessful(Object extra, boolean wasQueued) {
 			super();
 			this.extra = extra;
             this.wasQueued = wasQueued;

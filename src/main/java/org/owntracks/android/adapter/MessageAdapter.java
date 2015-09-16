@@ -4,6 +4,7 @@ package org.owntracks.android.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import org.owntracks.android.db.MessageDao;
 
 
 public class MessageAdapter extends AdapterCursorLoader {
+    private static final String TAG = "MessageAdapter";
     private int[] priorities = new int[3];
 
     public MessageAdapter(Context context) {

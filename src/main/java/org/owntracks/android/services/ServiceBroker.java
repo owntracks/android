@@ -31,6 +31,7 @@ import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
@@ -38,7 +39,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
-import org.owntracks.android.support.Statistics;
+import org.owntracks.android.support.StatisticsProvider;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -314,7 +315,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void onConnect() {
-		Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_CONNECTS);
+		StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_CONNECTS);
 
 
 		reconnectHandler.stop();
@@ -700,7 +701,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			public void run() {
 				Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
 				if (message instanceof LocationMessage)
-					Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT);
+					StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT);
 
 				// This should never happen
 				if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
@@ -743,14 +744,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 							backlog.add(message);
 						}
 						if (message instanceof LocationMessage)
-							Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE);
+							StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE);
 
-						Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_QUEUE_LENGTH);
+						StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH);
 
 						message.publishQueued();
 					} else {
 						if (message instanceof LocationMessage)
-							Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP);
+							StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP);
 
 						Log.v(TAG, "failed qos 0 message dumped");
 
@@ -787,7 +788,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		  	}
 		}
 
-		Statistics.setInt(context, Statistics.SERVICE_BROKER_QUEUE_LENGTH, backlog.size());
+		StatisticsProvider.setInt(context, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, backlog.size());
 
 	}
 
@@ -812,7 +813,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
                 Log.v(TAG, "Message received from inflight messages");
                 message.publishSuccessful();
 				if(message instanceof LocationMessage)
-					Statistics.incrementCounter(context, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS);
+					StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS);
 
 			}
         }

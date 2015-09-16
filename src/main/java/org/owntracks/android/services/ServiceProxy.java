@@ -15,7 +15,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.owntracks.android.support.Statistics;
+import org.owntracks.android.App;
+import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
@@ -50,7 +51,7 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	protected void onStartOnce() {
-		Statistics.setTime(this, Statistics.SERVICE_PROXY_START);
+		StatisticsProvider.setTime(this, StatisticsProvider.SERVICE_PROXY_START);
 
 		instantiateService(SERVICE_APP);
 		instantiateService(SERVICE_BROKER);

@@ -20,7 +20,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.DrawerFactory;
-import org.owntracks.android.support.Statistics;
+import org.owntracks.android.support.StatisticsProvider;
 
 public class ActivityStatistics extends ActivityBase {
 
@@ -77,18 +77,18 @@ public class ActivityStatistics extends ActivityBase {
     }
 
     private void set() {
-        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(Statistics.getTime(this, Statistics.APP_START)));
-        ((TextView)findViewById(R.id.reference)).setText(App.formatDate(Statistics.getTime(this, Statistics.REFERENCE)));
-        ((TextView)findViewById(R.id.serviceProxyStart)).setText(App.formatDate(Statistics.getTime(this, Statistics.SERVICE_PROXY_START)));
-        ((TextView)findViewById(R.id.serviceLocatorPlay)).setText(App.formatDate(Statistics.getTime(this, Statistics.SERVICE_LOCATOR_PLAY_CONNECTED)));
-        ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(App.formatDate(Statistics.getTime(this, Statistics.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE)));
-        ((TextView)findViewById(R.id.serviceLocatorOnLocationChanges)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES));
-        ((TextView)findViewById(R.id.serviceBrokerPInit)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT));
-        ((TextView)findViewById(R.id.serviceBrokerPDrop)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP));
-        ((TextView)findViewById(R.id.serviceBrokerPQueue)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE));
-        ((TextView)findViewById(R.id.serviceBrokerPSuccess)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS));
-        ((TextView)findViewById(R.id.serviceBrokerConnects)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_CONNECTS));
-        ((TextView)findViewById(R.id.serviceBrokerQueueLength)).setText(""+Statistics.getCounter(this, Statistics.SERVICE_BROKER_QUEUE_LENGTH));
+        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.APP_START)));
+        ((TextView)findViewById(R.id.reference)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.REFERENCE)));
+        ((TextView)findViewById(R.id.serviceProxyStart)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_PROXY_START)));
+        ((TextView)findViewById(R.id.serviceLocatorPlay)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED)));
+        ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(""+StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE));
+        ((TextView)findViewById(R.id.serviceLocatorOnLocationChanges)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES));
+        ((TextView)findViewById(R.id.serviceBrokerPInit)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT));
+        ((TextView)findViewById(R.id.serviceBrokerPDrop)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP));
+        ((TextView)findViewById(R.id.serviceBrokerPQueue)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE));
+        ((TextView)findViewById(R.id.serviceBrokerPSuccess)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS));
+        ((TextView)findViewById(R.id.serviceBrokerConnects)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_CONNECTS));
+        ((TextView)findViewById(R.id.serviceBrokerQueueLength)).setText(""+StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH));
 
     }
 
@@ -119,8 +119,8 @@ public class ActivityStatistics extends ActivityBase {
                 set();
                 return true;
             case R.id.clear:     // If the user hits the toolbar back arrow, go back to ActivityMain, no matter where he came from (same as hitting back)
-                Statistics.setTime(this, Statistics.REFERENCE);
-                Statistics.clearCounters(this);
+                StatisticsProvider.setTime(this, StatisticsProvider.REFERENCE);
+                StatisticsProvider.clearCounters(this);
                 set();
                 return true;
             default:
