@@ -16,20 +16,21 @@ import org.owntracks.android.services.ServiceProxy;
 
 public class SnackbarFactory {
 
-
-    public static Snackbar make(Activity a, String text, int duration) {
-        return Snackbar.make(a.getWindow().getDecorView().findViewById(android.R.id.content), text, duration);
+    public interface SnackbarFactoryDelegate {
+        View getSnackbarTargetView();
+    }
+    public static Snackbar make(SnackbarFactoryDelegate a, String text, int duration) {
+        return Snackbar.make(a.getSnackbarTargetView(), text, duration);
     }
 
-    public static Snackbar make(Activity a, int resID, int duration) {
-        return Snackbar.make(a.getWindow().getDecorView().findViewById(android.R.id.content), resID, duration);
+    public static Snackbar make(SnackbarFactoryDelegate a, int resID, int duration) {
+        return Snackbar.make(a.getSnackbarTargetView(), resID, duration);
     }
 
     public static void show(Snackbar s) {
         ((TextView) s.getView().findViewById(android.support.design.R.id.snackbar_text)).setTextColor(Color.WHITE);
         s.show();
     }
-
 
 
 

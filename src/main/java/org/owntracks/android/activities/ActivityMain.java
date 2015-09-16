@@ -51,6 +51,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -177,6 +178,20 @@ public class ActivityMain extends ActivityBase {
        // toggle.syncState();
     }
 
+    @Override
+    public View getSnackbarTargetView() {
+        Log.v(TAG, "getSnackbarTargetView");
+        Fragment f = FragmentHandler.getInstance().getCurrentFragmentInstance();
+        if(f instanceof SnackbarFactory.SnackbarFactoryDelegate) {
+            Log.v(TAG, "returing specifcdelegate");
+
+            return ((SnackbarFactory.SnackbarFactoryDelegate) f).getSnackbarTargetView();
+        }else {
+            Log.v(TAG, "returing general delegate");
+
+            return super.getSnackbarTargetView();
+        }
+    }
 
 
 
@@ -322,7 +337,7 @@ public class ActivityMain extends ActivityBase {
 				return;
 
 			FragmentTransaction ft = fa.getSupportFragmentManager()
-					.beginTransaction();
+                    .beginTransaction();
 
 			for (Fragment f : fragments.values())
 				ft.remove(f);
@@ -355,9 +370,12 @@ public class ActivityMain extends ActivityBase {
 		}
 
 		public Integer getBackStackSize() {
-			return backStack.size();
+            return backStack.size();
 		}
 
+        public Fragment getCurrentFragmentInstance() {
+            return getFragment(current);
+        }
 	}
 
 	@Override
@@ -533,7 +551,7 @@ public class ActivityMain extends ActivityBase {
 	}
 
 
-	public static class  MapFragment extends Fragment implements StaticHandlerInterface {
+	public static class  MapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
         private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
         private static final String KEY_NOTOPIC =          "+NOTOPIC+";
         private static final String KEY_POSITION =         "+POSITION+";
@@ -556,6 +574,11 @@ public class ActivityMain extends ActivityBase {
         private BitmapDescriptor currentLocationMarkerBitmap;
         private Marker currentLocationMarker;
         private Circle currentLocationPrecision;
+
+
+        public View getSnackbarTargetView() {
+            return selectedContactDetails;
+        }
 
         public static MapFragment getInstance(Bundle extras) {
 			MapFragment instance = new MapFragment();

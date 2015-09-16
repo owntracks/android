@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
+import org.owntracks.android.activities.ActivityBase;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -597,15 +598,15 @@ public class ServiceApplication implements ProxyableService,
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         final Activity a = App.getCurrentActivity();
-        if (App.isInForeground() && a != null) {
+        if (App.isInForeground() && a != null && a instanceof SnackbarFactory.SnackbarFactoryDelegate) {
             Snackbar s = null;
 
             if (e.getState() == ServiceBroker.State.CONNECTED) {
-                s = SnackbarFactory.make(a, R.string.snackbarConnected, Snackbar.LENGTH_LONG);
+                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarConnected, Snackbar.LENGTH_LONG);
             } else if (e.getState() == ServiceBroker.State.CONNECTING) {
-                s = SnackbarFactory.make(a, R.string.snackbarConnecting, Snackbar.LENGTH_LONG);
+                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarConnecting, Snackbar.LENGTH_LONG);
             } else if (e.getState() == ServiceBroker.State.DISCONNECTED || e.getState() == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
-                s = SnackbarFactory.make(a, R.string.snackbarDisconnected, Snackbar.LENGTH_LONG);
+                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnected, Snackbar.LENGTH_LONG);
                 s.setAction(R.string.snackbarDisconnectedReconnect, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -619,7 +620,7 @@ public class ServiceApplication implements ProxyableService,
                 });
 
             } else if (e.getState() == ServiceBroker.State.DISCONNECTED_ERROR) {
-                s = SnackbarFactory.make(a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
+                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
                 s.setAction(R.string.snackbarDisconnectedReconnect, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -632,7 +633,7 @@ public class ServiceApplication implements ProxyableService,
                     }
                 });
             } else if (e.getState() == ServiceBroker.State.DISCONNECTED_CONFIGINCOMPLETE) {
-                s = SnackbarFactory.make(a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
+                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
                 s.setAction(R.string.snackbarConfigIncompleteFix, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -677,8 +678,8 @@ public class ServiceApplication implements ProxyableService,
 			updateNotification();
 
 
-            if (App.isInForeground() && App.getCurrentActivity() != null) {
-               SnackbarFactory.show(SnackbarFactory.make(App.getCurrentActivity(), R.string.statePublished, Snackbar.LENGTH_SHORT));
+            if (App.isInForeground() && App.getCurrentActivity() != null && App.getCurrentActivity() instanceof SnackbarFactory.SnackbarFactoryDelegate) {
+               SnackbarFactory.show(SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)App.getCurrentActivity(), R.string.statePublished, Snackbar.LENGTH_SHORT));
             }
 
             if (!App.isInForeground() && Preferences.getNotificationTickerOnPublish() && !l.getSupressTicker() ) {

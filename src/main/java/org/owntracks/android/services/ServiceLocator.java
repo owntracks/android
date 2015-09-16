@@ -136,8 +136,14 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     }
 
 	public GeocodableLocation getLastKnownLocation() {
-		if ((this.googleApiClient != null) && this.googleApiClient.isConnected() && (LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null))
-			this.lastKnownLocation = new GeocodableLocation(LocationServices.FusedLocationApi.getLastLocation(googleApiClient));
+		if ((this.googleApiClient != null) && this.googleApiClient.isConnected() && (LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null)) {
+            Location l = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if(l != null)
+                this.lastKnownLocation = new GeocodableLocation(l);
+            else
+                this.lastKnownLocation = null;
+
+        }
 
 		return this.lastKnownLocation;
 	}
