@@ -51,4 +51,23 @@
 	public static *** w(...);    
 }
 
+# --------------------------------------------------------------------
+# Crashlytics
+# --------------------------------------------------------------------
+# http://support.crashlytics.com/knowledgebase/articles/202143-eclipse-with-proguard
+-keepattributes SourceFile,LineNumberTable
+
+
+# --------------------------------------------------------------------
+# REMOVE all Log messages except warnings and errors
+# --------------------------------------------------------------------
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+}
+
+
+
+
 

@@ -17,8 +17,9 @@ import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Statistics;
+import org.owntracks.android.support.StatisticsProvider;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -26,21 +27,24 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.BatteryManager;
+import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
 
-public class App extends Application {
+public class App extends Application  {
     private static final String TAG = "App";
 
     private static App instance;
     private static boolean inForeground;
+    private static int runningActivities = 0;
     private SimpleDateFormat dateFormater;
 
     private ContactLinkDao contactLinkDao;
@@ -49,6 +53,8 @@ public class App extends Application {
 
     private static HashMap<String, Contact> contacts;
     private static HashMap<String, Contact> initializingContacts;
+    private static Activity currentActivity;
+
 
     public static final int MODE_ID_PRIVATE=0;
     public static final int MODE_ID_HOSTED=1;
@@ -60,15 +66,10 @@ public class App extends Application {
 		super.onCreate();
         instance = this;
 
-        if(BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-        } else {
-            Fabric.with(this, new Crashlytics(), new Answers());
-        }
+        Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(), new Answers());
+        Preferences.initialize(this);
 
-        Preferences preferences = new Preferences(this);
-        Statistics.setTime(this, Statistics.APP_START);
-
+        StatisticsProvider.setTime(this, StatisticsProvider.APP_START);
         Answers.getInstance().logCustom(new CustomEvent("App started").putCustomAttribute("mode", Preferences.getModeId()));
 
         DaoMaster.OpenHelper helper = new DaoMaster.OpenHelper(this, "org.owntracks.android.db", null) {
@@ -85,7 +86,6 @@ public class App extends Application {
 		this.contactLinkDao = daoSession.getContactLinkDao();
 		this.waypointDao = daoSession.getWaypointDao();
         this.messageDao = daoSession.getMessageDao();
-
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
         this.initializingContacts = new HashMap<String, Contact>();
@@ -93,6 +93,8 @@ public class App extends Application {
 		//Initialize Google Maps and BitmapDescriptorFactory
 		MapsInitializer.initialize(getApplicationContext());
 		EventBus.getDefault().register(this);
+        registerActivityLifecycleCallbacks(new LifecycleCallbacks());
+
 
     }
 
@@ -213,4 +215,67 @@ public class App extends Application {
     public static boolean isInForeground() {
         return inForeground;
     }
+
+    public static Activity getCurrentActivity() {
+        return currentActivity;
+    }
+
+
+
+    private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
+
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+            Log.v(TAG, "onActivityStarted " + activity);
+            currentActivity = activity;
+            if (App.runningActivities == 0) {
+                App.onEnterForeground();
+            }
+            App.runningActivities++;
+
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+            Log.v(TAG, "onActivityResumed "  + activity);
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+            Log.v(TAG, "onActivityPaused "  + activity);
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            Log.v(TAG, "onActivityStopped "  + activity);
+
+            if(currentActivity == activity)
+                currentActivity = null;
+
+            App.runningActivities--;
+            if (App.runningActivities == 0) {
+                App.onEnterBackground();
+            }
+
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+            Log.v(TAG, "onActivityDestroyed "  + activity);
+
+        }
+
+
+    }
+
 }

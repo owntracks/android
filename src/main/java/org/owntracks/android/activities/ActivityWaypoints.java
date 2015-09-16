@@ -43,9 +43,8 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoints extends ActivityBase implements StaticHandlerInterface, LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
+public class ActivityWaypoints extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
     private static final String TAG = "ActivityWaypoints";
-    private Handler handler;
     public static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
     private Toolbar toolbar;
     private org.owntracks.android.support.RecyclerView listView;
@@ -77,7 +76,6 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
                 if (drawerItem == null)
                     return false;
 
-                Log.v(TAG, "Drawer item clicked: " + drawerItem.getIdentifier());
                 DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
                 switch (drawerItem.getIdentifier()) {
@@ -101,11 +99,10 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
 
         DrawerFactory.buildDrawer(this, toolbar, drawerListener, 2);
 
-        this.handler = new StaticHandler(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        layoutManager.scrollToPosition(0);
+        //layoutManager.scrollToPosition(0);
 
         listAdapter = new AdapterWaypoints(this);
         listAdapter.setOnViewHolderClickListener(this);
@@ -161,8 +158,7 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return App.getDb().query(App.getWaypointDao().getTablename(), App.getWaypointDao()
-                        .getAllColumns(), null, null, null, null, CURSOR_ORDER);
+                return App.getDb().query(App.getWaypointDao().getTablename(), App.getWaypointDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
             }
         };
     }
@@ -176,24 +172,21 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         listAdapter.swapCursor(null);
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().registerSticky(this);
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onStop();
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        handler.removeCallbacksAndMessages(null); // disable handler
         ServiceProxy.runOrBind(this, new Runnable() {
 
             @Override
@@ -204,31 +197,6 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
         });
         super.onDestroy();
     }
-    private void requestWaypointGeocoder(Waypoint w, boolean force) {
-        if (w.getGeocoder() == null || force) {
-
-            GeocodableLocation l = new GeocodableLocation("Waypoint");
-            l.setLatitude(w.getLatitude());
-            l.setLongitude(w.getLongitude());
-            l.setExtra(w);
-            (new ReverseGeocodingTask(this, handler)).execute(l);
-        }
-    }
-
-    public void handleHandlerMessage(Message msg) {
-        if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && ((GeocodableLocation)msg.obj).getExtra() instanceof  Waypoint) {
-
-            // Gets the geocoder from the returned array of [Geocoder, Waypoint] and assigns the geocoder to the waypoint
-            // The Geocoder will not change unless the location of the waypoint is updated. Therefore it is stored in the DAO and only overwritten when the waypoint is updated by the user
-            Waypoint w = (Waypoint) ((GeocodableLocation)msg.obj).getExtra();
-            w.setGeocoder(((GeocodableLocation) msg.obj).getGeocoder());
-            App.getWaypointDao().update(w);
-            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
-
-        }
-    }
-
-
 
 
     protected void remove(long id) {
@@ -277,11 +245,10 @@ public class ActivityWaypoints extends ActivityBase implements StaticHandlerInte
     @Override
     public void onResume() {
         super.onResume();
-
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
-
+        this.listView.removeAllViews(); // Clear out all views to prevent zombie view causing https://github.com/owntracks/android/issues/248
         registerForContextMenu(this.listView);
-        //EventBus.getDefault().register(this);
+        requery();
+        EventBus.getDefault().register(this);
     }
 
 
