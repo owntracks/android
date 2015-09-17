@@ -1,7 +1,13 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.5.22
+>Release date: 2015-09-17
+* [NEW] - Updated dependencies
+* [NEW] - Replaced Google Maps with MapBox
+* [NEW] - Added support for tid contact images
+
 ## OwnTracks 0.5.21
->Release date: 2015-XX-XX
+>Release date: 2015-08-23 for alpha testers
 * [FIX] #214 - Hosted .otrc file not associated with OwnTracks app
 * [FIX] #235 - Notification vibrate switch ignored
 * [FIX] #234 - Removed statistics page when not a debug build
