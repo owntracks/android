@@ -150,7 +150,7 @@
     <string name="preferencesCustomBeaconLayoutSummary">Custom layout to detect beacons</string>
     <string name="beaconRangingEnabledSummary">Enable ranging for BLE beacons</string>
     <string name="beaconRangingEnabled">Ranging</string>
-    <string name="menuContactShow">Show</string>
+    <string name="menuContactShow">Center</string>
     <string name="menuContactDetails">Details</string>
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuContactFollow">Follow</string>

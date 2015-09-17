@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -951,8 +952,16 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// onStartCommand will then deliver the intent to the ping(...) method if the service was alive or it will trigger a new connection attempt
         @Override
         public void schedule(long delayInMilliseconds) {
+
+
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_BROKER, ServiceBroker.RECEIVER_ACTION_PING, null));
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_BROKER, ServiceBroker.RECEIVER_ACTION_PING, null);
+			if (Build.VERSION.SDK_INT >= 19) {
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+			} else {
+				alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+			}
+
         }
     }
 
@@ -992,10 +1001,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
         private void schedule() {
 
-            AlarmManager alarmManager = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
-			 long next = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
-			Log.v(TAG, "scheduling next reconnect in " +  next);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +  next, ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
+			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
+			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null);
+			if (Build.VERSION.SDK_INT >= 19) {
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+			} else {
+				alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+			}
+
 			if(backoff <= BACKOFF_INTERVAL_MAX)
 				backoff++;
 

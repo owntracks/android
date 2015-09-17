@@ -9,10 +9,11 @@ import org.json.JSONObject;
 import android.location.Location;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.mapbox.mapboxsdk.api.ILatLng;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 
-public class GeocodableLocation extends Location {
+public class GeocodableLocation extends Location implements ILatLng {
 	private static final String TAG = "GeocodableLocation";
 
 	private String geocoder;
@@ -195,7 +196,6 @@ public class GeocodableLocation extends Location {
 	public LatLng getLatLng() {
 		return this.latlng;
 	}
-
 	public Date getDate() {
 		return new Date(getLocation().getTime());
 	}
