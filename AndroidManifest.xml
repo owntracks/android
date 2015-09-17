@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0521"
-    android:versionName="0.5.21" >
+    android:versionCode="0522"
+    android:versionName="0.5.22" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
