@@ -1,14 +1,14 @@
 package org.owntracks.android.model;
 
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 import org.owntracks.android.App;
-import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -18,16 +18,18 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Marker;
+import com.mapbox.mapboxsdk.overlay.Marker;
 
 public class Contact {
     private static final String TAG = "Contact";
@@ -37,7 +39,7 @@ public class Contact {
     private String trackerId;
     private GeocodableLocation location;
     private Uri linkLookupURI;
-    private Marker marker;
+    private WeakReference<Marker> marker;
     private View view;
 
     private boolean hasLink;
@@ -48,13 +50,15 @@ public class Contact {
     private Bitmap cardFace;
 
 
-	private static final int faceHeightScale = (int) convertDpToPixel(48);
-    private static Bitmap defaultFace = getRoundedFace(BitmapFactory.decodeResource(ServiceProxy.getInstance().getResources(), R.drawable.noimage));
-
+	private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
 
     public Contact(String topic) {
 		this.topic = topic;
-	}
+
+
+
+    }
+
 
 	public View getView() {
 		return this.view;
@@ -65,11 +69,11 @@ public class Contact {
 	}
 
 	public void setMarker(Marker marker) {
-		this.marker = marker;
+		this.marker = new WeakReference<>(marker);
 	}
 
 	public Marker getMarker() {
-		return this.marker;
+        return this.marker != null ? this.marker.get() : null;
 	}
 
     public String getDisplayName() {
@@ -162,12 +166,21 @@ public class Contact {
     }
 
     private static Bitmap getRoundedFace(Bitmap image) {
-        return getRoundedShape(Bitmap.createScaledBitmap(image, faceHeightScale, faceHeightScale, true));
+        return getRoundedShape(Bitmap.createScaledBitmap(image, FACE_HEIGHT_SCALE, FACE_HEIGHT_SCALE, true));
     }
+
+    public Drawable getFaceDrawable(Context c) {
+        return new BitmapDrawable(c.getResources() ,getFace());
+       //return new BitmapDrawable(c.getResources(), drawableToBitmap(TextDrawable.builder().buildRoundRect(getTrackerId(), ColorGenerator.MATERIAL.getColor(topic), FACE_HEIGHT_SCALE)));
+       // return TextDrawable.builder().buildRoundRect(getTrackerId(), ColorGenerator.MATERIAL.getColor(topic), FACE_HEIGHT_SCALE);
+    }
+
+
+
 
 	public Bitmap getFace() {
 
-        if (this.linkFace != null) {
+       if (this.linkFace != null) {
             return this.linkFace;
         }
 
@@ -175,23 +188,33 @@ public class Contact {
             return this.cardFace;
         }
 
-        return defaultFace;
+        return drawableToBitmap(TextDrawable.builder().buildRoundRect(getTrackerId(), ColorGenerator.MATERIAL.getColor(topic), FACE_HEIGHT_SCALE));
+
 	}
 
-    public BitmapDescriptor getFaceDescriptor() {
-        return BitmapDescriptorFactory.fromBitmap(getFace());
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : FACE_HEIGHT_SCALE;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : FACE_HEIGHT_SCALE;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
 
-
-
 	private static float convertDpToPixel(float dp) {
-		return dp
-				* (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
+		return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
 	}
-
-
-
 
 	public static Bitmap resolveImage(ContentResolver cr, long id) {
 		Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);

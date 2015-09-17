@@ -27,7 +27,8 @@ import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,11 +52,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -72,6 +71,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mapbox.mapboxsdk.api.ILatLng;
+import com.mapbox.mapboxsdk.overlay.Icon;
+import com.mapbox.mapboxsdk.tileprovider.tilesource.MapboxTileLayer;
+import com.mapbox.mapboxsdk.views.MapViewListener;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
@@ -194,6 +197,15 @@ public class ActivityMain extends ActivityBase {
     }
 
 
+    private void requestReportLocation(final Contact c) {
+        ServiceProxy.runOrBind(this, new Runnable() {
+
+            @Override
+            public void run() {
+                ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
+            }
+        });
+    }
 
 	public static class FragmentHandler extends Fragment {
 		private Class<?> current;
@@ -414,19 +426,29 @@ public class ActivityMain extends ActivityBase {
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                //((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectCurrentLocation(MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapboxMapFragment) FragmentHandler.getInstance().forward(MapboxMapFragment.class, null, that)).selectCurrentLocation(MapboxMapFragment.SELECT_CENTER_AND_ZOOM, true, false, MapboxMapFragment.ZOOM_LEVEL_NEIGHBORHOOD);
+
             }
         });
     }
 
     private void transitionToContactMap(final Contact c) {
         final AppCompatActivity that = this;
+
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+                ((MapboxMapFragment) FragmentHandler.getInstance().forward(MapboxMapFragment.class, null, that)).selectContact(c, MapboxMapFragment.SELECT_CENTER_AND_ZOOM, true, false);
             }
         });
+
+        //ServiceProxy.runOrBind(this, new Runnable() {
+        //    @Override
+       //    public void run() {
+        //        ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
+        //    }
+        //});
     }
 
     @Override
@@ -551,7 +573,9 @@ public class ActivityMain extends ActivityBase {
 	}
 
 
-	public static class  MapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
+
+    public static class  MapboxMapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
+        private com.mapbox.mapboxsdk.views.MapView mapView;
         private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
         private static final String KEY_NOTOPIC =          "+NOTOPIC+";
         private static final String KEY_POSITION =         "+POSITION+";
@@ -559,6 +583,471 @@ public class ActivityMain extends ActivityBase {
         private static final int SELECT_UPDATE = 0;
         private static final int SELECT_CENTER = 1;
         private static final int SELECT_CENTER_AND_ZOOM = 2;
+
+        private static final long ZOOM_LEVEL_COUNTRY = 6;
+        private static final long ZOOM_LEVEL_CITY = 11;
+        private static final long ZOOM_LEVEL_NEIGHBORHOOD = 17;
+
+        private LinearLayout selectedContactDetails;
+        private TextView selectedContactName;
+        private TextView selectedContactLocation;
+        private ImageView selectedContactImage;
+        private Menu mMenu;
+        private static Handler handler;
+        private MenuInflater mInflater;
+        private com.mapbox.mapboxsdk.overlay.Marker currentLocationMarker;
+
+
+        public View getSnackbarTargetView() {
+            return selectedContactDetails;
+        }
+
+        public static MapboxMapFragment getInstance(Bundle extras) {
+            MapboxMapFragment instance = new MapboxMapFragment();
+            instance.setArguments(extras);
+            return instance;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            handler = new StaticHandler(this);
+        }
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+            View v = inflater.inflate(R.layout.fragment_mapbox_map, container, false);
+
+
+
+            this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
+            registerForContextMenu(this.selectedContactDetails);
+
+            this.selectedContactName = (TextView) v.findViewById(R.id.name);
+            this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
+            this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
+
+
+
+
+            this.mapView = (com.mapbox.mapboxsdk.views.MapView) v.findViewById(R.id.mapView);
+            this.mapView.setAccessToken(getString(R.string.MAPBOX_API_KEY));
+            this.mapView.setTileSource(new MapboxTileLayer("binarybucks.nfc70b7d"));
+            this.mapView.setDiskCacheEnabled(true);
+            this.mapView.setUserLocationEnabled(false);
+
+
+
+
+
+            this.mapView.setMapViewListener(new MapViewListener() {
+                @Override
+                public void onShowMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
+
+                }
+
+                @Override
+                public void onHideMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
+
+                }
+
+                @Override
+                public void onTapMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
+                    setFollowingSelectedContact(false);
+                    Contact c = (Contact) marker.getRelatedObject();
+
+                    if (c != null)
+                        selectContact(c, SELECT_UPDATE, false, true);
+
+                }
+
+                @Override
+                public void onLongPressMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
+                    Contact c = (Contact) marker.getRelatedObject();
+
+                    if (c != null) {
+                        selectContact(c, SELECT_UPDATE, false, true);
+                        getActivity().openContextMenu(selectedContactDetails);
+                    }
+
+                }
+
+                @Override
+                public void onTapMap(com.mapbox.mapboxsdk.views.MapView mapView, ILatLng iLatLng) {
+                    unfollowContact();
+                }
+
+                @Override
+                public void onLongPressMap(com.mapbox.mapboxsdk.views.MapView mapView, ILatLng iLatLng) {
+                    unfollowContact();
+                }
+            });
+
+            setHasOptionsMenu(true);
+            onShow();
+
+            return v;
+        }
+
+
+
+
+        @Override
+        public void handleHandlerMessage(Message msg) {
+            if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null)) {
+                GeocodableLocation l = (GeocodableLocation) msg.obj;
+                if ((l.getTag() == null) || (this.selectedContactLocation == null) || !l.getTag().equals(Preferences.getSelectedContactTopic()))
+                    return;
+
+                this.selectedContactLocation.setText(l.toString());
+
+            }
+        }
+
+        public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate, float zoom) {
+            setFollowingSelectedContact(follow);
+            selectCurrentLocation(centerMode, animate, zoom);
+        }
+        public void selectCurrentLocation(final int centerMode, final boolean animate, final float zoom) {
+            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+
+                @Override
+                public void run() {
+                    GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+
+                    if (l == null)
+                        return;
+
+                    hideSelectedContactDetails();
+                    Preferences.setSelectedContactTopic(KEY_CURRENT_LOCATION);
+                    centerMap(l, centerMode, animate, zoom);
+                }
+            });
+
+        }
+
+        public void centerMap(GeocodableLocation l, int centerMode, boolean animate) {
+            centerMap(l, centerMode, animate, -1);
+        }
+
+        public void centerMap(ILatLng l, int centerMode, boolean animate, float zoom) {
+            if(centerMode!=SELECT_UPDATE) {
+                //CameraUpdate center;
+                //if(zoom == -1) {
+                //    center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER && zoom != -1? this.mMapView.getMap().getCameraPosition().zoom : 15f);
+                //} else {
+                //    center = CameraUpdateFactory.newLatLngZoom(latlon, zoom);
+                //}
+
+                if(animate)
+                    this.mapView.setCenter(l, false);
+                else
+                    //this.mMapView.getMap().moveCamera(center);
+                    this.mapView.setCenter(l, false);
+
+                if(zoom != -1)
+                    this.mapView.setZoom(zoom);
+
+
+            }
+        }
+
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            hideSelectedContactDetails();
+            HashMap<String, Contact> contacts = new HashMap<String, Contact>(App.getCachedContacts());
+            for(Contact c : contacts.values()) {
+                updateContactLocation(c);
+            }
+            Contact c = getSelectedContact();
+
+            Bundle extras = FragmentHandler.getInstance().getBundle(MapboxMapFragment.class);
+            com.mapbox.mapboxsdk.geometry.LatLng position = null;
+            float zoom = -1;
+
+            if(extras != null) {
+                position = extras.getParcelable(KEY_POSITION);
+                zoom = extras.getFloat(KEY_ZOOM);
+            }
+
+            if (c != null) {
+                selectContact(c, SELECT_UPDATE, true, false, zoom);
+                if(position != null)
+                    centerMap(position, SELECT_CENTER, false, zoom);
+            } else if (isFollowingCurrentLocation())
+                selectCurrentLocation(SELECT_CENTER, true, false, zoom);
+            else if(position != null)
+                centerMap(position, SELECT_CENTER, false, zoom);
+
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            if(menu != null) {
+                mMenu = menu;
+                mInflater = inflater;
+            } else if(mMenu == null || mInflater == null) {
+                return;
+            }
+
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_map, mMenu);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
+            if (v.getId()==R.id.contactDetails) {
+                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
+
+                if(Preferences.getFollowingSelectedContact())
+                    menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
+                else
+                    menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
+
+                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
+                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
+                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
+
+
+            }
+        }
+
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item)
+        {
+            Contact c = getSelectedContact();
+            switch (item.getItemId()) {
+                case MENU_CONTACT_SHOW:
+                    selectContact(c, MapboxMapFragment.SELECT_CENTER_AND_ZOOM, true);
+                    return true;
+                case MENU_CONTACT_FOLLOW:
+                    selectContact(c, MapboxMapFragment.SELECT_CENTER, true, true);
+                    return true;
+                case MENU_CONTACT_UNFOLLOW:
+                    setFollowingSelectedContact(false);
+                    return true;
+                case MENU_CONTACT_DETAILS:
+                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
+                    return true;
+                case MENU_CONTACT_NAVIGATE:
+                    ((ActivityMain)getActivity()).launchNavigation(c);
+                    return true;
+                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
+                    ((ActivityMain)getActivity()).requestReportLocation(c);
+                    return true;
+            }
+            return false;
+
+        }
+
+
+        @Override
+        public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            if (hidden)
+                onHide();
+            else
+                onShow();
+            super.onHiddenChanged(hidden);
+        }
+
+        private void onShow() {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            onCreateOptionsMenu(mMenu, mInflater);
+
+        }
+
+        private void onHide() {
+        }
+        @Override
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().registerSticky(this);
+        }
+
+        @Override
+        public void onStop() {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+
+
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
+            selectContact(c, centerMode, follow, animate, -1);
+        }
+
+        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate, float zoom) {
+            setFollowingSelectedContact(follow);
+            selectContact(c, centerMode, animate, zoom);
+        }
+
+        public void selectContact(final Contact c, int centerMode, boolean animate) {
+            selectContact(c, centerMode, animate, -1);
+        }
+
+        public void selectContact(final Contact c, int centerMode, boolean animate, float zoom) {
+            if (c == null)
+                return;
+
+            Preferences.setSelectedContactTopic(c.getTopic());
+
+            centerMap(c.getLocation(), centerMode, animate, zoom);
+
+            this.selectedContactName.setText(c.getDisplayName());
+            this.selectedContactLocation.setText(c.getLocation().toString());
+            this.selectedContactImage.setImageDrawable(c.getFaceDrawable(getActivity()));
+
+            showSelectedContactDetails();
+
+            if (c.getLocation().getGeocoder() == null)
+                (new ReverseGeocodingTask(getActivity(), handler)).execute(c.getLocation());
+
+        }
+
+        public void onEventMainThread(Events.ContactUpdated e) {
+            updateContactLocation(e.getContact());
+        }
+
+        public void onEventMainThread(Events.ContactAdded e) {
+            updateContactLocation(e.getContact());
+        }
+
+        public void onEventMainThread(Events.ContactRemoved e) {
+            removeContactLocation(e.getContact());
+        }
+
+        public void showSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.VISIBLE);
+        }
+
+        private void removeContactMarker(Contact c) {
+            if (c.getMarker() != null) {
+                mapView.removeMarker(c.getMarker());
+            }
+        }
+
+        public void updateContactLocation(Contact c) {
+            //removeContactMarker(c);
+            com.mapbox.mapboxsdk.overlay.Marker m = c.getMarker();
+            if(m != null) {
+                m.setPoint(c.getLocation().getLatLng());
+                c.getMarker().updateDrawingPosition();
+            } else {
+                m = new com.mapbox.mapboxsdk.overlay.Marker(mapView, "", "", new com.mapbox.mapboxsdk.geometry.LatLng(c.getLocation()));
+                m.setAnchor(new PointF(0.5F, 0.5F));
+                m.setRelatedObject(c);
+                c.setMarker(m);
+            }
+            m.setMarker(c.getFaceDrawable(getActivity()), false);
+            mapView.addMarker(m);
+
+            if (c == getSelectedContact())
+                selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE, true, true);
+
+        }
+
+
+        public void onEventMainThread(Events.CurrentLocationUpdated e) {
+
+            if(currentLocationMarker != null) {
+                this.currentLocationMarker.setPoint(e.getGeocodableLocation().getLatLng());
+                this.currentLocationMarker.updateDrawingPosition();
+
+
+            } else {
+                this.currentLocationMarker = new com.mapbox.mapboxsdk.overlay.Marker("", "", e.getGeocodableLocation().getLatLng());
+                Drawable markerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.current_location_marker);
+                Bitmap bitmap = Bitmap.createBitmap(markerDrawable.getIntrinsicWidth(), markerDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                markerDrawable.draw(canvas);
+
+                this.currentLocationMarker.setMarker(new BitmapDrawable(getActivity().getResources(), bitmap));
+                this.currentLocationMarker.setAnchor(new PointF(0.5f, 0.5f));
+                this.mapView.addMarker(this.currentLocationMarker);
+            }
+
+
+            if (isFollowingCurrentLocation())
+                selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, ZOOM_LEVEL_NEIGHBORHOOD);
+        }
+
+        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+            if(e.getState() == ServiceBroker.State.CONNECTING)
+                clearMap();
+
+        }
+
+        public void onEventMainThread(Events.ModeChanged e) {
+            clearMap();
+        }
+
+        public void clearMap() {
+            mapView.clear();
+            hideSelectedContactDetails();
+        }
+
+        public void hideSelectedContactDetails() {
+            this.selectedContactDetails.setVisibility(View.GONE);
+        }
+
+        private void removeContactLocation(Contact c) {
+            removeContactMarker(c);
+            Log.v(TAG, Preferences.getSelectedContactTopic());
+            if(c.getTopic() == Preferences.getSelectedContactTopic()) {
+                unfollowContact();
+            }
+        }
+
+        private void unfollowContact(){
+            setFollowingSelectedContact(false);
+            Preferences.setSelectedContactTopic(KEY_NOTOPIC);
+            hideSelectedContactDetails();
+        }
+
+
+        public Contact getSelectedContact() {
+            return App.getContact(Preferences.getSelectedContactTopic());
+        }
+
+        public boolean isFollowingCurrentLocation() {
+            return Preferences.getSelectedContactTopic().equals(KEY_CURRENT_LOCATION);
+        }
+
+        public void setFollowingSelectedContact(boolean followingSelectedContact) {
+            Preferences.setFollowingSelectedContact(followingSelectedContact);
+        }
+
+        public boolean isFollowingSelectedContact() {
+            return Preferences.getFollowingSelectedContact();
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle b) {
+            super.onSaveInstanceState(b);
+            b.putParcelable(KEY_POSITION, this.mapView.getCenter());
+            b.putFloat(KEY_ZOOM, this.mapView.getZoomLevel());
+
+            FragmentHandler.getInstance().setBundle(MapboxMapFragment.class, b);
+        }
+
+
+    }
+
+   /* public static class  MapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
+        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
+        private static final String KEY_NOTOPIC =          "+NOTOPIC+";
+        private static final String KEY_POSITION =         "+POSITION+";
+        private static final String KEY_ZOOM =              "+ZOOM+";
+        private static final int SELECT_UPDATE = 0;
+        private static final int SELECT_CENTER = 1;
+        private static final int SELECT_CENTER_AND_ZOOM = 2;
+
+
 
 
         private MapView mMapView;
@@ -636,6 +1125,8 @@ public class ActivityMain extends ActivityBase {
             else if(position != null)
                 centerMap(position.target, SELECT_CENTER, false, zoom);
         }
+
+
 
 		@Override
 		public void onPause() {
@@ -778,31 +1269,31 @@ public class ActivityMain extends ActivityBase {
         }
 
 		private void onHide() {
-		}
+        }
 
 		private void setUpMap() {
 			this.googleMap.setIndoorEnabled(false);
             this.googleMap.setBuildingsEnabled(true);
             this.googleMap.setMyLocationEnabled(false);
 
-			UiSettings s = this.googleMap.getUiSettings();
+            UiSettings s = this.googleMap.getUiSettings();
 			s.setCompassEnabled(false);
 			s.setMyLocationButtonEnabled(false);
 			s.setTiltGesturesEnabled(false);
-			s.setCompassEnabled(false);
-			s.setRotateGesturesEnabled(false);
-			s.setZoomControlsEnabled(false);
+            s.setCompassEnabled(false);
+            s.setRotateGesturesEnabled(false);
+            s.setZoomControlsEnabled(false);
 
-			this.mMapView.getMap().setOnMarkerClickListener(
-					new OnMarkerClickListener() {
+            this.mMapView.getMap().setOnMarkerClickListener(
+                    new OnMarkerClickListener() {
 
-						@Override
-						public boolean onMarkerClick(Marker m) {
+                        @Override
+                        public boolean onMarkerClick(Marker m) {
                             setFollowingSelectedContact(false);
-							Contact c = MapFragment.this.markerToContacts.get(m.getId());
+                            Contact c = MapFragment.this.markerToContacts.get(m.getId());
 
-							if (c != null)
-								selectContact(c, SELECT_UPDATE, false,true);
+                            if (c != null)
+                                selectContact(c, SELECT_UPDATE, false, true);
 
                             // Event was handled by our code do not launch default behaviour that would center the map on the marker
                             return true;
@@ -853,7 +1344,7 @@ public class ActivityMain extends ActivityBase {
 			Marker m = this.googleMap.addMarker(
                     new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getFaceDescriptor()).anchor(0.5F, 0.5F));
 			this.markerToContacts.put(m.getId(), c);
-			c.setMarker(m);
+			//c.setMarker(m);
 
 			if (c == getSelectedContact())
                 selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE, true, true);
@@ -862,8 +1353,8 @@ public class ActivityMain extends ActivityBase {
 
         private void removeContactMarker(Contact c) {
             if (c.getMarker() != null) {
-                this.markerToContacts.remove(c.getMarker().getId());
-                c.getMarker().remove();
+               // this.markerToContacts.remove(c.getMarker().getId());
+               // c.getMarker().remove();
             }
         }
 
@@ -944,7 +1435,7 @@ public class ActivityMain extends ActivityBase {
 
 			this.selectedContactName.setText(c.getDisplayName());
 			this.selectedContactLocation.setText(c.getLocation().toString());
-            this.selectedContactImage.setImageBitmap(c.getFace());
+            this.selectedContactImage.setImageDrawable(c.getFaceDrawable(getActivity()));
 
             showSelectedContactDetails();
 
@@ -1028,16 +1519,9 @@ public class ActivityMain extends ActivityBase {
             FragmentHandler.getInstance().setBundle(MapFragment.class, b);
         }
     }
+*/
 
-    private void requestReportLocation(final Contact c) {
-        ServiceProxy.runOrBind(this, new Runnable() {
 
-            @Override
-            public void run() {
-            ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
-            }
-        });
-    }
 
     public static class ContactsFragment extends Fragment implements
 			StaticHandlerInterface {
@@ -1246,7 +1730,6 @@ public class ActivityMain extends ActivityBase {
         public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
 			if (l == null)
 				return;
-
 
 
 			if ((l.getGeocoder() == null) && resolveGeocoder) {
