@@ -21,12 +21,15 @@
     <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
+    <uses-permission android:name="android.permission.READ_LOGS" />  <!-- For debug log collection -->
+
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" /> <!-- For config import/export -->
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- For notifications -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!-- To trigger waypoints when entering a WIFI network -->
+
+    <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+   <!-- To trigger waypoints when entering a WIFI network -->
     <application
         android:name=".App"
         android:allowBackup="true"
