@@ -21,4 +21,8 @@ public class CardMessage extends Message {
     public String getFace() {
         return face;
     }
+
+    String getBaseTopic() {
+        return null;
+    }
 }

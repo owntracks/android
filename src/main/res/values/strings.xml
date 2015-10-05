@@ -23,21 +23,13 @@
     <string name="preferencesLicenses">"Thanks"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
-    <string name="preferencesNotificationTickerOnPublish">Ticker on reports</string>
-    <string name="preferencesNotificationTickerOnPublishSummary">Show a ticker on successful reports</string>
-    <string name="preferencesNotificationVibrateOnPublish">Vibrate on reports</string>
-    <string name="preferencesNotificationVibrateOnPublishSummary">Vibrate on successful reports</string>
-    <string name="preferencesNotificationTickerOnWaypointTransition">Ticker on waypoints </string>
-    <string name="preferencesNotificationTickerOnWaypointTransitionSummary">Show a ticker on waypoint events </string>
-    <string name="preferencesNotificationVibrateOnWaypointTransition">Vibrate on waypoints </string>
-    <string name="preferencesNotificationVibrateOnWaypointTransitionSummary">Vibrate on waypoint events</string>
+    <string name="preferencesNotificationEvents">Events </string>
+    <string name="preferencesNotificationEventsSummary">Notify about received events </string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
-    <string name="preferencesNotificationGeocoderSummary">"Resolve displayed location to addresses"</string>
-    <string name="preferencesNotificationGeocoder">"Geocoder"</string>
-    <string name="preferencesNotificationOnMessageSummary">Notify about received messages</string>
-    <string name="preferencesNotificationOnMessage" >Messages</string>
+    <string name="preferencesNotificationMessagesSummary">Notify about received messages</string>
+    <string name="preferencesNotificationMessages" >Messages</string>
 
     <string name="preferencesConnectionAdvancedModeSummary">"Show advanced connection preferences"</string>
     <string name="preferencesConnectionAdvancedMode">"Advanced connection preferences"</string>
@@ -59,7 +51,7 @@
     <string name="preferencesLocatorDisplacement">Locator background  displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
     <string name="preferencesLocatorInterval">Locator background interval</string>
-    <string name="preferencesLocatorIntervalSummary">Minutes between location updates</string>
+    <string name="preferencesLocatorIntervalSummary">Seconds between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
@@ -67,8 +59,8 @@
     <string name="preferencesDocumentationSummary">owntracks.org/booklet/</string>
     <string name="preferencesTwitter">Twitter</string>
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
-    <string name="preferencesMail">Mail</string>
-    <string name="preferencesMailSummary">support@owntracks.org</string>
+    <string name="preferencesCommunity">Community</string>
+    <string name="preferencesCommunitySummary">community.owntracks.org</string>
 
     <string name="preferencesDeviceTopic">Device topic</string>
     <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>
@@ -242,6 +234,9 @@
     <string name="snackbarConfigIncomplete">Configuration incomplete</string>
     <string name="snackbarConfigIncompleteFix">Fix</string>
     <string name="snackbarDisconnectedReconnect">Reconnect</string>
+    <string name="aLocation">a location</string>
+    <string name="events">Events</string>
+    <string name="notificationMessageTitle">Messages</string>
 
     <string-array name="filepicker">
         <item>Select</item>

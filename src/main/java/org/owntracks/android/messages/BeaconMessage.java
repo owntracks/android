@@ -93,5 +93,6 @@ public class BeaconMessage extends Message {
 
 
     }
+
 }
 

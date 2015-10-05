@@ -359,7 +359,6 @@ public class Events {
 		public Contact getContact() {
 			return this.c;
 		}
-
 	}
 
     public static class MessageAdded extends E{
@@ -404,15 +403,15 @@ public class Events {
 
 
         public static class ServiceBeacon extends E {
-            private org.owntracks.android.services.ServiceBeacon.State state;
+            ///private org.owntracks.android.services.ServiceBeacon.State state;
 
-            public ServiceBeacon(org.owntracks.android.services.ServiceBeacon.State state) {
-                this.state = state;
-            }
+            //public ServiceBeacon(org.owntracks.android.services.ServiceBeacon.State state) {
+             //   this.state = state;
+            //}
 
-            public org.owntracks.android.services.ServiceBeacon.State getState() {
-                return this.state;
-            }
+           // public org.owntracks.android.services.ServiceBeacon.State getState() {
+            //    return this.state;
+            //}
 
         }
 

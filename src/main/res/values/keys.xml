@@ -27,19 +27,16 @@
     <string name="keySub">sub</string>
     <string name="keyPub">pub</string>
     <string name="keyPubInterval">pubInterval</string>
-    <string name="keyDeviceTopic">deviceTopic</string>
-    <string name="keyBaseTopic">baseTopic</string>
+    <string name="keyPubTopicBase">pubTopicBase</string>
+    <string name="keySubTopic">subTopic</string>
+
+
 
     <string name="keyNotification">notification</string>
-    <string name="keyNotificationGeocoder">notificationGeocoder</string>
     <string name="keyNotificationLocation">notificationLocation</string>
-    <string name="keyNotificationOnMessage">notificationOnMessage</string>
+    <string name="keyNotificationMessages">notificationMessages</string>
+    <string name="keyNotificationEvents">notificationEvents</string>
 
-    <string name="keyNotificationTickerOnPublish">notificationTickerOnPublish</string>
-    <string name="keyNotificationVibrateOnPublish">notificationVibrateOnPublish</string>
-    <string name="keyNotificationVibrateOnWaypointTransition">notificationVibrateOnWaypointTransition</string>
-    <string name="keyNotificationTickerOnWaypointTransition">notificationTickerOnWaypointTransition</string>
-    <string name="keyNotificationOnReceivedWaypointTransition">notificationOnReceivedWaypointTransition</string>
     <string name="keySelectedContactTopic">selectedContactTopic</string>
     <string name="keyFollowingSelectedContact">followingSelectedContact</string>
     <string name="keyAutostartOnBoot">autostartOnBoot</string>

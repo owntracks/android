@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
@@ -123,11 +124,7 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
 
 
         handler = new StaticHandler(this);
-        this.dao = App.getWaypointDao();
-
-
-
-
+        this.dao = Dao.getWaypointDao();
 
 
         Bundle extras = getIntent().getExtras();

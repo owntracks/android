@@ -1,6 +1,7 @@
 package org.owntracks.android.support;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,7 @@ import org.json.JSONException;
 
 import de.greenrobot.event.EventBus;
 
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.WaypointMessage;
@@ -56,6 +58,7 @@ public class Preferences {
 
     public static void initialize(Context c){
         Log.v(TAG, "preferences initializing");
+        activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
         hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, Context.MODE_PRIVATE);
@@ -75,8 +78,9 @@ public class Preferences {
         setMode(active, false);
     }
     private static void setMode(int active, boolean init){
-        int oldModeId = modeId;
         Log.v(TAG, "setting mode to: " + active);
+        detachAllActivePreferenceChangeListeners();
+        int oldModeId = modeId;
         modeId = active;
         switch (modeId) {
             case App.MODE_ID_PRIVATE:
@@ -90,19 +94,60 @@ public class Preferences {
                 break;
         }
         sharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
+
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
         privateSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         hostedSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
         publicSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
 
-        Log.v(TAG, "Active preferences for mode " + modeId + " are " + activeSharedPreferences);
+        attachAllActivePreferenceChangeListeners();
 
         if(!init) {
-            Answers.getInstance().logCustom(new CustomEvent("Mode changed")
-                    .putCustomAttribute("mode", modeId));
             EventBus.getDefault().post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
+
+    private static LinkedList<OnPreferenceChangedListener> activeSharedPreferencesChangeListener;
+
+    public static void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+        activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+        activeSharedPreferencesChangeListener.push(listener);
+    }
+
+    public static void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+        activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+        activeSharedPreferencesChangeListener.remove(listener);
+    }
+
+    private static void detachAllActivePreferenceChangeListeners() {
+        for(SharedPreferences.OnSharedPreferenceChangeListener listener : activeSharedPreferencesChangeListener) {
+            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+        }
+    }
+
+    private static void attachAllActivePreferenceChangeListeners() {
+        for(OnPreferenceChangedListener listener : activeSharedPreferencesChangeListener) {
+            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+            listener.onAttachAfterModeChanged();
+        }
+    }
+
+    public static String getSupportUrl() {
+        return App.getContext().getString(R.string.valCommunityUrl);
+    }
+
+
+    public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
+        void onAttachAfterModeChanged();
+    }
+
+
+
+
+
+
+
+
 
     public static String getKey(int resId) {
         return App.getContext().getString(resId);
@@ -210,6 +255,9 @@ public class Preferences {
     public static int getModeId() { return modeId; }
 
 
+    public SharedPreferences getActiveSharedPreferences() {
+        return activeSharedPreferences;
+    }
 
     public static String getAndroidId() {
         return App.getAndroidId();
@@ -254,13 +302,13 @@ public class Preferences {
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
         try { setPubIncludeBattery(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
         try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
-        try { setDeviceTopic(json.getString(getStringRessource(R.string.keyDeviceTopic))); } catch (JSONException e) {}
+        try { setDeviceTopicBase(json.getString(getStringRessource(R.string.keyPubTopicBase))); } catch (JSONException e) {}
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
-        try { setNotificationGeocoder(json.getBoolean(getStringRessource(R.string.keyNotificationGeocoder))); } catch (JSONException e) {}
         try { setNotificationLocation(json.getBoolean(getStringRessource(R.string.keyNotificationLocation))); } catch (JSONException e) {}
-        try { setNotificationTickerOnPublish(json.getBoolean(getStringRessource(R.string.keyNotificationTickerOnPublish))); } catch (JSONException e) {}
-        try { setNotificationTickerOnWaypointTransition(json.getBoolean(getStringRessource(R.string.keyNotificationTickerOnWaypointTransition))); } catch (JSONException e) {}
-        try { setBaseTopic(json.getString(getStringRessource(R.string.keyBaseTopic))); } catch (JSONException e) {}
+        try { setNotificationEvents(json.getBoolean(getStringRessource(R.string.keyNotificationEvents))); } catch (JSONException e) {}
+        try { setNotificationMessages(json.getBoolean(getStringRessource(R.string.keyNotificationMessages))); } catch (JSONException e) {}
+
+        try { setSubTopic(json.getString(getStringRessource(R.string.keySubTopic))); } catch (JSONException e) {}
         try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
         try { setLocatorAccuracyBackground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyBackground))); } catch (JSONException e) {}
         try { setLocatorAccuracyForeground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyForeground))); } catch (JSONException e) {}
@@ -291,7 +339,7 @@ public class Preferences {
     private static JSONArray waypointsToJSON() {
 
         JSONArray waypoints = new JSONArray();
-        for(Waypoint waypoint : App.getWaypointDao().loadAll()) {
+        for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
             WaypointMessage wpM = new WaypointMessage(waypoint);
             JSONObject wp = wpM.toJSONObject();
             try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
@@ -303,7 +351,7 @@ public class Preferences {
 
     private static void waypointsFromJson(JSONArray j) {
         Log.v(TAG, "importing " + j.length()+" waypoints");
-        WaypointDao dao = App.getWaypointDao();
+        WaypointDao dao = Dao.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
         for(int i = 0 ; i < j.length(); i++){
@@ -424,7 +472,7 @@ public class Preferences {
         setBoolean(R.string.keyCleanSession, aBoolean, false, false);
     }
     public static boolean getCleanSession() {
-        return getBoolean(R.string.keyCleanSession, R.bool.valCleanSession, R.bool.valCleanSessionHosted,R.bool.valCleanSessionPublic, true, true );
+        return getBoolean(R.string.keyCleanSession, R.bool.valCleanSession, R.bool.valCleanSessionHosted, R.bool.valCleanSessionPublic, true, true);
     }
 
 
@@ -460,7 +508,7 @@ public class Preferences {
     }
 
     public static long getLocatorIntervalMillis() {
-        return TimeUnit.MINUTES.toMillis(getInt(R.string.keyLocatorInterval, R.integer.valLocatorInterval));
+        return TimeUnit.SECONDS.toMillis(getInt(R.string.keyLocatorInterval, R.integer.valLocatorInterval));
     }
 
     // Locator interval is set by the user in minutes and therefore should be exported/imported in minutes.
@@ -493,7 +541,7 @@ public class Preferences {
     // Not used on public, as many people might use the same device type
     public static String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
-        return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+","").toLowerCase();
+        return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
 
     public static String getClientId(boolean fallbackToDefault) {
@@ -508,23 +556,23 @@ public class Preferences {
 
     public static String getClientIdDefault() {
         String clientID=getUsername()+"/"+getDeviceId(true);
-        return clientID.replaceAll("[^a-zA-Z0-9/]+","").toLowerCase();
+        return clientID.replaceAll("[^a-zA-Z0-9/]+", "").toLowerCase();
     }
 
     public static void setClientId(String clientId) {
         setString(R.string.keyClientId, clientId);
     }
 
-    public static void setDeviceTopic(String deviceTopic) {
-        setString(R.string.keyDeviceTopic, deviceTopic, false, false);
+    public static void setDeviceTopicBase(String deviceTopic) {
+        setString(R.string.keyPubTopicBase, deviceTopic, false, false);
     }
 
     public static String getPubTopicLocations() {
-        return getDeviceTopic(true);
+        return getPubTopicBase(true);
     }
 
     public static String getPubTopicWaypoints() {
-        return getDeviceTopic(true) +getPubTopicWaypointsPart();
+        return getPubTopicBase(true) +getPubTopicWaypointsPart();
     }
 
     public static String getPubTopicWaypointsPart() {
@@ -532,7 +580,7 @@ public class Preferences {
     }
 
     public static String getPubTopicEvents() {
-        return getDeviceTopic(true) + getPubTopicEventsPart();
+        return getPubTopicBase(true) + getPubTopicEventsPart();
     }
 
     public static String getPubTopicEventsPart() {
@@ -542,14 +590,14 @@ public class Preferences {
         return "/info";
     }
     public static String getPubTopicCommands() {
-        return getDeviceTopic(true) +getPubTopicCommandsPart();
+        return getPubTopicBase(true) +getPubTopicCommandsPart();
     }
     public static String getPubTopicCommandsPart() {
         return "/cmd";
     }
 
 
-    public static String getDeviceTopicDefault() {
+    public static String getPubTopicBaseDefault() {
         String formatString;
         String username;
         String deviceId = getDeviceId(true); // will use App.SESSION_UUID on public
@@ -558,32 +606,32 @@ public class Preferences {
 
         if(isModeHosted()) {
             username = getUsername();
-            formatString = getStringRessource(R.string.valDeviceTopicHosted);
+            formatString = getStringRessource(R.string.valPubTopicHosted);
         } else if(isModePublic()) {
             username = "user";
-            formatString = getStringRessource(R.string.valDeviceTopicPublic);
+            formatString = getStringRessource(R.string.valPubTopicPublic);
         } else {
             username = getUsername();
-            formatString = getStringRessource(R.string.valDeviceTopic);
+            formatString = getStringRessource(R.string.valPubTopic);
         }
 
         return String.format(formatString, username, deviceId);
     }
 
-    public static String getDeviceTopic(boolean fallbackToDefault) {
+    public static String getPubTopicBase(boolean fallbackToDefault) {
         if(!isModePrivate()) {
-            return getDeviceTopicDefault();
+            return getPubTopicBaseDefault();
         }
-        String topic = getString(R.string.keyDeviceTopic, R.string.valEmpty);
+        String topic = getString(R.string.keyPubTopicBase, R.string.valEmpty);
         if (topic.equals("") && fallbackToDefault)
-            topic = getDeviceTopicDefault();
+            topic = getPubTopicBaseDefault();
 
         return topic;
     }
 
 
-    public static String getBaseTopic() {
-        return getString(R.string.keyBaseTopic, R.string.valBaseTopic, R.string.valBaseTopicHosted, R.string.valBaseTopicPublic, true, true);
+    public static String getSubTopic() {
+        return getString(R.string.keySubTopic, R.string.valSubTopic, R.string.valSubTopicHosted, R.string.valSubTopicPublic, true, true);
     }
 
     public static String getTrackerId(boolean fallback) {
@@ -696,21 +744,20 @@ public class Preferences {
 
     private static void setNotificationLocation(boolean aBoolean) {
         setBoolean(R.string.keyNotificationLocation, aBoolean);
-
     }
 
-    private static void setNotificationTickerOnPublish(boolean aBoolean) {
-        setBoolean(R.string.keyNotificationTickerOnPublish, aBoolean);
-
+    public static void setNotificationEvents(boolean notificationEvents) {
+        setBoolean(R.string.keyNotificationEvents, notificationEvents);
     }
 
-    private static void setNotificationTickerOnWaypointTransition(boolean aBoolean) {
-        setBoolean(R.string.keyNotificationTickerOnWaypointTransition, aBoolean);
+    public static void setNotificationMessages(boolean notificationMessages) {
+        setBoolean(R.string.keyNotificationMessages, notificationMessages);
     }
 
-    private static void setBaseTopic(String string) {
-        setString(R.string.keyBaseTopic, string, false, false);
 
+
+    private static void setSubTopic(String string) {
+        setString(R.string.keySubTopic, string, false, false);
     }
 
     private static void setAutostartOnBoot(boolean aBoolean) {
@@ -726,10 +773,6 @@ public class Preferences {
     private static void setLocatorAccuracyBackground(int anInt) {
         setInt(R.string.keyLocatorAccuracyBackground, anInt);
 
-    }
-
-    private static void setNotificationGeocoder(boolean aBoolean) {
-        setBoolean(R.string.keyNotificationGeocoder, aBoolean);
     }
 
     private static void setLocatorInterval(int anInt) {
@@ -823,22 +866,17 @@ public class Preferences {
         return getBoolean(R.string.keyNotification, R.bool.valNotification);
     }
 
-    public static boolean getNotificationTickerOnWaypointTransition() {
-        return getBoolean(R.string.keyNotificationTickerOnWaypointTransition, R.bool.valNotificationTickerOnWaypointTransition);
-    }
-
-    public static boolean getNotificationTickerOnPublish() {
-        return getBoolean(R.string.keyNotificationTickerOnPublish, R.bool.valNotificationTickerOnPublish);
-    }
-
-    public static boolean getNotificationGeocoder() {
-        return getBoolean(R.string.keyNotificationGeocoder, R.bool.valNotificationGeocoder);
-    }
-
     public static boolean getNotificationLocation() {
-        return getBoolean(R.string.keyNotificationLocation,
-                R.bool.valNotificationLocation);
+        return getBoolean(R.string.keyNotificationLocation, R.bool.valNotificationLocation);
     }
+
+    public static boolean getNotificationMessages() {
+        return getBoolean(R.string.keyNotificationMessages, R.bool.valNotificationMessages);
+    }
+    public static boolean getNotificationEvents() {
+        return getBoolean(R.string.keyNotificationEvents, R.bool.valNotificationEvents);
+    }
+
 
     public static int getPubQos() {
         return getInt(R.string.keyPubQos, R.integer.valPubQos, R.integer.valPubQosHosted, R.integer.valPubQosPublic, false, true);
@@ -895,14 +933,6 @@ public class Preferences {
         return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
     }
 
-    public static Boolean getNotificationOnTransitionMessage() {
-        return getBoolean(R.string.keyNotificationOnReceivedWaypointTransition, R.bool.valNotificationOnReceivedWaypointTransition);
-    }
-
-    public static void setNotificationOnReceivedWaypointTransition(boolean val) {
-        setBoolean(R.string.keyNotificationOnReceivedWaypointTransition, val);
-    }
-
     public static String getBroadcastMessageTopic() {
         return "/msg";
     }
@@ -949,17 +979,6 @@ public class Preferences {
             return false;
         }
     }
-
-
-
-    public static boolean getNotificationVibrateOnPublish() {
-        return getBoolean(R.string.keyNotificationVibrateOnPublish, R.bool.valNotificationVibrateOnPublish);
-    }
-
-    public static boolean getNotificationVibrateOnWaypointTransition() {
-        return getBoolean(R.string.keyNotificationVibrateOnWaypointTransition, R.bool.valNotificationVibrateOnWayointTransition);
-    }
-
 
     public static boolean isPropperMessageType(JSONObject json, String type) {
         try {
@@ -1037,10 +1056,9 @@ public class Preferences {
         try {json.put(Preferences.getStringRessource(R.string.keyPubIncludeBattery), Preferences.getPubLocationIncludeBattery());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyPub), Preferences.getPub());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyNotification), Preferences.getNotification());} catch(JSONException e) {};
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationGeocoder), Preferences.getNotificationGeocoder());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyNotificationLocation), Preferences.getNotificationLocation());} catch(JSONException e) {};
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationTickerOnPublish), Preferences.getNotificationTickerOnPublish());} catch(JSONException e) {};
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationTickerOnWaypointTransition), Preferences.getNotificationTickerOnWaypointTransition());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationMessages), Preferences.getNotificationLocation());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyNotificationEvents), Preferences.getNotificationEvents());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyAutostartOnBoot), Preferences.getAutostartOnBoot());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyBackground), Preferences.getLocatorAccuracyBackground());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyForeground), Preferences.getLocatorAccuracyForeground());} catch(JSONException e) {};
@@ -1083,8 +1101,8 @@ public class Preferences {
                 try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrtPath), Preferences.getTlsCaCrtPath());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPath), Preferences.getTlsClientCrtPath());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword), Preferences.getTlsClientCrtPassword());} catch(JSONException e) {};
-                try {json.put(Preferences.getStringRessource(R.string.keyDeviceTopic), Preferences.getDeviceTopic(true));} catch(JSONException e) {};
-                try {json.put(Preferences.getStringRessource(R.string.keyBaseTopic), Preferences.getBaseTopic());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyPubTopicBase), Preferences.getPubTopicBase(true));} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keySubTopic), Preferences.getSubTopic());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyCleanSession), Preferences.getCleanSession());;} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyRemoteConfiguration), Preferences.getRemoteConfiguration());} catch(JSONException e) {};
 
