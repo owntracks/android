@@ -34,7 +34,11 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_APP = "1:App";
 	public static final String SERVICE_LOCATOR = "2:Loc";
 	public static final String SERVICE_BROKER = "3:Brk";
-    public static final String SERVICE_BEACON = "4:Bec";
+    public static final String SERVICE_PARSER = "4:Prs";
+	public static final String SERVICE_NOTIFICATION = "5:Not";
+	public static final String SERVICE_BEACON = "4:Bec";
+
+
 	public static final String KEY_SERVICE_ID = "srvID";
     private static ServiceProxy instance;
 	private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
@@ -54,6 +58,8 @@ public class ServiceProxy extends ServiceBindable {
 		StatisticsProvider.setTime(this, StatisticsProvider.SERVICE_PROXY_START);
 
 		instantiateService(SERVICE_APP);
+		instantiateService(SERVICE_PARSER);
+		instantiateService(SERVICE_NOTIFICATION);
 		instantiateService(SERVICE_BROKER);
         instantiateService(SERVICE_LOCATOR);
         instantiateService(SERVICE_BEACON);
@@ -111,7 +117,15 @@ public class ServiceProxy extends ServiceBindable {
             case SERVICE_BEACON:
                 p = new ServiceBeacon();
                 break;
-        }
+			case SERVICE_PARSER:
+				p = new ServiceParser();
+				break;
+
+			case SERVICE_NOTIFICATION:
+				p = new ServiceNotification();
+				break;
+
+		}
 
 		services.put(id, p);
 		p.onCreate(this);
@@ -135,6 +149,12 @@ public class ServiceProxy extends ServiceBindable {
     public static ServiceBeacon getServiceBeacon() {
         return (ServiceBeacon) getService(SERVICE_BEACON);
     }
+	public static ServiceParser getServiceParser() {
+		return (ServiceParser) getService(SERVICE_PARSER);
+	}
+	public static ServiceNotification getServiceNotification() {
+		return (ServiceNotification) getService(SERVICE_NOTIFICATION);
+	}
 
 	public static ProxyableService getServiceForIntent(Intent i) {
 		if ((i != null) && (i.getStringExtra(KEY_SERVICE_ID) != null))
@@ -232,9 +252,7 @@ public class ServiceProxy extends ServiceBindable {
 				}
 
 				@Override
-				public void onServiceConnected(ComponentName name,
-						IBinder binder) {
-                    Log.v("ServiceProxy", "serviceConnected, running queue");
+				public void onServiceConnected(ComponentName name, IBinder binder) {
 
                     bound = true;
                     attemptingToBind = false;
@@ -249,7 +267,6 @@ public class ServiceProxy extends ServiceBindable {
 		}
 
 		runQueue.addLast(runnable);
-        Log.v("ServiceProxy", "bindService called");
 
         try {
             if (!attemptingToBind) { // Prevent accidential bind during close

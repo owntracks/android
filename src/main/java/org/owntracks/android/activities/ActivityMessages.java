@@ -27,6 +27,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.MessageAdapter;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
@@ -137,7 +138,7 @@ public class ActivityMessages extends ActivityBase implements LoaderManager.Load
                     Log.v(TAG, "layoutPositon " + viewHolder.getLayoutPosition());
                     Log.v(TAG, "adapterPosition " + viewHolder.getAdapterPosition());
 
-                    App.getMessageDao().deleteByKey(viewHolder.getItemId());
+                    Dao.getMessageDao().deleteByKey(viewHolder.getItemId());
                     //listAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
                     //listAdapter.notifyDataSetChanged();
                     requery();
@@ -168,7 +169,7 @@ public class ActivityMessages extends ActivityBase implements LoaderManager.Load
         switch (item.getItemId()) {
             case R.id.remove:
                 Log.v(TAG, "removing all messages");
-                App.getMessageDao().deleteAll();
+                Dao.getMessageDao().deleteAll();
                 //listAdapter.notifyItemRangeRemoved(0,listAdapter.getItemCount());
                 getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
 
@@ -218,7 +219,7 @@ public class ActivityMessages extends ActivityBase implements LoaderManager.Load
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return App.getDb().query(App.getMessageDao().getTablename(), App.getMessageDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
+                return Dao.getDb().query(Dao.getMessageDao().getTablename(), Dao.getMessageDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
             }
         };
     }
@@ -239,7 +240,7 @@ public class ActivityMessages extends ActivityBase implements LoaderManager.Load
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                ServiceProxy.getServiceApplication().clearMessageNotifications();
+                ServiceProxy.getServiceNotification().clearNotificationMessages();
             }
         });
         EventBus.getDefault().registerSticky(this);

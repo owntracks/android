@@ -4,11 +4,16 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 import org.owntracks.android.App;
+import org.owntracks.android.db.ContactLink;
+import org.owntracks.android.db.ContactLinkDao;
+import org.owntracks.android.db.Dao;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -30,6 +35,10 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.mapbox.mapboxsdk.overlay.Marker;
+
+import de.greenrobot.dao.query.Query;
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.event.EventBus;
 
 public class Contact {
     private static final String TAG = "Contact";
@@ -254,5 +263,88 @@ public class Contact {
         this.hasLink = hasLink;
     }
 
+
+    /*
+	 * Resolves username and image either from a locally saved mapping or from
+	 * synced cloud contacts. If no mapping is found, no name is set and the
+	 * default image is assumed
+	 */
+    public static void resolveContact(Context context, Contact c) {
+
+        long contactId = getContactId(c);
+        boolean found = false;
+
+        if (contactId <= 0) {
+            setContactImageAndName(c, null, null);
+            c.setHasLink(false);
+            return;
+        }
+
+        // Resolve image and name from contact id
+        Cursor cursor = context.getContentResolver().query(ContactsContract.RawContacts.CONTENT_URI, null,ContactsContract.Data.CONTACT_ID + " = ?", new String[] { contactId + "" }, null);
+        if (!cursor.isAfterLast()) {
+
+            while (cursor.moveToNext()) {
+                Bitmap image = Contact.resolveImage(context.getContentResolver(), contactId);
+                String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+
+
+                setContactImageAndName(c, image, displayName);
+                c.setHasLink(true);
+                c.setLinkLookupURI(ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactId));
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            setContactImageAndName(c, null, null);
+            c.setHasLink(false);
+        }
+        cursor.close();
+
+    }
+
+    public static void setContactImageAndName(Contact c, Bitmap image, String name) {
+        c.setLinkName(name);
+        c.setLinkFace(image);
+    }
+
+    private static long getContactId(Contact c) {
+
+        ContactLink cl = queryContactLink( c);
+        return cl != null ? cl.getContactId() : 0;
+    }
+    private static ContactLink queryContactLink(Contact c) {
+        QueryBuilder qb = Dao.getContactLinkDao().queryBuilder();
+
+        Query query = qb.where(
+                qb.and(
+                        ContactLinkDao.Properties.Topic.eq(c.getTopic()),
+                        ContactLinkDao.Properties.ModeId.eq(Preferences.getModeId())
+                )
+        ).build();
+
+        return (ContactLink)query.unique();
+    }
+
+
+    public static void linkContact(Context context, Contact c, long contactId) {
+        ContactLink cl = new ContactLink(null, c.getTopic(), contactId, Preferences.getModeId());
+        Dao.getContactLinkDao().insertOrReplace(cl);
+
+        resolveContact(context, c);
+        EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
+    }
+
+    public static void unlinkContact(Contact c) {
+        ContactLink cl = queryContactLink(c);
+        if(cl != null)
+            Dao.getContactLinkDao().delete(cl);
+        c.setLinkName(null);
+        c.setLinkFace(null);
+        c.setHasLink(false);
+        EventBus.getDefault().postSticky(new Events.ContactUpdated(c));
+    }
 
 }

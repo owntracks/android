@@ -2,15 +2,19 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath "com.android.databinding:dataBinder:1.+"
         classpath 'io.fabric.tools:gradle:1.+'
+
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.android.databinding'
 apply plugin: 'io.fabric'
 
 repositories {
@@ -31,7 +35,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.android.support:design:23.+'
     compile 'com.android.support:recyclerview-v7:23.0.+'
-    compile 'com.android.support:preference-v7:23.0.+'
 
     // Play Services libraries
     compile 'com.google.android.gms:play-services-maps:7.+'
@@ -44,7 +47,10 @@ dependencies {
     compile 'org.altbeacon:android-beacon-library:2.+@aar'
     compile 'ch.hsr:geohash:1.1.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    compile 'org.fusesource.mqtt-client:mqtt-client:1.11'
     compile('com.crashlytics.sdk.android:crashlytics:+@aar') { transitive = true; }
+    compile('com.fasterxml.jackson.core:jackson-core:2.6.2')
+    compile('com.fasterxml.jackson.core:jackson-databind:2.6.2')
 
     // Widget libraries
     compile 'com.github.curioustechizen.android-ago:library:1.3.0'
@@ -90,7 +96,13 @@ android {
             ext.enableCrashlytics = false
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
 
+    }
 }
 def crashlyticsUploadStoredDeobsDebug = "crashlyticsUploadStoredDeobsDebug"
 def crashlyticsUploadDeobsDebug = "crashlyticsUploadDeobsDebug"

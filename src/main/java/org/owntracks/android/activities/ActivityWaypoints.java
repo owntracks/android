@@ -28,6 +28,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.AdapterWaypoints;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
@@ -158,7 +159,7 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return App.getDb().query(App.getWaypointDao().getTablename(), App.getWaypointDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
+                return Dao.getDb().query(Dao.getWaypointDao().getTablename(), Dao.getWaypointDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
             }
         };
     }
@@ -200,8 +201,8 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
 
 
     protected void remove(long id) {
-        Waypoint w = App.getWaypointDao().loadByRowId(id);
-        App.getWaypointDao().delete(w);
+        Waypoint w = Dao.getWaypointDao().loadByRowId(id);
+        Dao.getWaypointDao().delete(w);
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
     }
 

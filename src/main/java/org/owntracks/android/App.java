@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.owntracks.android.db.ContactLinkDao;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.DaoMaster;
 import org.owntracks.android.db.DaoSession;
 import org.owntracks.android.db.MessageDao;
@@ -80,45 +81,26 @@ public class App extends Application  {
             }
         };
 
-        db = helper.getWritableDatabase();
-        DaoMaster daoMaster = new DaoMaster(db);
-        DaoSession daoSession = daoMaster.newSession();
-		this.contactLinkDao = daoSession.getContactLinkDao();
-		this.waypointDao = daoSession.getWaypointDao();
-        this.messageDao = daoSession.getMessageDao();
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
 		this.contacts = new HashMap<String, Contact>();
         this.initializingContacts = new HashMap<String, Contact>();
 
 		//Initialize Google Maps and BitmapDescriptorFactory
-		MapsInitializer.initialize(getApplicationContext());
+        Dao.initialize(this);
+        MapsInitializer.initialize(getApplicationContext());
 		EventBus.getDefault().register(this);
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
 
 
     }
 
-	public static MessageDao getMessageDao() {
-		return instance.messageDao;
-	}
-
-    public static SQLiteDatabase getDb() { return instance.db; }
-    public static WaypointDao getWaypointDao() {
-        return instance.waypointDao;
-    }
-
-	public static ContactLinkDao getContactLinkDao() {
-		return instance.contactLinkDao;
-	}
 
 	public static Context getContext() {
 		return instance;
 	}
-
 	public static Contact getContact(String topic) {
 		return instance.contacts.get(topic);
 	}
-
 
     public static HashMap<String, Contact> getCachedContacts() {
         return contacts;
@@ -131,8 +113,6 @@ public class App extends Application  {
         }
     }
 
-
-
     public void onEvent(Events.ModeChanged e) {
         instance.contacts.clear();
     }
@@ -140,7 +120,6 @@ public class App extends Application  {
     public static void addContact(Contact c) {
         instance.contacts.put(c.getTopic(), c);
         initializingContacts.remove(c.getTopic());
-
         EventBus.getDefault().post(new Events.ContactAdded(c));
     }
 
@@ -161,13 +140,8 @@ public class App extends Application  {
 		return instance.dateFormater.format(d);
 	}
 
-	public static boolean isDebugBuild() {
-		return 0 != (instance.getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE);
-	}
-
 	public static String getAndroidId() {
-		return Secure.getString(instance.getContentResolver(),
-				Secure.ANDROID_ID);
+		return Secure.getString(instance.getContentResolver(), Secure.ANDROID_ID);
 	}
 
 	public static int getBatteryLevel() {
@@ -175,12 +149,6 @@ public class App extends Application  {
 		Intent batteryStatus = getContext().registerReceiver(null, ifilter);
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
-
-	public static void showLocationNotAvailableToast() {
-		Toast.makeText(App.getContext(), App.getContext()
-						.getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
-	}
-
 
 	public void onEventMainThread(Events.BrokerChanged e) {
 		contacts.clear();
@@ -194,7 +162,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableForegroundMode();
-                ServiceProxy.getServiceBeacon().setBackgroundMode(false);
+              //  ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
         });
     }
@@ -207,7 +175,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableBackgroundMode();
-                ServiceProxy.getServiceBeacon().setBackgroundMode(true);
+               // ServiceProxy.getServiceBeacon().setBackgroundMode(true);
             }
         });
     }
@@ -220,62 +188,27 @@ public class App extends Application  {
         return currentActivity;
     }
 
-
-
+    /*
+     * Keps track of running activities and if the app is in running in the foreground or background
+     */
     private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
-
-        @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        }
-
-        @Override
         public void onActivityStarted(Activity activity) {
-            Log.v(TAG, "onActivityStarted " + activity);
-            currentActivity = activity;
-            if (App.runningActivities == 0) {
-                App.onEnterForeground();
-            }
             App.runningActivities++;
-
+            currentActivity = activity;
+            if (App.runningActivities == 0) App.onEnterForeground();
         }
 
-        @Override
-        public void onActivityResumed(Activity activity) {
-            Log.v(TAG, "onActivityResumed "  + activity);
-        }
-
-        @Override
-        public void onActivityPaused(Activity activity) {
-            Log.v(TAG, "onActivityPaused "  + activity);
-
-        }
-
-        @Override
         public void onActivityStopped(Activity activity) {
-            Log.v(TAG, "onActivityStopped "  + activity);
-
-            if(currentActivity == activity)
-                currentActivity = null;
-
             App.runningActivities--;
-            if (App.runningActivities == 0) {
-                App.onEnterBackground();
-            }
-
+            if(currentActivity == activity)  currentActivity = null;
+            if (App.runningActivities == 0) App.onEnterBackground();
         }
 
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-        }
-
-        @Override
-        public void onActivityDestroyed(Activity activity) {
-            Log.v(TAG, "onActivityDestroyed "  + activity);
-
-        }
-
-
+        public void onActivityResumed(Activity activity) {  }
+        public void onActivityPaused(Activity activity) {  }
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) { }
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) { }
+        public void onActivityDestroyed(Activity activity) { }
     }
 
 }

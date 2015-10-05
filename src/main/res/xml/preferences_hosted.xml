@@ -48,53 +48,19 @@
                 android:key="@string/keyNotificationLocation"
                 android:summary="@string/preferencesNotificationLocationSummary"
                 android:title="@string/preferencesNotificationLocation" />
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationGeocoder"
-                android:dependency="@string/keyNotificationLocation"
-                android:key="@string/keyNotificationGeocoder"
-                android:summary="@string/preferencesNotificationGeocoderSummary"
-                android:title="@string/preferencesNotificationGeocoder" />
+
         </PreferenceCategory>
         <PreferenceCategory android:title="Background notifications">
-
             <SwitchPreference
-                android:defaultValue="@bool/valNotificationTickerOnPublish"
-                android:key="@string/keyNotificationTickerOnPublish"
-                android:summary="@string/preferencesNotificationTickerOnPublishSummary"
-                android:title="@string/preferencesNotificationTickerOnPublish" />
-
+                android:defaultValue="@bool/valNotificationMessages"
+                android:key="@string/keyNotificationMessages"
+                android:summary="@string/preferencesNotificationMessagesSummary"
+                android:title="@string/preferencesNotificationMessages" />
             <SwitchPreference
-                android:dependency="@string/keyNotificationTickerOnPublish"
-                android:defaultValue="@bool/valNotificationVibrateOnPublish"
-                android:key="@string/keyNotificationVibrateOnPublish"
-                android:summary="@string/preferencesNotificationVibrateOnPublishSummary"
-                android:title="@string/preferencesNotificationVibrateOnPublish" />
-
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationTickerOnWaypointTransition"
-                android:key="@string/keyNotificationTickerOnWaypointTransition"
-                android:summary="@string/preferencesNotificationTickerOnWaypointTransitionSummary"
-                android:title="@string/preferencesNotificationTickerOnWaypointTransition" />
-
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
-                android:dependency="@string/keyNotificationTickerOnWaypointTransition"
-                android:key="@string/keyNotificationVibrateOnWaypointTransition"
-                android:summary="@string/preferencesNotificationVibrateOnWaypointTransitionSummary"
-                android:title="@string/preferencesNotificationVibrateOnWaypointTransition" />
-
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationVibrateOnWayointTransition"
-                android:dependency="@string/keyNotificationTickerOnWaypointTransition"
-                android:key="@string/keyNotificationOnReceivedWaypointTransition"
-                android:summary="@string/preferencesNotificationTickerOnReceivedWaypointTransitionSummary"
-                android:title="@string/preferencesNotificationTickerOnReceivedWaypointTransition" />
-
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationOnMessageHosted"
-                android:key="@string/keyNotificationOnMessage"
-                android:summary="@string/preferencesNotificationOnMessageSummary"
-                android:title="@string/preferencesNotificationOnMessage" />
+                android:defaultValue="@bool/valNotificationEvents"
+                android:key="@string/keyNotificationEvents"
+                android:summary="@string/preferencesNotificationEventsSummary"
+                android:title="@string/preferencesNotificationEvents" />
 
 
         </PreferenceCategory>
@@ -182,17 +148,18 @@
             android:summary="@string/preferencesDocumentationSummary"
             android:title="@string/preferencesDocumentation" />
         <Preference
-            android:key="mail"
-            android:summary="@string/preferencesMailSummary"
-            android:title="@string/preferencesMail" />
-        <Preference
-            android:key="repo"
-            android:summary="@string/preferencesRepositorySummary"
-            android:title="@string/preferencesRepository" />
+            android:key="community"
+            android:summary="@string/preferencesCommunitySummary"
+            android:title="@string/preferencesCommunity" />
         <Preference
             android:key="twitter"
             android:summary="@string/preferencesTwitterSummary"
             android:title="@string/preferencesTwitter" />
+
+        <Preference
+            android:key="repo"
+            android:summary="@string/preferencesRepositorySummary"
+            android:title="@string/preferencesRepository" />
 
         <PreferenceScreen
             android:key="licenses"

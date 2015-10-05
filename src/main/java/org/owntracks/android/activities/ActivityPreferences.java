@@ -4,15 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -166,8 +163,8 @@ public class ActivityPreferences extends ActivityBase {
 
         private static Preference version;
         private static Preference repo;
-        private static Preference mail;
         private static Preference twitter;
+        private static Preference community;
 
         static String ver;
 
@@ -196,8 +193,8 @@ public class ActivityPreferences extends ActivityBase {
             }
 
             repo = findPreference("repo");
-            mail = findPreference("mail");
             twitter = findPreference("twitter");
+            community = findPreference("community");
             version = findPreference("versionReadOnly");
 
             locatorDisplacement = (EditIntegerPreference) findPreference(Preferences.getKey(R.string.keyLocatorDisplacement));
@@ -220,17 +217,6 @@ public class ActivityPreferences extends ActivityBase {
                 }
             });
 
-            mail.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("message/rfc822");
-                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{Preferences.getIssuesMail()});
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "OwnTracks (Version: " + ver + ")");
-                    a.startActivity(Intent.createChooser(intent, "Send Email"));
-                    return false;
-                }
-            });
 
             twitter.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -241,6 +227,17 @@ public class ActivityPreferences extends ActivityBase {
                     return false;
                 }
             });
+
+            community.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(Preferences.getSupportUrl()));
+                    a.startActivity(intent);
+                    return false;
+                }
+            });
+
 
             setServerPreferenceSummary(this);
 
