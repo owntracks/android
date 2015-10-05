@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.WaypointDao.Properties;
@@ -73,7 +74,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
         Log.v(TAG, "initialized for ServiceLocator");
         this.lastPublish = 0;
-		this.waypointDao = App.getWaypointDao();
+		this.waypointDao = Dao.getWaypointDao();
 
 
 		this.sharedPreferences = PreferenceManager .getDefaultSharedPreferences(this.context);
@@ -82,8 +83,14 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 			@Override
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreference, String key) {
-				if (key.equals(Preferences.getKey(R.string.keyPub)) || key.equals(Preferences .getKey(R.string.keyPubInterval)))
-					handlePreferences();
+				if (
+                        key.equals(Preferences.getKey(R.string.keyPub)) ||
+                        key.equals(Preferences.getKey(R.string.keyLocatorInterval)) ||
+                        key.equals(Preferences.getKey(R.string.keyLocatorDisplacement)) ||
+                        key.equals(Preferences.getKey(R.string.keyLocatorAccuracyForeground)) ||
+                        key.equals(Preferences.getKey(R.string.keyLocatorAccuracyBackground))) {
+                    handlePreferences();
+                }
 			}
 		};
 		this.sharedPreferences .registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
@@ -196,9 +203,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 	private boolean shouldPublishLocation() {
-        if (!this.foreground) {
+        if(!Preferences.getPub())
+            return false;
+
+        if (!this.foreground)
             return true;
-        }
 
 
         //Log.v(TAG, "shouldPublishLocation: time interval -> false");
@@ -314,7 +323,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         else
             setupBackgroundLocationRequest();
 
-		if (this.foreground || Preferences.getPub()) {
+		if (this.foreground ) {
             PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
@@ -351,7 +360,14 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
     @Override
+    public void onEvent(Events.Dummy event) {
+
+    }
+
+    @Override
     public void onLocationChanged(Location location) {
+
+
         if(!isForeground()) {
             StatisticsProvider.setTime(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
             StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES);

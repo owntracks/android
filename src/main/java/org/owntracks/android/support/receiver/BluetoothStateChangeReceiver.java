@@ -20,7 +20,7 @@ public class BluetoothStateChangeReceiver extends BroadcastReceiver{
             ServiceProxy.runOrBind(context, new Runnable() {
                 @Override
                 public void run() {
-                    ServiceProxy.getServiceBeacon().setBluetoothMode(state);
+                //    ServiceProxy.getServiceBeacon().setBluetoothMode(state);
                 }
             });
         }

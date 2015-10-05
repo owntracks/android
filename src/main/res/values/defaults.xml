@@ -4,10 +4,10 @@
 
 
 
-    <string name="valDeviceTopicPublic" formatted="false">public/%s/%s</string>
-    <string name="valBaseTopicPublic">public/+/+</string>
+    <string name="valPubTopicPublic" formatted="false">public/%s/%s</string>
+    <string name="valSubTopicPublic">public/+/+</string>
     <string name="valUsernamePublic">user</string>
-    <string name="valHostPublic">public.owntracks.org</string>
+    <string name="valHostPublic">public-mqtt.owntracks.org</string>
     <integer name="valPortPublic">8889</integer>
     <bool name="valCleanSessionPublic">true</bool>
     <bool name="valAuthPublic">false</bool>
@@ -17,13 +17,13 @@
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
     <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
-    <bool name="valNotificationOnMessagePublic" >true</bool>
+
     <bool name="valMessagesPublic" >true</bool>
 
 
-    <string name="valDeviceTopicHosted" formatted="false">owntracks/%s/%s</string>
-    <string name="valBaseTopicHosted">owntracks/+/+</string>
-    <string name="valHostHosted">hosted.owntracks.org</string>
+    <string name="valPubTopicHosted" formatted="false">owntracks/%s/%s</string>
+    <string name="valSubTopicHosted">owntracks/+/+</string>
+    <string name="valHostHosted">hosted-mqtt.owntracks.org</string>
     <integer name="valPortHosted">8883</integer>
     <bool name="valCleanSessionHosted">false</bool>
     <bool name="valAuthHosted">true</bool>
@@ -32,7 +32,6 @@
     <bool name="valPubRetainHosted">true</bool>
     <integer name="valPubQosHosted">1</integer>
     <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
-    <bool name="valNotificationOnMessageHosted" >true</bool>
     <bool name="valMessagesHosted" >true</bool>
 
 
@@ -40,22 +39,23 @@
     <integer name="valKeepaliveHosted">3600</integer>
 
 
-    <string name="valDeviceTopic" formatted="false">owntracks/%s/%s</string>
-    <string name="valBaseTopic">owntracks/+/+</string>
+    <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
+    <string name="valSubTopic">owntracks/+/+</string>
     <string name="valGeohashMsgTopic" formatted="false">msg/+/%s</string>
 
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">support@owntracks.org</string>
     <string name="valTwitterUrl">https://twitter.com/owntracks</string>
+    <string name="valCommunityUrl">https://community.owntracks.org</string>
     <string name="valTrackerId">""</string>
 
     <integer name="valPort">8883</integer>
-    <integer name="valPubInterval">5</integer>
+    <integer name="valPubInterval">300</integer>
 
     <integer name="valPubQos">1</integer>
     <integer name="valKeepalive">3600</integer>
     <integer name="valLocatorDisplacement">500</integer>
-    <integer name="valLocatorInterval">15</integer>
+    <integer name="valLocatorInterval">900</integer>
     <integer name="valLocatorAccuracyBackground">1</integer>
     <integer name="valLocatorAccuracyForeground">0</integer>
 
@@ -68,12 +68,10 @@
     <bool name="valCleanSessionPrivate">false</bool>
     <bool name="valPubIncludeBattery">false</bool>
     <bool name="valNotification">true</bool>
-    <bool name="valNotificationGeocoder">true</bool>
     <bool name="valNotificationLocation">true</bool>
-    <bool name="valNotificationTickerOnWaypointTransition">true</bool>
-    <bool name="valNotificationTickerOnPublish">true</bool>
-    <bool name="valNotificationVibrateOnWayointTransition">true</bool>
-    <bool name="valNotificationVibrateOnPublish">true</bool>
+    <bool name="valNotificationEvents">true</bool>
+    <bool name="valNotificationMessages" >true</bool>
+
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
     <bool name="valConnectionAdvancedMode">false</bool>
@@ -82,10 +80,8 @@
     <bool name="valRemoteCommandReportLocation">false</bool>
     <bool name="valRemoteConfiguration">false</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
-    <bool name="valNotificationOnReceivedWaypointTransition">true</bool>
     <bool name="valTls">true</bool>
     <bool name="valMessages" >true</bool>
-    <bool name="valNotificationOnMessage" >true</bool>
 
     <string-array name="modeIds">
         <item>0</item>

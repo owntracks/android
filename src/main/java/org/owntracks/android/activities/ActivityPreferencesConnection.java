@@ -734,7 +734,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceBroker().reconnect();
+                            ServiceProxy.getServiceBroker() .reconnect();
                         }
                     };
                     new Thread(r).start();

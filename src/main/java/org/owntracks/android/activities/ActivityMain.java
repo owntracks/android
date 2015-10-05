@@ -451,6 +451,11 @@ public class ActivityMain extends ActivityBase {
         //});
     }
 
+
+    public  void showLocationNotAvailableToast() {
+        Toast.makeText(this, getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
+    }
+
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
@@ -461,10 +466,9 @@ public class ActivityMain extends ActivityBase {
                 @Override
                 public void run() {
                     if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
-                        App.showLocationNotAvailableToast();
+                        showLocationNotAvailableToast();
                     else
-                        ServiceProxy.getServiceLocator()
-                                .publishManualLocationMessage();
+                        ServiceProxy.getServiceLocator().publishManualLocationMessage();
                 }
             });
 
@@ -477,7 +481,7 @@ public class ActivityMain extends ActivityBase {
                     if(ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
                         transitionToCurrentLocationMap();
                     } else {
-                        App.showLocationNotAvailableToast();
+                        showLocationNotAvailableToast();
                     }
                 }
             });
@@ -500,7 +504,7 @@ public class ActivityMain extends ActivityBase {
                 GeocodableLocation l = ServiceProxy.getServiceLocator()
                         .getLastKnownLocation();
                 if (l == null) {
-                    App.showLocationNotAvailableToast();
+                    showLocationNotAvailableToast();
                     return;
                 }
 
@@ -1880,14 +1884,8 @@ public class ActivityMain extends ActivityBase {
             if(c == null)
                 return;
 
-            ServiceProxy.runOrBind(getActivity(), new Runnable() {
+            Contact.unlinkContact(c);
 
-                @Override
-                public void run() {
-                    ServiceProxy.getServiceApplication().unlinkContact(DetailsFragment.this.contact);
-
-                }
-            });
 
         }
 
@@ -1895,16 +1893,10 @@ public class ActivityMain extends ActivityBase {
 			Uri result = intent.getData();
 			final String contactId = result.getLastPathSegment();
 
-			ServiceProxy.runOrBind(getActivity(), new Runnable() {
-
-				@Override
-				public void run() {
-					ServiceProxy.getServiceApplication().linkContact(
+					Contact.linkContact(getActivity(),
                             DetailsFragment.this.contact,
                             Long.parseLong(contactId));
 
-				}
-			});
 
 		}
 

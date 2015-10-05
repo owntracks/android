@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0522"
-    android:versionName="0.5.22" >
+    android:versionCode="0523"
+    android:versionName="0.5.23" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -21,7 +21,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- For BLE beacon detection -->
-    <uses-permission android:name="android.permission.READ_LOGS" />  <!-- For debug log collection -->
 
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"

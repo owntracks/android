@@ -32,7 +32,6 @@ import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
@@ -189,7 +188,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		if (!isBackgroundDataEnabled()) {
 			Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
 			changeState(State.DISCONNECTED_DATADISABLED);
-			reconnectHandler.schedule(); // we will try again to connect after some time
+			reconnectHandler.start(); // we will try again to connect after some time
 			return;
 		}
 
@@ -204,12 +203,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				if (connect())
 					onConnect();
 				else
-					reconnectHandler.schedule();
+					reconnectHandler.start();
 
 			} else {
 				Log.e(TAG, "handleStart: isDisconnected() == false");
 				changeState(State.DISCONNECTED_DATADISABLED);
-				reconnectHandler.schedule(); // we will try again to connect after some time
+				reconnectHandler.start(); // we will try again to connect after some time
 			}
 		} else {
 			Log.d(TAG, "handleStart: isDisconnected() == false");
@@ -268,7 +267,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		try {
 			MqttConnectOptions options = new MqttConnectOptions();
-
             if(Preferences.isModeHosted()) {
                 options.setPassword(Preferences.getPassword().toCharArray());
                 options.setUserName(String.format("%s|%s", Preferences.getUsername(), Preferences.getDeviceId(false)));
@@ -310,7 +308,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(Preferences.getDeviceTopic(true), lwt.toString().getBytes(), 0, false);
+            m.setWill(Preferences.getPubTopicBase(true), lwt.toString().getBytes(), 0, false);
         } catch(JSONException e) {}
 
 	}
@@ -429,24 +427,24 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 	public void subscribToInitialTopics() {
 		List<String> topics =new ArrayList<String>();
-		String baseTopic = Preferences.getBaseTopic();
+		String subTopicBase = Preferences.getSubTopic();
 
-		if(baseTopic.endsWith("#")) { // wildcard sub will match everything anyway
-			topics.add(baseTopic);
+		if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
+			topics.add(subTopicBase);
 		} else {
 
-			topics.add(baseTopic);
-			topics.add(baseTopic + "/info");
+			topics.add(subTopicBase);
+			topics.add(subTopicBase + "/info");
 
 			if (Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
-				topics.add(Preferences.getDeviceTopic(true) + "/cmd");
+				topics.add(Preferences.getPubTopicBase(true) + "/cmd");
 
 			if (Preferences.getDirectMessageEnable() && !Preferences.isModePublic())
-				topics.add(baseTopic + "/msg");
+				topics.add(subTopicBase + "/msg");
 
 			if (!Preferences.isModePublic()) {
-				topics.add(baseTopic + "/event");
-				topics.add(baseTopic + "/waypoint");
+				topics.add(subTopicBase + "/event");
+				topics.add(subTopicBase + "/waypoint");
 			}
 
 
@@ -588,8 +586,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	private void changeState(State newState, Exception e) {
 		//Log.d(TAG, "ServiceBroker state changed to: " + newState);
 		state = newState;
-		EventBus.getDefault().postSticky(
-                new Events.StateChanged.ServiceBroker(newState, e));
+		EventBus.getDefault().postSticky(new Events.StateChanged.ServiceBroker(newState, e));
 	}
 
 	private boolean isOnline() {
@@ -796,7 +793,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
         // Received messages are forwarded to ServiceApplication
-        ServiceProxy.getServiceApplication().messageArrived(topic, message);
+        ServiceProxy.getServiceParser().parseIncomingBrokerMessage(topic, message);
 	}
 
 
@@ -832,8 +829,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
             if (!networkWakelock.isHeld())
                 networkWakelock.acquire();
 
-			if (isOnline() && !isConnected() && !isConnecting()) {
-				//Log.v(TAG, "NetworkConnectionIntentReceiver: triggering doStart");
+			//if (isOnline() && !isConnected() && !isConnecting()) {
+			if (!isConnected() && !isConnecting()) {
+
+			//Log.v(TAG, "NetworkConnectionIntentReceiver: triggering doStart");
                 doStart();
             }
 
@@ -989,7 +988,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
 
         public void stop() {
-            Log.v(TAG, "stop");
+            Log.v(TAG, "stoping reocnnect handler");
 			backoff = 0;
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
             alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
@@ -1000,7 +999,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         }
 
         private void schedule() {
-
+			Log.v(TAG, "scheduling reconnect handler");
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null);

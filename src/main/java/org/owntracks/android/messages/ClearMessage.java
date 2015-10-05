@@ -10,4 +10,5 @@ public class ClearMessage extends Message {
         this.setRetained(true);
         this.setPayload(new byte[0]);
     }
+
 }

@@ -2,6 +2,9 @@ package org.owntracks.android.messages;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.owntracks.android.support.Preferences;
+
+import java.util.concurrent.TimeUnit;
 
 public class MsgMessage extends Message {
     private static final String TAG = "MsgMessage";
@@ -36,6 +39,8 @@ public class MsgMessage extends Message {
 
 
     }
+
+    public String getChannel() {return channel;};
 
     public double getLat() {
         return lat;
@@ -73,6 +78,14 @@ public class MsgMessage extends Message {
 
     public int getMttl() {
         return mttl;
+    }
+
+    public boolean expires() {
+        return mttl != 0;
+    }
+
+    public boolean isExpired() {
+        return expires() && TimeUnit.SECONDS.toMillis(this.mttl) <= System.currentTimeMillis();
     }
 
     public long getTst() {
