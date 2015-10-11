@@ -7,21 +7,21 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath "com.android.databinding:dataBinder:1.+"
+        //classpath "com.android.databinding:dataBinder:1.+"
         classpath 'io.fabric.tools:gradle:1.+'
 
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
+//apply plugin: 'com.android.databinding'
 apply plugin: 'io.fabric'
 
 repositories {
     mavenCentral()
 
     maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
-    maven { url  "http://jcenter.bintray.com"}
+    maven { url 'http://jcenter.bintray.com'}
     maven { url 'https://maven.fabric.io/public' }
 
     flatDir {
@@ -55,6 +55,7 @@ dependencies {
     // Widget libraries
     compile 'com.github.curioustechizen.android-ago:library:1.3.0'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile 'com.mikepenz:fontawesome-typeface:4.4.0.1@aar'
     compile('com.mikepenz:materialdrawer:3.0.6@aar') { transitive = true }
     compile 'com.afollestad:material-dialogs:0.7.5.2'
     compile 'com.joanzapata.android:android-iconify:1.0.10'

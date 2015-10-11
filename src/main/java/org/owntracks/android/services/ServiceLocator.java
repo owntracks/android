@@ -323,22 +323,19 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         else
             setupBackgroundLocationRequest();
 
-		if (this.foreground ) {
-            PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
-            r.setResultCallback(new ResultCallback<Status>() {
-                @Override
-                public void onResult(Status status) {
-                    if (status.isSuccess()) {
-                        Log.v(TAG, "requestLocationUpdates successfull");
-                    } else if (status.hasResolution()) {
-                        Log.v(TAG, "requestLocationUpdates failed. HasResolution");
-                    } else {
-                        Log.v(TAG, "requestLocationUpdates failed. " + status.getStatusMessage());
-                    }
+        PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
+        r.setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                if (status.isSuccess()) {
+                    Log.v(TAG, "requestLocationUpdates successfull");
+                } else if (status.hasResolution()) {
+                    Log.v(TAG, "requestLocationUpdates failed. HasResolution");
+                } else {
+                    Log.v(TAG, "requestLocationUpdates failed. " + status.getStatusMessage());
                 }
-            });
-		} else
-			Log.d(TAG, "Location updates not requested (in foreground: "+ this.foreground +", background updates: " +  Preferences.getPub());
+            }
+        });
 
 	}
 

@@ -189,13 +189,13 @@ public class App extends Application  {
     }
 
     /*
-     * Keps track of running activities and if the app is in running in the foreground or background
+     * Keeps track of running activities and if the app is in running in the foreground or background
      */
     private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
             App.runningActivities++;
             currentActivity = activity;
-            if (App.runningActivities == 0) App.onEnterForeground();
+            if (App.runningActivities == 1) App.onEnterForeground();
         }
 
         public void onActivityStopped(Activity activity) {
