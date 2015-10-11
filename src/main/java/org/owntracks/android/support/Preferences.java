@@ -1065,11 +1065,11 @@ public class Preferences {
         try {json.put(Preferences.getStringRessource(R.string.keyBeaconBackgroundScanPeriod), Preferences.getBeaconBackgroundScanPeriod());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyBeaconForegroundScanPeriod), Preferences.getBeaconForegroundScanPeriod());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyRemoteCommandReportLocation), Preferences.getRemoteCommandReportLocation());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyWaypoints), Preferences.waypointsToJSON());} catch(JSONException e) {};
 
         // Mode specific settings
         switch (getModeId()) {
             case App.MODE_ID_PUBLIC:
-                try {json.put(Preferences.getStringRessource(R.string.keyWaypoints), Preferences.waypointsToJSON());} catch(JSONException e) {};
                 break;
 
             case App.MODE_ID_HOSTED:

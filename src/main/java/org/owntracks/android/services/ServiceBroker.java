@@ -434,17 +434,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		} else {
 
 			topics.add(subTopicBase);
-			topics.add(subTopicBase + "/info");
+			topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
 
-			if (Preferences.getRemoteConfiguration() && !Preferences.isModePublic())
-				topics.add(Preferences.getPubTopicBase(true) + "/cmd");
+			if (!Preferences.isModePublic())
+				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicCommandsPart());
 
 			if (Preferences.getDirectMessageEnable() && !Preferences.isModePublic())
-				topics.add(subTopicBase + "/msg");
+				topics.add(subTopicBase + Preferences.getPubTopicCommandsPart());
 
 			if (!Preferences.isModePublic()) {
-				topics.add(subTopicBase + "/event");
-				topics.add(subTopicBase + "/waypoint");
+				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
+				topics.add(subTopicBase + Preferences.getPubTopicWaypointsPart());
 			}
 
 

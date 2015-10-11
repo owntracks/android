@@ -1,11 +1,12 @@
 OwnTracks Android App Release Notes
 ===================================
 ## OwnTracks 0.5.23
->Release date: 2015-XX-XX
+>Release date: 2015-10-11 for beta testers
 * [FIX] #271 - Automatic reconnect fails
 * [FIX] #273 - Updated support link
+* [FIX] #278 - Waypoints not exorted
 * [FIX] Changed locator interval unit to seconds to be in line with iOS
-
+* [FIX] Not currectly subscribed to cmd topic
 * [NEW] - Simplified notification preferences
 * [NEW] - Added dedicated notifications for messages and events
 
