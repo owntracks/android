@@ -156,6 +156,8 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderOngoing.setContentIntent(resultPendingIntent);
         this.notificationIntentOngoing = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
+
+
         notificationBuilderOngoing.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntentOngoing);
     }
 
@@ -412,6 +414,9 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
                 updateNotificationOngoing();
              }
+
+            Log.v(TAG, "reported");
+            Log.v(TAG, "toast: " + App.isInForeground() + ", " +  (App.getCurrentActivity() != null)  + ", " + ( App.getCurrentActivity() instanceof SnackbarFactory.SnackbarFactoryDelegate));
 
             if (App.isInForeground() && App.getCurrentActivity() != null && App.getCurrentActivity() instanceof SnackbarFactory.SnackbarFactoryDelegate) {
                 SnackbarFactory.show(SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate) App.getCurrentActivity(), R.string.statePublished, Snackbar.LENGTH_SHORT));
