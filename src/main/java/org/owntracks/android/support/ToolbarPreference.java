@@ -7,10 +7,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 
 // This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences_private screens
@@ -35,6 +35,7 @@ public class ToolbarPreference extends Preference {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 goUp();
             }
         });
@@ -45,7 +46,8 @@ public class ToolbarPreference extends Preference {
     }
 
     public void goUp(){
-        PreferenceScreen prefScreen = (PreferenceScreen) getPreferenceManager().findPreference(getKey() + "Screen");
+        PreferenceScreen prefScreen = (PreferenceScreen) getPreferenceManager().findPreference(getKey());
+
         if(prefScreen != null && prefScreen.getDialog() != null)
             prefScreen.getDialog().dismiss();
     }
