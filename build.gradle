@@ -23,6 +23,7 @@ repositories {
     maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
     maven { url 'http://jcenter.bintray.com'}
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://jitpack.io" }
 
     flatDir {
         dirs 'libs'
