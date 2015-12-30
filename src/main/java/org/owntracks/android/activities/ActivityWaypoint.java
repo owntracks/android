@@ -3,6 +3,7 @@ package org.owntracks.android.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -287,7 +288,7 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+                Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
                 if(l != null) {
                     ((ActivityWaypoint)c).latitude.setText(Double.toString((l.getLatitude())));
                     ((ActivityWaypoint)c).longitude.setText(Double.toString((l.getLongitude())));

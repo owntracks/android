@@ -11,6 +11,7 @@ import org.owntracks.android.messages.MsgMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.services.ServiceBroker;
@@ -193,6 +194,33 @@ public class Events {
 		}
 
 	}
+
+    public static class FusedContactAdded extends E {
+        FusedContact contact;
+
+        public FusedContactAdded(FusedContact f) {
+            super();
+            this.contact = f;
+        }
+
+        public FusedContact getContact() {
+            return this.contact;
+        }
+    }
+
+    public static class FusedContactUpdated extends E {
+        FusedContact contact;
+
+        public FusedContactUpdated(FusedContact f) {
+            super();
+            this.contact = f;
+        }
+
+        public FusedContact getContact() {
+            return this.contact;
+        }
+    }
+
 
     public static class ContactRemoved extends E{
         Contact contact;

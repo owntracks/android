@@ -3,42 +3,39 @@ package org.owntracks.android.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.owntracks.android.App;
+import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.ContactAdapter;
+import org.owntracks.android.databinding.ActivityContactsBinding;
+import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.messages.ClearMessage;
 import org.owntracks.android.messages.CommandMessage;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ReverseGeocodingTask;
+import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.SnackbarFactory;
-import org.owntracks.android.support.StaticHandler;
-import org.owntracks.android.support.StaticHandlerInterface;
 
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.databinding.DataBindingUtil;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -55,30 +52,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.mapbox.mapboxsdk.api.ILatLng;
-import com.mapbox.mapboxsdk.overlay.Icon;
 import com.mapbox.mapboxsdk.tileprovider.tilesource.MapboxTileLayer;
 import com.mapbox.mapboxsdk.views.MapViewListener;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import de.greenrobot.event.EventBus;
+import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
+import me.tatarka.bindingcollectionadapter.ItemViewArg;
+import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory;
 
 public class ActivityMain extends ActivityBase {
     private static final String TAG = "ActivityMain";
@@ -91,14 +74,13 @@ public class ActivityMain extends ActivityBase {
     private static final int MENU_CONTACT_UNFOLLOW = 4;
     private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
 
-    private static Drawer.OnDrawerItemClickListener drawerClickListener;
-    private static Drawer.OnDrawerNavigationListener drawerNavigationListener;
-
     private Toolbar toolbar;
     private Drawer drawer;
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
+        final ActivityMain self = this;
 		ServiceProxy.runOrBind(this, new Runnable() {
 			@Override
 			public void run() {
@@ -116,62 +98,25 @@ public class ActivityMain extends ActivityBase {
 		setContentView(R.layout.activity_main);
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-
-
-
-
-        final ActivityMain context = this;
-        drawerClickListener = new Drawer.OnDrawerItemClickListener() {
+        drawer = DrawerFactory.buildDrawerV2(this, toolbar, new DrawerFactory.OnDrawerItemClickListener() {
             @Override
-            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                Log.v(TAG, "" +drawerItem.getIdentifier());
-
-                switch (drawerItem.getIdentifier()) {
-                    case R.string.idLocations:
-                        if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
-                            // We're showing the root and rolling back the complete back stack so we discard it
-                            FragmentHandler.getInstance().clearBackStack();
-                            FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (AppCompatActivity) context, FragmentHandler.DIRECTION_BACK);
-                        }
-                        return true;
-                    case R.string.idPager:
-                        Intent intent3 = new Intent(context, ActivityMessages.class);
-                        startActivity(intent3);
-                        return true;
-                    case R.string.idWaypoints:
-                        Intent intent1 = new Intent(context, ActivityWaypoints.class);
-                        startActivity(intent1);
-                        return true;
-                    case R.string.idStatistics:
-                        Intent intent2 = new Intent(context, ActivityStatistics.class);
-                        startActivity(intent2);
-                        return true;
-
-                    case R.string.idSettings:
-                        Intent intent4 = new Intent(context, ActivityPreferences.class);
-                        startActivity(intent4);
-                        return true;
-
+            public boolean onItemClick() {
+                if (!ActivityMain.FragmentHandler.getInstance().atRoot()) {
+                    // We're showing the root and rolling back the complete back stack so we discard it
+                    FragmentHandler.getInstance().clearBackStack();
+                    FragmentHandler.getInstance().showFragment(FragmentHandler.getInstance().getRoot(), null, (AppCompatActivity) self, FragmentHandler.DIRECTION_BACK);
                 }
-                return false;
-            }
-        };
-        drawerNavigationListener = new Drawer.OnDrawerNavigationListener() {
-            @Override
-            public boolean onNavigationClickListener(View view) {
-                if(!FragmentHandler.getInstance().atRoot()) {
-                    FragmentHandler.getInstance().back(context);
-                    return true;
-                }
-                return false;
-            }
-        };
 
-        drawer = DrawerFactory.buildDrawer(this, toolbar, drawerClickListener, drawerNavigationListener, 0);
+                drawer.closeDrawer();
+                return true;
+            }
+        });
+
+
+
 
 
         FragmentHandler.getInstance().init(ContactsFragment.class, drawer);
-        Log.v(TAG, "Fragment show current or root");
 		FragmentHandler.getInstance().showCurrentOrRoot(this);
 
 	}
@@ -202,7 +147,7 @@ public class ActivityMain extends ActivityBase {
 
             @Override
             public void run() {
-                ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
+                //ServiceProxy.getServiceBroker().publish(new CommandMessage(CommandMessage.ACTION_REPORT_LOCATION), c.getCommandTopic(), Preferences.getPubQosCommands(), Preferences.getPubRetainCommands(), null, null);
             }
         });
     }
@@ -433,22 +378,8 @@ public class ActivityMain extends ActivityBase {
         });
     }
 
-    private void transitionToContactMap(final Contact c) {
-        final AppCompatActivity that = this;
-
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                ((MapboxMapFragment) FragmentHandler.getInstance().forward(MapboxMapFragment.class, null, that)).selectContact(c, MapboxMapFragment.SELECT_CENTER_AND_ZOOM, true, false);
-            }
-        });
-
-        //ServiceProxy.runOrBind(this, new Runnable() {
-        //    @Override
-       //    public void run() {
-        //        ((MapFragment) FragmentHandler.getInstance().forward(MapFragment.class, null, that)).selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true, false);
-        //    }
-        //});
+    private void transitionToContactMap(FusedContact c) {
+        FragmentHandler.getInstance().forward(MapboxMapFragment.class, null, this);
     }
 
 
@@ -501,7 +432,7 @@ public class ActivityMain extends ActivityBase {
 
             @Override
             public void run() {
-                GeocodableLocation l = ServiceProxy.getServiceLocator()
+                Location l = ServiceProxy.getServiceLocator()
                         .getLastKnownLocation();
                 if (l == null) {
                     showLocationNotAvailableToast();
@@ -578,7 +509,8 @@ public class ActivityMain extends ActivityBase {
 
 
 
-    public static class  MapboxMapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
+    public static class  MapboxMapFragment extends Fragment implements SnackbarFactory.SnackbarFactoryDelegate {
+        private static final java.lang.String KEY_SELECTED_CONTACT_TOPIC = "KEY_SELECTED_CONTACT_TOPIC";
         private com.mapbox.mapboxsdk.views.MapView mapView;
         private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
         private static final String KEY_NOTOPIC =          "+NOTOPIC+";
@@ -592,19 +524,19 @@ public class ActivityMain extends ActivityBase {
         private static final long ZOOM_LEVEL_CITY = 11;
         private static final long ZOOM_LEVEL_NEIGHBORHOOD = 17;
 
-        private LinearLayout selectedContactDetails;
-        private TextView selectedContactName;
-        private TextView selectedContactLocation;
-        private ImageView selectedContactImage;
         private Menu mMenu;
         private static Handler handler;
         private MenuInflater mInflater;
         private com.mapbox.mapboxsdk.overlay.Marker currentLocationMarker;
-
+        ActivityMapBinding binding;
+        private HashMap<String, com.mapbox.mapboxsdk.overlay.Marker> markers;
 
         public View getSnackbarTargetView() {
-            return selectedContactDetails;
+            return null;
+           // return selectedContactDetails;
         }
+
+
 
         public static MapboxMapFragment getInstance(Bundle extras) {
             MapboxMapFragment instance = new MapboxMapFragment();
@@ -615,35 +547,18 @@ public class ActivityMain extends ActivityBase {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            handler = new StaticHandler(this);
         }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-            View v = inflater.inflate(R.layout.fragment_mapbox_map, container, false);
+            this.markers = new HashMap<>();
 
-
-
-            this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
-            registerForContextMenu(this.selectedContactDetails);
-
-            this.selectedContactName = (TextView) v.findViewById(R.id.name);
-            this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
-            this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
-
-
-
-
-            this.mapView = (com.mapbox.mapboxsdk.views.MapView) v.findViewById(R.id.mapView);
+            this.binding = DataBindingUtil.inflate(inflater, R.layout.activity_map, container, false);
+            this.mapView = binding.mapView;
             this.mapView.setAccessToken(getString(R.string.MAPBOX_API_KEY));
             this.mapView.setTileSource(new MapboxTileLayer("binarybucks.nfc70b7d"));
             this.mapView.setDiskCacheEnabled(true);
             this.mapView.setUserLocationEnabled(false);
-
-
-
-
-
             this.mapView.setMapViewListener(new MapViewListener() {
                 @Override
                 public void onShowMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
@@ -657,22 +572,11 @@ public class ActivityMain extends ActivityBase {
 
                 @Override
                 public void onTapMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
-                    setFollowingSelectedContact(false);
-                    Contact c = (Contact) marker.getRelatedObject();
-
-                    if (c != null)
-                        selectContact(c, SELECT_UPDATE, false, true);
 
                 }
 
                 @Override
                 public void onLongPressMarker(com.mapbox.mapboxsdk.views.MapView mapView, com.mapbox.mapboxsdk.overlay.Marker marker) {
-                    Contact c = (Contact) marker.getRelatedObject();
-
-                    if (c != null) {
-                        selectContact(c, SELECT_UPDATE, false, true);
-                        getActivity().openContextMenu(selectedContactDetails);
-                    }
 
                 }
 
@@ -690,59 +594,16 @@ public class ActivityMain extends ActivityBase {
             setHasOptionsMenu(true);
             onShow();
 
-            return v;
+            return binding.getRoot();
         }
 
 
-
-
-        @Override
-        public void handleHandlerMessage(Message msg) {
-            if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null)) {
-                GeocodableLocation l = (GeocodableLocation) msg.obj;
-                if ((l.getTag() == null) || (this.selectedContactLocation == null) || !l.getTag().equals(Preferences.getSelectedContactTopic()))
-                    return;
-
-                this.selectedContactLocation.setText(l.toString());
-
-            }
-        }
 
         public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate, float zoom) {
-            setFollowingSelectedContact(follow);
-            selectCurrentLocation(centerMode, animate, zoom);
-        }
-        public void selectCurrentLocation(final int centerMode, final boolean animate, final float zoom) {
-            ServiceProxy.runOrBind(getActivity(), new Runnable() {
-
-                @Override
-                public void run() {
-                    GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-
-                    if (l == null)
-                        return;
-
-                    hideSelectedContactDetails();
-                    Preferences.setSelectedContactTopic(KEY_CURRENT_LOCATION);
-                    centerMap(l, centerMode, animate, zoom);
-                }
-            });
-
+            // TODO
         }
 
-        public void centerMap(GeocodableLocation l, int centerMode, boolean animate) {
-            centerMap(l, centerMode, animate, -1);
-        }
-
-        public void centerMap(ILatLng l, int centerMode, boolean animate, float zoom) {
-            if(centerMode!=SELECT_UPDATE) {
-                //CameraUpdate center;
-                //if(zoom == -1) {
-                //    center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER && zoom != -1? this.mMapView.getMap().getCameraPosition().zoom : 15f);
-                //} else {
-                //    center = CameraUpdateFactory.newLatLngZoom(latlon, zoom);
-                //}
-
+        public void centerMap(ILatLng l, boolean animate, float zoom) {
                 if(animate)
                     this.mapView.setCenter(l, false);
                 else
@@ -752,8 +613,6 @@ public class ActivityMain extends ActivityBase {
                 if(zoom != -1)
                     this.mapView.setZoom(zoom);
 
-
-            }
         }
 
 
@@ -761,30 +620,12 @@ public class ActivityMain extends ActivityBase {
         public void onResume() {
             super.onResume();
 
-            hideSelectedContactDetails();
-            HashMap<String, Contact> contacts = new HashMap<String, Contact>(App.getCachedContacts());
-            for(Contact c : contacts.values()) {
-                updateContactLocation(c);
+            for(FusedContact c : App.getFusedContacts().values()) {
+                updateContactMarker(c);
             }
-            Contact c = getSelectedContact();
 
             Bundle extras = FragmentHandler.getInstance().getBundle(MapboxMapFragment.class);
-            com.mapbox.mapboxsdk.geometry.LatLng position = null;
-            float zoom = -1;
-
-            if(extras != null) {
-                position = extras.getParcelable(KEY_POSITION);
-                zoom = extras.getFloat(KEY_ZOOM);
-            }
-
-            if (c != null) {
-                selectContact(c, SELECT_UPDATE, true, false, zoom);
-                if(position != null)
-                    centerMap(position, SELECT_CENTER, false, zoom);
-            } else if (isFollowingCurrentLocation())
-                selectCurrentLocation(SELECT_CENTER, true, false, zoom);
-            else if(position != null)
-                centerMap(position, SELECT_CENTER, false, zoom);
+            // TODO: Restore state
 
         }
 
@@ -823,29 +664,7 @@ public class ActivityMain extends ActivityBase {
         @Override
         public boolean onContextItemSelected(MenuItem item)
         {
-            Contact c = getSelectedContact();
-            switch (item.getItemId()) {
-                case MENU_CONTACT_SHOW:
-                    selectContact(c, MapboxMapFragment.SELECT_CENTER_AND_ZOOM, true);
-                    return true;
-                case MENU_CONTACT_FOLLOW:
-                    selectContact(c, MapboxMapFragment.SELECT_CENTER, true, true);
-                    return true;
-                case MENU_CONTACT_UNFOLLOW:
-                    setFollowingSelectedContact(false);
-                    return true;
-                case MENU_CONTACT_DETAILS:
-                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
-                    return true;
-                case MENU_CONTACT_NAVIGATE:
-                    ((ActivityMain)getActivity()).launchNavigation(c);
-                    return true;
-                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
-                    ((ActivityMain)getActivity()).requestReportLocation(c);
-                    return true;
-            }
             return false;
-
         }
 
 
@@ -860,12 +679,11 @@ public class ActivityMain extends ActivityBase {
         }
 
         private void onShow() {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             onCreateOptionsMenu(mMenu, mInflater);
-
         }
 
         private void onHide() {
+
         }
         @Override
         public void onStart() {
@@ -880,154 +698,26 @@ public class ActivityMain extends ActivityBase {
         }
 
 
-        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
-            selectContact(c, centerMode, follow, animate, -1);
+        public void selectContact(FusedContact c) {
+            // TODO
         }
 
-        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate, float zoom) {
-            setFollowingSelectedContact(follow);
-            selectContact(c, centerMode, animate, zoom);
+        public void updateContactMarker(FusedContact c) {
+            // TODO
         }
 
-        public void selectContact(final Contact c, int centerMode, boolean animate) {
-            selectContact(c, centerMode, animate, -1);
-        }
-
-        public void selectContact(final Contact c, int centerMode, boolean animate, float zoom) {
-            if (c == null)
-                return;
-
-            Preferences.setSelectedContactTopic(c.getTopic());
-
-            centerMap(c.getLocation(), centerMode, animate, zoom);
-
-            this.selectedContactName.setText(c.getDisplayName());
-            this.selectedContactLocation.setText(c.getLocation().toString());
-            this.selectedContactImage.setImageDrawable(c.getFaceDrawable(getActivity()));
-
-            showSelectedContactDetails();
-
-            if (c.getLocation().getGeocoder() == null)
-                (new ReverseGeocodingTask(getActivity(), handler)).execute(c.getLocation());
-
-        }
-
-        public void onEventMainThread(Events.ContactUpdated e) {
-            updateContactLocation(e.getContact());
-        }
-
-        public void onEventMainThread(Events.ContactAdded e) {
-            updateContactLocation(e.getContact());
-        }
-
-        public void onEventMainThread(Events.ContactRemoved e) {
-            removeContactLocation(e.getContact());
-        }
-
-        public void showSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.VISIBLE);
-        }
-
-        private void removeContactMarker(Contact c) {
-            if (c.getMarker() != null) {
-                mapView.removeMarker(c.getMarker());
-            }
-        }
-
-        public void updateContactLocation(Contact c) {
-            //removeContactMarker(c);
-            com.mapbox.mapboxsdk.overlay.Marker m = c.getMarker();
-            if(m != null) {
-                m.setPoint(c.getLocation().getLatLng());
-                c.getMarker().updateDrawingPosition();
-            } else {
-                m = new com.mapbox.mapboxsdk.overlay.Marker(mapView, "", "", new com.mapbox.mapboxsdk.geometry.LatLng(c.getLocation()));
-                m.setAnchor(new PointF(0.5F, 0.5F));
-                m.setRelatedObject(c);
-                c.setMarker(m);
-            }
-            m.setMarker(c.getFaceDrawable(getActivity()), false);
-            mapView.addMarker(m);
-
-            if (c == getSelectedContact())
-                selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE, true, true);
-
-        }
-
-
-        public void onEventMainThread(Events.CurrentLocationUpdated e) {
-
-            if(currentLocationMarker != null) {
-                this.currentLocationMarker.setPoint(e.getGeocodableLocation().getLatLng());
-                this.currentLocationMarker.updateDrawingPosition();
-
-
-            } else {
-                this.currentLocationMarker = new com.mapbox.mapboxsdk.overlay.Marker("", "", e.getGeocodableLocation().getLatLng());
-                Drawable markerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.current_location_marker);
-                Bitmap bitmap = Bitmap.createBitmap(markerDrawable.getIntrinsicWidth(), markerDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                markerDrawable.draw(canvas);
-
-                this.currentLocationMarker.setMarker(new BitmapDrawable(getActivity().getResources(), bitmap));
-                this.currentLocationMarker.setAnchor(new PointF(0.5f, 0.5f));
-                this.mapView.addMarker(this.currentLocationMarker);
-            }
-
-
-            if (isFollowingCurrentLocation())
-                selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, ZOOM_LEVEL_NEIGHBORHOOD);
-        }
 
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            if(e.getState() == ServiceBroker.State.CONNECTING)
-                clearMap();
-
+            // TOOD
         }
 
         public void onEventMainThread(Events.ModeChanged e) {
-            clearMap();
+            // TOOD
         }
 
-        public void clearMap() {
-            mapView.clear();
-            hideSelectedContactDetails();
-        }
-
-        public void hideSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.GONE);
-        }
-
-        private void removeContactLocation(Contact c) {
-            removeContactMarker(c);
-            Log.v(TAG, Preferences.getSelectedContactTopic());
-            if(c.getTopic() == Preferences.getSelectedContactTopic()) {
-                unfollowContact();
-            }
-        }
 
         private void unfollowContact(){
-            setFollowingSelectedContact(false);
-            Preferences.setSelectedContactTopic(KEY_NOTOPIC);
-            hideSelectedContactDetails();
-        }
-
-
-        public Contact getSelectedContact() {
-            return App.getContact(Preferences.getSelectedContactTopic());
-        }
-
-        public boolean isFollowingCurrentLocation() {
-            return Preferences.getSelectedContactTopic().equals(KEY_CURRENT_LOCATION);
-        }
-
-        public void setFollowingSelectedContact(boolean followingSelectedContact) {
-            Preferences.setFollowingSelectedContact(followingSelectedContact);
-        }
-
-        public boolean isFollowingSelectedContact() {
-            return Preferences.getFollowingSelectedContact();
+            // TODO
         }
 
         @Override
@@ -1035,507 +725,19 @@ public class ActivityMain extends ActivityBase {
             super.onSaveInstanceState(b);
             b.putParcelable(KEY_POSITION, this.mapView.getCenter());
             b.putFloat(KEY_ZOOM, this.mapView.getZoomLevel());
-
             FragmentHandler.getInstance().setBundle(MapboxMapFragment.class, b);
         }
 
 
     }
 
-   /* public static class  MapFragment extends Fragment implements StaticHandlerInterface, SnackbarFactory.SnackbarFactoryDelegate {
-        private static final String KEY_CURRENT_LOCATION = "+CURRENTLOCATION+";
-        private static final String KEY_NOTOPIC =          "+NOTOPIC+";
-        private static final String KEY_POSITION =         "+POSITION+";
-        private static final String KEY_ZOOM =              "+ZOOM+";
-        private static final int SELECT_UPDATE = 0;
-        private static final int SELECT_CENTER = 1;
-        private static final int SELECT_CENTER_AND_ZOOM = 2;
 
+    public static class ContactsFragment extends Fragment implements RecyclerViewAdapter.ClickHandler, RecyclerViewAdapter.LongClickHandler, BindingRecyclerViewAdapterFactory
 
-
-
-        private MapView mMapView;
-		private GoogleMap googleMap;
-		private LinearLayout selectedContactDetails;
-		private TextView selectedContactName;
-		private TextView selectedContactLocation;
-		private ImageView selectedContactImage;
-		private Map<String, Contact> markerToContacts;
-        private Menu mMenu;
-        private static Handler handler;
-        private MenuInflater mInflater;
-        private BitmapDescriptor currentLocationMarkerBitmap;
-        private Marker currentLocationMarker;
-        private Circle currentLocationPrecision;
-
-
-        public View getSnackbarTargetView() {
-            return selectedContactDetails;
-        }
-
-        public static MapFragment getInstance(Bundle extras) {
-			MapFragment instance = new MapFragment();
-			instance.setArguments(extras);
-			return instance;
-		}
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			handler = new StaticHandler(this);
-		}
-
-		@Override
-		public void onStart() {
-			super.onStart();
-			EventBus.getDefault().registerSticky(this);
-		}
-
-		@Override
-		public void onStop() {
-			EventBus.getDefault().unregister(this);
-			super.onStop();
-		}
-
-		@Override
-		public void onResume() {
-			super.onResume();
-			this.mMapView.onResume();
-
-
-            HashMap<String, Contact> contacts = new HashMap<String, Contact>(App.getCachedContacts());
-            for(Contact c : contacts.values())
-				updateContactLocation(c);
-
-            Contact c = getSelectedContact();
-
-            Bundle extras = FragmentHandler.getInstance().getBundle(MapFragment.class);
-            CameraPosition position = null;
-            float zoom = -1;
-
-            if(extras != null) {
-                position = extras.getParcelable(KEY_POSITION);
-                zoom = position.zoom;
-
-            }
-
-            if (c != null) {
-                selectContact(c, SELECT_UPDATE, true, false, zoom);
-                if(position != null)
-                    centerMap(position.target, SELECT_CENTER, false, zoom);
-
-            } else if (isFollowingCurrentLocation())
-                selectCurrentLocation(SELECT_CENTER, true, false, zoom);
-            else if(position != null)
-                centerMap(position.target, SELECT_CENTER, false, zoom);
-        }
-
-
-
-		@Override
-		public void onPause() {
-			this.mMapView.onPause();
-			super.onPause();
-		}
-
-		@Override
-		public void onDestroy() {
-			this.mMapView.onDestroy();
-			super.onDestroy();
-		}
-
-		@Override
-		public void onLowMemory() {
-			this.mMapView.onLowMemory();
-			super.onLowMemory();
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-			View v = inflater.inflate(R.layout.fragment_map, container, false);
-
-
-
-            this.markerToContacts = new HashMap<String, Contact>();
-			this.selectedContactDetails = (LinearLayout) v.findViewById(R.id.contactDetails);
-            registerForContextMenu(this.selectedContactDetails);
-
-            this.selectedContactName = (TextView) v.findViewById(R.id.name);
-			this.selectedContactLocation = (TextView) v.findViewById(R.id.location);
-			this.selectedContactImage = (ImageView) v.findViewById(R.id.image);
-
-
-            Drawable markerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.current_location_marker);
-            Bitmap bitmap = Bitmap.createBitmap(markerDrawable.getIntrinsicWidth(), markerDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            markerDrawable.draw(canvas);
-
-            MapsInitializer.initialize(App.getContext());
-
-            this.currentLocationMarkerBitmap = BitmapDescriptorFactory.fromBitmap(bitmap);
-
-            hideSelectedContactDetails();
-
-			this.mMapView = (MapView) v.findViewById(R.id.mapView);
-			this.mMapView.onCreate(savedInstanceState);
-			this.mMapView.onResume(); // needed to get the map to display immediately
-			this.googleMap = this.mMapView.getMap();
-
-			// Check if we were successful in obtaining the map.
-			if (this.mMapView != null) {
-                //MapsInitializer.initialize(getActivity());
-				setUpMap();
-			}
-
-            setHasOptionsMenu(true);
-            onShow();
-
-			return v;
-		}
-
-        @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-                if(menu != null) {
-                    mMenu = menu;
-                    mInflater = inflater;
-                } else if(mMenu == null || mInflater == null) {
-                    return;
-                }
-
-                mMenu.clear();
-                mInflater.inflate(R.menu.fragment_map, mMenu);
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-            if (v.getId()==R.id.contactDetails) {
-                menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
-
-                if(Preferences.getFollowingSelectedContact())
-                    menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
-                else
-                    menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
-
-                menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
-                menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
-                menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
-
-
-            }
-        }
-
-
-        @Override
-        public boolean onContextItemSelected(MenuItem item)
-        {
-            Contact c = getSelectedContact();
-            switch (item.getItemId()) {
-                case MENU_CONTACT_SHOW:
-                    selectContact(c, MapFragment.SELECT_CENTER_AND_ZOOM, true);
-                    return true;
-                case MENU_CONTACT_FOLLOW:
-                    selectContact(c, MapFragment.SELECT_CENTER, true, true);
-                    return true;
-                case MENU_CONTACT_UNFOLLOW:
-                    setFollowingSelectedContact(false);
-                    return true;
-                case MENU_CONTACT_DETAILS:
-                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
-                    return true;
-                case MENU_CONTACT_NAVIGATE:
-                    ((ActivityMain)getActivity()).launchNavigation(c);
-                    return true;
-                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
-                    ((ActivityMain)getActivity()).requestReportLocation(c);
-                    return true;
-            }
-            return false;
-
-        }
-
-
-		@Override
-		public void onHiddenChanged(boolean hidden) {
-			super.onHiddenChanged(hidden);
-			if (hidden)
-				onHide();
-			else
-				onShow();
-			super.onHiddenChanged(hidden);
-		}
-
-		private void onShow() {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-            onCreateOptionsMenu(mMenu, mInflater);
-
-        }
-
-		private void onHide() {
-        }
-
-		private void setUpMap() {
-			this.googleMap.setIndoorEnabled(false);
-            this.googleMap.setBuildingsEnabled(true);
-            this.googleMap.setMyLocationEnabled(false);
-
-            UiSettings s = this.googleMap.getUiSettings();
-			s.setCompassEnabled(false);
-			s.setMyLocationButtonEnabled(false);
-			s.setTiltGesturesEnabled(false);
-            s.setCompassEnabled(false);
-            s.setRotateGesturesEnabled(false);
-            s.setZoomControlsEnabled(false);
-
-            this.mMapView.getMap().setOnMarkerClickListener(
-                    new OnMarkerClickListener() {
-
-                        @Override
-                        public boolean onMarkerClick(Marker m) {
-                            setFollowingSelectedContact(false);
-                            Contact c = MapFragment.this.markerToContacts.get(m.getId());
-
-                            if (c != null)
-                                selectContact(c, SELECT_UPDATE, false, true);
-
-                            // Event was handled by our code do not launch default behaviour that would center the map on the marker
-                            return true;
-						}
-					});
-
-			this.mMapView.getMap().setOnMapClickListener(
-                    new OnMapClickListener() {
-
-                        @Override
-                        public void onMapClick(LatLng arg0) {
-                            unfollowContact();
-                        }
-                    });
-		}
-
-
-        public void showSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.VISIBLE);
-        }
-        public void hideSelectedContactDetails() {
-            this.selectedContactDetails.setVisibility(View.GONE);
-        }
-
-        public void centerMap(LatLng latlon, int centerMode, boolean animate) {
-            centerMap(latlon, centerMode, animate, -1);
-        }
-		public void centerMap(LatLng latlon, int centerMode, boolean animate, float zoom) {
-            if(centerMode!=SELECT_UPDATE) {
-                CameraUpdate center;
-                if(zoom == -1) {
-                     center = CameraUpdateFactory.newLatLngZoom(latlon, centerMode == SELECT_CENTER && zoom != -1? this.mMapView.getMap().getCameraPosition().zoom : 15f);
-                } else {
-                     center = CameraUpdateFactory.newLatLngZoom(latlon, zoom);
-                }
-
-                if(animate)
-                    this.mMapView.getMap().animateCamera(center);
-                else
-                    this.mMapView.getMap().moveCamera(center);
-            }
-		}
-
-		public void updateContactLocation(Contact c) {
-
-            removeContactMarker(c);
-
-			Marker m = this.googleMap.addMarker(
-                    new MarkerOptions().position(c.getLocation().getLatLng()).icon(c.getFaceDescriptor()).anchor(0.5F, 0.5F));
-			this.markerToContacts.put(m.getId(), c);
-			//c.setMarker(m);
-
-			if (c == getSelectedContact())
-                selectContact(c, isFollowingSelectedContact() ? SELECT_CENTER : SELECT_UPDATE, true, true);
-
-		}
-
-        private void removeContactMarker(Contact c) {
-            if (c.getMarker() != null) {
-               // this.markerToContacts.remove(c.getMarker().getId());
-               // c.getMarker().remove();
-            }
-        }
-
-        private void removeContactLocation(Contact c) {
-            removeContactMarker(c);
-            Log.v(TAG, Preferences.getSelectedContactTopic());
-            if(c.getTopic() == Preferences.getSelectedContactTopic()) {
-                unfollowContact();
-            }
-        }
-
-        private void unfollowContact(){
-            setFollowingSelectedContact(false);
-            Preferences.setSelectedContactTopic(KEY_NOTOPIC);
-            hideSelectedContactDetails();
-        }
-
-		@Override
-		public void handleHandlerMessage(Message msg) {
-
-			if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null)) {
-				GeocodableLocation l = (GeocodableLocation) msg.obj;
-				if ((l.getTag() == null) || (this.selectedContactLocation == null) || !l.getTag().equals(Preferences.getSelectedContactTopic()))
-					return;
-
-				this.selectedContactLocation.setText(l.toString());
-
-			}
-		}
-
-
-        public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate) {
-            selectCurrentLocation(centerMode, follow, animate, -1);
-        }
-
-        public void selectCurrentLocation(final int centerMode, final boolean follow, boolean animate, float zoom) {
-            setFollowingSelectedContact(follow);
-            selectCurrentLocation(centerMode, animate, zoom);
-        }
-        public void selectCurrentLocation(final int centerMode, final boolean animate, final float zoom) {
-            ServiceProxy.runOrBind(getActivity(), new Runnable() {
-
-                @Override
-                public void run() {
-                    GeocodableLocation l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-
-                    if (l == null)
-                        return;
-
-                    hideSelectedContactDetails();
-                    Preferences.setSelectedContactTopic(KEY_CURRENT_LOCATION);
-                    centerMap(l.getLatLng(), centerMode, animate, zoom);
-                }
-            });
-
-        }
-
-        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate) {
-            selectContact(c, centerMode, follow, animate, -1);
-        }
-
-        public void selectContact(final Contact c, int centerMode, boolean follow, boolean animate, float zoom) {
-             setFollowingSelectedContact(follow);
-             selectContact(c, centerMode, animate, zoom);
-         }
-
-        public void selectContact(final Contact c, int centerMode, boolean animate) {
-            selectContact(c, centerMode, animate, -1);
-        }
-
-        public void selectContact(final Contact c, int centerMode, boolean animate, float zoom) {
-			if (c == null)
-				return;
-
-			Preferences.setSelectedContactTopic(c.getTopic());
-
-            centerMap(c.getLocation().getLatLng(), centerMode, animate, zoom);
-
-			this.selectedContactName.setText(c.getDisplayName());
-			this.selectedContactLocation.setText(c.getLocation().toString());
-            this.selectedContactImage.setImageDrawable(c.getFaceDrawable(getActivity()));
-
-            showSelectedContactDetails();
-
-			if (c.getLocation().getGeocoder() == null)
-				(new ReverseGeocodingTask(getActivity(), handler)).execute(c.getLocation());
-
-		}
-
-		public void onEventMainThread(Events.ContactUpdated e) {
-            updateContactLocation(e.getContact());
-		}
-
-        public void onEventMainThread(Events.ContactAdded e) {
-            updateContactLocation(e.getContact());
-        }
-
-        public void onEventMainThread(Events.ContactRemoved e) {
-            removeContactLocation(e.getContact());
-        }
-
-
-
-        public void onEventMainThread(Events.CurrentLocationUpdated e) {
-            Log.v(TAG,"CurrentLocationUpdated" );
-            if(currentLocationMarker != null)
-                this.currentLocationMarker.remove();
-
-            if(currentLocationPrecision != null)
-                this.currentLocationPrecision.remove();
-            this.currentLocationMarker = this.googleMap.addMarker(new MarkerOptions().position(e.getGeocodableLocation().getLatLng()).icon(this.currentLocationMarkerBitmap).draggable(false).flat(true).anchor(0.5F, 0.5F));
-//.zIndex(10000).fillColor(R.color.currentLocationRadiusFill).strokeColor(R.color.currentLocationRadiusStroke).
-            CircleOptions circleOptions = new CircleOptions().center(e.getGeocodableLocation().getLatLng()).radius(e.getGeocodableLocation().getAccuracy()).strokeWidth(2).strokeColor(0x883f72b5).fillColor(0x110000FF);
-            this.currentLocationPrecision = this.googleMap.addCircle(circleOptions);
-
-
-
-            if (isFollowingCurrentLocation())
-				selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, true);
-		}
-
-        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            if(e.getState() == ServiceBroker.State.CONNECTING)
-                clearMap();
-
-        }
-
-        public void onEventMainThread(Events.ModeChanged e) {
-            clearMap();
-        }
-
-        public void clearMap() {
-                markerToContacts.clear();
-                mMapView.getMap().clear();
-                hideSelectedContactDetails();
-        }
-
-        public Contact getSelectedContact() {
-			return App.getContact(Preferences.getSelectedContactTopic());
-		}
-
-        public boolean isFollowingCurrentLocation() {
-            return Preferences.getSelectedContactTopic().equals(KEY_CURRENT_LOCATION);
-        }
-
-//		public boolean hasCurrentLocation() {
-//            return this.currentLocation != null;
-//		}
-
-        public void setFollowingSelectedContact(boolean followingSelectedContact) {
-            Preferences.setFollowingSelectedContact(followingSelectedContact);
-        }
-
-        public boolean isFollowingSelectedContact() {
-            return Preferences.getFollowingSelectedContact();
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle b) {
-            super.onSaveInstanceState(b);
-            b.putParcelable(KEY_POSITION, this.mMapView.getMap().getCameraPosition());
-            FragmentHandler.getInstance().setBundle(MapFragment.class, b);
-        }
-    }
-*/
-
-
-
-    public static class ContactsFragment extends Fragment implements
-			StaticHandlerInterface {
+    {
 
         private static final String TAG_CURRENTLOCATION = "TAG_CURRENTLOCATION";
-        private static Handler handler;
 
-		private ListView contactsList;
-        private ContactAdapter listAdapter;
-        private ArrayList<Contact> contacts;
         private Menu mMenu;
         private MenuInflater mInflater;
 
@@ -1546,65 +748,37 @@ public class ActivityMain extends ActivityBase {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			handler = new StaticHandler(this);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
-            View v = inflater.inflate(R.layout.fragment_contacts, container,
-                    false);
-           // LinearLayout subView = (LinearLayout) v.findViewById(R.id.fragmentToolbarChild);
-           // ((ViewGroup)subView.getParent()).removeView(subView);
-           // Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-           // layoutParams.gravity = Gravity.LEFT  | Gravity.BOTTOM;
-
-            //this.toolbar.addView(subView, layoutParams);
+            ActivityContactsBinding v = DataBindingUtil.inflate(inflater, R.layout.activity_contacts, container, false);
 
 
+            v.setVariable(BR.adapterFactory, this);
+            v.setViewModel(App.getContactsViewModel());
 
-            this.contactsList = (ListView) v.findViewById(R.id.contactsList);
-
-            this.contactsList.setEmptyView((View) v.findViewById(R.id.contactsListPlaceholder));
-            setListAdapter(true);
-
-
-            this.contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1, final int position, long arg3) {
-                    ((ActivityMain) getActivity()).transitionToContactMap((Contact) listAdapter.getItem(position));
-                }
-            });
-
-            registerForContextMenu(this.contactsList);
-            EventBus.getDefault().register(this);
 
             setHasOptionsMenu(true);
 
             onShow();
-            return v;
+            return v.getRoot();
         }
 
-            @Override
-            public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-                if(menu != null) {
-                    mMenu = menu;
-                    mInflater = inflater;
-                } else if(mMenu == null || mInflater == null) {
-                    return;
-                }
-
-                mMenu.clear();
-                mInflater.inflate(R.menu.fragment_contacts, mMenu);
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            if(menu != null) {
+                mMenu = menu;
+                mInflater = inflater;
+            } else if(mMenu == null || mInflater == null) {
+                return;
             }
 
-
-        private void setListAdapter(boolean fromCache) {
-            this.listAdapter = new ContactAdapter(this.getActivity(), fromCache ? new ArrayList<Contact>(App.getCachedContacts().values()) : null);
-            this.contactsList.setAdapter(this.listAdapter);
+            mMenu.clear();
+            mInflater.inflate(R.menu.fragment_contacts, mMenu);
         }
+
 
         @Override
 		public void onStart() {
@@ -1618,34 +792,17 @@ public class ActivityMain extends ActivityBase {
 
         @Override
         public void onDestroy() {
-            handler.removeCallbacksAndMessages(null);
-            EventBus.getDefault().unregister(this);
             super.onDestroy();
         }
 
 		@Override
 		public void onResume() {
             super.onResume();
-
-            registerForContextMenu(this.contactsList);
-
-            ServiceProxy.runOrBind(getActivity(), new Runnable() {
-
-                @Override
-                public void run() {
-                    updateCurrentLocation(ServiceProxy.getServiceLocator().getLastKnownLocation(), true);
-
-                }
-            });
-
 		}
 
         @Override
         public void onPause() {
-            unregisterForContextMenu(this.contactsList);
-
             super.onPause();
-
         }
 
 
@@ -1659,7 +816,6 @@ public class ActivityMain extends ActivityBase {
 		}
 
 		private void onShow() {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Locations");
             onCreateOptionsMenu(mMenu, mInflater);
 
         }
@@ -1679,36 +835,8 @@ public class ActivityMain extends ActivityBase {
                 menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
 
             }
-
-
-
         }
 
-        @Override
-        public boolean onContextItemSelected(MenuItem item)
-        {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            if(info == null)
-                return true;
-
-            Contact c = (Contact) listAdapter.getItem(info.position);
-
-            switch (item.getItemId()) {
-                case MENU_CONTACT_SHOW:
-                    ((ActivityMain)getActivity()).transitionToContactMap(c);
-                    break;
-                case MENU_CONTACT_DETAILS:
-                    ((ActivityMain)getActivity()).transitionToContactDetails(c);
-                    break;
-                case MENU_CONTACT_NAVIGATE:
-                    ((ActivityMain)getActivity()).launchNavigation(c);
-                    break;
-                case MENU_CONTACT_REQUEST_REPORT_LOCATION:
-                    ((ActivityMain)getActivity()).requestReportLocation(c);
-
-            }
-            return true;
-        }
 
 
 
@@ -1718,67 +846,36 @@ public class ActivityMain extends ActivityBase {
         }
 
 		public void onEventMainThread(Events.CurrentLocationUpdated e) {
-            updateCurrentLocation(e.getGeocodableLocation(), true);
 		}
 
 		public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            if(e.getState() == ServiceBroker.State.CONNECTING)
-                setListAdapter(false); // Ignore cached values. Either they're removed already or are invalid and will be removed soon
 		}
 
         public void onEventMainThread(Events.ModeChanged e) {
-            setListAdapter(false);
         }
 
 
-        public void updateCurrentLocation(GeocodableLocation l, boolean resolveGeocoder) {
-			if (l == null)
-				return;
 
-
-			if ((l.getGeocoder() == null) && resolveGeocoder) {
-				l.setTag(TAG_CURRENTLOCATION);
-				(new ReverseGeocodingTask(getActivity(), handler)).execute(l);
-			}
-		}
-
-        public void updateContactLocation(){
-            updateContactLocation(null, false);
-        }
-
-        public void updateContactLocation(Contact c, boolean resolveGeocoder) {
-
-            this.listAdapter.notifyDataSetChanged();
-
-            if (resolveGeocoder && c != null && c.getLocation() != null && c.getLocation().getGeocoder() == null)
-                (new ReverseGeocodingTask(getActivity(), handler)).execute(c.getLocation());
+        @Override
+        public void onClick(View v, Object viewModel) {
+            Log.v(TAG, "onClick" + viewModel);
+            FragmentHandler.getInstance().forward(MapboxMapFragment.class, null, (AppCompatActivity)getActivity());
 
         }
 
+        @Override
+        public void onLongClick(View v, Object viewModel) {
+           // registerForContextMenu(v);
+            //openContextMenu(v);
+           // unregisterForContextMenu(v);
 
-		@Override
-		public void handleHandlerMessage(Message msg) {
-
-			if ((msg.what == ReverseGeocodingTask.GEOCODER_RESULT) && (msg.obj != null))
-				if (((GeocodableLocation) msg.obj).getTag().equals(TAG_CURRENTLOCATION))
-					updateCurrentLocation((GeocodableLocation) msg.obj, false);
-				else
-                    updateContactLocation();
-		}
-
-		public void onEventMainThread(Events.ContactUpdated e) {
-            updateContactLocation(e.getContact(), true);
-		}
-        public void onEventMainThread(Events.ContactAdded e) {
-
-            listAdapter.addItem(e.getContact());
-            updateContactLocation(e.getContact(), true);
         }
 
-        public void onEventMainThread(Events.ContactRemoved e) {
-            listAdapter.removeItem(e.getContact());
+        @Override
+        public <T> BindingRecyclerViewAdapter<T> create(RecyclerView recyclerView, ItemViewArg<T> arg) {
+            Log.v("BindingRecyclerViewAdap", "create");
+            return new RecyclerViewAdapter<>(this, this, arg);
         }
-
     }
 
 
@@ -1958,7 +1055,7 @@ public class ActivityMain extends ActivityBase {
             ServiceProxy.runOrBind(getActivity(), new Runnable() {
                 @Override
                 public void run() {
-                    ServiceProxy.getServiceBroker().publish(new ClearMessage(contact.getTopic()));
+                    //ServiceProxy.getServiceBroker().publish(new ClearMessage(contact.getTopic()));
                 }
             });
         }
@@ -1972,7 +1069,7 @@ public class ActivityMain extends ActivityBase {
         public void onEventMainThread(Events.ContactRemoved e) {
             // Contact will be cleared, close this view
             if (e.getContact() == this.contact);
-                FragmentHandler.getInstance().back((AppCompatActivity)getActivity());
+                FragmentHandler.getInstance().back((AppCompatActivity) getActivity());
         }
 
         public void onEventMainThread(Events.ModeChanged e) {

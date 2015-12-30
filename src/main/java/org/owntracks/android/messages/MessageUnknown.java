@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutoingMessageProcessor;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MessageEvent extends MessageBase{
-    public static final String BASETOPIC_SUFFIX = "/event";
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
+public class MessageUnknown extends MessageBase {
+
+    public String getBaseTopicSuffix() {  return null; }
+
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processMessage(this);

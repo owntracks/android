@@ -16,6 +16,10 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -24,6 +28,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
@@ -35,8 +40,12 @@ import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.Message;
+import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
+import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
@@ -51,50 +60,44 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import ch.hsr.geohash.GeoHash;
 import de.greenrobot.event.EventBus;
 
-public class ServiceBroker implements MqttCallback, ProxyableService {
-    public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
+public class ServiceBroker implements MqttCallback, ProxyableService, OutoingMessageProcessor {
+	private static final String TAG = "ServiceBroker";
+	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
-    private static final String TAG = "ServiceBroker";
+	private static final int MAX_INFLIGHT_MESSAGES = 10;
 
 
-    private static final int MAX_INFLIGHT_MESSAGES = 10;
+	private ServiceProxy context;
 
-    public enum State {
+	private PausableThreadPoolExecutor pubPool;
+
+
+	public enum State {
         INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, DISCONNECTED_ERROR
     }
-
 
 	private static State state = State.INITIAL;
 
 	private CustomMqttClient mqttClient;
 	private Thread workerThread;
 	private static Exception error;
-	private HandlerThread pubThread;
-	private Handler pubHandler;
     private MqttClientPersistence persistenceStore;
 	private BroadcastReceiver netConnReceiver;
-	private ServiceProxy context;
-    private LinkedList<String> subscribtions;
     private WakeLock networkWakelock;
     private WakeLock connectionWakelock;
     private ReconnectHandler reconnectHandler;
 	private PingHandler pingHandler;
 	private boolean connectedWithCleanSession;
 
-    private  Map<IMqttDeliveryToken, Message> inflightMessages = new HashMap<>(); // keeps track of sent messages for delivery callbacks
-    private final Object inflightMessagesLock = new Object();
-
-    private LinkedList<Message> backlog = new LinkedList<>(); // keeps track of messages that failed to send
-    private final Object backlogLock = new Object();
-
 	private static final int MIN_GEOHASH_PRECISION = 3 ;
 	private static final int MAX_GEOHASH_PRECISION = 6;
-
 	private static final int GEOHASH_SLOTS = MAX_GEOHASH_PRECISION-MIN_GEOHASH_PRECISION+1;
 	String[] activeGeohashTopics = new String[GEOHASH_SLOTS];
 	private static final String[] NO_GEOHASHES = new String[GEOHASH_SLOTS];
@@ -104,15 +107,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void onCreate(ServiceProxy p) {
 		this.context = p;
 		this.workerThread = null;
-		this.error = null;
-        this.subscribtions = new LinkedList<>();
-		this.pubThread = new HandlerThread("org.owntracks.android.services.ServiceBroker.pubThread");
-		this.pubThread.start();
-		this.pubHandler = new Handler(this.pubThread.getLooper());
+		initPubPool();
+		this.pubPool.pause();
         this.persistenceStore = new CustomMemoryPersistence();
         this.reconnectHandler = new ReconnectHandler(context);
         changeState(State.INITIAL);
         doStart();
+	}
+
+	private void initPubPool() {
+		if(pubPool != null && !pubPool.isShutdown()) {
+			pubPool.shutdownNow();
+		}
+		this.pubPool = new PausableThreadPoolExecutor(1,1,1, TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
 	}
 
 	@Override
@@ -126,6 +133,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				doStart();
 
 		} else if(ServiceBroker.RECEIVER_ACTION_PING.equals(intent.getAction())) {
+			Log.v(TAG,	 "onStartCommand ServiceBroker.RECEIVER_ACTION_PING");
+
 			if(pingHandler != null)
 				pingHandler.ping(intent);
 			else
@@ -139,22 +148,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
 	private void doStart(final boolean force) {
-		Log.v(TAG, "doStart " + force);
-
 		Thread thread1 = new Thread() {
 			@Override
 			public void run() {
 				Log.v(TAG, "running thread");
 				handleStart(force);
-				if (this == ServiceBroker.this.workerThread) // Clean up worker
+				if (this == ServiceBroker.this.workerThread)
 					ServiceBroker.this.workerThread = null;
 			}
 
 			@Override
 			public void interrupt() {
 				Log.v(TAG, "worker thread interrupt");
-				if (this == ServiceBroker.this.workerThread) // Clean up worker
-																// thread
+				if (this == ServiceBroker.this.workerThread)
 					ServiceBroker.this.workerThread = null;
 				super.interrupt();
 			}
@@ -166,16 +172,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		Log.v(TAG, "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
-            //Log.v(TAG, "handleStart: canConnect() == false");
 			changeState(State.DISCONNECTED_CONFIGINCOMPLETE);
-
 			return;
         }
+
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
-		if ((state == State.DISCONNECTED_USERDISCONNECT)
-				&& !force) {
-			//Log.d(TAG, "handleStart: userdisconnect==true");
+		if ((state == State.DISCONNECTED_USERDISCONNECT) && !force) {
 			return;
 		}
 
@@ -195,9 +198,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		// Don't do anything unless we're disconnected
 
 		if (isDisconnected()) {
-			//Log.v(TAG, "handleStart: isDisconnected() == true");
-			// Check if there is a data connection
-			if (isOnline()) {
+			if (isOnline()) { // Check if there is a data connection
 				Log.v(TAG, "handleStart: isOnline() == true");
 
 				if (connect())
@@ -212,7 +213,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			}
 		} else {
 			Log.d(TAG, "handleStart: isDisconnected() == false");
-
 		}
 	}
 
@@ -331,6 +331,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 			onUncleanSessionConnect();
 
 		onSessionConnect();
+		pubPool.resume();
+
 	}
 
 
@@ -351,7 +353,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				updateGeohashSubscriptions();
 		}
 
-		deliverBacklog();
 	}
 
 	public void onEvent(Events.CurrentLocationUpdated e) {
@@ -434,13 +435,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		} else {
 
 			topics.add(subTopicBase);
-			topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
+			if(Preferences.getInfo())
+				topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
 
 			if (!Preferences.isModePublic())
 				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicCommandsPart());
 
-			if (Preferences.getDirectMessageEnable() && !Preferences.isModePublic())
-				topics.add(subTopicBase + Preferences.getPubTopicCommandsPart());
+			if (Preferences.getMessaging() && !Preferences.isModePublic())
+				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicMsgPart()); // general messages
 
 			if (!Preferences.isModePublic()) {
 				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
@@ -450,7 +452,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
 		}
 
-		if(Preferences.getBroadcastMessageEnabled())
+		if(Preferences.getMessaging())
 			topics.add(Preferences.getBroadcastMessageTopic());
 
 
@@ -474,9 +476,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 		try {
 
 			this.mqttClient.subscribe(topics);
-			for (String topic : topics) {
-				subscribtions.push(topic);
-			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -542,6 +542,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	public void connectionLost(Throwable t) {
 		Log.e(TAG, "connectionLost: " + t.toString());
         t.printStackTrace();
+		pubPool.pause();
 		// we protect against the phone switching off while we're doing this
 		// by requesting a wake lock - we request the minimum possible wake
 		// lock - just enough to keep the CPU running until we've finished
@@ -675,30 +676,57 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
         return c.getString(id);
     }
 
-    public void publish(String message, String topic, int qos, boolean retained, MessageLifecycleCallbacks callback, Object extra) {
-        publish(new Message(topic, message, qos, retained, callback, extra));
-    }
-
-    public void publish(Message message, String topic, int qos, boolean retained, MessageLifecycleCallbacks callback, Object extra){
-        message.setCallback(callback);
-        message.setExtra(extra);
+    public void publish(MessageBase message, String topic, int qos, boolean retained, MessageLifecycleCallbacks callback, Object extra){
+        //message.setCallback(callback);
+        //message.setExtra(extra);
         publish(message, topic, qos, retained);
     }
 
-    public void publish(Message message, String topic, int qos, boolean retained){
+    public void publish(MessageBase message, String topic, int qos, boolean retained){
         message.setTopic(topic);
-        message.setRetained(retained);
-        message.setQos(qos);
+        //message.setRetained(retained);
+        //message.setQos(qos);
         publish(message);
     }
 
-    public void publish(final Message message) {
-		this.pubHandler.post(new Runnable() {
+	@Override
+	public void processMessage(MessageBase message) {
+		Log.v(TAG, "processMessage: " + message + ", q size: " + pubPool.getQueue().size());
+		try {
+			MqttMessage m = new MqttMessage();
+			m.setPayload(ServiceProxy.getServiceParser().toJSON(message).getBytes());
+			m.setQos(message.getQos());
+			m.setRetained(message.getRetained());
+			try {
+				MqttDeliveryToken token = this.mqttClient.getTopic(message.getTopic()).publish(m);
+				if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
+					Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+					this.pubPool.pause();
+				}
+			} catch (MqttException e) {
+				Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
+				e.printStackTrace();
+			};
+		} catch (JsonProcessingException e) {
+			Log.e(TAG, "processMessage: JsonProcessingException");
+			e.printStackTrace();
+		}
+
+	}
+
+
+	public void publish(final MessageBase message) {
+		message.setOutgoingProcessor(this);
+		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
+		this.pubPool.execute(message);
+
+		return;
+/*		this.pubHandler.post(new Runnable() {
 
 			@Override
 			public void run() {
 				Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
-				if (message instanceof LocationMessage)
+				if (message instanceof MessageLocation)
 					StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT);
 
 				// This should never happen
@@ -706,14 +734,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 					Log.e(TAG, "PUB ON MAIN THREAD");
 				}
 
-				// Check if we can publish
-				//if (!isOnline() || !isConnected()) {
-				//    Log.d("ServiceBroker", "publish deferred");
-				//    doStart();
-				//    return;
-				//}
 
-				message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
+
+				//message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
 
 				try {
 
@@ -721,8 +744,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 						throw new Exception("message without topic. class:" + message.getClass() + ", msg: " + message.toString());
 					}
 
-					//IMqttDeliveryToken t = ;
-					message.publishing();
+					//message.publishing();
 					synchronized (inflightMessagesLock) {
 						// either works if client is connected or throws Exception if not.
 						// If Client is initialized but not connected, it throws a paho exception and we have to remove the message in the catch
@@ -761,7 +783,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 				} finally {
 				}
 			}
-		});
+		});*/
 
 	}
 
@@ -771,24 +793,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
     }
 
 
-    // After reconnecting, we try to deliver messages for which the publish previously threw an error
-    // Messages are removed from the backlock, a publish is attempted and if the publish the message is added at the end of the backlog again until ttl reaches zero
-    private void deliverBacklog() {
-        Log.v(TAG, "delivering backlog");
-		synchronized (backlogLock) {
-
-			Iterator<Message> i = backlog.iterator();
-			while (i.hasNext() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
-            Message m;
-                m = i.next();
-                i.remove();
-           	 	publish(m);
-		  	}
-		}
-
-		StatisticsProvider.setInt(context, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, backlog.size());
-
-	}
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -800,21 +804,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
     @Override
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
-        Log.v(TAG, "delivery complete thread " + Thread.currentThread().getId());
-
-        Message message;
-        synchronized (inflightMessagesLock) {
-            message = inflightMessages.remove(messageToken);
-            Log.v(TAG, "Delivery complete of " + messageToken.getMessageId());
-
-            if(message != null) {
-                Log.v(TAG, "Message received from inflight messages");
-                message.publishSuccessful();
-				if(message instanceof LocationMessage)
-					StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS);
-
-			}
-        }
+		if(this.pubPool.isPaused() && this.mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
+			Log.v(TAG, "resuming pubPool that was paused to to backPreassure. Currently outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+			this.pubPool.resume();
+		}
     }
 
 	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
@@ -847,13 +840,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 	}
 
     public void clearQueues() {
-        synchronized (inflightMessagesLock) {
-            inflightMessages.clear();
-        }
-
-        synchronized (backlogLock) {
-            backlog.clear();
-        }
+		initPubPool();
     }
 
     public void onEvent(Events.ModeChanged e) {
@@ -930,18 +917,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService {
 
         @Override
         public void init(ClientComms comms) {
-            this.comms = comms;
+            Log.v(TAG, "init " + this);
+			this.comms = comms;
         }
 
         @Override
         public void start() {
-            Log.v(TAG, "start");
+            Log.v(TAG, "start " + this);
             schedule(comms.getKeepAlive());
         }
 
         @Override
         public void stop() {
-            Log.v(TAG, "stop");
+            Log.v(TAG, "stop " + this);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
             alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_BROKER, ServiceBroker.RECEIVER_ACTION_PING, null));
         }

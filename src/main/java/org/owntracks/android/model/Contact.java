@@ -7,6 +7,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Dao;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
@@ -41,6 +42,8 @@ import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 
 public class Contact {
+
+
     private static final String TAG = "Contact";
 
     private int uid;
@@ -132,6 +135,7 @@ public class Contact {
     public GeocodableLocation getLocation() {
 		return this.location;
 	}
+
 
 	public void setLocation(GeocodableLocation location) {
 		this.location = location;

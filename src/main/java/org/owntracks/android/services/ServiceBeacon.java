@@ -124,7 +124,9 @@ public class ServiceBeacon implements BeaconConsumer, BootstrapNotifier, Proxyab
         this.context = c;
         Log.v(TAG, "onCreate()");
         beaconManager = BeaconManager.getInstanceForApplication(context);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // estimote
+       // beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215"));
+
+        //beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // estimote
         beaconManager.bind(this);
         //>/Region region = new Region("all beacons", null, null, null);
         //RegionBootstrap regionBootstrap = new RegionBootstrap(this, region);
