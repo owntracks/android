@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable name="item" type="org.owntracks.android.model.FusedContact"/>
+    </data>
+
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <include
+            android:id="@+id/fragmentToolbar"
+            layout="@layout/toolbar"/>
+
+        <com.mapbox.mapboxsdk.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+
+        <LinearLayout
+            android:layout_gravity="bottom"
+            android:id="@+id/contactDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_behavior="org.owntracks.android.support.BehaviourMapContact"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:background="@drawable/map_contact_details_background">
+
+            <include layout="@layout/binding_row_contact"
+                android:transitionName="rowContact"
+                bind:item="@{item}"/>
+
+
+        </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

@@ -155,6 +155,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         notificationBuilderOngoing.setContentIntent(resultPendingIntent);
+        notificationBuilderOngoing.setSortKey("a");
         this.notificationIntentOngoing = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
 
 
@@ -174,6 +175,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilderMessages.setContentIntent(resultPendingIntent);
         notificationBuilderMessages.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION, null));
+        notificationBuilderOngoing.setSortKey("b");
 
         notificationBuilderMessages.setSmallIcon(R.drawable.ic_notification);
         notificationBuilderMessages.setGroup(NOTIFICATION_ID_MESSAGES + "");
@@ -210,6 +212,8 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         notificationBuilderEvents.setAutoCancel(true);
         notificationBuilderEvents.setShowWhen(false);
         notificationBuilderEvents.setGroup(NOTIFICATION_ID_EVENTS + "");
+        notificationBuilderOngoing.setSortKey("c"
+        );
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
@@ -394,6 +398,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     public void onEvent(Events.TransitionMessageReceived e) {
         if(e.getTransitionMessage().isRetained())
             return;
+
 
         e.getTransitionMessage().setTopic(e.getTopic());
         addNotificationEvents(e.getTransitionMessage());

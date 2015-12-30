@@ -3,6 +3,7 @@ package org.owntracks.android;
 
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,14 +11,18 @@ import java.util.HashMap;
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.DaoMaster;
-import org.owntracks.android.db.DaoSession;
 import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.model.ContactsViewModel;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.StatisticsProvider;
 
 import android.app.Activity;
@@ -25,20 +30,23 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings.Secure;
+import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.android.gms.maps.MapsInitializer;
 
 import de.greenrobot.event.EventBus;
+import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
+import me.tatarka.bindingcollectionadapter.ItemViewArg;
+import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory;
 
 public class App extends Application  {
     private static final String TAG = "App";
@@ -47,13 +55,18 @@ public class App extends Application  {
     private static boolean inForeground;
     private static int runningActivities = 0;
     private SimpleDateFormat dateFormater;
+    private static Handler mainHanler;
 
     private ContactLinkDao contactLinkDao;
 	private WaypointDao waypointDao;
     private MessageDao messageDao;
 
-    private static HashMap<String, Contact> contacts;
-    private static HashMap<String, Contact> initializingContacts;
+    private static ArrayMap<String, FusedContact> fusedContacts;
+    private static ContactsViewModel contactsViewModel;
+
+    private static HashMap<String, Contact> contacts;    /* TODO: DEPRECATED*/
+    private static HashMap<String, Contact> initializingContacts;    /* TODO: DEPRECATED*/
+
     private static Activity currentActivity;
 
 
@@ -61,6 +74,10 @@ public class App extends Application  {
     public static final int MODE_ID_HOSTED=1;
     public static final int MODE_ID_PUBLIC=2;
     private SQLiteDatabase db;
+
+    public static ArrayMap<String, FusedContact> getFusedContacts() {
+        return fusedContacts;
+    }
 
     @Override
 	public void onCreate() {
@@ -81,13 +98,18 @@ public class App extends Application  {
             }
         };
 
-		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
-		this.contacts = new HashMap<String, Contact>();
-        this.initializingContacts = new HashMap<String, Contact>();
 
-		//Initialize Google Maps and BitmapDescriptorFactory
+		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
+        this.mainHanler = new Handler(getMainLooper());
+        this.contacts = new HashMap<String, Contact>();
+        this.initializingContacts = new HashMap<String, Contact>();
+        this.fusedContacts = new ArrayMap<String, FusedContact>();
+        this.contactsViewModel =  new ContactsViewModel();
+
+        ContactImageProvider.initialize(this);
+        GeocodingProvider.initialize(this);
+
         Dao.initialize(this);
-        MapsInitializer.initialize(getApplicationContext());
 		EventBus.getDefault().register(this);
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
 
@@ -98,12 +120,37 @@ public class App extends Application  {
 	public static Context getContext() {
 		return instance;
 	}
-	public static Contact getContact(String topic) {
+    public static App getInstance() {
+        return instance;
+    }
+
+    /*TODO: refactor to getFusedContact remove */
+    public static Contact getContact(String topic) {
 		return instance.contacts.get(topic);
 	}
 
+    public static FusedContact getFusedContact(String topic) {
+        return fusedContacts.get(topic);
+    }
+
+    public static ContactsViewModel getContactsViewModel() {
+        return contactsViewModel;
+    }
+
+    /* TODO: DEPRECATED*/
     public static HashMap<String, Contact> getCachedContacts() {
         return contacts;
+    }
+
+    public static void addFusedContact(final FusedContact c) {
+        fusedContacts.put(c.getTopic(), c);
+
+        postOnMainHandler(new Runnable() {
+            @Override
+            public void run() {
+                contactsViewModel.items.add(c);
+            }
+        });
     }
 
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
@@ -116,21 +163,27 @@ public class App extends Application  {
     public void onEvent(Events.ModeChanged e) {
         instance.contacts.clear();
     }
+    public static void postOnMainHandler(Runnable r) {
+        mainHanler.post(r);
+    }
 
+        /* TODO: DEPRECATED*/
     public static void addContact(Contact c) {
         instance.contacts.put(c.getTopic(), c);
         initializingContacts.remove(c.getTopic());
         EventBus.getDefault().post(new Events.ContactAdded(c));
     }
-
+    /* TODO: DEPRECATED*/
     public static void addUninitializedContact(Contact c) {
         instance.initializingContacts.put(c.getTopic(), c);
     }
 
+    /* TODO: DEPRECATED*/
     public static Contact getInitializingContact(String topic) {
         return instance.initializingContacts.get(topic);
     }
 
+        /* TODO: DEPRECATED*/
     public static void removeContact(Contact c) {
         instance.contacts.remove(c.getTopic());
         EventBus.getDefault().post(new Events.ContactRemoved(c));
@@ -156,13 +209,13 @@ public class App extends Application  {
 
     public static void onEnterForeground() {
         Log.v(TAG, "onEnterForeground");
-        inForeground = true; 
+        inForeground = true;
         ServiceProxy.runOrBind(getContext(), new Runnable() {
 
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableForegroundMode();
-              //  ServiceProxy.getServiceBeacon().setBackgroundMode(false);
+                //  ServiceProxy.getServiceBeacon().setBackgroundMode(false);
             }
         });
     }
@@ -175,7 +228,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableBackgroundMode();
-               // ServiceProxy.getServiceBeacon().setBackgroundMode(true);
+                // ServiceProxy.getServiceBeacon().setBackgroundMode(true);
             }
         });
     }

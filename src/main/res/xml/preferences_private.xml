@@ -186,7 +186,7 @@
             android:title="@string/preferencesRepository" />
 
         <PreferenceScreen
-            android:key="licenses"
+            android:key="licensesScreen"
             android:summary="@string/preferencesLicensesSummary"
             android:title="@string/preferencesLicenses">
             <org.owntracks.android.support.ToolbarPreference

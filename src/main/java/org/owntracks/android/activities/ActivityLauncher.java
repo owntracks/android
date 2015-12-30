@@ -177,7 +177,7 @@ public class ActivityLauncher extends ActivityBase {
 	}
 
 	public void startActivityMain() {
-		startActivityFromClass(ActivityMain.class);
+		startActivityFromClass(ActivityContacts.class);
 	}
 
 	public void startActivityFromClass(Class<?> c) {

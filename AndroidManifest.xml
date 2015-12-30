@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0523"
-    android:versionName="0.5.23" >
+    android:versionCode="0601"
+    android:versionName="0.6.01" >
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -25,10 +25,11 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" /> <!-- For config import/export -->
-    <uses-permission android:name="android.permission.VIBRATE" /> <!-- For notifications -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- For notifications -->
     <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
-   <!-- To trigger waypoints when entering a WIFI network -->
+    <!-- To trigger waypoints when entering a WIFI network -->
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -58,6 +59,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ActivityMain" >
+        </activity>
+        <activity android:name=".activities.ActivityContacts" >
         </activity>
         <activity
             android:name=".activities.ActivityWaypoints"
@@ -130,10 +133,11 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/json" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -188,6 +192,8 @@
         <activity
             android:name=".activities.ActivityStatistics"
             android:label="@string/title_activity_activity_statistics" >
+        </activity>
+        <activity android:name=".activities.ActivityMap" android:parentActivityName=".activities.ActivityContacts" >
         </activity>
     </application>
 

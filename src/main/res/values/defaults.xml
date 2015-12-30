@@ -19,6 +19,7 @@
     <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
 
     <bool name="valMessagesPublic" >true</bool>
+    <bool name="valInfoPublic" >true</bool>
 
 
     <string name="valPubTopicHosted" formatted="false">owntracks/%s/%s</string>
@@ -33,6 +34,7 @@
     <integer name="valPubQosHosted">1</integer>
     <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
     <bool name="valMessagesHosted" >true</bool>
+    <bool name="valInfoHosted" >true</bool>
 
 
 
@@ -82,6 +84,7 @@
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valTls">true</bool>
     <bool name="valMessages" >true</bool>
+    <bool name="valInfo" >true</bool>
 
     <string-array name="modeIds">
         <item>0</item>
