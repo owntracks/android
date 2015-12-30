@@ -81,14 +81,13 @@ public class ServiceProxy extends ServiceBindable {
 
 	}
 
-    @Override
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int r = super.onStartCommand(intent, flags, startId); // Invokes
 																// onStartOnce(...)
 																// the fist time
 																// to initialize
 																// the service
-
 		ProxyableService s = getServiceForIntent(intent);
 		if (s != null)
 			s.onStartCommand(intent, flags, startId);

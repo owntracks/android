@@ -12,12 +12,7 @@ public class ReceiverProxy extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, final Intent intent) {
-        Log.v(TAG, "onReceive - action: " + intent.getAction());
-        ServiceProxy.runOrBind(context, new Runnable() {
-            @Override
-            public void run() {
-            ServiceProxy.getInstance().onStartCommand(intent, 0, 0);
-            }
-        });
+        intent.setClass(context, ServiceProxy.class);
+        context.startService(intent);
     }
 }

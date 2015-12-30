@@ -137,6 +137,7 @@ public class Preferences {
     }
 
 
+
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -319,6 +320,7 @@ public class Preferences {
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try { setMessaging(json.getBoolean(getStringRessource(R.string.keyMessaging))); } catch (JSONException e) {}
+        try { setInfo(json.getBoolean(getStringRessource(R.string.keyInfo))); } catch (JSONException e) {}
 
 
 
@@ -594,6 +596,9 @@ public class Preferences {
     }
     public static String getPubTopicCommandsPart() {
         return "/cmd";
+    }
+    public static String getPubTopicMsgPart() {
+        return "/msg";
     }
 
 
@@ -949,10 +954,19 @@ public class Preferences {
         return getBoolean(R.string.keyMessaging, R.bool.valMessages, R.bool.valMessagesHosted, R.bool.valMessagesPublic, false, false);
     }
 
+    public static boolean getInfo() {
+        return getBoolean(R.string.keyInfo, R.bool.valInfo, R.bool.valInfoHosted, R.bool.valInfoPublic, false, false);
+    }
+
 
     public static void setMessaging(boolean messaging) {
         setBoolean(R.string.keyMessaging, messaging);
     }
+
+    public static void setInfo(boolean info) {
+        setBoolean(R.string.keyInfo, info);
+    }
+
 
     public static String getTlsClientCrtPassword() {
         return getString(R.string.keyTlsClientCrtPassword, R.string.valEmpty);

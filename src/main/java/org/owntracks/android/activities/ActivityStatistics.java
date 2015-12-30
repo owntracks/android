@@ -37,6 +37,10 @@ public class ActivityStatistics extends ActivityBase {
         final Context context = this;
         Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
             @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                return false;
+            }
+
             public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                 switch (drawerItem.getIdentifier()) {
                     case R.string.idLocations:
