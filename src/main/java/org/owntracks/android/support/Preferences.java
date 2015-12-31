@@ -365,8 +365,8 @@ public class Preferences {
 
                 waypointJson = j.getJSONObject(i);
                 newWaypoint  = new Waypoint();
-                newWaypoint.setLatitude(waypointJson.getDouble("lat"));
-                newWaypoint.setLongitude(waypointJson.getDouble("lon"));
+                newWaypoint.setGeofenceLatitude(waypointJson.getDouble("lat"));
+                newWaypoint.setGeofenceLongitude(waypointJson.getDouble("lon"));
 
 
                 String descRaw = waypointJson.getString("desc");
@@ -382,7 +382,7 @@ public class Preferences {
 
                     newWaypoint.setDescription(a[0]);
                     if(a.length > 1)
-                        newWaypoint.setSsid(a[1]);
+                        newWaypoint.setWifiSSID(a[1]);
                     else {
                         Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID but no data was found after the sign");
 
@@ -408,12 +408,12 @@ public class Preferences {
 
 
             try {
-                newWaypoint.setRadius(waypointJson.getInt("rad"));
+                newWaypoint.setGeofenceRadius(waypointJson.getInt("rad"));
 
             } catch(Exception e) {
                 Log.v(TAG, "unable to import radius and/or transition attribute");
 
-                newWaypoint.setRadius(0);
+                newWaypoint.setGeofenceRadius(0);
             }
 
 

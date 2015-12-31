@@ -25,16 +25,18 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Description = new Property(1, String.class, "description", false, "DESCRIPTION");
-        public final static Property Geocoder = new Property(2, String.class, "geocoder", false, "GEOCODER");
-        public final static Property Latitude = new Property(3, Double.class, "latitude", false, "LATITUDE");
-        public final static Property Longitude = new Property(4, Double.class, "longitude", false, "LONGITUDE");
-        public final static Property Radius = new Property(5, Integer.class, "radius", false, "RADIUS");
-        public final static Property Ssid = new Property(6, String.class, "ssid", false, "SSID");
-        public final static Property Shared = new Property(7, Boolean.class, "shared", false, "SHARED");
-        public final static Property Date = new Property(8, java.util.Date.class, "date", false, "DATE");
-        public final static Property LastTriggered = new Property(9, Long.class, "lastTriggered", false, "LAST_TRIGGERED");
-        public final static Property GeofenceId = new Property(10, String.class, "geofenceId", false, "GEOFENCE_ID");
-        public final static Property ModeId = new Property(11, int.class, "modeId", false, "MODE_ID");
+        public final static Property GeofenceLatitude = new Property(2, Double.class, "geofenceLatitude", false, "GEOFENCE_LATITUDE");
+        public final static Property GeofenceLongitude = new Property(3, Double.class, "geofenceLongitude", false, "GEOFENCE_LONGITUDE");
+        public final static Property GeofenceRadius = new Property(4, Integer.class, "geofenceRadius", false, "GEOFENCE_RADIUS");
+        public final static Property GeofenceId = new Property(5, String.class, "geofenceId", false, "GEOFENCE_ID");
+        public final static Property WifiSSID = new Property(6, String.class, "wifiSSID", false, "WIFI_SSID");
+        public final static Property BeaconUUID = new Property(7, String.class, "beaconUUID", false, "BEACON_UUID");
+        public final static Property BeaconMajor = new Property(8, String.class, "beaconMajor", false, "BEACON_MAJOR");
+        public final static Property BeaconMinor = new Property(9, String.class, "beaconMinor", false, "BEACON_MINOR");
+        public final static Property Shared = new Property(10, Boolean.class, "shared", false, "SHARED");
+        public final static Property Date = new Property(11, java.util.Date.class, "date", false, "DATE");
+        public final static Property LastTriggered = new Property(12, Long.class, "lastTriggered", false, "LAST_TRIGGERED");
+        public final static Property ModeId = new Property(13, int.class, "modeId", false, "MODE_ID");
     };
 
 
@@ -52,16 +54,18 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         db.execSQL("CREATE TABLE " + constraint + "'WAYPOINT' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'DESCRIPTION' TEXT," + // 1: description
-                "'GEOCODER' TEXT," + // 2: geocoder
-                "'LATITUDE' REAL," + // 3: latitude
-                "'LONGITUDE' REAL," + // 4: longitude
-                "'RADIUS' INTEGER," + // 5: radius
-                "'SSID' TEXT," + // 6: ssid
-                "'SHARED' INTEGER," + // 7: shared
-                "'DATE' INTEGER," + // 8: date
-                "'LAST_TRIGGERED' INTEGER," + // 9: lastTriggered
-                "'GEOFENCE_ID' TEXT," + // 10: geofenceId
-                "'MODE_ID' INTEGER NOT NULL );"); // 11: modeId
+                "'GEOFENCE_LATITUDE' REAL," + // 2: geofenceLatitude
+                "'GEOFENCE_LONGITUDE' REAL," + // 3: geofenceLongitude
+                "'GEOFENCE_RADIUS' INTEGER," + // 4: geofenceRadius
+                "'GEOFENCE_ID' TEXT," + // 5: geofenceId
+                "'WIFI_SSID' TEXT," + // 6: wifiSSID
+                "'BEACON_UUID' TEXT," + // 7: beaconUUID
+                "'BEACON_MAJOR' TEXT," + // 8: beaconMajor
+                "'BEACON_MINOR' TEXT," + // 9: beaconMinor
+                "'SHARED' INTEGER," + // 10: shared
+                "'DATE' INTEGER," + // 11: date
+                "'LAST_TRIGGERED' INTEGER," + // 12: lastTriggered
+                "'MODE_ID' INTEGER NOT NULL );"); // 13: modeId
     }
 
     /** Drops the underlying database table. */
@@ -85,51 +89,61 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             stmt.bindString(2, description);
         }
  
-        String geocoder = entity.getGeocoder();
-        if (geocoder != null) {
-            stmt.bindString(3, geocoder);
+        Double geofenceLatitude = entity.getGeofenceLatitude();
+        if (geofenceLatitude != null) {
+            stmt.bindDouble(3, geofenceLatitude);
         }
  
-        Double latitude = entity.getLatitude();
-        if (latitude != null) {
-            stmt.bindDouble(4, latitude);
+        Double geofenceLongitude = entity.getGeofenceLongitude();
+        if (geofenceLongitude != null) {
+            stmt.bindDouble(4, geofenceLongitude);
         }
  
-        Double longitude = entity.getLongitude();
-        if (longitude != null) {
-            stmt.bindDouble(5, longitude);
-        }
- 
-        Integer radius = entity.getRadius();
-        if (radius != null) {
-            stmt.bindLong(6, radius);
-        }
- 
-        String ssid = entity.getSsid();
-        if (ssid != null) {
-            stmt.bindString(7, ssid);
-        }
- 
-        Boolean shared = entity.getShared();
-        if (shared != null) {
-            stmt.bindLong(8, shared ? 1l: 0l);
-        }
- 
-        java.util.Date date = entity.getDate();
-        if (date != null) {
-            stmt.bindLong(9, date.getTime());
-        }
- 
-        Long lastTriggered = entity.getLastTriggered();
-        if (lastTriggered != null) {
-            stmt.bindLong(10, lastTriggered);
+        Integer geofenceRadius = entity.getGeofenceRadius();
+        if (geofenceRadius != null) {
+            stmt.bindLong(5, geofenceRadius);
         }
  
         String geofenceId = entity.getGeofenceId();
         if (geofenceId != null) {
-            stmt.bindString(11, geofenceId);
+            stmt.bindString(6, geofenceId);
         }
-        stmt.bindLong(12, entity.getModeId());
+ 
+        String wifiSSID = entity.getWifiSSID();
+        if (wifiSSID != null) {
+            stmt.bindString(7, wifiSSID);
+        }
+ 
+        String beaconUUID = entity.getBeaconUUID();
+        if (beaconUUID != null) {
+            stmt.bindString(8, beaconUUID);
+        }
+ 
+        String beaconMajor = entity.getBeaconMajor();
+        if (beaconMajor != null) {
+            stmt.bindString(9, beaconMajor);
+        }
+ 
+        String beaconMinor = entity.getBeaconMinor();
+        if (beaconMinor != null) {
+            stmt.bindString(10, beaconMinor);
+        }
+ 
+        Boolean shared = entity.getShared();
+        if (shared != null) {
+            stmt.bindLong(11, shared ? 1l: 0l);
+        }
+ 
+        java.util.Date date = entity.getDate();
+        if (date != null) {
+            stmt.bindLong(12, date.getTime());
+        }
+ 
+        Long lastTriggered = entity.getLastTriggered();
+        if (lastTriggered != null) {
+            stmt.bindLong(13, lastTriggered);
+        }
+        stmt.bindLong(14, entity.getModeId());
     }
 
     /** @inheritdoc */
@@ -144,16 +158,18 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         Waypoint entity = new Waypoint( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // description
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // geocoder
-            cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3), // latitude
-            cursor.isNull(offset + 4) ? null : cursor.getDouble(offset + 4), // longitude
-            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // radius
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // ssid
-            cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0, // shared
-            cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)), // date
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // lastTriggered
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // geofenceId
-            cursor.getInt(offset + 11) // modeId
+            cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2), // geofenceLatitude
+            cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3), // geofenceLongitude
+            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // geofenceRadius
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // geofenceId
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // wifiSSID
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // beaconUUID
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // beaconMajor
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // beaconMinor
+            cursor.isNull(offset + 10) ? null : cursor.getShort(offset + 10) != 0, // shared
+            cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)), // date
+            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // lastTriggered
+            cursor.getInt(offset + 13) // modeId
         );
         return entity;
     }
@@ -163,16 +179,18 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public void readEntity(Cursor cursor, Waypoint entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDescription(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setGeocoder(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3));
-        entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getDouble(offset + 4));
-        entity.setRadius(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
-        entity.setSsid(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setShared(cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0);
-        entity.setDate(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
-        entity.setLastTriggered(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
-        entity.setGeofenceId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setModeId(cursor.getInt(offset + 11));
+        entity.setGeofenceLatitude(cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2));
+        entity.setGeofenceLongitude(cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3));
+        entity.setGeofenceRadius(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
+        entity.setGeofenceId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setWifiSSID(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBeaconUUID(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setBeaconMajor(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setBeaconMinor(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setShared(cursor.isNull(offset + 10) ? null : cursor.getShort(offset + 10) != 0);
+        entity.setDate(cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)));
+        entity.setLastTriggered(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
+        entity.setModeId(cursor.getInt(offset + 13));
      }
     
     /** @inheritdoc */

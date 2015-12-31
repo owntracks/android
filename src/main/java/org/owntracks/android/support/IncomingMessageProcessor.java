@@ -5,6 +5,7 @@ import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageMsg;
+import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 
 public interface IncomingMessageProcessor {
@@ -13,5 +14,6 @@ public interface IncomingMessageProcessor {
     void processMessage(MessageCard message);
     void processMessage(MessageCmd message);
     void processMessage(MessageMsg message);
+    void processMessage(MessageTransition message);
     void processMessage(MessageUnknown message);
 }

@@ -27,9 +27,12 @@ import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.activities.ActivityMessages;
 import org.owntracks.android.activities.ActivityPreferencesConnection;
 import org.owntracks.android.messages.LocationMessage;
+import org.owntracks.android.messages.MessageMsg;
+import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MsgMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.Contact;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -142,7 +145,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     * NOTIFICATION BUILDER SETUP
     * */
     private void setupNotificationOngoing() {
-        Log.v(TAG, "setupNotificationOngoing. Enabled: " +Preferences.getNotification() );
+        Log.v(TAG, "setupNotificationOngoing. Enabled: " + Preferences.getNotification());
         if (!Preferences.getNotification())
             return;
 
@@ -259,31 +262,33 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     }
 
 
-    public void addNotificationEvents(TransitionMessage m) {
-        Contact c = App.getContact(ServiceProxy.getServiceParser().getBaseTopicForEvent(m.getTopic()));
+    public void addNotificationEvents(MessageTransition message) {
+
+        FusedContact c = App.getFusedContact(message.getTopic());
+
         String name;
         String dateStr = dateFormater.format(new Date());
-        String transition =  context.getString(m.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionentering : R.string.transitionleaving);
-        String location = m.getDescription();
+        String transition =  context.getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionentering : R.string.transitionleaving);
+        String location = message.getDesc();
 
         if (location == null) {
             location = context.getString(R.string.aLocation);
         }
 
         if(c != null)
-         name = c.getDisplayName();
+            name = c.getFusedName();
         else {
-            name = m.getTrackerId();
+            name = message.getTid();
 
             if (name == null) {
-                name = m.getTopic();
+                name = message.getTopic();
             }
         }
 
-        Spannable message = new SpannableString(dateStr + ": " + name + " " + transition + " " + location);
-        message.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, dateStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        Spannable notification = new SpannableString(dateStr + ": " + name + " " + transition + " " + location);
+        notification.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, dateStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        notificationListEvents.push(message);
+        notificationListEvents.push(notification);
     }
 
     private void clearNotificationTransitions() {
@@ -313,7 +318,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         notificationManager.notify(NOTIFICATION_ID_EVENTS, notificationBuilderEvents.build());
     }
 
-    public void addNotificationMessage(MsgMessage m) {
+    public void addNotificationMessage(MessageMsg m) {
 
         String channel = "#" + m.getChannel();
         Spannable message = new SpannableString(channel + ": " + m.getDesc());
@@ -387,26 +392,9 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     @Override
     public void onEvent(Events.Dummy event) { }
 
-    public void onEvent(Events.MsgMessageReceived e) {
-        if(e.getMessage().isExpired())
-            return;
-
-        addNotificationMessage(e.getMessage());
-        updateNotificationMessage();
-    }
-
-    public void onEvent(Events.TransitionMessageReceived e) {
-        if(e.getTransitionMessage().isRetained())
-            return;
-
-
-        e.getTransitionMessage().setTopic(e.getTopic());
-        addNotificationEvents(e.getTransitionMessage());
-        updateNotificationEvents();
-    }
 
     public void onEventMainThread(Events.PublishSuccessful e) {
-        Log.v(TAG, "publish successfull. this.lastPublishedLocationTst:" + this.lastPublishedLocationTst + ", " + "event: " +  e.getDate().getTime());
+        Log.v(TAG, "publish successfull. this.lastPublishedLocationTst:" + this.lastPublishedLocationTst + ", " + "event: " + e.getDate().getTime());
         if ((e.getExtra() != null) && (e.getExtra() instanceof LocationMessage) ) {
 
             if (Preferences.getNotificationLocation()) {
@@ -484,5 +472,21 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         updateNotificationOngoing();
     }
 
+    public void processMessage(MessageTransition message) {
+        if(message.getRetained())
+            return;
+
+        addNotificationEvents(message);
+        updateNotificationEvents();
+
+    }
+
+    public void processMessage(MessageMsg message) {
+        if(message.isExpired())
+            return;
+
+        addNotificationMessage(message);
+        updateNotificationMessage();
+    }
 }
 
