@@ -15,6 +15,7 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
@@ -33,6 +34,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.transition.Transition;
 import android.util.Log;
 
 
@@ -65,7 +67,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
     private LocationRequest mLocationRequest;
     private boolean ready = false;
-    private boolean foreground = false;
+    private boolean foreground = App.isInForeground();
     private Location lastKnownLocation;
     private long lastPublish;
     private WaypointDao waypointDao;
@@ -162,7 +164,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     public void enteredWifiNetwork(String ssid) {
         Log.v(TAG, "matching waypoints against SSID " + ssid);
 
-        List<Waypoint> ws = this.waypointDao.queryBuilder().where(Properties.ModeId.eq(Preferences.getModeId()), Properties.Ssid.like("Cupcake")).build().list();
+        List<Waypoint> ws = this.waypointDao.queryBuilder().where(Properties.ModeId.eq(Preferences.getModeId()), Properties.WifiSSID.like("TestSSID")).build().list();
 
         for (Waypoint w : ws) {
             Log.v(TAG, "matched waypoint with ssid " + w.getDescription());
@@ -268,20 +270,18 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
         if(Preferences.getLocatorAccuracyForeground() == 0) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 1) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 2) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
+            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_NO_POWER");
+            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        //Log.v(TAG, "setupBackgroundLocationRequest interval: " + TimeUnit.SECONDS.toMillis(10));
-        //Log.v(TAG, "setupBackgroundLocationRequest displacement: 50");
         this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
 		this.mLocationRequest.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
         this.mLocationRequest.setSmallestDisplacement(50);
@@ -321,6 +321,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
         disableLocationUpdates();
 
+        Log.v(TAG, "requestLocationUpdates fg:" + this.foreground + " app fg:" + App.isInForeground());
         if (this.foreground)
             setupForegroundLocationRequest();
         else
@@ -401,7 +402,21 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void publishTransitionMessage(Waypoint w, Location triggeringLocation, int transition) {
-      //  ServiceProxy.getServiceBroker().publish(new TransitionMessage(w, triggeringLocation, transition), Preferences.getPubTopicEvents(), Preferences.getPubQosEvents(), Preferences.getPubRetainEvents(), null, null);
+        MessageTransition message = new MessageTransition();
+        message.setTransition(transition);
+        message.setTid(Preferences.getTrackerId(true));
+        message.setLat(triggeringLocation.getLatitude());
+        message.setLon(triggeringLocation.getLongitude());
+        message.setAcc(triggeringLocation.getAccuracy());
+        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+        message.setDesc(w.getShared() ? w.getDescription() : null);
+
+        message.setTopic(Preferences.getPubTopicEvents());
+        message.setQos(Preferences.getPubQosEvents());
+        message.setRetained(Preferences.getPubRetainEvents());
+
+        ServiceProxy.getServiceBroker().publish(message);
 	}
     private void publishSsidTransitionMessage(Waypoint w) {
      //   ServiceProxy.getServiceBroker().publish(new TransitionMessage(w), Preferences.getPubTopicEvents(), Preferences.getPubQosEvents(), Preferences.getPubRetainEvents(), null, null);
@@ -456,7 +471,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         message.setTopic(Preferences.getPubTopicLocations());
         message.setQos(Preferences.getPubQosLocations());
         message.setRetained(Preferences.getPubRetainLocations());
-        this.lastPublish = System.currentTimeMillis();
 
 		ServiceProxy.getServiceBroker().publish(message);
 
@@ -536,7 +550,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
 					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-					.setCircularRegion(w.getLatitude(), w.getLongitude(), w.getRadius())
+					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
             Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId() );
@@ -626,11 +640,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     }
 
     private List<Waypoint> loadWaypointsForModeIdWithValidGeofence(int modeId) {
-        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId), Properties.Latitude.isNotNull(), Properties.Longitude.isNotNull(), Properties.Radius.isNotNull(), Properties.Radius.gt(0)).build().list();
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId), Properties.GeofenceLatitude.isNotNull(), Properties.GeofenceLongitude.isNotNull(), Properties.GeofenceRadius.isNotNull(), Properties.GeofenceRadius.gt(0)).build().list();
     }
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
-		return (w.getRadius() != null) && (w.getRadius() > 0) && (w.getLatitude() != null) && (w.getLongitude() != null);
+		return (w.getGeofenceRadius() != null) && (w.getGeofenceRadius() > 0) && (w.getGeofenceLatitude() != null) && (w.getGeofenceLongitude() != null);
 	}
 
     public boolean isReady() {

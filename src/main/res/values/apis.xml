@@ -2,4 +2,7 @@
 <resources>
     <string name="MAPBOX_API_KEY">YOUR_MAPBOX_API_KEY</string>
     <string name="GOOGLE_MAPS_API_KEY">YOUR_GOOGLE_MAPS_API_KEY</string>
+    <string name="ESTIMOTE_API_ID">YOUR_ESTIMOTE_API_KEY</string>
+    <string name="ESTIMOTE_API_KEY">YOUR_ESTIMOTE_API_KEY</string>
+
 </resources>

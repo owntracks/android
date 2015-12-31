@@ -1,6 +1,5 @@
 package org.owntracks.android.messages;
 
-import org.altbeacon.beacon.Identifier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,9 +9,9 @@ import android.util.Log;
 public class BeaconMessage extends Message {
     private static final String TAG = "BeaconMessage";
 
-    private Identifier uuid;
-    private Identifier major;
-    private Identifier minor;
+    //private Identifier uuid;
+    //private Identifier major;
+    //private Identifier minor;
     private int rssi;
     private double distance;
     private String bluetoothName;
@@ -23,6 +22,7 @@ public class BeaconMessage extends Message {
     private long time;
     private int proximity;
 
+/*
     public BeaconMessage(Identifier uuid, Identifier major, Identifier minor, int rssi,
                          double distance, String bluetoothName, int manufacturer,
                          String bluetoothAddress, int beaconTypeCode, int txPower, long time,
@@ -40,6 +40,7 @@ public class BeaconMessage extends Message {
         this.time = time;
         this.proximity = proximity;
     }
+*/
 
     @Override
     public String toString() {
@@ -53,9 +54,11 @@ public class BeaconMessage extends Message {
             json.put("_type", "beacon")
 
                     // Same as iBeacon report
+/*
                     .put("uuid", this.uuid)
                     .put("major", this.major)
                     .put("minor", this.minor)
+*/
                     .put("tst", this.time)
                     .put("rssi", this.rssi)
                     .put("acc", -1)

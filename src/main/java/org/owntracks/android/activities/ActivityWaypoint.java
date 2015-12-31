@@ -136,14 +136,14 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
             this.waypoint = null;
         } else {
             this.description.setText(this.waypoint.getDescription());
-            this.latitude.setText(this.waypoint.getLatitude().toString());
-            this.longitude.setText(this.waypoint.getLongitude().toString());
+            this.latitude.setText(this.waypoint.getGeofenceLatitude().toString());
+            this.longitude.setText(this.waypoint.getGeofenceLongitude().toString());
 
-            if (this.waypoint.getRadius() != null && this.waypoint.getRadius() > 0) {
-                this.radius.setText(this.waypoint.getRadius().toString());
+            if (this.waypoint.getGeofenceRadius() != null && this.waypoint.getGeofenceRadius() > 0) {
+                this.radius.setText(this.waypoint.getGeofenceRadius().toString());
             }
 
-            this.ssid.setText(this.waypoint.getSsid());
+            this.ssid.setText(this.waypoint.getWifiSSID());
 
             // Shared waypoints are disabled in public mode to protect user's privacy
             findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
@@ -313,19 +313,19 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
 
         w.setDescription(this.description.getText().toString());
         try {
-            w.setLatitude(Double.parseDouble(this.latitude.getText().toString()));
-            w.setLongitude(Double.parseDouble(this.longitude.getText().toString()));
+            w.setGeofenceLatitude(Double.parseDouble(this.latitude.getText().toString()));
+            w.setGeofenceLongitude(Double.parseDouble(this.longitude.getText().toString()));
         } catch (NumberFormatException e) {
         }
 
         try {
-            w.setRadius(Integer.parseInt(this.radius.getText().toString()));
+            w.setGeofenceRadius(Integer.parseInt(this.radius.getText().toString()));
         } catch (NumberFormatException e) {
-            w.setRadius(null);
+            w.setGeofenceRadius(null);
         }
 
         try {
-            w.setSsid(this.ssid.getText().toString());
+            w.setWifiSSID(this.ssid.getText().toString());
         } catch (NumberFormatException e) {
         }
 

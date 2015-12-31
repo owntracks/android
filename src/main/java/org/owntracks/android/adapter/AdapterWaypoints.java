@@ -61,7 +61,7 @@ public class AdapterWaypoints extends AdapterCursorLoader {
 
         //((ItemViewHolder) viewHolder).mDetails.setReferenceTime(cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName)) * 1000);
         //((ItemViewHolder) viewHolder).mTime.setPrefix("#" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Channel.columnName)) + ", ");
-        boolean geofence = cursor.getInt(cursor.getColumnIndex(WaypointDao.Properties.Radius.columnName)) > 0;
+        boolean geofence = cursor.getInt(cursor.getColumnIndex(WaypointDao.Properties.GeofenceRadius.columnName)) > 0;
 
         if(geofence) {
             long lastTriggered = cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName));

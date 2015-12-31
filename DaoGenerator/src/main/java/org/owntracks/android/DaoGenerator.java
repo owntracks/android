@@ -7,10 +7,10 @@ import de.greenrobot.daogenerator.Schema;
 
 // Generates Data Access Objects in src/main/java/org.owntracks.android/db
 // Increase schema version if changes are made
-// To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > other, right click "run"  and select Run '[run]'.
+// To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > application, right click "run"  and select Run.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 8;
+    private static final int SCHEMA_VERSION = 10;
 
     public static void main(String args[]) throws Exception {
 
@@ -35,15 +35,17 @@ public class DaoGenerator {
         Entity waypoint = schema.addEntity("Waypoint");
         waypoint.addIdProperty(); // For stable ids of cursor adapter
         waypoint.addStringProperty("description");
-        waypoint.addStringProperty("geocoder");
-        waypoint.addDoubleProperty("latitude");
-        waypoint.addDoubleProperty("longitude");
-        waypoint.addIntProperty("radius");
-        waypoint.addStringProperty("ssid");
+        waypoint.addDoubleProperty("geofenceLatitude");
+        waypoint.addDoubleProperty("geofenceLongitude");
+        waypoint.addIntProperty("geofenceRadius");
+        waypoint.addStringProperty("geofenceId");
+        waypoint.addStringProperty("wifiSSID");
+        waypoint.addStringProperty("beaconUUID");
+        waypoint.addStringProperty("beaconMajor");
+        waypoint.addStringProperty("beaconMinor");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
         waypoint.addLongProperty("lastTriggered");
-        waypoint.addStringProperty("geofenceId");
         waypoint.addIntProperty("modeId").notNull();
 
 
