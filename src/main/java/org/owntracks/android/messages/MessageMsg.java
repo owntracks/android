@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutoingMessageProcessor;
 
+import java.util.concurrent.TimeUnit;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageMsg extends MessageBase {
@@ -113,6 +115,17 @@ public class MessageMsg extends MessageBase {
     public void setTst(long tst) {
         this.tst = tst;
     }
+
+    @JsonIgnore
+    public boolean expires() {
+        return mttl != 0;
+    }
+
+    @JsonIgnore
+    public boolean isExpired() {
+        return expires() && TimeUnit.SECONDS.toMillis(this.mttl) <= System.currentTimeMillis();
+    }
+
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @Override

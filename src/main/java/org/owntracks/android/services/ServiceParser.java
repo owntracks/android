@@ -1,13 +1,18 @@
 package org.owntracks.android.services;
 
 import android.content.Intent;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.location.Geofence;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.messages.MessageBase;
@@ -15,6 +20,7 @@ import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageMsg;
+import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
@@ -22,6 +28,7 @@ import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 
+import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +89,15 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     }
 
     @Override
+    public void processMessage(MessageTransition message) {
+        Log.v(TAG, "processMessage MessageTransition (" + message.getTopic() + ")");
+        ServiceProxy.getServiceNotification().processMessage(message);
+    }
+
+    @Override
     public void processMessage(MessageMsg message) {
+        Log.v(TAG, "processMessage MessageMsg (" + message.getTopic() + ")");
+
         String externalId = message.getTopic() + "$" + message.getTst();
 
         org.owntracks.android.db.Message m = Dao.getMessageDao().queryBuilder().where(MessageDao.Properties.ExternalId.eq(externalId)).unique();
@@ -112,7 +127,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
                 }
 
             Dao.getMessageDao().insert(m);
-            //EventBus.getDefault().post(new Events.MessageAdded(m));
+            ServiceProxy.getServiceNotification().processMessage(message);
         }
     }
 
@@ -151,7 +166,10 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         try {
             MessageBase m = mapper.readValue(message.getPayload(), MessageBase.class);
             m.setTopic(getBaseTopic(m, topic));
+            m.setRetained(message.isRetained());
+            m.setQos(message.getQos());
             m.setIncomingProcessor(this);
+
 
             pool.execute(m);
 

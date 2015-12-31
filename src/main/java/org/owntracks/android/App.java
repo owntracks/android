@@ -106,6 +106,9 @@ public class App extends Application  {
         this.fusedContacts = new ArrayMap<String, FusedContact>();
         this.contactsViewModel =  new ContactsViewModel();
 
+        //EstimoteSDK.initialize(this, getString(R.string.ESTIMOTE_API_ID), getString(R.string.ESTIMOTE_API_KEY));
+        //EstimoteSDK.enableDebugLogging(true);
+
         ContactImageProvider.initialize(this);
         GeocodingProvider.initialize(this);
 
@@ -165,22 +168,6 @@ public class App extends Application  {
     }
     public static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
-    }
-
-        /* TODO: DEPRECATED*/
-    public static void addContact(Contact c) {
-        instance.contacts.put(c.getTopic(), c);
-        initializingContacts.remove(c.getTopic());
-        EventBus.getDefault().post(new Events.ContactAdded(c));
-    }
-    /* TODO: DEPRECATED*/
-    public static void addUninitializedContact(Contact c) {
-        instance.initializingContacts.put(c.getTopic(), c);
-    }
-
-    /* TODO: DEPRECATED*/
-    public static Contact getInitializingContact(String topic) {
-        return instance.initializingContacts.get(topic);
     }
 
         /* TODO: DEPRECATED*/

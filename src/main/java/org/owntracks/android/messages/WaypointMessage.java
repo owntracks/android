@@ -27,18 +27,18 @@ public class WaypointMessage extends Message {
         JSONObject json = new JSONObject();
         try {
             json.put("_type", "waypoint")
-                    .put("lat", this.waypoint.getLatitude())
-                    .put("lon", this.waypoint.getLongitude())
+                    .put("lat", this.waypoint.getGeofenceLatitude())
+                    .put("lon", this.waypoint.getGeofenceLongitude())
                     .put("tst", (long) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
-                    .put("rad", this.waypoint.getRadius() != null ? this.waypoint.getRadius() : 0);
+                    .put("rad", this.waypoint.getGeofenceRadius() != null ? this.waypoint.getGeofenceRadius() : 0);
 
             if (this.trackerId != null && !this.trackerId.isEmpty()) 
                 json.put("tid", this.trackerId);
 
             String desc = this.waypoint.getDescription();
 
-            if(this.waypoint.getSsid() != null && !this.waypoint.getSsid().isEmpty())
-                desc += "$"+this.waypoint.getSsid();
+            if(this.waypoint.getWifiSSID() != null && !this.waypoint.getWifiSSID().isEmpty())
+                desc += "$"+this.waypoint.getWifiSSID();
 
 
             json.put("desc", desc);
