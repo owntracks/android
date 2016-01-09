@@ -37,6 +37,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property Date = new Property(11, java.util.Date.class, "date", false, "DATE");
         public final static Property LastTriggered = new Property(12, Long.class, "lastTriggered", false, "LAST_TRIGGERED");
         public final static Property ModeId = new Property(13, int.class, "modeId", false, "MODE_ID");
+        public final static Property Type = new Property(14, int.class, "type", false, "TYPE");
     };
 
 
@@ -65,7 +66,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
                 "'SHARED' INTEGER," + // 10: shared
                 "'DATE' INTEGER," + // 11: date
                 "'LAST_TRIGGERED' INTEGER," + // 12: lastTriggered
-                "'MODE_ID' INTEGER NOT NULL );"); // 13: modeId
+                "'MODE_ID' INTEGER NOT NULL ," + // 13: modeId
+                "'TYPE' INTEGER NOT NULL );"); // 14: type
     }
 
     /** Drops the underlying database table. */
@@ -144,6 +146,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             stmt.bindLong(13, lastTriggered);
         }
         stmt.bindLong(14, entity.getModeId());
+        stmt.bindLong(15, entity.getType());
     }
 
     /** @inheritdoc */
@@ -169,7 +172,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
             cursor.isNull(offset + 10) ? null : cursor.getShort(offset + 10) != 0, // shared
             cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)), // date
             cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // lastTriggered
-            cursor.getInt(offset + 13) // modeId
+            cursor.getInt(offset + 13), // modeId
+            cursor.getInt(offset + 14) // type
         );
         return entity;
     }
@@ -191,6 +195,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         entity.setDate(cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)));
         entity.setLastTriggered(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
         entity.setModeId(cursor.getInt(offset + 13));
+        entity.setType(cursor.getInt(offset + 14));
      }
     
     /** @inheritdoc */
