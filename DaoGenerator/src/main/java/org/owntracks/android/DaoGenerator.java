@@ -47,7 +47,8 @@ public class DaoGenerator {
         waypoint.addDateProperty("date");
         waypoint.addLongProperty("lastTriggered");
         waypoint.addIntProperty("modeId").notNull();
-
+        waypoint.addIntProperty("type").notNull();
+        waypoint.setSuperclass("BaseObservable");
 
         Entity message = schema.addEntity("Message");
         message.addIdProperty(); // For stable ids of cursor adapter
