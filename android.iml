@@ -139,8 +139,8 @@
     <orderEntry type="library" exported="" name="okhttp-urlconnection-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="compiler-1.0-rc5" level="project" />
     <orderEntry type="library" exported="" name="com.amulyakhare.textdrawable-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="baseLibrary-1.0-rc5" level="project" />
     <orderEntry type="library" exported="" name="hawtbuf-1.10" level="project" />
+    <orderEntry type="library" exported="" name="baseLibrary-1.0-rc5" level="project" />
     <orderEntry type="library" exported="" name="beta-1.1.4" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.5" level="project" />
     <orderEntry type="library" exported="" name="bindingcollectionadapter-recyclerview-1.0.0" level="project" />
