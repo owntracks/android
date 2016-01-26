@@ -4,14 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.android.gms.location.Geofence;
 
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageTransition extends MessageBase{
     public static final String BASETOPIC_SUFFIX = "/event";
+    public static final String EVENT_ENTER = "enter";
+    public static final String EVENT_LEAVE = "leave";
+
+    public static final String TRIGGER_BEACON = "b";
+    public static final String TRIGGER_CIRCULAR = "c";
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @JsonIgnore
@@ -62,9 +65,9 @@ public class MessageTransition extends MessageBase{
 
     public void setEvent(String event) {
         this.event = event;
-        if (event.equals("enter"))
+        if (event.equals(EVENT_ENTER))
             transition = Geofence.GEOFENCE_TRANSITION_ENTER;
-        else if (event.equals("exit"))
+        else if (event.equals(EVENT_LEAVE))
             transition = Geofence.GEOFENCE_TRANSITION_EXIT;
         else
             transition = 0;
@@ -74,9 +77,9 @@ public class MessageTransition extends MessageBase{
     public void setTransition(int transition) {
         this.transition = transition;
         if (transition == Geofence.GEOFENCE_TRANSITION_ENTER)
-            event = "enter";
+            event = EVENT_ENTER;
         else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT)
-            event = "exit";
+            event = EVENT_LEAVE;
         else
             event = null;
     }
@@ -103,7 +106,7 @@ public class MessageTransition extends MessageBase{
     }
 
     @Override
-    public void processOutgoingMessage(OutoingMessageProcessor handler) {
+    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
     }
 

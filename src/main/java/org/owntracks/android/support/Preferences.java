@@ -137,7 +137,6 @@ public class Preferences {
     }
 
 
-
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -321,6 +320,8 @@ public class Preferences {
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
         try { setMessaging(json.getBoolean(getStringRessource(R.string.keyMessaging))); } catch (JSONException e) {}
         try { setInfo(json.getBoolean(getStringRessource(R.string.keyInfo))); } catch (JSONException e) {}
+        try { setEncryption(json.getBoolean(getStringRessource(R.string.keyEncryption))); } catch (JSONException e) {}
+        try { setEncryptionKey(json.getString(getStringRessource(R.string.keyEncryptionKey))); } catch (JSONException e) {}
 
 
 
@@ -976,6 +977,23 @@ public class Preferences {
     }
 
 
+    public static boolean getEncryption() {
+        //return getBoolean(R.string.keyEncryption, R.bool.valFalse);
+        return true;
+    }
+    public static void setEncryption(boolean encryption) {
+        setBoolean(R.string.keyEncryption, encryption);
+    }
+
+    public static String getEncryptionKey() {
+        return "strenggeheim";
+       // return getString(R.string.keyEncryptionKey, R.string.valEmpty);
+    }
+    public static void setEncryptionKey(String key) {
+        setString(R.string.keyEncryptionKey, key);
+    }
+
+
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
@@ -1007,6 +1025,7 @@ public class Preferences {
         }
         return true;
     }
+
 
 
     // Maybe make this configurable
@@ -1080,6 +1099,8 @@ public class Preferences {
         try {json.put(Preferences.getStringRessource(R.string.keyBeaconForegroundScanPeriod), Preferences.getBeaconForegroundScanPeriod());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyRemoteCommandReportLocation), Preferences.getRemoteCommandReportLocation());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyWaypoints), Preferences.waypointsToJSON());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyEncryption), Preferences.getEncryption());} catch(JSONException e) {};
+        try {json.put(Preferences.getStringRessource(R.string.keyEncryptionKey), Preferences.getEncryptionKey());} catch(JSONException e) {};
 
         // Mode specific settings
         switch (getModeId()) {

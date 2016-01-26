@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 
 import java.util.concurrent.TimeUnit;
 
@@ -134,7 +134,7 @@ public class MessageMsg extends MessageBase {
     }
 
     @Override
-    public void processOutgoingMessage(OutoingMessageProcessor handler) {
+    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
     }
 

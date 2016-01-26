@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 
@@ -71,7 +71,7 @@ public class MessageCard extends MessageBase{
     }
 
     @Override
-    public void processOutgoingMessage(OutoingMessageProcessor handler) {
+    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
     }
 

@@ -18,11 +18,13 @@ import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
+import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageMsg;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
@@ -85,7 +87,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
 
     @Override
     public void processMessage(MessageCmd message) {
-        Log.v(TAG, "processMessage MessageCmd (" + message.getTopic()+")");
+        Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
     }
 
     @Override
@@ -165,6 +167,15 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     public void fromJSON(String topic, MqttMessage message) throws Exception {
         try {
             MessageBase m = mapper.readValue(message.getPayload(), MessageBase.class);
+
+            if(m instanceof MessageEncrypted) {
+                try {
+                    m = mapper.readValue(EncryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "unable to parse decrypted message");
+                }
+            }
+
             m.setTopic(getBaseTopic(m, topic));
             m.setRetained(message.isRetained());
             m.setQos(message.getQos());

@@ -3,46 +3,37 @@ package org.owntracks.android.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.*;
-import com.google.android.gms.maps.model.LatLngBounds;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.databinding.ActivityWaypointBindingBinding;
 import org.owntracks.android.db.Dao;
+import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
 
-import de.greenrobot.dao.DaoException;
-import de.greenrobot.dao.query.Query;
 import de.greenrobot.event.EventBus;
 
 
@@ -65,18 +56,16 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
 
 
     private Waypoint waypoint;
+    boolean update = true;
 
-    private EditText description;
-    private EditText longitude;
-    private EditText latitude;
-    private EditText radius;
-    private EditText ssid;
 
     private Switch share;
     private MenuItem saveButton;
 
     // Thanks Google for not providing a getter for the value of switches.
     private boolean shareValue = false;
+    private ActivityWaypointBindingBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,89 +78,35 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         });
 
 
-        requiredForSave = new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {  conditionallyEnableSaveButton(); }
-        };
-
         setContentView(R.layout.activity_waypoint);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_waypoint_binding);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-        this.description = (EditText) findViewById(R.id.description);
-        this.latitude = (EditText) findViewById(R.id.latitude);
-        this.longitude = (EditText) findViewById(R.id.longitude);
-        this.radius = (EditText) findViewById(R.id.radius);
-        this.ssid = (EditText) findViewById(R.id.ssid);
-
-
-        this.share = (Switch) findViewById(R.id.share);
-        this.share.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                shareValue = isChecked;
-            }
-        });
-
-
-        handler = new StaticHandler(this);
         this.dao = Dao.getWaypointDao();
 
 
-        Bundle extras = getIntent().getExtras();
-        ;
-
-
-        if(getIntent().getExtras() == null || (this.waypoint = this.dao.loadByRowId(extras.getLong("keyId"))) == null) {
-            this.waypoint = null;
-        } else {
-            this.description.setText(this.waypoint.getDescription());
-            this.latitude.setText(this.waypoint.getGeofenceLatitude().toString());
-            this.longitude.setText(this.waypoint.getGeofenceLongitude().toString());
-
-            if (this.waypoint.getGeofenceRadius() != null && this.waypoint.getGeofenceRadius() > 0) {
-                this.radius.setText(this.waypoint.getGeofenceRadius().toString());
-            }
-
-            this.ssid.setText(this.waypoint.getWifiSSID());
-
-            // Shared waypoints are disabled in public mode to protect user's privacy
-            findViewById(R.id.shareWrapper).setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
-
-            this.share.setChecked(this.waypoint.getShared());
-
+        if (hasIntentExtras()) {
+            this.waypoint = this.dao.loadByRowId(getIntent().getExtras().getLong("keyId"));
         }
-    }
-    private void conditionallyEnableSaveButton() {
 
-        boolean enabled = false;
-        try {
-            enabled = (this.description.getText().toString().length() > 0)
-                    && (this.latitude.getText().toString().length() > 0)
-                    && (this.longitude.getText().toString().length() > 0);
-        } catch (Exception e) {
-            enabled = false; // invalid input or NumberFormatException result in no valid input
+        if(this.waypoint == null) {
+            this.update = false;
+            this.waypoint = new Waypoint();
         }
-        Log.v(TAG, "conditionallyEnableSaveButton: " +enabled);
-        saveButton.setEnabled(enabled);
-        saveButton.getIcon().setAlpha(enabled ? 255 : 130);
+
+        binding.setItem(this.waypoint);
+        binding.shareWrapper.setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
 
     }
 
 
     @Override
     public void onDestroy() {
-        handler.removeCallbacksAndMessages(null); // disable handler
+       // handler.removeCallbacksAndMessages(null); // disable handler
         ServiceProxy.runOrBind(this, new Runnable() {
 
             @Override
@@ -203,14 +138,6 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         getMenuInflater().inflate(R.menu.activity_waypoint, menu);
         this.saveButton = menu.findItem(R.id.save);
 
-        // Setup change listener that change enabled state of save button
-        this.description.addTextChangedListener(requiredForSave);
-        this.latitude.addTextChangedListener(requiredForSave);
-        this.longitude.addTextChangedListener(requiredForSave);
-        this.radius.addTextChangedListener(requiredForSave);
-
-        // Check if we should initially enable or disable save button based on values set in onCreate
-        conditionallyEnableSaveButton();
         return true;
     }
 
@@ -253,8 +180,6 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
                 attributions = "";
             }
 
-            latitude.setText("" + place.getLatLng().latitude);
-            longitude.setText(""+place.getLatLng().longitude);
 
             //mViewName.setText(name);
             //mViewAddress.setText(address);
@@ -290,43 +215,47 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
             public void run() {
                 Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
                 if(l != null) {
-                    ((ActivityWaypoint)c).latitude.setText(Double.toString((l.getLatitude())));
-                    ((ActivityWaypoint)c).longitude.setText(Double.toString((l.getLongitude())));
+                //    ((ActivityWaypoint)c).latitude.setText(Double.toString((l.getLatitude())));
+                //    ((ActivityWaypoint)c).longitude.setText(Double.toString((l.getLongitude())));
                 }
             }
         });
     }
 
     private void save() {
-        Waypoint w;
+       Waypoint w = this.waypoint;
 
 
-        boolean update;
-        if (this.waypoint == null) {
-            w = new Waypoint();
+        if (!update) {
             w.setModeId(Preferences.getModeId());
-            update = false;
-        } else {
-            w = this.waypoint;
-            update = true;
+            w.setDate(new java.util.Date());
         }
 
-        w.setDescription(this.description.getText().toString());
+        w.setDescription(binding.description.getText().toString());
         try {
-            w.setGeofenceLatitude(Double.parseDouble(this.latitude.getText().toString()));
-            w.setGeofenceLongitude(Double.parseDouble(this.longitude.getText().toString()));
+            w.setGeofenceLatitude(Double.parseDouble(binding.latitude.getText().toString()));
+            w.setGeofenceLongitude(Double.parseDouble(binding.longitude.getText().toString()));
         } catch (NumberFormatException e) {
+
         }
 
         try {
-            w.setGeofenceRadius(Integer.parseInt(this.radius.getText().toString()));
+            w.setGeofenceRadius(Integer.parseInt(binding.radius.getText().toString()));
         } catch (NumberFormatException e) {
             w.setGeofenceRadius(null);
         }
 
+        w.setBeaconUUID(binding.beaconUUID.getText().toString());
         try {
-            w.setWifiSSID(this.ssid.getText().toString());
+            w.setBeaconMinor(Integer.valueOf(binding.beaconMinor.getText().toString()));
         } catch (NumberFormatException e) {
+            w.setBeaconMinor(0);
+        }
+
+        try {
+            w.setBeaconMajor(Integer.valueOf(binding.beaconMajor.getText().toString()));
+        } catch (NumberFormatException e) {
+            w.setBeaconMajor(0);
         }
 
         if(!Preferences.isModePublic())
@@ -338,7 +267,6 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         if (update)
             update(w);
         else {
-            w.setDate(new java.util.Date());
             add(w);
         }
 

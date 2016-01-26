@@ -1,7 +1,7 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +19,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageEvent.class, name="event"),
         @JsonSubTypes.Type(value=MessageMsg.class, name="msg"),
         @JsonSubTypes.Type(value=MessageCard.class, name="card"),
-        @JsonSubTypes.Type(value=MessageCmd.class, name="cmd")
+        @JsonSubTypes.Type(value=MessageCmd.class, name="cmd"),
+        @JsonSubTypes.Type(value=MessageEncrypted.class, name="encrypted")
+
 })
 
 public abstract class MessageBase extends BaseObservable implements Runnable{
@@ -54,7 +56,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         protected WeakReference<IncomingMessageProcessor> _processorIn;
 
         @JsonIgnore
-        protected WeakReference<OutoingMessageProcessor> _processorOut;
+        protected WeakReference<OutgoingMessageProcessor> _processorOut;
 
         @JsonIgnore
         public String getTopic() {
@@ -80,7 +82,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         }
 
         @JsonIgnore
-        public void setOutgoingProcessor(OutoingMessageProcessor processor) {
+        public void setOutgoingProcessor(OutgoingMessageProcessor processor) {
                 this._processorOut = new WeakReference<>(processor);
         }
 
@@ -88,7 +90,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         public abstract void processIncomingMessage(IncomingMessageProcessor handler);
 
         @JsonIgnore
-        public abstract void processOutgoingMessage(OutoingMessageProcessor handler);
+        public abstract void processOutgoingMessage(OutgoingMessageProcessor handler);
 
         @JsonIgnore
         public abstract String getBaseTopicSuffix();
