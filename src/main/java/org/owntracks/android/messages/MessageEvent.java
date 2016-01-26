@@ -3,7 +3,7 @@ package org.owntracks.android.messages;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageEvent extends MessageBase{
@@ -15,7 +15,7 @@ public class MessageEvent extends MessageBase{
     }
 
     @Override
-    public void processOutgoingMessage(OutoingMessageProcessor handler) {
+    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
     }
 

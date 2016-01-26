@@ -40,7 +40,7 @@
             android:paddingBottom="0dp"
             android:background="@drawable/map_contact_details_background">
 
-            <include layout="@layout/binding_row_contact"
+            <include layout="@layout/row_contact_binding"
                 android:transitionName="rowContact"
                 bind:item="@{item}"/>
 

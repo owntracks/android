@@ -5,7 +5,7 @@ package org.owntracks.android.db;
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
 /**
- * Entity mapped to table CONTACT_LINK.
+ * Entity mapped to table "CONTACT_LINK".
  */
 public class ContactLink {
 

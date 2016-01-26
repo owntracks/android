@@ -4,12 +4,14 @@ package org.owntracks.android.db;
 
 // KEEP INCLUDES - put your custom includes here
     import android.databinding.BaseObservable;
+    import android.databinding.Bindable;
+    import android.databinding.BindingConversion;
     import android.location.Location;
 // KEEP INCLUDES END
 /**
- * Entity mapped to table WAYPOINT.
+ * Entity mapped to table "WAYPOINT".
  */
-public class Waypoint extends BaseObservable {
+public class Waypoint {
 
     private Long id;
     private String description;
@@ -19,8 +21,8 @@ public class Waypoint extends BaseObservable {
     private String geofenceId;
     private String wifiSSID;
     private String beaconUUID;
-    private String beaconMajor;
-    private String beaconMinor;
+    private Integer beaconMajor;
+    private Integer beaconMinor;
     private Boolean shared;
     private java.util.Date date;
     private Long lastTriggered;
@@ -40,7 +42,7 @@ public class Waypoint extends BaseObservable {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, Double geofenceLatitude, Double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, String beaconMajor, String beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId, int type) {
+    public Waypoint(Long id, String description, Double geofenceLatitude, Double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId, int type) {
         this.id = id;
         this.description = description;
         this.geofenceLatitude = geofenceLatitude;
@@ -122,19 +124,19 @@ public class Waypoint extends BaseObservable {
         this.beaconUUID = beaconUUID;
     }
 
-    public String getBeaconMajor() {
+    public Integer getBeaconMajor() {
         return beaconMajor;
     }
 
-    public void setBeaconMajor(String beaconMajor) {
+    public void setBeaconMajor(Integer beaconMajor) {
         this.beaconMajor = beaconMajor;
     }
 
-    public String getBeaconMinor() {
+    public Integer getBeaconMinor() {
         return beaconMinor;
     }
 
-    public void setBeaconMinor(String beaconMinor) {
+    public void setBeaconMinor(Integer beaconMinor) {
         this.beaconMinor = beaconMinor;
     }
 
@@ -186,6 +188,8 @@ public class Waypoint extends BaseObservable {
         l.setAccuracy(getGeofenceRadius() != null ? getGeofenceRadius() : 0);
         return l;
     }
+
+
     // KEEP METHODS END
 
 }

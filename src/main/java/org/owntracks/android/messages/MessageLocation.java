@@ -1,9 +1,8 @@
 package org.owntracks.android.messages;
 
-import android.location.Location;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.lang.ref.WeakReference;
 import com.mapbox.mapboxsdk.api.ILatLng;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -124,7 +123,7 @@ public class MessageLocation extends MessageBase implements ILatLng {
     }
 
     @Override
-    public void processOutgoingMessage(OutoingMessageProcessor handler) {
+    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
     }
 

@@ -10,7 +10,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > application, right click "run"  and select Run.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 10;
+    private static final int SCHEMA_VERSION = 12;
 
     public static void main(String args[]) throws Exception {
 
@@ -32,6 +32,7 @@ public class DaoGenerator {
         contactLink.addIndex(compoundPk);
 
 
+
         Entity waypoint = schema.addEntity("Waypoint");
         waypoint.addIdProperty(); // For stable ids of cursor adapter
         waypoint.addStringProperty("description");
@@ -41,14 +42,13 @@ public class DaoGenerator {
         waypoint.addStringProperty("geofenceId");
         waypoint.addStringProperty("wifiSSID");
         waypoint.addStringProperty("beaconUUID");
-        waypoint.addStringProperty("beaconMajor");
-        waypoint.addStringProperty("beaconMinor");
+        waypoint.addIntProperty("beaconMajor");
+        waypoint.addIntProperty("beaconMinor");
         waypoint.addBooleanProperty("shared");
         waypoint.addDateProperty("date");
         waypoint.addLongProperty("lastTriggered");
         waypoint.addIntProperty("modeId").notNull();
         waypoint.addIntProperty("type").notNull();
-        waypoint.setSuperclass("BaseObservable");
 
         Entity message = schema.addEntity("Message");
         message.addIdProperty(); // For stable ids of cursor adapter
