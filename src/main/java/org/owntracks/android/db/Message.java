@@ -5,7 +5,7 @@ package org.owntracks.android.db;
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
 /**
- * Entity mapped to table MESSAGE.
+ * Entity mapped to table "MESSAGE".
  */
 public class Message {
 

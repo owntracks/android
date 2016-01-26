@@ -19,6 +19,7 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
@@ -65,8 +66,6 @@ public class App extends Application  {
     private static ContactsViewModel contactsViewModel;
 
     private static HashMap<String, Contact> contacts;    /* TODO: DEPRECATED*/
-    private static HashMap<String, Contact> initializingContacts;    /* TODO: DEPRECATED*/
-
     private static Activity currentActivity;
 
 
@@ -90,19 +89,9 @@ public class App extends Application  {
         StatisticsProvider.setTime(this, StatisticsProvider.APP_START);
         Answers.getInstance().logCustom(new CustomEvent("App started").putCustomAttribute("mode", Preferences.getModeId()));
 
-        DaoMaster.OpenHelper helper = new DaoMaster.OpenHelper(this, "org.owntracks.android.db", null) {
-            @Override
-            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                DaoMaster.dropAllTables(db, true);
-                onCreate(db);
-            }
-        };
-
-
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         this.mainHanler = new Handler(getMainLooper());
         this.contacts = new HashMap<String, Contact>();
-        this.initializingContacts = new HashMap<String, Contact>();
         this.fusedContacts = new ArrayMap<String, FusedContact>();
         this.contactsViewModel =  new ContactsViewModel();
 
@@ -113,6 +102,7 @@ public class App extends Application  {
         GeocodingProvider.initialize(this);
 
         Dao.initialize(this);
+        EncryptionProvider.initialize();
 		EventBus.getDefault().register(this);
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
 

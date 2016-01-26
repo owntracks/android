@@ -9,16 +9,11 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -38,36 +33,29 @@ import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
-import org.owntracks.android.messages.LocationMessage;
-import org.owntracks.android.messages.Message;
 import org.owntracks.android.messages.MessageBase;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.messages.MessageEncrypted;
+import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
-import org.owntracks.android.support.OutoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import ch.hsr.geohash.GeoHash;
 import de.greenrobot.event.EventBus;
 
-public class ServiceBroker implements MqttCallback, ProxyableService, OutoingMessageProcessor {
+public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor {
 	private static final String TAG = "ServiceBroker";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -691,10 +679,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutoingMes
 
 	@Override
 	public void processMessage(MessageBase message) {
+		MessageBase mm;
 		Log.v(TAG, "processMessage: " + message + ", q size: " + pubPool.getQueue().size());
 		try {
+			if(Preferences.getEncryption()) {
+				mm = new MessageEncrypted();
+				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(ServiceProxy.getServiceParser().toJSON(message)));
+			} else {
+				mm = message;
+			}
+
+
 			MqttMessage m = new MqttMessage();
-			m.setPayload(ServiceProxy.getServiceParser().toJSON(message).getBytes());
+			m.setPayload(ServiceProxy.getServiceParser().toJSON(mm).getBytes());
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 			try {

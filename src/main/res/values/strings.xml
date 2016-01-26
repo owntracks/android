@@ -237,6 +237,9 @@
     <string name="aLocation">a location</string>
     <string name="events">Events</string>
     <string name="notificationMessageTitle">Messages</string>
+    <string name="beaconUUID">UUID</string>
+    <string name="beaconMajor">Major</string>
+    <string name="beaconMinor">Minor</string>
 
     <string-array name="filepicker">
         <item>Select</item>

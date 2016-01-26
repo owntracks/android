@@ -10,11 +10,14 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TimeUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
@@ -28,7 +31,11 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.db.Dao;
+import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.BeaconMessage;
+import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.support.receiver.BluetoothStateChangeReceiver;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -41,18 +48,20 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     private static final String TAG = "ServiceBeacon";
 
     private Context context;
-
+    private HashMap<Long, Region> activeRegions;
 
 
 
     private String scanId;
     private BeaconManager beaconManager;
+    private WaypointDao waypointDao;
 
     @Override
     public void onCreate(ServiceProxy c) {
         this.context = c;
         Log.v(TAG, "onCreate()");
-
+        this.waypointDao = Dao.getWaypointDao();
+        this.activeRegions = new HashMap<>();
         beaconManager = BeaconManager.getInstanceForApplication(context);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
@@ -120,7 +129,35 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         beaconManager.setMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
-                Log.i(TAG, "didEnterRegion " + region.getUniqueId());
+                Log.i(TAG, "didEnterRegion " + region.getUniqueId() + " " + Long.parseLong(region.getUniqueId()));
+
+                Waypoint w = waypointDao.load(Long.parseLong(region.getUniqueId()));
+                if(w == null) {
+                    Log.e(TAG, "unable to load waypoint from entered region");
+                    return;
+                }
+                MessageTransition m = new MessageTransition();
+                if(w.getGeofenceLatitude() != null)
+                    m.setLat(w.getGeofenceLatitude());
+                else
+                    m.setLat(0);
+                if(w.getGeofenceLongitude() != null)
+                   m.setLon(w.getGeofenceLongitude());
+                else
+                    m.setLon(0);
+                m.setDesc(w.getDescription());
+                m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+                m.setEvent(MessageTransition.EVENT_ENTER);
+                m.setTid(Preferences.getTrackerId(true));
+                m.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+                m.setTrigger(MessageTransition.TRIGGER_BEACON);
+
+
+                m.setTopic(Preferences.getPubTopicEvents());
+                m.setQos(Preferences.getPubQosEvents());
+                m.setRetained(Preferences.getPubRetainEvents());
+                
+                ServiceProxy.getServiceBroker().publish(m);
             }
 
             @Override
@@ -149,11 +186,84 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         } catch (RemoteException e) {    }
 */
 
-        try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("iphone", Identifier.parse("DBD75A2A-78C0-425C-A22B-37646BA46884"), null, null));
-        } catch (RemoteException e) {    }
+
+
+            for(Waypoint w : loadWaypointsForModeIdWithValidBeacon()) {
+                //DBD75A2A-78C0-425C-A22B-37646BA46884
+                addRegion(w);
+            }
+
 
     }
+
+    public void onEvent(Events.WaypointAdded e) {
+        addRegion(e.getWaypoint());
+    }
+
+    private void removeRegion(Waypoint w) {
+        try {
+            Region r = activeRegions.get(w.getId());
+            if(r != null) {
+                Log.v(TAG, "removing region for ID " + w.getId());
+                beaconManager.stopMonitoringBeaconsInRegion(r);
+                activeRegions.remove(w.getId());
+            } else
+                Log.e(TAG, "skipping remove, region not setup for ID " + w.getId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addRegion(Waypoint w) {
+        Log.v(TAG, "addRegion: " + w.getDescription());
+        if(!isWaypointWithValidRegion(w))
+            return;
+
+
+        Log.v(TAG, "startMonitoringBeaconsInRegion " + w.getId() + " desc: " + w.getDescription() + " UUID: " + w.getBeaconUUID() + " " + w.getBeaconMajor() + "/" + w.getBeaconMinor());
+        try {
+            Region r = getRegionFromWaypoint(w);
+            Log.v(TAG, r.getUniqueId() + " " + r.getId1() + " " + r.getId2() + " " + r.getId3());
+            beaconManager.startMonitoringBeaconsInRegion(r);
+        } catch (Exception e) {
+            Log.e(TAG, "unable to add region");
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isWaypointWithValidRegion(Waypoint w) {
+
+        try {
+            if(w.getBeaconUUID() == null)
+                return false;
+
+            Identifier.parse(w.getBeaconUUID());
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "beacon UUID parse exception: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+    private Region getRegionFromWaypoint(Waypoint w) {
+        return new Region(w.getId().toString(), Identifier.parse(w.getBeaconUUID()), Identifier.fromInt(w.getBeaconMajor()), Identifier.fromInt(w.getBeaconMinor()));
+    }
+
+    public void onEvent(Events.WaypointUpdated e) {
+        removeRegion(e.getWaypoint());
+        addRegion(e.getWaypoint());
+    }
+
+    public void onEvent(Events.WaypointRemoved e) {
+        removeRegion(e.getWaypoint());
+    }
+
+    private List<Waypoint> loadWaypointsForModeIdWithValidBeacon() {
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId()), WaypointDao.Properties.BeaconUUID.isNotNull()).build().list();
+    }
+
+
 
     @Override
     public Context getApplicationContext() {

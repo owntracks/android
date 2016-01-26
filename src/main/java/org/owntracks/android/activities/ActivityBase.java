@@ -18,4 +18,8 @@ public class ActivityBase extends AppCompatActivity implements SnackbarFactory.S
     public View getSnackbarTargetView() {
         return getWindow().getDecorView().findViewById(android.R.id.content);
     }
+
+    protected boolean hasIntentExtras() {
+        return getIntent() != null && getIntent().getExtras() != null;
+    }
 }
