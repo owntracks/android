@@ -29,6 +29,7 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Dao;
@@ -55,6 +56,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     private String scanId;
     private BeaconManager beaconManager;
     private WaypointDao waypointDao;
+    private BackgroundPowerSaver backgroundPowerSaver;
 
     @Override
     public void onCreate(ServiceProxy c) {
@@ -62,7 +64,13 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         Log.v(TAG, "onCreate()");
         this.waypointDao = Dao.getWaypointDao();
         this.activeRegions = new HashMap<>();
+        backgroundPowerSaver = new BackgroundPowerSaver(context);
+
+
         beaconManager = BeaconManager.getInstanceForApplication(context);
+        beaconManager.setAndroidLScanningDisabled(false);
+
+        // TODO: make configurable
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
         beaconManager.bind(this);
@@ -156,7 +164,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
                 m.setTopic(Preferences.getPubTopicEvents());
                 m.setQos(Preferences.getPubQosEvents());
                 m.setRetained(Preferences.getPubRetainEvents());
-                
+
                 ServiceProxy.getServiceBroker().publish(m);
             }
 
@@ -279,4 +287,20 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     public boolean bindService(Intent intent, ServiceConnection serviceConnection, int i) {
         return context.bindService(intent, serviceConnection, i);
     }
+
+    public void enableForegroundMode() {
+        if(beaconManager != null) {
+            Log.v(TAG, "enabling foreground mode");
+            beaconManager.setBackgroundMode(false);
+        }
+    }
+
+    public void enableBackgroundMode() {
+        if(beaconManager != null) {
+            Log.v(TAG, "enabling background mode");
+            beaconManager.setBackgroundMode(true);
+        }
+
+    }
+
 }
