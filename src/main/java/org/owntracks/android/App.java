@@ -192,7 +192,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableForegroundMode();
-                //  ServiceProxy.getServiceBeacon().setBackgroundMode(false);
+                ServiceProxy.getServiceBeacon().enableForegroundMode();
             }
         });
     }
@@ -205,7 +205,8 @@ public class App extends Application  {
             @Override
             public void run() {
                 ServiceProxy.getServiceLocator().enableBackgroundMode();
-                // ServiceProxy.getServiceBeacon().setBackgroundMode(true);
+                ServiceProxy.getServiceBeacon().enableBackgroundMode();
+
             }
         });
     }

@@ -695,6 +695,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 			try {
+				Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
 				MqttDeliveryToken token = this.mqttClient.getTopic(message.getTopic()).publish(m);
 				if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
 					Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);

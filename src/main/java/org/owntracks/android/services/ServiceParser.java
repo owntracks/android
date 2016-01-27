@@ -169,10 +169,14 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
             MessageBase m = mapper.readValue(message.getPayload(), MessageBase.class);
 
             if(m instanceof MessageEncrypted) {
+                Log.v(TAG, "received encrypted message");
                 try {
-                    m = mapper.readValue(EncryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
+                    String decrypted = EncryptionProvider.decrypt(((MessageEncrypted) m).getData());
+                    Log.v(TAG, "decoded encrypted message to: " + decrypted);
+                    m = mapper.readValue(decrypted, MessageBase.class);
                 } catch (Exception e) {
                     Log.e(TAG, "unable to parse decrypted message");
+                    e.printStackTrace();
                 }
             }
 
