@@ -1,16 +1,11 @@
 package org.owntracks.android;
 
-
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
 import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.DaoMaster;
 import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
@@ -23,7 +18,6 @@ import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.StatisticsProvider;
 
 import android.app.Activity;
@@ -37,17 +31,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.support.v4.util.ArrayMap;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
-import com.crashlytics.android.core.CrashlyticsCore;
-
 import de.greenrobot.event.EventBus;
-import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
-import me.tatarka.bindingcollectionadapter.ItemViewArg;
-import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory;
 
 public class App extends Application  {
     private static final String TAG = "App";
@@ -57,10 +43,6 @@ public class App extends Application  {
     private static int runningActivities = 0;
     private SimpleDateFormat dateFormater;
     private static Handler mainHanler;
-
-    private ContactLinkDao contactLinkDao;
-	private WaypointDao waypointDao;
-    private MessageDao messageDao;
 
     private static ArrayMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
@@ -72,7 +54,6 @@ public class App extends Application  {
     public static final int MODE_ID_PRIVATE=0;
     public static final int MODE_ID_HOSTED=1;
     public static final int MODE_ID_PUBLIC=2;
-    private SQLiteDatabase db;
 
     public static ArrayMap<String, FusedContact> getFusedContacts() {
         return fusedContacts;
@@ -83,24 +64,19 @@ public class App extends Application  {
 		super.onCreate();
         instance = this;
 
-        Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(), new Answers());
         Preferences.initialize(this);
 
         StatisticsProvider.setTime(this, StatisticsProvider.APP_START);
-        Answers.getInstance().logCustom(new CustomEvent("App started").putCustomAttribute("mode", Preferences.getModeId()));
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
-        this.mainHanler = new Handler(getMainLooper());
-        this.contacts = new HashMap<String, Contact>();
-        this.fusedContacts = new ArrayMap<String, FusedContact>();
-        this.contactsViewModel =  new ContactsViewModel();
+        mainHanler = new Handler(getMainLooper());
+        contacts = new HashMap<>();
+        fusedContacts = new ArrayMap<>();
+        contactsViewModel =  new ContactsViewModel();
 
-        //EstimoteSDK.initialize(this, getString(R.string.ESTIMOTE_API_ID), getString(R.string.ESTIMOTE_API_KEY));
-        //EstimoteSDK.enableDebugLogging(true);
 
         ContactImageProvider.initialize(this);
         GeocodingProvider.initialize(this);
-
         Dao.initialize(this);
         EncryptionProvider.initialize();
 		EventBus.getDefault().register(this);
