@@ -987,7 +987,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
         private void schedule() {
 			Log.v(TAG, "scheduling reconnect handler");
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds = (long)Math.pow(2, ++backoff) * TimeUnit.MINUTES.toMillis(1);
+			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
