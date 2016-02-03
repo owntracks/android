@@ -952,7 +952,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
     class ReconnectHandler {
 		private static final String TAG = "ReconnectHandler";
-		private static final int BACKOFF_INTERVAL_MAX = 64; // Will try to reconnect after 1, 2, 4, 8, 16, 32, 64 minutes
+		private static final int BACKOFF_INTERVAL_MAX = 6; // Will try to reconnect after 1, 2, 4, 8, 16, 32, 64 minutes
 		private int backoff = 0;
 
 		private Context context;
@@ -987,7 +987,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
         private void schedule() {
 			Log.v(TAG, "scheduling reconnect handler");
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds = (long)backoff * TimeUnit.MINUTES.toMillis(1);
+			long delayInMilliseconds = (long)Math.pow(2, ++backoff) * TimeUnit.MINUTES.toMillis(1);
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
@@ -995,9 +995,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 				alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
 			}
 
-			if(backoff <= BACKOFF_INTERVAL_MAX) {
-				backoff = (int) Math.pow(2, ++backoff);
-			}
+			if(backoff <= BACKOFF_INTERVAL_MAX)
+				backoff++;
 		}
     }
 
