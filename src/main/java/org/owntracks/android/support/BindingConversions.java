@@ -3,9 +3,10 @@ package org.owntracks.android.support;
 import android.databinding.BindingConversion;
 
 public class BindingConversions {
+    private static final String EMPTY_STRING = "";
     @BindingConversion
     public static String convertDoubleToString(Double d) {
-        return  d != null? d.toString() : null;
+        return  d != null? d.toString() : EMPTY_STRING;
 
     }
     @BindingConversion
@@ -14,12 +15,12 @@ public class BindingConversions {
     }
     @BindingConversion
     public static String convertStringToString(String s) {
-        return  s != null ? s : "";
-    }
-    @BindingConversion
-    public static String convertIntegerToString(Integer d) {
-        return  d != null? d.toString() : null;
+        return  s != null ? s : EMPTY_STRING;
     }
 
+    @BindingConversion
+    public static String convertIntegerToString(Integer d) {
+        return  d != null? d.toString() : EMPTY_STRING;
+    }
 
 }

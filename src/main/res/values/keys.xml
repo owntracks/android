@@ -29,7 +29,6 @@
     <string name="keyPubInterval">pubInterval</string>
     <string name="keyPubTopicBase">pubTopicBase</string>
     <string name="keySubTopic">subTopic</string>
-    <string name="keyEncryption">encryption</string>
     <string name="keyEncryptionKey">encryptionKey</string>
 
 

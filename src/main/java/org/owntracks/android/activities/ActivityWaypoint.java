@@ -16,12 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.*;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityWaypointBindingBinding;
 import org.owntracks.android.db.Dao;
@@ -33,6 +35,7 @@ import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandlerInterface;
+import org.owntracks.android.support.Toasts;
 
 import de.greenrobot.event.EventBus;
 
@@ -101,6 +104,38 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         binding.setItem(this.waypoint);
         binding.shareWrapper.setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
 
+        setupRequiredFields();
+    }
+
+    private void setupRequiredFields() {
+        requiredForSave = new SimpleTextChangeListener() {
+            @Override
+            public void onChanged(String s) {
+                conditionallyEnableSaveButton();
+            }
+        };
+
+        binding.description.addTextChangedListener(requiredForSave);
+        binding.latitude.addTextChangedListener(requiredForSave);
+        binding.longitude.addTextChangedListener(requiredForSave);
+
+    }
+
+    private void conditionallyEnableSaveButton() {
+
+        boolean enabled = false;
+        try {
+            enabled = (binding.description.getText().toString().length() > 0)
+                    && (binding.description.getText().toString().length() > 0)
+                    && (binding.description.getText().toString().length() > 0);
+
+        } catch (Exception e) {
+            enabled = false; // invalid input or NumberFormatException result in no valid input
+        }
+        Log.v(TAG, "conditionallyEnableSaveButton: " +enabled);
+        saveButton.setEnabled(enabled);
+        saveButton.getIcon().setAlpha(enabled ? 255 : 130);
+
     }
 
 
@@ -137,6 +172,7 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_waypoint, menu);
         this.saveButton = menu.findItem(R.id.save);
+        conditionallyEnableSaveButton();
 
         return true;
     }
@@ -209,14 +245,15 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
     }
 
     private void useCurrentLocation() {
-        final Context c = this;
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
                 Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
                 if(l != null) {
-                //    ((ActivityWaypoint)c).latitude.setText(Double.toString((l.getLatitude())));
-                //    ((ActivityWaypoint)c).longitude.setText(Double.toString((l.getLongitude())));
+                    waypoint.setGeofenceLatitude(l.getLatitude());
+                    waypoint.setGeofenceLongitude(l.getLongitude());
+                } else {
+                    Toasts.showLocationNotAvailable();
                 }
             }
         });

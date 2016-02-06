@@ -48,8 +48,6 @@ import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterF
 
 public class ActivityContacts extends ActivityBase implements RecyclerViewAdapter.ClickHandler, RecyclerViewAdapter.LongClickHandler, BindingRecyclerViewAdapterFactory {
     private static final String TAG = "ActivityContacts";
-    RecyclerView rvContacts;
-    ContactsAdapter adapter;
     private Toolbar toolbar;
     private Drawer drawer;
 
