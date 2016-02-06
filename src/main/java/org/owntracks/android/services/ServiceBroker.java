@@ -175,18 +175,15 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			return;
 		}
 
-		// Respect user's wish to not use data
-		if (!isBackgroundDataEnabled()) {
+		// Check if there is a data connection. If not, try again in some time.
+		if (!isOnline()) {
 			Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
 			changeState(State.DISCONNECTED_DATADISABLED);
 			reconnectHandler.start(); // we will try again to connect after some time
 			return;
 		}
 
-		// Don't do anything unless we're disconnected
-
 		if (isDisconnected()) {
-			if (isOnline()) { // Check if there is a data connection
 				Log.v(TAG, "handleStart: isOnline() == true");
 
 				if (connect())
@@ -194,11 +191,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 				else
 					reconnectHandler.start();
 
-			} else {
-				Log.e(TAG, "handleStart: isDisconnected() == false");
-				changeState(State.DISCONNECTED_DATADISABLED);
-				reconnectHandler.start(); // we will try again to connect after some time
-			}
 		} else {
 			Log.d(TAG, "handleStart: isDisconnected() == false");
 		}
@@ -606,11 +598,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		return (this.mqttClient != null)
 				&& (state == State.CONNECTING);
 	}
-
-	private boolean isBackgroundDataEnabled() {
-		return isOnline();
-	}
-
 
 	@Override
 	public void onDestroy() {
