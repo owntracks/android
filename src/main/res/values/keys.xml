@@ -30,6 +30,7 @@
     <string name="keyPubTopicBase">pubTopicBase</string>
     <string name="keySubTopic">subTopic</string>
     <string name="keyEncryptionKey">encryptionKey</string>
+    <string name="keyRecord">record</string>
 
 
 
