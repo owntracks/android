@@ -8,7 +8,7 @@
 
     <PreferenceScreen
         android:key="reportingScreen"
-        android:title="@string/preferencesTopicSettings" >
+        android:title="@string/preferencesReporting" >
 
         <SwitchPreference
             android:defaultValue="@bool/valPub"
@@ -22,6 +22,12 @@
             android:dependency="@string/keyPub"
             android:summary="@string/preferencesIncludeBatterySummary"
             android:title="@string/preferencesIncludeBattery" />
+
+        <SwitchPreference
+            android:defaultValue="@bool/valRecordHosted"
+            android:key="@string/keyRecord"
+            android:summary="@string/preferencesRecordSummary"
+            android:title="@string/preferencesRecord" />
 
 
     </PreferenceScreen>

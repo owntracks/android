@@ -35,7 +35,7 @@
     <string name="preferencesConnectionAdvancedMode">"Advanced connection preferences"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
-    <string name="preferencesTopicSettings">"Reporting"</string>
+    <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesTopic">"Topic"</string>
     <string name="preferencesTopicSummary">"Topic to send and receive messages"</string>
     <string name="preferencesRetain">"Publish retained"</string>
@@ -245,6 +245,8 @@
     <string name="beaconUUID">UUID</string>
     <string name="beaconMajor">Major</string>
     <string name="beaconMinor">Minor</string>
+    <string name="preferencesRecordSummary">Record</string>
+    <string name="preferencesRecord">Record</string>
 
     <string-array name="filepicker">
         <item>Select</item>

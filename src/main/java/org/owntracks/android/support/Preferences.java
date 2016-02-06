@@ -974,6 +974,13 @@ public class Preferences {
         return getString(R.string.keyEncryptionKey, R.string.valEmpty);
     }
 
+    public static boolean getRecord() {
+        return isModeHosted() && hasValidPremiumSubscription() && getBoolean(R.string.keyRecord, R.bool.valFalse);
+    }
+
+    public static boolean hasValidPremiumSubscription() {
+
+    }
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
