@@ -35,7 +35,7 @@
     <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
     <bool name="valMessagesHosted" >true</bool>
     <bool name="valInfoHosted" >true</bool>
-
+    <bool name="valRecordHosted">false</bool>
 
 
     <integer name="valKeepaliveHosted">3600</integer>
