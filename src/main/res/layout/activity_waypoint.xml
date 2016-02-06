@@ -29,7 +29,6 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/description"
                 app:met_floatingLabel="normal"
-
                 app:met_underlineColor="#82FFFFFF"
                 app:met_floatingLabelTextColor="#82FFFFFF"
                 app:met_primaryColor="#FFFFFF"

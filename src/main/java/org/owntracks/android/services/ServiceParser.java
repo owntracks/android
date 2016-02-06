@@ -170,6 +170,9 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
 
             if(m instanceof MessageEncrypted) {
                 Log.v(TAG, "received encrypted message");
+                if(!EncryptionProvider.isPayloadEncryptionEnabled())
+                    return;
+
                 try {
                     String decrypted = EncryptionProvider.decrypt(((MessageEncrypted) m).getData());
                     Log.v(TAG, "decoded encrypted message to: " + decrypted);

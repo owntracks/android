@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -62,14 +63,30 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     public void onCreate(ServiceProxy c) {
         this.context = c;
         Log.v(TAG, "onCreate()");
+
+        // Gets aditional information about available BLE features
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Log.v(TAG, "bluetoothAdapter.isMultipleAdvertisementSupported: " + bluetoothAdapter.isMultipleAdvertisementSupported());
+            Log.v(TAG, "bluetoothAdapter.isOffloadedFilteringSupported: " + bluetoothAdapter.isOffloadedFilteringSupported());
+            Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
+        }
+
+
         this.waypointDao = Dao.getWaypointDao();
         this.activeRegions = new HashMap<>();
         backgroundPowerSaver = new BackgroundPowerSaver(context);
 
 
+
+
         beaconManager = BeaconManager.getInstanceForApplication(context);
         beaconManager.setAndroidLScanningDisabled(false);
+        beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
+        beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
+        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
 
+        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
         // TODO: make configurable
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 

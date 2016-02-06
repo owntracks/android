@@ -682,7 +682,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		MessageBase mm;
 		Log.v(TAG, "processMessage: " + message + ", q size: " + pubPool.getQueue().size());
 		try {
-			if(Preferences.getEncryption()) {
+			if(EncryptionProvider.isPayloadEncryptionEnabled()) {
 				mm = new MessageEncrypted();
 				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(ServiceProxy.getServiceParser().toJSON(message)));
 			} else {

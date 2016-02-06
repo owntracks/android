@@ -23,6 +23,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.SnackbarFactory;
+import org.owntracks.android.support.Toasts;
 
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -350,13 +351,7 @@ public class ActivityMain extends ActivityBase {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else {
-            Toast.makeText(
-                    App.getContext(),
-                    App.getContext()
-                            .getString(R.string.contactLocationUnknown),
-                    Toast.LENGTH_SHORT
-            ).show();
-
+            Toasts.showLocationNotAvailable();
         }
     }
 

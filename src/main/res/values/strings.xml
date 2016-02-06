@@ -61,6 +61,11 @@
     <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
     <string name="preferencesCommunity">Community</string>
     <string name="preferencesCommunitySummary">community.owntracks.org</string>
+    <string name="preferencesEncryption">Encryption</string>
+    <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
+    <string name="preferencesEncryptionKey">Encryption Key</string>
+
+
 
     <string name="preferencesDeviceTopic">Device topic</string>
     <string name="preferencesDeviceTopicSummary">The topic base for publishes</string>

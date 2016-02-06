@@ -22,6 +22,8 @@ import org.owntracks.android.support.StatisticsProvider;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.KeyguardManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -81,12 +83,13 @@ public class App extends Application  {
         EncryptionProvider.initialize();
 		EventBus.getDefault().register(this);
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-
+        registerScreenOnReceiver();
 
     }
 
 
-	public static Context getContext() {
+
+    public static Context getContext() {
 		return instance;
 	}
     public static App getInstance() {
@@ -217,5 +220,43 @@ public class App extends Application  {
         public void onActivitySaveInstanceState(Activity activity, Bundle outState) { }
         public void onActivityDestroyed(Activity activity) { }
     }
+    private void registerScreenOnReceiver() {
+        final IntentFilter theFilter = new IntentFilter();
+        /** System Defined Broadcast */
+        theFilter.addAction(Intent.ACTION_SCREEN_ON);
+        theFilter.addAction(Intent.ACTION_SCREEN_OFF);
+
+        // Sets foreground and background modes based on device lock and unlock if the app is active
+
+
+
+
+        BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String strAction = intent.getAction();
+
+                KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+
+                if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON))
+                {
+                    if( myKM.inKeyguardRestrictedInputMode())
+                    {
+                        if(App.isInForeground())
+                            App.onEnterBackground();
+                    } else
+                    {
+                        if(App.isInForeground())
+                            App.onEnterBackground();
+
+                    }
+                }
+            }
+        };
+
+        getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
+
+    }
+
 
 }
