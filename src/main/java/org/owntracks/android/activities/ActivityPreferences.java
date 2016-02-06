@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class ActivityPreferences extends ActivityBase {
 
     static Preference connectionPreferenceScreen;
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
+    private Drawer drawer;
 
 
     // Return from ActivityPreferencesConnection to see if we need to reload the preferences because a mode change occured
@@ -70,38 +72,10 @@ public class ActivityPreferences extends ActivityBase {
         getSupportActionBar().setTitle(getTitle());
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
-            @Override
-            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                return false;
-            }
 
-            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                switch (drawerItem.getIdentifier()) {
-                    case R.string.idLocations:
-                        goToRoot();
-                        return true;
-                    case R.string.idPager:
-                        Intent intent1 = new Intent(context, ActivityMessages.class);
-                        startActivity(intent1);
-                        return true;
-                    case R.string.idWaypoints:
-                        Intent intent = new Intent(context, ActivityWaypoints.class);
-                        startActivity(intent);
-                        return true;
-                    case R.string.idSettings:
-                        return true;
-                    case R.string.idStatistics:
-                        Intent intent2 = new Intent(context, ActivityStatistics.class);
-                        startActivity(intent2);
-                        return true;
-
-                }
-                return false;
-            }
-        };
-
-        DrawerFactory.buildDrawer(this, toolbar, drawerListener, 2);
+        toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
+        setSupportActionBar(toolbar);
+        drawer = DrawerFactory.buildDrawerV2(this, toolbar);
 
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferences(), "preferences").commit();
 

@@ -19,7 +19,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:elevation="5dp"
-        android:src="@drawable/noimage"/>
+        />
 
     <LinearLayout
         android:id="@+id/textview_container"

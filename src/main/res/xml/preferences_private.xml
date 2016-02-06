@@ -141,6 +141,15 @@
 
         </PreferenceCategory>
 
+        <PreferenceCategory android:title="@string/preferencesEncryption">
+            <org.owntracks.android.support.EditStringPreference
+                android:defaultValue="@string/valEmpty"
+                android:key="@string/keyEncryptionKey"
+                android:summary="@string/preferencesEncryptionKeySummary"
+                android:title="@string/preferencesEncryptionKey" />
+
+        </PreferenceCategory>
+        
         <PreferenceCategory android:title="Misc">
 
 

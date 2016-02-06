@@ -1,15 +1,18 @@
 package org.owntracks.android.support;
 
 
+import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
 
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.SecretBox;
 import org.abstractj.kalium.crypto.Util;
+import org.owntracks.android.R;
 
 import java.util.Arrays;
 
+import de.greenrobot.event.EventBus;
 
 
 public class EncryptionProvider {
@@ -20,50 +23,68 @@ public class EncryptionProvider {
     private static SecretBox b;
     private static Random r;
     private static byte[] key;
+    private static boolean enabled;
 
-    public static void initialize() {
+    public static boolean isPayloadEncryptionEnabled() {
+        return enabled;
+    }
+
+    private static void initializeSecretBox() {
+        String encryptionKey = Preferences.getEncryptionKey();
+        enabled = encryptionKey != null && encryptionKey.length() > 0;
+        Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
+        if (!enabled)
+            return;
+
+
         key = new byte[crypto_secretbox_KEYBYTES];
-
-        String k = "s3cr1t"; // TODO: FOR TESTING ONLY, GET FROM PREFERENCES
-
-        System.arraycopy(k.getBytes(), 0, key, 0, k.length());
-        Log.v(TAG, "using key to init box: " + key);
+        System.arraycopy(encryptionKey.getBytes(), 0, key, 0, encryptionKey.length());
         b = new SecretBox(key);
         r = new Random();
+        Log.v(TAG, "SecretBox initialized");
     }
+
+    public static void initialize() {
+        initializeSecretBox();
+        SecretBoxManager m = new SecretBoxManager();
+    }
+
     public static String decrypt(String cyphertextb64) {
-
-        Log.v(TAG, "decrypt: encoded cyphertext: " + cyphertextb64);
-
-        byte[] onTheWire  =  Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT );
+        byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
-        byte[] cyphertext = new byte[onTheWire.length-crypto_secretbox_NONCEBYTES];
+        byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
 
-        System.arraycopy(onTheWire , 0, nonce, 0, crypto_secretbox_NONCEBYTES);
+        System.arraycopy(onTheWire, 0, nonce, 0, crypto_secretbox_NONCEBYTES);
         System.arraycopy(onTheWire, crypto_secretbox_NONCEBYTES, cyphertext, 0, onTheWire.length - crypto_secretbox_NONCEBYTES);
-
-        Log.v(TAG, "using nonce (b64) to decrypt: " + Base64.encodeToString(nonce, Base64.NO_WRAP));
-
-        String plaintext = new String(b.decrypt(nonce, cyphertext));
-        Log.v(TAG, "decrypt: plaintext: " + plaintext);
-        return plaintext;
+        return new String(b.decrypt(nonce, cyphertext));
     }
+
     public static String encrypt(String plaintext) {
-        Log.v(TAG, "encrypt: plaintext: " + plaintext);
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
-        byte[] cypthertext = b.encrypt(nonce, plaintext.getBytes());
-        byte[] out = new byte[crypto_secretbox_NONCEBYTES+cypthertext.length];
+        byte[] cyphertext = b.encrypt(nonce, plaintext.getBytes());
+        byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
 
         System.arraycopy(nonce, 0, out, 0, crypto_secretbox_NONCEBYTES);
-        System.arraycopy(cypthertext, 0, out, crypto_secretbox_NONCEBYTES, cypthertext.length);
+        System.arraycopy(cyphertext, 0, out, crypto_secretbox_NONCEBYTES, cyphertext.length);
 
-        String b64 = Base64.encodeToString(out, Base64.NO_WRAP);
-
-        Log.v(TAG, "using nonce (b64) to encrypt: " + Base64.encodeToString(nonce, Base64.NO_WRAP));
-
-        Log.v(TAG, "encrypt: encoded out: " +out );
-
-        return b64;
+        return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
+    private static class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
+        public SecretBoxManager() {
+            Preferences.registerOnPreferenceChangedListener(this);
+        }
+
+
+        @Override
+        public void onAttachAfterModeChanged() {
+            initializeSecretBox();
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if(Preferences.getKey(R.string.keyEncryptionKey).equals(key))
+                initializeSecretBox();
+        }
+    }
 }

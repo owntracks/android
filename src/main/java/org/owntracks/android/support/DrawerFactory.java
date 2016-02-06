@@ -38,11 +38,16 @@ public class DrawerFactory {
     public static final int IDENTIFIER_SETTINGS = 4;
     public static final int IDENTIFIER_STATISTICS = 5;
 
+    private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
+    private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.materialize_primary;
+    private static final int COLOR_ICON_SECONDARY = R.color.md_light_secondary;
+    private static final int COLOR_ICON_SECONDARY_ACTIVE = COLOR_ICON_PRIMARY_ACTIVE;
+
     public interface OnDrawerItemClickListener {
         boolean onItemClick();
     }
     public static Drawer buildDrawerV2(final Activity activity,Toolbar toolbar) {
-        return buildDrawerV2(activity, toolbar);
+        return buildDrawerV2(activity, toolbar, null);
     }
 
      public static Drawer buildDrawerV2(final Activity activity,Toolbar toolbar, final OnDrawerItemClickListener activityClickListener) {
@@ -50,16 +55,34 @@ public class DrawerFactory {
                 .withActivity(activity)
                 .withToolbar(toolbar)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Locations").withIdentifier(IDENTIFIER_LOCATIONS).withIcon(GoogleMaterial.Icon.gmd_my_location),
-                        new PrimaryDrawerItem().withName("Messages").withIdentifier(IDENTIFIER_MESSAGES).withIcon(GoogleMaterial.Icon.gmd_comment_text),
-                        new PrimaryDrawerItem().withName("Waypoints").withIdentifier(IDENTIFIER_WAYPOINTS).withIcon(GoogleMaterial.Icon.gmd_gps_dot)
+                        new PrimaryDrawerItem().withName("Locations").withIdentifier(IDENTIFIER_LOCATIONS)
+                                .withIcon(R.drawable.ic_place_black_24dp)
+                                .withIconColorRes(COLOR_ICON_PRIMARY)
+                                .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
+                                .withIconTintingEnabled(true),
+                        new PrimaryDrawerItem().withName("Messages").withIdentifier(IDENTIFIER_MESSAGES)
+                                .withIcon(R.drawable.ic_chat_bubble_outline_black_24dp)
+                                .withIconColorRes(COLOR_ICON_PRIMARY)
+                                .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
+                                .withIconTintingEnabled(true),
+                        new PrimaryDrawerItem().withName("Waypoints").withIdentifier(IDENTIFIER_WAYPOINTS)
+                                .withIcon(R.drawable.ic_adjust_black_24dp)
+                                .withIconColorRes(COLOR_ICON_PRIMARY)
+                                .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
+                                .withIconTintingEnabled(true)
+
                 ).addStickyDrawerItems(
-                        new SecondaryDrawerItem().withName("Preferences").withIdentifier(IDENTIFIER_SETTINGS).withIcon(GoogleMaterial.Icon.gmd_settings),
-                        new SecondarySwitchDrawerItem().withName("Reporting"),
-                        new SecondarySwitchDrawerItem().withName("Ranging")
+                        new SecondaryDrawerItem().withName("Preferences").withIdentifier(IDENTIFIER_SETTINGS)
+                                .withIcon(R.drawable.ic_settings_black_36dp)
+                                .withIconColorRes(COLOR_ICON_SECONDARY)
+                                .withSelectedIconColorRes(COLOR_ICON_SECONDARY_ACTIVE)
+                                .withIconTintingEnabled(true)
+
+                        //new SecondarySwitchDrawerItem().withName("Reporting"),
+                        //new SecondarySwitchDrawerItem().withName("Ranging")
 
 
-         ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem == null)
@@ -96,7 +119,7 @@ public class DrawerFactory {
                     }
                 }).withAccountHeader(new AccountHeaderBuilder()
                                 .withActivity(activity)
-                                .withHeaderBackground(R.drawable.header2)
+                                .withHeaderBackground(R.drawable.drawer4)
                                 .build()
                 ).build();
         return drawer;
