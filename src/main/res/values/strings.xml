@@ -247,6 +247,7 @@
     <string name="beaconMinor">Minor</string>
     <string name="preferencesRecordSummary">Record</string>
     <string name="preferencesRecord">Record</string>
+    <string name="locationPermissionNotAvailable">Location access denied</string>
 
     <string-array name="filepicker">
         <item>Select</item>

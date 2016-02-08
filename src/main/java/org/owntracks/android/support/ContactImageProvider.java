@@ -46,13 +46,9 @@ public class ContactImageProvider {
             Drawable d;
             FusedContact contact = params[0];
             if(contact == null)
-                throw new RuntimeException("no contact provided to ContactImageProvider");
-
-
-            if(contact.hasLink()) {
-                //TODO: implement link
                 return null;
-            }
+                //throw new RuntimeException("no contact provided to ContactImageProvider");
+
 
 
             if(contact.hasCard()) {
@@ -90,6 +86,9 @@ public class ContactImageProvider {
         }
 
         protected void onPostExecute(Drawable result) {
+            if(result == null)
+                return;
+
             ImageView imageView = target.get();
             if(imageView != null)
                 imageView.setImageDrawable(result);

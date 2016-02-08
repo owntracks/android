@@ -66,6 +66,12 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
         // Gets aditional information about available BLE features
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if(bluetoothAdapter == null) {
+            Log.e(TAG, "Bluetooth is not available");
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Log.v(TAG, "bluetoothAdapter.isMultipleAdvertisementSupported: " + bluetoothAdapter.isMultipleAdvertisementSupported());
             Log.v(TAG, "bluetoothAdapter.isOffloadedFilteringSupported: " + bluetoothAdapter.isOffloadedFilteringSupported());
@@ -89,6 +95,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
         // TODO: make configurable
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+
 
         beaconManager.bind(this);
 

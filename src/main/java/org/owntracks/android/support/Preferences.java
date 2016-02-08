@@ -979,7 +979,7 @@ public class Preferences {
     }
 
     public static boolean hasValidPremiumSubscription() {
-
+        return false;
     }
 
     // Checks if the app is started for the first time.

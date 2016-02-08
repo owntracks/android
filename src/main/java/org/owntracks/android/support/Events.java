@@ -446,7 +446,14 @@ public class Events {
 
 
     }
-
-
+    public static class PermissionGranted extends E {
+        private String permission;
+        public PermissionGranted(String p) {
+            this.permission = p;
+        }
+        public String getPermission() {
+            return permission;
+        }
+    }
 
 }

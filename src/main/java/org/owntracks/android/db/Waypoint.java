@@ -188,8 +188,6 @@ public class Waypoint {
         l.setAccuracy(getGeofenceRadius() != null ? getGeofenceRadius() : 0);
         return l;
     }
-
-
     // KEEP METHODS END
 
 }

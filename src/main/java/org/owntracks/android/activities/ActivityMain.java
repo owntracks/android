@@ -351,7 +351,7 @@ public class ActivityMain extends ActivityBase {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else {
-            Toasts.showLocationNotAvailable();
+            Toasts.showContactLocationNotAvailable();
         }
     }
 
@@ -378,9 +378,6 @@ public class ActivityMain extends ActivityBase {
     }
 
 
-    public  void showLocationNotAvailableToast() {
-        Toast.makeText(this, getString(R.string.currentLocationNotAvailable), Toast.LENGTH_SHORT).show();
-    }
 
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -392,7 +389,7 @@ public class ActivityMain extends ActivityBase {
                 @Override
                 public void run() {
                     if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
-                        showLocationNotAvailableToast();
+                        Toasts.showCurrentLocationNotAvailable();
                     else
                         ServiceProxy.getServiceLocator().publishManualLocationMessage();
                 }
@@ -407,7 +404,7 @@ public class ActivityMain extends ActivityBase {
                     if(ServiceProxy.getServiceLocator().getLastKnownLocation() != null) {
                         transitionToCurrentLocationMap();
                     } else {
-                        showLocationNotAvailableToast();
+                        Toasts.showCurrentLocationNotAvailable();
                     }
                 }
             });
@@ -430,7 +427,7 @@ public class ActivityMain extends ActivityBase {
                 Location l = ServiceProxy.getServiceLocator()
                         .getLastKnownLocation();
                 if (l == null) {
-                    showLocationNotAvailableToast();
+                    Toasts.showCurrentLocationNotAvailable();
                     return;
                 }
 
@@ -961,37 +958,6 @@ public class ActivityMain extends ActivityBase {
 
 		}
 
-		// Called when contact is picked
-		@Override
-		public void onActivityResult(int requestCode, int resultCode,
-				Intent data) {
-			super.onActivityResult(requestCode, resultCode, data);
-
-			if ((requestCode == CONTACT_PICKER_RESULT) && (resultCode == RESULT_OK))
-				assignContact(data);
-		}
-
-        private void unassignContact(Contact c) {
-
-            if(c == null)
-                return;
-
-            Contact.unlinkContact(c);
-
-
-        }
-
-		private void assignContact(Intent intent) {
-			Uri result = intent.getData();
-			final String contactId = result.getLastPathSegment();
-
-					Contact.linkContact(getActivity(),
-                            DetailsFragment.this.contact,
-                            Long.parseLong(contactId));
-
-
-		}
-
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
@@ -1021,11 +987,6 @@ public class ActivityMain extends ActivityBase {
             }
 
 
-            mMenu.clear();
-            mInflater.inflate(R.menu.fragment_details, mMenu);
-
-            mMenu.findItem(R.id.action_assign).setVisible(!this.contact.hasLink());
-            mMenu.findItem(R.id.action_unassign).setVisible(this.contact.hasLink());
 
 
         }
@@ -1033,12 +994,6 @@ public class ActivityMain extends ActivityBase {
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.action_assign:
-                    startActivityForResult(new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI), CONTACT_PICKER_RESULT);
-                    return true;
-                case R.id.action_unassign:
-                    unassignContact(this.contact);
-                    return true;
                 case R.id.action_clear:
                     clearTopic(this.contact);
                     return true;

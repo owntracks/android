@@ -1,5 +1,6 @@
 package org.owntracks.android.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -30,6 +31,7 @@ import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Toasts;
 
 import java.util.HashMap;
 
@@ -43,6 +45,8 @@ public class ActivityMap extends ActivityBase {
     private static final long ZOOM_LEVEL_CITY = 11;
     private static final long ZOOM_LEVEL_NEIGHBORHOOD = 17;
     private static final String TAG = "ActivityMap";
+    private static final int PERMISSION_REQUEST_DISK_CACHE = 1 ;
+    private static final int PERMISSION_REQUEST_USER_LOCATION = 2 ;
 
 
     private MapView mapView;
@@ -58,9 +62,11 @@ public class ActivityMap extends ActivityBase {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_map);
         this.mapView = binding.mapView;
         this.mapView.setAccessToken(getString(R.string.MAPBOX_API_KEY));
-        this.mapView.setTileSource(new MapboxTileLayer("binarybucks.nfc70b7d"));
-        this.mapView.setDiskCacheEnabled(true);
-        this.mapView.setUserLocationEnabled(false);
+        this.mapView.setTileSource(new MapboxTileLayer(getString(R.string.MAPBOX_TILE_LAYER)));
+
+
+        runActionWithPermissionCheck(PERMISSION_REQUEST_DISK_CACHE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
 
         toolbar =(Toolbar) findViewById(R.id.fragmentToolbar);
@@ -93,7 +99,6 @@ public class ActivityMap extends ActivityBase {
                     binding.setVariable(BR.item, contact);
                     this.mapView.setZoom(ZOOM_LEVEL_NEIGHBORHOOD);
                     this.mapView.setCenter(contact.getLatLng(), true);
-
                     break;
 
                 case KEY_ACTION_VALUE_CENTER_CURRENT:
@@ -107,6 +112,27 @@ public class ActivityMap extends ActivityBase {
 
     }
 
+
+    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
+        switch (action) {
+            case PERMISSION_REQUEST_DISK_CACHE:
+                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION");
+                if (granted) {
+                    this.mapView.setDiskCacheEnabled(true);
+                } else {
+                    this.mapView.setDiskCacheEnabled(false);
+                }
+                return;
+
+            case PERMISSION_REQUEST_USER_LOCATION:
+                if (granted) {
+                    this.mapView.setUserLocationEnabled(true);
+                } else {
+                    this.mapView.setUserLocationEnabled(false);
+                }
+
+        }
+    }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.fragment_contacts, menu);
