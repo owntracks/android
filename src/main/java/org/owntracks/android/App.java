@@ -4,10 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.MessageDao;
-import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.ContactsViewModel;
 import org.owntracks.android.model.FusedContact;
@@ -27,7 +24,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;

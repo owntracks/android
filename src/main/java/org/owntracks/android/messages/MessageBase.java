@@ -27,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class MessageBase extends BaseObservable implements Runnable{
         protected static final String TAG = "MessageBase";
         protected String _mqtt_topic;
+        protected Boolean record;
+
         @JsonIgnore
         protected int _mqtt_qos;
 
@@ -94,4 +96,12 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
 
         @JsonIgnore
         public abstract String getBaseTopicSuffix();
+
+        public Boolean getRecord() {
+                return record;
+        }
+
+        public void setRecord(Boolean record) {
+                this.record = record;
+        }
 }

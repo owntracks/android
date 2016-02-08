@@ -1,7 +1,9 @@
 package org.owntracks.android.activities;
 
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
@@ -9,7 +11,9 @@ import android.databinding.tool.Binding;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,11 +39,13 @@ import org.owntracks.android.BR;
 import org.owntracks.android.adapter.ContactsAdapter;
 import org.owntracks.android.databinding.ActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.ServiceLocator;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerFactory;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RecyclerViewAdapter;
+import org.owntracks.android.support.Toasts;
 
 import de.greenrobot.event.EventBus;
 import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
@@ -48,6 +54,9 @@ import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterF
 
 public class ActivityContacts extends ActivityBase implements RecyclerViewAdapter.ClickHandler, RecyclerViewAdapter.LongClickHandler, BindingRecyclerViewAdapterFactory {
     private static final String TAG = "ActivityContacts";
+    private static final int PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST = 1;
+    private static final int PERMISSION_REQUEST_REPORT_LOCATION = 2;
+    private static final int PERMISSION_REQUEST_SHOW_CURRENT_LOCATION = 3;
     private Toolbar toolbar;
     private Drawer drawer;
 
@@ -93,6 +102,8 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
         //listView.setOnScrollListener(listener);
 
 
+        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST);
+
 
     }
 
@@ -119,21 +130,47 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_report:
-                ServiceProxy.runOrBind(this, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
-                            Log.v(TAG, "location not avilable");
-                        else
-                            ServiceProxy.getServiceLocator().publishManualLocationMessage();
-                    }
-                });
+                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_REPORT_LOCATION);
                 return true;
+            case R.id.menu_mylocation:
+                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_SHOW_CURRENT_LOCATION);
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
+        switch (action) {
+            case PERMISSION_REQUEST_REPORT_LOCATION:
+                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION " + granted);
+                if (granted) {
+                    ServiceProxy.runOrBind(this, new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
+                                Toasts.showCurrentLocationNotAvailable();
+                            else
+                                ServiceProxy.getServiceLocator().publishManualLocationMessage();
+                        }
+                    });
+                } else {
+                    Toasts.showLocationPermissionNotAvailable();
+                }
+                return;
+
+
+            case PERMISSION_REQUEST_SHOW_CURRENT_LOCATION:
+                Log.v(TAG, "request code: PERMISSION_REQUEST_SHOW_CURRENT_LOCATION");
+                if (granted) {
+                    Log.v(TAG, "PERMISSION_REQUEST_SHOW_CURRENT_LOCATION permission granted");
+                    //TODO: zoom in on current location
+                } else {
+                    Toasts.showLocationPermissionNotAvailable();
+                }
+                return;
+        }
     }
 
 
@@ -143,7 +180,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
         super.onResume();
         Log.v(TAG, "restarting loader");
-       // requery();
     }
 
 

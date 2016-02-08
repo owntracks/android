@@ -10,7 +10,7 @@
 
     <PreferenceScreen
         android:key="reportingScreen"
-        android:title="@string/preferencesTopicSettings" >
+        android:title="@string/preferencesReporting" >
 
         <SwitchPreference
             android:defaultValue="@bool/valPub"
