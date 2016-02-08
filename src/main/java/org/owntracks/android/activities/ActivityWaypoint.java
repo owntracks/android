@@ -44,6 +44,7 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
     private static final String TAG = "ActivityWaypoint";
 
     private static final int REQUEST_PLACE_PICKER = 19283;
+    private static final int PERMISSION_REQUEST_USE_CURRENT = 1;
     private WaypointDao dao;
     private TextWatcher requiredForSave;
     private GeocodableLocation currentLocation;
@@ -185,7 +186,8 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
                 finish();
                 return true;
             case R.id.useCurrent:
-                useCurrentLocation();
+                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USE_CURRENT);
+
                 return true;
             case R.id.pick:
                 pickLocation();
@@ -244,20 +246,36 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
 
     }
 
-    private void useCurrentLocation() {
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-                if(l != null) {
-                    waypoint.setGeofenceLatitude(l.getLatitude());
-                    waypoint.setGeofenceLongitude(l.getLongitude());
+
+
+    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
+        switch (action) {
+            case PERMISSION_REQUEST_USE_CURRENT:
+                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION");
+                if (granted) {
+                    ServiceProxy.runOrBind(this, new Runnable() {
+
+                        @Override
+                        public void run() {
+                            Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+                            if(l != null) {
+                                waypoint.setGeofenceLatitude(l.getLatitude());
+                                waypoint.setGeofenceLongitude(l.getLongitude());
+                            } else {
+
+                                Toasts.showCurrentLocationNotAvailable();
+                            }
+                        }
+                    });
                 } else {
-                    Toasts.showLocationNotAvailable();
+                    Toasts.showLocationPermissionNotAvailable();
                 }
-            }
-        });
+                return;
+
+        }
     }
+
+
 
     private void save() {
        Waypoint w = this.waypoint;

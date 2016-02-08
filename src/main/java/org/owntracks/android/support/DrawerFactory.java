@@ -117,11 +117,12 @@ public class DrawerFactory {
                         activity.startActivity(i);
                         return true;
                     }
-                }).withAccountHeader(new AccountHeaderBuilder()
-                                .withActivity(activity)
-                                .withHeaderBackground(R.drawable.drawer4)
-                                .build()
-                ).build();
+                })
+                //.withAccountHeader(new AccountHeaderBuilder()
+                //                .withActivity(activity)
+                //                .withHeaderBackground(R.drawable.drawer4)
+                //                .build()
+                .build();
         return drawer;
 
     }

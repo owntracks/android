@@ -9,11 +9,9 @@ import de.greenrobot.dao.AbstractDaoSession;
 import de.greenrobot.dao.identityscope.IdentityScopeType;
 import de.greenrobot.dao.internal.DaoConfig;
 
-import org.owntracks.android.db.ContactLink;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.Message;
 
-import org.owntracks.android.db.ContactLinkDao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.MessageDao;
 
@@ -26,11 +24,9 @@ import org.owntracks.android.db.MessageDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
-    private final DaoConfig contactLinkDaoConfig;
     private final DaoConfig waypointDaoConfig;
     private final DaoConfig messageDaoConfig;
 
-    private final ContactLinkDao contactLinkDao;
     private final WaypointDao waypointDao;
     private final MessageDao messageDao;
 
@@ -38,32 +34,22 @@ public class DaoSession extends AbstractDaoSession {
             daoConfigMap) {
         super(db);
 
-        contactLinkDaoConfig = daoConfigMap.get(ContactLinkDao.class).clone();
-        contactLinkDaoConfig.initIdentityScope(type);
-
         waypointDaoConfig = daoConfigMap.get(WaypointDao.class).clone();
         waypointDaoConfig.initIdentityScope(type);
 
         messageDaoConfig = daoConfigMap.get(MessageDao.class).clone();
         messageDaoConfig.initIdentityScope(type);
 
-        contactLinkDao = new ContactLinkDao(contactLinkDaoConfig, this);
         waypointDao = new WaypointDao(waypointDaoConfig, this);
         messageDao = new MessageDao(messageDaoConfig, this);
 
-        registerDao(ContactLink.class, contactLinkDao);
         registerDao(Waypoint.class, waypointDao);
         registerDao(Message.class, messageDao);
     }
     
     public void clear() {
-        contactLinkDaoConfig.getIdentityScope().clear();
         waypointDaoConfig.getIdentityScope().clear();
         messageDaoConfig.getIdentityScope().clear();
-    }
-
-    public ContactLinkDao getContactLinkDao() {
-        return contactLinkDao;
     }
 
     public WaypointDao getWaypointDao() {

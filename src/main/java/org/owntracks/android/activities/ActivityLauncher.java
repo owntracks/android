@@ -3,6 +3,7 @@ package org.owntracks.android.activities;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.PermissionProvider;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -73,10 +74,14 @@ public class ActivityLauncher extends ActivityBase {
 	protected void onResume() {
 		super.onResume();
 
+		checkPermissions();
 		checkPlayServices();
 
 		if (this.playServicesOk)
 			launchChecksComplete();
+	}
+
+	private void checkPermissions() {
 	}
 
 	private void checkPlayServices() {

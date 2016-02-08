@@ -22,6 +22,7 @@ import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.WaypointMessage;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageLifecycleCallbacks;
+import org.owntracks.android.support.PermissionProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
 
@@ -33,6 +34,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.transition.Transition;
 import android.util.Log;
@@ -71,6 +73,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     private Location lastKnownLocation;
     private long lastPublish;
     private WaypointDao waypointDao;
+    private static boolean hasLocationPermission = false;
 
     @Override
     public void onCreate(ServiceProxy p) {
@@ -80,11 +83,16 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         this.lastPublish = 0;
         this.waypointDao = Dao.getWaypointDao();
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
+        hasLocationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-        this.preferencesChangedListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
             @Override
-            public void onSharedPreferenceChanged(
-                    SharedPreferences sharedPreference, String key) {
+            public void onAttachAfterModeChanged() {
+
+            }
+
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (
                         key.equals(Preferences.getKey(R.string.keyPub)) ||
                                 key.equals(Preferences.getKey(R.string.keyLocatorInterval)) ||
@@ -93,12 +101,10 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
                                 key.equals(Preferences.getKey(R.string.keyLocatorAccuracyBackground))) {
                     handlePreferences();
                 }
+
             }
-        };
-        this.sharedPreferences.registerOnSharedPreferenceChangeListener(this.preferencesChangedListener);
+        });
 
-
-        ServiceApplication.checkPlayServices(); // show error notification if  play services were disabled
 
         Log.v(TAG, "Initializing GoogleApiClient");
         googleApiClient = new GoogleApiClient.Builder(this.context)
@@ -148,10 +154,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             try {
                 Location l = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 this.lastKnownLocation = l;
+                hasLocationPermission = true;
 
             } catch (SecurityException e) {
-                // TODO: Ask for location access permission
                 Log.e(TAG, e.getMessage());
+                hasLocationPermission = false;
                 this.lastKnownLocation = null;
             }
 
@@ -318,15 +325,20 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             return;
         }
 
+        Log.v(TAG, "checking location permission");
+
+
 
         disableLocationUpdates();
 
         Log.v(TAG, "requestLocationUpdates fg:" + this.foreground + " app fg:" + App.isInForeground());
-        if (this.foreground)
-            setupForegroundLocationRequest();
-        else
-            setupBackgroundLocationRequest();
         try {
+
+            if (this.foreground)
+                setupForegroundLocationRequest();
+            else
+                setupBackgroundLocationRequest();
+
             PendingResult<Status> r = LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
@@ -340,10 +352,12 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
                     }
                 }
             });
+            hasLocationPermission = true;
         } catch (SecurityException e) {
             Log.e(TAG, e.getMessage());
-            // TODO: request permission
+            hasLocationPermission = false;
         }
+
 
     }
 
@@ -511,6 +525,18 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         requestGeofences();
     }
 
+    public void onEvent(Events.PermissionGranted e) {
+        Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
+        if(!hasLocationPermission && e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            hasLocationPermission = true;
+            Log.v(TAG, "requesting geofences and location updates");
+            requestGeofences();
+            requestLocationUpdates();
+        }
+    }
+
+
+
 
     private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
         if(update && remove)
@@ -574,9 +600,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
                     }
                 }
             });
+            hasLocationPermission = true;
+
         }catch (SecurityException e) {
-            // TODO: implement permission check
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
+            hasLocationPermission = false;
         }
 	}
 
@@ -661,5 +689,10 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
     public boolean hasLocationRequest() {
         return mLocationRequest != null;
+    }
+
+
+    public static boolean hasLocationPermission() {
+        return hasLocationPermission;
     }
 }

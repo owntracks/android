@@ -10,28 +10,12 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > application, right click "run"  and select Run.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 12;
+    private static final int SCHEMA_VERSION = 13;
 
     public static void main(String args[]) throws Exception {
 
         Schema schema = new Schema(SCHEMA_VERSION, "org.owntracks.android.db");
         schema.enableKeepSectionsByDefault();
-
-
-        Entity contactLink = schema.addEntity("ContactLink");
-        contactLink.addIdProperty().columnName("_id");
-        Property topic = contactLink.addStringProperty("topic").notNull().getProperty();
-        contactLink.addLongProperty("contactId");
-        Property modeId = contactLink.addIntProperty("modeId").notNull().getProperty();
-
-        // GreenDao does not yet support compound primary keys. We create a unique index on the two columns instead
-        Index compoundPk = new Index();
-        compoundPk.addProperty(topic);
-        compoundPk.addProperty(modeId);
-        compoundPk.makeUnique();
-        contactLink.addIndex(compoundPk);
-
-
 
         Entity waypoint = schema.addEntity("Waypoint");
         waypoint.addIdProperty(); // For stable ids of cursor adapter

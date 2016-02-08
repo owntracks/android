@@ -8,7 +8,6 @@ public  class Dao {
     private static final String NAME = "org.owntracks.android.db";
     private static final String TAG = "Dao";
     private static SQLiteDatabase db;
-    private static ContactLinkDao contactLinkDao;
     private static WaypointDao waypointDao;
     private static MessageDao messageDao;
 
@@ -30,7 +29,6 @@ public  class Dao {
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
 
-        contactLinkDao = daoSession.getContactLinkDao();
         waypointDao = daoSession.getWaypointDao();
         messageDao = daoSession.getMessageDao();
     }
@@ -41,8 +39,5 @@ public  class Dao {
 
     public static SQLiteDatabase getDb() { return db; }
     public static WaypointDao getWaypointDao() {  return waypointDao; }
-    public static ContactLinkDao getContactLinkDao() {
-        return contactLinkDao;
-    }
 
 }
