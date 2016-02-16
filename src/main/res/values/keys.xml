@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="keyDeviceUUID">deviceUUID</string>
-    <string name="keyTrackerId">trackerId</string>
     <string name="keyDeviceId">deviceId</string>
 
+    <string name="keyTrackerId">tid</string>
     <string name="keyClientId">clientId</string>
     <string name="keyHost">host</string>
     <string name="keyPort">port</string>
