@@ -14,7 +14,7 @@ buildscript {
 repositories {
     mavenCentral()
 
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
+    maven { url 'https://repo.eclipse.org/content/repositories/paho-snapshots/' }
     maven { url 'http://jcenter.bintray.com'}
     maven { url "https://jitpack.io" }
     maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
@@ -44,7 +44,7 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'de.greenrobot:greendao:2.0.0'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.3-SNAPSHOT'
     compile 'com.fasterxml.jackson.core:jackson-core:2.6.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
