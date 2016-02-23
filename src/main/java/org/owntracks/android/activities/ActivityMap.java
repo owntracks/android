@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.mikepenz.materialdrawer.Drawer;
 
 import org.owntracks.android.App;
+import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
