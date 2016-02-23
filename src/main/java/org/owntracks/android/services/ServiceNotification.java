@@ -41,7 +41,6 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
@@ -359,13 +358,12 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent, int flags, int startId) {
         if (ServiceNotification.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION.equals(intent.getAction())) {
             clearNotificationMessages();
         } else if (ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION.equals(intent.getAction())) {
             clearNotificationTransitions();
         }
-        return 0;
     }
 
 
@@ -403,7 +401,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
                 this.lastPublishedLocationTst = l.getLocation().getDate().getTime();
 
                 if (l.getLocation().getGeocoder() == null)
-                    (new ReverseGeocodingTask(this.context, this.handler)).execute(new GeocodableLocation[]{l.getLocation()});
+                    (new ReverseGeocodingTask(this.context, this.handler)).execute(l.getLocation());
 
                 updateNotificationOngoing();
              }

@@ -1,21 +1,18 @@
 package org.owntracks.android.messages;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 
 import org.json.JSONObject;
 import org.owntracks.android.App;
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Preferences;
 
 public class LocationMessage extends Message{
     private static final String TAG = "LocationMessage";
 
-    private GeocodableLocation location;
-    private Waypoint waypoint;
+    private final GeocodableLocation location;
     private String description;
     private String trackerId;
     private String trigger;
@@ -44,9 +41,8 @@ public class LocationMessage extends Message{
     public LocationMessage(GeocodableLocation l) {
         super();
 		this.location = l;
-		this.battery = Preferences.getPubLocationIncludeBattery() ? App.getBatteryLevel() : -1;;
-		this.waypoint = null;
-		this.supressesTicker = false;
+		this.battery = Preferences.getPubLocationIncludeBattery() ? App.getBatteryLevel() : -1;
+        this.supressesTicker = false;
         this.trackerId = null;
         this.trigger = null;
         this.trackerId = Preferences.getTrackerId(true);

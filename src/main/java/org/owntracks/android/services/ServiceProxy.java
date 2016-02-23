@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import java.io.Closeable;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -13,7 +14,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.owntracks.android.support.PermissionProvider;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
@@ -37,9 +37,8 @@ public class ServiceProxy extends ServiceBindable {
 
 	public static final String KEY_SERVICE_ID = "srvID";
     private static ServiceProxy instance;
-	private static HashMap<String, ProxyableService> services = new HashMap<String, ProxyableService>();
-
-	private static LinkedList<Runnable> runQueue = new LinkedList<Runnable>();
+	private static final HashMap<String, ProxyableService> services = new HashMap<>();
+	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
@@ -80,11 +79,7 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		int r = super.onStartCommand(intent, flags, startId); // Invokes
-																// onStartOnce(...)
-																// the fist time
-																// to initialize
-																// the service
+		int r = super.onStartCommand(intent, flags, startId);
 		ProxyableService s = getServiceForIntent(intent);
 		if (s != null)
 			s.onStartCommand(intent, flags, startId);
@@ -95,11 +90,11 @@ public class ServiceProxy extends ServiceBindable {
 		return services.get(id);
 	}
 
-	private ProxyableService instantiateService(String id) {
-		ProxyableService p = services.get(id);
-		if (p != null)
-			return p;
+	private void instantiateService(String id) {
+		if (services.containsKey(id))
+			return;
 
+		ProxyableService p = null;
         switch (id) {
             case SERVICE_APP:
                 p = new ServiceApplication();
@@ -116,19 +111,17 @@ public class ServiceProxy extends ServiceBindable {
 			case SERVICE_PARSER:
 				p = new ServiceParser();
 				break;
-
 			case SERVICE_NOTIFICATION:
 				p = new ServiceNotification();
 				break;
 		}
 
-
+		if(p == null)
+			return;
 
 		services.put(id, p);
 		p.onCreate(this);
 		EventBus.getDefault().registerSticky(p);
-
-		return p;
 	}
 
 	public static ServiceApplication getServiceApplication() {

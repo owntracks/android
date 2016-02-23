@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar"/>
+    <include     android:id="@+id/fragmentToolbar"
+        layout="@layout/toolbar"/>
 
     <FrameLayout
         android:id="@+id/content_frame"
-        android:layout_below="@+id/fragmentToolbar"
+        android:layout_below="@id/fragmentToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

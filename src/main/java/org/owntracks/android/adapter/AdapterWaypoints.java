@@ -3,27 +3,16 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.os.Message;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.IconTextView;
 import android.widget.TextView;
 
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.db.MessageDao;
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.support.ReverseGeocodingTask;
-import org.owntracks.android.support.StaticHandler;
-import org.owntracks.android.support.StaticHandlerInterface;
 
 
 public class AdapterWaypoints extends AdapterCursorLoader {

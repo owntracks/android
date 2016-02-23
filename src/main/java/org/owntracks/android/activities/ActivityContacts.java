@@ -3,7 +3,6 @@ package org.owntracks.android.activities;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +20,6 @@ import com.mikepenz.materialdrawer.Drawer;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.BR;
 
 import org.owntracks.android.databinding.ActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
@@ -41,7 +39,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     private static final String TAG = "ActivityContacts";
     private static final int PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST = 1;
     private static final int PERMISSION_REQUEST_REPORT_LOCATION = 2;
-    private Drawer drawer;
 
 
     @Override
@@ -63,7 +60,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        drawer = DrawerProvider.buildDrawer(this, toolbar);
+        Drawer drawer = DrawerProvider.buildDrawer(this, toolbar);
 
 
         //drawer = DrawerProvider.buildDrawer(this, toolbar, null, null, 0);
@@ -133,7 +130,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
                 } else {
                     Toasts.showLocationPermissionNotAvailable();
                 }
-                return;
 
 
         }

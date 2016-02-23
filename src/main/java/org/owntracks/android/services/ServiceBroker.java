@@ -45,7 +45,6 @@ import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
 
 import java.io.FileNotFoundException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -104,9 +103,9 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public void onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null)
-			return 0;
+			return;
 
 		if(ServiceBroker.RECEIVER_ACTION_RECONNECT.equals(intent.getAction()) && !isConnected()) {
 			Log.v(TAG,	 "onStartCommand ServiceBroker.RECEIVER_ACTION_RECONNECT");
@@ -121,7 +120,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			else
 				doStart();
 		}
-        return 0;
+        return;
 	}
 
 	private void doStart() {
@@ -240,43 +239,39 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 		try {
 			MqttConnectOptions options = new MqttConnectOptions();
-            if(Preferences.isModeHosted()) {
-                options.setPassword(Preferences.getPassword().toCharArray());
-                options.setUserName(String.format("%s|%s", Preferences.getUsername(), Preferences.getDeviceId(false)));
-                options.setSocketFactory(new SocketFactory());
-            } else {
-                if (Preferences.getAuth()) {
-                    options.setPassword(Preferences.getPassword().toCharArray());
-                    options.setUserName(Preferences.getUsername());
-                }
 
-                if (Preferences.getTls()) {
-					String tlsCaCrt = Preferences.getTlsCaCrtName();
-					String tlsClientCrt = Preferences.getTlsClientCrtName();
+			if (Preferences.getAuth()) {
+				options.setPassword(Preferences.getPassword().toCharArray());
+				options.setUserName(Preferences.getUsername());
+			}
 
-					SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+			if (Preferences.getTls()) {
+				String tlsCaCrt = Preferences.getTlsCaCrtName();
+				String tlsClientCrt = Preferences.getTlsClientCrtName();
 
-					if (tlsCaCrt.length() > 0) {
-						try {
-							socketFactoryOptions.withCaInputStream(context.openFileInput(tlsCaCrt));
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
+				SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+
+				if (tlsCaCrt.length() > 0) {
+					try {
+						socketFactoryOptions.withCaInputStream(context.openFileInput(tlsCaCrt));
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
 					}
+				}
 
-					if (tlsClientCrt.length() > 0)						{
-						try {
-							socketFactoryOptions.withClientP12InputStream(context.openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
-						} catch (FileNotFoundException e1) {
-							e1.printStackTrace();
-						}
+				if (tlsClientCrt.length() > 0)						{
+					try {
+						socketFactoryOptions.withClientP12InputStream(context.openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
 					}
+				}
 
 
 
-					options.setSocketFactory(new SocketFactory(socketFactoryOptions));
-                }
-            }
+				options.setSocketFactory(new SocketFactory(socketFactoryOptions));
+			}
+
 
             setWill(options);
 			options.setKeepAliveInterval(Preferences.getKeepalive());
@@ -342,7 +337,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	}
 
 	public void subscribToInitialTopics() {
-		List<String> topics =new ArrayList<String>();
+		List<String> topics = new ArrayList<>();
 		String subTopicBase = Preferences.getSubTopic();
 
 		if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
@@ -353,10 +348,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			if(Preferences.getInfo())
 				topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
 
-			if (!Preferences.isModePublic())
+			if (!Preferences.isModeMqttPublic())
 				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicCommandsPart());
 
-			if (!Preferences.isModePublic()) {
+			if (!Preferences.isModeMqttPublic()) {
 				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
 				topics.add(subTopicBase + Preferences.getPubTopicWaypointsPart());
 			}
@@ -484,7 +479,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	}
 
 	private void changeState(Exception e) {
-		this.error = e;
+		error = e;
 		changeState(State.DISCONNECTED_ERROR, e);
 	}
 
@@ -619,7 +614,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			} catch (MqttException e) {
 				Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
 				e.printStackTrace();
-			};
+			}
 		} catch (JsonProcessingException e) {
 			Log.e(TAG, "processMessage: JsonProcessingException");
 			e.printStackTrace();
@@ -632,71 +627,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		message.setOutgoingProcessor(this);
 		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
 		this.pubPool.execute(message);
-
-		return;
-/*		this.pubHandler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				Log.v(toString(), "Init publish of " + message + " to " + message.getTopic());
-				if (message instanceof MessageLocation)
-					StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT);
-
-				// This should never happen
-				if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
-					Log.e(TAG, "PUB ON MAIN THREAD");
-				}
-
-
-
-				//message.setPayload(message.toString().getBytes(Charset.forName("UTF-8")));
-
-				try {
-
-					if (message.getTopic() == null) {
-						throw new Exception("message without topic. class:" + message.getClass() + ", msg: " + message.toString());
-					}
-
-					//message.publishing();
-					synchronized (inflightMessagesLock) {
-						// either works if client is connected or throws Exception if not.
-						// If Client is initialized but not connected, it throws a paho exception and we have to remove the message in the catch
-						// if client is not initialized and NullpointerException is thrown
-						Log.v(TAG, "queueing message for delivery");
-						inflightMessages.put(ServiceBroker.this.mqttClient.getTopic(message.getTopic()).publish(message), message); // if we reach this point, the previous publish did not throw an exception and the message went out
-					}
-					Log.v(TAG, "queued message for delivery on thread: " + Thread.currentThread().getId());
-				} catch (Exception e) {
-					synchronized (inflightMessagesLock) {
-						inflightMessages.remove(message);
-					}
-					// Handle TTL for message to discard it after message.ttl publish attempts or discard right away if message qos is 0
-					if (message.getQos() != 0 && message.decrementTTL() >= 1) {
-						Log.v(TAG, "failed qos 1|2 message added to backlog");
-						synchronized (backlogLock) {
-							backlog.add(message);
-						}
-						if (message instanceof LocationMessage)
-							StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE);
-
-						StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH);
-
-						message.publishQueued();
-					} else {
-						if (message instanceof LocationMessage)
-							StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP);
-
-						Log.v(TAG, "failed qos 0 message dumped");
-
-						message.publishFailed();
-					}
-
-					Log.e(TAG, "cought delivery exception. backlog size is: " + backlog.size());
-					e.printStackTrace();
-				} finally {
-				}
-			}
-		});*/
 
 	}
 
@@ -871,7 +801,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		private static final int BACKOFF_INTERVAL_MAX = 6; // Will try to reconnect after 1, 2, 4, 8, 16, 32, 64 minutes
 		private int backoff = 0;
 
-		private Context context;
+		private final Context context;
         private boolean hasStarted;
 
 

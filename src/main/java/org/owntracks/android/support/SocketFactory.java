@@ -73,7 +73,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     public SocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         this(new SocketFactoryOptions());
     }
-    public SocketFactory(SocketFactoryOptions options) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
+    public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Log.v(this.toString(), "initializing CustomSocketFactory");
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -157,7 +157,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     }
 
     @Override
-    public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+    public Socket createSocket(String host, int port) throws IOException {
 
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
         r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
@@ -165,7 +165,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     }
 
     @Override
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException {
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
         r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;

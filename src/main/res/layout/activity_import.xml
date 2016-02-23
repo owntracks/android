@@ -6,7 +6,8 @@
 
     >
 
-    <include layout="@layout/toolbar"
+    <include     android:id="@+id/fragmentToolbar"
+        layout="@layout/toolbar"
              />
 
     <ScrollView

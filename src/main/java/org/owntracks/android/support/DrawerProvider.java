@@ -32,7 +32,7 @@ public class DrawerProvider {
 
 
     public interface OnDrawerItemClickListener {
-        boolean onItemClick();
+        void onItemClick();
     }
 
     public static Drawer buildDrawer(final ActivityBase activity, Toolbar toolbar) {

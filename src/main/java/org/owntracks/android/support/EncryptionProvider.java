@@ -7,12 +7,7 @@ import android.util.Log;
 
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.SecretBox;
-import org.abstractj.kalium.crypto.Util;
 import org.owntracks.android.R;
-
-import java.util.Arrays;
-
-import de.greenrobot.event.EventBus;
 
 
 public class EncryptionProvider {

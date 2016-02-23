@@ -18,8 +18,8 @@ package org.owntracks.android.support;
 public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
     private static final String TAG = "ThreadPoolExecutor";
     private boolean isPaused;
-    private ReentrantLock lock;
-    private Condition condition;
+    private final ReentrantLock lock;
+    private final Condition condition;
 
     /**
      * @param corePoolSize    The size of the pool

@@ -1,23 +1,18 @@
 package org.owntracks.android.activities;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
-import com.mikepenz.materialdrawer.Drawer;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.StatisticsProvider;
 
 public class ActivityStatus extends ActivityBase {
