@@ -392,11 +392,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     @Override
     public void onEvent(Events.Dummy event) { }
 
-    @Override
-    public List<String> getRequiredInitialServicePermissions() {
-        return null;
-    }
-
 
     public void onEventMainThread(Events.PublishSuccessful e) {
         Log.v(TAG, "publish successfull. this.lastPublishedLocationTst:" + this.lastPublishedLocationTst + ", " + "event: " + e.getDate().getTime());

@@ -64,7 +64,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         getSupportActionBar().setTitle(getTitle());
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        preferencesFragment = new WeakReference<FragmentPreferences>(new FragmentPreferences());
+        preferencesFragment = new WeakReference<>(new FragmentPreferences());
         getFragmentManager().beginTransaction().replace(R.id.content_frame, preferencesFragment.get(), "preferences").commit();
 
     }
@@ -77,7 +77,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                 if (requestCode == FILE_SELECT_CODE_TLS_CLIENT_CRT_PATH)
                     new ClientCrtCopyTask(preferencesFragment.get()).execute(uri);
-                else if (requestCode == FILE_SELECT_CODE_TLS_CA_CRT_PATH)
+                else
                     new CaCrtCopyTask(preferencesFragment.get()).execute(uri);
 
 

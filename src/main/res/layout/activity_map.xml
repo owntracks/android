@@ -42,7 +42,7 @@
             android:paddingBottom="0dp"
             android:background="@drawable/map_contact_details_background">
 
-            <include layout="@layout/row_contact_binding"
+            <include layout="@layout/row_contact"
                 android:visibility="gone"
                 android:transitionName="rowContact"
                 bind:item="@{item}"/>

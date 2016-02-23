@@ -26,6 +26,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -48,8 +49,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
     private static final String TAG = "ServiceLocator";
 
     public static final String RECEIVER_ACTION_GEOFENCE_TRANSITION = "org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION";
-    public static final String RECEIVER_ACTION_LOCATION_CHANGE = "org.owntracks.android.RECEIVER_ACTION_LOCATION_CHANGE";
-    public static final String RECEIVER_ACTION_PUBLISH_LASTKNOWN = "org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN";
     public static final String RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL = "org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL";
 
     GoogleApiClient googleApiClient;
@@ -67,14 +66,16 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
     @Override
     public void onCreate(ServiceProxy p) {
-
         this.context = p;
+        checkLocationPermission();
+
         this.lastPublish = 0;
         this.waypointDao = Dao.getWaypointDao();
-        hasLocationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        this.googleApiClient = new GoogleApiClient.Builder(this.context).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
-        if(!hasLocationPermission)
-            ServiceProxy.getServiceNotification().notifyMissingPermissions();
+        if (ServiceApplication.checkPlayServices() && !hasConnectedGoogleApiClient()) {
+            this.googleApiClient.connect();
+        }
 
         Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
             @Override
@@ -95,26 +96,9 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
             }
         });
-
-
-        Log.v(TAG, "Initializing GoogleApiClient");
-        googleApiClient = new GoogleApiClient.Builder(this.context)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        if (ServiceApplication.checkPlayServices()) {
-            if (!this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting()) {
-                Log.v(TAG, "Connecting GoogleApiClient");
-                this.googleApiClient.connect();
-            } else {
-                Log.v(TAG, "GoogleApiClient is already connected or connecting");
-            }
-        }
-
-        this.ready = false;
     }
+
+
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -141,18 +125,13 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
     public Location getLastKnownLocation() {
 
-        if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
+        if (hasConnectedGoogleApiClient()) {
             try {
-                Log.v(TAG, "getting last known location");
                 this.lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 hasLocationPermission = true;
 
             } catch (SecurityException e) {
-                Log.e(TAG, e.getMessage());
-                hasLocationPermission = false;
-                ServiceProxy.getServiceNotification().notifyMissingPermissions();
-
-                this.lastKnownLocation = null;
+                handleSecurityException(e);
             }
 
         }
@@ -281,7 +260,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 	private void disableLocationUpdates() {
 
-		if ((this.googleApiClient != null) && this.googleApiClient.isConnected()) {
+		if (hasConnectedGoogleApiClient()) {
 
             PendingResult<Status> r = LocationServices.FusedLocationApi.removeLocationUpdates(this.googleApiClient, this);
             r.setResultCallback(new ResultCallback<Status>() {
@@ -300,12 +279,10 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void requestLocationUpdates() {
-        if (!this.ready || googleApiClient == null || !googleApiClient.isConnected()) {
+        if (!isReady() || !hasConnectedGoogleApiClient()) {
             Log.e(TAG, "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;
         }
-
-        Log.v(TAG, "checking location permission");
 
 
 
@@ -334,10 +311,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             });
             hasLocationPermission = true;
         } catch (SecurityException e) {
-            Log.e(TAG, e.getMessage());
-            hasLocationPermission = false;
-            ServiceProxy.getServiceNotification().notifyMissingPermissions();
-
+            handleSecurityException(e);
         }
 
 
@@ -541,7 +515,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void requestGeofences() {
-		if (!this.ready)
+		if (!isReady())
 			return;
 
 		List<Geofence> fences = new ArrayList<>();
@@ -589,11 +563,16 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             hasLocationPermission = true;
 
         }catch (SecurityException e) {
-            Log.e(TAG, e.getMessage());
-            hasLocationPermission = false;
-            ServiceProxy.getServiceNotification().notifyMissingPermissions();
+            handleSecurityException(e);
         }
 	}
+
+    private void handleSecurityException(@Nullable  SecurityException e) {
+        if(e != null)
+            Log.e(TAG, e.getMessage());
+        hasLocationPermission = false;
+        ServiceProxy.getServiceNotification().notifyMissingPermissions();
+    }
 
 
     private GeofencingRequest getGeofencingRequest(List<Geofence> fences) {
@@ -602,6 +581,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         builder.addGeofences(fences);
         return builder.build();
     }
+
 	private void removeGeofence(Waypoint w) {
 		List<Waypoint> l = new LinkedList<>();
 		l.add(w);
@@ -677,16 +657,14 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         return foreground;
     }
 
-    public boolean hasLocationClient() {
-        return googleApiClient != null;
+    public boolean hasConnectedGoogleApiClient () {
+        return this.googleApiClient != null && this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting();
     }
 
-    public boolean hasLocationRequest() {
-        return mLocationRequest != null;
-    }
+    private void checkLocationPermission() {
+        hasLocationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-
-    public static boolean hasLocationPermission() {
-        return hasLocationPermission;
+        if(!hasLocationPermission)
+            handleSecurityException(null);
     }
 }
