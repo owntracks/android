@@ -2,6 +2,8 @@ package org.owntracks.android.support;
 
 
 import android.app.Activity;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +27,7 @@ public class DrawerProvider {
     private static final String TAG = "DrawerProvider";
 
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
-    private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.materialize_primary;
+    private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;
     private static final int COLOR_ICON_SECONDARY = R.color.md_light_secondary;
     private static final int COLOR_ICON_SECONDARY_ACTIVE = COLOR_ICON_PRIMARY_ACTIVE;
 
@@ -39,28 +41,31 @@ public class DrawerProvider {
         return buildDrawer(activity, toolbar, null);
     }
 
-    private static PrimaryDrawerItem drawerItemForClass(ActivityBase activeActivity, Class<?> targetActivityClass, int targetActivityTitleRessource) {
+    private static PrimaryDrawerItem drawerItemForClass(ActivityBase activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleRessource, @DrawableRes int iconResource) {
 
         return new PrimaryDrawerItem()
                 .withName(activeActivity.getString(targetActivityTitleRessource))
                 .withSelectable(false)
-                .withIcon(R.drawable.ic_place_black_24dp)
+                .withSelectedTextColorRes(COLOR_ICON_PRIMARY_ACTIVE)
+                .withIcon(iconResource)
                 .withIconColorRes(COLOR_ICON_PRIMARY)
                 .withIconTintingEnabled(true)
                 .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
                 .withTag(targetActivityClass)
+                .withTextColorRes(R.color.md_black_1000)
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
-    private static SecondaryDrawerItem secondaryDrawerItemForClass(Activity activeActivity, Class<?> targetActivityClass, int targetActivityTitleRessource) {
+    private static SecondaryDrawerItem secondaryDrawerItemForClass(ActivityBase activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleRessource, @DrawableRes int iconResource) {
         return new SecondaryDrawerItem()
                 .withName(activeActivity.getString(targetActivityTitleRessource))
-                .withIcon(R.drawable.ic_settings_black_36dp)
+                .withIcon(iconResource  )
                 .withIconColorRes(COLOR_ICON_SECONDARY)
                 .withSelectedIconColorRes(COLOR_ICON_SECONDARY_ACTIVE)
                 .withIconTintingEnabled(true)
                 .withTag(targetActivityClass)
                 .withSelectable(false)
+                .withTextColorRes(R.color.md_black_1000)
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
@@ -74,16 +79,19 @@ public class DrawerProvider {
          return new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
+                 .withStickyFooterShadow(false)
+                 .withStickyFooterDivider(true)
+                .withDis
                 .addDrawerItems(
-                        drawerItemForClass(activity, ActivityMap.class, R.string.title_activity_map),
-                        drawerItemForClass(activity, ActivityContacts.class, R.string.title_activity_contacts),
-                        drawerItemForClass(activity, ActivityFeatured.class, R.string.title_activity_featured),
-                        drawerItemForClass(activity, ActivityRegions.class, R.string.title_activity_regions)
+                        drawerItemForClass(activity, ActivityMap.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
+                        drawerItemForClass(activity, ActivityContacts.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
+                      //  TODO: drawerItemForClass(activity, ActivityFeatured.class, R.string.title_activity_featured, R.drawable.ic_info_black_24dp)
+                        drawerItemForClass(activity, ActivityRegions.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp)
 
 
                 ).addStickyDrawerItems(
-                        secondaryDrawerItemForClass(activity, ActivityStatus.class, R.string.title_activity_status),
-                        secondaryDrawerItemForClass(activity, ActivityPreferences.class, R.string.title_activity_preferences)
+                        secondaryDrawerItemForClass(activity, ActivityStatus.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
+                        secondaryDrawerItemForClass(activity, ActivityPreferences.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
