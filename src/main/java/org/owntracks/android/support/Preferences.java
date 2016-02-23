@@ -304,7 +304,6 @@ public class Preferences {
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
         try { setNotificationLocation(json.getBoolean(getStringRessource(R.string.keyNotificationLocation))); } catch (JSONException e) {}
         try { setNotificationEvents(json.getBoolean(getStringRessource(R.string.keyNotificationEvents))); } catch (JSONException e) {}
-        try { setNotificationMessages(json.getBoolean(getStringRessource(R.string.keyNotificationMessages))); } catch (JSONException e) {}
 
         try { setSubTopic(json.getString(getStringRessource(R.string.keySubTopic))); } catch (JSONException e) {}
         try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
@@ -316,7 +315,6 @@ public class Preferences {
         try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
         try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
         try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
-        try { setMessaging(json.getBoolean(getStringRessource(R.string.keyMessaging))); } catch (JSONException e) {}
         try { setInfo(json.getBoolean(getStringRessource(R.string.keyInfo))); } catch (JSONException e) {}
 
         try {
@@ -490,9 +488,6 @@ public class Preferences {
         return getString(R.string.keySelectedContactTopic, R.string.valEmpty);
     }
 
-    public static String getGeohashMsgTopic() {
-        return getString(R.string.keyGeohashTopic, R.string.valGeohashMsgTopic, R.string.valGeohashMsgTopicHosted, R.string.valGeohashMsgTopicPublic, true, true);
-    }
 
     public static void setSelectedContactTopic(String topic) {
         Log.v(TAG, "selecting " + topic);
@@ -590,9 +585,6 @@ public class Preferences {
     }
     public static String getPubTopicCommandsPart() {
         return "/cmd";
-    }
-    public static String getPubTopicMsgPart() {
-        return "/msg";
     }
 
 
@@ -749,11 +741,6 @@ public class Preferences {
         setBoolean(R.string.keyNotificationEvents, notificationEvents);
     }
 
-    public static void setNotificationMessages(boolean notificationMessages) {
-        setBoolean(R.string.keyNotificationMessages, notificationMessages);
-    }
-
-
 
     private static void setSubTopic(String string) {
         setString(R.string.keySubTopic, string, false, false);
@@ -852,11 +839,11 @@ public class Preferences {
         return getBoolean(R.string.keyTls, R.bool.valTls, R.bool.valTlsHosted, R.bool.valTlsPublic, true, true);
     }
 
-    public static String getTlsCaCrtPath() {
+    public static String getTlsCaCrtName() {
         return getString(R.string.keyTlsCaCrtPath, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, true);
     }
 
-    public static String getTlsClientCrtPath() {
+    public static String getTlsClientCrtName() {
         return getString(R.string.keyTlsClientCrtPath, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, true);
     }
 
@@ -869,9 +856,6 @@ public class Preferences {
         return getBoolean(R.string.keyNotificationLocation, R.bool.valNotificationLocation);
     }
 
-    public static boolean getNotificationMessages() {
-        return getBoolean(R.string.keyNotificationMessages, R.bool.valNotificationMessages);
-    }
     public static boolean getNotificationEvents() {
         return getBoolean(R.string.keyNotificationEvents, R.bool.valNotificationEvents);
     }
@@ -932,29 +916,8 @@ public class Preferences {
         return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
     }
 
-    public static String getBroadcastMessageTopic() {
-        return "/msg";
-    }
-
-    public static boolean getBroadcastMessageEnabled() {
-        return getMessaging();
-    }
-
-    public static boolean getDirectMessageEnable() {
-        return getMessaging(); // for now
-    }
-
-    public static boolean getMessaging() {
-        return getBoolean(R.string.keyMessaging, R.bool.valMessages, R.bool.valMessagesHosted, R.bool.valMessagesPublic, false, false);
-    }
-
     public static boolean getInfo() {
         return getBoolean(R.string.keyInfo, R.bool.valInfo, R.bool.valInfoHosted, R.bool.valInfoPublic, false, false);
-    }
-
-
-    public static void setMessaging(boolean messaging) {
-        setBoolean(R.string.keyMessaging, messaging);
     }
 
     public static void setInfo(boolean info) {
@@ -1048,10 +1011,6 @@ public class Preferences {
         return getPubRetain();
     }
 
-    public static boolean getLocationBasedServicesEnabled() {
-        return true;
-    }
-
     public static void setPersistentGeohash (String hash) {
         setString(R.string.keyCurrentGeohash, hash);
     }
@@ -1076,7 +1035,6 @@ public class Preferences {
         try {json.put(Preferences.getStringRessource(R.string.keyPub), Preferences.getPub());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyNotification), Preferences.getNotification());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyNotificationLocation), Preferences.getNotificationLocation());} catch(JSONException e) {};
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationMessages), Preferences.getNotificationLocation());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyNotificationEvents), Preferences.getNotificationEvents());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyAutostartOnBoot), Preferences.getAutostartOnBoot());} catch(JSONException e) {};
         try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyBackground), Preferences.getLocatorAccuracyBackground());} catch(JSONException e) {};
@@ -1098,7 +1056,6 @@ public class Preferences {
                 try {json.put(Preferences.getStringRessource(R.string.keyClientId), Preferences.getClientId(true));} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTrackerId), Preferences.getTrackerId(true));} catch(JSONException e) {};
 
-                try {json.put(Preferences.getStringRessource(R.string.keyMessaging), Preferences.getMessaging());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyRemoteConfiguration), Preferences.getRemoteConfiguration());} catch(JSONException e) {};
 
                 break;
@@ -1112,13 +1069,12 @@ public class Preferences {
                 try {json.put(Preferences.getStringRessource(R.string.keyClientId), Preferences.getClientId(true));} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTrackerId), Preferences.getTrackerId(true));} catch(JSONException e) {};
 
-                try {json.put(Preferences.getStringRessource(R.string.keyMessaging), Preferences.getMessaging());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyPubQos), Preferences.getPubQos()) ;} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyKeepalive), Preferences.getKeepalive());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyPubRetain), Preferences.getPubRetain());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTls), Preferences.getTls());} catch(JSONException e) {};
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrtPath), Preferences.getTlsCaCrtPath());} catch(JSONException e) {};
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPath), Preferences.getTlsClientCrtPath());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrtPath), Preferences.getTlsCaCrtName());} catch(JSONException e) {};
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPath), Preferences.getTlsClientCrtName());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword), Preferences.getTlsClientCrtPassword());} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keyPubTopicBase), Preferences.getPubTopicBase(true));} catch(JSONException e) {};
                 try {json.put(Preferences.getStringRessource(R.string.keySubTopic), Preferences.getSubTopic());} catch(JSONException e) {};

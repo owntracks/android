@@ -2,7 +2,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mapbox="http://schemas.android.com/tools">
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    >
 
     <data>
         <import type="android.view.View"/>
@@ -17,14 +18,15 @@
         >
 
         <include
+            android:transitionName="toolbar"
             android:id="@+id/fragmentToolbar"
             layout="@layout/toolbar"/>
 
-        <com.mapbox.mapboxsdk.views.MapView
+        <com.google.android.gms.maps.MapView
+            android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/mapView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent"/>
 
 
         <LinearLayout
@@ -41,6 +43,7 @@
             android:background="@drawable/map_contact_details_background">
 
             <include layout="@layout/row_contact_binding"
+                android:visibility="gone"
                 android:transitionName="rowContact"
                 bind:item="@{item}"/>
 

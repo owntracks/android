@@ -145,6 +145,8 @@ public class ActivityImport extends ActivityBase {
                 }
             } catch (OutOfMemoryError e) {
                 throw new Error("Unable to load content into memory");
+            } catch (Exception e ) {
+                e.printStackTrace();
             }
 
             Log.v(TAG, "file content: " + total);

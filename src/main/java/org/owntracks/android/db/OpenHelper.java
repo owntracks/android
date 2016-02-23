@@ -3,16 +3,7 @@ package org.owntracks.android.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.util.Log;
-import android.view.View;
-
-import com.mapbox.mapboxsdk.overlay.Marker;
-
-import org.owntracks.android.model.GeocodableLocation;
-
-import java.lang.ref.WeakReference;
 
 public class OpenHelper extends SQLiteOpenHelper {
     private static final String TAG = "OpenHelper";

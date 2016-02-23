@@ -14,5 +14,6 @@
     app:navigationIcon="?attr/homeAsUpIndicator"
     app:title="Default Title"
     android:elevation="4dp"
+    android:transitionName="toolbar"
     app:contentInsetStart="72dp"
     />

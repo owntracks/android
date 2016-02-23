@@ -24,6 +24,49 @@
 
 
             <TextView
+                android:id="@+id/tv13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location Permission"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="#212121"/>
+
+            <TextView
+                android:id="@+id/permissionLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:textSize="14sp"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tv14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Storage Permission"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="#212121"/>
+
+            <TextView
+                android:id="@+id/permissionStorage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:textSize="14sp"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp"/>
+
+
+            <TextView
                 android:id="@+id/tv0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

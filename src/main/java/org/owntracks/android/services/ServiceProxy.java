@@ -1,7 +1,6 @@
 package org.owntracks.android.services;
 
 import java.io.Closeable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -12,10 +11,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.owntracks.android.App;
+import org.owntracks.android.support.PermissionProvider;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
@@ -24,11 +22,9 @@ import de.greenrobot.event.EventBus;
 public class ServiceProxy extends ServiceBindable {
 	private static final String TAG = "ServiceProxy";
 
-
     public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
     public static final String WAKELOCK_TAG_BROKER_NETWORK = "org.owntracks.android.wakelock.broker.network";
     public static final String WAKELOCK_TAG_BROKER_CONNECTIONLOST = "org.owntracks.android.wakelock.broker.connectionlost";
-
 
 
     public static final String SERVICE_APP = "1:App";
@@ -47,6 +43,7 @@ public class ServiceProxy extends ServiceBindable {
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
+
 
     @Override
 	public void onCreate() {
@@ -123,8 +120,9 @@ public class ServiceProxy extends ServiceBindable {
 			case SERVICE_NOTIFICATION:
 				p = new ServiceNotification();
 				break;
-
 		}
+
+
 
 		services.put(id, p);
 		p.onCreate(this);
@@ -268,12 +266,12 @@ public class ServiceProxy extends ServiceBindable {
 		runQueue.addLast(runnable);
 
         try {
-            if (!attemptingToBind) { // Prevent accidential bind during close
+            if (!attemptingToBind) { // Prevent accidental bind during close
                 attemptingToBind = true;
                 context.bindService(new Intent(context, ServiceProxy.class), connection.getServiceConnection(), Context.BIND_AUTO_CREATE);
             }
         } catch (Exception e) {
-            Log.v("ServiceProxy", "bind exception ");
+            Log.e("ServiceProxy", "bind exception ");
             e.printStackTrace();
             attemptingToBind = false;
         }

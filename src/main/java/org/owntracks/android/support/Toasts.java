@@ -19,4 +19,17 @@ public class Toasts {
         Toast.makeText(App.getContext(), App.getContext().getString(R.string.locationPermissionNotAvailable), Toast.LENGTH_SHORT).show();
     }
 
+    public static void showStoragePemissionDenied() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.storageAccessDenied), Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showUnableToCopyCertificateToast() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
+
+    }
+
+    public static void showCopyCertificateSuccessToast() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.successCopyCertificate), Toast.LENGTH_SHORT).show();
+
+    }
 }

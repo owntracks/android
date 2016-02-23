@@ -4,14 +4,14 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.lang.ref.WeakReference;
-import com.mapbox.mapboxsdk.api.ILatLng;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.android.gms.maps.model.LatLng;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MessageLocation extends MessageBase implements ILatLng {
+public class MessageLocation extends MessageBase  {
     private String tid;
     private String t;
     private int bat;
@@ -24,19 +24,16 @@ public class MessageLocation extends MessageBase implements ILatLng {
     private LatLng point;
 
 
-    @Override
     @JsonProperty("lat")
     public double getLatitude() {
         return lat;
     }
 
-    @Override
     @JsonProperty("lon")
     public double getLongitude() {
         return lon;
     }
 
-    @Override
     @JsonIgnore
     public double getAltitude() {
         return 0;
@@ -114,9 +111,10 @@ public class MessageLocation extends MessageBase implements ILatLng {
 
     }
 
-    public LatLng getPoint() {
-        return point;
+    public LatLng getLatLng() {
+        return point != null ? point : (point = new LatLng(lat, lon));
     }
+
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processMessage(this);

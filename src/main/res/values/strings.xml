@@ -29,7 +29,7 @@
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
     <string name="preferencesNotificationMessagesSummary">Notify about received messages</string>
-    <string name="preferencesNotificationMessages" >Messages</string>
+    <string name="preferencesNotificationMessages">Messages</string>
 
     <string name="preferencesConnectionAdvancedModeSummary">"Show advanced connection preferences"</string>
     <string name="preferencesConnectionAdvancedMode">"Advanced connection preferences"</string>
@@ -64,7 +64,6 @@
     <string name="preferencesEncryption">Encryption</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
-
 
 
     <string name="preferencesDeviceTopic">Device topic</string>
@@ -205,7 +204,8 @@
     <string name="clearMessage">Clear</string>
     <string name="messageListPlaceholder">No messages received yet</string>
     <string-array name="qos_readable">
-       p <item>"0"</item>
+        p
+        <item>"0"</item>
         <item>"1"</item>
         <item>"2"</item>
     </string-array>
@@ -248,6 +248,16 @@
     <string name="preferencesRecordSummary">Record</string>
     <string name="preferencesRecord">Record</string>
     <string name="locationPermissionNotAvailable">Location access denied</string>
+    <string name="storageAccessDenied">Permission to access storage was denied</string>
+    <string name="title_activity_regions">Regions</string>
+    <string name="title_activity_region">Region</string>
+    <string name="title_activity_featured">Featured</string>
+    <string name="title_activity_map">Map</string>
+    <string name="title_activity_contacts">Contacts</string>
+    <string name="title_activity_status">Status</string>
+    <string name="title_activity_preferences">Preferences</string>
+    <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
+    <string name="successCopyCertificate">Certificate copied to internal storage</string>
 
     <string-array name="filepicker">
         <item>Select</item>

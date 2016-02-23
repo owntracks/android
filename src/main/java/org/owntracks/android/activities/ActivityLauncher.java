@@ -1,5 +1,6 @@
 package org.owntracks.android.activities;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
@@ -182,7 +183,7 @@ public class ActivityLauncher extends ActivityBase {
 	}
 
 	public void startActivityMain() {
-		startActivityFromClass(ActivityContacts.class);
+		startActivityFromClass(App.getRootActivityClass());
 	}
 
 	public void startActivityFromClass(Class<?> c) {
