@@ -37,6 +37,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -568,8 +569,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 		if (fences.isEmpty()) {
 			return;
 		}
+
+
         try {
-            PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, fences, ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION, null));
+
+            PendingResult<Status> r = LocationServices.GeofencingApi.addGeofences(googleApiClient, getGeofencingRequest(fences), ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION, null));
             r.setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(@NonNull Status status) {
@@ -591,6 +595,13 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         }
 	}
 
+
+    private GeofencingRequest getGeofencingRequest(List<Geofence> fences) {
+        GeofencingRequest.Builder  builder = new GeofencingRequest().Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER); //trigger transition when geofence is setup and device is already in it
+        builder.addGeofences(fences);
+        return builder.build();
+    }
 	private void removeGeofence(Waypoint w) {
 		List<Waypoint> l = new LinkedList<>();
 		l.add(w);
