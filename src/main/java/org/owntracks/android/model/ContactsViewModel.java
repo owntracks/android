@@ -4,7 +4,6 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
 import org.owntracks.android.R;
-import org.owntracks.android.BR;
 
 
 import me.tatarka.bindingcollectionadapter.ItemView;

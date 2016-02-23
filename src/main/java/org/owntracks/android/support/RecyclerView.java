@@ -4,13 +4,11 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * Created by alexander on 6/24/15.
- */
+
 public class RecyclerView extends android.support.v7.widget.RecyclerView {
     private View emptyView;
 
-    private AdapterDataObserver emptyObserver = new AdapterDataObserver() {
+    private final AdapterDataObserver emptyObserver = new AdapterDataObserver() {
 
 
         @Override

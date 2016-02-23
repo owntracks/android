@@ -2,7 +2,6 @@ package org.owntracks.android;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
@@ -48,9 +47,11 @@ public class App extends Application  {
     private static Activity currentActivity;
 
 
-    public static final int MODE_ID_PRIVATE=0;
-    public static final int MODE_ID_HOSTED=1;
-    public static final int MODE_ID_PUBLIC=2;
+    public static final int MODE_ID_MQTT_PRIVATE =0;
+    public static final int MODE_ID_MQTT_PUBLIC =2;
+    public static final int MODE_ID_HTTP_PRIVATE=3;
+
+
 
     public static ArrayMap<String, FusedContact> getFusedContacts() {
         return fusedContacts;
@@ -113,12 +114,12 @@ public class App extends Application  {
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if(e.getState() == ServiceBroker.State.CONNECTING) {
             //Log.v(TAG, "State changed to connecting. Clearing cached contacts");
-            instance.fusedContacts.clear();
+            fusedContacts.clear();
         }
     }
 
     public void onEvent(Events.ModeChanged e) {
-        instance.fusedContacts.clear();
+        fusedContacts.clear();
     }
     public static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
@@ -142,7 +143,7 @@ public class App extends Application  {
 		fusedContacts.clear();
 	}
 
-    public static void onEnterForeground() {
+    private static void onEnterForeground() {
         Log.v(TAG, "onEnterForeground");
         inForeground = true;
         ServiceProxy.runOrBind(getContext(), new Runnable() {
@@ -155,7 +156,7 @@ public class App extends Application  {
         });
     }
 
-    public static void onEnterBackground() {
+    private static void onEnterBackground() {
         Log.v(TAG, "onEnterBackground");
         inForeground = false;
         ServiceProxy.runOrBind(getContext(), new Runnable() {

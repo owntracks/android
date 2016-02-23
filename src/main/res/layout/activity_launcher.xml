@@ -1,11 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/default_vertical_spacing"
     android:paddingLeft="@dimen/default_spacing"
     android:paddingRight="@dimen/default_spacing"
     android:paddingTop="@dimen/default_vertical_spacing"
-    tools:context=".ActivityLauncher" >
+     >
 
 </RelativeLayout>

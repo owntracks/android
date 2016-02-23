@@ -17,8 +17,8 @@ import android.util.Log;
 public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Void> {
 	private static final String TAG = "ReverseGeocodingTask";
 
-    private Context mContext;
-    private Handler mHandler;
+    private final Context mContext;
+    private final Handler mHandler;
 	public static final int GEOCODER_RESULT = 3452;
 	public static final int GEOCODER_NORESULT = 3453;
 

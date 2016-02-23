@@ -18,12 +18,9 @@ import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 
-import com.mikepenz.materialdrawer.Drawer;
-
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.EditIntegerPreference;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -136,13 +133,10 @@ public class ActivityPreferences extends ActivityBase {
 
             Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
-            if (Preferences.isModePrivate()) {
+            if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.preferences_private);
-            } else if(Preferences.isModeHosted()) {
-                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HOSTED);
-                addPreferencesFromResource(R.xml.preferences_hosted);
-            } else if(Preferences.isModePublic()){
+            } else if(Preferences.isModeMqttPublic()){
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
                 addPreferencesFromResource(R.xml.preferences_public);
             } else {

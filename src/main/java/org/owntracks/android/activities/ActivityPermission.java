@@ -1,7 +1,6 @@
 package org.owntracks.android.activities;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -39,7 +38,6 @@ public class ActivityPermission extends ActivityBase{
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
             }
 
         }

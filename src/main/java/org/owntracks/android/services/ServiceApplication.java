@@ -9,9 +9,6 @@ import android.os.Message;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
-import java.util.List;
 
 public class ServiceApplication implements ProxyableService, StaticHandlerInterface {
     private static final String TAG = "ServiceApplication";
@@ -29,8 +26,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return 0;
+    public void onStartCommand(Intent intent, int flags, int startId) {
     }
 
     @Override
@@ -46,11 +42,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
 	public static boolean checkPlayServices() {
             GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
             int result = googleAPI.isGooglePlayServicesAvailable(App.getContext());
-            if(result != ConnectionResult.SUCCESS) {
-                return false;
-            }
+        return result == ConnectionResult.SUCCESS;
 
-            return true;
-
-	}
+    }
 }

@@ -194,6 +194,15 @@
                 android:value=".activities.ActivityMap" />
         </activity>
         <activity
+            android:name=".activities.ActivityContact"
+            android:launchMode="singleTop"
+            android:parentActivityName=".activities.ActivityMap">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ActivityMap" />
+        </activity>
+
+        <activity
             android:name=".activities.ActivityMap"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"

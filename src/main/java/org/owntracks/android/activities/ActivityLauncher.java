@@ -4,7 +4,6 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.PermissionProvider;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,7 +16,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.Toast;

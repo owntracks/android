@@ -37,7 +37,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     public static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
     private Toolbar toolbar;
     private org.owntracks.android.support.RecyclerView listView;
-    private int LOADER_ID = 1;
+    private final int LOADER_ID = 1;
     private AdapterWaypoints listAdapter;
     private Drawer drawer;
 

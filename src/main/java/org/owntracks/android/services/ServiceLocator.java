@@ -319,9 +319,9 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public void onStartCommand(Intent intent, int flags, int startId) {
         if(intent == null)
-            return 0;
+            return;
 
         Log.v(TAG, "onStartCommand " + intent.getAction());
         if (ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL.equals(intent.getAction())) {
@@ -332,7 +332,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             Log.e(TAG, "Received unknown intent action: " + intent.getAction());
         }
 
-		return 0;
 	}
 
     @Override
@@ -389,7 +388,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         ServiceProxy.getServiceBroker().publish(message);
 	}
     private void publishSsidTransitionMessage(Waypoint w) {
-     //   ServiceProxy.getServiceBroker().publish(new TransitionMessage(w), Preferences.getPubTopicEvents(), Preferences.getPubQosEvents(), Preferences.getPubRetainEvents(), null, null);
+
     }
 
 
@@ -397,7 +396,6 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	private void publishWaypointMessage(WaypointMessage message) {
 		if (ServiceProxy.getServiceBroker() == null) {
 			Log.e(TAG, "publishWaypointMessage called without a broker instance");
-            return;
 		}
 
         //TODO:
@@ -593,7 +591,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 	}
 
 	private void removeGeofencesByWaypoint(List<Waypoint> list) {
-		ArrayList<String> l = new ArrayList<String>();
+		ArrayList<String> l = new ArrayList<>();
 
 		// Either removes waypoints from the provided list or all waypoints
 		for (Waypoint w : list == null ? loadWaypointsForCurrentMode() : list) {

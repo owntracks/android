@@ -58,7 +58,7 @@ public class MessageCard extends MessageBase{
 
 
     public void setContact(FusedContact contact) {
-        this._contact = new WeakReference<FusedContact>(contact);
+        this._contact = new WeakReference<>(contact);
     }
     private void notifyContactPropertyChanged() {
         if(_contact != null && _contact.get() != null)

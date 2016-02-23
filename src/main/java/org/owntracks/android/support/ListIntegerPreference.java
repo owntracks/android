@@ -2,7 +2,6 @@ package org.owntracks.android.support;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.preference.ListPreference;
 import android.util.AttributeSet;
 
 import com.afollestad.materialdialogs.prefs.MaterialListPreference;

@@ -2,7 +2,6 @@ package org.owntracks.android.messages;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +39,7 @@ public class MsgMessage extends Message {
 
     }
 
-    public String getChannel() {return channel;};
+    public String getChannel() {return channel;}
 
     public double getLat() {
         return lat;
