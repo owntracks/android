@@ -3,14 +3,8 @@ package org.owntracks.android.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import org.owntracks.android.R;
-import org.owntracks.android.db.Message;
 
 
 public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -21,13 +15,11 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
     protected OnViewHolderClickListener onViewHolderClickListener;
 
     public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView mTextView;
         public View rootView;
         private OnViewHolderClickListener<ClickableViewHolder> onClickListener;
         public ClickableViewHolder(View view) {
             super(view);
             this.rootView = view;
-            mTextView = (TextView)view.findViewById(R.id.section_text);
             itemView.setOnClickListener(this);
         }
 

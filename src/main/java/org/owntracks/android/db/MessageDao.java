@@ -35,7 +35,7 @@ public class MessageDao extends AbstractDao<Message, Long> {
         public final static Property Priority = new Property(9, Integer.class, "priority", false, "PRIORITY");
         public final static Property IconUrl = new Property(10, String.class, "iconUrl", false, "ICON_URL");
         public final static Property Url = new Property(11, String.class, "url", false, "URL");
-    };
+    }
 
 
     public MessageDao(DaoConfig config) {

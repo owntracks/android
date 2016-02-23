@@ -10,8 +10,6 @@ import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.owntracks.android.BR;
-
 
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageCard;
@@ -22,13 +20,9 @@ import org.owntracks.android.support.ContactImageProvider;
 public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
-    String topic;
+    final String topic;
     MessageLocation messageLocation;
     MessageCard messageCard;
-
-    String linkId;
-    String linkName;
-    String linkFaceUri;
 
     @Bindable
     Integer imageProviderLevel = IMAGE_PROVIDER_LEVEL_TID;
@@ -86,9 +80,6 @@ public class FusedContact extends BaseObservable {
 
     @Bindable
     public String getFusedName() {
-        if(linkName != null)
-            return linkName;
-
         if(hasCard() && messageCard.hasName())
             return messageCard.getName() + (hasLocation() ? (" (" + messageLocation.getTid() +")") : "" );
 
@@ -122,10 +113,6 @@ public class FusedContact extends BaseObservable {
         return hasLocation() ? this.messageLocation.getTid() : getTopic().substring(getTopic().length()-2).replace("/","");
     }
 
-    public Bitmap getFace() {
-        return null;
-    }
-
     @Bindable
     public String getTopic() {
         return topic;
@@ -133,10 +120,6 @@ public class FusedContact extends BaseObservable {
 
     private static float convertDpToPixel(float dp) {
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
-    }
-
-    public boolean hasLink() {
-        return linkFaceUri != null;
     }
 
     public LatLng getLatLng() {

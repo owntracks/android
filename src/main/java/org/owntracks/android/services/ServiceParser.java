@@ -1,14 +1,10 @@
 package org.owntracks.android.services;
 
 import android.content.Intent;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.android.gms.location.Geofence;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.owntracks.android.App;
@@ -25,7 +21,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
-import java.util.List;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -104,8 +100,8 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return 0;
+    public void onStartCommand(Intent intent, int flags, int startId) {
+        return;
     }
 
     @Override
@@ -122,7 +118,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         }
     }
 
-    public void fromJSON(String topic, MqttMessage message) throws Exception {
+    public void fromJSON(String topic, MqttMessage message) {
         try {
             MessageBase m = mapper.readValue(message.getPayload(), MessageBase.class);
 

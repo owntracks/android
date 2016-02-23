@@ -10,7 +10,7 @@ import org.owntracks.android.db.Waypoint;
 public class WaypointMessage extends Message {
     private static final String TAG = "WaypointMessage";
 
-    Waypoint waypoint;
+    final Waypoint waypoint;
     String trackerId;
 	public WaypointMessage(Waypoint w) {
         super();
@@ -29,7 +29,7 @@ public class WaypointMessage extends Message {
             json.put("_type", "waypoint")
                     .put("lat", this.waypoint.getGeofenceLatitude())
                     .put("lon", this.waypoint.getGeofenceLongitude())
-                    .put("tst", (long) (TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime())))
+                    .put("tst", TimeUnit.MILLISECONDS.toSeconds(this.waypoint.getDate().getTime()))
                     .put("rad", this.waypoint.getGeofenceRadius() != null ? this.waypoint.getGeofenceRadius() : 0);
 
             if (this.trackerId != null && !this.trackerId.isEmpty()) 

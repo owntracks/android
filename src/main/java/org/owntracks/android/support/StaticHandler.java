@@ -9,7 +9,7 @@ public class StaticHandler extends Handler {
 	private final WeakReference<StaticHandlerInterface> ref;
 
 	public StaticHandler(StaticHandlerInterface caller) {
-		this.ref = new WeakReference<StaticHandlerInterface>(caller);
+		this.ref = new WeakReference<>(caller);
 	}
 
 	@Override

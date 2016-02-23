@@ -1,10 +1,6 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -34,7 +30,7 @@ public class GeocodingProvider {
 
         final WeakReference<MessageLocation> message;
         public MessageLocationResolverTask(MessageLocation m) {
-            this.message = new WeakReference<MessageLocation>(m);
+            this.message = new WeakReference<>(m);
         }
 
         @Override
@@ -68,7 +64,7 @@ public class GeocodingProvider {
             lon = params[1];
             run = params[2];
 
-            if(!geocoder.isPresent()) {
+            if(!Geocoder.isPresent()) {
                Log.e(TAG, "geocoder is not present");
                 return null;
             }

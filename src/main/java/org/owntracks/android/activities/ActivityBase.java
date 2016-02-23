@@ -1,36 +1,26 @@
 package org.owntracks.android.activities;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SnackbarFactory;
-import org.owntracks.android.support.StatisticsProvider;
 
 import de.greenrobot.event.EventBus;
 
-public class ActivityBase extends AppCompatActivity implements SnackbarFactory.SnackbarFactoryDelegate {
+public abstract class ActivityBase extends AppCompatActivity implements SnackbarFactory.SnackbarFactoryDelegate {
     private static final String TAG = "ActivityBase";
     protected Toolbar toolbar;
 

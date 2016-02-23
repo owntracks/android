@@ -10,8 +10,8 @@ public class CardMessage extends Message {
     private String face;
 	public CardMessage(JSONObject json) {
         super();
-        try{ this.name = json.getString("name"); } catch (JSONException e) {};
-        try{ this.face = json.getString("face"); } catch (JSONException e) {};
+        try{ this.name = json.getString("name"); } catch (JSONException e) {}
+        try{ this.face = json.getString("face"); } catch (JSONException e) {}
     }
 
     public String getName() {

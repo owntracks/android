@@ -37,7 +37,7 @@ public abstract class ServiceBindable extends Service {
 		private WeakReference<ServiceBindable> mService;
 
 		public ServiceBinder(ServiceBindable serviceBindable) {
-			this.mService = new WeakReference<ServiceBindable>(serviceBindable);
+			this.mService = new WeakReference<>(serviceBindable);
 		}
 
 		public ServiceBindable getService() {

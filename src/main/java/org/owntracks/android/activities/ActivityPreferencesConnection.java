@@ -25,7 +25,6 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -300,82 +299,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         }
 
 
-        private void loadIdentificationPreferencesHosted(final Activity a) {
-            Preference.OnPreferenceClickListener identificationClickListener = new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new MaterialDialog.Builder(a)
-                            .customView(R.layout.preferences_identification_hosted, true)
-                            .title(R.string.preferencesIdentification)
-                            .positiveText(R.string.accept)
-                            .negativeText(R.string.cancel)
-                            .showListener(new DialogInterface.OnShowListener() {
-                                @Override
-                                public void onShow(DialogInterface dialog) {
-                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.usernameHosted);
-                                    final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.passwordHosted);
-                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
-                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
-
-                                    username.setText(Preferences.getUsername());
-                                    password.setText(Preferences.getPassword());
-                                    deviceId.setText(Preferences.getDeviceId(false));
-                                    trackerId.setText(Preferences.getTrackerId(false));
-                                    trackerId.setHint(Preferences.getTrackerIdDefault());
-
-                                    deviceId.addTextChangedListener(new TextWatcher() {
-                                        @Override
-                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                                        }
-
-                                        @Override
-                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                            if (s.length() >= 2)
-                                                trackerId.setHint(s.toString().substring(deviceId.length() - 2));
-                                            else
-                                                trackerId.setHint(Preferences.getTrackerIdDefault());
-                                        }
-
-                                        @Override
-                                        public void afterTextChanged(Editable s) {
-
-                                        }
-                                    });
-
-                                }
-                            })
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    final MaterialEditText username = (MaterialEditText) d.findViewById(R.id.usernameHosted);
-                                    final MaterialEditText password = (MaterialEditText) d.findViewById(R.id.passwordHosted);
-                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceIdHosted);
-                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
-
-                                    Preferences.setUsername(username.getText().toString());
-                                    Preferences.setPassword(password.getText().toString());
-                                    Preferences.setDeviceId(deviceId.getText().toString());
-                                    Preferences.setTrackerId(trackerId.getText().toString());
-
-                                    updateConnectButton();
-
-                                }
-                            })
-                            .show();
-
-                    return true;
-                }
-            };
-
-            authenticationVal = Preferences.getAuth();
-            identificationPreference = findPreference(getString(R.string.keyIdentification));
-            identificationPreference.setOnPreferenceClickListener(identificationClickListener);
-
-        }
 
 
         private void loadSecurityPreferences(final Activity a) {
@@ -615,7 +539,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
 
 
-            if (Preferences.isModePrivate()) {
+            if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.preferences_private_connection);
 
@@ -625,14 +549,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 loadOptionsPreferences(a);
                 loadIdentificationPreferences(a);
 
-            } else if (Preferences.isModeHosted()) {
-                Log.v(TAG, "Prepping hosted preferences");
-                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HOSTED);
-                addPreferencesFromResource(R.xml.preferences_hosted_connection);
-
-                loadIdentificationPreferencesHosted(a);
-
-            } else if (Preferences.isModePublic()) {
+            } else if (Preferences.isModeMqttPublic()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
                 addPreferencesFromResource(R.xml.preferences_public_connection);
             } else {
@@ -806,11 +723,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
     private abstract static class CopyTask extends AsyncTask<Uri, String, String> {
         public static final Integer STATUS_SUCCESS = 1;
         public static final Integer STATUS_ERROR = 2;
-        private WeakReference<FragmentPreferences> reference;
+        private final WeakReference<FragmentPreferences> reference;
 
 
         public CopyTask(FragmentPreferences fragment) {
-            this.reference = new WeakReference<FragmentPreferences>(fragment);
+            this.reference = new WeakReference<>(fragment);
         }
 
         public FragmentPreferences getFragement() {

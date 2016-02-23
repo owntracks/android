@@ -1,7 +1,6 @@
 package org.owntracks.android.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.location.Location;
@@ -16,14 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.*;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityWaypointBindingBinding;
 import org.owntracks.android.db.Dao;
@@ -103,7 +100,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         }
 
         binding.setItem(this.waypoint);
-        binding.shareWrapper.setVisibility(Preferences.isModePublic() ? View.GONE : View.VISIBLE);
+        binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
 
         setupRequiredFields();
     }
@@ -270,7 +267,6 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
                 } else {
                     Toasts.showLocationPermissionNotAvailable();
                 }
-                return;
 
         }
     }
@@ -313,7 +309,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
             w.setBeaconMajor(0);
         }
 
-        if(!Preferences.isModePublic())
+        if(!Preferences.isModeMqttPublic())
             w.setShared(shareValue);
         else
             w.setShared(false);

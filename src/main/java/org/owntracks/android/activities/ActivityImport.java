@@ -10,40 +10,27 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
-import org.owntracks.android.messages.ConfigurationMessage;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.EnumSet;
 
 public class ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
 
     private TextView input;
-    private MenuItem saveButton;
     JSONObject configJSON = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +70,7 @@ public class ActivityImport extends ActivityBase {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_export, menu);
 
-        saveButton = menu.findItem(R.id.save);
+        MenuItem saveButton = menu.findItem(R.id.save);
         saveButton.setEnabled(configJSON != null);
         saveButton.getIcon().setAlpha(configJSON != null ? 255 : 130);
 
@@ -117,7 +104,7 @@ public class ActivityImport extends ActivityBase {
 
                 Log.e(TAG, "restarting app");
                 Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-                PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0, i, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0, i, 0);
                 AlarmManager manager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
                 manager.set(AlarmManager.RTC, System.currentTimeMillis() + 1, intent);
                 System.exit(2);

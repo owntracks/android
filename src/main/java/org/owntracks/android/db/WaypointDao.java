@@ -38,7 +38,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property LastTriggered = new Property(12, Long.class, "lastTriggered", false, "LAST_TRIGGERED");
         public final static Property ModeId = new Property(13, int.class, "modeId", false, "MODE_ID");
         public final static Property Type = new Property(14, int.class, "type", false, "TYPE");
-    };
+    }
 
 
     public WaypointDao(DaoConfig config) {

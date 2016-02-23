@@ -22,7 +22,7 @@ public class StatisticsProvider  {
     public static final String SERVICE_BROKER_QUEUE_LENGTH = "SERVICE_BROKER_QUEUE_LENGTH";
     public static final String SERVICE_BROKER_CONNECTS = "SERVICE_BROKER_CONNECTS";
 
-    public static InternalProviderInterface provider = BuildConfig.DEBUG ? new StatisticsProviderDebug() : new StatisticsProviderProduction();
+    public static final InternalProviderInterface provider = BuildConfig.DEBUG ? new StatisticsProviderDebug() : new StatisticsProviderProduction();
 
     public static void incrementCounter(Context c, String key) {
         provider.incrementCounter(c, key);

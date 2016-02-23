@@ -3,45 +3,28 @@ package org.owntracks.android.services;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TimeUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import de.greenrobot.event.EventBus;
-
-import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
-import org.owntracks.android.App;
-import org.owntracks.android.R;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.messages.BeaconMessage;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.support.receiver.BluetoothStateChangeReceiver;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.MessageLifecycleCallbacks;
 
 // Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
 //  -> https://github.com/AltBeacon/spec
@@ -87,10 +70,10 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
         beaconManager = BeaconManager.getInstanceForApplication(context);
-        beaconManager.setAndroidLScanningDisabled(false);
         beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
         beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
         beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
+        BeaconManager.setAndroidLScanningDisabled(false);
 
         beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
         // TODO: make configurable
@@ -146,8 +129,8 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return 0;
+    public void onStartCommand(Intent intent, int flags, int startId) {
+
     }
 
     @Override
