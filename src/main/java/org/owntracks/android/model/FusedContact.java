@@ -6,14 +6,12 @@ import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
+
+
+import com.google.android.gms.maps.model.LatLng;
+
 import org.owntracks.android.BR;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.mapbox.mapboxsdk.clustering.geometry.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageCard;

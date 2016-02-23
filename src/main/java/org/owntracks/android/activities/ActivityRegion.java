@@ -40,8 +40,8 @@ import org.owntracks.android.support.Toasts;
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoint extends ActivityBase implements StaticHandlerInterface {
-    private static final String TAG = "ActivityWaypoint";
+public class ActivityRegion extends ActivityBase implements StaticHandlerInterface {
+    private static final String TAG = "ActivityRegion";
 
     private static final int REQUEST_PLACE_PICKER = 19283;
     private static final int PERMISSION_REQUEST_USE_CURRENT = 1;
@@ -77,7 +77,7 @@ public class ActivityWaypoint extends ActivityBase implements StaticHandlerInter
         ServiceProxy.runOrBind(this, new Runnable() {
             @Override
             public void run() {
-                Log.v("ActivityWaypoints", "ServiceProxy bound");
+                Log.v("ActivityRegions", "ServiceProxy bound");
             }
         });
 

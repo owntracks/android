@@ -44,15 +44,15 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
 
+import java.io.FileNotFoundException;
+import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import ch.hsr.geohash.GeoHash;
 import de.greenrobot.event.EventBus;
 
 public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor {
@@ -83,13 +83,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
     private ReconnectHandler reconnectHandler;
 	private PingHandler pingHandler;
 	private boolean connectedWithCleanSession;
-
-	private static final int MIN_GEOHASH_PRECISION = 3 ;
-	private static final int MAX_GEOHASH_PRECISION = 6;
-	private static final int GEOHASH_SLOTS = MAX_GEOHASH_PRECISION-MIN_GEOHASH_PRECISION+1;
-	String[] activeGeohashTopics = new String[GEOHASH_SLOTS];
-	private static final String[] NO_GEOHASHES = new String[GEOHASH_SLOTS];
-	String pendingGeohash;
 
 	@Override
 	public void onCreate(ServiceProxy p) {
@@ -250,7 +243,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
             if(Preferences.isModeHosted()) {
                 options.setPassword(Preferences.getPassword().toCharArray());
                 options.setUserName(String.format("%s|%s", Preferences.getUsername(), Preferences.getDeviceId(false)));
-                options.setSocketFactory(new SocketFactory(false, false));
+                options.setSocketFactory(new SocketFactory());
             } else {
                 if (Preferences.getAuth()) {
                     options.setPassword(Preferences.getPassword().toCharArray());
@@ -258,7 +251,30 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
                 }
 
                 if (Preferences.getTls()) {
-                    options.setSocketFactory(new SocketFactory(Preferences.getTlsCaCrtPath().length() > 0, Preferences.getTlsClientCrtPath().length() > 0));
+					String tlsCaCrt = Preferences.getTlsCaCrtName();
+					String tlsClientCrt = Preferences.getTlsClientCrtName();
+
+					SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+
+					if (tlsCaCrt.length() > 0) {
+						try {
+							socketFactoryOptions.withCaInputStream(context.openFileInput(tlsCaCrt));
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
+					}
+
+					if (tlsClientCrt.length() > 0)						{
+						try {
+							socketFactoryOptions.withClientP12InputStream(context.openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						}
+					}
+
+
+
+					options.setSocketFactory(new SocketFactory(socketFactoryOptions));
                 }
             }
 
@@ -271,7 +287,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			this.mqttClient.connect(options);
 			changeState(State.CONNECTED);
 
-			activeGeohashTopics = NO_GEOHASHES;
 			return true;
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
@@ -317,94 +332,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 	private void onCleanSessionConnect() {
-		Log.v(TAG, "onCleanSessionConnect()");
 	}
 
 	private void onUncleanSessionConnect() {
-		Log.v(TAG, "onUncleanSessionConnect()");
-
-		activeGeohashTopics  = hashToSubPrecisionTopics(Preferences.getAndClearPersistentGeohash());
 	}
 
 	private void onSessionConnect() {
 		subscribToInitialTopics();
-
-		if (Preferences.getLocationBasedServicesEnabled() && pendingGeohash != null) {
-				updateGeohashSubscriptions();
-		}
-
 	}
-
-	public void onEvent(Events.CurrentLocationUpdated e) {
-		Log.v(TAG, "onEvent() - CurrentLocationUpdated ");
-
-		if(Preferences.getLocationBasedServicesEnabled()) {
-			pendingGeohash = GeoHash.geoHashStringWithCharacterPrecision(e.getGeocodableLocation().getLatitude(), e.getGeocodableLocation().getLongitude(), MAX_GEOHASH_PRECISION);
-			if(isConnected())
-				updateGeohashSubscriptions();
-		}
-	}
-
-	private String[] hashToSubPrecisionTopics(String maxPrecision) {
-		if("".equals(maxPrecision))
-			return NO_GEOHASHES;
-
-		String[] r = new String[GEOHASH_SLOTS];
-		String format = Preferences.getGeohashMsgTopic();
-		for(int i = MIN_GEOHASH_PRECISION; i <= MAX_GEOHASH_PRECISION; i++) {
-			int j = i - MIN_GEOHASH_PRECISION;
-			r[j]= String.format(format, maxPrecision.substring(0, i-1));
-		}
-		return r;
-	}
-
-	public void updateGeohashSubscriptions() {
-		Log.v(TAG, "updateGeohashSubscriptions() with hash " + pendingGeohash);
-		String[] newGeohashTopics = hashToSubPrecisionTopics(pendingGeohash);
-
-		if(activeGeohashTopics[0] == null) {
-			activeGeohashTopics = newGeohashTopics;
-			subscribe(activeGeohashTopics);
-			handleGeohashForUnCleanSession();
-			return;
-		}
-
-		int newGeohashIndex = -1;
-		int activeGeohashIndex;
-		for(int i = MIN_GEOHASH_PRECISION; i <= MAX_GEOHASH_PRECISION; i++) {
-			activeGeohashIndex = i - MIN_GEOHASH_PRECISION; // index in geohash topic storage
-			Log.v(TAG, "updateGeohashSubscriptions() - comparing activeGeohashIndex: " + activeGeohashIndex+ ". New: " + newGeohashTopics[activeGeohashIndex] + ", active: " + activeGeohashTopics[activeGeohashIndex]);
-			if(!newGeohashTopics[activeGeohashIndex].equals(activeGeohashTopics[activeGeohashIndex])) {
-				newGeohashIndex = activeGeohashIndex;
-				Log.v(TAG, "updateGeohashSubscriptions()  - compare difference at index " + newGeohashIndex);
-				break;
-			}
-		}
-		Log.v(TAG, "updateGeohashSubscriptions() - newGeohashIndex == " + newGeohashIndex);
-
-
-		if(newGeohashIndex >= 0) {
-			Log.v(TAG, "updateGeohashSubscriptions() - newGeohashIndex > 0");
-			unsubscribe(Arrays.copyOfRange(activeGeohashTopics, newGeohashIndex, activeGeohashTopics.length - 1)); // unsubscribe from match to end
-			subscribe(Arrays.copyOfRange(newGeohashTopics, newGeohashIndex, newGeohashTopics.length - 1));
-			activeGeohashTopics = newGeohashTopics;
-			handleGeohashForUnCleanSession();
-		}
-	}
-
-	private void handleGeohashForUnCleanSession() {
-		if(!connectedWithCleanSession)
-			Preferences.setPersistentGeohash(pendingGeohash);
-		else
-			Preferences.getAndClearPersistentGeohash();
-	}
-
-
-    public void resubscribe(){
-		//unsubscribe();
-		//subscribToInitialTopics();
-    }
-
 
 	public void subscribToInitialTopics() {
 		List<String> topics =new ArrayList<String>();
@@ -421,9 +356,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			if (!Preferences.isModePublic())
 				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicCommandsPart());
 
-			if (Preferences.getMessaging() && !Preferences.isModePublic())
-				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicMsgPart()); // general messages
-
 			if (!Preferences.isModePublic()) {
 				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
 				topics.add(subTopicBase + Preferences.getPubTopicWaypointsPart());
@@ -431,10 +363,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 		}
-
-		if(Preferences.getMessaging())
-			topics.add(Preferences.getBroadcastMessageTopic());
-
 
 		subscribe(topics.toArray(new String[topics.size()]));
 
@@ -824,7 +752,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	public void onEvent(Events.Dummy e) {
 	}
 
-    public void clearQueues() {
+
+	public void clearQueues() {
 		initPubPool();
     }
 

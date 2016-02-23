@@ -264,13 +264,13 @@ action#android.intent.action.EDIT
 ADDED from AndroidManifest.xml:128:13
 	android:name
 		ADDED from AndroidManifest.xml:128:21
-activity#org.owntracks.android.activities.ActivityWaypoints
+activity#org.owntracks.android.activities.ActivityRegions
 ADDED from AndroidManifest.xml:170:9
 	android:label
 		ADDED from AndroidManifest.xml:172:13
 	android:name
 		ADDED from AndroidManifest.xml:171:13
-activity#org.owntracks.android.activities.ActivityWaypoint
+activity#org.owntracks.android.activities.ActivityRegion
 ADDED from AndroidManifest.xml:174:9
 	android:label
 		ADDED from AndroidManifest.xml:176:13

@@ -1,47 +1,32 @@
 package org.owntracks.android.activities;
 
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.databinding.tool.Binding;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.BR;
 
-import org.owntracks.android.adapter.ContactsAdapter;
 import org.owntracks.android.databinding.ActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.ServiceLocator;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerFactory;
+import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RecyclerViewAdapter;
@@ -56,8 +41,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     private static final String TAG = "ActivityContacts";
     private static final int PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST = 1;
     private static final int PERMISSION_REQUEST_REPORT_LOCATION = 2;
-    private static final int PERMISSION_REQUEST_SHOW_CURRENT_LOCATION = 3;
-    private Toolbar toolbar;
     private Drawer drawer;
 
 
@@ -77,19 +60,13 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
        // b.setFusedContacts(App.getFusedContactsViewModel());
         //b.rvContacts.setLayoutManager(new LinearLayoutManager(this));
 
-        toolbar =(Toolbar) findViewById(R.id.fragmentToolbar);
+        toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        drawer = DrawerFactory.buildDrawerV2(this, toolbar, new DrawerFactory.OnDrawerItemClickListener() {
-            @Override
-            public boolean onItemClick() {
-                drawer.closeDrawer();
-                return false;
-            }
-        });
+        drawer = DrawerProvider.buildDrawer(this, toolbar);
 
 
-        //drawer = DrawerFactory.buildDrawer(this, toolbar, null, null, 0);
+        //drawer = DrawerProvider.buildDrawer(this, toolbar, null, null, 0);
         //rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
 
         //adapter = new ContactsAdapter(App.getFusedContacts());
@@ -132,8 +109,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
             case R.id.menu_report:
                 runActionWithLocationPermissionCheck(PERMISSION_REQUEST_REPORT_LOCATION);
                 return true;
-            case R.id.menu_mylocation:
-                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_SHOW_CURRENT_LOCATION);
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -161,15 +136,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
                 return;
 
 
-            case PERMISSION_REQUEST_SHOW_CURRENT_LOCATION:
-                Log.v(TAG, "request code: PERMISSION_REQUEST_SHOW_CURRENT_LOCATION");
-                if (granted) {
-                    Log.v(TAG, "PERMISSION_REQUEST_SHOW_CURRENT_LOCATION permission granted");
-                    //TODO: zoom in on current location
-                } else {
-                    Toasts.showLocationPermissionNotAvailable();
-                }
-                return;
         }
     }
 
@@ -239,22 +205,22 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
     @Override
     public void onClick(View v, Object viewModel) {
-        Intent intent = new Intent(this, ActivityMap.class);
         Bundle b = new Bundle();
-        b.putInt(ActivityMap.KEY_ACTION, ActivityMap.KEY_ACTION_VALUE_CENTER_CONTACT);
-        b.putString(ActivityMap.KEY_TOPIC, ((FusedContact) viewModel).getTopic());
-        intent.putExtras(b);
-
-        //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, v, "rowContact");
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            startActivity(intent);
-//            startActivity(intent, options.toBundle());
-        } else {
-            startActivity(intent);
-        }
+        b.putInt(ActivityMap.INTENT_KEY_ACTION, ActivityMap.ACTION_FOLLOW_CONTACT);
+        b.putString(ActivityMap.INTENT_KEY_TOPIC, ((FusedContact) viewModel).getTopic());
+        transitionToActivityMap(b);
     }
+
+
+    private void transitionToActivityMap(Bundle extras) {
+        Intent intent = new Intent(this, ActivityMap.class);
+        intent.putExtras(extras);
+       // intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        overridePendingTransition (R.anim.push_up_in,R.anim.push_down_out);
+
+    }
+
 
     @Override
     public void onLongClick(View v, Object viewModel) {

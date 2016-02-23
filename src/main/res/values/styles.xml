@@ -24,6 +24,7 @@
     <style name="Theme.Owntracks.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:textColor">@color/textPrimary</item>
 
         <item name="colorPrimary">@color/primary</item>
@@ -31,7 +32,10 @@
         <item name="colorAccent">@color/accent</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/primary</item>
+
     </style>
+
+    <color name="transparent">#00000000</color>
 
 
     <style name="DialogTheme" parent="@style/Base.Theme.AppCompat.Dialog">

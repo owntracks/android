@@ -2,7 +2,6 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
-import org.owntracks.android.App;
 import org.owntracks.android.db.Message;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.CardMessage;
@@ -10,12 +9,9 @@ import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.messages.MsgMessage;
 import org.owntracks.android.messages.TransitionMessage;
 import org.owntracks.android.messages.WaypointMessage;
-import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.messages.LocationMessage;
-import org.owntracks.android.services.ServiceBroker;
-import org.owntracks.android.services.ServiceLocator;
 
 import android.location.Location;
 
@@ -182,14 +178,14 @@ public class Events {
 	}
 
 	public static class ContactAdded extends E {
-		Contact contact;
+        FusedContact contact;
 
-		public ContactAdded(Contact f) {
+		public ContactAdded(FusedContact f) {
 			super();
 			this.contact = f;
 		}
 
-		public Contact getContact() {
+		public FusedContact getContact() {
 			return this.contact;
 		}
 
@@ -223,26 +219,26 @@ public class Events {
 
 
     public static class ContactRemoved extends E{
-        Contact contact;
+        FusedContact contact;
 
-        public ContactRemoved(Contact f) {
+        public ContactRemoved(FusedContact f) {
             super();
             this.contact = f;
         }
 
-        public Contact getContact() {
+        public FusedContact getContact() {
             return this.contact;
         }
     }
 
     public static class ClearLocationMessageReceived extends E{
-        Contact c;
-        public ClearLocationMessageReceived(Contact c) {
+        FusedContact c;
+        public ClearLocationMessageReceived(FusedContact c) {
             super();
             this.c = c;
         }
 
-        public Contact getContact() {
+        public FusedContact getContact() {
             return c;
         }
     }
@@ -377,14 +373,14 @@ public class Events {
 
 
     public static class ContactUpdated extends E {
-		private Contact c;
+		private FusedContact c;
 
-		public ContactUpdated(Contact c) {
+		public ContactUpdated(FusedContact c) {
 			super();
 			this.c = c;
 		}
 
-		public Contact getContact() {
+		public FusedContact getContact() {
 			return this.c;
 		}
 	}

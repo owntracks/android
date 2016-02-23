@@ -10,23 +10,20 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerFactory;
+import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.EditIntegerPreference;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -38,7 +35,6 @@ public class ActivityPreferences extends ActivityBase {
 
     static Preference connectionPreferenceScreen;
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
-    private Drawer drawer;
 
 
     // Return from ActivityPreferencesConnection to see if we need to reload the preferences because a mode change occured
@@ -60,6 +56,7 @@ public class ActivityPreferences extends ActivityBase {
     }
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,26 +64,17 @@ public class ActivityPreferences extends ActivityBase {
 
         setContentView(R.layout.activity_preferences);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getTitle());
+        setupSupportToolbar();
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-        drawer = DrawerFactory.buildDrawerV2(this, toolbar);
 
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferences(), "preferences").commit();
 
-    }
-
-
-    private void goToRoot() {
-        Intent intent1 = new Intent(this, ActivityMain.class);
-        intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent1);
-        finish();
     }
 
 
@@ -94,9 +82,6 @@ public class ActivityPreferences extends ActivityBase {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:     // If the user hits the toolbar back arrow, go back to ActivityMain, no matter where he came from (same as hitting back)
-                goToRoot();
-                return true;
             case R.id.connect:
 
                 Runnable r = new Runnable() {
@@ -124,12 +109,6 @@ public class ActivityPreferences extends ActivityBase {
                 return super.onOptionsItemSelected(item);
         }
 
-    }
-
-    // If the user hits back, go back to ActivityMain, no matter where he came from
-    @Override
-    public void onBackPressed() {
-        goToRoot();
     }
 
 

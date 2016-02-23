@@ -8,11 +8,5 @@
         app:showAsAction="ifRoom"
         android:title="@string/publish"/>
 
-    <item
-        android:id="@+id/menu_mylocation"
-        android:icon="@drawable/ic_mylocation"
-        android:orderInCategory="2"
-        app:showAsAction="ifRoom"
-        android:title="@string/currentLocation"/>
 
 </menu>
