@@ -113,11 +113,6 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
 
     }
 
-    @Override
-    public List<String> getRequiredInitialServicePermissions() {
-        return null;
-    }
-
     private String getBaseTopic(MessageBase message, String topic){
 
         if (message.getBaseTopicSuffix() != null && topic.endsWith(message.getBaseTopicSuffix())) {

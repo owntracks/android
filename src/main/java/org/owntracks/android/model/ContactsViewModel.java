@@ -13,6 +13,6 @@ import me.tatarka.bindingcollectionadapter.ItemView;
 public class ContactsViewModel{
 
     public final ObservableList<FusedContact> items = new ObservableArrayList<>();
-    public final ItemView itemView = ItemView.of(BR.item, R.layout.row_contact_binding);
+    public final ItemView itemView = ItemView.of(BR.item, R.layout.row_contact);
 
 }
