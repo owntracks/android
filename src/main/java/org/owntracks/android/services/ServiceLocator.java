@@ -597,7 +597,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
     private GeofencingRequest getGeofencingRequest(List<Geofence> fences) {
-        GeofencingRequest.Builder  builder = new GeofencingRequest().Builder();
+        GeofencingRequest.Builder  builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER); //trigger transition when geofence is setup and device is already in it
         builder.addGeofences(fences);
         return builder.build();
