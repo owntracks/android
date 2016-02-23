@@ -3,6 +3,7 @@ package org.owntracks.android.model;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
+import org.owntracks.android.BR;
 import org.owntracks.android.R;
 
 
