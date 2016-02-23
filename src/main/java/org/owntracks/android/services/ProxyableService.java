@@ -4,13 +4,14 @@ import android.content.Intent;
 
 import org.owntracks.android.support.Events;
 
+import java.util.List;
+
 public interface ProxyableService {
-	public void onCreate(ServiceProxy c);
+	void onCreate(ServiceProxy c);
 
-	public void onDestroy();
+	void onDestroy();
 
-	public int onStartCommand(Intent intent, int flags, int startId);
+	int onStartCommand(Intent intent, int flags, int startId);
 
-	public void onEvent(Events.Dummy event);
-
+	void onEvent(Events.Dummy event);
 }

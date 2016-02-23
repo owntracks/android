@@ -49,11 +49,6 @@
 
         </PreferenceCategory>
         <PreferenceCategory android:title="Background notifications">
-            <SwitchPreference
-                android:defaultValue="@bool/valNotificationMessages"
-                android:key="@string/keyNotificationMessages"
-                android:summary="@string/preferencesNotificationMessagesSummary"
-                android:title="@string/preferencesNotificationMessages" />
         <SwitchPreference
             android:defaultValue="@bool/valNotificationEvents"
             android:key="@string/keyNotificationEvents"
@@ -91,12 +86,6 @@
 
 
         <PreferenceCategory android:title="Services">
-            <SwitchPreference
-                android:defaultValue="@bool/valMessages"
-                android:key="@string/keyMessaging"
-                android:summary="@string/preferencesMessagesSummary"
-                android:title="@string/preferencesMessages" />
-
             <SwitchPreference
                 android:defaultValue="@bool/valRemoteCommandReportLocation"
                 android:key="@string/keyRemoteCommandReportLocation"

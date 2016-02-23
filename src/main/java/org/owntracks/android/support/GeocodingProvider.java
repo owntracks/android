@@ -8,19 +8,9 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
-import android.util.Base64;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.View;
-import android.widget.ImageView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.mapbox.mapboxsdk.util.MapboxUtils;
-
-import org.owntracks.android.messages.LocationMessage;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.model.FusedContact;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

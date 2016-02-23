@@ -12,15 +12,11 @@ import com.google.android.gms.location.Geofence;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.owntracks.android.App;
-import org.owntracks.android.R;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.MessageDao;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.messages.MessageMsg;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
@@ -29,8 +25,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
-
-import java.util.Date;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -96,43 +91,6 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         ServiceProxy.getServiceNotification().processMessage(message);
     }
 
-    @Override
-    public void processMessage(MessageMsg message) {
-        Log.v(TAG, "processMessage MessageMsg (" + message.getTopic() + ")");
-
-        String externalId = message.getTopic() + "$" + message.getTst();
-
-        org.owntracks.android.db.Message m = Dao.getMessageDao().queryBuilder().where(MessageDao.Properties.ExternalId.eq(externalId)).unique();
-        if (m == null) {
-            m = new org.owntracks.android.db.Message();
-            m.setIcon(message.getIcon());
-            m.setPriority(message.getPrio());
-            m.setIcon(message.getIcon());
-            m.setIconUrl(message.getIconUrl());
-            m.setUrl(message.getUrl());
-            m.setExternalId(externalId);
-            m.setDescription(message.getDesc());
-            m.setTitle(message.getTitle());
-            m.setTst(message.getTst());
-            if (message.getMttl() != 0)
-                m.setExpiresTst(message.getTst() + message.getMttl());
-
-            if (message.getTopic().equals(Preferences.getBroadcastMessageTopic()))
-                m.setChannel("broadcast");
-            else if (message.getTopic().startsWith(Preferences.getPubTopicBase(true)))
-                m.setChannel("direct");
-            else
-                try {
-                    m.setChannel(message.getTopic().split("/")[1]);
-                } catch (IndexOutOfBoundsException exception) {
-                    m.setChannel("undefined");
-                }
-
-            Dao.getMessageDao().insert(m);
-            ServiceProxy.getServiceNotification().processMessage(message);
-        }
-    }
-
     public void onCreate(ServiceProxy c) {
         this.mapper = new ObjectMapper();
         this.context = c;
@@ -153,6 +111,11 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     @Override
     public void onEvent(Events.Dummy event) {
 
+    }
+
+    @Override
+    public List<String> getRequiredInitialServicePermissions() {
+        return null;
     }
 
     private String getBaseTopic(MessageBase message, String topic){

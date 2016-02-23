@@ -1,5 +1,6 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -26,33 +27,72 @@ import javax.security.cert.CertificateException;
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     private javax.net.ssl.SSLSocketFactory factory;
 
-    public SocketFactory(boolean sideloadCa, boolean sideloadClientP12) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException {
+    public static class SocketFactoryOptions {
+
+        private InputStream caCrtInputStream;
+        private InputStream caClientP12InputStream;
+        private String caClientP12Password;
+
+        public SocketFactoryOptions withCaInputStream(InputStream stream) {
+            this.caCrtInputStream = stream;
+            return this;
+        }
+        public SocketFactoryOptions withClientP12InputStream(InputStream stream) {
+            this.caClientP12InputStream = stream;
+            return this;
+        }
+        public SocketFactoryOptions withClientP12Password(String password) {
+            this.caClientP12Password = password;
+            return this;
+        }
+
+        public boolean hasCaCrt() {
+            return caCrtInputStream != null;
+        }
+
+        public boolean hasClientP12Crt() {
+            return caClientP12Password != null;
+        }
+
+        public InputStream getCaCrtInputStream() {
+            return caCrtInputStream;
+        }
+
+        public InputStream getCaClientP12InputStream() {
+            return caClientP12InputStream;
+        }
+
+        public String getCaClientP12Password() {
+            return caClientP12Password;
+        }
+
+        public boolean hasClientP12Password() {
+            return (caClientP12Password != null) && !caClientP12Password.equals("");
+        }
+    }
+    public SocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
+        this(new SocketFactoryOptions());
+    }
+    public SocketFactory(SocketFactoryOptions options) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Log.v(this.toString(), "initializing CustomSocketFactory");
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
 
-        if(sideloadCa) {
-            Log.v(this.toString(), "CA sideload: true");
+        if(options.hasCaCrt()) {
+            Log.v(this.toString(), "options.hasCaCrt(): true");
 
             KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             caKeyStore.load(null, null);
 
             CertificateFactory caCF = CertificateFactory.getInstance("X.509");
-            InputStream caInput = new BufferedInputStream(new FileInputStream(Preferences.getTlsCaCrtPath()));
-            Log.v(this.toString(), "Using custom tls cert from : " + Preferences.getTlsCaCrtPath());
             java.security.cert.Certificate ca;
-            try {
-                ca = caCF.generateCertificate(caInput);
+                ca = caCF.generateCertificate(options.getCaCrtInputStream());
                 caKeyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
                 tmf.init(caKeyStore);
 
-            } catch (Exception e) {
-                Log.e(this.toString(), e.toString());
-            } finally {
-                caInput.close();
-            }
+
 
             Log.v(this.toString(), "CA Keystore content: ");
             Enumeration<String> aliasesCA = caKeyStore.aliases();
@@ -66,23 +106,13 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             tmf.init((KeyStore) null);
         }
 
-        if (sideloadClientP12) {
-            Log.v(this.toString(), "Client .p12 sideload: true");
+        if (options.hasClientP12Crt()) {
+            Log.v(this.toString(), "options.hasClientP12Crt(): true");
 
-            // load client cert
-            KeyStore clientKeyStore = null;
-            clientKeyStore = KeyStore.getInstance("PKCS12");
+            KeyStore clientKeyStore = KeyStore.getInstance("PKCS12");
 
-            InputStream clientIn = new BufferedInputStream(new FileInputStream(Preferences.getTlsClientCrtPath()));
-            Log.v(this.toString(), "Using custom tls client cert from : " + Preferences.getTlsClientCrtPath());
-            clientKeyStore.load(clientIn, Preferences.getTlsClientCrtPassword().toCharArray());
-            try {
-                kmf.init(clientKeyStore, Preferences.getTlsClientCrtPassword().toCharArray());
-            } catch (UnrecoverableKeyException e) {
-                Log.e(  this.toString(), e.toString());
-            } finally {
-                clientIn.close();
-            }
+            clientKeyStore.load(options.getCaClientP12InputStream(), options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
+            kmf.init(clientKeyStore, options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
 
             Log.v(this.toString(), "Client .p12 Keystore content: ");
             Enumeration<String> aliasesClientCert = clientKeyStore.aliases();
@@ -92,11 +122,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             }
         } else {
             Log.v(this.toString(), "Client .p12 sideload: false, using null client cert");
-            try {
-                kmf.init(null,null);
-            } catch (UnrecoverableKeyException e) {
-                Log.e(this.toString(), e.toString());
-            }
+            kmf.init(null,null);
         }
 
         // Create an SSLContext that uses our TrustManager

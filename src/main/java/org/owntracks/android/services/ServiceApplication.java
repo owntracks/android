@@ -11,8 +11,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class ServiceApplication implements ProxyableService,
-		StaticHandlerInterface {
+import java.util.List;
+
+public class ServiceApplication implements ProxyableService, StaticHandlerInterface {
     private static final String TAG = "ServiceApplication";
 
     private static boolean playServicesAvailable;

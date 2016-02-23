@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
-import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.ContactsViewModel;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.ServiceBroker;
@@ -45,7 +45,6 @@ public class App extends Application  {
     private static ArrayMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
 
-    private static HashMap<String, Contact> contacts;    /* TODO: DEPRECATED*/
     private static Activity currentActivity;
 
 
@@ -68,7 +67,6 @@ public class App extends Application  {
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         mainHanler = new Handler(getMainLooper());
-        contacts = new HashMap<>();
         fusedContacts = new ArrayMap<>();
         contactsViewModel =  new ContactsViewModel();
 
@@ -92,11 +90,6 @@ public class App extends Application  {
         return instance;
     }
 
-    /*TODO: refactor to getFusedContact remove */
-    public static Contact getContact(String topic) {
-		return instance.contacts.get(topic);
-	}
-
     public static FusedContact getFusedContact(String topic) {
         return fusedContacts.get(topic);
     }
@@ -105,10 +98,6 @@ public class App extends Application  {
         return contactsViewModel;
     }
 
-    /* TODO: DEPRECATED*/
-    public static HashMap<String, Contact> getCachedContacts() {
-        return contacts;
-    }
 
     public static void addFusedContact(final FusedContact c) {
         fusedContacts.put(c.getTopic(), c);
@@ -124,21 +113,15 @@ public class App extends Application  {
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if(e.getState() == ServiceBroker.State.CONNECTING) {
             //Log.v(TAG, "State changed to connecting. Clearing cached contacts");
-            instance.contacts.clear();
+            instance.fusedContacts.clear();
         }
     }
 
     public void onEvent(Events.ModeChanged e) {
-        instance.contacts.clear();
+        instance.fusedContacts.clear();
     }
     public static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
-    }
-
-        /* TODO: DEPRECATED*/
-    public static void removeContact(Contact c) {
-        instance.contacts.remove(c.getTopic());
-        EventBus.getDefault().post(new Events.ContactRemoved(c));
     }
 
 	public static String formatDate(Date d) {
@@ -156,7 +139,7 @@ public class App extends Application  {
 	}
 
 	public void onEventMainThread(Events.BrokerChanged e) {
-		contacts.clear();
+		fusedContacts.clear();
 	}
 
     public static void onEnterForeground() {
@@ -192,6 +175,14 @@ public class App extends Application  {
 
     public static Activity getCurrentActivity() {
         return currentActivity;
+    }
+
+    public static void removeContact(FusedContact contact) {
+        //TODO
+    }
+
+    public static Class<?> getRootActivityClass(){
+        return ActivityMap.class;
     }
 
     /*

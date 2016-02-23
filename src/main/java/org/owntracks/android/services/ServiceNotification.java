@@ -23,15 +23,12 @@ import com.google.android.gms.location.Geofence;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityFeatured;
 import org.owntracks.android.activities.ActivityLauncher;
-import org.owntracks.android.activities.ActivityMessages;
 import org.owntracks.android.activities.ActivityPreferencesConnection;
+import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.messages.LocationMessage;
-import org.owntracks.android.messages.MessageMsg;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.messages.MsgMessage;
-import org.owntracks.android.messages.TransitionMessage;
-import org.owntracks.android.model.Contact;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
@@ -44,6 +41,7 @@ import org.owntracks.android.support.StaticHandlerInterface;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
@@ -77,6 +75,13 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     private SimpleDateFormat dateFormater;
 
 
+    // Permission notification
+    private NotificationCompat.Builder notificationBuilderPermission;
+    private static final int NOTIFICATION_ID_PERMISSION = 4;
+    private Notification notificationPermission;
+
+
+
     @Override
     public void onCreate(ServiceProxy c) {
         this.context = c;
@@ -98,7 +103,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
             }
 
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                if (key.equals(Preferences.getKey(R.string.keyNotification)) || key.equals(Preferences.getKey(R.string.keyNotificationLocation)) || key.equals(Preferences.getKey(R.string.keyNotificationMessages)) || key.equals(Preferences.getKey(R.string.keyNotificationEvents))) {
+                if (key.equals(Preferences.getKey(R.string.keyNotification)) || key.equals(Preferences.getKey(R.string.keyNotificationLocation)) || key.equals(Preferences.getKey(R.string.keyNotificationEvents))) {
                     Log.v(TAG, "notification prefs changed");
                     clearNotifications();
                     setupNotifications();
@@ -134,6 +139,8 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         setupNotificationEvents();
         setupNotificationMessages();
     }
+
+
 
     private void updateNotifications() {
         updateNotificationOngoing();
@@ -173,7 +180,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderMessages = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityMessages.class);
+        Intent resultIntent = new Intent(this.context, ActivityFeatured.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilderMessages.setContentIntent(resultPendingIntent);
@@ -230,7 +237,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     /*
     * NEW NOTIFICATION HANDLING
     * */
-    public void updateNotificationOngoing() {
+    public void  updateNotificationOngoing() {
         if (!Preferences.getNotification())
             return;
 
@@ -318,13 +325,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         notificationManager.notify(NOTIFICATION_ID_EVENTS, notificationBuilderEvents.build());
     }
 
-    public void addNotificationMessage(MessageMsg m) {
-
-        String channel = "#" + m.getChannel();
-        Spannable message = new SpannableString(channel + ": " + m.getDesc());
-        message.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, channel.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        notificationListMessages.push(message);
-    }
 
     public void clearNotificationMessages() {
         this.notificationListMessages.clear();
@@ -391,6 +391,11 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
     @Override
     public void onEvent(Events.Dummy event) { }
+
+    @Override
+    public List<String> getRequiredInitialServicePermissions() {
+        return null;
+    }
 
 
     public void onEventMainThread(Events.PublishSuccessful e) {
@@ -480,13 +485,34 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         updateNotificationEvents();
 
     }
+    public void notifyMissingPermissions() {
 
-    public void processMessage(MessageMsg message) {
-        if(message.isExpired())
-            return;
+        notificationBuilderPermission = new NotificationCompat.Builder(context);
 
-        addNotificationMessage(message);
-        updateNotificationMessage();
+        Intent resultIntent = new Intent(this.context, ActivityStatus.class);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilderMessages.setContentIntent(resultPendingIntent);
+
+        notificationBuilderMessages.setSmallIcon(R.drawable.ic_notification);
+        notificationBuilderMessages.setGroup(NOTIFICATION_ID_PERMISSION + "");
+        notificationBuilderMessages.setAutoCancel(false);
+        notificationBuilderMessages.setShowWhen(false);
+
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            notificationBuilderMessages.setColor(ContextCompat.getColor(context, R.color.primary));
+            notificationBuilderMessages.setPriority(Notification.PRIORITY_MIN);
+            notificationBuilderMessages.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilderMessages.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+
+
+        notificationBuilderPermission.setContentText("Missing a required permission");
+        notificationBuilderPermission.setContentTitle(this.context.getString(R.string.app_name));
+        notificationPermission =  notificationBuilderPermission.build();
+
+
     }
 }
 

@@ -18,17 +18,13 @@ public class BehaviourMapContact  extends CoordinatorLayout.Behavior<LinearLayou
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, LinearLayout child, View dependency) {
-        Log.v("BehaviourMapContact", "layoutDependsOn: " + dependency);
         return dependency instanceof Snackbar.SnackbarLayout;
     }
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, LinearLayout child, View dependency) {
-        Log.v("BehaviourMapContact", "onDependentViewChanged: " + parent);
-
         float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
         child.setTranslationY(translationY);
-
         return true;
     }
 }

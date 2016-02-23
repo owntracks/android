@@ -36,7 +36,6 @@
 
     <string name="keyNotification">notification</string>
     <string name="keyNotificationLocation">notificationLocation</string>
-    <string name="keyNotificationMessages">notificationMessages</string>
     <string name="keyNotificationEvents">notificationEvents</string>
 
     <string name="keySelectedContactTopic">selectedContactTopic</string>

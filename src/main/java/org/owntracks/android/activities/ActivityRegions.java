@@ -1,15 +1,10 @@
 package org.owntracks.android.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,38 +14,32 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.AdapterWaypoints;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DividerItemDecoration;
-import org.owntracks.android.support.DrawerFactory;
+import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.SimpleCursorLoader;
-import org.owntracks.android.support.StaticHandler;
-import org.owntracks.android.support.StaticHandlerInterface;
 
 import de.greenrobot.event.EventBus;
 
 
-public class ActivityWaypoints extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
-    private static final String TAG = "ActivityWaypoints";
+public class ActivityRegions extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
+    private static final String TAG = "ActivityRegions";
     public static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
     private Toolbar toolbar;
     private org.owntracks.android.support.RecyclerView listView;
     private int LOADER_ID = 1;
     private AdapterWaypoints listAdapter;
+    private Drawer drawer;
 
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -66,43 +55,8 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
         setContentView(R.layout.activity_waypoints);
         Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        final Context context = this;
-        Drawer.OnDrawerItemClickListener drawerListener = new Drawer.OnDrawerItemClickListener() {
-            @Override
-            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                return false;
-            }
-
-            public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                if (drawerItem == null)
-                    return false;
-
-
-                switch (drawerItem.getIdentifier()) {
-                    case R.string.idLocations:
-                        goToRoot();
-                        return true;
-                    case R.string.idPager:
-                        Intent intent1 = new Intent(context, ActivityMessages.class);
-                        startActivity(intent1);
-                        return true;
-                    case R.string.idWaypoints:
-                        return true;
-                    case R.string.idSettings:
-                        Intent intent = new Intent(context, ActivityPreferences.class);
-                        startActivity(intent);
-                        return true;
-                }
-                return false;
-            }
-        };
-
-        DrawerFactory.buildDrawer(this, toolbar, drawerListener, 2);
-
+        getSupportActionBar().setTitle(getTitle());
+        drawer = DrawerProvider.buildDrawer(this, toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -146,16 +100,6 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
         getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
-    private void goToRoot() {
-        Intent intent1 = new Intent(this, ActivityMain.class);
-        intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent1);
-        finish();
-    }
-    @Override
-    public void onBackPressed() {
-        goToRoot();
-    }
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -236,7 +180,7 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add:
-                Intent detailIntent = new Intent(this, ActivityWaypoint.class);
+                Intent detailIntent = new Intent(this, ActivityRegion.class);
                 startActivity(detailIntent);
                 return true;
             default:
@@ -259,7 +203,7 @@ public class ActivityWaypoints extends ActivityBase implements LoaderManager.Loa
     @Override
     public void onViewHolderClick(View rootView, AdapterWaypoints.ItemViewHolder viewHolder) {
 
-        Intent detailIntent = new Intent(this, ActivityWaypoint.class);
+        Intent detailIntent = new Intent(this, ActivityRegion.class);
         detailIntent.putExtra("keyId", viewHolder.getItemId());
         startActivity(detailIntent);
 
