@@ -715,12 +715,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
         public void ping(Intent intent) {
 			Log.v(TAG, "sending");
-			IMqttToken token = comms.checkForActivity();
-
-			// No ping has been sent.
-			if (token == null) {
-				return;
-			}
 
 			if (wakelock == null) {
 				PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
@@ -730,7 +724,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			if(!wakelock.isHeld())
 				wakelock.acquire();
 
-			token.setActionCallback(new IMqttActionListener() {
+			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
 
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
@@ -750,6 +744,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 					}
 				}
 			});
+
+			if (token == null) {
+				wakelock.release();
+			}
         }
 
         public PingHandler(Context c) {
