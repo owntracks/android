@@ -61,12 +61,11 @@
 
     <integer name="valBeaconBackgroundScanPeriod">30</integer>
     <integer name="valBeaconForegroundScanPeriod">0</integer>
-    <integer name="valZero">0</integer>
 
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
     <bool name="valCleanSessionPrivate">false</bool>
-    <bool name="valPubIncludeBattery">false</bool>
+    <bool name="valPubExtendedData">true</bool>
     <bool name="valNotification">true</bool>
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationEvents">true</bool>
@@ -84,9 +83,14 @@
 
     <string-array name="modeIds">
         <item>0</item>
-        <item>1</item>
         <item>2</item>
     </string-array>
+
+    <string-array name="profileIds_readable">
+        <item>Private</item>
+        <item>Public</item>
+    </string-array>
+
     <string-array name="locatorAccuracy">
         <item>0</item>
         <item>1</item>
@@ -98,4 +102,8 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <integer name="valZero">0</integer>
+    <string name="valEmpty">""</string>
+
 </resources>

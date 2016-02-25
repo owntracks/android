@@ -145,16 +145,20 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.ContactUpdated e) {
         updateContactLocation(e.getContact());
-        if (e.getContact() == followedContact) ;
-        actionCenterContact(e.getContact());
+
+        if (e.getContact() == followedContact)
+            actionCenterContact(e.getContact());
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.ContactAdded e) {
         updateContactLocation(e.getContact());
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.CurrentLocationUpdated e) {
         onDeviceLocationUpdated(e.getGeocodableLocation());
     }
@@ -169,7 +173,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
-    public void updateContactLocation(FusedContact c) {
+    private void updateContactLocation(FusedContact c) {
         if (!c.hasLocation())
             return;
 
@@ -271,6 +275,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        Log.v(TAG, "onMarkerClick");
         actionSelectContact(App.getFusedContact(marker.getSnippet()));
         return true;
     }

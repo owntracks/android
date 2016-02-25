@@ -11,8 +11,8 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
     private static final String TAG = "AdapterCursorLoader";
     private static final String ID_COLUMN = "_id";
-    protected final Context mContext;
-    protected OnViewHolderClickListener onViewHolderClickListener;
+    private final Context mContext;
+    private OnViewHolderClickListener onViewHolderClickListener;
 
     public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View rootView;
@@ -40,7 +40,7 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
     private boolean mDataValid;
 
 
-    public AdapterCursorLoader(Context context) {
+    AdapterCursorLoader(Context context) {
         mContext = context;
         mCursor = null;
         mDataValid = false;
@@ -59,11 +59,11 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         return 0;
     }
 
-    public Cursor getCursor() {
+    private Cursor getCursor() {
         return mCursor;
     }
 
-    public abstract void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position);
+    protected abstract void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position);
 
 
     @Override
@@ -79,7 +79,7 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         onBindViewHolder(viewHolder, mCursor, position);
     }
 
-    public abstract ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
+    protected abstract ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

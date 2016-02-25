@@ -43,7 +43,7 @@ public class RoundedImageView extends ImageView {
         Bitmap b =  ((BitmapDrawable)drawable).getBitmap() ;
         Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
 
-        int w = getWidth(), h = getHeight();
+        int w = getWidth();
 
 
         Bitmap roundBitmap =  getCroppedBitmap(bitmap, w);
@@ -61,7 +61,6 @@ public class RoundedImageView extends ImageView {
                 sbmp.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
-        final int color = 0xffa19774;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, sbmp.getWidth(), sbmp.getHeight());
 

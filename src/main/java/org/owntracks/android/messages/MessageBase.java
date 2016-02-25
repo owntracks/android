@@ -25,14 +25,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 public abstract class MessageBase extends BaseObservable implements Runnable{
         protected static final String TAG = "MessageBase";
-        protected String _mqtt_topic;
-        protected Boolean record;
+        private String _mqtt_topic;
+        private Boolean record;
 
         @JsonIgnore
-        protected int _mqtt_qos;
+        private int _mqtt_qos;
 
         @JsonIgnore
-        protected boolean _mqtt_retained;
+        private boolean _mqtt_retained;
 
         @JsonIgnore
         public boolean getRetained() {
@@ -54,10 +54,10 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         }
 
         @JsonIgnore
-        protected WeakReference<IncomingMessageProcessor> _processorIn;
+        private WeakReference<IncomingMessageProcessor> _processorIn;
 
         @JsonIgnore
-        protected WeakReference<OutgoingMessageProcessor> _processorOut;
+        private WeakReference<OutgoingMessageProcessor> _processorOut;
 
         @JsonIgnore
         public String getTopic() {
@@ -88,10 +88,10 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         }
 
         @JsonIgnore
-        public abstract void processIncomingMessage(IncomingMessageProcessor handler);
+        protected abstract void processIncomingMessage(IncomingMessageProcessor handler);
 
         @JsonIgnore
-        public abstract void processOutgoingMessage(OutgoingMessageProcessor handler);
+        protected abstract void processOutgoingMessage(OutgoingMessageProcessor handler);
 
         @JsonIgnore
         public abstract String getBaseTopicSuffix();

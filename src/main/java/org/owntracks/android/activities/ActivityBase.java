@@ -22,25 +22,25 @@ import de.greenrobot.event.EventBus;
 
 public abstract class ActivityBase extends AppCompatActivity implements SnackbarFactory.SnackbarFactoryDelegate {
     private static final String TAG = "ActivityBase";
-    protected Toolbar toolbar;
+    Toolbar toolbar;
 
     @Override
     public View getSnackbarTargetView() {
         return getWindow().getDecorView().findViewById(android.R.id.content);
     }
 
-    protected boolean hasIntentExtras() {
+    boolean hasIntentExtras() {
         return getIntent() != null && getIntent().getExtras() != null;
     }
 
     private static final int[] PERMISSION_GRANTED = new int[]{PackageManager.PERMISSION_GRANTED};
     private static final String[] PERMISSIONS_PLACEHOLDER = new String[]{""};
 
-    protected void runActionWithLocationPermissionCheck(int action) {
+    void runActionWithLocationPermissionCheck(int action) {
         runActionWithPermissionCheck(action, Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
-    protected void runActionWithPermissionCheck(int action, String permission) {
+    private void runActionWithPermissionCheck(int action, String permission) {
         Log.v(TAG, "runActionWithPermissionCheck() " + permission);
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             onRequestPermissionsResult(action, PERMISSIONS_PLACEHOLDER, PERMISSION_GRANTED);
@@ -53,7 +53,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Snackbar
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             EventBus.getDefault().post(new Events.PermissionGranted(permissions[0])); // Notify about changed permissions
 
@@ -64,7 +64,7 @@ public abstract class ActivityBase extends AppCompatActivity implements Snackbar
         }
     }
 
-    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
+    void onRunActionWithPermissionCheck(int action, boolean granted) {
 
     }
 
@@ -122,18 +122,18 @@ public abstract class ActivityBase extends AppCompatActivity implements Snackbar
         overridePendingTransition(R.anim.none, R.anim.push_down_out);
     }
 
-    protected void setupSupportToolbar() {
+    void setupSupportToolbar() {
         setupSupportToolbar(true);
     }
 
-    protected void setupSupportToolbar(boolean hideTitle) {
+    private void setupSupportToolbar(boolean hideTitle) {
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(!hideTitle);
     }
 
-    protected void goToRoot() {
+    void goToRoot() {
 
         Intent i = new Intent(this, App.getRootActivityClass());
         i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TOP);
