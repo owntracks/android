@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.owntracks.android.messages.MessageWaypoint;
+
 public  class Dao {
     private static final String NAME = "org.owntracks.android.db";
     private static final String TAG = "Dao";
@@ -34,5 +36,8 @@ public  class Dao {
 
     public static SQLiteDatabase getDb() { return db; }
     public static WaypointDao getWaypointDao() {  return waypointDao; }
+
+
+
 
 }

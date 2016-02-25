@@ -111,6 +111,7 @@ public class App extends Application  {
         });
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if(e.getState() == ServiceBroker.State.CONNECTING) {
             //Log.v(TAG, "State changed to connecting. Clearing cached contacts");
@@ -118,10 +119,11 @@ public class App extends Application  {
         }
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.ModeChanged e) {
         fusedContacts.clear();
     }
-    public static void postOnMainHandler(Runnable r) {
+    private static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
     }
 
@@ -139,7 +141,8 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
-	public void onEventMainThread(Events.BrokerChanged e) {
+    @SuppressWarnings("unused")
+    public void onEventMainThread(Events.BrokerChanged e) {
 		fusedContacts.clear();
 	}
 

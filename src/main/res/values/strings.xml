@@ -96,8 +96,8 @@
     <string name="stateIdle">"Idle"</string>
     <string name="preferencesCleanSessionEnabled">Clean Session</string>
     <string name="publish">Report</string>
-    <string name="preferencesIncludeBatterySummary">Include the device battery level in reports</string>
-    <string name="preferencesIncludeBattery">Include battery</string>
+    <string name="preferencesPubExtendedDataSummary">Include extended data in location reports</string>
+    <string name="preferencesPubExtendedData">Extended data</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
@@ -215,11 +215,11 @@
         <item>Low power</item>
         <item>No power</item>
     </string-array>
-    <string-array name="profileIds_readable">
-        <item>Private</item>
-        <item>Hosted</item>
-        <item>Public</item>
-    </string-array>
+
+
+    <string name="mode_mqtt_private_label">Private</string>
+    <string name="mode_mqtt_public_label">Public</string>
+
     <string name="title_activity_activity_statistics">Statistics</string>
 
     <string name="hello_world">Hello world!</string>
@@ -258,6 +258,13 @@
     <string name="title_activity_preferences">Preferences</string>
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
     <string name="successCopyCertificate">Certificate copied to internal storage</string>
+    <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
+    <string name="preferencesCategoryNotificatinBackground">Background notifications</string>
+    <string name="preferencesCategoryAdvancedServices">Services</string>
+    <string name="preferencesCategoryAdvancedLocator">Locator</string>
+    <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
+    <string name="preferencesCategoryAdvancedMisc">Misc</string>
+    <string name="preferencesCategoryReporting">Reporting</string>
 
     <string-array name="filepicker">
         <item>Select</item>

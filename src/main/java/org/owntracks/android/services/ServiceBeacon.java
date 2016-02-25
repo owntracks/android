@@ -211,6 +211,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.WaypointAdded e) {
         addRegion(e.getWaypoint());
     }
@@ -265,11 +266,13 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         return new Region(w.getId().toString(), Identifier.parse(w.getBeaconUUID()), Identifier.fromInt(w.getBeaconMajor()), Identifier.fromInt(w.getBeaconMinor()));
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.WaypointUpdated e) {
         removeRegion(e.getWaypoint());
         addRegion(e.getWaypoint());
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.WaypointRemoved e) {
         removeRegion(e.getWaypoint());
     }

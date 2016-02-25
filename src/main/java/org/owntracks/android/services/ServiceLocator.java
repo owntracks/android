@@ -6,16 +6,14 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.App;
-import org.owntracks.android.R;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.messages.WaypointMessage;
+import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.MessageLifecycleCallbacks;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
 
@@ -45,7 +43,7 @@ import com.google.android.gms.location.LocationServices;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceLocator implements ProxyableService, MessageLifecycleCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ServiceLocator implements ProxyableService, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = "ServiceLocator";
 
     public static final String RECEIVER_ACTION_GEOFENCE_TRANSITION = "org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION";
@@ -86,11 +84,11 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (
-                        key.equals(Preferences.getKey(R.string.keyPub)) ||
-                                key.equals(Preferences.getKey(R.string.keyLocatorInterval)) ||
-                                key.equals(Preferences.getKey(R.string.keyLocatorDisplacement)) ||
-                                key.equals(Preferences.getKey(R.string.keyLocatorAccuracyForeground)) ||
-                                key.equals(Preferences.getKey(R.string.keyLocatorAccuracyBackground))) {
+                        key.equals(Preferences.Keys.PUB) ||
+                                key.equals(Preferences.Keys.LOCATOR_INTERVAL) ||
+                                key.equals(Preferences.Keys.LOCATOR_DISPLACEMENT) ||
+                                key.equals(Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND) ||
+                                key.equals(Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND)) {
                     handlePreferences();
                 }
 
@@ -393,13 +391,25 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 
 
-	private void publishWaypointMessage(WaypointMessage message) {
+	private void publishWaypointMessage(Waypoint w) {
 		if (ServiceProxy.getServiceBroker() == null) {
 			Log.e(TAG, "publishWaypointMessage called without a broker instance");
 		}
 
-        //TODO:
-        //ServiceProxy.getServiceBroker().publish(message, Preferences.getPubTopicWaypoints(), Preferences.getPubQosWaypoints(), Preferences.getPubRetainWaypoints(), null, null);
+
+        MessageWaypoint message = new MessageWaypoint();
+        message.setDesc(w.getDescription());
+        message.setLat(w.getGeofenceLatitude());
+        message.setLon(w.getGeofenceLongitude());
+        message.setRad(w.getGeofenceRadius());
+        message.setShared(w.getShared());
+        message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+
+        message.setTopic(Preferences.getPubTopicWaypoints());
+        message.setQos(Preferences.getPubQosWaypoints());
+        message.setRetained(Preferences.getPubRetainWaypoints());
+
+        ServiceProxy.getServiceBroker().publish(message);
 	}
 
     public void publishManualLocationMessage() {
@@ -434,7 +444,7 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(Preferences.getTrackerId(true));
-        if(Preferences.getPubLocationIncludeBattery())
+        if(Preferences.getPubLocationExtendedData())
             message.setBat(App.getBatteryLevel());
 
         message.setTopic(Preferences.getPubTopicLocations());
@@ -445,41 +455,28 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
 
 	}
 
-	@Override
-	public void onMessagePublishSuccessful(Object extra, boolean wasQueued) {
-        Log.v(TAG, "onMessagePublishSuccessful. WasQueued: " + !wasQueued);
-		if (extra == null)
-			return;
-
-		EventBus.getDefault().postSticky(new Events.PublishSuccessful(extra, wasQueued));
-	}
-
-    @Override
-    public void onMessagePublishFailed(Object extra) {  }
-
-    @Override
-    public void onMesssagePublishing(Object extra) { }
-
-    @Override
-    public void onMessagePublishQueued(Object extra) { }
-
+    @SuppressWarnings("unused")
     public void onEvent(Events.WaypointAdded e) {
 		handleWaypoint(e.getWaypoint(), false, false);
 	}
 
-	public void onEvent(Events.WaypointUpdated e) {
+    @SuppressWarnings("unused")
+    public void onEvent(Events.WaypointUpdated e) {
 		handleWaypoint(e.getWaypoint(), true, false);
 	}
 
-	public void onEvent(Events.WaypointRemoved e) {
+    @SuppressWarnings("unused")
+    public void onEvent(Events.WaypointRemoved e) {
 		handleWaypoint(e.getWaypoint(), false, true);
 	}
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.ModeChanged e) {
         removeGeofencesByWaypoint(loadWaypointsForModeId(e.getOldModeId()));
         requestGeofences();
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(Events.PermissionGranted e) {
         Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
         if(!hasLocationPermission && e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -497,11 +494,9 @@ public class ServiceLocator implements ProxyableService, MessageLifecycleCallbac
         if(update && remove)
             throw new IllegalArgumentException("update and remove cannot be true at the same time");
 
-        // We've an update and the waypoint is shared. Send out the new waypoint
+        // We've an update or created a waypoint and the waypoint is shared. Send out the new waypoint
         if (!remove && w.getShared()){
-            WaypointMessage wpM = new WaypointMessage(w);
-            wpM.setTrackerId(Preferences.getTrackerId(true));
-            publishWaypointMessage(wpM);
+            publishWaypointMessage(w);
         }
 
 		if (update || remove)

@@ -11,5 +11,6 @@ public interface ProxyableService {
 
 	void onStartCommand(Intent intent, int flags, int startId);
 
+	@SuppressWarnings("unused")
 	void onEvent(Events.Dummy event);
 }

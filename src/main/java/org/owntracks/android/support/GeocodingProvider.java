@@ -69,11 +69,11 @@ public class GeocodingProvider {
                 return null;
             }
 
-            List<Address> addresses = null;
+            List<Address> addresses;
             try {
                 addresses = geocoder.getFromLocation(lat, lon, 1);
                 if ((addresses != null) && (addresses.size() > 0)) {
-                    StringBuffer g = new StringBuffer();
+                    StringBuilder g = new StringBuilder();
                     if (addresses.get(0).getAddressLine(0) != null)
                         g.append(addresses.get(0).getAddressLine(0)).append(", ");
                     if (addresses.get(0).getLocality() != null)

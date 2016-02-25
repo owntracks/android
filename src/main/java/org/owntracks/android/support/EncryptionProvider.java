@@ -78,7 +78,7 @@ public class EncryptionProvider {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if(Preferences.getKey(R.string.keyEncryptionKey).equals(key))
+            if(Preferences.Keys._ENCRYPTION_KEY.equals(key))
                 initializeSecretBox();
         }
     }

@@ -3,7 +3,6 @@ package org.owntracks.android.model;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -21,13 +20,14 @@ import org.owntracks.android.support.ContactImageProvider;
 public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
-    final String topic;
-    MessageLocation messageLocation;
-    MessageCard messageCard;
+    private final String topic;
+    private MessageLocation messageLocation;
+    private MessageCard messageCard;
 
     @Bindable
+    private
     Integer imageProviderLevel = IMAGE_PROVIDER_LEVEL_TID;
-    public static final Integer IMAGE_PROVIDER_LEVEL_TID =0;
+    private static final Integer IMAGE_PROVIDER_LEVEL_TID =0;
     public static final Integer IMAGE_PROVIDER_LEVEL_CARD =1;
     public static final Integer IMAGE_PROVIDER_LEVEL_LINK =2;
 

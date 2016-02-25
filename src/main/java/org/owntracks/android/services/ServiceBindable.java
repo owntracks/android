@@ -1,9 +1,7 @@
 package org.owntracks.android.services;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
