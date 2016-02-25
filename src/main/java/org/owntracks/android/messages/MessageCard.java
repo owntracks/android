@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageCard extends MessageBase{
-    public static final String BASETOPIC_SUFFIX = "/info";
+    private static final String BASETOPIC_SUFFIX = "/info";
     private WeakReference<FusedContact> _contact;
     private String name;
     private String face;

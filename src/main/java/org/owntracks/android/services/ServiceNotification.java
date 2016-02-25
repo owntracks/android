@@ -27,7 +27,7 @@ import org.owntracks.android.activities.ActivityFeatured;
 import org.owntracks.android.activities.ActivityLauncher;
 import org.owntracks.android.activities.ActivityPreferencesConnection;
 import org.owntracks.android.activities.ActivityStatus;
-import org.owntracks.android.messages.LocationMessage;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
@@ -50,7 +50,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     private ServiceProxy context;
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
     private StaticHandler handler;
-    private GeocodableLocation lastPublishedLocation;
+    private MessageLocation lastPublishedLocationMessage;
     private long lastPublishedLocationTst = 0;
     private NotificationManager notificationManager;
 
@@ -102,7 +102,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
             }
 
             public void onSharedPreferenceChanged(SharedPreferences sharedPreference, String key) {
-                if (key.equals(Preferences.getKey(R.string.keyNotification)) || key.equals(Preferences.getKey(R.string.keyNotificationLocation)) || key.equals(Preferences.getKey(R.string.keyNotificationEvents))) {
+                if (key.equals(Preferences.Keys.NOTIFICATION) || key.equals(Preferences.Keys.NOTIFICATION_LOCATION) || key.equals(Preferences.Keys.NOTIFICATION_EVENTS)) {
                     Log.v(TAG, "notification prefs changed");
                     clearNotifications();
                     setupNotifications();
@@ -136,14 +136,12 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         setupNotificationOngoing();
         setupNotificationEvents();
-        setupNotificationMessages();
     }
 
 
 
     private void updateNotifications() {
         updateNotificationOngoing();
-        updateNotificationMessage();
         updateNotificationEvents();
     }
 
@@ -221,8 +219,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         notificationBuilderEvents.setAutoCancel(true);
         notificationBuilderEvents.setShowWhen(false);
         notificationBuilderEvents.setGroup(NOTIFICATION_ID_EVENTS + "");
-        notificationBuilderOngoing.setSortKey("c"
-        );
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
@@ -246,7 +242,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
-            title = this.lastPublishedLocation.getGeocoder();
+            title = this.lastPublishedLocationMessage.getGeocoder();
         } else {
             title = this.context.getString(R.string.app_name);
         }
@@ -378,12 +374,10 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     }
 
     private void geocoderAvailableForLocation(GeocodableLocation l) {
-        if (l == this.lastPublishedLocation)
-            updateNotificationOngoing();
     }
 
     private boolean isLastPublishedLocationWithGeocoderAvailable() {
-        return this.lastPublishedLocation != null && this.lastPublishedLocation.getGeocoder() != null;
+        return this.lastPublishedLocationMessage != null && this.lastPublishedLocationMessage.getGeocoder() != null;
     }
 
 
@@ -391,30 +385,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     public void onEvent(Events.Dummy event) { }
 
 
-    public void onEventMainThread(Events.PublishSuccessful e) {
-        Log.v(TAG, "publish successfull. this.lastPublishedLocationTst:" + this.lastPublishedLocationTst + ", " + "event: " + e.getDate().getTime());
-        if ((e.getExtra() != null) && (e.getExtra() instanceof LocationMessage) ) {
-
-            if (Preferences.getNotificationLocation()) {
-                LocationMessage l = (LocationMessage) e.getExtra();
-                this.lastPublishedLocation = l.getLocation();
-                this.lastPublishedLocationTst = l.getLocation().getDate().getTime();
-
-                if (l.getLocation().getGeocoder() == null)
-                    (new ReverseGeocodingTask(this.context, this.handler)).execute(l.getLocation());
-
-                updateNotificationOngoing();
-             }
-
-            Log.v(TAG, "reported");
-            Log.v(TAG, "toast: " + App.isInForeground() + ", " +  (App.getCurrentActivity() != null)  + ", " + ( App.getCurrentActivity() instanceof SnackbarFactory.SnackbarFactoryDelegate));
-
-            if (App.isInForeground() && App.getCurrentActivity() != null && App.getCurrentActivity() instanceof SnackbarFactory.SnackbarFactoryDelegate) {
-                SnackbarFactory.show(SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate) App.getCurrentActivity(), R.string.statePublished, Snackbar.LENGTH_SHORT));
-            }
-        }
-    }
-
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         final Activity a = App.getCurrentActivity();
         if (App.isInForeground() && a != null && a instanceof SnackbarFactory.SnackbarFactoryDelegate) {

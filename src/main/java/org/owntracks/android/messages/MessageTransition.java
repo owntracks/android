@@ -65,12 +65,17 @@ public class MessageTransition extends MessageBase{
 
     public void setEvent(String event) {
         this.event = event;
-        if (event.equals(EVENT_ENTER))
-            transition = Geofence.GEOFENCE_TRANSITION_ENTER;
-        else if (event.equals(EVENT_LEAVE))
-            transition = Geofence.GEOFENCE_TRANSITION_EXIT;
-        else
-            transition = 0;
+        switch (event) {
+            case EVENT_ENTER:
+                transition = Geofence.GEOFENCE_TRANSITION_ENTER;
+                break;
+            case EVENT_LEAVE:
+                transition = Geofence.GEOFENCE_TRANSITION_EXIT;
+                break;
+            default:
+                transition = 0;
+                break;
+        }
     }
 
     @JsonIgnore

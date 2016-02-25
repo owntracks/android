@@ -7,7 +7,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageEvent extends MessageBase{
-    public static final String BASETOPIC_SUFFIX = "/event";
+    private static final String BASETOPIC_SUFFIX = "/event";
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {

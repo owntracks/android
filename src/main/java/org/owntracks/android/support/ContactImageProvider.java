@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
 public class ContactImageProvider {
     private static final String TAG = "ContactImageProvider";
     private static ContactBitmapMemoryCache memoryCache;
-    public static BitmapDrawable placeholder;
+    private static BitmapDrawable placeholder;
 
 
     public static void invalidateCacheLevelCard(String key) {
@@ -175,7 +175,7 @@ public class ContactImageProvider {
         }
     }
 
-    public static Bitmap getRoundedShape(Bitmap bitmap) {
+    private static Bitmap getRoundedShape(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
@@ -196,7 +196,7 @@ public class ContactImageProvider {
         return output;
     }
 
-    public static Bitmap drawableToBitmap (Drawable drawable) {
+    private static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable)drawable).getBitmap();
         }

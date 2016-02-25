@@ -152,11 +152,13 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.FusedContactUpdated e){
         Log.v(TAG, "FusedContactUpdated. IDX: " + App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
        // this.adapter.notifyItemInserted(App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
       //  this.adapter.notifyDataSetChanged();
     }
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.FusedContactAdded e){
         Log.v(TAG, "FusedContactAdded. IDX: " + App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
 
@@ -177,10 +179,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
 
-            if(Preferences.getFollowingSelectedContact())
-                menu.add(Menu.NONE, MENU_CONTACT_UNFOLLOW, 2, R.string.menuContactUnfollow);
-            else
-                menu.add(Menu.NONE, MENU_CONTACT_FOLLOW, 2, R.string.menuContactFollow);
 
             menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
             menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
