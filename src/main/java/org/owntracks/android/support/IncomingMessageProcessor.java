@@ -14,4 +14,5 @@ public interface IncomingMessageProcessor {
     void processMessage(MessageCmd message);
     void processMessage(MessageTransition message);
     void processMessage(MessageUnknown message);
+
 }

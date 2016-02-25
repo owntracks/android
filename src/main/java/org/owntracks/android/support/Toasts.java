@@ -1,6 +1,5 @@
 package org.owntracks.android.support;
 
-import android.content.Context;
 import android.widget.Toast;
 
 import org.owntracks.android.App;

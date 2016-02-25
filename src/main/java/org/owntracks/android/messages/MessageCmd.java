@@ -7,7 +7,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageCmd extends MessageBase{
-    public static final String BASETOPIC_SUFFIX = "/cmd";
+    private static final String BASETOPIC_SUFFIX = "/cmd";
     @Override
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @Override

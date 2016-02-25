@@ -3,14 +3,12 @@ package org.owntracks.android.support;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
 import me.tatarka.bindingcollectionadapter.ItemViewArg;
-import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory;
 
 
 public class RecyclerViewAdapter<T> extends BindingRecyclerViewAdapter<T> implements View.OnClickListener, View.OnLongClickListener{

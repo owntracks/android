@@ -57,7 +57,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
 
     private Waypoint waypoint;
-    boolean update = true;
+    private boolean update = true;
 
 
     private Switch share;
@@ -121,7 +121,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
     private void conditionallyEnableSaveButton() {
 
-        boolean enabled = false;
+        boolean enabled;
         try {
             enabled = (binding.description.getText().toString().length() > 0)
                     && (binding.description.getText().toString().length() > 0)
@@ -152,14 +152,14 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     }
 
 
-    protected void add(Waypoint w) {
+    private void add(Waypoint w) {
         long id = this.dao.insert(w);
         Log.v(TAG, "added waypoint with id: " + id);
         EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
         //EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
-    protected void update(Waypoint w) {
+    private void update(Waypoint w) {
         this.dao.update(w);
         EventBus.getDefault().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
         //EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
@@ -235,9 +235,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
             // identified by a request code.
             startActivityForResult(intent, REQUEST_PLACE_PICKER);
 
-        } catch (GooglePlayServicesRepairableException e) {
-            // ...
-        } catch (GooglePlayServicesNotAvailableException e) {
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             // ...
         }
 

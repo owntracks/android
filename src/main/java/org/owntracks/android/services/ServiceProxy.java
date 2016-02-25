@@ -1,7 +1,6 @@
 package org.owntracks.android.services;
 
 import java.io.Closeable;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.LinkedList;
 

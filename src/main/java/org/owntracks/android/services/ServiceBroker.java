@@ -23,7 +23,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
@@ -37,12 +36,12 @@ import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.MessageLifecycleCallbacks;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.receiver.Parser;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -574,19 +573,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
         return c.getString(id);
     }
 
-    public void publish(MessageBase message, String topic, int qos, boolean retained, MessageLifecycleCallbacks callback, Object extra){
-        //message.setCallback(callback);
-        //message.setExtra(extra);
-        publish(message, topic, qos, retained);
-    }
-
-    public void publish(MessageBase message, String topic, int qos, boolean retained){
-        message.setTopic(topic);
-        //message.setRetained(retained);
-        //message.setQos(qos);
-        publish(message);
-    }
-
 	@Override
 	public void processMessage(MessageBase message) {
 		MessageBase mm;
@@ -594,19 +580,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		try {
 			if(EncryptionProvider.isPayloadEncryptionEnabled()) {
 				mm = new MessageEncrypted();
-				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(ServiceProxy.getServiceParser().toJSON(message)));
+				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(Parser.serializeSync(message)));
 			} else {
 				mm = message;
 			}
 
 
 			MqttMessage m = new MqttMessage();
-			m.setPayload(ServiceProxy.getServiceParser().toJSON(mm).getBytes());
+			m.setPayload(Parser.serializeSync(mm).getBytes());
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 			try {
 				Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
-				MqttDeliveryToken token = this.mqttClient.getTopic(message.getTopic()).publish(m);
+				this.mqttClient.getTopic(message.getTopic()).publish(m);
 				if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
 					Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
 					this.pubPool.pause();
@@ -672,7 +658,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
                 doStart();
             }
 
-            if(networkWakelock.isHeld());
+            if(networkWakelock.isHeld())
                 networkWakelock.release();
         }
 	}
@@ -687,12 +673,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		initPubPool();
     }
 
-    public void onEvent(Events.ModeChanged e) {
+	@SuppressWarnings("unused")
+	public void onEvent(Events.ModeChanged e) {
         disconnect(false);
         clearQueues();
     }
 
-    public void onEvent(Events.BrokerChanged e) {
+	@SuppressWarnings("unused")
+	public void onEvent(Events.BrokerChanged e) {
         clearQueues();
     }
 

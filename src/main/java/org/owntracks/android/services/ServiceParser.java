@@ -21,6 +21,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.receiver.Parser;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -56,10 +57,6 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         } else {
             c.setMessageLocation(message);
         }
-
-
-
-
     }
 
     @Override
@@ -120,29 +117,11 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
 
     public void fromJSON(String topic, MqttMessage message) {
         try {
-            MessageBase m = mapper.readValue(message.getPayload(), MessageBase.class);
-
-            if(m instanceof MessageEncrypted) {
-                Log.v(TAG, "received encrypted message");
-                if(!EncryptionProvider.isPayloadEncryptionEnabled())
-                    return;
-
-                try {
-                    String decrypted = EncryptionProvider.decrypt(((MessageEncrypted) m).getData());
-                    Log.v(TAG, "decoded encrypted message to: " + decrypted);
-                    m = mapper.readValue(decrypted, MessageBase.class);
-                } catch (Exception e) {
-                    Log.e(TAG, "unable to parse decrypted message");
-                    e.printStackTrace();
-                }
-            }
-
+            MessageBase m = Parser.deserializeSync(message.getPayload().toString());
             m.setTopic(getBaseTopic(m, topic));
             m.setRetained(message.isRetained());
             m.setQos(message.getQos());
             m.setIncomingProcessor(this);
-
-
             pool.execute(m);
 
         } catch (Exception e) {
@@ -154,50 +133,8 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         }
     }
 
-    public String toJSON(MessageBase m) throws JsonProcessingException {
-        return mapper.writeValueAsString(m);
-    }
 
-
-    public void parseIncomingBrokerMessage(String topic, MqttMessage message) throws Exception {
+        public void parseIncomingBrokerMessage(String topic, MqttMessage message) throws Exception {
         fromJSON(topic, message);
     }
-
-    public void onEventMainThread(Events.ClearLocationMessageReceived e) {
-        App.removeContact(e.getContact());
-    }
-
-
-
-
-
-
-    private String getBaseTopic(String forStr, String topic) {
-        if (topic.endsWith(forStr))
-            return topic.substring(0, (topic.length() - forStr.length()));
-        else
-            return topic;
-    }
-
-    public String getBaseTopicForEvent(String topic) {
-        return getBaseTopic(Preferences.getPubTopicEventsPart(), topic);
-    }
-
-    //TODO
-    public void onEventMainThread(Events.ConfigurationMessageReceived e) {
-
-        Preferences.fromJsonObject(e.getConfigurationMessage().toJSONObject());
-
-        // Reconnect to broker after new configuration has been saved.
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.getServiceBroker().reconnect();
-            }
-        };
-        new Thread(r).start();
-
-    }
-
 }
