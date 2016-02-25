@@ -15,7 +15,7 @@ public class MessageEncrypted extends MessageBase{
         this.data = cyphertext;
     }
 
-    String data;
+    private String data;
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {

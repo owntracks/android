@@ -31,7 +31,7 @@ public class ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
 
     private TextView input;
-    JSONObject configJSON = null;
+    private JSONObject configJSON = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -217,25 +217,7 @@ public class ActivityImport extends ActivityBase {
         dialog.show();
     }
 
-    private String readFile( String file ) throws IOException {
-
-        BufferedReader reader = new BufferedReader( new FileReader (file));
-        String         line = null;
-        StringBuilder  stringBuilder = new StringBuilder();
-        String         ls = System.getProperty("line.separator");
-
-        while( ( line = reader.readLine() ) != null ) {
-            stringBuilder.append( line );
-            stringBuilder.append( ls );
-        }
-
-        reader.close();
-
-        return stringBuilder.toString();
-    }
-
-
-    public static String formatString(String text){
+    private static String formatString(String text){
 
         StringBuilder json = new StringBuilder();
         String indentString = "";
@@ -245,17 +227,17 @@ public class ActivityImport extends ActivityBase {
             switch (letter) {
                 case '{':
                 case '[':
-                    json.append("\n" + indentString + letter + "\n");
+                    json.append("\n").append(indentString).append(letter).append("\n");
                     indentString = indentString + "\t";
                     json.append(indentString);
                     break;
                 case '}':
                 case ']':
                     indentString = indentString.replaceFirst("\t", "");
-                    json.append("\n" + indentString + letter);
+                    json.append("\n").append(indentString).append(letter);
                     break;
                 case ',':
-                    json.append(letter + "\n" + indentString);
+                    json.append(letter).append("\n").append(indentString);
                     break;
 
                 default:

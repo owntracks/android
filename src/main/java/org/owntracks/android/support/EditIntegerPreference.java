@@ -18,9 +18,7 @@ public class EditIntegerPreference extends org.owntracks.android.support.EditStr
     @Override
     protected boolean persistString(String value) {
         if(value == null || "".equals(value)) {
-            SharedPreferences.Editor editor = getSharedPreferences().edit();
-            editor.remove(getKey());
-            editor.commit();
+            Preferences.clearKey(getKey());
             return true;
         }
         try {

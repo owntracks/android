@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -54,7 +53,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Context context = this;
 
         setContentView(R.layout.activity_preferences);
 
@@ -159,7 +157,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    MaterialDialog dialog = new MaterialDialog.Builder(a)
+                        new MaterialDialog.Builder(a)
                             .customView(R.layout.preferences_host, true)
                             .title(R.string.preferencesHost)
                             .positiveText(R.string.accept)
@@ -192,7 +190,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     try {
                                         Preferences.setPort(Integer.parseInt(port.getText().toString()));
                                     } catch (NumberFormatException e) {
-                                        Preferences.clearKey(R.string.keyPort);
+                                        Preferences.clearKey(Preferences.Keys.PORT);
                                     }
                                 }
                             })
@@ -450,8 +448,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
 
                                     Preferences.setTls(tlsVal);
-                                    Preferences.setTlsCaCrtPath(tlsCaCrtName);
-                                    Preferences.setTlsClientCrtPath(tlsClientCrtName);
+                                    Preferences.setTlsCaCrt(tlsCaCrtName);
+                                    Preferences.setTlsClientCrt(tlsClientCrtName);
                                     Preferences.setTlsClientCrtPassword(((MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword)).getText().toString());
                                     updateConnectButton();
                                     securityDialog = null;
@@ -510,7 +508,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                         Preferences.setKeepalive(Integer.parseInt(keepalive.getText().toString()));
 
                                     } catch (NumberFormatException e) {
-                                        Preferences.clearKey(R.string.keyKeepalive);
+                                        Preferences.clearKey(Preferences.Keys.KEEPALIVE);
                                     }
 
                                     updateConnectButton();
@@ -532,7 +530,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             final Activity a = getActivity();
-            PackageManager pm = a.getPackageManager();
             setHasOptionsMenu(true);
 
 
@@ -556,9 +553,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 throw new RuntimeException("Unknown application mode");
             }
 
-            mode = findPreference(Preferences.getKey(R.string.keyModeId));
-            String[] modesReadable = getResources().getStringArray(R.array.profileIds_readable);
-            mode.setSummary(modesReadable[Preferences.getModeId()]);
+            mode = findPreference(Preferences.Keys.MODE_ID);
+            mode.setSummary(ActivityPreferences.getModeIdReadable(getActivity()));
             mode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -590,6 +586,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             super.onDestroy();
         }
 
+        @SuppressWarnings("unused")
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
             if (cachedState != null) {
@@ -744,7 +741,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 FileOutputStream outputStream = App.getContext().openFileOutput(filename, Context.MODE_PRIVATE);
 
                 byte [] buffer = new byte[256];
-                int bytesRead = 0;
+                int bytesRead;
                 while((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }

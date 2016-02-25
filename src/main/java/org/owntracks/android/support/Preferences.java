@@ -1,6 +1,9 @@
 package org.owntracks.android.support;
 
-import java.util.Date;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +18,7 @@ import org.owntracks.android.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.StringRes;
 import android.util.Log;
 
 
@@ -25,7 +29,8 @@ import de.greenrobot.event.EventBus;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.messages.WaypointMessage;
+import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.messages.MessageWaypoint;
 
 public class Preferences {
     private static final String TAG = "Preferences";
@@ -61,13 +66,18 @@ public class Preferences {
         publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
         handleFirstStart();
-        deviceUUID = sharedPreferences.getString(getKey(R.string.keyDeviceUUID), "undefined-uuid");
-        initMode(sharedPreferences.getInt(getStringRessource(R.string.keyModeId), getIntResource(R.integer.valModeId)));
+        deviceUUID = sharedPreferences.getString(Keys._DEVICE_UUID, "undefined-uuid");
+        initMode(sharedPreferences.getInt(Keys.MODE_ID, getIntResource(R.integer.valModeId)));
     }
 
 
     public static void initMode(int active) {
-        setMode(active, true);
+        // Check for valid mode IDs and fallback to Private if an invalid mode is set
+        if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC) {
+            setMode(active, true);
+        } else {
+            setMode(App.MODE_ID_MQTT_PRIVATE, true);
+        }
     }
 
     public static void setMode(int active) {
@@ -86,12 +96,12 @@ public class Preferences {
                 activeSharedPreferences = publicSharedPreferences;
                 break;
         }
-        sharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
+        sharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
 
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
-        privateSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
-        hostedSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
-        publicSharedPreferences.edit().putInt(getKey(R.string.keyModeId), modeId).commit();
+        privateSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
+        hostedSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
+        publicSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
 
         attachAllActivePreferenceChangeListeners();
 
@@ -142,20 +152,20 @@ public class Preferences {
 
 
 
-    public static String getKey(int resId) {
-        return App.getContext().getString(resId);
+    //public static String getKey(int resId) {
+    //    return App.getContext().getString(resId);
+    //}
+
+    public static boolean getBoolean(String key,  int defId) {
+        return getBoolean(key, defId, defId, false);
     }
 
-    public static boolean getBoolean(int resId,  int defId) {
-        return getBoolean(resId, defId, defId, false);
-    }
-
-    public static boolean getBoolean(int resId,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
+    public static boolean getBoolean(String key, int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
         if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  publicSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdPublic));
+            return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  publicSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
         }
 
-        return privateSharedPreferences.getBoolean(getKey(resId), getBooleanRessource(defIdPrivate));
+        return privateSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
     }
 
     public static boolean getBooleanRessource(int resId) {
@@ -163,79 +173,89 @@ public class Preferences {
     }
 
     // For keys that do not need overrides in any modes
-    public static int getInt(int resId,  int defId) {
-        return getInt(resId, defId, defId, false);
+    public static int getInt(String key,  int defId) {
+        return getInt(key, defId, defId, false);
     }
-    public static int getInt(int resId,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
+    public static int getInt(String key,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
         if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getIntResource(defIdPublic) :  publicSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
+            return forceDefIdPublic ? getIntResource(defIdPublic) :  publicSharedPreferences.getInt(key, getIntResource(defIdPrivate));
         }
 
-        return privateSharedPreferences.getInt(getKey(resId), getIntResource(defIdPrivate));
+        return privateSharedPreferences.getInt(key, getIntResource(defIdPrivate));
     }
     public static int getIntResource(int resId) {
         return App.getContext().getResources().getInteger(resId);
     }
 
+
+    public static int getIntegerDefaultValue(int defaultValueResPrivate, int defaultValueResPublic) {
+        return isModeMqttPrivate() ? getIntResource(defaultValueResPrivate) : getIntResource(defaultValueResPublic);
+    }
+
+
+
     // Gets the key from specified preferences
     // If the returned value is an empty string or null, the default id is returned
     // This is a quick fix as an empty string does not return the default value
-    private static String getStringWithFallback(SharedPreferences preferences, int resId, int defId) {
-        String s = preferences.getString(getKey(resId), "");
+    private static String getStringWithFallback(SharedPreferences preferences, String key, int defId) {
+        String s = preferences.getString(key, "");
         return ("".equals(s)) ? getStringRessource(defId) : s;
     }
 
-    public static String getString(int resId,  int defId) {
-        return getString(resId, defId, defId, false);
+    public static String getString(String key,  int defId) {
+        return getString(key, defId, defId, false);
     }
-    public static String getString(int resId,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
+    public static String getString(String key,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
         if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, resId, defIdPublic);
+            return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, key, defIdPublic);
         }
 
-        return getStringWithFallback(privateSharedPreferences, resId, defIdPrivate);
+        return getStringWithFallback(privateSharedPreferences, key, defIdPrivate);
+    }
+
+    public static String getStringDefaultValue(@StringRes  int defIdPrivate, @StringRes int defIdPublic) {
+        return isModeMqttPrivate() ? getStringRessource(defIdPrivate) : getStringRessource(defIdPublic);
     }
 
     public static String getStringRessource(int resId) {
         return App.getContext().getResources().getString(resId);
     }
 
-    public static void setString(int resId, String value) {
-        setString(resId, value, true);
+    public static void setString(String key, String value) {
+        setString(key, value, true);
     }
-    public static void setString(int resId, String value, boolean allowSetWhenPublic) {
+    public static void setString(String key, String value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putString(getKey(resId), value).commit();
+        activeSharedPreferences.edit().putString(key, value).commit();
     }
 
-    public static void setInt(int resId, int value) {
-        setInt(resId, value, true);
+    public static void setInt(String key, int value) {
+        setInt(key, value, true);
     }
-    public static void setInt(int resId, int value, boolean allowSetWhenPublic) {
+    public static void setInt(String key, int value, boolean allowSetWhenPublic) {
         if((isModeMqttPublic() && !allowSetWhenPublic)) {
-            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putInt(getKey(resId), value).commit();
+        activeSharedPreferences.edit().putInt(key, value).commit();
     }
-    public static void setBoolean(int resId, boolean value) {
-        setBoolean(resId, value, true);
+    public static void setBoolean(String key, boolean value) {
+        setBoolean(key, value, true);
     }
-    public static void setBoolean(int resId, boolean value, boolean allowSetWhenPublic) {
+    public static void setBoolean(String key, boolean value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Log.e(TAG, "setting of key denied in the current mode: " + getKey(resId));
+            Log.e(TAG, "setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putBoolean(getKey(resId), value).commit();
+        activeSharedPreferences.edit().putBoolean(key, value).commit();
     }
 
-    public static void clearKey(int resId) {
-        activeSharedPreferences.edit().remove(getKey(resId)).commit();
+    public static void clearKey(String key) {
+        activeSharedPreferences.edit().remove(key).commit();
     }
-
 
     public static int getModeId() { return modeId; }
 
@@ -257,11 +277,23 @@ public class Preferences {
         return false;
     }
 
+    public void importFromMessage(MessageConfiguration m, String key) {
+        //if(m.containsKey(key))
+    }
+
+
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface MessageConfigurationProperty {
+        public String key();
+
+    }
+
 
 
     public static void fromJsonObject(JSONObject json) {
-        if (!isPropperMessageType(json, "configuration"))
-            return;
+
 
         Log.v(TAG, "fromJsonObject: " +  json.toString());
 
@@ -276,14 +308,14 @@ public class Preferences {
         try { setKeepalive(json.getInt(getStringRessource(R.string.keyKeepalive))); } catch (JSONException e) {}
         try { setPubRetain(json.getBoolean(getStringRessource(R.string.keyPubRetain))); } catch (JSONException e) {}
         try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
-        try { setTlsCaCrtPath(json.getString(getStringRessource(R.string.keyTlsCaCrtPath))); } catch (JSONException e) {}
-        try { setTlsClientCrtPath(json.getString(getStringRessource(R.string.keyTlsClientCrtPath))); } catch (JSONException e) {}
+        try { setTlsCaCrt(json.getString(getStringRessource(R.string.keyTlsCaCrt))); } catch (JSONException e) {}
+        try { setTlsClientCrt(json.getString(getStringRessource(R.string.keyTlsClientCrt))); } catch (JSONException e) {}
         try { setTlsClientCrtPassword(json.getString(getStringRessource(R.string.keyTlsClientCrtPassword))); } catch (JSONException e) {}
 
         try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
         try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
         try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
-        try { setPubIncludeBattery(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
+        try { setPubLocationExtendedData(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
         try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
         try { setDeviceTopicBase(json.getString(getStringRessource(R.string.keyPubTopicBase))); } catch (JSONException e) {}
         try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
@@ -305,7 +337,7 @@ public class Preferences {
         try {
             JSONArray j = json.getJSONArray("waypoints");
             if (j != null) {
-                waypointsFromJson(j);
+                //waypointsFromJson(j);
             } else {
                 Log.v(TAG, "no valid waypoints");
             }
@@ -315,156 +347,70 @@ public class Preferences {
         }
     }
 
-    private static JSONArray waypointsToJSON() {
+    private static List<MessageWaypoint> waypointsToJSON() {
 
-        JSONArray waypoints = new JSONArray();
+        List<MessageWaypoint> messages = new LinkedList<>();
         for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
-            WaypointMessage wpM = new WaypointMessage(waypoint);
-            JSONObject wp = wpM.toJSONObject();
-            try { wp.put("shared", waypoint.getShared()); } catch (JSONException e) { }
-            waypoints.put(wp);
+            messages.add(MessageWaypoint.fromDaoObject(waypoint));
         }
-        return waypoints;
+        return messages;
     }
 
 
-    private static void waypointsFromJson(JSONArray j) {
-        Log.v(TAG, "importing " + j.length()+" waypoints");
+    private static void waypointsFromJson(List<MessageWaypoint> j) {
+        Log.v(TAG, "importing " + j.size()+" waypoints");
         WaypointDao dao = Dao.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
-        for(int i = 0 ; i < j.length(); i++){
-            Log.v(TAG, "importing waypoint: " + i);
-            Waypoint newWaypoint;
-            JSONObject waypointJson;
-            try {
-                Log.v(TAG, "checking for required attributes");
+        for (MessageWaypoint m: j) {
+            Waypoint w = m.toDaoObject();
 
-                waypointJson = j.getJSONObject(i);
-                newWaypoint  = new Waypoint();
-                newWaypoint.setGeofenceLatitude(waypointJson.getDouble("lat"));
-                newWaypoint.setGeofenceLongitude(waypointJson.getDouble("lon"));
-
-
-                String descRaw = waypointJson.getString("desc");
-                if (descRaw.contains(":")) {
-                    Log.v(TAG, "Beacon payload in waypoint desc attribute is not yet supported");
-                    newWaypoint.setDescription(descRaw.split(":")[0]);
-                } else if(descRaw.contains("$")) {
-                    String[] a = descRaw.split("$");
-                    if(a.length == 0) {
-                        Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID no data was found before the sign");
-                        continue;
-                    }
-
-                    newWaypoint.setDescription(a[0]);
-                    if(a.length > 1)
-                        newWaypoint.setWifiSSID(a[1]);
-                    else {
-                        Log.e(TAG, "Waypoint desc contained a $ sign, indicating a SSID but no data was found after the sign");
-
-                    }
-                } else {
-                    newWaypoint.setDescription(descRaw);
-                }
-
-
-            } catch (JSONException e) {
-                // If the above fails we're missing a required attribute and cannot continue the import
-                Log.v(TAG, "missing essential waypoint data: " + e);
-
-                continue;
-            }
-
-            try {
-                newWaypoint.setShared(waypointJson.getBoolean("shared"));
-            } catch (JSONException e) {
-                Log.v(TAG, "unable to import shared attribute");
-                newWaypoint.setShared(false);
-            }
-
-
-            try {
-                newWaypoint.setGeofenceRadius(waypointJson.getInt("rad"));
-
-            } catch(Exception e) {
-                Log.v(TAG, "unable to import radius and/or transition attribute");
-
-                newWaypoint.setGeofenceRadius(0);
-            }
-
-
-
-            try {
-                newWaypoint.setDate(new java.util.Date(waypointJson.getLong("tst") * 1000));
-            } catch(JSONException e) {
-                Log.v(TAG, "unable to import date attribute");
-
-                newWaypoint.setDate(new Date());
-            }
-
-
-            Waypoint existingWaypoint = null;
             for(Waypoint e : deviceWaypoints) {
                 Log.v(TAG, "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
-                Log.v(TAG, "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime()));
+                Log.v(TAG, "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
 
-                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(newWaypoint.getDate().getTime())) {
-                    existingWaypoint = e;
-                    break;
+                // remove exisiting waypoint before importing new one
+                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
+                    dao.delete(e);
+                    EventBus.getDefault().post(new Events.WaypointRemoved(e));
                 }
             }
-            if(existingWaypoint != null) {
-                Log.v(TAG, "found existing waypoint with same date. Deleting it before import");
-                dao.delete(existingWaypoint);
-                EventBus.getDefault().post(new Events.WaypointRemoved(existingWaypoint));
-            } else {
-                Log.v(TAG, "waypoint does not exist, doing clean import");
-            }
 
-            dao.insert(newWaypoint);
-            EventBus.getDefault().post(new Events.WaypointAdded(newWaypoint));
-
-
+            dao.insert(w);
+            EventBus.getDefault().post(new Events.WaypointAdded(w));
         }
-
     }
 
     public static boolean getRemoteConfiguration() {
-        return getBoolean(R.string.keyRemoteConfiguration, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
+        return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
     }
 
     public static boolean getRemoteCommandReportLocation() {
-        return getBoolean(R.string.keyRemoteCommandReportLocation, R.bool.valRemoteCommandReportLocation);
+        return getBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, R.bool.valRemoteCommandReportLocation);
     }
 
-
     public static void setRemoteConfiguration(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteConfiguration, aBoolean, false);
+        setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean, false);
     }
 
     public static void setRemoteCommandReportLocation(boolean aBoolean) {
-        setBoolean(R.string.keyRemoteCommandReportLocation, aBoolean, true);
+        setBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, aBoolean, true);
     }
 
     public static void setCleanSession(boolean aBoolean) {
-        setBoolean(R.string.keyCleanSession, aBoolean, false);
+        setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
     }
     public static boolean getCleanSession() {
-        return getBoolean(R.string.keyCleanSession, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
+        return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
     }
 
 
-    public static boolean getPubLocationIncludeBattery() {
-        return getBoolean(R.string.keyPubIncludeBattery, R.bool.valPubIncludeBattery, R.bool.valPubIncludeBattery, false);
-    }
-
-    public static boolean getFollowingSelectedContact() {
-        return getBoolean(R.string.keyFollowingSelectedContact, R.bool.valFalse);
+    public static boolean getPubLocationExtendedData() {
+        return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData, R.bool.valPubExtendedData, false);
     }
 
     public static int getLocatorDisplacement() {
-        return getInt(R.string.keyLocatorDisplacement, R.integer.valLocatorDisplacement);
+        return getInt(Keys.LOCATOR_DISPLACEMENT, R.integer.valLocatorDisplacement);
     }
 
     public static long getLocatorIntervalMillis() {
@@ -472,16 +418,16 @@ public class Preferences {
     }
 
     public static int getLocatorInterval() {
-        return getInt(R.string.keyLocatorInterval, R.integer.valLocatorInterval);
+        return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
     public static String getUsername() {
         // in public, the username is just used to build the topic public/user/$deviceId
-        return getString(R.string.keyUsername, R.string.valEmpty, R.string.valUsernamePublic, true);
+        return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, true);
     }
 
     public static boolean getAuth() {
-        return getBoolean(R.string.keyAuth, R.bool.valAuth, R.bool.valAuthPublic, true);
+        return getBoolean(Keys.AUTH, R.bool.valAuth, R.bool.valAuthPublic, true);
 
     }
 
@@ -489,7 +435,7 @@ public class Preferences {
         if(Preferences.isModeMqttPublic())
             return getDeviceUUID();
 
-        String deviceId = getString(R.string.keyDeviceId, R.string.valEmpty);
+        String deviceId = getString(Keys.DEVICE_ID, R.string.valEmpty);
         if ("".equals(deviceId) && fallbackToDefault)
             return getDeviceIdDefault();
         return deviceId;
@@ -505,7 +451,7 @@ public class Preferences {
         if(isModeMqttPublic())
             return MqttAsyncClient.generateClientId();
 
-        String clientId = getString(R.string.keyClientId, R.string.valEmpty);
+        String clientId = getString(Keys.CLIENT_ID, R.string.valEmpty);
         if ("".equals(clientId) && fallbackToDefault)
             clientId = getClientIdDefault();
         return clientId;
@@ -517,11 +463,11 @@ public class Preferences {
     }
 
     public static void setClientId(String clientId) {
-        setString(R.string.keyClientId, clientId);
+        setString(Keys.CLIENT_ID, clientId);
     }
 
     public static void setDeviceTopicBase(String deviceTopic) {
-        setString(R.string.keyPubTopicBase, deviceTopic, false);
+        setString(Keys.PUB_TOPIC_BASE, deviceTopic, false);
     }
 
     public static String getPubTopicLocations() {
@@ -576,7 +522,7 @@ public class Preferences {
         if(!isModeMqttPrivate()) {
             return getPubTopicBaseDefault();
         }
-        String topic = getString(R.string.keyPubTopicBase, R.string.valEmpty);
+        String topic = getString(Keys.PUB_TOPIC_BASE, R.string.valEmpty);
         if (topic.equals("") && fallbackToDefault)
             topic = getPubTopicBaseDefault();
 
@@ -585,12 +531,12 @@ public class Preferences {
 
 
     public static String getSubTopic() {
-        return getString(R.string.keySubTopic, R.string.valSubTopic, R.string.valSubTopicPublic, true);
+        return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, true);
     }
 
     public static String getTrackerId(boolean fallback) {
 
-        String tid = getString(R.string.keyTrackerId, R.string.valEmpty);
+        String tid = getString(Keys.TRACKER_ID, R.string.valEmpty);
 
         if(tid==null || tid.isEmpty())
             return fallback ? getTrackerIdDefault() : "";
@@ -608,18 +554,18 @@ public class Preferences {
 
     public static void setHost(String value) {
         if (!value.equals(getHost())) {
-            setString(R.string.keyHost, value, false);
+            setString(Keys.HOST, value, false);
             brokerChanged();
         }
     }
 
     public static void setPortDefault(int value) {
-        clearKey(R.string.keyPort);
+        clearKey(Keys.PORT);
     }
 
     public static void setPort(int value) {
         if (value != getPort()) {
-            setInt(R.string.keyPort, value, false);
+            setInt(Keys.PORT, value, false);
             brokerChanged();
         }
     }
@@ -630,24 +576,24 @@ public class Preferences {
         if(len>=2){
             value=value.substring(0,2);
             if( Character.isLetterOrDigit(value.charAt(0)) && Character.isLetterOrDigit(value.charAt(1)) )
-                setString(R.string.keyTrackerId, value);
+                setString(Keys.TRACKER_ID, value);
         }
         else {
             if( len >0 && Character.isLetterOrDigit(value.charAt(0)))
-                setString(R.string.keyTrackerId, value);
+                setString(Keys.TRACKER_ID, value);
             else
-                setString(R.string.keyTrackerId,"");
+                setString(Keys.TRACKER_ID,"");
         }
 
     }
 
 
     public static int getPort() {
-        return getInt(R.string.keyPort, R.integer.valPort, R.integer.valPortPublic, true);
+        return getInt(Keys.PORT, R.integer.valPort, R.integer.valPortPublic, true);
     }
 
 
-    public static String getIntWithHintSupport(int key) {
+    public static String getIntWithHintSupport(String key) {
         int i = getInt(key, R.integer.valInvalid);
         if (i == -1) {
             return "";
@@ -657,100 +603,100 @@ public class Preferences {
     }
 
     public static String getPortWithHintSupport() {
-        return getIntWithHintSupport(R.string.keyPort);
+        return getIntWithHintSupport(Keys.PORT);
     }
 
     public static void setKeepalive(int value) {
-        setInt(R.string.keyKeepalive, value, false);
+        setInt(Keys.KEEPALIVE, value, false);
     }
 
 
     public static String getKeepaliveWithHintSupport() {
-        return getIntWithHintSupport(R.string.keyKeepalive);
+        return getIntWithHintSupport(Keys.KEEPALIVE);
     }
 
     public static int getKeepalive() {
-        return getInt(R.string.keyKeepalive, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
+        return getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
     }
 
     public static void setUsername(String value) {
         if (!value.equals(getUsername())) {
 
-            setString(R.string.keyUsername, value);
+            setString(Keys.USERNAME, value);
             brokerChanged();
         }
     }
 
 
-    private static void setPubIncludeBattery(boolean aBoolean) {
-        setBoolean(R.string.keyPubIncludeBattery, aBoolean);
+    private static void setPubLocationExtendedData(boolean aBoolean) {
+        setBoolean(Keys.PUB_EXTENDED_DATA, aBoolean);
     }
 
 
     private static void setPub(boolean aBoolean) {
-        setBoolean(R.string.keyPub, aBoolean);
+        setBoolean(Keys.PUB, aBoolean);
     }
 
     private static void setNotification(boolean aBoolean) {
-        setBoolean(R.string.keyNotification, aBoolean);
+        setBoolean(Keys.NOTIFICATION, aBoolean);
 
     }
 
     private static void setNotificationLocation(boolean aBoolean) {
-        setBoolean(R.string.keyNotificationLocation, aBoolean);
+        setBoolean(Keys.NOTIFICATION_LOCATION, aBoolean);
     }
 
     public static void setNotificationEvents(boolean notificationEvents) {
-        setBoolean(R.string.keyNotificationEvents, notificationEvents);
+        setBoolean(Keys.NOTIFICATION_EVENTS, notificationEvents);
     }
 
 
     private static void setSubTopic(String string) {
-        setString(R.string.keySubTopic, string, false);
+        setString(Keys.SUB_TOPIC, string, false);
     }
 
     private static void setAutostartOnBoot(boolean aBoolean) {
-        setBoolean(R.string.keyAutostartOnBoot, aBoolean);
+        setBoolean(Keys.AUTOSTART_ON_BOOT, aBoolean);
 
     }
 
     private static void setLocatorAccuracyForeground(int anInt) {
-        setInt(R.string.keyLocatorAccuracyForeground, anInt);
+        setInt(Keys.LOCATOR_ACCURACY_FOREGROUND, anInt);
 
     }
 
     private static void setLocatorAccuracyBackground(int anInt) {
-        setInt(R.string.keyLocatorAccuracyBackground, anInt);
+        setInt(Keys.LOCATOR_ACCURACY_BACKGROUND, anInt);
 
     }
 
     private static void setLocatorInterval(int anInt) {
-        setInt(R.string.keyLocatorInterval, anInt);
+        setInt(Keys.LOCATOR_INTERVAL, anInt);
 
     }
 
     private static void setBeaconBackgroundScanPeriod(int anInt) {
-        setInt(R.string.keyBeaconBackgroundScanPeriod, anInt);
+        setInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, anInt);
 
     }
 
     private static void setBeaconForegroundScanPeriod(int anInt) {
-        setInt(R.string.keyBeaconBackgroundScanPeriod, anInt);
+        setInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, anInt);
 
     }
 
     private static void setLocatorDisplacement(int anInt) {
-        setInt(R.string.keyLocatorDisplacement, anInt);
+        setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
 
     }
 
     private static void setPubRetain(boolean aBoolean) {
-        setBoolean(R.string.keyPubRetain, aBoolean, false);
+        setBoolean(Keys.PUB_RETAIN, aBoolean, false);
 
     }
 
     private static void setPubQos(int anInt) {
-        setInt(R.string.keyPubQos, anInt, false);
+        setInt(Keys.PUB_QOS, anInt, false);
     }
 
 
@@ -758,29 +704,29 @@ public class Preferences {
 
     public static void setPassword(String password) {
         if (!password.equals(getPassword())) {
-            setString(R.string.keyPassword, password);
+            setString(Keys.PASSWORD, password);
             brokerChanged();
         }
     }
 
 
     public static void setDeviceId(String deviceId) {
-        setString(R.string.keyDeviceId, deviceId, false);
+        setString(Keys.DEVICE_ID, deviceId, false);
     }
 
     public static void setAuth(boolean auth) {
-        setBoolean(R.string.keyAuth, auth, false);
+        setBoolean(Keys.AUTH, auth, false);
     }
 
     public static void setTls(boolean tlsSpecifier) {
-        setBoolean(R.string.keyTls, tlsSpecifier, false);
+        setBoolean(Keys.TLS, tlsSpecifier, false);
     }
 
-    public static void setTlsCaCrtPath(String tlsCrtPath) {
-        setString(R.string.keyTlsCaCrtPath, tlsCrtPath, false);
+    public static void setTlsCaCrt(String tlsCrtPath) {
+        setString(Keys.TLS_CA_CRT, tlsCrtPath, false);
     }
-    public static void setTlsClientCrtPath(String tlsCrtPath) {
-        setString(R.string.keyTlsClientCrtPath, tlsCrtPath, false);
+    public static void setTlsClientCrt(String tlsCrtPath) {
+        setString(Keys.TLS_CLIENT_CRT, tlsCrtPath, false);
     }
 
 
@@ -791,62 +737,57 @@ public class Preferences {
 
 
     public static String getHost() {
-        return getString(R.string.keyHost, R.string.valEmpty, R.string.valHostPublic, true);
+        return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, true);
     }
 
     public static String getPassword() {
-        return getString(R.string.keyPassword, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, true);
     }
 
     public static boolean getTls() {
-        return getBoolean(R.string.keyTls, R.bool.valTls, R.bool.valTlsPublic, true);
+        return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
     }
 
     public static String getTlsCaCrtName() {
-        return getString(R.string.keyTlsCaCrtPath, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.TLS_CA_CRT, R.string.valEmpty, R.string.valEmpty, true);
     }
 
     public static String getTlsClientCrtName() {
-        return getString(R.string.keyTlsClientCrtPath, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, true);
     }
 
 
     public static boolean getNotification() {
-        return getBoolean(R.string.keyNotification, R.bool.valNotification);
+        return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
     }
 
     public static boolean getNotificationLocation() {
-        return getBoolean(R.string.keyNotificationLocation, R.bool.valNotificationLocation);
+        return getBoolean(Keys.NOTIFICATION_LOCATION, R.bool.valNotificationLocation);
     }
 
     public static boolean getNotificationEvents() {
-        return getBoolean(R.string.keyNotificationEvents, R.bool.valNotificationEvents);
+        return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
     }
 
 
     public static int getPubQos() {
-        return getInt(R.string.keyPubQos, R.integer.valPubQos, R.integer.valPubQosPublic, true);
+        return getInt(Keys.PUB_QOS, R.integer.valPubQos, R.integer.valPubQosPublic, true);
     }
 
     public static boolean getPubRetain() {
-        return getBoolean(R.string.keyPubRetain, R.bool.valPubRetain, R.bool.valPubRetainPublic, true);
+        return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain, R.bool.valPubRetainPublic, true);
     }
 
     public static boolean getPub() {
-        return getBoolean(R.string.keyPub, R.bool.valPub);
+        return getBoolean(Keys.PUB, R.bool.valPub);
     }
 
     public static boolean getAutostartOnBoot() {
-        return getBoolean(R.string.keyAutostartOnBoot, R.bool.valAutostartOnBoot);
+        return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
     }
 
     public static String getRepoUrl() {
         return App.getContext().getString(R.string.valRepoUrl);
-
-    }
-
-    public static String getIssuesMail() {
-        return App.getContext().getString(R.string.valIssuesMail);
 
     }
 
@@ -856,82 +797,67 @@ public class Preferences {
     }
 
     public static int getLocatorAccuracyForeground() {
-        return getInt(R.string.keyLocatorAccuracyForeground, R.integer.valLocatorAccuracyForeground);
+        return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
     public static int getBeaconBackgroundScanPeriod() {
-        return getInt(R.string.keyBeaconBackgroundScanPeriod, R.integer.valBeaconBackgroundScanPeriod);
+        return getInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, R.integer.valBeaconBackgroundScanPeriod);
     }
 
     public static int getBeaconForegroundScanPeriod() {
-        return getInt(R.string.keyBeaconBackgroundScanPeriod, R.integer.valBeaconForegroundScanPeriod);
+        return getInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, R.integer.valBeaconForegroundScanPeriod);
     }
 
     public static int getLocatorAccuracyBackground() {
-        return getInt(R.string.keyLocatorAccuracyBackground, R.integer.valLocatorAccuracyBackground);
+        return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
     public static String getCustomBeaconLayout() {
-        return getString(R.string.keyCustomBeaconLayout, R.string.valEmpty);
+        return getString(Keys.BEACON_LAYOUT, R.string.valEmpty);
     }
 
     public static boolean getBeaconRangingEnabled() {
-        return getBoolean(R.string.keyBeaconRangingEnabled, R.bool.valBeaconRangingEnabled);
+        return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
     }
 
+    // Enable cards
     public static boolean getInfo() {
-        return getBoolean(R.string.keyInfo, R.bool.valInfo, R.bool.valInfoPublic, false);
+        return getBoolean(Keys.INFO, R.bool.valInfo, R.bool.valInfoPublic, false);
     }
 
     public static void setInfo(boolean info) {
-        setBoolean(R.string.keyInfo, info);
+        setBoolean(Keys.INFO, info);
     }
 
 
     public static String getTlsClientCrtPassword() {
-        return getString(R.string.keyTlsClientCrtPassword, R.string.valEmpty);
+        return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
     public static void setTlsClientCrtPassword(String password) {
-        setString(R.string.keyTlsClientCrtPassword, password);
+        setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
 
     public static String getEncryptionKey() {
-        return getString(R.string.keyEncryptionKey, R.string.valEmpty);
+        return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
     // This has no use yet but may be useful later
     public static void handleFirstStart() {
-        if(sharedPreferences.getBoolean(getKey(R.string.keyFistStart), true)) {
+        if(sharedPreferences.getBoolean(Keys._FIST_START, true)) {
             Log.v(TAG, "Initial application launch");
-            sharedPreferences.edit().putBoolean(getKey(R.string.keyFistStart), false).commit();
+            sharedPreferences.edit().putBoolean(Keys._FIST_START , false).commit();
             String uuid = UUID.randomUUID().toString().toUpperCase();
-            sharedPreferences.edit().putString(getKey(R.string.keyDeviceUUID), "A"+uuid.substring(1)).commit();
+            sharedPreferences.edit().putString(Keys._DEVICE_UUID, "A"+uuid.substring(1)).commit();
         } else {
             Log.v(TAG, "Consecutive application launch");
         }
     }
 
-    public static boolean isPropperMessageType(JSONObject json, String type) {
-        try {
-            if(json == null)
-                Log.e(TAG, "Attempt to invoke isPropperMessageType on null object");
-
-            if (!json.getString("_type").equals(type))
-                throw new JSONException("wrong type");
-        } catch (JSONException e) {
-            Log.e(TAG, "Unable to deserialize " + type  +" object from JSON " + json.toString());
-            return false;
-        }
-        return true;
-    }
-
-
-
     // Maybe make this configurable
-    // For now it makes thins easier to change
+    // For now it makes things easier to change
     public static int getPubQosEvents() {
         return getPubQos();
     }
@@ -964,15 +890,6 @@ public class Preferences {
         return getPubRetain();
     }
 
-    public static void setPersistentGeohash (String hash) {
-        setString(R.string.keyCurrentGeohash, hash);
-    }
-    public static String getAndClearPersistentGeohash () {
-        String h = getString(R.string.keyCurrentGeohash, R.string.valEmpty);
-        clearKey(R.string.keyCurrentGeohash);
-        return h;
-    }
-
 
     public static JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
@@ -984,7 +901,7 @@ public class Preferences {
         // Misc settings
         try {json.put(Preferences.getStringRessource(R.string.keyLocatorDisplacement), Preferences.getLocatorDisplacement());} catch(JSONException e) {}
         try {json.put(Preferences.getStringRessource(R.string.keyLocatorInterval), Preferences.getLocatorInterval());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyPubIncludeBattery), Preferences.getPubLocationIncludeBattery());} catch(JSONException e) {}
+        try {json.put(Preferences.getStringRessource(R.string.keyPubIncludeBattery), Preferences.getPubLocationExtendedData());} catch(JSONException e) {}
         try {json.put(Preferences.getStringRessource(R.string.keyPub), Preferences.getPub());} catch(JSONException e) {}
         try {json.put(Preferences.getStringRessource(R.string.keyNotification), Preferences.getNotification());} catch(JSONException e) {}
         try {json.put(Preferences.getStringRessource(R.string.keyNotificationLocation), Preferences.getNotificationLocation());} catch(JSONException e) {}
@@ -1016,8 +933,8 @@ public class Preferences {
                 try {json.put(Preferences.getStringRessource(R.string.keyKeepalive), Preferences.getKeepalive());} catch(JSONException e) {}
                 try {json.put(Preferences.getStringRessource(R.string.keyPubRetain), Preferences.getPubRetain());} catch(JSONException e) {}
                 try {json.put(Preferences.getStringRessource(R.string.keyTls), Preferences.getTls());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrtPath), Preferences.getTlsCaCrtName());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPath), Preferences.getTlsClientCrtName());} catch(JSONException e) {}
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrt), Preferences.getTlsCaCrtName());} catch(JSONException e) {}
+                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrt), Preferences.getTlsClientCrtName());} catch(JSONException e) {}
                 try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword), Preferences.getTlsClientCrtPassword());} catch(JSONException e) {}
                 try {json.put(Preferences.getStringRessource(R.string.keyPubTopicBase), Preferences.getPubTopicBase(true));} catch(JSONException e) {}
                 try {json.put(Preferences.getStringRessource(R.string.keySubTopic), Preferences.getSubTopic());} catch(JSONException e) {}
@@ -1030,5 +947,51 @@ public class Preferences {
 
 
         return json;
+    }
+
+    public static class Keys {
+        public static final String AUTH                             = "auth";
+        public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
+        public static final String BEACON_BACKGROUND_SCAN_PERIOD    = "beaconBackgroundScanPeriod";
+        public static final String BEACON_FOREGROUND_SCAN_PERIOD    = "beaconForegroundScanPeriod";
+        public static final String BEACON_LAYOUT                    = "beaconLayout";
+        public static final String BEACON_RANGING                   = "ranging";
+        public static final String CLEAN_SESSION                    = "cleanSession";
+        public static final String CLIENT_ID                        = "clientId";
+        public static final String DEVICE_ID                        = "deviceId";
+        public static final String HOST                             = "host";
+        public static final String INFO                             = "info";
+        public static final String KEEPALIVE                        = "keepalive";
+        public static final String LOCATOR_ACCURACY_BACKGROUND      = "locatorAccuracyBackground";
+        public static final String LOCATOR_ACCURACY_FOREGROUND      = "locatorAccuracyForeground";
+        public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
+        public static final String LOCATOR_INTERVAL                 = "locatorInterval";
+        public static final String MODE_ID                          = "modeId";
+        public static final String NOTIFICATION                     = "notification";
+        public static final String NOTIFICATION_EVENTS              = "notificationEvents";
+        public static final String NOTIFICATION_LOCATION            = "notificationLocation";
+        public static final String PASSWORD                         = "password";
+        public static final String PORT                             = "port";
+        public static final String PUB                              = "pub";
+        public static final String PUB_EXTENDED_DATA                = "pubExtendedData";
+        public static final String PUB_QOS                          = "pubQos";
+        public static final String PUB_RETAIN                       = "pubRetain";
+        public static final String PUB_TOPIC_BASE                   = "pubTopicBase";
+        public static final String REMOTE_COMMAND_REPORT_LOCATION   = "remoteCommandReportLocation";
+        public static final String REMOTE_CONFIGURATION             = "remoteConfiguration";
+        public static final String SUB                              = "sub";
+        public static final String SUB_TOPIC                        = "subTopic";
+        public static final String TLS                              = "tls";
+        public static final String TLS_CA_CRT                       = "tlsCaCrt";
+        public static final String TLS_CLIENT_CRT                   = "tlsClientCrt";
+        public static final String TLS_CLIENT_CRT_PASSWORD          = "tlsClientCrtPassword";
+        public static final String TRACKER_ID                       = "trackerId";
+        public static final String USERNAME                         = "username";
+
+        // Internal keys
+        public static final String _DEVICE_UUID                     = "deviceUUID";
+        public static final String _ENCRYPTION_KEY                  = "encryptionKey";
+        public static final String _FIST_START                      = "fistStart";
+
     }
 }

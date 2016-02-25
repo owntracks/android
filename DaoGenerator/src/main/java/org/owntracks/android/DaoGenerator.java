@@ -1,8 +1,6 @@
 package org.owntracks.android;
 
 import de.greenrobot.daogenerator.Entity;
-import de.greenrobot.daogenerator.Index;
-import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
 
 // Generates Data Access Objects in src/main/java/org.owntracks.android/db

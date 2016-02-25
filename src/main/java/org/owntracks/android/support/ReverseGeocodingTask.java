@@ -1,6 +1,5 @@
 package org.owntracks.android.support;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,7 +48,7 @@ public class ReverseGeocodingTask extends AsyncTask<GeocodableLocation, Void, Vo
 
 
 					if (addresses.get(0) != null) {
-						StringBuffer g = new StringBuffer();
+						StringBuilder g = new StringBuilder();
 						if(addresses.get(0).getAddressLine(0) != null)
 							g.append(addresses.get(0).getAddressLine(0)).append(", ");
 						if(addresses.get(0).getLocality() != null)

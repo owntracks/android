@@ -34,7 +34,7 @@ import de.greenrobot.event.EventBus;
 
 public class ActivityRegions extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
     private static final String TAG = "ActivityRegions";
-    public static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
+    private static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
     private Toolbar toolbar;
     private org.owntracks.android.support.RecyclerView listView;
     private final int LOADER_ID = 1;
@@ -96,7 +96,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
     }
 
-    public void requery() {
+    private void requery() {
         getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
@@ -147,7 +147,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     }
 
 
-    protected void remove(long id) {
+    private void remove(long id) {
         Waypoint w = Dao.getWaypointDao().loadByRowId(id);
         Dao.getWaypointDao().delete(w);
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
@@ -160,17 +160,21 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     }
 
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.WaypointAdded e) {
         requery();
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.WaypointTransition e) {
         requery();
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.WaypointRemoved e) {
         requery();
     }
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events.WaypointUpdated e) {
         requery();
     }

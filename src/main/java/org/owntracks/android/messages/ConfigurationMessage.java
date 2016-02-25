@@ -23,5 +23,4 @@ public class ConfigurationMessage extends Message{
     public JSONObject toJSONObject() {
         return json;
     }
-
 }
