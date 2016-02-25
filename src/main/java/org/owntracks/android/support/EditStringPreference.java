@@ -3,10 +3,11 @@ package org.owntracks.android.support;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+
 import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;
 
 public class EditStringPreference extends MaterialEditTextPreference {
-    public EditStringPreference(Context context, AttributeSet attrs) {
+    EditStringPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -25,4 +26,9 @@ public class EditStringPreference extends MaterialEditTextPreference {
         this.hint = hint;
     }
 
+    public void setText(String text) {
+        if(!shouldPersist())
+            return;
+        super.setText(text);
+    }
 }

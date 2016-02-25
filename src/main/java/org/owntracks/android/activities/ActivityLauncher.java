@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -45,6 +46,7 @@ public class ActivityLauncher extends ActivityBase {
 			this.mDialog = dialog;
 		}
 
+		@NonNull
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			return this.mDialog;
@@ -180,11 +182,11 @@ public class ActivityLauncher extends ActivityBase {
 		bindService(i, this.serviceApplicationConnection, Context.BIND_AUTO_CREATE);
 	}
 
-	public void startActivityMain() {
+	private void startActivityMain() {
 		startActivityFromClass(App.getRootActivityClass());
 	}
 
-	public void startActivityFromClass(Class<?> c) {
+	private void startActivityFromClass(Class<?> c) {
 		Intent intent = new Intent(this.context, c);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
