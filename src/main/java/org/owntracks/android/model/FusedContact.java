@@ -20,6 +20,7 @@ import org.owntracks.android.support.ContactImageProvider;
 public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
+
     private final String topic;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
@@ -28,8 +29,6 @@ public class FusedContact extends BaseObservable {
     private
     Integer imageProviderLevel = IMAGE_PROVIDER_LEVEL_TID;
     private static final Integer IMAGE_PROVIDER_LEVEL_TID =0;
-    public static final Integer IMAGE_PROVIDER_LEVEL_CARD =1;
-    public static final Integer IMAGE_PROVIDER_LEVEL_LINK =2;
 
     public Integer getImageProviderLevel() {
         return imageProviderLevel;
@@ -48,25 +47,33 @@ public class FusedContact extends BaseObservable {
 
     public void setMessageLocation(MessageLocation messageLocation) {
         this.messageLocation = messageLocation;
-        this.messageLocation.setContact(this);
+        this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
+        notifyMessageLocationPropertyChanged();
     }
 
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
-        this.messageCard.setContact(this);
-        this.notifyPropertyChanged(BR.fusedName);
-        this.notifyPropertyChanged(BR.imageProviderLevel);
         ContactImageProvider.invalidateCacheLevelCard(getTopic());
+        notifyMessageCardPropertyChanged();
     }
 
     public void notifyMessageCardPropertyChanged() {
-        notifyPropertyChanged(BR.fusedName);
+        this.notifyPropertyChanged(BR.fusedName);
+        this.notifyPropertyChanged(BR.imageProviderLevel);
+        this.notifyPropertyChanged(BR.topic);
 
     }
 
     public void notifyMessageLocationPropertyChanged() {
-        notifyPropertyChanged(BR.fusedName);
-        notifyPropertyChanged(BR.fusedLocation);
+        Log.v(TAG, "notifyMessageLocationPropertyChanged");
+        this.notifyPropertyChanged(BR.fusedName);
+        this.notifyPropertyChanged(BR.fusedLocation);
+        this.notifyPropertyChanged(BR.fusedLocationDate);
+        this.notifyPropertyChanged(BR.fusedLocationAccuracy);
+
+        this.notifyPropertyChanged(BR.trackerId);
+        this.notifyPropertyChanged(BR.topic);
+
     }
 
 
@@ -82,7 +89,7 @@ public class FusedContact extends BaseObservable {
     @Bindable
     public String getFusedName() {
         if(hasCard() && messageCard.hasName())
-            return messageCard.getName() + (hasLocation() ? (" (" + messageLocation.getTid() +")") : "" );
+            return messageCard.getName();
 
         if(hasLocation() && messageLocation.getTid() != null)
             return "Device-"+messageLocation.getTid();
@@ -101,6 +108,16 @@ public class FusedContact extends BaseObservable {
         return this.hasLocation() ? this.messageLocation.getGeocoder() : null;
     }
 
+    @Bindable
+    public long getFusedLocationDate() {
+        return this.hasLocation() ? messageLocation.getTst() : 0;
+    }
+
+    @Bindable
+    public String getFusedLocationAccuracy() {
+        return Integer.toString(this.hasLocation() ? messageLocation.getAcc() : 0);
+    }
+
     public boolean hasLocation() {
         return this.messageLocation != null;
     }
@@ -110,6 +127,7 @@ public class FusedContact extends BaseObservable {
     }
 
 
+    @Bindable
     public String getTrackerId() {
         return hasLocation() ? this.messageLocation.getTid() : getTopic().substring(getTopic().length()-2).replace("/","");
     }

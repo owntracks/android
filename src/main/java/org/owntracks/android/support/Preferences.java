@@ -553,10 +553,7 @@ public class Preferences {
     }
 
     public static void setHost(String value) {
-        if (!value.equals(getHost())) {
             setString(Keys.HOST, value, false);
-            brokerChanged();
-        }
     }
 
     public static void setPortDefault(int value) {
@@ -564,11 +561,8 @@ public class Preferences {
     }
 
     public static void setPort(int value) {
-        if (value != getPort()) {
             setInt(Keys.PORT, value, false);
-            brokerChanged();
-        }
-    }
+   }
 
     public static void setTrackerId(String value){
         int len=value.length();
@@ -620,11 +614,8 @@ public class Preferences {
     }
 
     public static void setUsername(String value) {
-        if (!value.equals(getUsername())) {
 
             setString(Keys.USERNAME, value);
-            brokerChanged();
-        }
     }
 
 
@@ -703,10 +694,7 @@ public class Preferences {
 
 
     public static void setPassword(String password) {
-        if (!password.equals(getPassword())) {
             setString(Keys.PASSWORD, password);
-            brokerChanged();
-        }
     }
 
 
@@ -728,13 +716,6 @@ public class Preferences {
     public static void setTlsClientCrt(String tlsCrtPath) {
         setString(Keys.TLS_CLIENT_CRT, tlsCrtPath, false);
     }
-
-
-    private static void brokerChanged() {
-        Log.v(TAG, "broker changed");
-        EventBus.getDefault().post(new Events.BrokerChanged());
-    }
-
 
     public static String getHost() {
         return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, true);
@@ -966,7 +947,7 @@ public class Preferences {
         public static final String LOCATOR_ACCURACY_FOREGROUND      = "locatorAccuracyForeground";
         public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
         public static final String LOCATOR_INTERVAL                 = "locatorInterval";
-        public static final String MODE_ID                          = "modeId";
+        public static final String MODE_ID                          = "mode";
         public static final String NOTIFICATION                     = "notification";
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";

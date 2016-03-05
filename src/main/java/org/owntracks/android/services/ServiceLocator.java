@@ -67,7 +67,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         this.context = p;
         checkLocationPermission();
 
-        this.lastPublish = 0;
+        this.lastPublish = System.currentTimeMillis(); // defer first location report when the service is started;
         this.waypointDao = Dao.getWaypointDao();
         this.googleApiClient = new GoogleApiClient.Builder(this.context).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
@@ -191,7 +191,8 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         if (!this.foreground)
             return true;
 
-        return (System.currentTimeMillis() - this.lastPublish) > TimeUnit.MINUTES.toMillis(1);
+        // Publishes are throttled to 30 seconds when in the foreground to not spam the server
+        return (System.currentTimeMillis() - this.lastPublish) > TimeUnit.SECONDS.toMillis(30);
     }
 
 

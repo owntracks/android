@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageEncrypted;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
@@ -49,11 +50,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor {
+public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler {
 	private static final String TAG = "ServiceBroker";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -82,23 +85,53 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	private PingHandler pingHandler;
 	private boolean connectedWithCleanSession;
 
+	private MqttConnectOptions lastConnectionOptions;
+	private String lastConnectionId = null;
+
+
+
+
+
 	@Override
 	public void onCreate(ServiceProxy p) {
 		this.context = p;
 		this.workerThread = null;
-		initPubPool();
-		this.pubPool.pause();
+		initPausedPubPool();
         this.persistenceStore = new CustomMemoryPersistence();
         this.reconnectHandler = new ReconnectHandler(context);
         changeState(State.INITIAL);
         doStart();
+
+
+		// Testing
+		MessageLocation m = new MessageLocation();
+		m.setLat(52.4251861);
+		m.setLon(9.7330908);
+		m.setAcc(100);
+		m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+		m.setT("m");
+		m.setTopic("owntracks/binarybucks/e");
+		m.setTid("e");
+
+		ServiceProxy.getServiceParser().processMessage(m);
 	}
 
-	private void initPubPool() {
+	private void initPausedPubPool() {
+		Log.v(TAG, "Executor initPausedPubPool with new paused queue");
 		if(pubPool != null && !pubPool.isShutdown()) {
+			Log.v(TAG, "Executor shutting down existing executor " + pubPool);
 			pubPool.shutdownNow();
 		}
 		this.pubPool = new PausableThreadPoolExecutor(1,1,1, TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+		this.pubPool.setRejectedExecutionHandler(this);
+		Log.v(TAG, "Executor created new executor instance: " + pubPool);
+		pubPool.pause(); // pause until client is setup and connected
+	}
+
+
+	@Override
+	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+		Log.v(TAG, "Executor task execution rejected for executor " + executor + " -> task: " + r);
 	}
 
 	@Override
@@ -237,11 +270,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
         }
 
 		try {
-			MqttConnectOptions options = new MqttConnectOptions();
-
+			 lastConnectionOptions = new MqttConnectOptions();
 			if (Preferences.getAuth()) {
-				options.setPassword(Preferences.getPassword().toCharArray());
-				options.setUserName(Preferences.getUsername());
+				lastConnectionOptions.setPassword(Preferences.getPassword().toCharArray());
+				lastConnectionOptions.setUserName(Preferences.getUsername());
 			}
 
 			if (Preferences.getTls()) {
@@ -268,17 +300,17 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 
-				options.setSocketFactory(new SocketFactory(socketFactoryOptions));
+				lastConnectionOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
 			}
 
 
-            setWill(options);
-			options.setKeepAliveInterval(Preferences.getKeepalive());
-			options.setConnectionTimeout(30);
+            setWill(lastConnectionOptions);
+			lastConnectionOptions.setKeepAliveInterval(Preferences.getKeepalive());
+			lastConnectionOptions.setConnectionTimeout(30);
 			connectedWithCleanSession = Preferences.getCleanSession();
-			options.setCleanSession(connectedWithCleanSession);
+			lastConnectionOptions.setCleanSession(connectedWithCleanSession);
 
-			this.mqttClient.connect(options);
+			this.mqttClient.connect(lastConnectionOptions);
 			changeState(State.CONNECTED);
 
 			return true;
@@ -302,9 +334,20 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 	}
 
+	private String getConnectionId() {
+		return mqttClient.getCurrentServerURI()+"/"+lastConnectionOptions.getUserName();
+	}
+
 	private void onConnect() {
 		StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_CONNECTS);
 
+		// Check if we're connecting to the same broker that we were already connected to
+		String connectionId = getConnectionId();
+		if(lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
+			EventBus.getDefault().post(new Events.BrokerChanged());
+			lastConnectionId = connectionId;
+			Log.v(TAG, "lastConnectionId changed to: " + lastConnectionId);
+		}
 
 		reconnectHandler.stop();
 
@@ -590,19 +633,18 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			m.setPayload(Parser.serializeSync(mm).getBytes());
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
-			try {
-				Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
-				this.mqttClient.getTopic(message.getTopic()).publish(m);
-				if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
-					Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
-					this.pubPool.pause();
-				}
-			} catch (MqttException e) {
-				Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
-				e.printStackTrace();
+
+			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
+			this.mqttClient.getTopic(message.getTopic()).publish(m);
+			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
+				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+				this.pubPool.pause();
 			}
 		} catch (JsonProcessingException e) {
 			Log.e(TAG, "processMessage: JsonProcessingException");
+			e.printStackTrace();
+		} catch (MqttException e) {
+			Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -610,9 +652,14 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 	public void publish(final MessageBase message) {
+		if(state == State.DISCONNECTED_CONFIGINCOMPLETE) {
+				Log.e(TAG, "dropping outgoing message due to incomplete configuration");
+				return;
+		}
+
 		message.setOutgoingProcessor(this);
 		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
-		this.pubPool.execute(message);
+		this.pubPool.queue(message);
 
 	}
 
@@ -670,11 +717,12 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 	public void clearQueues() {
-		initPubPool();
+		initPausedPubPool();
     }
 
 	@SuppressWarnings("unused")
 	public void onEvent(Events.ModeChanged e) {
+		Log.v(TAG, "ModeChanged. Disconnecting and draining message queue");
         disconnect(false);
         clearQueues();
     }

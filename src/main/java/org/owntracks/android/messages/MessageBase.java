@@ -1,7 +1,12 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
+import android.util.Log;
+
+import org.owntracks.android.support.CanceableRunnable;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.PausableThreadPoolExecutor;
+
 import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,16 +28,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 })
 
-public abstract class MessageBase extends BaseObservable implements Runnable{
+public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
         protected static final String TAG = "MessageBase";
         private String _mqtt_topic;
-        private Boolean record;
 
         @JsonIgnore
         private int _mqtt_qos;
 
         @JsonIgnore
         private boolean _mqtt_retained;
+        private volatile boolean cancelOnRun = false;
 
         @JsonIgnore
         public boolean getRetained() {
@@ -71,11 +76,22 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
 
         @Override
         public void run(){
+                // If the message is enqueued to a ThreadPoolExecutor, stopping that executor results in the first queued message runnable being run
+                // We check if the running thread is shutting down and don't submit that messagfe to the message handler
+                if(cancelOnRun)
+                        return;
+
                 if(_processorIn != null && _processorIn.get() !=  null)
                         processIncomingMessage(_processorIn.get());
                 if(_processorOut != null && _processorOut.get() !=  null)
                         processOutgoingMessage(_processorOut.get());
         }
+
+        @Override
+        public void cancelOnRun() {
+                this.cancelOnRun = true;
+        }
+
 
         @JsonIgnore
         public void setIncomingProcessor(IncomingMessageProcessor processor) {
@@ -96,11 +112,5 @@ public abstract class MessageBase extends BaseObservable implements Runnable{
         @JsonIgnore
         public abstract String getBaseTopicSuffix();
 
-        public Boolean getRecord() {
-                return record;
-        }
 
-        public void setRecord(Boolean record) {
-                this.record = record;
-        }
 }

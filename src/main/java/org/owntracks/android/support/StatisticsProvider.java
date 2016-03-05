@@ -25,7 +25,8 @@ public class StatisticsProvider  {
     public static final InternalProviderInterface provider = BuildConfig.DEBUG ? new StatisticsProviderDebug() : new StatisticsProviderProduction();
 
     public static void incrementCounter(Context c, String key) {
-        provider.incrementCounter(c, key);
+        // temporarily disabled
+        //provider.incrementCounter(c, key);
     }
 
     public static int getCounter(Context c, String key) {

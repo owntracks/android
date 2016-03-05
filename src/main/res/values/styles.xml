@@ -9,7 +9,7 @@
      You may obtain a copy of the License at
   
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/secondary</item>
@@ -37,6 +38,18 @@
 
     <color name="transparent">#00000000</color>
 
+    <style name="ListItemPrimary" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+
+    <style name="ListItemSecondary" parent="@style/TextAppearance.AppCompat.Caption">
+
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/textSecondary</item>
+
+    </style>
 
     <style name="DialogTheme" parent="@style/Base.Theme.AppCompat.Dialog">
 
@@ -53,9 +66,10 @@
 
 
     <color name="divider">#1E000000</color>
-    <color name="textPrimary">#585b5f</color>
-    <color name="textSecondary">#818181</color>
-    <color name="background">#ffffff</color>
+    <color name="textPrimary">#de000000</color>
+    <color name="textSecondary">#8a000000</color>
+
+    <color name="background">#fffafafa</color>
 
     <color name="pressed">#FFE4E4E4</color>
     <color name="primary">#3f72b5</color>
