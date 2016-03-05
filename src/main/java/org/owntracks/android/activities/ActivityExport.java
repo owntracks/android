@@ -3,18 +3,23 @@ package org.owntracks.android.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import org.owntracks.android.R;
-import org.owntracks.android.messages.ConfigurationMessage;
+import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.receiver.Parser;
 
 public class ActivityExport extends ActivityBase {
     private static final String TAG = "ActivityExport";
@@ -56,10 +61,15 @@ public class ActivityExport extends ActivityBase {
 
 
     private void export() {
-
-
-        ConfigurationMessage config = new ConfigurationMessage();
-        Log.v("Export", "Config: \n" + config.toString());
+        MessageConfiguration export = Preferences.export();
+        String exportStr;
+        try {
+            exportStr = Parser.serializeSync(export);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
+        Log.v("Export", "Config: \n" + exportStr);
 
         File cDir = getBaseContext().getCacheDir();
         File tempFile = new File(cDir.getPath() + "/" + TEMP_FILE_NAME) ;
@@ -67,7 +77,7 @@ public class ActivityExport extends ActivityBase {
         try {
             FileWriter writer = new FileWriter(tempFile);
 
-            writer.write(config.toString());
+            writer.write(exportStr.toString());
             writer.close();
 
             Log.v(TAG, "Saved temporary config file for export to " + tempFile.getPath());

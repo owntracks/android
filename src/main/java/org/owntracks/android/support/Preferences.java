@@ -4,6 +4,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -257,6 +261,7 @@ public class Preferences {
         activeSharedPreferences.edit().remove(key).commit();
     }
 
+    @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true)
     public static int getModeId() { return modeId; }
 
 
@@ -872,7 +877,29 @@ public class Preferences {
     }
 
 
-    public static JSONObject toJSONObject() {
+    public static MessageConfiguration export() {
+        List<Method> methods = getMethodsAnnotatedWithMethodXY();
+        MessageConfiguration cfg = new MessageConfiguration();
+        for(Method m : methods) {
+            m.setAccessible(true);
+
+            Log.v(TAG,"method for config key: " + m.getAnnotation(Export.class).key());
+            Log.v(TAG,"calling method: " + m.getName());
+            Log.v(TAG,"return type: " + m.getReturnType());
+            ;
+
+            try {
+                //If the underlying method is static, then the specified obj argument is ignored. It may be null.
+                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null, null));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return cfg;
+
+        /*
         JSONObject json = new JSONObject();
 
         // Header
@@ -927,7 +954,7 @@ public class Preferences {
         }
 
 
-        return json;
+        return json;*/
     }
 
     public static class Keys {
@@ -975,4 +1002,34 @@ public class Preferences {
         public static final String _FIST_START                      = "fistStart";
 
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface Export {
+        String key();
+        boolean exportModeMqttPrivate() default false;
+        boolean exportModeMqttPublic() default false;
+    }
+
+    public static List<Method> getMethodsAnnotatedWithMethodXY() {
+        final List<Method> methods = new ArrayList<Method>();
+        Class<?> klass  = Preferences.class;
+        while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+            final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(klass.getDeclaredMethods()));
+            for (final Method method : allMethods) {
+                if (method.isAnnotationPresent(Export.class) ) {
+                    Export annotInstance = method.getAnnotation(Export.class);
+                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic()) {
+                        methods.add(method);
+
+                    }
+                }
+            }
+            // move to the upper class in the hierarchy in search for more methods
+            klass = klass.getSuperclass();
+        }
+        return methods;
+    }
+
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 public class MessageConfiguration extends MessageBase{
     private static final String BASETOPIC_SUFFIX = "/cmd";
 
-    private Map<String,String> map = new HashMap<String,String>();
+    private Map<String,Object> map = new HashMap<String,Object>();
 
 
 
@@ -41,12 +41,12 @@ public class MessageConfiguration extends MessageBase{
 
     // To reduce maintenance effort, the configuration object can have an arbitrary number of key/value attributes for preferences keys and values
     @JsonAnyGetter
-    public Map<String,String> any() {
+    public Map<String,Object> any() {
         return map;
     }
 
     @JsonAnySetter
-    public void set(String key, String value) {
+    public void set(String key, Object value) {
         map.put(key, value);
     }
     public Object get(String key) {

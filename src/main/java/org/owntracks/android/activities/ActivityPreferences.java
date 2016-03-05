@@ -54,8 +54,16 @@ public class ActivityPreferences extends ActivityBase {
                 Log.v(TAG, "onActivityResult with REQUEST_CODE_CONNECTION");
                 if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
                     Log.v(TAG,"recreating ActivityPreferences due to mode change");
-                    this.recreate();
-                    this.overridePendingTransition(0, 0);
+                 //   this.recreate();
+                 //   this.overridePendingTransition(0, 0);
+
+                    Intent intent = getIntent();
+                    overridePendingTransition(0, 0);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    overridePendingTransition(0, 0);
+                    startActivity(intent);
+
                 }
 
                 break;
@@ -125,9 +133,8 @@ public class ActivityPreferences extends ActivityBase {
         private static Preference repo;
         private static Preference twitter;
         private static Preference community;
-
+        private Preference export;
         static String ver;
-
 
 
         @Override
@@ -153,6 +160,7 @@ public class ActivityPreferences extends ActivityBase {
             }
 
 
+            export = findPreference("export");
 
             repo = findPreference("repo");
             twitter = findPreference("twitter");
@@ -162,6 +170,16 @@ public class ActivityPreferences extends ActivityBase {
 
             try { ver = pm.getPackageInfo(a.getPackageName(), 0).versionName; } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
             version.setSummary(ver);
+
+            export.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity(), ActivityExport.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    getActivity().startActivity(intent);
+                    return true;
+                }
+            });
 
             repo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
