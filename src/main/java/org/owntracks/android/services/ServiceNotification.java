@@ -456,27 +456,26 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         Intent resultIntent = new Intent(this.context, ActivityStatus.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilderMessages.setContentIntent(resultPendingIntent);
+        notificationBuilderPermission.setContentIntent(resultPendingIntent);
 
-        notificationBuilderMessages.setSmallIcon(R.drawable.ic_notification);
-        notificationBuilderMessages.setGroup(NOTIFICATION_ID_PERMISSION + "");
-        notificationBuilderMessages.setAutoCancel(false);
-        notificationBuilderMessages.setShowWhen(false);
+        notificationBuilderPermission.setSmallIcon(R.drawable.ic_notification);
+        notificationBuilderPermission.setGroup(NOTIFICATION_ID_PERMISSION + "");
+        notificationBuilderPermission.setAutoCancel(false);
+        notificationBuilderPermission.setShowWhen(false);
 
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
-            notificationBuilderMessages.setColor(ContextCompat.getColor(context, R.color.primary));
-            notificationBuilderMessages.setPriority(Notification.PRIORITY_MIN);
-            notificationBuilderMessages.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderMessages.setVisibility(Notification.VISIBILITY_PUBLIC);
+            notificationBuilderPermission.setColor(ContextCompat.getColor(context, R.color.primary));
+            notificationBuilderPermission.setPriority(Notification.PRIORITY_DEFAULT);
+            notificationBuilderPermission.setCategory(Notification.CATEGORY_ERROR);
+            notificationBuilderPermission.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
 
         notificationBuilderPermission.setContentText("Missing a required permission");
         notificationBuilderPermission.setContentTitle(this.context.getString(R.string.app_name));
-        notificationPermission =  notificationBuilderPermission.build();
 
-
+        notificationManager.notify(NOTIFICATION_ID_PERMISSION, notificationBuilderPermission.build());
     }
 }
 

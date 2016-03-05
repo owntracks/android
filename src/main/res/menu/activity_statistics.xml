@@ -5,18 +5,17 @@
 
     <item
         android:id="@+id/refresh"
-        android:icon="@drawable/ic_done"
+        android:icon="@drawable/ic_refresh_white_24dp"
         android:orderInCategory="97"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/refresh">
     </item>
 
     <item
-        android:id="@+id/clear"
-        android:icon="@drawable/ic_delete"
+        android:id="@+id/debug"
+        android:icon="@drawable/ic_bug_report_white_24dp"
         android:orderInCategory="97"
         app:showAsAction="always"
         android:title="@string/clear">
     </item>
-
 </menu>

@@ -203,6 +203,9 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
         Bundle b = new Bundle();
         b.putInt(ActivityMap.INTENT_KEY_ACTION, ActivityMap.ACTION_FOLLOW_CONTACT);
         b.putString(ActivityMap.INTENT_KEY_TOPIC, ((FusedContact) viewModel).getTopic());
+        Log.v(TAG, "onClick. ActivityMap.INTENT_KEY_ACTION: " + ActivityMap.ACTION_FOLLOW_CONTACT);
+        Log.v(TAG, "onClick. ActivityMap.INTENT_KEY_TOPIC: " + b.getString(ActivityMap.INTENT_KEY_TOPIC));
+
         transitionToActivityMap(b);
     }
 

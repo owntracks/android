@@ -15,6 +15,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.receiver.Parser;
 
 import android.app.Activity;
 import android.app.Application;
@@ -63,7 +64,7 @@ public class App extends Application  {
         instance = this;
 
         Preferences.initialize(this);
-
+        Parser.initialize(this);
         StatisticsProvider.setTime(this, StatisticsProvider.APP_START);
 
 		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
@@ -79,6 +80,7 @@ public class App extends Application  {
 		EventBus.getDefault().register(this);
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         registerScreenOnReceiver();
+
 
     }
 
@@ -101,6 +103,7 @@ public class App extends Application  {
 
 
     public static void addFusedContact(final FusedContact c) {
+        Log.v(TAG, "addFusedContact: " + c.getTopic());
         fusedContacts.put(c.getTopic(), c);
 
         postOnMainHandler(new Runnable() {
@@ -111,18 +114,23 @@ public class App extends Application  {
         });
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-        if(e.getState() == ServiceBroker.State.CONNECTING) {
-            //Log.v(TAG, "State changed to connecting. Clearing cached contacts");
-            fusedContacts.clear();
-        }
+    public static void clearFusedContacts() {
+        Log.v(TAG, "clearing fusedContacts");
+        fusedContacts.clear();
+
+        postOnMainHandler(new Runnable() {
+            @Override
+            public void run() {
+                contactsViewModel.items.clear();
+            }
+        });
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(Events.ModeChanged e) {
-        fusedContacts.clear();
+    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+
     }
+
     private static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
     }
@@ -142,9 +150,9 @@ public class App extends Application  {
 	}
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(Events.BrokerChanged e) {
-		fusedContacts.clear();
-	}
+    public void onEvent(Events.BrokerChanged e) {
+        clearFusedContacts();
+    }
 
     private static void onEnterForeground() {
         Log.v(TAG, "onEnterForeground");

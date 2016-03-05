@@ -265,6 +265,7 @@
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
     <string name="preferencesCategoryReporting">Reporting</string>
+    <string name="contactDetailsTrackerId">Tracker ID</string>
 
     <string-array name="filepicker">
         <item>Select</item>

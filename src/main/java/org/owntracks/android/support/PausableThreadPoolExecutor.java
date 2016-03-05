@@ -3,6 +3,9 @@ package org.owntracks.android.support;
 
         import android.util.Log;
 
+        import org.owntracks.android.messages.MessageBase;
+        import org.owntracks.android.services.ServiceBroker;
+
         import java.util.concurrent.BlockingQueue;
         import java.util.concurrent.ThreadPoolExecutor;
         import java.util.concurrent.TimeUnit;
@@ -35,18 +38,32 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
         condition = lock.newCondition();
     }
 
+    public void execute(Runnable command) {
+        Log.v(TAG, "queued() " + command+ " executor: " + this);
+        super.execute(command);
+    }
+
+    protected void afterExecute(Runnable r, Throwable t) {
+        Log.v(TAG, "afterRun() " + r+ " executor: " + this);
+        super.afterExecute(r, t);
+    }
     /**
      * @param thread   The thread being executed
      * @param runnable The runnable task
      * @see {@link ThreadPoolExecutor#beforeExecute(Thread, Runnable)}
      */
     @Override
-    protected void beforeExecute(Thread thread, Runnable runnable) {
+    protected void beforeExecute(Thread thread, Runnable runnable)  {
+        Log.v(TAG, "beforeRun() " + runnable + " executor: " + this);
+
         super.beforeExecute(thread, runnable);
         lock.lock();
         try {
             while (isPaused) condition.await();
         } catch (InterruptedException ie) {
+            Log.v(TAG, "InterruptedException " + runnable + " executor: " + this);
+            if(runnable instanceof CanceableRunnable)
+                ((CanceableRunnable)runnable).cancelOnRun();
             thread.interrupt();
         } finally {
             lock.unlock();
@@ -65,20 +82,32 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
      * Pause the execution
      */
     public void pause() {
+        Log.v(TAG, "pause() isPaused:" +isPaused + " executor: " + this) ;
+
+        if(isPaused) {
+            Log.v(TAG, "already paused" + " executor: " + this);
+            return;
+        } else {
+            Log.v(TAG, "pausing" + " executor: " + this);
+        }
+
         lock.lock();
-        Log.v(TAG, "paused");
         try {
             isPaused = true;
         } finally {
             lock.unlock();
         }
+        Log.v(TAG, "paused" + " executor: " + this);
+
     }
 
     /**
      * Resume pool execution
      */
     public void resume() {
-        Log.v(TAG, "resume");
+        Log.v(TAG, "resume" + " executor: " + this);
+        if(!isPaused)
+            return;
 
         lock.lock();
         try {
@@ -88,4 +117,14 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
             lock.unlock();
         }
     }
+
+    public void queue(MessageBase message) {
+        this.execute(message);
+    }
+
+    public interface ExecutorRunnable extends java.lang.Runnable{
+        void cancelOnRun();
+    }
+
+
 }
