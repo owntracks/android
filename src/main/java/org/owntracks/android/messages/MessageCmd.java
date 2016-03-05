@@ -8,8 +8,19 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageCmd extends MessageBase{
     private static final String BASETOPIC_SUFFIX = "/cmd";
+    private String action;
+
     @Override
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processMessage(this);

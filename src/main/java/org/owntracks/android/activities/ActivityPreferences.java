@@ -160,7 +160,7 @@ public class ActivityPreferences extends ActivityBase {
             }
 
 
-            export = findPreference("export");
+            export = findPreference("exportToMessage");
 
             repo = findPreference("repo");
             twitter = findPreference("twitter");

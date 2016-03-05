@@ -8,8 +8,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
+import android.util.ArrayMap;
 import android.util.Log;
 
 
@@ -282,9 +285,9 @@ public class Preferences {
         return false;
     }
 
-    public void importFromMessage(MessageConfiguration m, String key) {
-        //if(m.containsKey(key))
-    }
+
+
+
 
 
 
@@ -297,10 +300,34 @@ public class Preferences {
 
 
 
-    public static void fromJsonObject(JSONObject json) {
+    public static void importFromMessage(MessageConfiguration m) {
+
+        HashMap<String, Method> methods = getImportMethods();
+
+        for(String key : m.getKeys()) {
+            try {
+                methods.get(key).invoke(null, m.get(key));
+            } catch (IllegalAccessException e)  {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(m.hasWaypoints()) {
+            waypointsFromJson(m.getWaypoints());
+        }
 
 
-        Log.v(TAG, "fromJsonObject: " +  json.toString());
+
+
+/*
+
+
+
+
+
+        Log.v(TAG, "importFromMessage: " +  json.toString());
 
         try { setMode(json.getInt(getStringRessource(R.string.keyModeId))); } catch (JSONException e) {}
         try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
@@ -349,7 +376,7 @@ public class Preferences {
         } catch(JSONException e){
             Log.v(TAG, "waypoints invalid with exception: " + e);
 
-        }
+        }*/
     }
 
     private static List<MessageWaypoint> waypointsToJSON() {
@@ -556,7 +583,7 @@ public class Preferences {
         return topic;
     }
 
-
+    @Export(key =Keys.SUB_TOPIC, exportModeMqttPrivate =true)
     public static String getSubTopic() {
         return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, true);
     }
@@ -917,8 +944,8 @@ public class Preferences {
     }
 
 
-    public static MessageConfiguration export() {
-        List<Method> methods = getMethodsAnnotatedWithMethodXY();
+    public static MessageConfiguration exportToMessage() {
+        List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
         for(Method m : methods) {
             m.setAccessible(true);
@@ -937,6 +964,10 @@ public class Preferences {
                 e.printStackTrace();
             }
         }
+
+
+        cfg.set("waypoints", waypointsToJSON());
+
         return cfg;
 
         /*
@@ -1050,8 +1081,15 @@ public class Preferences {
         boolean exportModeMqttPrivate() default false;
         boolean exportModeMqttPublic() default false;
     }
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface Import {
+        String key();
+        boolean importModeMqttPrivate() default false;
+        boolean importModeMqttPublic() default false;
+    }
 
-    public static List<Method> getMethodsAnnotatedWithMethodXY() {
+    public static List<Method> getExportMethods() {
         final List<Method> methods = new ArrayList<Method>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -1062,7 +1100,6 @@ public class Preferences {
                     Export annotInstance = method.getAnnotation(Export.class);
                     if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic()) {
                         methods.add(method);
-
                     }
                 }
             }
@@ -1072,4 +1109,23 @@ public class Preferences {
         return methods;
     }
 
+    public static HashMap<String, Method> getImportMethods() {
+        final HashMap<String, Method> methods = new HashMap<>();
+        Class<?> klass  = Preferences.class;
+        while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+            final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(klass.getDeclaredMethods()));
+            for (final Method method : allMethods) {
+                if (method.isAnnotationPresent(Import.class) ) {
+                    Import annotInstance = method.getAnnotation(Import.class);
+                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.importModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.importModeMqttPublic()) {
+                        methods.put(annotInstance.key(), method);
+                    }
+                }
+            }
+            // move to the upper class in the hierarchy in search for more methods
+            klass = klass.getSuperclass();
+        }
+        return methods;
+    }
 }

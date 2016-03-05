@@ -14,6 +14,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageConfiguration extends MessageBase{
@@ -68,5 +69,11 @@ public class MessageConfiguration extends MessageBase{
     }
 
 
+    public Set<String> getKeys() {
+        return map.keySet();
+    }
 
+    public boolean hasWaypoints() {
+        return waypoints != null && waypoints.size() > 0;
+    }
 }
