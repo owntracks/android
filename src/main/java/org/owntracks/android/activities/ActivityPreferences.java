@@ -55,6 +55,7 @@ public class ActivityPreferences extends ActivityBase {
                 if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
                     Log.v(TAG,"recreating ActivityPreferences due to mode change");
                     this.recreate();
+                    this.overridePendingTransition(0, 0);
                 }
 
                 break;

@@ -59,11 +59,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private HashMap<String, Marker> markers;
     private MapView mapView;
     private Bundle intentExtras;
-    private FusedContact activeContact;
     private MapLocationSource mapLocationSource;
     private int mode = ACTION_FOLLOW_DEVICE;
     private FusedContact followedContact;
     private BottomSheetBehavior bottomSheetBehavior;
+    private FusedContact selectedContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet.bottomSheetLayout);
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.bottomSheet.bottomSheetLayout.setOnClickListener(bottomSheetClickListener);
+        this.bottomSheetBehavior.setPeekHeight(0);
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
 
@@ -94,7 +95,9 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onStart() {
+
         super.onStart();
+
     }
 
     @Override
@@ -284,7 +287,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onMapClick(LatLng latLng) {
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        deselectContact();
     }
 
     @Override
@@ -295,9 +298,17 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void actionSelectContact(FusedContact fusedContact) {
+        if(selectedContact == fusedContact)
+            return;
+        else
+            selectedContact = fusedContact;
+
         binding.bottomSheet.setItem(fusedContact);
         binding.bottomSheet.contactPeek.setItem(fusedContact);
-        bottomSheetBehavior.setPeekHeight(72);
+        // bottomSheetBehavior.setState(State.HIDDEN) doesn't work due to a bug in the support library
+        // Set an initial height of 0 px to hide it instead and set it to 76dp on click instead.
+        // setPeekHeight takes real px as a value. We convert the appropriate value from 76dp
+        bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
     }
@@ -313,6 +324,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void deselectContact() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         binding.bottomSheet.setItem(null);
+        selectedContact = null;
     }
 
     View.OnClickListener bottomSheetClickListener = new View.OnClickListener() {
