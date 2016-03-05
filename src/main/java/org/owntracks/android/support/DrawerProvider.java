@@ -81,7 +81,6 @@ public class DrawerProvider {
                 .withToolbar(toolbar)
                  .withStickyFooterShadow(false)
                  .withStickyFooterDivider(true)
-                .withDis
                 .addDrawerItems(
                         drawerItemForClass(activity, ActivityMap.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
                         drawerItemForClass(activity, ActivityContacts.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),

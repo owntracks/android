@@ -117,7 +117,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
 
     public void fromJSON(String topic, MqttMessage message) {
         try {
-            MessageBase m = Parser.deserializeSync(message.getPayload().toString());
+            MessageBase m = Parser.deserializeSync(message.getPayload());
             m.setTopic(getBaseTopic(m, topic));
             m.setRetained(message.isRetained());
             m.setQos(message.getQos());

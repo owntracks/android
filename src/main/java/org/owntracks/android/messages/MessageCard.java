@@ -14,7 +14,6 @@ import java.lang.ref.WeakReference;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageCard extends MessageBase{
     private static final String BASETOPIC_SUFFIX = "/info";
-    private WeakReference<FusedContact> _contact;
     private String name;
     private String face;
     private boolean hasCachedFace;
@@ -42,29 +41,13 @@ public class MessageCard extends MessageBase{
         return this.face != null;
     }
 
-    public void setHasCachedFace() {
-        this.hasCachedFace = true;
-    }
-    public boolean hasCachedFace() {
-        return this.hasCachedFace;
-    }
-
-        public boolean hasName() {
+    public boolean hasName() {
         return this.name != null;
     }
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
 
-
-    public void setContact(FusedContact contact) {
-        this._contact = new WeakReference<>(contact);
-    }
-    private void notifyContactPropertyChanged() {
-        if(_contact != null && _contact.get() != null)
-            this._contact.get().notifyMessageCardPropertyChanged();
-
-    }
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processMessage(this);

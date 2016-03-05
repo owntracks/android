@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <data>
@@ -27,27 +25,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-
-        <LinearLayout
-            android:layout_gravity="bottom"
-            android:id="@+id/contactDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
-            app:behavior_hideable="true"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:background="@drawable/map_contact_details_background">
-
-            <include layout="@layout/row_contact"
-                android:visibility="gone"
-                android:transitionName="rowContact"
-                bind:item="@{item}"/>
+        <include layout="@layout/contact" android:id="@+id/bottomSheet"/>
 
 
-        </LinearLayout>
+
+
     </android.support.design.widget.CoordinatorLayout>
 </layout>

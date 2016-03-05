@@ -3,12 +3,15 @@ package org.owntracks.android.activities;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,9 +47,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private static final long ZOOM_LEVEL_STREET = 15;
     private static final long ZOOM_LEVEL_BUILDING = 20;
 
-    private static final int PERMISSION_REQUEST_DISK_CACHE = 1;
     private static final int PERMISSION_REQUEST_USER_LOCATION = 2;
-    private static final String DEVICE_LOCATION_MARKER_TOPIC = "++DEVICE++";
 
 
     public static final int ACTION_FOLLOW_DEVICE = 0;
@@ -62,6 +63,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private MapLocationSource mapLocationSource;
     private int mode = ACTION_FOLLOW_DEVICE;
     private FusedContact followedContact;
+    private BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,9 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.mapView = binding.mapView;
         this.mapView.onCreate(savedInstanceState);
         this.mapView.getMapAsync(this);
+        this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet.bottomSheetLayout);
+        this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
+        binding.bottomSheet.bottomSheetLayout.setOnClickListener(bottomSheetClickListener);
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
 
@@ -83,6 +88,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
         this.intentExtras = getIntent().getExtras();
         this.mapLocationSource = new MapLocationSource();
+        
 
     }
 
@@ -97,6 +103,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.mapView.onResume();
         de.greenrobot.event.EventBus.getDefault().registerSticky(this);
     }
+
+
 
     @Override
     public void onPause() {
@@ -174,6 +182,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     private void updateContactLocation(FusedContact c) {
+        Log.v(TAG, "updateContactLocation: " + c.getTopic() + " hasLocation: " + c.hasLocation());
         if (!c.hasLocation())
             return;
 
@@ -218,6 +227,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         });
 
         // Load all contacts
+        Log.v(TAG, "Populating map with # markers: " + App.getFusedContacts().size());
         for (FusedContact contact : App.getFusedContacts().values()) {
             updateContactLocation(contact);
         }
@@ -242,7 +252,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             int action = intentExtras.getInt(INTENT_KEY_ACTION);
             switch (action) {
                 case ACTION_FOLLOW_CONTACT:
-                    actionCenterContact(App.getFusedContact(intentExtras.getString(INTENT_KEY_TOPIC)));
+                    Log.v(TAG, "action: ACTION_FOLLOW_CONTACT:" + action);
+                    Log.v(TAG, "topic:" + intentExtras.getString(INTENT_KEY_TOPIC));
+                    FusedContact c = App.getFusedContact(intentExtras.getString(INTENT_KEY_TOPIC));
+                    Log.v(TAG, "contact: " + c);
+                    actionCenterContact(c);
                     break;
                 case ACTION_FOLLOW_DEVICE:
                     actionCenterDevice();
@@ -270,7 +284,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onMapClick(LatLng latLng) {
-
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     @Override
@@ -281,7 +295,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void actionSelectContact(FusedContact fusedContact) {
-        binding.setItem(fusedContact);
+        binding.bottomSheet.setItem(fusedContact);
+        binding.bottomSheet.contactPeek.setItem(fusedContact);
+        bottomSheetBehavior.setPeekHeight(72);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
     }
 
     private void actionFollowContact(FusedContact fusedContact) {
@@ -293,8 +311,34 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     private void deselectContact() {
-        binding.setItem(null);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        binding.bottomSheet.setItem(null);
     }
+
+    View.OnClickListener bottomSheetClickListener = new View.OnClickListener() {
+        // On click on the bottom sheet itself
+        @Override
+        public void onClick(View v) {
+            if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    };
+
+
+    BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
+        @Override
+        public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+        }
+
+        @Override
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+        }
+    };
+
+
+
 
     private static class MapLocationSource implements LocationSource {
         private static final String TAG = "MapLocationSource";
