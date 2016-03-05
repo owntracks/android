@@ -386,10 +386,12 @@ public class Preferences {
         }
     }
 
+    @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true)
     public static boolean getRemoteConfiguration() {
         return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
     }
 
+    @Export(key =Keys.REMOTE_COMMAND_REPORT_LOCATION, exportModeMqttPrivate =true)
     public static boolean getRemoteCommandReportLocation() {
         return getBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, R.bool.valRemoteCommandReportLocation);
     }
@@ -405,15 +407,19 @@ public class Preferences {
     public static void setCleanSession(boolean aBoolean) {
         setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
     }
+
+    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true)
     public static boolean getCleanSession() {
         return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
     }
 
 
+    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true)
     public static boolean getPubLocationExtendedData() {
         return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData, R.bool.valPubExtendedData, false);
     }
 
+    @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeMqttPublic =true)
     public static int getLocatorDisplacement() {
         return getInt(Keys.LOCATOR_DISPLACEMENT, R.integer.valLocatorDisplacement);
     }
@@ -422,18 +428,26 @@ public class Preferences {
         return TimeUnit.SECONDS.toMillis(getLocatorInterval());
     }
 
+    @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeMqttPublic =true)
     public static int getLocatorInterval() {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
+    @Export(key =Keys.USERNAME, exportModeMqttPrivate =true)
     public static String getUsername() {
         // in public, the username is just used to build the topic public/user/$deviceId
         return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, true);
     }
 
+    @Export(key =Keys.AUTH, exportModeMqttPrivate =true)
     public static boolean getAuth() {
         return getBoolean(Keys.AUTH, R.bool.valAuth, R.bool.valAuthPublic, true);
 
+    }
+
+    @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true)
+    public static String getDeviceId() {
+        return getDeviceId(true);
     }
 
     public static String getDeviceId(boolean fallbackToDefault) {
@@ -452,6 +466,10 @@ public class Preferences {
         return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
 
+    @Export(key =Keys.CLIENT_ID, exportModeMqttPrivate =true)
+    public static String getClientId() {
+        return getClientId(false);
+    }
     public static String getClientId(boolean fallbackToDefault) {
         if(isModeMqttPublic())
             return MqttAsyncClient.generateClientId();
@@ -523,6 +541,10 @@ public class Preferences {
         return String.format(formatString, username, deviceId);
     }
 
+    @Export(key =Keys.PUB_TOPIC_BASE, exportModeMqttPrivate =true)
+    public static String getPubTopicBase() {
+        return getPubTopicBase(false);
+    }
     public static String getPubTopicBase(boolean fallbackToDefault) {
         if(!isModeMqttPrivate()) {
             return getPubTopicBaseDefault();
@@ -539,6 +561,11 @@ public class Preferences {
         return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, true);
     }
 
+    @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    public static String getTrackerId() {
+        return getTrackerId(false);
+
+    }
     public static String getTrackerId(boolean fallback) {
 
         String tid = getString(Keys.TRACKER_ID, R.string.valEmpty);
@@ -586,7 +613,7 @@ public class Preferences {
 
     }
 
-
+    @Export(key =Keys.PORT, exportModeMqttPrivate =true)
     public static int getPort() {
         return getInt(Keys.PORT, R.integer.valPort, R.integer.valPortPublic, true);
     }
@@ -614,6 +641,7 @@ public class Preferences {
         return getIntWithHintSupport(Keys.KEEPALIVE);
     }
 
+    @Export(key =Keys.KEEPALIVE, exportModeMqttPrivate =true)
     public static int getKeepalive() {
         return getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
     }
@@ -721,32 +749,36 @@ public class Preferences {
     public static void setTlsClientCrt(String tlsCrtPath) {
         setString(Keys.TLS_CLIENT_CRT, tlsCrtPath, false);
     }
-
+    @Export(key =Keys.HOST, exportModeMqttPrivate =true)
     public static String getHost() {
         return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, true);
     }
-
+    @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true)
     public static String getPassword() {
         return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, true);
     }
 
+    @Export(key =Keys.TLS, exportModeMqttPrivate =true)
     public static boolean getTls() {
         return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
     }
 
+    @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
     public static String getTlsCaCrtName() {
         return getString(Keys.TLS_CA_CRT, R.string.valEmpty, R.string.valEmpty, true);
     }
 
+    @Export(key =Keys.TLS_CLIENT_CRT, exportModeMqttPrivate =true)
     public static String getTlsClientCrtName() {
         return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, true);
     }
 
-
+    @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getNotification() {
         return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
     }
 
+    @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getNotificationLocation() {
         return getBoolean(Keys.NOTIFICATION_LOCATION, R.bool.valNotificationLocation);
     }
@@ -755,19 +787,22 @@ public class Preferences {
         return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
     }
 
-
+    @Export(key =Keys.PUB_QOS, exportModeMqttPrivate =true)
     public static int getPubQos() {
         return getInt(Keys.PUB_QOS, R.integer.valPubQos, R.integer.valPubQosPublic, true);
     }
-
+    @Export(key =Keys.PUB_RETAIN, exportModeMqttPrivate =true)
     public static boolean getPubRetain() {
         return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain, R.bool.valPubRetainPublic, true);
     }
 
+    @Export(key =Keys.PUB, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getPub() {
         return getBoolean(Keys.PUB, R.bool.valPub);
     }
 
+
+    @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getAutostartOnBoot() {
         return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
     }
@@ -782,26 +817,31 @@ public class Preferences {
 
     }
 
+    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static int getLocatorAccuracyForeground() {
         return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
+    @Export(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static int getBeaconBackgroundScanPeriod() {
         return getInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, R.integer.valBeaconBackgroundScanPeriod);
     }
 
+    @Export(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static int getBeaconForegroundScanPeriod() {
         return getInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, R.integer.valBeaconForegroundScanPeriod);
     }
 
+    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static int getLocatorAccuracyBackground() {
         return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
+    @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static String getCustomBeaconLayout() {
         return getString(Keys.BEACON_LAYOUT, R.string.valEmpty);
     }
-
+    @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getBeaconRangingEnabled() {
         return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
     }
@@ -815,7 +855,7 @@ public class Preferences {
         setBoolean(Keys.INFO, info);
     }
 
-
+    @Export(key =Keys.TLS_CLIENT_CRT_PASSWORD, exportModeMqttPrivate =true)
     public static String getTlsClientCrtPassword() {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
@@ -823,7 +863,7 @@ public class Preferences {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
-
+    @Export(key =Keys._ENCRYPTION_KEY, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
