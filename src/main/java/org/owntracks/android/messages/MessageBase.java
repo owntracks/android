@@ -31,6 +31,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
         protected static final String TAG = "MessageBase";
+        public static final String ACTION_REPORT_LOCATION = "reportLocation";
+
+
         private String _mqtt_topic;
 
         @JsonIgnore

@@ -3,7 +3,6 @@ package org.owntracks.android.services;
 import android.content.Intent;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -11,12 +10,11 @@ import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageEncrypted;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
@@ -76,6 +74,11 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     @Override
     public void processMessage(MessageCmd message) {
         Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
+        if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) && Preferences.getRemoteCommandReportLocation()) {
+            ServiceProxy.getServiceLocator().publishResponseLocationMessage();
+        }
+
+
     }
 
     @Override
@@ -83,6 +86,15 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         Log.v(TAG, "processMessage MessageTransition (" + message.getTopic() + ")");
         ServiceProxy.getServiceNotification().processMessage(message);
     }
+
+    public void processMessage(MessageConfiguration message) {
+        Log.v(TAG, "processMessage MessageConfiguration (" + message.getTopic()+")");
+        if(!Preferences.getRemoteConfiguration())
+            return;
+
+        Preferences.importFromMessage(message);
+    }
+
 
     public void onCreate(ServiceProxy c) {
         this.mapper = new ObjectMapper();
@@ -115,7 +127,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         }
     }
 
-    public void fromJSON(String topic, MqttMessage message) {
+    public void fromMqttMessage(String topic, MqttMessage message) {
         try {
             MessageBase m = Parser.deserializeSync(message.getPayload());
             m.setTopic(getBaseTopic(m, topic));
@@ -134,7 +146,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     }
 
 
-        public void parseIncomingBrokerMessage(String topic, MqttMessage message) throws Exception {
-        fromJSON(topic, message);
+    public void parseIncomingBrokerMessage(String topic, MqttMessage message) throws Exception {
+        fromMqttMessage(topic, message);
     }
 }
