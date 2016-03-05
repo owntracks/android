@@ -25,11 +25,17 @@ public class MessageWaypoint extends MessageBase{
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
     private String desc;
+
+
+
     private double lon;
     private double lat;
     private int rad;
     private long tst;
     private boolean shared;
+    private String uuid;
+    private int major;
+    private int minor;
 
     public String getDesc() {
         return desc;
@@ -127,6 +133,31 @@ public class MessageWaypoint extends MessageBase{
         message.setShared(w.getShared());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
         return message;
+    }
+
+
+    public int getMinor() {
+        return minor;
+    }
+
+    public void setMinor(int minor) {
+        this.minor = minor;
+    }
+
+    public int getMajor() {
+        return major;
+    }
+
+    public void setMajor(int major) {
+        this.major = major;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
 }
