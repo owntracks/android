@@ -90,7 +90,14 @@
         <activity
             android:name=".activities.ActivityExport"
             android:configChanges="orientation"
-            android:label="@string/export"/>
+            android:label="@string/export"
+                        android:parentActivityName=".activities.ActivityPreferences">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ActivityPreferences" />
+        </activity>
+
+
         <activity
             android:name=".activities.ActivityImport"
             android:configChanges="orientation"
