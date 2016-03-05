@@ -20,7 +20,8 @@
         app:layout_behavior="@string/bottom_sheet_behavior"
         android:elevation="6dp">
 
-        <include android:id="@+id/contactPeek" layout="@layout/row_contact" />
+        <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
+
 
         <com.github.curioustechizen.ago.RelativeTimeTextView
             android:id="@+id/locationDate"
@@ -52,7 +53,7 @@
             android:id="@+id/acc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{item.fusedLocationAccuracy }"
+            android:text="@{item.fusedLocationAccuracy +'m'}"
             android:textSize="16sp"
             android:ellipsize="end"
             android:singleLine="true"
@@ -73,9 +74,13 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingBottom="@dimen/activity_horizontal_margin"
             style="@style/ListItemSecondary"/>
-            />
 
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="72dp"
+            android:background="#E4E4E4"/>
 
 
 

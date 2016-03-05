@@ -21,27 +21,12 @@
     <bool name="valInfoPublic" >true</bool>
 
 
-    <string name="valPubTopicHosted" formatted="false">owntracks/%s/%s</string>
-    <string name="valSubTopicHosted">owntracks/+/+</string>
-    <string name="valHostHosted">hosted-mqtt.owntracks.org</string>
-    <integer name="valPortHosted">8883</integer>
-    <bool name="valCleanSessionHosted">false</bool>
-    <bool name="valAuthHosted">true</bool>
-    <bool name="valTlsHosted">true</bool>
-    <bool name="valRemoteConfigurationHosted">false</bool>
-    <bool name="valPubRetainHosted">true</bool>
-    <integer name="valPubQosHosted">1</integer>
-    <string name="valGeohashMsgTopicHosted" formatted="false">msg/+/%s</string>
-    <bool name="valInfoHosted" >true</bool>
-    <bool name="valRecordHosted">false</bool>
-
 
     <integer name="valKeepaliveHosted">3600</integer>
 
 
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valSubTopic">owntracks/+/+</string>
-    <string name="valGeohashMsgTopic" formatted="false">msg/+/%s</string>
 
     <string name="valRepoUrl">https://github.com/owntracks</string>
     <string name="valIssuesMail">support@owntracks.org</string>
@@ -87,8 +72,8 @@
     </string-array>
 
     <string-array name="profileIds_readable">
-        <item>Private</item>
-        <item>Public</item>
+        <item>MQTT Private</item>
+        <item>MQTT Public</item>
     </string-array>
 
     <string-array name="locatorAccuracy">
