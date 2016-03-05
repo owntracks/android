@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageEvent.class, name="event"),
         @JsonSubTypes.Type(value=MessageCard.class, name="card"),
         @JsonSubTypes.Type(value=MessageCmd.class, name="cmd"),
+        @JsonSubTypes.Type(value=MessageConfiguration.class, name="configuration"),
         @JsonSubTypes.Type(value=MessageEncrypted.class, name="encrypted")
 
 })
