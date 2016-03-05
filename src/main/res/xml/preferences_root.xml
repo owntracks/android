@@ -24,13 +24,8 @@
     </PreferenceScreen>
 
     <Preference
+        android:key="export"
         android:title="@string/preferencesExport">
-
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="org.owntracks.android"
-            android:targetClass="org.owntracks.android.activities.ActivityExport"
-            />
     </Preference>
 
     <PreferenceScreen

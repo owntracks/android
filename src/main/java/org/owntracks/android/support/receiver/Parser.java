@@ -24,6 +24,7 @@ public class Parser {
 
     }
 
+
     public static MessageBase deserializeSync(@NonNull byte[] json) throws IOException, EncryptionException {
         MessageBase m = mapper.readValue(json, MessageBase.class);
 

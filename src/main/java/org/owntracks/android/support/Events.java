@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.owntracks.android.db.Message;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.messages.ConfigurationMessage;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 
