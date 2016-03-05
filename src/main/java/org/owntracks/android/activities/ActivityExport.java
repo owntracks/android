@@ -3,7 +3,6 @@ package org.owntracks.android.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceGroup;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -61,7 +60,7 @@ public class ActivityExport extends ActivityBase {
 
 
     private void export() {
-        MessageConfiguration export = Preferences.export();
+        MessageConfiguration export = Preferences.exportToMessage();
         String exportStr;
         try {
             exportStr = Parser.serializeSync(export);
@@ -80,7 +79,7 @@ public class ActivityExport extends ActivityBase {
             writer.write(exportStr.toString());
             writer.close();
 
-            Log.v(TAG, "Saved temporary config file for export to " + tempFile.getPath());
+            Log.v(TAG, "Saved temporary config file for exportToMessage to " + tempFile.getPath());
 
         } catch (IOException e) {
             e.printStackTrace();

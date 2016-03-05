@@ -19,11 +19,11 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 import org.owntracks.android.R;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.receiver.Parser;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -31,7 +31,7 @@ public class ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
 
     private TextView input;
-    private JSONObject configJSON = null;
+    private MessageConfiguration configJSON = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +94,7 @@ public class ActivityImport extends ActivityBase {
 
     private void importAction() {
         Log.v(TAG, "Importing configuration. Brace for impact.");
-        Preferences.fromJsonObject(configJSON);
+        Preferences.importFromMessage(configJSON);
 
        // importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
         Snackbar s = Snackbar.make(findViewById(R.id.frame), R.string.snackbarImportCompleted, Snackbar.LENGTH_LONG);
@@ -143,8 +143,8 @@ public class ActivityImport extends ActivityBase {
                 throw new Error("Unable to read content");
             }
 
-            JSONObject j = new JSONObject(total.toString());
-            if(j == null) {
+            configJSON= (MessageConfiguration) Parser.deserializeSync(total.toString().getBytes());
+            if(configJSON == null || !(configJSON instanceof MessageConfiguration)) {
                 throw new Error("Unable to parse content");
             }
 
@@ -155,8 +155,7 @@ public class ActivityImport extends ActivityBase {
 //            Log.v(TAG, "json: " + j.toString());
 
 
-            configJSON = j;
-            input.setText(formatString(j.toString()));
+            input.setText(formatString(Parser.serializeSync(configJSON)));
 /*
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                     .setTitle(getResources().getString(R.string.preferencesImportFile))
@@ -172,7 +171,7 @@ public class ActivityImport extends ActivityBase {
                         public void onClick(DialogInterface dialog, int which) {
                             try {
 
-                                Preferences.fromJsonObject(new StringifiedJSONObject(fileContent));
+                                Preferences.importFromMessage(new StringifiedJSONObject(fileContent));
                                 Runnable r = new Runnable() {
                                     @Override
                                     public void run() {
