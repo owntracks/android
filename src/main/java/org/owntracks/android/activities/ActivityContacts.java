@@ -25,7 +25,6 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.Toasts;
 
@@ -96,7 +95,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.fragment_contacts, menu);
+        inflater.inflate(R.menu.activity_map, menu);
         return true;
     }
     @Override
@@ -123,7 +122,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
                             if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
                                 Toasts.showCurrentLocationNotAvailable();
                             else
-                                ServiceProxy.getServiceLocator().publishManualLocationMessage();
+                                ServiceProxy.getServiceLocator().reportLocationManually();
                         }
                     });
                 } else {
@@ -171,7 +170,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     private static final int MENU_CONTACT_FOLLOW = 3;
     private static final int MENU_CONTACT_UNFOLLOW = 4;
     private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
-
 
 
     @Override
