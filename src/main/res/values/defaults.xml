@@ -28,10 +28,8 @@
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valSubTopic">owntracks/+/+</string>
 
-    <string name="valRepoUrl">https://github.com/owntracks</string>
-    <string name="valIssuesMail">support@owntracks.org</string>
-    <string name="valTwitterUrl">https://twitter.com/owntracks</string>
-    <string name="valCommunityUrl">https://community.owntracks.org</string>
+
+
     <string name="valTrackerId">""</string>
 
     <integer name="valPort">8883</integer>

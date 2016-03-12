@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0-beta5'
+        classpath 'com.android.tools.build:gradle:2.1.0-alpha1'
     }
 }
 
@@ -34,11 +34,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
     compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.android.support:customtabs:23.2.0'
 
     // Play Services libraries
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
     compile 'com.google.android.gms:play-services-base:8.4.0'
+
 
     // Utility libraries
     compile 'de.greenrobot:eventbus:2.4.0'

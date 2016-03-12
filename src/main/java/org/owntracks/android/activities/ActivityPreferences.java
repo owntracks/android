@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -135,6 +136,7 @@ public class ActivityPreferences extends ActivityBase {
         private static Preference community;
         private Preference export;
         static String ver;
+        private Preference documentation;
 
 
         @Override
@@ -162,10 +164,14 @@ public class ActivityPreferences extends ActivityBase {
 
             export = findPreference("export");
 
+
+
             repo = findPreference("repo");
             twitter = findPreference("twitter");
             community = findPreference("community");
             version = findPreference("versionReadOnly");
+            documentation = findPreference("versionReadOnly");
+
 
 
             try { ver = pm.getPackageInfo(a.getPackageName(), 0).versionName; } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
@@ -184,6 +190,14 @@ public class ActivityPreferences extends ActivityBase {
             repo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
+                    private static final String EXTRA_CUSTOM_TABS_SESSION = "android.support.customtabs.extra.SESSION";
+                    private static final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
+
+                    Bundle extras = new Bundle;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                        extras.putBinder(EXTRA_CUSTOM_TABS_SESSION,  sessionICustomTabsCallback.asBinder() /* Set to null for no session */);
+                    }
+
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(Preferences.getRepoUrl()));
                     a.startActivity(intent);
@@ -211,7 +225,15 @@ public class ActivityPreferences extends ActivityBase {
                     return false;
                 }
             });
-
+            documentation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(Preferences.getDocumentationUrl()));
+                    a.startActivity(intent);
+                    return false;
+                }
+            });
 
             setServerPreferenceSummary(this);
 
