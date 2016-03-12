@@ -1,5 +1,36 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.6.02
+>Release date: 2016-03-11 for alpha testers
+* [FIX] Empty map due to wrong package name
+* [FIX] Crash on Status activity
+* [FIX] Queue lenght on Status activity was always 0
+* [FIX] #323 061: region for Beacon bug
+* [FIX] #322 061: waypoints marked as Shared are not being published
+* [NEW] Update support libraries to 23.2.1
+* [NEW] Date format for today skips yyyy-mm-dd prefix
+* [NEW] Removed connectivity snackbar from connection preferences (replaced by Toast)
+
+## OwnTracks 0.6.01
+>Release date: 2016-03-11 for alpha testers
+* [NEW] - Completely rewritten message backend
+* [NEW] - Reimplemented Google Maps
+* [NEW] - Rewrote preferences code
+* [NEW] - Rewrote contact image handling
+* [NEW] - Added BLE beacon support
+* [NEW] - Dropped OwnTracks Hosted support 
+* [NEW] - Dropped Message support 
+* [NEW] - Removed unneeded permissions 
+* [NEW] - Support for Android M permissions 
+* [NEW] - Improved handling of certificates  
+* [NEW] - Added support for symmetric payload encryption  
+* [NEW] - Improved reconnect behaviour (#271, #297, #302)  
+
+* [FIX] #294 - Android app doesn't suscribe right topic for Messages
+* [FIX] #289 - Go back from THANKS Menu
+
+
+
 ## OwnTracks 0.5.23
 >Release date: 2015-10-11 for beta testers
 * [FIX] #271 - Automatic reconnect fails

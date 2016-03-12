@@ -3,31 +3,20 @@ package org.owntracks.android.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.joanzapata.android.iconify.IconDrawable;
-import com.joanzapata.android.iconify.Iconify;
 
 import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.support.StatisticsProvider;
 
 public class ActivityStatus extends ActivityBase {
 
-
-    private BottomSheetBehavior mBehavior;
-    private View mBottomSheet;
-    private BottomSheetDialog mBottomSheetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,20 +25,6 @@ public class ActivityStatus extends ActivityBase {
         setupSupportToolbar();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mBottomSheet = findViewById(R.id.bottomSheet);
-        mBehavior = BottomSheetBehavior.from(mBottomSheet);
-        mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
-        });
 
 
 
@@ -61,13 +36,13 @@ public class ActivityStatus extends ActivityBase {
 
     private void set() {
         ((TextView)findViewById(R.id.permissionLocation)).setText( (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) ? "granted" : "denied");
-        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.APP_START)));
-        ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE)));
-        ((TextView)findViewById(R.id.serviceBrokerQueueLength)).setText(Integer.toString(StatisticsProvider.getCounter(this, StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH)));
+        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.APP_START)));
+        ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE)));
+        ((TextView)findViewById(R.id.serviceBrokerQueueLength)).setText(Integer.toString(StatisticsProvider.getInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH)));
 
 
-        ((TextView)findViewById(R.id.serviceProxyStart)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_PROXY_START)));
-        ((TextView)findViewById(R.id.serviceLocatorPlay)).setText(App.formatDate(StatisticsProvider.getTime(this, StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED)));
+        ((TextView)findViewById(R.id.serviceProxyStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_PROXY_START)));
+        ((TextView)findViewById(R.id.serviceLocatorPlay)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED)));
         ((TextView)findViewById(R.id.playServicesStatus)).setText(getPlayServicesStatus());
 
 
@@ -100,9 +75,7 @@ public class ActivityStatus extends ActivityBase {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_statistics, menu);
-        menu.findItem(R.id.debug).setVisible(BuildConfig.DEBUG);
+        getMenuInflater().inflate(R.menu.activity_status, menu);
         return true;
     }
 
@@ -112,22 +85,10 @@ public class ActivityStatus extends ActivityBase {
             case R.id.refresh:
                 set();
                 return true;
-            case R.id.debug:
-                showBottomSheetView();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-    private void showBottomSheetView() {
-        if(mBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        else
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
 
 
 

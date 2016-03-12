@@ -589,28 +589,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
         @SuppressWarnings("unused")
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
             Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
-            if (cachedState != null) {
-                Snackbar snackbar = null;
-                if (e.getState() == ServiceBroker.State.CONNECTED) {
-                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnected, Snackbar.LENGTH_LONG); // Don’t forget to show!
-                } else if (e.getState() == ServiceBroker.State.CONNECTING) {
-                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarConnecting, Snackbar.LENGTH_LONG); // Don’t forget to show!
+            Toasts.showBrokerStateChange(e.getState());
 
-                } else if (e.getState() == ServiceBroker.State.DISCONNECTED || e.getState() == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
-                    snackbar = Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnected, Snackbar.LENGTH_LONG); // Don’t forget to show!
-                } else if (e.getState() == ServiceBroker.State.DISCONNECTED_ERROR) {
-                    snackbar =  Snackbar.make(getActivity().findViewById(R.id.content_frame), R.string.snackbarDisconnectedError, Snackbar.LENGTH_LONG); // Don’t forget to show!
-                }
-
-                // Fix snackbar text color and show
-                if(snackbar != null) {
-                    View view = snackbar.getView();
-                    TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
-                    tv.setTextColor(Color.WHITE);
-                    snackbar.show();
-                }
-
-            }
             cachedState = e.getState(); // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
             updateDisconnectButton(e.getState());
         }

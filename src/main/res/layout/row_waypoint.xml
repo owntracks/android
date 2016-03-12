@@ -24,10 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/na"
-        android:textSize="16sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="#212121" />
+        style="@style/ListItemPrimary"/>
 
 
     <TextView
@@ -35,19 +34,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/na"
-        android:textSize="14sp"
         android:ellipsize="none"
         android:singleLine="false"
-        android:textColor="#212121" />
+        style="@style/ListItemSecondary"/>
 
     <com.github.curioustechizen.ago.RelativeTimeTextView
         android:id="@+id/meta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/na"
-        android:textSize="12sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="#858585" />
+        style="@style/ListItemSecondary"/>
 
 </LinearLayout>

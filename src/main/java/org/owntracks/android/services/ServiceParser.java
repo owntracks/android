@@ -75,7 +75,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     public void processMessage(MessageCmd message) {
         Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
         if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) && Preferences.getRemoteCommandReportLocation()) {
-            ServiceProxy.getServiceLocator().publishResponseLocationMessage();
+            ServiceProxy.getServiceLocator().reportLocationResponse();
         }
 
 
@@ -130,6 +130,11 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     public void fromMqttMessage(String topic, MqttMessage message) {
         try {
             MessageBase m = Parser.deserializeSync(message.getPayload());
+            if(!m.isValidMessage()) {
+                Log.e(TAG, "message failed validation: " + message.getPayload());
+                return;
+            }
+
             m.setTopic(getBaseTopic(m, topic));
             m.setRetained(message.isRetained());
             m.setQos(message.getQos());

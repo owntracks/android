@@ -13,14 +13,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.*;
+import com.google.android.gms.maps.model.LatLng;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityWaypointBindingBinding;
 import org.owntracks.android.db.Dao;
@@ -102,10 +106,10 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         binding.setItem(this.waypoint);
         binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
 
-        setupRequiredFields();
+        setupListenerAndRequiredFields();
     }
 
-    private void setupRequiredFields() {
+    private void setupListenerAndRequiredFields() {
         requiredForSave = new SimpleTextChangeListener() {
             @Override
             public void onChanged(String s) {
@@ -117,6 +121,12 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         binding.latitude.addTextChangedListener(requiredForSave);
         binding.longitude.addTextChangedListener(requiredForSave);
 
+        binding.share.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                shareValue = isChecked;
+            }
+        });
     }
 
     private void conditionallyEnableSaveButton() {
@@ -131,9 +141,10 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
             enabled = false; // invalid input or NumberFormatException result in no valid input
         }
         Log.v(TAG, "conditionallyEnableSaveButton: " +enabled);
-        saveButton.setEnabled(enabled);
-        saveButton.getIcon().setAlpha(enabled ? 255 : 130);
-
+        if(saveButton != null) {
+            saveButton.setEnabled(enabled);
+            saveButton.getIcon().setAlpha(enabled ? 255 : 130);
+        }
     }
 
 
@@ -183,7 +194,8 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
                 finish();
                 return true;
             case R.id.useCurrent:
-                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USE_CURRENT);
+                //runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USE_CURRENT);
+                pickLocation();
 
                 return true;
             case R.id.pick:
@@ -201,42 +213,32 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_PLACE_PICKER
-                && resultCode == Activity.RESULT_OK) {
+
+        if (requestCode == REQUEST_PLACE_PICKER && resultCode == Activity.RESULT_OK) {
 
             // The user has selected a place. Extract the name and address.
-            final Place place = PlacePicker.getPlace(data, this);
+            Place place = PlacePicker.getPlace(this, data);
 
-            final CharSequence name = place.getName();
-            final CharSequence address = place.getAddress();
-            String attributions = PlacePicker.getAttributions(data);
-            if (attributions == null) {
-                attributions = "";
+            final LatLng l = place.getLatLng();
+            final CharSequence addr = place.getAddress();
+            if(l != null) {
+                binding.latitude.setText(Double.toString(l.latitude));
+                binding.longitude.setText(Double.toString(l.latitude));
+                Toast.makeText(App.getContext(), addr, Toast.LENGTH_LONG).show();
             }
-
-
-            //mViewName.setText(name);
-            //mViewAddress.setText(address);
-            //mViewAttributions.setText(Html.fromHtml(attributions));
-
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    // not used yet
-    private void pickLocation() {
+    private void  pickLocation() {
         try {
-            PlacePicker.IntentBuilder intentBuilder =  new PlacePicker.IntentBuilder();
 
-            Intent intent = intentBuilder.build(this);
-            // Start the intent by requesting a result,
-            // identified by a request code.
-            startActivityForResult(intent, REQUEST_PLACE_PICKER);
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER);
 
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            // ...
+            e.printStackTrace();
         }
 
     }
