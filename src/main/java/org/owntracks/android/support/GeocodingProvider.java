@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.services.ServiceNotification;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -20,6 +21,10 @@ public class GeocodingProvider {
     private static final Double RUN_SECOND = 2d;
 
     public static void resolve(MessageLocation m) {
+        MessageLocationResolverTask.execute(m, RUN_FIRST);
+    }
+
+    public static void resolve(MessageLocation m, ServiceNotification s) {
         MessageLocationResolverTask.execute(m, RUN_FIRST);
     }
 

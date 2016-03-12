@@ -16,18 +16,12 @@ import android.view.View;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.SnackbarFactory;
 
 import de.greenrobot.event.EventBus;
 
-public abstract class ActivityBase extends AppCompatActivity implements SnackbarFactory.SnackbarFactoryDelegate {
+public abstract class ActivityBase extends AppCompatActivity  {
     private static final String TAG = "ActivityBase";
     Toolbar toolbar;
-
-    @Override
-    public View getSnackbarTargetView() {
-        return getWindow().getDecorView().findViewById(android.R.id.content);
-    }
 
     boolean hasIntentExtras() {
         return getIntent() != null && getIntent().getExtras() != null;
@@ -92,22 +86,10 @@ public abstract class ActivityBase extends AppCompatActivity implements Snackbar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
-     //   switch (item.getItemId()) {
-        //        case android.R.id.home: //
-       //         goToRoot();
-        //         return true;
-        //        }
-        //        return false;
     }
 
     public void onBackPressed() {
-        //    if(this.getClass() != App.getRootActivityClass()) {
-        //       goToRoot();
-        //    }
-//
-     //   Log.v(TAG, "onBackPressed");
         super.onBackPressed();
-       // supportFinishAfterTransition();
     }
 
     @Override
@@ -139,12 +121,6 @@ public abstract class ActivityBase extends AppCompatActivity implements Snackbar
         i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         supportFinishAfterTransition();
-       // overridePendingTransition(0, 0);
-
     }
-
-
-
-
 
 }

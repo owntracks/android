@@ -50,7 +50,7 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	protected void onStartOnce() {
-		StatisticsProvider.setTime(this, StatisticsProvider.SERVICE_PROXY_START);
+		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
 
 		instantiateService(SERVICE_APP);
 		instantiateService(SERVICE_PARSER);

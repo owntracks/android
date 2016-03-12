@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.support.v4.util.ArrayMap;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
@@ -37,21 +38,19 @@ public class App extends Application  {
     private static final String TAG = "App";
 
     private static App instance;
-    private static boolean inForeground;
-    private static int runningActivities = 0;
-    private SimpleDateFormat dateFormater;
-    private static Handler mainHanler;
+    private static SimpleDateFormat dateFormater;
+    private static SimpleDateFormat dateFormaterToday;
 
+    private static Handler mainHanler;
     private static ArrayMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
-
     private static Activity currentActivity;
-
+    private static boolean inForeground;
+    private static int runningActivities = 0;
 
     public static final int MODE_ID_MQTT_PRIVATE =0;
     public static final int MODE_ID_MQTT_PUBLIC =2;
     public static final int MODE_ID_HTTP_PRIVATE=3;
-
 
 
     public static ArrayMap<String, FusedContact> getFusedContacts() {
@@ -62,26 +61,24 @@ public class App extends Application  {
 	public void onCreate() {
 		super.onCreate();
         instance = this;
-
-        Preferences.initialize(this);
-        Parser.initialize(this);
-        StatisticsProvider.setTime(this, StatisticsProvider.APP_START);
-
-		this.dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
+        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
+        dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
         mainHanler = new Handler(getMainLooper());
         fusedContacts = new ArrayMap<>();
         contactsViewModel =  new ContactsViewModel();
 
-
+        StatisticsProvider.initialize(this);
+        Preferences.initialize(this);
+        Parser.initialize(this);
         ContactImageProvider.initialize(this);
         GeocodingProvider.initialize(this);
         Dao.initialize(this);
         EncryptionProvider.initialize();
 		EventBus.getDefault().register(this);
+
+        // Background detection
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         registerScreenOnReceiver();
-
-
     }
 
 
@@ -131,12 +128,23 @@ public class App extends Application  {
 
     }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(Events.ModeChanged e) {
+        clearFusedContacts();
+        ContactImageProvider.invalidateCache();
+    }
+
+
     private static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
     }
 
 	public static String formatDate(Date d) {
-		return instance.dateFormater.format(d);
+        if(DateUtils.isToday(d.getTime())) {
+            return instance.dateFormaterToday.format(d);
+        } else {
+            return instance.dateFormater.format(d);
+        }
 	}
 
 	public static String getAndroidId() {
@@ -202,12 +210,15 @@ public class App extends Application  {
      */
     private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
+            Log.v(TAG, "onActivityStarted:" + activity);
+
             App.runningActivities++;
             currentActivity = activity;
             if (App.runningActivities == 1) App.onEnterForeground();
         }
 
         public void onActivityStopped(Activity activity) {
+            Log.v(TAG, "onActivityStopped:" + activity);
             App.runningActivities--;
             if(currentActivity == activity)  currentActivity = null;
             if (App.runningActivities == 0) App.onEnterBackground();

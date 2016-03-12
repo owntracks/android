@@ -116,5 +116,13 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonIgnore
         public abstract String getBaseTopicSuffix();
 
+        // Called after deserialization to check if all required attributes are set or not.
+        // The message is discarded if false is returned.
+        @JsonIgnore
+        public boolean isValidMessage() {
+                return true;
+        }
+
+
 
 }
