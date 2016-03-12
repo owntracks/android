@@ -190,16 +190,8 @@ public class ActivityPreferences extends ActivityBase {
             repo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    private static final String EXTRA_CUSTOM_TABS_SESSION = "android.support.customtabs.extra.SESSION";
-                    private static final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
-
-                    Bundle extras = new Bundle;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        extras.putBinder(EXTRA_CUSTOM_TABS_SESSION,  sessionICustomTabsCallback.asBinder() /* Set to null for no session */);
-                    }
-
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(Preferences.getRepoUrl()));
+                    intent.setData(Uri.parse(Preferences.getDocumentationUrl()));
                     a.startActivity(intent);
                     return false;
                 }
