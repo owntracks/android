@@ -1,197 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/frame"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-        <include layout="@layout/toolbar"
-            android:id="@+id/fragmentToolbar" />
+    <include layout="@layout/toolbar"
+        android:id="@+id/fragmentToolbar" />
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/fragmentToolbar">
-            <LinearLayout
-                android:orientation="vertical"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/activity_horizontal_margin"
-                android:id="@+id/layout">
+    <ScrollView
 
-
-                <TextView
-                    android:id="@+id/tv13"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Location Permission"
-                    android:textSize="16sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textColor="#212121"/>
-
-                <TextView
-                    android:id="@+id/permissionLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/na"
-                    android:textSize="14sp"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:id="@+id/tv0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="App started"
-                    android:textSize="16sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textColor="#212121"/>
-
-                <TextView
-                    android:id="@+id/appStart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/na"
-                    android:textSize="14sp"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:id="@+id/tv4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Locator last location change"
-                    android:textSize="16sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textColor="#212121"/>
-                <TextView
-                    android:id="@+id/serviceLocatorOnLocationChangeDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/na"
-                    android:textSize="14sp"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:id="@+id/tv12"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Queued messages"
-                    android:textSize="16sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textColor="#212121"/>
-
-                <TextView
-                    android:id="@+id/serviceBrokerQueueLength"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/na"
-                    android:textSize="14sp"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="8dp"/>
-
-
-            </LinearLayout>
-        </ScrollView>
-    </RelativeLayout>
-    <LinearLayout
-        android:orientation="vertical"
-        android:background="@color/md_white_1000"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottomSheet"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:elevation="16dp"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
-
-
-        <TextView
-            android:id="@+id/tv2"
-            android:layout_width="wrap_content"
+        android:layout_below="@id/fragmentToolbar">
+        <LinearLayout
+            android:orientation="vertical"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Background service started"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="#212121"/>
-        <TextView
-            android:id="@+id/serviceProxyStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textSize="14sp"
-            android:ellipsize="none"
-            android:singleLine="false"
-            android:textColor="#212121"
-            android:layout_marginBottom="8dp"/>
+            android:padding="@dimen/activity_horizontal_margin"
+            android:id="@+id/layout">
 
 
-        <TextView
-            android:id="@+id/tv5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Google PlayServices status"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="#212121"/>
-        <TextView
-            android:id="@+id/playServicesStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textSize="14sp"
-            android:ellipsize="none"
-            android:singleLine="false"
-            android:textColor="#212121"
-            android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/appStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App started"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
 
 
-        <TextView
-            android:id="@+id/tv3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PlayServices connected since"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textColor="#212121"/>
-        <TextView
-            android:id="@+id/serviceLocatorPlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/na"
-            android:textSize="14sp"
-            android:ellipsize="none"
-            android:singleLine="false"
-            android:textColor="#212121"
-            android:layout_marginBottom="8dp"/>
+            <TextView
+                android:id="@+id/serviceProxyStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+
+            <TextView
+                android:id="@+id/tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Background service started"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
 
 
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E4E4E4"/>
 
-    </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+
+            <TextView
+                android:id="@+id/permissionLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location Permission"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+            <TextView
+                android:id="@+id/serviceLocatorOnLocationChangeDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Locator last location change"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+            <TextView
+                android:id="@+id/serviceBrokerQueueLength"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Queued messages"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E4E4E4"/>
+
+            <TextView
+                android:id="@+id/playServicesStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Google PlayServices status"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+
+            <TextView
+                android:id="@+id/serviceLocatorPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+            <TextView
+                android:id="@+id/tv3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PlayServices connected since"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

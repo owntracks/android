@@ -12,6 +12,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageLocation extends MessageBase  {
+    public static final String REPORT_TYPE_USER = "u";
+    public static final String REPORT_TYPE_RESPONSE = "r";
     private String tid;
     private String t;
     private int bat;
@@ -100,6 +102,7 @@ public class MessageLocation extends MessageBase  {
         notifyContactPropertyChanged();
     }
 
+    @JsonIgnore
     public String getBaseTopicSuffix() {  return null; }
 
     public void setContact(FusedContact contact) {
@@ -111,6 +114,7 @@ public class MessageLocation extends MessageBase  {
 
     }
 
+    @JsonIgnore
     public LatLng getLatLng() {
         return point != null ? point : (point = new LatLng(lat, lon));
     }

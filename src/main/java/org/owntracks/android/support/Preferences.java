@@ -291,15 +291,6 @@ public class Preferences {
 
 
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface MessageConfigurationProperty {
-        public String key();
-
-    }
-
-
-
     public static void importFromMessage(MessageConfiguration m) {
 
         HashMap<String, Method> methods = getImportMethods();
@@ -423,14 +414,17 @@ public class Preferences {
         return getBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, R.bool.valRemoteCommandReportLocation);
     }
 
+    @Import(key =Keys.REMOTE_CONFIGURATION)
     public static void setRemoteConfiguration(boolean aBoolean) {
         setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean, false);
     }
 
+    @Import(key =Keys.REMOTE_COMMAND_REPORT_LOCATION)
     public static void setRemoteCommandReportLocation(boolean aBoolean) {
         setBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, aBoolean, true);
     }
 
+    @Import(key =Keys.CLEAN_SESSION)
     public static void setCleanSession(boolean aBoolean) {
         setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
     }
@@ -512,10 +506,12 @@ public class Preferences {
         return clientID.replaceAll("[^a-zA-Z0-9/]+", "").toLowerCase();
     }
 
+    @Import(key =Keys.CLIENT_ID)
     public static void setClientId(String clientId) {
         setString(Keys.CLIENT_ID, clientId);
     }
 
+    @Import(key =Keys.PUB_TOPIC_BASE)
     public static void setDeviceTopicBase(String deviceTopic) {
         setString(Keys.PUB_TOPIC_BASE, deviceTopic, false);
     }
@@ -611,6 +607,7 @@ public class Preferences {
             return "na";  // Empty trackerId won't be included in the message.
     }
 
+    @Import(key =Keys.HOST)
     public static void setHost(String value) {
             setString(Keys.HOST, value, false);
     }
@@ -619,10 +616,12 @@ public class Preferences {
         clearKey(Keys.PORT);
     }
 
+    @Import(key =Keys.PORT)
     public static void setPort(int value) {
             setInt(Keys.PORT, value, false);
    }
 
+    @Import(key =Keys.TRACKER_ID)
     public static void setTrackerId(String value){
         int len=value.length();
         // value validation - must be max 2 characters, only letters and digits
@@ -659,6 +658,8 @@ public class Preferences {
         return getIntWithHintSupport(Keys.PORT);
     }
 
+
+    @Import(key =Keys.KEEPALIVE)
     public static void setKeepalive(int value) {
         setInt(Keys.KEEPALIVE, value, false);
     }
@@ -673,6 +674,7 @@ public class Preferences {
         return getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
     }
 
+    @Import(key =Keys.USERNAME)
     public static void setUsername(String value) {
 
             setString(Keys.USERNAME, value);
@@ -683,98 +685,107 @@ public class Preferences {
         setBoolean(Keys.PUB_EXTENDED_DATA, aBoolean);
     }
 
-
+    @Import(key =Keys.PUB)
     private static void setPub(boolean aBoolean) {
         setBoolean(Keys.PUB, aBoolean);
     }
 
+    @Import(key =Keys.NOTIFICATION)
     private static void setNotification(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION, aBoolean);
 
     }
-
+    @Import(key =Keys.NOTIFICATION_LOCATION)
     private static void setNotificationLocation(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_LOCATION, aBoolean);
     }
-
+    @Import(key =Keys.NOTIFICATION_EVENTS)
     public static void setNotificationEvents(boolean notificationEvents) {
         setBoolean(Keys.NOTIFICATION_EVENTS, notificationEvents);
     }
 
-
+    @Import(key =Keys.SUB_TOPIC)
     private static void setSubTopic(String string) {
         setString(Keys.SUB_TOPIC, string, false);
     }
 
+    @Import(key =Keys.AUTOSTART_ON_BOOT)
     private static void setAutostartOnBoot(boolean aBoolean) {
         setBoolean(Keys.AUTOSTART_ON_BOOT, aBoolean);
 
     }
-
+    @Import(key =Keys.LOCATOR_ACCURACY_FOREGROUND)
     private static void setLocatorAccuracyForeground(int anInt) {
         setInt(Keys.LOCATOR_ACCURACY_FOREGROUND, anInt);
 
     }
 
+    @Import(key =Keys.LOCATOR_ACCURACY_BACKGROUND)
     private static void setLocatorAccuracyBackground(int anInt) {
         setInt(Keys.LOCATOR_ACCURACY_BACKGROUND, anInt);
 
     }
-
+    @Import(key =Keys.LOCATOR_INTERVAL)
     private static void setLocatorInterval(int anInt) {
         setInt(Keys.LOCATOR_INTERVAL, anInt);
 
     }
 
+    @Import(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD)
     private static void setBeaconBackgroundScanPeriod(int anInt) {
         setInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, anInt);
 
     }
 
+    @Import(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD)
     private static void setBeaconForegroundScanPeriod(int anInt) {
         setInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, anInt);
 
     }
 
+    @Import(key =Keys.LOCATOR_DISPLACEMENT)
     private static void setLocatorDisplacement(int anInt) {
         setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
 
     }
-
+    @Import(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD)
     private static void setPubRetain(boolean aBoolean) {
         setBoolean(Keys.PUB_RETAIN, aBoolean, false);
 
     }
-
+    @Import(key =Keys.PUB_QOS)
     private static void setPubQos(int anInt) {
         setInt(Keys.PUB_QOS, anInt, false);
     }
 
 
 
-
+    @Import(key =Keys.PASSWORD)
     public static void setPassword(String password) {
             setString(Keys.PASSWORD, password);
     }
 
-
+    @Import(key =Keys.DEVICE_ID)
     public static void setDeviceId(String deviceId) {
         setString(Keys.DEVICE_ID, deviceId, false);
     }
 
+
+    @Import(key =Keys.AUTH)
     public static void setAuth(boolean auth) {
         setBoolean(Keys.AUTH, auth, false);
     }
 
+    @Import(key =Keys.TLS)
     public static void setTls(boolean tlsSpecifier) {
         setBoolean(Keys.TLS, tlsSpecifier, false);
     }
 
-    public static void setTlsCaCrt(String tlsCrtPath) {
-        setString(Keys.TLS_CA_CRT, tlsCrtPath, false);
+    public static void setTlsCaCrt(String name) {
+        setString(Keys.TLS_CA_CRT, name, false);
     }
-    public static void setTlsClientCrt(String tlsCrtPath) {
-        setString(Keys.TLS_CLIENT_CRT, tlsCrtPath, false);
+    public static void setTlsClientCrt(String name) {
+        setString(Keys.TLS_CLIENT_CRT, name, false);
     }
     @Export(key =Keys.HOST, exportModeMqttPrivate =true)
     public static String getHost() {
@@ -878,6 +889,7 @@ public class Preferences {
         return getBoolean(Keys.INFO, R.bool.valInfo, R.bool.valInfoPublic, false);
     }
 
+    @Import(key =Keys.INFO)
     public static void setInfo(boolean info) {
         setBoolean(Keys.INFO, info);
     }
@@ -886,11 +898,11 @@ public class Preferences {
     public static String getTlsClientCrtPassword() {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
+
     public static void setTlsClientCrtPassword(String password) {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
-    @Export(key =Keys._ENCRYPTION_KEY, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
@@ -969,63 +981,6 @@ public class Preferences {
         cfg.set("waypoints", waypointsToJSON());
 
         return cfg;
-
-        /*
-        JSONObject json = new JSONObject();
-
-        // Header
-        try {json.put("_type", "configuration");} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyModeId), Preferences.getModeId());} catch(JSONException e) {}
-
-        // Misc settings
-        try {json.put(Preferences.getStringRessource(R.string.keyLocatorDisplacement), Preferences.getLocatorDisplacement());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyLocatorInterval), Preferences.getLocatorInterval());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyPubIncludeBattery), Preferences.getPubLocationExtendedData());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyPub), Preferences.getPub());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyNotification), Preferences.getNotification());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationLocation), Preferences.getNotificationLocation());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyNotificationEvents), Preferences.getNotificationEvents());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyAutostartOnBoot), Preferences.getAutostartOnBoot());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyBackground), Preferences.getLocatorAccuracyBackground());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyLocatorAccuracyForeground), Preferences.getLocatorAccuracyForeground());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyBeaconBackgroundScanPeriod), Preferences.getBeaconBackgroundScanPeriod());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyBeaconForegroundScanPeriod), Preferences.getBeaconForegroundScanPeriod());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyRemoteCommandReportLocation), Preferences.getRemoteCommandReportLocation());} catch(JSONException e) {}
-        try {json.put(Preferences.getStringRessource(R.string.keyWaypoints), Preferences.waypointsToJSON());} catch(JSONException e) {}
-
-        // Mode specific settings
-        switch (getModeId()) {
-            case App.MODE_ID_MQTT_PUBLIC:
-                break;
-
-            case App.MODE_ID_MQTT_PRIVATE:
-                try {json.put(Preferences.getStringRessource(R.string.keyHost), Preferences.getHost());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyPort), Preferences.getPort());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyAuth), Preferences.getAuth());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyUsername), Preferences.getUsername());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyPassword), Preferences.getPassword());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyDeviceId), Preferences.getDeviceId(true));} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyClientId), Preferences.getClientId(true));} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTrackerId), Preferences.getTrackerId(true));} catch(JSONException e) {}
-
-                try {json.put(Preferences.getStringRessource(R.string.keyPubQos), Preferences.getPubQos()) ;} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyKeepalive), Preferences.getKeepalive());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyPubRetain), Preferences.getPubRetain());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTls), Preferences.getTls());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsCaCrt), Preferences.getTlsCaCrtName());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrt), Preferences.getTlsClientCrtName());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyTlsClientCrtPassword), Preferences.getTlsClientCrtPassword());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyPubTopicBase), Preferences.getPubTopicBase(true));} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keySubTopic), Preferences.getSubTopic());} catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyCleanSession), Preferences.getCleanSession());
-                } catch(JSONException e) {}
-                try {json.put(Preferences.getStringRessource(R.string.keyRemoteConfiguration), Preferences.getRemoteConfiguration());} catch(JSONException e) {}
-
-                break;
-        }
-
-
-        return json;*/
     }
 
     public static class Keys {
@@ -1085,8 +1040,6 @@ public class Preferences {
     @Target(ElementType.METHOD)
     public @interface Import {
         String key();
-        boolean importModeMqttPrivate() default false;
-        boolean importModeMqttPublic() default false;
     }
 
     public static List<Method> getExportMethods() {
@@ -1117,10 +1070,7 @@ public class Preferences {
             final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(klass.getDeclaredMethods()));
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Import.class) ) {
-                    Import annotInstance = method.getAnnotation(Import.class);
-                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.importModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.importModeMqttPublic()) {
-                        methods.put(annotInstance.key(), method);
-                    }
+                    methods.put(method.getAnnotation(Import.class).key(), method);
                 }
             }
             // move to the upper class in the hierarchy in search for more methods
