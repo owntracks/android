@@ -8,12 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
 import com.mikepenz.materialdrawer.Drawer;
 
@@ -175,28 +173,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
 
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, MENU_CONTACT_SHOW, 1, R.string.menuContactShow);
-
-
-            menu.add(Menu.NONE, MENU_CONTACT_DETAILS, 3, R.string.menuContactDetails);
-            menu.add(Menu.NONE, MENU_CONTACT_NAVIGATE, 4, R.string.menuContactNavigate);
-            menu.add(Menu.NONE, MENU_CONTACT_REQUEST_REPORT_LOCATION, 5, R.string.menuContactRequestReportLocation);
-
-
-    }
-
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int index = info.position;
-        View view = info.targetView;
-        Log.v(TAG, "onContextItemSelected "  + view.getTag());
-        return true;
-    }
-
 
     @Override
     public void onClick(View v, Object viewModel) {
@@ -222,11 +198,8 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
     @Override
     public void onLongClick(View v, Object viewModel) {
-        registerForContextMenu(v);
-        openContextMenu(v);
-        unregisterForContextMenu(v);
 
-    }
+   }
 
     @Override
     public <T> BindingRecyclerViewAdapter<T> create(RecyclerView recyclerView, ItemViewArg<T> arg) {
