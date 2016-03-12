@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_center"
+        android:title="@string/menuContactCenter"/>
+
+    <item
+        android:id="@+id/menu_follow"
+        android:title="@string/menuContactFollow"/>
+    <item
+        android:id="@+id/menu_navigate"
+        android:title="@string/menuContactNavigate"/>
+    <item
+        android:id="@+id/menu_requestReportLocation"
+        android:title="@string/menuContactRequestReportLocation"/>
+
+</menu>

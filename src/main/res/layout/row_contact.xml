@@ -12,6 +12,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+
         android:minHeight="72dp">
 
         <ImageView
@@ -32,7 +34,6 @@
             android:layout_alignWithParentIfMissing="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_toRightOf="@+id/image"
             android:orientation="vertical"
             android:paddingBottom="16dp"
@@ -50,7 +51,7 @@
 
             <TextView
                 android:id="@+id/location"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{item.fusedLocation ?? @string/na}"
                 android:ellipsize="end"
@@ -58,6 +59,21 @@
                 style="@style/ListItemSecondary"/>
 
         </LinearLayout>
-
+        <ImageButton
+            android:id="@+id/moreButton"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_more_vert_black_24dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:tint="@color/tintBlack"
+            android:tintMode="src_atop"
+            android:layout_alignTop="@+id/textview_container"
+            android:layout_alignBottom="@+id/textview_container" />
     </RelativeLayout>
 </layout>

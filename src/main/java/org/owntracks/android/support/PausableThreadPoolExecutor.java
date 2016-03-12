@@ -24,6 +24,8 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
     private final ReentrantLock lock;
     private final Condition condition;
 
+
+
     /**
      * @param corePoolSize    The size of the pool
      * @param maximumPoolSize The maximum size of the pool
@@ -124,6 +126,10 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
 
     public interface ExecutorRunnable extends java.lang.Runnable{
         void cancelOnRun();
+    }
+
+    public int getQueueLength() {
+        return getQueue().size();
     }
 
 

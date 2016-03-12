@@ -125,6 +125,8 @@
                         android:hint="@string/beaconUUID"
                         android:id="@+id/beaconUUID"
                         android:inputType="textVisiblePassword"
+                        android:text='@{item.beaconUUID}'
+
                         app:met_floatingLabel="normal"
                         app:met_baseColor="@color/textPrimary"
                         app:met_primaryColor="@color/accent"

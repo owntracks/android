@@ -102,22 +102,9 @@ public class MessageWaypoint extends MessageBase{
         w.setGeofenceLatitude(getLat());
         w.setGeofenceLongitude(getLon());
         w.setGeofenceRadius(getRad());
-
-        if(getDesc().contains(":")) {
-            String[] a = getDesc().split(":");
-
-            w.setDescription(a[0]);
-            if(a.length >= 2)
-                w.setBeaconUUID(a[1]);
-            if(a.length >= 3)
-                try{ w.setBeaconMajor(Integer.parseInt(a[2]));} catch (NumberFormatException e){};
-            if(a.length >= 4)
-                try{ w.setBeaconMinor(Integer.parseInt(a[3]));} catch (NumberFormatException e){};
-
-        } else {
-            w.setDescription(getDesc());
-        }
-
+        w.setBeaconUUID(getUuid());
+        w.setBeaconMajor(getMajor());
+        w.setBeaconMinor(getMinor());
         w.setShared(isShared());
         w.setDate(new Date(TimeUnit.SECONDS.toSeconds(getTst())));
 
@@ -132,6 +119,9 @@ public class MessageWaypoint extends MessageBase{
         message.setRad(w.getGeofenceRadius());
         message.setShared(w.getShared());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+        message.setUuid(w.getBeaconUUID());
+        message.setMajor(w.getBeaconMajor());
+        message.setMinor(w.getBeaconMinor());
         return message;
     }
 
@@ -158,6 +148,11 @@ public class MessageWaypoint extends MessageBase{
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    @Override
+    public boolean isValidMessage() {
+        return super.isValidMessage() && (desc != null);
     }
 
 }

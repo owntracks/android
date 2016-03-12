@@ -28,6 +28,7 @@ import org.owntracks.android.support.DividerItemDecoration;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
+import org.owntracks.android.support.Toasts;
 
 import de.greenrobot.event.EventBus;
 
@@ -151,6 +152,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         Waypoint w = Dao.getWaypointDao().loadByRowId(id);
         Dao.getWaypointDao().delete(w);
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
+        Toasts.showWaypointRemovedToast();
     }
 
     @Override
