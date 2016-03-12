@@ -105,7 +105,6 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
         binding.setItem(this.waypoint);
         binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
-
         setupListenerAndRequiredFields();
     }
 
@@ -127,6 +126,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
                 shareValue = isChecked;
             }
         });
+        binding.share.setChecked(this.waypoint.getShared());
     }
 
     private void conditionallyEnableSaveButton() {
@@ -225,7 +225,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
             final CharSequence addr = place.getAddress();
             if(l != null) {
                 binding.latitude.setText(Double.toString(l.latitude));
-                binding.longitude.setText(Double.toString(l.latitude));
+                binding.longitude.setText(Double.toString(l.longitude));
                 Toast.makeText(App.getContext(), addr, Toast.LENGTH_LONG).show();
             }
         }
