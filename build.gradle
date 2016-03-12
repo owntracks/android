@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0-beta5'
+        classpath 'com.android.tools.build:gradle:2.0.0-beta6'
     }
 }
 
@@ -30,10 +30,10 @@ dependencies {
     compile files('libs/kalium-jni-1.0.0-SNAPSHOT.jar')
 
     // Support libraries
-    compile 'com.android.support:support-v4:23.2.0'
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.android.support:design:23.2.0'
-    compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.android.support:support-v4:23.2.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
 
     // Play Services libraries
     compile 'com.google.android.gms:play-services-maps:8.4.0'
@@ -88,6 +88,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         multiDexEnabled false
+        applicationId "org.owntracks.android"
     }
     dataBinding {
         enabled = true

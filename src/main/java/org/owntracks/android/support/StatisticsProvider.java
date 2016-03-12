@@ -2,10 +2,15 @@ package org.owntracks.android.support;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
+import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class StatisticsProvider  {
@@ -22,107 +27,57 @@ public class StatisticsProvider  {
     public static final String SERVICE_BROKER_QUEUE_LENGTH = "SERVICE_BROKER_QUEUE_LENGTH";
     public static final String SERVICE_BROKER_CONNECTS = "SERVICE_BROKER_CONNECTS";
 
-    public static final InternalProviderInterface provider = BuildConfig.DEBUG ? new StatisticsProviderDebug() : new StatisticsProviderProduction();
+    private static InternalProviderInterface provider = new Provider();
 
-    public static void incrementCounter(Context c, String key) {
-        // temporarily disabled
-        //provider.incrementCounter(c, key);
+
+    public static void setInt(String key, int value) {
+        provider.setInt(key, value);
+    }
+    public static int getInt(String key) {
+        return provider.getInt(key);
     }
 
-    public static int getCounter(Context c, String key) {
-        return provider.getCounter(c, key);
+    public static void setTime(String key) {
+        provider.setTime(key);
     }
 
-    public static void setInt(Context c, String key, int value) {
-        provider.setInt(c, key, value);
+    public static Date getTime(String key) {
+        return provider.getTime(key);
     }
 
-    public static void setTime(Context c, String key) {
-        provider.setTime(c, key);
-    }
-
-    public static Date getTime(Context c, String key) {
-        return provider.getTime(c, key);
-    }
-
-    public static void clearCounters(Context c) {
-        provider.clearCounters(c);
+    public static void initialize(App app) {
+        provider.setTime(StatisticsProvider.APP_START);
     }
 
 
     private interface InternalProviderInterface {
-        void incrementCounter(Context c, String key);
-        int getCounter(Context c, String key);
-        void setInt(Context c, String key, int value);
-        void setTime(Context c, String key);
-        Date getTime(Context c, String key);
-        void clearCounters(Context c);
+        void setInt( String key, int value);
+        Integer getInt(String key);
+        void setTime(String key);
+        Date getTime(String key);
 
     }
 
-    public static class StatisticsProviderProduction implements InternalProviderInterface {
+    public static class Provider implements InternalProviderInterface {
+        private Map<String, Object> counter = new HashMap<>();
 
-        @Override
-        public void incrementCounter(Context c, String key) {
-
+        public void setInt(String key, int value) {
+            counter.put(key, value);
         }
 
-        @Override
-        public int getCounter(Context c, String key) {
-            return 0;
+        @NonNull
+        public Integer getInt(String key) {
+            return counter.containsKey(key) ? (Integer) counter.get(key) : 0;
         }
 
-        @Override
-        public void setInt(Context c, String key, int value) {
-
+        public void setTime(String key) {
+            counter.put(key, new Date());
         }
 
-        @Override
-        public void setTime(Context c, String key) {
-
+        @NonNull
+        public Date getTime(String key) {
+            return counter.containsKey(key) ? (Date)counter.get(key) : new Date(0);
         }
 
-        @Override
-        public Date getTime(Context c, String key) {
-            return null;
-        }
-
-        @Override
-        public void clearCounters(Context c) {
-
-        }
-    }
-
-    public static class StatisticsProviderDebug implements InternalProviderInterface {
-
-        public void incrementCounter(Context c, String key) {
-            PreferenceManager.getDefaultSharedPreferences(c).edit().putInt(key, PreferenceManager.getDefaultSharedPreferences(c).getInt(key, 0) + 1).commit();
-        }
-
-        public int getCounter(Context c, String key) {
-            return PreferenceManager.getDefaultSharedPreferences(c).getInt(key, 0);
-        }
-
-        public void setInt(Context c, String key, int value) {
-            PreferenceManager.getDefaultSharedPreferences(c).edit().putInt(key, value).commit();
-        }
-
-        public void setTime(Context c, String key) {
-            PreferenceManager.getDefaultSharedPreferences(c).edit().putLong(key, (new Date().getTime())).commit();
-        }
-
-        public Date getTime(Context c, String key) {
-            return new Date(PreferenceManager.getDefaultSharedPreferences(c).getLong(key, 0));
-        }
-
-        public void clearCounters(Context c) {
-            setTime(c, REFERENCE);
-            setInt(c, SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES, 0);
-            setInt(c, SERVICE_BROKER_LOCATION_PUBLISH_INIT, 0);
-            setInt(c, SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS0_DROP, 0);
-            setInt(c, SERVICE_BROKER_LOCATION_PUBLISH_INIT_QOS12_QUEUE, 0);
-            setInt(c, SERVICE_BROKER_LOCATION_PUBLISH_SUCCESS, 0);
-            setInt(c, SERVICE_BROKER_CONNECTS, 0);
-        }
     }
 }

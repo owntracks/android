@@ -194,6 +194,9 @@
     <string name="snackbarConnected">Connected</string>
     <string name="snackbarDisconnected">Disconnected</string>
     <string name="snackbarDisconnectedError">Disconnected with error</string>
+
+
+
     <string name="geofenceLastTransition">Last transition:</string>
     <string name="ssid">SSID</string>
     <string name="idPager">Messages</string>
@@ -266,6 +269,8 @@
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
     <string name="preferencesCategoryReporting">Reporting</string>
     <string name="contactDetailsTrackerId">Tracker ID</string>
+    <string name="waypointRemoved">Region removed</string>
+    <string name="menuContactCenter">Center</string>
 
     <string-array name="filepicker">
         <item>Select</item>

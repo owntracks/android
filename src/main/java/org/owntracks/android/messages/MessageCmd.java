@@ -31,4 +31,9 @@ public class MessageCmd extends MessageBase{
         handler.processMessage(this);
     }
 
+    @Override
+    public boolean isValidMessage() {
+        return super.isValidMessage() && (action != null);
+    }
+
 }

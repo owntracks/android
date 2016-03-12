@@ -104,7 +104,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 
 		// Testing
-		MessageLocation m = new MessageLocation();
+		/*MessageLocation m = new MessageLocation();
 		m.setLat(52.4251861);
 		m.setLon(9.7330908);
 		m.setAcc(100);
@@ -113,7 +113,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		m.setTopic("owntracks/binarybucks/e");
 		m.setTid("e");
 
-		ServiceProxy.getServiceParser().processMessage(m);
+		ServiceProxy.getServiceParser().processMessage(m);*/
 	}
 
 	private void initPausedPubPool() {
@@ -339,7 +339,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	}
 
 	private void onConnect() {
-		StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_BROKER_CONNECTS);
 
 		// Check if we're connecting to the same broker that we were already connected to
 		String connectionId = getConnectionId();
@@ -659,6 +658,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 		message.setOutgoingProcessor(this);
 		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
+
 		this.pubPool.queue(message);
 
 	}
@@ -680,8 +681,10 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
     @Override
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
+
 		if(this.pubPool.isPaused() && this.mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
-			Log.v(TAG, "resuming pubPool that was paused to to backPreassure. Currently outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+			Log.v(TAG, "resuming pubPool that was paused due to backPreassure. Currently outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
 			this.pubPool.resume();
 		}
     }
@@ -718,6 +721,7 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 	public void clearQueues() {
 		initPausedPubPool();
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, 0);
     }
 
 	@SuppressWarnings("unused")
@@ -929,8 +933,6 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
         @Override
         public void clear() throws MqttPersistenceException {
-            Log.v(TAG, "clearing store");
-
             data.clear();
         }
 
