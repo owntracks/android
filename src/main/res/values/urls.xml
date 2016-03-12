@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="valRepoUrl">https://github.com/owntracks</string>
+    <string name="valIssuesMail">support@owntracks.org</string>
+    <string name="valTwitterUrl">https://twitter.com/owntracks</string>
+    <string name="valCommunityUrl">https://community.owntracks.org</string>
+    <string name="valDocumentationUrl">https://owntracks.org/booklet</string>
+</resources>

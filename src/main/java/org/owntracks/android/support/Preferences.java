@@ -146,6 +146,10 @@ public class Preferences {
         return App.getContext().getString(R.string.valCommunityUrl);
     }
 
+    public static String getDocumentationUrl() {
+        return App.getContext().getString(R.string.valDocumentationUrl);
+    }
+
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
