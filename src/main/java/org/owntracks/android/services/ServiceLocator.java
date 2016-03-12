@@ -13,6 +13,7 @@ import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
@@ -107,7 +108,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     @Override
     public void onConnected(Bundle arg0) {
         Log.e(TAG, "GoogleApiClient is now connected");
-        StatisticsProvider.setTime(context, StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
+        StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
 
         this.ready = true;
         initLocationRequest();
@@ -324,7 +325,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
         Log.v(TAG, "onStartCommand " + intent.getAction());
         if (ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL.equals(intent.getAction())) {
-            publishManualLocationMessage();
+            reportLocationManually();
         } else if (intent.getAction().equals(ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION)) {
             onFenceTransition(intent);
         } else {
@@ -343,15 +344,14 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         Log.v(TAG, "onLocationChanged");
 
         if(!isForeground()) {
-            StatisticsProvider.setTime(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
-            StatisticsProvider.incrementCounter(context, StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_CHANGES);
+            StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
         }
         lastKnownLocation = location;
 
         EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
 
         if (shouldPublishLocation())
-            publishLocationMessage();
+            reportLocation();
     }
 
 	public void enableForegroundMode() {
@@ -413,28 +413,28 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         ServiceProxy.getServiceBroker().publish(message);
 	}
 
-    public void publishManualLocationMessage() {
-        publishLocationMessage("u"); // manual publish requested by the user
+    public void reportLocationManually() {
+        reportLocation(MessageLocation.REPORT_TYPE_USER); // manual publish requested by the user
     }
 
-    public void publishResponseLocationMessage() {
-        publishLocationMessage("r"); // response to a "reportLocation" request
+    public void reportLocationResponse() {
+        reportLocation(MessageLocation.REPORT_TYPE_RESPONSE); // response to a "reportLocation" request
     }
 
-    public void publishLocationMessage() {
-        publishLocationMessage(null); // automatic publish after a location change
+    public void reportLocation() {
+        reportLocation(null); // automatic publish after a location change
 	}
 
-	private void publishLocationMessage(String trigger) {
+	private void reportLocation(String trigger) {
 
 		if (ServiceProxy.getServiceBroker() == null) {
-            Log.e(TAG, "publishLocationMessage called without a broker instance");
+            Log.e(TAG, "reportLocation called without a broker instance");
             return;
 		}
 
         Location l = getLastKnownLocation();
 		if (l == null) {
-            Log.e(TAG, "publishLocationMessage called without a known location");
+            Log.e(TAG, "reportLocation called without a known location");
 			return;
 		}
 

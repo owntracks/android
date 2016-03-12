@@ -11,11 +11,5 @@
         android:title="@string/refresh">
     </item>
 
-    <item
-        android:id="@+id/debug"
-        android:icon="@drawable/ic_bug_report_white_24dp"
-        android:orderInCategory="97"
-        app:showAsAction="always"
-        android:title="@string/clear">
-    </item>
+
 </menu>

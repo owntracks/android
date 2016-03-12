@@ -36,6 +36,8 @@ public class ContactImageProvider {
     public static void invalidateCacheLevelCard(String key) {
         memoryCache.clearLevelCard(key);
     }
+
+
     private  static abstract class ContactBitmapWorkerTask extends AsyncTask<FusedContact, Void, Bitmap> {
 
         public ContactBitmapWorkerTask() {
@@ -175,6 +177,10 @@ public class ContactImageProvider {
         }
     }
 
+    public static void invalidateCache() {
+        Log.v(TAG, "invalidateCache()");
+        memoryCache.clear();
+    }
     private static Bitmap getRoundedShape(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
@@ -219,5 +225,8 @@ public class ContactImageProvider {
     private static float convertDpToPixel(float dp) {
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
     }
+
+
+
 
 }

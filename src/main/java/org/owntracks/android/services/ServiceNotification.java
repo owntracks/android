@@ -25,7 +25,6 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityFeatured;
 import org.owntracks.android.activities.ActivityLauncher;
-import org.owntracks.android.activities.ActivityPreferencesConnection;
 import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
@@ -34,9 +33,9 @@ import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
-import org.owntracks.android.support.SnackbarFactory;
 import org.owntracks.android.support.StaticHandler;
 import org.owntracks.android.support.StaticHandlerInterface;
+import org.owntracks.android.support.Toasts;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -228,10 +227,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         }
     }
 
-
-    /*
-    * NEW NOTIFICATION HANDLING
-    * */
     public void  updateNotificationOngoing() {
         if (!Preferences.getNotification())
             return;
@@ -387,56 +382,8 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-        final Activity a = App.getCurrentActivity();
-        if (App.isInForeground() && a != null && a instanceof SnackbarFactory.SnackbarFactoryDelegate) {
-            Snackbar s = null;
-
-            if (e.getState() == ServiceBroker.State.CONNECTED) {
-                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarConnected, Snackbar.LENGTH_LONG);
-            } else if (e.getState() == ServiceBroker.State.CONNECTING) {
-                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarConnecting, Snackbar.LENGTH_LONG);
-            } else if (e.getState() == ServiceBroker.State.DISCONNECTED || e.getState() == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
-                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnected, Snackbar.LENGTH_LONG);
-                s.setAction(R.string.snackbarDisconnectedReconnect, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ServiceProxy.runOrBind(a, new Runnable() {
-                            @Override
-                            public void run() {
-                                ServiceProxy.getServiceBroker().reconnect();
-                            }
-                        });
-                    }
-                });
-
-            } else if (e.getState() == ServiceBroker.State.DISCONNECTED_ERROR) {
-                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
-                s.setAction(R.string.snackbarDisconnectedReconnect, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ServiceProxy.runOrBind(a, new Runnable() {
-                            @Override
-                            public void run() {
-                                ServiceProxy.getServiceBroker().reconnect();
-                            }
-                        });
-                    }
-                });
-            } else if (e.getState() == ServiceBroker.State.DISCONNECTED_CONFIGINCOMPLETE) {
-                s = SnackbarFactory.make((SnackbarFactory.SnackbarFactoryDelegate)a, R.string.snackbarDisconnectedError, Snackbar.LENGTH_INDEFINITE);
-                s.setAction(R.string.snackbarConfigIncompleteFix, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(a, ActivityPreferencesConnection.class);
-                        a.startActivity(intent);
-                    }
-                });
-            }
-
-            if(s != null)
-                SnackbarFactory.show(s);
-
-        }
+        if (App.isInForeground())
+            Toasts.showBrokerStateChange(e.getState());
 
         updateNotificationOngoing();
     }
@@ -457,6 +404,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilderPermission.setContentIntent(resultPendingIntent);
+
 
         notificationBuilderPermission.setSmallIcon(R.drawable.ic_notification);
         notificationBuilderPermission.setGroup(NOTIFICATION_ID_PERMISSION + "");

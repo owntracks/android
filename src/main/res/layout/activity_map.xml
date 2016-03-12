@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+    xmlns:rttv="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <import type="android.view.View"/>
@@ -25,8 +26,153 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <include layout="@layout/contact" android:id="@+id/bottomSheet"/>
 
+
+
+
+
+        <LinearLayout
+
+            android:id="@+id/bottomSheetLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:orientation="vertical"
+            app:behavior_hideable="true"
+            app:layout_behavior="@string/bottom_sheet_behavior"
+            android:elevation="6dp">
+
+            <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
+
+
+            <com.github.curioustechizen.ago.RelativeTimeTextView
+                android:id="@+id/locationDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                rttv:reference_time="@{item.fusedLocationDate*1000}"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary"/>
+
+            <TextView
+                android:id="@+id/locationDateLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contactDetailsReportedTime"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary"/>
+
+
+
+            <TextView
+                android:id="@+id/acc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.fusedLocationAccuracy +'m'}"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary"/>
+
+
+            <TextView
+                android:id="@+id/accLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contactDetailsAccuracy"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary"/>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="#E4E4E4"/>
+
+
+
+            <TextView
+                android:id="@+id/topic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.topic ?? @string/na}"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary"/>
+
+            <TextView
+                android:id="@+id/topicLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contactDetailsTopic"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary"/>
+
+            />
+
+            <TextView
+                android:id="@+id/tid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.trackerId ?? @string/na}"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary"/>
+
+
+            <TextView
+                android:id="@+id/tidLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contactDetailsTrackerId"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary"/>
+
+            />
+
+
+        </LinearLayout>
+
+<!--        <android.support.design.widget.FloatingActionButton
+            android:id= "@+id/fab"
+            android:layout_width= "wrap_content"
+            android:layout_height= "wrap_content"
+            android:layout_marginRight= "16dp"
+            android:layout_marginEnd= "16dp"
+            android:src= "@drawable/ic_contact_link"
+            android:visibility="gone"
+
+            app:layout_anchor= "@id/bottomSheetLayout"
+            app:layout_anchorGravity= "top|right"  />-->
 
 
 
