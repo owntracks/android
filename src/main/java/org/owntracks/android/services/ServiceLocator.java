@@ -398,14 +398,8 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		}
 
 
-        MessageWaypoint message = new MessageWaypoint();
-        message.setDesc(w.getDescription());
-        message.setLat(w.getGeofenceLatitude());
-        message.setLon(w.getGeofenceLongitude());
-        message.setRad(w.getGeofenceRadius());
-        message.setShared(w.getShared());
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
 
+        MessageWaypoint message = MessageWaypoint.fromDaoObject(w);
         message.setTopic(Preferences.getPubTopicWaypoints());
         message.setQos(Preferences.getPubQosWaypoints());
         message.setRetained(Preferences.getPubRetainWaypoints());
