@@ -169,8 +169,8 @@ public class ActivityPreferences extends ActivityBase {
             repo = findPreference("repo");
             twitter = findPreference("twitter");
             community = findPreference("community");
+            documentation = findPreference("documentation");
             version = findPreference("versionReadOnly");
-            documentation = findPreference("versionReadOnly");
 
 
 
@@ -191,7 +191,7 @@ public class ActivityPreferences extends ActivityBase {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(Preferences.getDocumentationUrl()));
+                    intent.setData(Uri.parse(getString(R.string.valRepoUrl)));
                     a.startActivity(intent);
                     return false;
                 }
@@ -202,7 +202,7 @@ public class ActivityPreferences extends ActivityBase {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(Preferences.getTwitterUrl()));
+                    intent.setData(Uri.parse(getString(R.string.valTwitterUrl)));
                     a.startActivity(intent);
                     return false;
                 }
@@ -212,7 +212,7 @@ public class ActivityPreferences extends ActivityBase {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(Preferences.getSupportUrl()));
+                    intent.setData(Uri.parse(getString(R.string.valCommunityUrl)));
                     a.startActivity(intent);
                     return false;
                 }
@@ -221,7 +221,7 @@ public class ActivityPreferences extends ActivityBase {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(Preferences.getDocumentationUrl()));
+                    intent.setData(Uri.parse(getString(R.string.valDocumentationUrl)));
                     a.startActivity(intent);
                     return false;
                 }

@@ -142,13 +142,6 @@ public class Preferences {
         }
     }
 
-    public static String getSupportUrl() {
-        return App.getContext().getString(R.string.valCommunityUrl);
-    }
-
-    public static String getDocumentationUrl() {
-        return App.getContext().getString(R.string.valDocumentationUrl);
-    }
 
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
@@ -847,16 +840,6 @@ public class Preferences {
     @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getAutostartOnBoot() {
         return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
-    }
-
-    public static String getRepoUrl() {
-        return App.getContext().getString(R.string.valRepoUrl);
-
-    }
-
-    public static String getTwitterUrl() {
-        return App.getContext().getString(R.string.valTwitterUrl);
-
     }
 
     @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true)
