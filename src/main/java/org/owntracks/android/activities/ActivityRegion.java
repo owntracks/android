@@ -135,8 +135,8 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         boolean enabled;
         try {
             enabled = (binding.description.getText().toString().length() > 0)
-                    && (binding.description.getText().toString().length() > 0)
-                    && (binding.description.getText().toString().length() > 0);
+                    && (binding.latitude.getText().toString().length() > 0)
+                    && (binding.longitude.getText().toString().length() > 0);
 
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input

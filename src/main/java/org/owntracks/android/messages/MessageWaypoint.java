@@ -25,17 +25,16 @@ public class MessageWaypoint extends MessageBase{
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
     private String desc;
-
-
-
     private double lon;
     private double lat;
-    private int rad;
     private long tst;
-    private boolean shared;
+
+    // Optional types for optional values
+    private Boolean shared;
+    private Integer rad;
     private String uuid;
-    private int major;
-    private int minor;
+    private Integer major;
+    private Integer minor;
 
     public String getDesc() {
         return desc;
@@ -61,11 +60,11 @@ public class MessageWaypoint extends MessageBase{
         this.lat = lat;
     }
 
-    public int getRad() {
+    public Integer getRad() {
         return rad;
     }
 
-    public void setRad(int rad) {
+    public void setRad(Integer rad) {
         this.rad = rad;
     }
 
@@ -77,11 +76,12 @@ public class MessageWaypoint extends MessageBase{
         this.tst = tst;
     }
 
+    @JsonIgnore
     public boolean isShared() {
-        return shared;
+        return shared != null && shared;
     }
 
-    public void setShared(boolean shared) {
+    public void setShared(Boolean shared) {
         this.shared = shared;
     }
 
@@ -126,19 +126,19 @@ public class MessageWaypoint extends MessageBase{
     }
 
 
-    public int getMinor() {
+    public Integer getMinor() {
         return minor;
     }
 
-    public void setMinor(int minor) {
+    public void setMinor(Integer minor) {
         this.minor = minor;
     }
 
-    public int getMajor() {
+    public Integer getMajor() {
         return major;
     }
 
-    public void setMajor(int major) {
+    public void setMajor(Integer major) {
         this.major = major;
     }
 
