@@ -54,6 +54,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
             App.addFusedContact(c);
         } else {
             c.setMessageLocation(message);
+            App.updateFusedContact(c);
         }
     }
 
@@ -68,6 +69,7 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
             App.addFusedContact(c);
         } else {
             c.setMessageCard(message);
+            App.updateFusedContact(c);
         }
     }
 

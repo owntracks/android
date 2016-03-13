@@ -106,6 +106,8 @@ android {
         release {
             minifyEnabled false
             zipAlignEnabled true
+            applicationIdSuffix ''
+
         }
         debug {
             applicationIdSuffix '.debug'
