@@ -185,6 +185,11 @@ public class Waypoint {
         l.setAccuracy(getGeofenceRadius() != null ? getGeofenceRadius() : 0);
         return l;
     }
+
+
+    public void setDefaults() {
+        this.setShared(false);
+    }
     // KEEP METHODS END
 
 }
