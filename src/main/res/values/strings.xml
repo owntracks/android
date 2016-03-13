@@ -256,7 +256,7 @@
     <string name="title_activity_region">Region</string>
     <string name="title_activity_featured">Featured</string>
     <string name="title_activity_map">Map</string>
-    <string name="title_activity_contacts">Contacts</string>
+    <string name="title_activity_contacts">Friends</string>
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Preferences</string>
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
