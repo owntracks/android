@@ -109,7 +109,13 @@ public class App extends Application  {
                 contactsViewModel.items.add(c);
             }
         });
+        EventBus.getDefault().post(c);
     }
+
+    public static void updateFusedContact(FusedContact c) {
+        EventBus.getDefault().post(c);
+    }
+
 
     public static void clearFusedContacts() {
         Log.v(TAG, "clearing fusedContacts");
@@ -204,6 +210,7 @@ public class App extends Application  {
     public static Class<?> getRootActivityClass(){
         return ActivityMap.class;
     }
+
 
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background

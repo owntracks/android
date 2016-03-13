@@ -59,21 +59,5 @@
                 style="@style/ListItemSecondary"/>
 
         </LinearLayout>
-        <ImageButton
-            android:id="@+id/moreButton"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_more_vert_black_24dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:tint="@color/tintBlack"
-            android:tintMode="src_atop"
-            android:layout_alignTop="@+id/textview_container"
-            android:layout_alignBottom="@+id/textview_container" />
     </RelativeLayout>
 </layout>

@@ -2,14 +2,20 @@ package org.owntracks.android.activities;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.databinding.ObservableList;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +47,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class ActivityMap extends ActivityBase implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
+public class ActivityMap extends ActivityBase implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, PopupMenu.OnMenuItemClickListener {
     private static final String TAG = "ActivityMap";
 
     public static final String INTENT_KEY_TOPIC = "t";
@@ -91,7 +97,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.bottomSheetLayout.setOnClickListener(bottomSheetClickListener);
         this.bottomSheetBehavior.setPeekHeight(0);
-
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
 
@@ -104,31 +109,40 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
         this.intentExtras = getIntent().getExtras();
         this.mapLocationSource = new MapLocationSource();
-        binding.contactPeek.moreButton.setOnClickListener(new View.OnClickListener() {
+
+        binding.moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupMenu(v);
 
             }
         });
-
     }
 
     private void showPopupMenu(View v) {
-        PopupMenu popupMenu = new PopupMenu(this, v);
+
+
+        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.BOTTOM ); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return true;
-            }
-        });
+        popupMenu.setOnMenuItemClickListener(this);
 
         popupMenu.show();
-
     }
+
+
+    private void actionNavigateToSelectedContact() {
+        if(activeContact != null && activeContact.hasLocation()) {
+            LatLng l = activeContact.getLatLng();
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
 
     @Override
     public void onStart() {
@@ -150,6 +164,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onPause() {
         super.onPause();
         this.mapView.onPause();
+
         de.greenrobot.event.EventBus.getDefault().unregister(this);
 
     }
@@ -199,25 +214,20 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     @SuppressWarnings("unused")
-    public void onEvent(Events.ContactUpdated e) {
-        if (e.getContact() == activeContact) {
+    public void onEventMainThread(FusedContact e) {
+        if (e == activeContact) {
             if(mode == ACTION_FOLLOW_CONTACT)
-                actionFollowContact(e.getContact());
+                actionFollowContact(e);
             else if(mode == ACTION_SELECT_CONTACT) {
-                actionSelectContact(e.getContact());
+                actionSelectContact(e);
             }
         } else {
-            updateContactLocation(e.getContact());
+            updateContactLocation(e);
         }
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(Events.ContactAdded e) {
-        updateContactLocation(e.getContact());
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(Events.CurrentLocationUpdated e) {
+    public void onEventMainThread(Events.CurrentLocationUpdated e) {
         onDeviceLocationUpdated(e.getGeocodableLocation());
     }
 
@@ -231,13 +241,43 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
+    /*private void addContact(FusedContact c) {
+        c.addOnPropertyChangedCallback(contactChangedCallback);
+        updateContactLocation(c);
+    }*/
+
+/*
+    private Observable.OnPropertyChangedCallback contactChangedCallback = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(final Observable observable, int i) {
+            Log.v(TAG, "onPropertyChanged " + observable);
+
+
+            if(observable instanceof FusedContact) {
+                if(Looper.myLooper() == Looper.getMainLooper())
+                    updateContactLocation((FusedContact)observable);
+                else {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            updateContactLocation((FusedContact) observable);
+                        }
+                    });
+                }
+            }
+
+        }
+    };
+
+*/
+
+
 
     private void updateContactLocation(FusedContact c) {
         Log.v(TAG, "updateContactLocation: " + c.getTopic() + " hasLocation: " + c.hasLocation());
         if (!c.hasLocation())
             return;
 
-        //removeContactMarker(c);
         Marker m = markers.get(c.getTopic());
 
         if (m != null) {
@@ -251,7 +291,12 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     }
 
-
+    private void onAddInitialMarkers() {
+        Iterator it = App.getFusedContacts().entrySet().iterator();
+        while (it.hasNext()) {
+            updateContactLocation((FusedContact)((Map.Entry)it.next()).getValue());
+        }
+    }
     @SuppressWarnings("MissingPermission")
     // Map uses custom provider that handles missing permissions
     @Override
@@ -277,53 +322,41 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
         });
 
-        // Load all contacts
-        Log.v(TAG, "Populating map with # markers: " + App.getFusedContacts().size());
-        Iterator it = App.getFusedContacts().entrySet().iterator();
-        while (it.hasNext()) {
-            updateContactLocation((FusedContact)((Map.Entry)it.next()).getValue());
+        onAddInitialMarkers();
+        onHandleIntentExtras();
+
+/*        App.getContactsViewModel().items.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<FusedContact>>() {
+        @Override
+        public void onChanged(ObservableList<FusedContact> fusedContacts) {
+            Log.v(TAG, "ObservableList onChanged" );
 
         }
 
+        @Override
+        public void onItemRangeChanged(ObservableList<FusedContact> fusedContacts, int i, int i1) {
 
-        onHandleIntentExtras();
+        }
 
-        Log.v(TAG, "setting up viewmodel listener");
-        App.getContactsViewModel().items.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<FusedContact>>() {
-            @Override
-            public void onChanged(ObservableList<FusedContact> fusedContacts) {
-                Log.v(TAG, "ObservableList onChanged" );
+        @Override
+        public void onItemRangeInserted(ObservableList<FusedContact> fusedContacts, int i, int i1) {
+            Log.v(TAG, "ObservableList onItemRangeInserted" );
+            //updateContactLocation(fusedContacts.get(i)));
+            Log.v(TAG, "contact added: " + fusedContacts.get(i));
+            addContact(fusedContacts.get(i));
+        }
 
-            }
+        @Override
+        public void onItemRangeMoved(ObservableList<FusedContact> fusedContacts, int i, int i1, int i2) {
+            Log.v(TAG, "ObservableList onItemRangeMoved" );
 
-            @Override
-            public void onItemRangeChanged(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-                Log.v(TAG, "ObservableList onItemRangeChanged start" + i + " count: " + i1 );
-                for (int counter = i; i<fusedContacts.size() && i< counter+i1; i++ ) {
-                    Log.v(TAG, "updated: " + fusedContacts.get(counter).getTopic());
-                }
-            }
+        }
+        @Override
+        public void onItemRangeRemoved(ObservableList<FusedContact> fusedContacts, int i, int i1) {
+            Log.v(TAG, "ObservableList onItemRangeRemoved" );
 
-            @Override
-            public void onItemRangeInserted(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-                Log.v(TAG, "ObservableList onItemRangeInserted" );
-               //updateContactLocation(fusedContacts.get(i)));
-
-            }
-
-            @Override
-            public void onItemRangeMoved(ObservableList<FusedContact> fusedContacts, int i, int i1, int i2) {
-                Log.v(TAG, "ObservableList onItemRangeMoved" );
-
-            }
-
-            @Override
-            public void onItemRangeRemoved(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-                Log.v(TAG, "ObservableList onItemRangeRemoved" );
-
-            }
-        });
-    }
+        }
+    });*/
+}
 
 
     @Override
@@ -384,7 +417,10 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
-    private void actionFollowContact(FusedContact c) {
+    private void actionFollowContact(@Nullable FusedContact c) {
+        if(c == null)
+            return;
+
         this.mode = ACTION_FOLLOW_CONTACT;
         updateContactLocation(c);
         updateBottomSheetContact(c);
@@ -473,6 +509,26 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     };
 
+    // Popup menu click
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_navigate:
+                actionNavigateToSelectedContact();
+                return true;
+            case R.id.menu_follow:
+                if(mode == ACTION_FREE_ROAM) {
+                    actionFollowContact(activeContact);
+                } else {
+                    mode = ACTION_FREE_ROAM;
+                }
+                return true;
+
+            default:
+                return false;
+        }
+
+    }
 
 
 

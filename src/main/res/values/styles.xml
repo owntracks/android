@@ -1,4 +1,4 @@
-<!--
+ <!--
  File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
@@ -68,8 +68,7 @@
     <color name="divider">#1E000000</color>
     <color name="textPrimary">#de000000</color>
     <color name="textSecondary">#8a000000</color>
-    <color name="tintBlack">@color/textSecondary</color>
-
+    <color name="buttonTint">@color/textSecondary</color>
     <color name="background">#fffafafa</color>
 
     <color name="pressed">#FFE4E4E4</color>
