@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true) // Don't fail on deserialization if an unknown attribute is encountered
-@JsonInclude(JsonInclude.Include.NON_NULL) // Don't serialize attributes with null values
+@JsonInclude(JsonInclude.Include.NON_EMPTY) // Don't serialize attributes with null values
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 @JsonSubTypes({
         @JsonSubTypes.Type(value=MessageLocation.class, name="location"),
