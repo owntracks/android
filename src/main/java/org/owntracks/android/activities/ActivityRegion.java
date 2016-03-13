@@ -101,6 +101,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         if(this.waypoint == null) {
             this.update = false;
             this.waypoint = new Waypoint();
+            this.waypoint.setDefaults();
         }
 
         binding.setItem(this.waypoint);
@@ -298,15 +299,16 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
         w.setBeaconUUID(binding.beaconUUID.getText().toString());
         try {
+
             w.setBeaconMinor(Integer.valueOf(binding.beaconMinor.getText().toString()));
         } catch (NumberFormatException e) {
-            w.setBeaconMinor(0);
+            w.setBeaconMinor(null);
         }
 
         try {
             w.setBeaconMajor(Integer.valueOf(binding.beaconMajor.getText().toString()));
         } catch (NumberFormatException e) {
-            w.setBeaconMajor(0);
+            w.setBeaconMajor(null);
         }
 
         if(!Preferences.isModeMqttPublic())
