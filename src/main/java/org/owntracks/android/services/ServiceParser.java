@@ -143,6 +143,10 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
             m.setIncomingProcessor(this);
             pool.execute(m);
 
+            if(m instanceof MessageUnknown) {
+                Log.v(TAG, "unknown message topic: " + topic +" payload: " + new String(message.getPayload()));
+            }
+
         } catch (Exception e) {
 
             Log.e(TAG, "JSON parser exception for message: " + new String(message.getPayload()));

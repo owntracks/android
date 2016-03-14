@@ -40,6 +40,7 @@ public class Parser {
     }
 
     public static String serializeSync(@NonNull MessageBase message) throws JsonProcessingException {
+
         return mapper.writeValueAsString(message);
     }
 

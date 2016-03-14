@@ -33,18 +33,18 @@ public class MessageConfiguration extends MessageBase{
 
 
     @JsonProperty
-    private List<MessageWaypoint> waypoints;
+    private MessageWaypointCollection waypoints;
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processMessage(this);
     }
 
-    public List<MessageWaypoint> getWaypoints() {
+    public MessageWaypointCollection getWaypoints() {
         return waypoints;
     }
 
-    public void setWaypoints(List<MessageWaypoint> waypoints) {
+    public void setWaypoints(MessageWaypointCollection waypoints) {
         this.waypoints = waypoints;
     }
 
