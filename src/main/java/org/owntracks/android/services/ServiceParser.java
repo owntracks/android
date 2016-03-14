@@ -14,6 +14,8 @@ import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
+import org.owntracks.android.messages.MessageWaypoints;
+import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
@@ -78,8 +80,16 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
         Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
         if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) && Preferences.getRemoteCommandReportLocation()) {
             ServiceProxy.getServiceLocator().reportLocationResponse();
-        }
+        } else if(message.getAction().equals(MessageCmd.ACTION_WAYPOINTS)) {
+            ServiceProxy.getServiceApplication().publishWaypointsMessage();
+        } else if(message.getAction().equals(MessageCmd.ACTION_SET_WAYPOINTS)) {
+            MessageWaypoints waypoints = message.getMessageWaypoints();
+            if(waypoints == null)
+                return;
 
+            Preferences.importWaypointsFromJson(waypoints.getWaypoints());
+
+        }
 
     }
 

@@ -11,25 +11,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.util.ArrayMap;
 import android.util.Log;
 
-
-import org.json.JSONException;
 
 import de.greenrobot.event.EventBus;
 
@@ -38,7 +33,6 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.messages.MessageWaypointCollection;
 
 public class Preferences {
     private static final String TAG = "Preferences";
@@ -307,7 +301,7 @@ public class Preferences {
         }
 
         if(m.hasWaypoints()) {
-            waypointsFromJson(m.getWaypoints());
+            importWaypointsFromJson(m.getWaypoints());
         }
 
 
@@ -361,7 +355,7 @@ public class Preferences {
         try {
             JSONArray j = json.getJSONArray("waypoints");
             if (j != null) {
-                //waypointsFromJson(j);
+                //importWaypointsFromJson(j);
             } else {
                 Log.v(TAG, "no valid waypoints");
             }
@@ -371,7 +365,7 @@ public class Preferences {
         }*/
     }
 
-    private static MessageWaypointCollection waypointsToJSON() {
+    public static MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
         for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
@@ -381,7 +375,10 @@ public class Preferences {
     }
 
 
-    private static void waypointsFromJson(List<MessageWaypoint> j) {
+    public static void importWaypointsFromJson(@Nullable List<MessageWaypoint> j) {
+        if(j == null)
+            return;
+
         Log.v(TAG, "importing " + j.size()+" waypoints");
         WaypointDao dao = Dao.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();

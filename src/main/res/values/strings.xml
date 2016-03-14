@@ -271,6 +271,12 @@
     <string name="contactDetailsTrackerId">Tracker ID</string>
     <string name="waypointRemoved">Region removed</string>
     <string name="menuContactCenter">Center</string>
+    <string name="preferencesExportToFile">Export to file</string>
+    <string name="preferencesExportToFileSummary">Export to file</string>
+    <string name="exportWaypointsToEndpoint">Export waypoints to endpoint</string>
+    <string name="exportWaypointsToEndpointSummary">export waypoints to endpoints</string>
+    <string name="preferencesExportFailed">Preferences export failed</string>
+    <string name="preferencesExportSuccess">Export successfull</string>
 
     <string-array name="filepicker">
         <item>Select</item>
