@@ -372,6 +372,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	private void publishTransitionMessage(Waypoint w, Location triggeringLocation, int transition) {
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
+        message.setTrigger(MessageTransition.TRIGGER_CIRCULAR);
         message.setTid(Preferences.getTrackerId(true));
         message.setLat(triggeringLocation.getLatitude());
         message.setLon(triggeringLocation.getLongitude());

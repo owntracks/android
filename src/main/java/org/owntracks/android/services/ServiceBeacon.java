@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.os.Build;
 import android.os.RemoteException;
 import android.util.Log;
@@ -23,6 +24,7 @@ import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageTransition;
+import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
@@ -124,8 +126,44 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void onEvent(Events.Dummy event) {
+
+    }
+
+    private void publishTransitionMessage(Region triggeringRegion, String transition) {
+        Waypoint w = waypointDao.load(Long.parseLong(triggeringRegion.getUniqueId()));
+        if(w == null) {
+            Log.e(TAG, "unable to load waypoint from entered region");
+            return;
+        }
+        MessageTransition m = new MessageTransition();
+        if(w.getGeofenceLatitude() != null)
+            m.setLat(w.getGeofenceLatitude());
+        else
+            m.setLat(0);
+
+        if(w.getGeofenceLongitude() != null)
+            m.setLon(w.getGeofenceLongitude());
+        else
+            m.setLon(0);
+
+        m.setDesc(w.getDescription());
+        m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        m.setEvent(transition);
+        m.setTid(Preferences.getTrackerId(true));
+        m.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+        m.setTrigger(MessageTransition.TRIGGER_BEACON);
+
+
+        m.setTopic(Preferences.getPubTopicEvents());
+        m.setQos(Preferences.getPubQosEvents());
+        m.setRetained(Preferences.getPubRetainEvents());
+        ServiceProxy.getServiceBroker().publish(m);
+
+        w.setLastTriggered(System.currentTimeMillis());
+        this.waypointDao.update(w);
 
     }
 
@@ -136,40 +174,15 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             @Override
             public void didEnterRegion(Region region) {
                 Log.i(TAG, "didEnterRegion " + region.getUniqueId() + " " + Long.parseLong(region.getUniqueId()));
-
-                Waypoint w = waypointDao.load(Long.parseLong(region.getUniqueId()));
-                if(w == null) {
-                    Log.e(TAG, "unable to load waypoint from entered region");
-                    return;
-                }
-                MessageTransition m = new MessageTransition();
-                if(w.getGeofenceLatitude() != null)
-                    m.setLat(w.getGeofenceLatitude());
-                else
-                    m.setLat(0);
-                if(w.getGeofenceLongitude() != null)
-                   m.setLon(w.getGeofenceLongitude());
-                else
-                    m.setLon(0);
-                m.setDesc(w.getDescription());
-                m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-                m.setEvent(MessageTransition.EVENT_ENTER);
-                m.setTid(Preferences.getTrackerId(true));
-                m.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
-                m.setTrigger(MessageTransition.TRIGGER_BEACON);
+                publishTransitionMessage(region, MessageTransition.EVENT_ENTER);
 
 
-                m.setTopic(Preferences.getPubTopicEvents());
-                m.setQos(Preferences.getPubQosEvents());
-                m.setRetained(Preferences.getPubRetainEvents());
-
-                ServiceProxy.getServiceBroker().publish(m);
             }
 
             @Override
             public void didExitRegion(Region region) {
                 Log.i(TAG, "didExitRegion " + region.getUniqueId());
-
+                publishTransitionMessage(region, MessageTransition.EVENT_LEAVE);
             }
 
             @Override
@@ -177,34 +190,14 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
                 Log.i(TAG, "didDetermineStateForRegion " + region.getUniqueId() + " state: " + state);
             }
         });
-/*
-        beaconManager.setRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    Log.i(TAG, "The first beacon I see is about " + beacons.iterator().next().getDistance() + " meters away.");
-                }
-            }
-        });
-
-        try {
-            beaconManager.startRangingBeaconsInRegion(new Region("foo", Identifier.parse("DBD75A2A-78C0-425C-A22B-37646BA46884"), null, null));
-        } catch (RemoteException e) {    }
-*/
-
-
 
             for(Waypoint w : loadWaypointsForModeIdWithValidBeacon()) {
-                //DBD75A2A-78C0-425C-A22B-37646BA46884
                 addRegion(w);
             }
-
-
     }
 
     @SuppressWarnings("unused")
     public void onEvent(Events.WaypointAdded e) {
-
         addRegion(e.getWaypoint());
     }
 
@@ -261,7 +254,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
     private Region getRegionFromWaypoint(Waypoint w) {
-        return new Region(w.getId().toString(), Identifier.parse(w.getBeaconUUID()), Identifier.fromInt(w.getBeaconMajor()), Identifier.fromInt(w.getBeaconMinor()));
+        return new Region(w.getId().toString(), Identifier.parse(w.getBeaconUUID()), w.getBeaconMajor() != null ? Identifier.fromInt(w.getBeaconMajor()) : null, w.getBeaconMinor() != null ? Identifier.fromInt(w.getBeaconMinor()) : null);
     }
 
     @SuppressWarnings("unused")

@@ -38,6 +38,7 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.messages.MessageWaypointCollection;
 
 public class Preferences {
     private static final String TAG = "Preferences";
@@ -294,11 +295,14 @@ public class Preferences {
 
         for(String key : m.getKeys()) {
             try {
+                Log.v(TAG, "import for key: " + key + " with value: " + m.get(key));
                 methods.get(key).invoke(null, m.get(key));
             } catch (IllegalAccessException e)  {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+
             }
         }
 
@@ -367,9 +371,9 @@ public class Preferences {
         }*/
     }
 
-    private static List<MessageWaypoint> waypointsToJSON() {
+    private static MessageWaypointCollection waypointsToJSON() {
 
-        List<MessageWaypoint> messages = new LinkedList<>();
+        MessageWaypointCollection messages = new MessageWaypointCollection();
         for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
             messages.add(MessageWaypoint.fromDaoObject(waypoint));
         }
@@ -391,6 +395,7 @@ public class Preferences {
 
                 // remove exisiting waypoint before importing new one
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
+                    Log.v(TAG, "removing existing waypoint with same tst before adding it");
                     dao.delete(e);
                     EventBus.getDefault().post(new Events.WaypointRemoved(e));
                 }
@@ -965,7 +970,7 @@ public class Preferences {
         }
 
 
-        cfg.set("waypoints", waypointsToJSON());
+        cfg.setWaypoints(waypointsToJSON());
 
         return cfg;
     }

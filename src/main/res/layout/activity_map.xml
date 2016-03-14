@@ -41,6 +41,7 @@
             android:background="@color/background"
             android:orientation="vertical"
             app:behavior_hideable="true"
+            android:clickable="true"
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
