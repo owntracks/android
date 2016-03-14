@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="root">>
+
+        <Preference
+            android:key="exportToFile"
+            android:title="@string/preferencesExportToFile"
+            android:summary="@string/preferencesExportToFileSummary">
+        </Preference>
+    <Preference
+        android:key="exportWaypointsToEndpoint"
+        android:title="@string/exportWaypointsToEndpoint"
+        android:summary="@string/exportWaypointsToEndpointSummary">
+    </Preference>
+
+</PreferenceScreen>

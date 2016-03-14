@@ -1,14 +1,17 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:id="@+id/frame"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar" />
+    <include     android:id="@+id/fragmentToolbar"
+        layout="@layout/toolbar"/>
 
-    <TextView android:id="@+id/exportPlaceholder"
-        android:gravity="center"
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_below="@id/fragmentToolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/exportPlaceholder" />
-</LinearLayout>
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

@@ -57,14 +57,7 @@ public class ActivityPreferences extends ActivityBase {
                     Log.v(TAG,"recreating ActivityPreferences due to mode change");
                  //   this.recreate();
                  //   this.overridePendingTransition(0, 0);
-
-                    Intent intent = getIntent();
-                    overridePendingTransition(0, 0);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    finish();
-                    overridePendingTransition(0, 0);
-                    startActivity(intent);
-
+                    loadFragment();
                 }
 
                 break;
@@ -80,19 +73,22 @@ public class ActivityPreferences extends ActivityBase {
 
         setContentView(R.layout.activity_preferences);
 
-        setupSupportToolbar();
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(getTitle());
+        loadFragment();
 
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferences(), "preferences").commit();
 
     }
 
+    private void loadFragment() {
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferences(), "preferences").commit();
+    }
 
 
     @Override
@@ -182,7 +178,9 @@ public class ActivityPreferences extends ActivityBase {
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(getActivity(), ActivityExport.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
                     getActivity().startActivity(intent);
+
                     return true;
                 }
             });
@@ -240,7 +238,10 @@ public class ActivityPreferences extends ActivityBase {
                     Log.v(TAG, "startActivityForResult ActivityPreferencesConnection");
                     Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
+
                     getActivity().startActivityForResult(intent, REQUEST_CODE_CONNECTION);
+
                     return true;
                 }
             };

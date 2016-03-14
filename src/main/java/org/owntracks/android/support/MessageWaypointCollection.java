@@ -1,4 +1,6 @@
-package org.owntracks.android.messages;
+package org.owntracks.android.support;
+
+import org.owntracks.android.messages.MessageWaypoint;
 
 import java.util.LinkedList;
 

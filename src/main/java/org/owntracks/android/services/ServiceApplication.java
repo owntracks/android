@@ -1,7 +1,11 @@
 package org.owntracks.android.services;
 
 import org.owntracks.android.App;
+import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.MessageWaypointCollection;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandlerInterface;
 
 import android.content.Intent;
@@ -44,5 +48,20 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
             int result = googleAPI.isGooglePlayServicesAvailable(App.getContext());
         return result == ConnectionResult.SUCCESS;
 
+    }
+
+    public boolean publishWaypointsMessage() {
+        MessageWaypoints m = new MessageWaypoints();
+        MessageWaypointCollection waypoints = Preferences.waypointsToJSON();
+        if(waypoints == null)
+            return false;
+
+        m.setWaypoints(waypoints);
+
+        m.setTopic(Preferences.getPubTopicWaypoints());
+        m.setQos(Preferences.getPubQosWaypoints());
+        m.setRetained(Preferences.getPubRetainWaypoints());
+        ServiceProxy.getServiceBroker().publish(m);
+        return true;
     }
 }
