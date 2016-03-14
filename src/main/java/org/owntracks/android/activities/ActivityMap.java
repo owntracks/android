@@ -95,7 +95,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         //this.fab = binding.fab;
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
-        binding.bottomSheetLayout.setOnClickListener(bottomSheetClickListener);
+        binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
         this.bottomSheetBehavior.setPeekHeight(0);
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
@@ -122,10 +122,9 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void showPopupMenu(View v) {
 
 
-        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.BOTTOM ); //new PopupMenu(this, v);
+        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-
         popupMenu.show();
     }
 
@@ -482,12 +481,16 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         activeContact = null;
     }
 
+
     View.OnClickListener bottomSheetClickListener = new View.OnClickListener() {
         // On click on the bottom sheet itself
         @Override
         public void onClick(View v) {
             if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            else if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         }
     };
 

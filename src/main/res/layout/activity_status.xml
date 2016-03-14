@@ -18,12 +18,16 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:paddingBottom="@dimen/activity_horizontal_margin"
+
             android:id="@+id/layout">
 
 
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/appStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -33,6 +37,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,6 +50,8 @@
 
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/serviceProxyStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -54,6 +62,8 @@
 
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -74,6 +84,8 @@
 
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/permissionLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,6 +96,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,6 +108,8 @@
                 style="@style/ListItemSecondary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/serviceLocatorOnLocationChangeDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,6 +119,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -113,6 +131,8 @@
                 style="@style/ListItemSecondary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/serviceBrokerQueueLength"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,6 +142,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -137,6 +159,8 @@
                 android:background="#E4E4E4"/>
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/playServicesStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,6 +171,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -158,6 +184,8 @@
 
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/serviceLocatorPlay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -167,6 +195,8 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/tv3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -178,4 +208,5 @@
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

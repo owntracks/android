@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.location.Geofence;
 
 import org.json.JSONException;
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageWaypoint extends MessageBase{
     public static final String BASETOPIC_SUFFIX = "/event";
-
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
@@ -106,7 +106,7 @@ public class MessageWaypoint extends MessageBase{
         w.setBeaconMajor(getMajor());
         w.setBeaconMinor(getMinor());
         w.setShared(isShared());
-        w.setDate(new Date(TimeUnit.SECONDS.toSeconds(getTst())));
+        w.setDate(new Date(TimeUnit.SECONDS.toMillis(getTst())));
 
         return w;
     }
