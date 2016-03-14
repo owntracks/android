@@ -21,7 +21,9 @@ import de.greenrobot.event.EventBus;
 
 public abstract class ActivityBase extends AppCompatActivity  {
     private static final String TAG = "ActivityBase";
+    protected static final java.lang.String DISABLES_ANIMATION = "disablesAnimation";
     Toolbar toolbar;
+    private boolean disablesAnimation = false;
 
     boolean hasIntentExtras() {
         return getIntent() != null && getIntent().getExtras() != null;
@@ -65,7 +67,8 @@ public abstract class ActivityBase extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-
+        if(getIntent() != null && getIntent().getExtras() !=  null)
+            disablesAnimation = getIntent().getExtras().getBoolean(DISABLES_ANIMATION);
 
     }
 
@@ -94,14 +97,23 @@ public abstract class ActivityBase extends AppCompatActivity  {
 
     @Override
     public void onStart() {
-        overridePendingTransition(R.anim.push_up_in, R.anim.none);
+        if(disablesAnimation)
+            overridePendingTransition(0, 0);
+        else
+            overridePendingTransition(R.anim.push_up_in, R.anim.none);
+
+
         super.onStart();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        overridePendingTransition(R.anim.none, R.anim.push_down_out);
+        if(disablesAnimation)
+            overridePendingTransition(0, 0);
+        else
+            overridePendingTransition(R.anim.push_up_in, R.anim.none);
+
     }
 
     void setupSupportToolbar() {
