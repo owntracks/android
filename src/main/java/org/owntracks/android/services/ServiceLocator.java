@@ -13,7 +13,6 @@ import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
@@ -441,7 +440,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(Preferences.getTrackerId(true));
         if(Preferences.getPubLocationExtendedData())
-            message.setBat(App.getBatteryLevel());
+            message.setBatt(App.getBatteryLevel());
 
         message.setTopic(Preferences.getPubTopicLocations());
         message.setQos(Preferences.getPubQosLocations());

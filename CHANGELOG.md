@@ -1,5 +1,17 @@
 OwnTracks Android App Release Notes
 ===================================
+>Release date: 2016-03-16 for alpha testers
+* [FIX] #335 bat -> batt in location payloads
+* [FIX] Screen flicker when switching modes
+* [NEW] #287 - Export waypoints via MQTT
+
+## OwnTracks 0.6.04
+>Release date: 2016-03-14 for alpha testers
+* [FIX] #333 - active beacon event shows inactive in Region list
+* [FIX] #320 - import otrc from exported on 061 fails bug
+* [FIX] Configuration export didn't include type attribute for exported waypoints
+* [FIX] No tranisitions sent when exiting a beacon region
+
 ## OwnTracks 0.6.02
 >Release date: 2016-03-11 for alpha testers
 * [FIX] Empty map due to wrong package name
