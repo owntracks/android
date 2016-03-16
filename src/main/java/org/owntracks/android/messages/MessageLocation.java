@@ -16,7 +16,7 @@ public class MessageLocation extends MessageBase  {
     public static final String REPORT_TYPE_RESPONSE = "r";
     private String tid;
     private String t;
-    private int bat;
+    private int batt;
     private int acc;
     private double lat;
     private double lon;
@@ -59,12 +59,12 @@ public class MessageLocation extends MessageBase  {
         this.t = t;
     }
 
-    public int getBat() {
-        return bat;
+    public int getBatt() {
+        return batt;
     }
 
-    public void setBat(int bat) {
-        this.bat = bat;
+    public void setBatt(int batt) {
+        this.batt = batt;
     }
 
     public int getAcc() {
