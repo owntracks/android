@@ -3,6 +3,7 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.databinding.tool.util.StringUtils;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,7 +63,7 @@ public class AdapterWaypoints extends AdapterCursorLoader {
         //((ItemViewHolder) viewHolder).mDetails.setReferenceTime(cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName)) * 1000);
         //((ItemViewHolder) viewHolder).mTime.setPrefix("#" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Channel.columnName)) + ", ");
         boolean geofence = cursor.getInt(cursor.getColumnIndex(WaypointDao.Properties.GeofenceRadius.columnName)) > 0;
-        boolean beaconUUID = cursor.getString(cursor.getColumnIndex(WaypointDao.Properties.BeaconUUID.columnName)).length() > 0;
+        boolean beaconUUID = StringUtils.isNotBlank(cursor.getString(cursor.getColumnIndex(WaypointDao.Properties.BeaconUUID.columnName)));
 
         Log.v("AdapterWaypoints", "geofence " +geofence +  " uuid " + beaconUUID);
 
