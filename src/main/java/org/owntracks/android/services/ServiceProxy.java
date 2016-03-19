@@ -26,16 +26,17 @@ public class ServiceProxy extends ServiceBindable {
     public static final String WAKELOCK_TAG_BROKER_CONNECTIONLOST = "org.owntracks.android.wakelock.broker.connectionlost";
 
 
-    public static final String SERVICE_APP = "1:App";
-	public static final String SERVICE_LOCATOR = "2:Loc";
-	public static final String SERVICE_BROKER = "3:Brk";
-    public static final String SERVICE_PARSER = "4:Prs";
-	public static final String SERVICE_NOTIFICATION = "5:Not";
-	public static final String SERVICE_BEACON = "4:Bec";
+    public static final String SERVICE_APP = "A";
+	public static final String SERVICE_LOCATOR = "L";
+	public static final String SERVICE_BROKER = "B";
+    public static final String SERVICE_PARSER = "P";
+	public static final String SERVICE_NOTIFICATION = "N";
+	public static final String SERVICE_BEACON = "BE";
+	public static final String SERVICE_MESSAGE = "M";
 
 
 	public static final String KEY_SERVICE_ID = "srvID";
-    private static ServiceProxy instance;
+	private static ServiceProxy instance;
 	private static final HashMap<String, ProxyableService> services = new HashMap<>();
 	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
 	private static ServiceProxyConnection connection;
@@ -50,15 +51,19 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	protected void onStartOnce() {
+		instance = this;
+
 		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
 
 		instantiateService(SERVICE_APP);
 		instantiateService(SERVICE_PARSER);
 		instantiateService(SERVICE_NOTIFICATION);
-		instantiateService(SERVICE_BROKER);
+
+		instantiateService(SERVICE_MESSAGE);
+
+
         instantiateService(SERVICE_LOCATOR);
         instantiateService(SERVICE_BEACON);
-		instance = this;
 	}
 
 	public static ServiceProxy getInstance() {
@@ -89,9 +94,9 @@ public class ServiceProxy extends ServiceBindable {
 		return services.get(id);
 	}
 
-	private void instantiateService(String id) {
+	public static ProxyableService instantiateService(String id) {
 		if (services.containsKey(id))
-			return;
+			return services.get(id);
 
 		ProxyableService p = null;
         switch (id) {
@@ -113,14 +118,18 @@ public class ServiceProxy extends ServiceBindable {
 			case SERVICE_NOTIFICATION:
 				p = new ServiceNotification();
 				break;
+			case SERVICE_MESSAGE:
+				p = new ServiceMessage();
+				break;
 		}
 
 		if(p == null)
-			return;
+			return null;
 
 		services.put(id, p);
-		p.onCreate(this);
+		p.onCreate(instance);
 		EventBus.getDefault().registerSticky(p);
+		return p;
 	}
 
 	public static ServiceApplication getServiceApplication() {
@@ -144,6 +153,10 @@ public class ServiceProxy extends ServiceBindable {
 	public static ServiceNotification getServiceNotification() {
 		return (ServiceNotification) getService(SERVICE_NOTIFICATION);
 	}
+	public static ServiceMessage getServiceMessage() {
+		return (ServiceMessage) getService(SERVICE_MESSAGE);
+	}
+
 
 	public static ProxyableService getServiceForIntent(Intent i) {
 		if ((i != null) && (i.getStringExtra(KEY_SERVICE_ID) != null))

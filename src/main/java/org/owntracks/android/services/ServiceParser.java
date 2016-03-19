@@ -78,16 +78,23 @@ public class ServiceParser implements ProxyableService, IncomingMessageProcessor
     @Override
     public void processMessage(MessageCmd message) {
         Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
-        if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) && Preferences.getRemoteCommandReportLocation()) {
+        if(!Preferences.getRemoteCommand()) {
+            Log.e(TAG, "remote commands are disabled");
+            return;
+        }
+
+        if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) ) {
             ServiceProxy.getServiceLocator().reportLocationResponse();
         } else if(message.getAction().equals(MessageCmd.ACTION_WAYPOINTS)) {
             ServiceProxy.getServiceApplication().publishWaypointsMessage();
         } else if(message.getAction().equals(MessageCmd.ACTION_SET_WAYPOINTS)) {
-            MessageWaypoints waypoints = message.getMessageWaypoints();
+            Log.v(TAG, "ACTION_SET_WAYPOINTS received");
+            MessageWaypointCollection waypoints = message.getWaypoints();
+            Log.v(TAG, "waypoints: " + waypoints);
             if(waypoints == null)
                 return;
 
-            Preferences.importWaypointsFromJson(waypoints.getWaypoints());
+            Preferences.importWaypointsFromJson(waypoints);
 
         }
 
