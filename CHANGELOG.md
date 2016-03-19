@@ -1,5 +1,17 @@
 OwnTracks Android App Release Notes
 ===================================
+
+## OwnTracks 0.6.06
+>Release date: 2016-03-19 for alpha testers
+* [FIX] Fixed crash in GeocodingProvider
+* [FIX] #336 - Fixed crash in regions list
+* [FIX] Fixed setWaypoints remote cmd
+* [NEW] Dropped remoteCommandReportLocation preferences key in favor of the general cmd setting used by iOS
+* [NEW] Prepared message backend for HTTP mode
+* [NEW] Changed monitoring settings of beacon service
+
+
+## OwnTracks 0.6.05
 >Release date: 2016-03-16 for alpha testers
 * [FIX] #335 bat -> batt in location payloads
 * [FIX] Screen flicker when switching modes
