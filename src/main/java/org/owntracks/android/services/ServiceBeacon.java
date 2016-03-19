@@ -98,16 +98,8 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             return;
         }
         MessageTransition m = new MessageTransition();
-        if(w.getGeofenceLatitude() != null)
-            m.setLat(w.getGeofenceLatitude());
-        else
-            m.setLat(0);
-
-        if(w.getGeofenceLongitude() != null)
-            m.setLon(w.getGeofenceLongitude());
-        else
-            m.setLon(0);
-
+        m.setLat(w.getGeofenceLatitude());
+        m.setLon(w.getGeofenceLongitude());
         m.setDesc(w.getDescription());
         m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         m.setEvent(transition);
