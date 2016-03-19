@@ -41,7 +41,7 @@ public class GeocodingProvider {
         @Override
         protected void onPostExecute(String result) {
             // Retry once if request timed out or we didn't get a result for some temporary reason
-            if(result == null && run.equals(RUN_FIRST)) {
+            if(result == null && run.equals(RUN_FIRST) && message.get() != null) {
                 MessageLocationResolverTask.execute(message.get(), RUN_SECOND);
                 return;
             }
