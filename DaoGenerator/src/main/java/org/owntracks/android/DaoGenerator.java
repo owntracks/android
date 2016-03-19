@@ -8,7 +8,7 @@ import de.greenrobot.daogenerator.Schema;
 // To generate files, open Gradle (View > Tool Windows > Gradle) tasks and chose android > :DaoGenerator > Tasks > application, right click "run"  and select Run.
 
 public class DaoGenerator {
-    private static final int SCHEMA_VERSION = 14;
+    private static final int SCHEMA_VERSION = 15;
 
     public static void main(String args[]) throws Exception {
 
@@ -17,9 +17,9 @@ public class DaoGenerator {
 
         Entity waypoint = schema.addEntity("Waypoint");
         waypoint.addIdProperty(); // For stable ids of cursor adapter
-        waypoint.addStringProperty("description");
-        waypoint.addDoubleProperty("geofenceLatitude");
-        waypoint.addDoubleProperty("geofenceLongitude");
+        waypoint.addStringProperty("description").notNull();
+        waypoint.addDoubleProperty("geofenceLatitude").notNull();
+        waypoint.addDoubleProperty("geofenceLongitude").notNull();
         waypoint.addIntProperty("geofenceRadius");
         waypoint.addStringProperty("geofenceId");
         waypoint.addStringProperty("wifiSSID");

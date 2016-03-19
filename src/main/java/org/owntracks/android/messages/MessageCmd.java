@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
+import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class MessageCmd extends MessageBase{
 
     public static final String ACTION_WAYPOINTS = "waypoints";
 
-    private MessageWaypoints waypoints;
+    private MessageWaypointCollection waypoints;
     private Map<String,Object> map = new HashMap<>();
 
     @JsonAnyGetter
@@ -58,10 +59,14 @@ public class MessageCmd extends MessageBase{
         return action;
     }
 
-    @JsonIgnore
-    public MessageWaypoints getMessageWaypoints() {
+    public void setWaypoints(MessageWaypointCollection m) {
+        this.waypoints = m;
+    }
+
+    public MessageWaypointCollection getWaypoints() {
         return waypoints;
     }
+
 
 
     public void setAction(String action) {

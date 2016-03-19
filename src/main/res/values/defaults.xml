@@ -58,8 +58,8 @@
     <bool name="valConnectionAdvancedMode">false</bool>
     <bool name="valZeroLenghClientIdEnabled">false</bool>
     <bool name="valAuth">true</bool>
-    <bool name="valRemoteCommandReportLocation">false</bool>
-    <bool name="valRemoteConfiguration">false</bool>
+    <bool name="valRemoteCommand">true</bool>
+    <bool name="valRemoteConfiguration">true</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valTls">true</bool>
     <bool name="valInfo" >true</bool>

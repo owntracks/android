@@ -384,7 +384,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setQos(Preferences.getPubQosEvents());
         message.setRetained(Preferences.getPubRetainEvents());
 
-        ServiceProxy.getServiceBroker().publish(message);
+        ServiceProxy.getServiceMessage().sendMessage(message);
 	}
     private void publishSsidTransitionMessage(Waypoint w) {
 
@@ -446,7 +446,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setQos(Preferences.getPubQosLocations());
         message.setRetained(Preferences.getPubRetainLocations());
 
-		ServiceProxy.getServiceBroker().publish(message);
+		ServiceProxy.getServiceMessage().sendMessage(message);
 
 	}
 

@@ -11,9 +11,10 @@ package org.owntracks.android.db;
 public class Waypoint {
 
     private Long id;
+    /** Not-null value. */
     private String description;
-    private Double geofenceLatitude;
-    private Double geofenceLongitude;
+    private double geofenceLatitude;
+    private double geofenceLongitude;
     private Integer geofenceRadius;
     private String geofenceId;
     private String wifiSSID;
@@ -39,7 +40,7 @@ public class Waypoint {
         this.id = id;
     }
 
-    public Waypoint(Long id, String description, Double geofenceLatitude, Double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId, int type) {
+    public Waypoint(Long id, String description, double geofenceLatitude, double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId, int type) {
         this.id = id;
         this.description = description;
         this.geofenceLatitude = geofenceLatitude;
@@ -65,27 +66,29 @@ public class Waypoint {
         this.id = id;
     }
 
+    /** Not-null value. */
     public String getDescription() {
         return description;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public Double getGeofenceLatitude() {
+    public double getGeofenceLatitude() {
         return geofenceLatitude;
     }
 
-    public void setGeofenceLatitude(Double geofenceLatitude) {
+    public void setGeofenceLatitude(double geofenceLatitude) {
         this.geofenceLatitude = geofenceLatitude;
     }
 
-    public Double getGeofenceLongitude() {
+    public double getGeofenceLongitude() {
         return geofenceLongitude;
     }
 
-    public void setGeofenceLongitude(Double geofenceLongitude) {
+    public void setGeofenceLongitude(double geofenceLongitude) {
         this.geofenceLongitude = geofenceLongitude;
     }
 

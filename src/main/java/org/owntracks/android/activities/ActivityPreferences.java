@@ -1,13 +1,11 @@
 package org.owntracks.android.activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -295,7 +293,7 @@ public class ActivityPreferences extends ActivityBase {
         private void populateScreenAdvanced(PreferenceScreen screen) {
             PreferenceCategory services = getCategory(R.string.preferencesCategoryAdvancedServices);
             screen.addPreference(services);
-            addSwitchPreference(services, Preferences.Keys.REMOTE_COMMAND_REPORT_LOCATION, R.string.preferencesRemoteCommandReportLocation, R.string.preferencesRemoteCommandReportLocationSummary, R.bool.valRemoteCommandReportLocation);
+            addSwitchPreference(services, Preferences.Keys.REMOTE_COMMAND, R.string.preferencesRemoteCommand, R.string.preferencesRemoteCommandSummary, R.bool.valRemoteCommand);
 
             PreferenceCategory locator = getCategory(R.string.preferencesCategoryAdvancedLocator);
             screen.addPreference(locator);

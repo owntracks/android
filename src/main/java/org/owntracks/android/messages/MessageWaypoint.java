@@ -99,6 +99,7 @@ public class MessageWaypoint extends MessageBase{
     public Waypoint toDaoObject() {
         Waypoint w = new Waypoint();
 
+        w.setDescription(getDesc());
         w.setGeofenceLatitude(getLat());
         w.setGeofenceLongitude(getLon());
         w.setGeofenceRadius(getRad());
