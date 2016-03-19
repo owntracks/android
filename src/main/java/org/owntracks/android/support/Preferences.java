@@ -408,9 +408,9 @@ public class Preferences {
         return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
     }
 
-    @Export(key =Keys.REMOTE_COMMAND_REPORT_LOCATION, exportModeMqttPrivate =true)
-    public static boolean getRemoteCommandReportLocation() {
-        return getBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, R.bool.valRemoteCommandReportLocation);
+    @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true)
+    public static boolean getRemoteCommand() {
+        return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
 
     @Import(key =Keys.REMOTE_CONFIGURATION)
@@ -418,9 +418,9 @@ public class Preferences {
         setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean, false);
     }
 
-    @Import(key =Keys.REMOTE_COMMAND_REPORT_LOCATION)
-    public static void setRemoteCommandReportLocation(boolean aBoolean) {
-        setBoolean(Keys.REMOTE_COMMAND_REPORT_LOCATION, aBoolean, true);
+    @Import(key =Keys.REMOTE_COMMAND)
+    public static void setRemoteCommand(boolean aBoolean) {
+        setBoolean(Keys.REMOTE_COMMAND, aBoolean, true);
     }
 
     @Import(key =Keys.CLEAN_SESSION)
@@ -1000,7 +1000,7 @@ public class Preferences {
         public static final String PUB_QOS                          = "pubQos";
         public static final String PUB_RETAIN                       = "pubRetain";
         public static final String PUB_TOPIC_BASE                   = "pubTopicBase";
-        public static final String REMOTE_COMMAND_REPORT_LOCATION   = "remoteCommandReportLocation";
+        public static final String REMOTE_COMMAND                   = "cmd";
         public static final String REMOTE_CONFIGURATION             = "remoteConfiguration";
         public static final String SUB                              = "sub";
         public static final String SUB_TOPIC                        = "subTopic";

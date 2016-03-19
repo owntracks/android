@@ -108,8 +108,8 @@
     <string name="preferencesBeaconForegroundPeriodSummary">Seconds between foreground beacon scans</string>
     <string name="preferencesBeaconBackgroundPeriod">Background beacon scannning period</string>
     <string name="preferencesBeaconBackgroundPeriodSummary">Seconds between background beacon scans</string>
-    <string name="preferencesRemoteCommandReportLocation">Remote report location command</string>
-    <string name="preferencesRemoteCommandReportLocationSummary">Respond to report location command</string>
+    <string name="preferencesRemoteCommand">Remote commands</string>
+    <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Allow remote configuration </string>
     <string name="description">Description</string>
