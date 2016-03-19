@@ -42,6 +42,9 @@ import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.interfaces.MessageReceiver;
+import org.owntracks.android.support.interfaces.MessageSender;
+import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 
 import java.io.FileNotFoundException;
@@ -56,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler {
+public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, ServiceMessageEndpoint {
 	private static final String TAG = "ServiceBroker";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -66,6 +69,29 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	private ServiceProxy context;
 
 	private PausableThreadPoolExecutor pubPool;
+	private MessageSender messageDeliveredCallback;
+	private MessageSender messageQueuedCallback;
+	private MessageReceiver messageReceivedCallback;
+
+	@Override
+	public void sendMessage(MessageBase message) {
+		publish(message);
+	}
+
+	@Override
+	public void setOnMessageDeliveredCallback(MessageSender callback) {
+		this.messageDeliveredCallback = callback;
+	}
+
+	@Override
+	public void setOnMessageQueuedCallback(MessageSender callback) {
+		this.messageQueuedCallback = callback; 
+	}
+
+	@Override
+	public void setOnMessageReceivedCallback(MessageReceiver callback) {
+		this.messageReceivedCallback = callback; 
+	}
 
 
 	public enum State {
