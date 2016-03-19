@@ -62,54 +62,13 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
         }
 
+        BeaconManager.setAndroidLScanningDisabled(false);
         beaconManager = BeaconManager.getInstanceForApplication(context);
         beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
         beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
-        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
-        BeaconManager.setAndroidLScanningDisabled(false);
-
-        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(10));
-        // TODO: make configurable
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-
-
+        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(30));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));        // TODO: make configurable
         beaconManager.bind(this);
-
-/*
-        beaconManager = new BeaconManager(context);
-
-        beaconManager.setNearableListener(new BeaconManager.NearableListener() {
-            @Override
-            public void onNearablesDiscovered(List<Nearable> nearables) {
-                Log.d(TAG, "Discovered nearables: " + nearables);
-            }
-        });
-
-        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
-            @Override
-            public void onEnteredRegion(Region region, List<Beacon> list) {
-                Log.v(TAG, "onEnteredReagion: " + region.getIdentifier());
-            }
-
-            @Override
-            public void onExitedRegion(Region region) {
-                Log.v(TAG, "onExitedRegion: " + region);
-            }
-        });
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-            @Override
-            public void onServiceReady()
-
-            {
-                scanId = beaconManager.startNearableDiscovery();
-                beaconManager.startMonitoring( new Region("iphone",UUID.fromString("8492E75F-4FD6-469D-B132-043FE94921D8"), 2128, 4301));
-                Log.v(TAG, "startNearableDiscovery");
-            }
-        });
-
-*/
-
-
 
     }
 
