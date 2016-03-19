@@ -25,8 +25,8 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Description = new Property(1, String.class, "description", false, "DESCRIPTION");
-        public final static Property GeofenceLatitude = new Property(2, Double.class, "geofenceLatitude", false, "GEOFENCE_LATITUDE");
-        public final static Property GeofenceLongitude = new Property(3, Double.class, "geofenceLongitude", false, "GEOFENCE_LONGITUDE");
+        public final static Property GeofenceLatitude = new Property(2, double.class, "geofenceLatitude", false, "GEOFENCE_LATITUDE");
+        public final static Property GeofenceLongitude = new Property(3, double.class, "geofenceLongitude", false, "GEOFENCE_LONGITUDE");
         public final static Property GeofenceRadius = new Property(4, Integer.class, "geofenceRadius", false, "GEOFENCE_RADIUS");
         public final static Property GeofenceId = new Property(5, String.class, "geofenceId", false, "GEOFENCE_ID");
         public final static Property WifiSSID = new Property(6, String.class, "wifiSSID", false, "WIFI_SSID");
@@ -38,7 +38,7 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         public final static Property LastTriggered = new Property(12, Long.class, "lastTriggered", false, "LAST_TRIGGERED");
         public final static Property ModeId = new Property(13, int.class, "modeId", false, "MODE_ID");
         public final static Property Type = new Property(14, int.class, "type", false, "TYPE");
-    }
+    };
 
 
     public WaypointDao(DaoConfig config) {
@@ -54,9 +54,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"WAYPOINT\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"DESCRIPTION\" TEXT," + // 1: description
-                "\"GEOFENCE_LATITUDE\" REAL," + // 2: geofenceLatitude
-                "\"GEOFENCE_LONGITUDE\" REAL," + // 3: geofenceLongitude
+                "\"DESCRIPTION\" TEXT NOT NULL ," + // 1: description
+                "\"GEOFENCE_LATITUDE\" REAL NOT NULL ," + // 2: geofenceLatitude
+                "\"GEOFENCE_LONGITUDE\" REAL NOT NULL ," + // 3: geofenceLongitude
                 "\"GEOFENCE_RADIUS\" INTEGER," + // 4: geofenceRadius
                 "\"GEOFENCE_ID\" TEXT," + // 5: geofenceId
                 "\"WIFI_SSID\" TEXT," + // 6: wifiSSID
@@ -85,21 +85,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
- 
-        String description = entity.getDescription();
-        if (description != null) {
-            stmt.bindString(2, description);
-        }
- 
-        Double geofenceLatitude = entity.getGeofenceLatitude();
-        if (geofenceLatitude != null) {
-            stmt.bindDouble(3, geofenceLatitude);
-        }
- 
-        Double geofenceLongitude = entity.getGeofenceLongitude();
-        if (geofenceLongitude != null) {
-            stmt.bindDouble(4, geofenceLongitude);
-        }
+        stmt.bindString(2, entity.getDescription());
+        stmt.bindDouble(3, entity.getGeofenceLatitude());
+        stmt.bindDouble(4, entity.getGeofenceLongitude());
  
         Integer geofenceRadius = entity.getGeofenceRadius();
         if (geofenceRadius != null) {
@@ -160,9 +148,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     public Waypoint readEntity(Cursor cursor, int offset) {
         Waypoint entity = new Waypoint( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // description
-            cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2), // geofenceLatitude
-            cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3), // geofenceLongitude
+            cursor.getString(offset + 1), // description
+            cursor.getDouble(offset + 2), // geofenceLatitude
+            cursor.getDouble(offset + 3), // geofenceLongitude
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // geofenceRadius
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // geofenceId
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // wifiSSID
@@ -182,9 +170,9 @@ public class WaypointDao extends AbstractDao<Waypoint, Long> {
     @Override
     public void readEntity(Cursor cursor, Waypoint entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setDescription(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setGeofenceLatitude(cursor.isNull(offset + 2) ? null : cursor.getDouble(offset + 2));
-        entity.setGeofenceLongitude(cursor.isNull(offset + 3) ? null : cursor.getDouble(offset + 3));
+        entity.setDescription(cursor.getString(offset + 1));
+        entity.setGeofenceLatitude(cursor.getDouble(offset + 2));
+        entity.setGeofenceLongitude(cursor.getDouble(offset + 3));
         entity.setGeofenceRadius(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
         entity.setGeofenceId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setWifiSSID(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
