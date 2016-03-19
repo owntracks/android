@@ -10,7 +10,6 @@ OwnTracks Android App Release Notes
 * [NEW] Prepared message backend for HTTP mode
 * [NEW] Changed monitoring settings of beacon service
 
-
 ## OwnTracks 0.6.05
 >Release date: 2016-03-16 for alpha testers
 * [FIX] #335 bat -> batt in location payloads
