@@ -634,7 +634,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     }
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {
-		return (w.getGeofenceRadius() != null) && (w.getGeofenceRadius() > 0) && (w.getGeofenceLatitude() != null) && (w.getGeofenceLongitude() != null);
+		return (w.getGeofenceRadius() != null) && (w.getGeofenceRadius() > 0);
 	}
 
     public boolean isReady() {
