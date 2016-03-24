@@ -58,10 +58,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
 
         m.setWaypoints(waypoints);
 
-        m.setTopic(Preferences.getPubTopicWaypoints());
-        m.setQos(Preferences.getPubQosWaypoints());
-        m.setRetained(Preferences.getPubRetainWaypoints());
-        ServiceProxy.getServiceBroker().publish(m);
+        ServiceProxy.getServiceMessage().sendMessage(m);
         return true;
     }
 }

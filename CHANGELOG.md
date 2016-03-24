@@ -1,6 +1,13 @@
 OwnTracks Android App Release Notes
 ===================================
 
+## OwnTracks 0.6.07
+>Release date: 2016-03-24 for alpha testers
+* [FIX] Changed enabled waypoint label
+* [FIX] Transition messages not send
+* [FIX] Configuration import didn't respect target mode
+* [NEW] Refactored message handling code
+
 ## OwnTracks 0.6.06
 >Release date: 2016-03-19 for alpha testers
 * [FIX] Fixed crash in GeocodingProvider

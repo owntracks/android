@@ -1,5 +1,6 @@
 package org.owntracks.android.activities;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
@@ -37,6 +38,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceLocator;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.DrawerProvider;
@@ -192,12 +194,14 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
-            ServiceProxy.runOrBind(this, new Runnable() {
-                @Override
-                public void run() {
-                    ServiceProxy.getServiceLocator().reportLocationManually();
-                }
-            });
+
+
+            PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
+            try {
+                p.send();
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
             return true;
         } else if (itemId == R.id.menu_mylocation) {
             actionFollowDevice();
