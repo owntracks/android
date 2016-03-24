@@ -181,7 +181,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilderMessages.setContentIntent(resultPendingIntent);
         notificationBuilderMessages.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION, null));
-        notificationBuilderOngoing.setSortKey("b");
+        notificationBuilderMessages.setSortKey("b");
 
         notificationBuilderMessages.setSmallIcon(R.drawable.ic_notification);
         notificationBuilderMessages.setGroup(NOTIFICATION_ID_MESSAGES + "");

@@ -108,10 +108,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         m.setTrigger(MessageTransition.TRIGGER_BEACON);
 
 
-        m.setTopic(Preferences.getPubTopicEvents());
-        m.setQos(Preferences.getPubQosEvents());
-        m.setRetained(Preferences.getPubRetainEvents());
-        ServiceProxy.getServiceBroker().publish(m);
+        ServiceProxy.getServiceMessage().sendMessage(m);
 
         w.setLastTriggered(System.currentTimeMillis());
         this.waypointDao.update(w);

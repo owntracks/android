@@ -161,7 +161,7 @@
     <string name="contactListPlaceholder">No locations received yet</string>
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="waypointLocalDefaultFormatMessage" formatted="false">%e %d</string>
-    <string name="geofenceActive">Geofence active</string>
+    <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
     <string name="idLocations">drawer.id.locations</string>
     <string name="idWaypoints">drawer.id.waypoints</string>

@@ -380,10 +380,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
         message.setDesc(w.getShared() ? w.getDescription() : null);
 
-        message.setTopic(Preferences.getPubTopicEvents());
-        message.setQos(Preferences.getPubQosEvents());
-        message.setRetained(Preferences.getPubRetainEvents());
-
         ServiceProxy.getServiceMessage().sendMessage(message);
 	}
     private void publishSsidTransitionMessage(Waypoint w) {
@@ -400,11 +396,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
         MessageWaypoint message = MessageWaypoint.fromDaoObject(w);
-        message.setTopic(Preferences.getPubTopicWaypoints());
-        message.setQos(Preferences.getPubQosWaypoints());
-        message.setRetained(Preferences.getPubRetainWaypoints());
 
-        ServiceProxy.getServiceBroker().publish(message);
+
+        ServiceProxy.getServiceMessage().sendMessage(message);
 	}
 
     public void reportLocationManually() {
@@ -442,9 +436,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         if(Preferences.getPubLocationExtendedData())
             message.setBatt(App.getBatteryLevel());
 
-        message.setTopic(Preferences.getPubTopicLocations());
-        message.setQos(Preferences.getPubQosLocations());
-        message.setRetained(Preferences.getPubRetainLocations());
+        Log.v(TAG, "handing location message to servicemessage");
 
 		ServiceProxy.getServiceMessage().sendMessage(message);
 
@@ -521,6 +513,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
 					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setNotificationResponsiveness(30*1000)
 					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
