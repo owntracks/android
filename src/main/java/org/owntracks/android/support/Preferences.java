@@ -789,6 +789,11 @@ public class Preferences {
         setBoolean(Keys.TLS, tlsSpecifier, false);
     }
 
+    @Import(key =Keys.WS)
+    public static void setWs(boolean wsEnable) {
+        setBoolean(Keys.WS, wsEnable, false);
+    }
+
     public static void setTlsCaCrt(String name) {
         setString(Keys.TLS_CA_CRT, name, false);
     }
@@ -807,6 +812,10 @@ public class Preferences {
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
     public static boolean getTls() {
         return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
+    }
+    @Export(key =Keys.WS, exportModeMqttPrivate =true)
+    public static boolean getWs() {
+        return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsDisable, true);
     }
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
@@ -1025,6 +1034,7 @@ public class Preferences {
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIST_START                      = "fistStart";
 
+        public static final String WS = "ws";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
