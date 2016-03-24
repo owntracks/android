@@ -374,7 +374,18 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		}
 
 		try {
-			String prefix = Preferences.getTls() ? "ssl" : "tcp";
+			String prefix = "tcp";
+
+			if (Preferences.getTls()) {
+				if (Preferences.getWs())
+					prefix = "wss";
+				else
+					prefix = "ssl";
+			} else {
+				if (Preferences.getWs())
+					prefix = "ws";
+			}
+
 			String cid = Preferences.getClientId(true);
             String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
 			Log.v(TAG, "init() mode: " + Preferences.getModeId());
