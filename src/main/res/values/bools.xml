@@ -2,4 +2,6 @@
 <resources>
     <bool name="valTrue">true</bool>
     <bool name="valFalse">false</bool>
+    <bool name="valWsEnable">true</bool>
+    <bool name="valWsDisable">false</bool>
 </resources>

@@ -62,6 +62,7 @@
     <bool name="valRemoteConfiguration">true</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valTls">true</bool>
+    <bool name="valWs">false</bool>
     <bool name="valInfo" >true</bool>
 
     <string-array name="modeIds">
