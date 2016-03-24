@@ -86,7 +86,13 @@ public class Preferences {
         setMode(active, false);
     }
     private static void setMode(int active, boolean init){
+        Log.v(TAG, "setMode: " + active);
+
+        if(!init && modeId == active)
+            return;
+
         Log.v(TAG, "setting mode to: " + active);
+
         detachAllActivePreferenceChangeListeners();
         int oldModeId = modeId;
         modeId = active;
@@ -286,6 +292,9 @@ public class Preferences {
     public static void importFromMessage(MessageConfiguration m) {
 
         HashMap<String, Method> methods = getImportMethods();
+
+        if(m.containsKey(Keys.MODE_ID))
+            setMode((Integer) m.get(Keys.MODE_ID));
 
         for(String key : m.getKeys()) {
             try {

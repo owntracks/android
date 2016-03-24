@@ -43,6 +43,9 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonIgnore
         private boolean _mqtt_retained;
         private volatile boolean cancelOnRun = false;
+        private int direction = DIRECTION_INCOMING;
+        private static final int DIRECTION_INCOMING = 1;
+        private static final int DIRECTION_OUTGOING = 2;
 
         @JsonIgnore
         public boolean getRetained() {
@@ -124,6 +127,23 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
                 return true;
         }
 
+        @JsonIgnore
+        public void setIncoming() {
+                this.direction = DIRECTION_INCOMING;
+        }
 
+        @JsonIgnore
+        public void setOutgoing() {
+                this.direction = DIRECTION_OUTGOING;
+        }
 
+        @JsonIgnore
+        public boolean isIncoming() {
+                return this.direction == DIRECTION_INCOMING;
+        }
+
+        @JsonIgnore
+        public boolean isOutgoing() {
+                return !isIncoming();
+        }
 }

@@ -33,8 +33,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.messages.MessageCard;
+import org.owntracks.android.messages.MessageCmd;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageEncrypted;
+import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.messages.MessageTransition;
+import org.owntracks.android.messages.MessageUnknown;
+import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
@@ -69,29 +77,130 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 	private ServiceProxy context;
 
 	private PausableThreadPoolExecutor pubPool;
-	private MessageSender messageDeliveredCallback;
-	private MessageSender messageQueuedCallback;
-	private MessageReceiver messageReceivedCallback;
+	private MessageSender messageSender;
+	private MessageReceiver messageReceiver;
 
 	@Override
 	public void sendMessage(MessageBase message) {
-		publish(message);
+		Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
+
+		if(state == State.DISCONNECTED_CONFIGINCOMPLETE) {
+			Log.e(TAG, "dropping outgoing message due to incomplete configuration");
+			return;
+		}
+
+		message.setOutgoingProcessor(this);
+		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
+
+		this.pubPool.queue(message);
+		this.messageSender.onMessageQueued(message);
 	}
 
 	@Override
-	public void setOnMessageDeliveredCallback(MessageSender callback) {
-		this.messageDeliveredCallback = callback;
+	public void setMessageSenderCallback(MessageSender callback) {
+		this.messageSender = callback;
 	}
 
 	@Override
-	public void setOnMessageQueuedCallback(MessageSender callback) {
-		this.messageQueuedCallback = callback; 
+	public void setMessageReceiverCallback(MessageReceiver callback) {
+		this.messageReceiver = callback;
+	}
+
+
+	@Override
+	public void processMessage(MessageBase message) {
+		message.setTopic(Preferences.getPubTopicBase());
+		publishMessage(message);
 	}
 
 	@Override
-	public void setOnMessageReceivedCallback(MessageReceiver callback) {
-		this.messageReceivedCallback = callback; 
+	public void processMessage(MessageCmd message) {
+		message.setTopic(Preferences.getPubTopicCommands());
+		publishMessage(message);
 	}
+
+	@Override
+	public void processMessage(MessageEvent message) {
+		publishMessage(message);
+	}
+
+	@Override
+	public void processMessage(MessageLocation message) {
+		message.setTopic(Preferences.getPubTopicLocations());
+		message.setQos(Preferences.getPubQosLocations());
+		message.setRetained(Preferences.getPubRetainLocations());
+
+		publishMessage(message);
+	}
+
+	@Override
+	public void processMessage(MessageTransition message) {
+		message.setTopic(Preferences.getPubTopicEvents());
+		message.setQos(Preferences.getPubQosEvents());
+		message.setRetained(Preferences.getPubRetainEvents());
+
+		publishMessage(message);
+	}
+
+	@Override
+	public void processMessage(MessageWaypoint message) {
+		message.setTopic(Preferences.getPubTopicWaypoints());
+		message.setQos(Preferences.getPubQosWaypoints());
+		message.setRetained(Preferences.getPubRetainWaypoints());
+
+		publishMessage(message);
+	}
+
+	@Override
+	public void processMessage(MessageWaypoints message) {
+		message.setTopic(Preferences.getPubTopicWaypoints());
+		message.setQos(Preferences.getPubQosWaypoints());
+		message.setRetained(Preferences.getPubRetainWaypoints());
+
+		publishMessage(message);
+	}
+
+
+	private void publishMessage(MessageBase message) {
+
+		MessageBase mm;
+		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
+		try {
+			if(EncryptionProvider.isPayloadEncryptionEnabled()) {
+				mm = new MessageEncrypted();
+				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(Parser.serializeSync(message)));
+			} else {
+				mm = message;
+			}
+
+
+			MqttMessage m = new MqttMessage();
+			m.setPayload(Parser.serializeSync(mm).getBytes());
+			m.setQos(message.getQos());
+			m.setRetained(message.getRetained());
+
+			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
+			this.mqttClient.getTopic(message.getTopic()).publish(m);
+
+			// At this point, delivery is technically not completed. However, if the mqttClient didn't throw any errors, the message likely makes it to the broker
+			// We don't save any references between delivery tokens and messages to singal completion when deliveryComplete is called
+			this.messageSender.onMessageDelivered(message);
+
+			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
+				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+				this.pubPool.pause();
+			}
+		} catch (JsonProcessingException e) {
+			Log.e(TAG, "processMessage: JsonProcessingException");
+			e.printStackTrace();
+		} catch (MqttException e) {
+			Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+
 
 
 	public enum State {
@@ -641,54 +750,8 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
         return c.getString(id);
     }
 
-	@Override
-	public void processMessage(MessageBase message) {
-		MessageBase mm;
-		Log.v(TAG, "processMessage: " + message + ", q size: " + pubPool.getQueue().size());
-		try {
-			if(EncryptionProvider.isPayloadEncryptionEnabled()) {
-				mm = new MessageEncrypted();
-				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(Parser.serializeSync(message)));
-			} else {
-				mm = message;
-			}
 
 
-			MqttMessage m = new MqttMessage();
-			m.setPayload(Parser.serializeSync(mm).getBytes());
-			m.setQos(message.getQos());
-			m.setRetained(message.getRetained());
-
-			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
-			this.mqttClient.getTopic(message.getTopic()).publish(m);
-			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
-				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
-				this.pubPool.pause();
-			}
-		} catch (JsonProcessingException e) {
-			Log.e(TAG, "processMessage: JsonProcessingException");
-			e.printStackTrace();
-		} catch (MqttException e) {
-			Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
-			e.printStackTrace();
-		}
-
-	}
-
-
-	public void publish(final MessageBase message) {
-		if(state == State.DISCONNECTED_CONFIGINCOMPLETE) {
-				Log.e(TAG, "dropping outgoing message due to incomplete configuration");
-				return;
-		}
-
-		message.setOutgoingProcessor(this);
-		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
-
-		this.pubPool.queue(message);
-
-	}
 
 
     public Exception getError() {
@@ -699,13 +762,44 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
-        // Received messages are forwarded to ServiceApplication
-        ServiceProxy.getServiceParser().parseIncomingBrokerMessage(topic, message);
+
+		try {
+			MessageBase m = Parser.deserializeSync(message.getPayload());
+			if(!m.isValidMessage()) {
+				Log.e(TAG, "message failed validation: " + message.getPayload());
+				return;
+			}
+
+			m.setTopic(getBaseTopic(m, topic));
+			m.setRetained(message.isRetained());
+			m.setQos(message.getQos());
+			this.messageReceiver.onMessageReceived(m);
+			if(m instanceof MessageUnknown) {
+				Log.v(TAG, "unknown message topic: " + topic +" payload: " + new String(message.getPayload()));
+			}
+
+		} catch (Exception e) {
+
+			Log.e(TAG, "JSON parser exception for message: " + new String(message.getPayload()));
+			Log.e(TAG, e.getMessage() +" " + e.getCause());
+
+			e.printStackTrace();
+		}
+	}
+
+
+	private String getBaseTopic(MessageBase message, String topic){
+
+		if (message.getBaseTopicSuffix() != null && topic.endsWith(message.getBaseTopicSuffix())) {
+			return topic.substring(0, (topic.length() - message.getBaseTopicSuffix().length()));
+		} else {
+			return topic;
+		}
 	}
 
 
 
-    @Override
+	@Override
 	public void deliveryComplete(IMqttDeliveryToken messageToken) {
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
 

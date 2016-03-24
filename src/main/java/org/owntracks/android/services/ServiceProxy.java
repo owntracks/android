@@ -29,7 +29,6 @@ public class ServiceProxy extends ServiceBindable {
     public static final String SERVICE_APP = "A";
 	public static final String SERVICE_LOCATOR = "L";
 	public static final String SERVICE_BROKER = "B";
-    public static final String SERVICE_PARSER = "P";
 	public static final String SERVICE_NOTIFICATION = "N";
 	public static final String SERVICE_BEACON = "BE";
 	public static final String SERVICE_MESSAGE = "M";
@@ -56,7 +55,6 @@ public class ServiceProxy extends ServiceBindable {
 		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
 
 		instantiateService(SERVICE_APP);
-		instantiateService(SERVICE_PARSER);
 		instantiateService(SERVICE_NOTIFICATION);
 
 		instantiateService(SERVICE_MESSAGE);
@@ -112,9 +110,6 @@ public class ServiceProxy extends ServiceBindable {
             case SERVICE_BEACON:
                 p = new ServiceBeacon();
                 break;
-			case SERVICE_PARSER:
-				p = new ServiceParser();
-				break;
 			case SERVICE_NOTIFICATION:
 				p = new ServiceNotification();
 				break;
@@ -147,9 +142,6 @@ public class ServiceProxy extends ServiceBindable {
     public static ServiceBeacon getServiceBeacon() {
         return (ServiceBeacon) getService(SERVICE_BEACON);
     }
-	public static ServiceParser getServiceParser() {
-		return (ServiceParser) getService(SERVICE_PARSER);
-	}
 	public static ServiceNotification getServiceNotification() {
 		return (ServiceNotification) getService(SERVICE_NOTIFICATION);
 	}
