@@ -100,7 +100,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void onMessageDelivered(MessageBase message) {
-        Log.v(TAG, "message delivered: " + message);
+        Log.v(TAG, "message delivered: " + message + " " + message.isOutgoing());
 
         if(message instanceof MessageLocation) {
             de.greenrobot.event.EventBus.getDefault().post(message);
