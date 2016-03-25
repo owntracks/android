@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -143,6 +144,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         private static boolean tlsVal;
         private static boolean cleansessionVal;
         private static boolean authenticationVal;
+        private static boolean wsVal;
 
 
         private SharedPreferences.OnSharedPreferenceChangeListener modeListener;
@@ -168,12 +170,21 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
+                                    final Switch ws = (Switch)d.findViewById(R.id.ws);
 
                                     host.setText(Preferences.getHost());
                                     host.setFloatingLabelAlwaysShown(true);
 
                                     port.setText(Preferences.getPortWithHintSupport());
                                     port.setFloatingLabelAlwaysShown(true);
+
+                                    ws.setChecked(wsVal);
+                                    ws.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                            wsVal = isChecked;
+                                        }
+                                    });
 
                                 }
                             })
@@ -192,6 +203,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     } catch (NumberFormatException e) {
                                         Preferences.clearKey(Preferences.Keys.PORT);
                                     }
+
+                                    Preferences.setWs(wsVal);
                                 }
                             })
 
@@ -204,6 +217,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
             hostPreference = findPreference(getString(R.string.keyHost));
             hostPreference.setOnPreferenceClickListener(hostClickListener);
+            wsVal = Preferences.getWs();
 
         }
 
@@ -463,7 +477,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
             tlsVal = Preferences.getTls();
             securityPreference = findPreference(getString(R.string.keySecurity));
             securityPreference.setOnPreferenceClickListener(securityListener);
-
 
         }
 

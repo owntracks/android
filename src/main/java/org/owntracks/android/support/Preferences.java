@@ -789,6 +789,11 @@ public class Preferences {
         setBoolean(Keys.TLS, tlsSpecifier, false);
     }
 
+    @Import(key =Keys.WS)
+    public static void setWs(boolean wsEnable) {
+        setBoolean(Keys.WS, wsEnable, false);
+    }
+
     public static void setTlsCaCrt(String name) {
         setString(Keys.TLS_CA_CRT, name, false);
     }
@@ -807,6 +812,10 @@ public class Preferences {
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
     public static boolean getTls() {
         return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
+    }
+    @Export(key =Keys.WS, exportModeMqttPrivate =true)
+    public static boolean getWs() {
+        return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
     }
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
@@ -1019,6 +1028,7 @@ public class Preferences {
         public static final String TLS_CLIENT_CRT_PASSWORD          = "tlsClientCrtPassword";
         public static final String TRACKER_ID                       = "trackerId";
         public static final String USERNAME                         = "username";
+        public static final String WS                               = "ws";
 
         // Internal keys
         public static final String _DEVICE_UUID                     = "deviceUUID";

@@ -14,6 +14,7 @@
     <bool name="valTlsPublic">true</bool>
     <bool name="valRemoteConfigurationPublic">false</bool>
     <bool name="valPubRetainPublic">false</bool>
+    <bool name="valWsPublic">false</bool>
     <integer name="valKeepalivePublic">3600</integer>
     <integer name="valPubQosPublic">0</integer>
     <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
@@ -62,6 +63,7 @@
     <bool name="valRemoteConfiguration">true</bool>
     <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valTls">true</bool>
+    <bool name="valWs">false</bool>
     <bool name="valInfo" >true</bool>
 
     <string-array name="modeIds">
