@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -168,12 +169,15 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
+                                    final CheckBox wsEnable = (CheckBox)d.findViewById(R.id.wsEnable);
 
                                     host.setText(Preferences.getHost());
                                     host.setFloatingLabelAlwaysShown(true);
 
                                     port.setText(Preferences.getPortWithHintSupport());
                                     port.setFloatingLabelAlwaysShown(true);
+
+                                    wsEnable.setChecked(Preferences.getWs());
 
                                 }
                             })
@@ -184,6 +188,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
+                                    final CheckBox wsEnable = (CheckBox)d.findViewById(R.id.wsEnable);
 
 
                                     Preferences.setHost(host.getText().toString());
@@ -192,6 +197,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     } catch (NumberFormatException e) {
                                         Preferences.clearKey(Preferences.Keys.PORT);
                                     }
+
+                                    Preferences.setWs(wsEnable.isChecked());
                                 }
                             })
 
