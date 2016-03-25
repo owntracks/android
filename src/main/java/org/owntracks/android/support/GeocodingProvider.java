@@ -25,9 +25,34 @@ public class GeocodingProvider {
     }
 
     public static void resolve(MessageLocation m, ServiceNotification s) {
-        MessageLocationResolverTask.execute(m, RUN_FIRST);
+        NotificationLocationResolverTask.execute(m, s, RUN_FIRST);
     }
 
+    private static class NotificationLocationResolverTask extends MessageLocationResolverTask {
+
+        private final WeakReference<ServiceNotification> service;
+
+        public static void execute(MessageLocation m, ServiceNotification s, double run) {
+            (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+        }
+
+
+        public NotificationLocationResolverTask(MessageLocation m, ServiceNotification service) {
+            super(m);
+            this.service = new WeakReference<>(service);
+
+        }
+
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            MessageLocation m = this.message.get();
+            ServiceNotification s = this.service.get();
+            if(m!=null && s!=null) {
+                s.onMessageLocationGeocoderResult(m);
+            }
+        }
+    }
     private static class MessageLocationResolverTask extends ResolverTask {
         public static void execute(MessageLocation m, double run) {
             (new MessageLocationResolverTask(m)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
