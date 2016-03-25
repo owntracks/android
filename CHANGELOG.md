@@ -1,7 +1,7 @@
 OwnTracks Android App Release Notes
 ===================================
-## OwnTracks 0.6.07
->Release date: 2016-03-24 for alpha testers
+## OwnTracks 0.6.08
+>Release date: 2016-03-25 for alpha testers
 * [FIX] Changed enabled waypoint label (again)
 * [FIX] Notification action to report location
 * [NEW] Websocket support in private mode
