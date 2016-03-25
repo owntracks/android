@@ -31,6 +31,7 @@ import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.StaticHandler;
@@ -379,12 +380,32 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     public void onEvent(Events.Dummy event) { }
 
 
+
+
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
         if (App.isInForeground())
             Toasts.showBrokerStateChange(e.getState());
 
         updateNotificationOngoing();
+    }
+
+    public void onEvent(MessageLocation m) {
+        Log.v(TAG, "onEvent MessageLocation");
+        if(m.isOutgoing() && (lastPublishedLocationMessage == null || lastPublishedLocationMessage.getTst() <=  m.getTst())) {
+            this.lastPublishedLocationMessage = m;
+            Log.v(TAG, "resoving geocoder");
+            GeocodingProvider.resolve(m, this);
+        }
+    }
+
+    public void onMessageLocationGeocoderResult(MessageLocation m) {
+        Log.v(TAG, "onMessageLocationGeocoderResult");
+
+        if (m == lastPublishedLocationMessage) {
+            Log.v(TAG, "updateNotificationOngoing");
+            updateNotificationOngoing();
+        }
     }
 
     public void processMessage(MessageTransition message) {
