@@ -56,7 +56,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     // Ongoing notification
     private static final int NOTIFICATION_ID_ONGOING = 1;
     private NotificationCompat.Builder notificationBuilderOngoing;
-    private PendingIntent notificationIntentOngoing;
     private Notification notificationOngoing;
 
     // Event notification
@@ -162,10 +161,10 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderOngoing.setContentIntent(resultPendingIntent);
         notificationBuilderOngoing.setSortKey("a");
-        this.notificationIntentOngoing = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
+
+        notificationBuilderOngoing.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null, PendingIntent.FLAG_CANCEL_CURRENT));
 
 
-        notificationBuilderOngoing.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), this.notificationIntentOngoing);
     }
 
 
