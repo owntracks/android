@@ -31,6 +31,9 @@
     <PreferenceScreen
         android:key="informationScreen"
         android:title="@string/preferencesInfo" >
+        <org.owntracks.android.support.ToolbarPreference
+            android:key="information"
+            android:title="@string/preferencesInfo" />
 
         <Preference
             android:key="documentation"

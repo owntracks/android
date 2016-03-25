@@ -34,6 +34,7 @@ import org.owntracks.android.support.EditStringPreference;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.ToolbarPreference;
 
 import de.greenrobot.event.EventBus;
 
@@ -252,7 +253,6 @@ public class ActivityPreferences extends ActivityBase {
                         return false;
 
                     final Dialog dialog = ((PreferenceScreen)preference).getDialog();
-
                     LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
                     final Toolbar bar = (Toolbar) LayoutInflater.from(preference.getContext()).inflate(R.layout.toolbar, root, false);
                     root.addView(bar, 0); // insert at top
@@ -269,10 +269,10 @@ public class ActivityPreferences extends ActivityBase {
                 }
             };
             findPreference("connectionScreen").setOnPreferenceClickListener(connectionListener);
-            findPreference("reportingScreen").setOnPreferenceClickListener(genericListener);
-            findPreference("notificationScreen").setOnPreferenceClickListener(genericListener);
-            findPreference("advancedScreen").setOnPreferenceClickListener(genericListener);
-            findPreference("informationScreen").setOnPreferenceClickListener(genericListener);
+           // findPreference("reportingScreen").setOnPreferenceClickListener(genericListener);
+           // findPreference("notificationScreen").setOnPreferenceClickListener(genericListener);
+            // findPreference("advancedScreen").setOnPreferenceClickListener(genericListener);
+            // findPreference("informationScreen").setOnPreferenceClickListener(genericListener);
         }
 
         private void populatePreferencesScreen(PreferenceScreen root) {
@@ -285,12 +285,14 @@ public class ActivityPreferences extends ActivityBase {
 
 
         private void populateScreenReporting(PreferenceScreen screen) {
+            addToolbar(screen);
             addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
             addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedDataSummary, R.string.preferencesPubExtendedData, R.bool.valPubExtendedData);
         }
 
 
         private void populateScreenAdvanced(PreferenceScreen screen) {
+            addToolbar(screen);
             PreferenceCategory services = getCategory(R.string.preferencesCategoryAdvancedServices);
             screen.addPreference(services);
             addSwitchPreference(services, Preferences.Keys.REMOTE_COMMAND, R.string.preferencesRemoteCommand, R.string.preferencesRemoteCommandSummary, R.bool.valRemoteCommand);
@@ -314,6 +316,8 @@ public class ActivityPreferences extends ActivityBase {
         }
 
         private void populateScreenNotification(PreferenceScreen screen) {
+            addToolbar(screen);
+
             PreferenceCategory ongoing = getCategory(R.string.preferencesCategoryNotificationOngoing);
             screen.addPreference(ongoing);
             addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION, R.string.preferencesNotification, R.string.preferencesNotificationSummary, R.bool.valNotification);
@@ -347,6 +351,12 @@ public class ActivityPreferences extends ActivityBase {
 
         private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueAllModes) {
             return addSwitchPreference(parent, key, titleRes, summaryRes, defaultValueAllModes, defaultValueAllModes);
+        }
+
+        private void addToolbar(PreferenceScreen parent) {
+            ToolbarPreference t = new ToolbarPreference(getActivity(), parent);
+            t.setTitle(parent.getTitle());
+            parent.addPreference(t);
         }
 
         private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueResPrivate, @BoolRes int defaultValueResPublic) {

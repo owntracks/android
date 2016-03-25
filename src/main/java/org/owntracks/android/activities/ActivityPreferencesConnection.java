@@ -464,6 +464,9 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     Preferences.setTls(tlsVal);
                                     Preferences.setTlsCaCrt(tlsCaCrtName);
                                     Preferences.setTlsClientCrt(tlsClientCrtName);
+
+                                    Log.v(TAG, "" + tlsCaCrtName + " " + tlsClientCrtName);
+
                                     Preferences.setTlsClientCrtPassword(((MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword)).getText().toString());
                                     updateConnectButton();
                                     securityDialog = null;
@@ -690,6 +693,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void setTlsCaCrtName(String name) {
             if (securityDialog != null) {
                 ((TextView) securityDialog.findViewById(R.id.tlsCaCrt)).setText(name);
+                tlsCaCrtName = name;
+
             }
         }
 
@@ -700,8 +705,10 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void setTlsClientCrtName(String name) {
             if (securityDialog != null) {
                 ((TextView) securityDialog.findViewById(R.id.tlsClientCrt)).setText(name);
+                tlsClientCrtName = name;
             }
         }
+
         public void clearTlsClientCrtName() {
             setTlsClientCrtName("");
         }
