@@ -4,6 +4,7 @@
     <string name="preferencesServer">"Connection"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesPort">"Port"</string>
+    <string name="preferencesWebsocket">Use WebSocket protocol</string>
     <string name="preferencesUserUsername">"Username"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
     <string name="preferencesConnectionSecurity">"Connection security"</string>
@@ -277,6 +278,7 @@
     <string name="exportWaypointsToEndpointSummary">export waypoints to endpoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successfull</string>
+    <string name="wsLabel">Use WebSocket protocol</string>
 
     <string-array name="filepicker">
         <item>Select</item>
