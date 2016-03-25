@@ -68,7 +68,6 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     private MenuItem saveButton;
 
     // Thanks Google for not providing a getter for the value of switches.
-    private boolean shareValue = false;
     private ActivityWaypointBindingBinding binding;
 
     @Override
@@ -121,12 +120,6 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         binding.latitude.addTextChangedListener(requiredForSave);
         binding.longitude.addTextChangedListener(requiredForSave);
 
-        binding.share.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                shareValue = isChecked;
-            }
-        });
         binding.share.setChecked(this.waypoint.getShared());
     }
 
@@ -312,7 +305,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
         }
 
         if(!Preferences.isModeMqttPublic())
-            w.setShared(shareValue);
+            w.setShared(binding.share.isChecked());
         else
             w.setShared(false);
 
