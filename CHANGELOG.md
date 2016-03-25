@@ -1,5 +1,11 @@
 OwnTracks Android App Release Notes
 ===================================
+
+## OwnTracks 0.6.09
+>Release date: 2016-03-25
+* [FIX] #339 - Latest Android version doesn't accept CA and client crts
+* [FIX] #338 - crash on preferences click
+
 ## OwnTracks 0.6.08
 >Release date: 2016-03-25 for alpha testers
 * [FIX] Changed enabled waypoint label (again)
