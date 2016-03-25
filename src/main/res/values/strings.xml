@@ -277,6 +277,9 @@
     <string name="exportWaypointsToEndpointSummary">export waypoints to endpoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successfull</string>
+    <string name="geofenceAndBeaconInactive">Geofence and beacon disabled</string>
+    <string name="geofenceAndBeaconActive">Geofence and beacon enabled</string>
+    <string name="beaconActive">Beacon enabled</string>
 
     <string-array name="filepicker">
         <item>Select</item>

@@ -21,13 +21,17 @@ import java.util.Date;
 
 
 public class AdapterWaypoints extends AdapterCursorLoader {
-    private String labelGeofence = "Geofence active";
+    private String labelGeofence;
     private String labelBeacon = "Beacon active";
     private String labelGeofenceAndBeacon = "Geofence and beacon active";
     private String labelNothing = "Geofence and beacon inactive";
 
     public AdapterWaypoints(Context context) {
         super(context);
+        labelGeofence = context.getString(R.string.geofenceActive);
+        labelBeacon = context.getString(R.string.beaconActive);
+        labelGeofenceAndBeacon = context.getString(R.string.geofenceAndBeaconActive);
+        labelNothing = context.getString(R.string.geofenceAndBeaconInactive);
 
     }
 
