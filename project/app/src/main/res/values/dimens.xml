@@ -8,5 +8,4 @@
 
     <!--Welcome sliding page  -->
     <dimen name="welcome_content_min_height">96dp</dimen>
-
 </resources>

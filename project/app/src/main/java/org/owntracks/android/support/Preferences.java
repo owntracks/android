@@ -664,6 +664,10 @@ public class Preferences {
     public static void setNotificationEvents(boolean notificationEvents) {
         setBoolean(Keys.NOTIFICATION_EVENTS, notificationEvents);
     }
+    @Import(key =Keys.ENABLE_WIDGET)
+    public static void setEnableWidget(boolean enable) {
+        setBoolean(Keys.ENABLE_WIDGET, enable);
+    }
 
     @Import(key =Keys.SUB_TOPIC)
     private static void setSubTopic(String string) {
@@ -797,9 +801,12 @@ public class Preferences {
     public static boolean getNotificationLocation() {
         return getBoolean(Keys.NOTIFICATION_LOCATION, R.bool.valNotificationLocation);
     }
-
+    
     public static boolean getNotificationEvents() {
         return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
+    }
+    public static boolean getEnableWidget() {
+        return getBoolean(Keys.ENABLE_WIDGET, R.bool.valEnableWidget);
     }
 
     @Export(key =Keys.PUB_QOS, exportModeMqttPrivate =true)
@@ -1008,6 +1015,7 @@ public class Preferences {
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
+        public static final String ENABLE_WIDGET                    = "enableWidget";
         public static final String PASSWORD                         = "password";
         public static final String PORT                             = "port";
         public static final String PUB                              = "pub";

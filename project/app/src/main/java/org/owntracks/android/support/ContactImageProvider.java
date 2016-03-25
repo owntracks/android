@@ -94,7 +94,7 @@ public class ContactImageProvider {
     }
 
 
-    private static Bitmap getBitmapFromCache(FusedContact contact) {
+    public static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
@@ -196,7 +196,7 @@ public class ContactImageProvider {
         return output;
     }
 
-    private static Bitmap drawableToBitmap(Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable)drawable).getBitmap();
         }
@@ -216,7 +216,7 @@ public class ContactImageProvider {
 
     private static final int FACE_DIMENSIONS = (int) convertDpToPixel(48);
 
-    private static float convertDpToPixel(float dp) {
+    public static float convertDpToPixel(float dp) {
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
     }
 

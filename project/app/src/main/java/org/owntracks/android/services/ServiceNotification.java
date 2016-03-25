@@ -422,6 +422,32 @@ public class ServiceNotification implements ProxyableService {
         }
     }
 
+    public void onEvent(Events.PermissionGranted e) {
+        Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
+        if(e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            clearNotificationPermission();
+        }
+    }
+
+
+    public void onEvent(MessageLocation m) {
+        Log.v(TAG, "onEvent MessageLocation");
+        if(m.isOutgoing() && (lastPublishedLocationMessage == null || lastPublishedLocationMessage.getTst() <=  m.getTst())) {
+            this.lastPublishedLocationMessage = m;
+            Log.v(TAG, "resoving geocoder");
+            GeocodingProvider.resolve(m, this);
+        }
+    }
+
+    public void onMessageLocationGeocoderResult(MessageLocation m) {
+        Log.v(TAG, "onMessageLocationGeocoderResult");
+
+        if (m == lastPublishedLocationMessage) {
+            Log.v(TAG, "updateNotificationOngoing");
+            updateNotificationOngoing();
+        }
+    }
+
     public void processMessage(MessageTransition message) {
         if(message.getRetained())
             return;

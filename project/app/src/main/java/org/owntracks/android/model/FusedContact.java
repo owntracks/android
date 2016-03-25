@@ -19,6 +19,7 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 
+import org.owntracks.android.support.Preferences;
 
 public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
@@ -81,6 +82,10 @@ public class FusedContact extends BaseObservable {
         this.notifyPropertyChanged(BR.trackerId);
         this.notifyPropertyChanged(BR.id);
 
+        
+        if (Preferences.getEnableWidget()) {
+            App.notifyWidgetUpdate();
+        }
     }
 
 

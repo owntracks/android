@@ -47,6 +47,7 @@ import org.owntracks.android.support.Toasts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -118,6 +119,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
         hideBottomSheet();
 
+        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
@@ -281,7 +283,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             Toasts.showEndpointNotConfigured();
     }
 
-
     private void clearMap() {
         Log.v(TAG, "clearMap");
         if(map != null) {
@@ -294,6 +295,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation() || map == null)
             return;
+        Log.v(TAG, "updateContactMarker: " + c.getTopic() + " hasLocation: " + c.hasLocation());
 
         Marker m = markers.get(c.getId());
 
@@ -357,7 +359,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         onHandleIntentExtras();
 
         Timber.v("trace post %s", System.currentTimeMillis());
-
     }
 
     @Override
@@ -421,6 +422,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         centerMap(c.getLatLng());
     }
 
+
+
     private void actionFollowDevice() {
         this.mode = ACTION_FOLLOW_DEVICE;
 
@@ -481,6 +484,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             else if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
                 collapseBottomSheet();
 
+            return true;
         }
     };
 
