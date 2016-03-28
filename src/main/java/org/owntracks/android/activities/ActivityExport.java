@@ -128,7 +128,7 @@ public class ActivityExport extends ActivityBase {
                 @Override
                 public void run() {
                     if(ServiceProxy.getServiceApplication().publishWaypointsMessage()) {
-                        Toast.makeText(context, R.string.preferencesExportSuccess, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
 
                     } else {
                         Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();

@@ -281,6 +281,7 @@
     <string name="geofenceAndBeaconInactive">Geofence and beacon disabled</string>
     <string name="geofenceAndBeaconActive">Geofence and beacon enabled</string>
     <string name="beaconActive">Beacon enabled</string>
+    <string name="preferencesExportQueued">Export queued</string>
 
     <string-array name="filepicker">
         <item>Select</item>
