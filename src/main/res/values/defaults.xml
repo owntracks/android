@@ -45,6 +45,8 @@
 
     <integer name="valBeaconBackgroundScanPeriod">30</integer>
     <integer name="valBeaconForegroundScanPeriod">0</integer>
+    <integer name="valBeaconMode">0</integer>
+
 
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>

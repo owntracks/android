@@ -39,6 +39,10 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     private BeaconManager beaconManager;
     private WaypointDao waypointDao;
 
+    private static final int BEACON_MODE_DEFAULT = 0;
+    private static final int BEACON_MODE_LEGACY_SCANNING = 1;
+    private static final int BEACON_MODE_OFF = 2;
+
     @Override
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "onCreate()");
@@ -48,12 +52,31 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         this.activeRegions = new HashMap<>();
 
 
+
+
+        if(loadWaypointsForModeIdWithValidBeacon().size() > 0) {
+            initBeaconManager();
+        } else {
+            Log.v(TAG, "not initializing beaconManager because no regions are setup");
+        }
+
+    }
+
+
+    private void initBeaconManager() {
         // Gets additional information about available BLE features
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        int beaconMode = Preferences.getBeaconMode();
 
         if(bluetoothAdapter == null) {
             Log.e(TAG, "Bluetooth is not available");
             return;
+        }
+        if(beaconMode == BEACON_MODE_OFF) {
+            Log.e(TAG, "Beacon scanning is disabled");
+            return;
+
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -62,14 +85,14 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
         }
 
-        BeaconManager.setAndroidLScanningDisabled(false);
+
+        BeaconManager.setAndroidLScanningDisabled(beaconMode == BEACON_MODE_LEGACY_SCANNING);
         beaconManager = BeaconManager.getInstanceForApplication(context);
         beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
         beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
         beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(30));
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));        // TODO: make configurable
         beaconManager.bind(this);
-
     }
 
 
@@ -123,8 +146,6 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             public void didEnterRegion(Region region) {
                 Log.i(TAG, "didEnterRegion " + region.getUniqueId() + " " + Long.parseLong(region.getUniqueId()));
                 publishTransitionMessage(region, MessageTransition.EVENT_ENTER);
-
-
             }
 
             @Override
@@ -139,9 +160,9 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             }
         });
 
-            for(Waypoint w : loadWaypointsForModeIdWithValidBeacon()) {
-                addRegion(w);
-            }
+        for(Waypoint w : loadWaypointsForModeIdWithValidBeacon()) {
+            addRegion(w);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -170,8 +191,16 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
     private void addRegion(Waypoint w) {
         Log.v(TAG, "addRegion: " + w.getDescription());
-        if(!hasBeaconManager() || !isWaypointWithValidRegion(w))
+
+
+
+        if(!isWaypointWithValidRegion(w))
             return;
+
+        if(!hasBeaconManager()) {
+            initBeaconManager();
+            return;
+        }
 
 
         Log.v(TAG, "startMonitoringBeaconsInRegion " + w.getId() + " desc: " + w.getDescription() + " UUID: " + w.getBeaconUUID() + " " + w.getBeaconMajor() + "/" + w.getBeaconMinor());
