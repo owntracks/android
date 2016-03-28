@@ -1,6 +1,13 @@
 OwnTracks Android App Release Notes
 ===================================
 
+## OwnTracks 0.6.10
+>Release date: 2016-03-28 for beta testers
+* [FIX] #338 - Bluetooth beacon functionality can cause battery drain
+* [FIX] #344 - Waypoints loose "shared" indicator on import enhancement
+* [FIX] #343 - 0.6.9: waypoint export should say 'queued'
+* [FIX] #341 - remove the *map center* button on the *Friends* page
+
 ## OwnTracks 0.6.09
 >Release date: 2016-03-25
 * [FIX] #339 - Latest Android version doesn't accept CA and client crts
