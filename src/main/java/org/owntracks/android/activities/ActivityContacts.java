@@ -93,22 +93,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     }
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_map, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_report:
-                runActionWithLocationPermissionCheck(PERMISSION_REQUEST_REPORT_LOCATION);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
         switch (action) {
@@ -163,13 +147,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
       //  this.adapter.notifyDataSetChanged();
 
     }
-
-    private static final int MENU_CONTACT_SHOW = 0;
-    private static final int MENU_CONTACT_DETAILS = 1;
-    private static final int MENU_CONTACT_NAVIGATE = 2;
-    private static final int MENU_CONTACT_FOLLOW = 3;
-    private static final int MENU_CONTACT_UNFOLLOW = 4;
-    private static final int MENU_CONTACT_REQUEST_REPORT_LOCATION = 5;
 
 
     @Override
