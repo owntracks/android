@@ -106,7 +106,7 @@ public class MessageWaypoint extends MessageBase{
         w.setBeaconUUID(getUuid());
         w.setBeaconMajor(getMajor());
         w.setBeaconMinor(getMinor());
-        w.setShared(isShared());
+        w.setShared(true);
         w.setDate(new Date(TimeUnit.SECONDS.toMillis(getTst())));
 
         return w;

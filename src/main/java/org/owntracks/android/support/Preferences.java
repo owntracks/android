@@ -886,6 +886,19 @@ public class Preferences {
     public static String getCustomBeaconLayout() {
         return getString(Keys.BEACON_LAYOUT, R.string.valEmpty);
     }
+
+    @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    public static int getBeaconMode() {
+        return getInt(Keys.BEACON_MODE, R.integer.valBeaconMode);
+    }
+
+    @Import(key =Keys.BEACON_MODE)
+    public static void setBeaconMode(int beaconMode) {
+        if(beaconMode >= 0 && beaconMode <= 2)
+            setInt(Keys.BEACON_MODE, beaconMode);
+    }
+
+
     @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getBeaconRangingEnabled() {
         return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
@@ -997,6 +1010,8 @@ public class Preferences {
         public static final String BEACON_FOREGROUND_SCAN_PERIOD    = "beaconForegroundScanPeriod";
         public static final String BEACON_LAYOUT                    = "beaconLayout";
         public static final String BEACON_RANGING                   = "ranging";
+        public static final String BEACON_MODE                      = "beaconMode";
+
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
