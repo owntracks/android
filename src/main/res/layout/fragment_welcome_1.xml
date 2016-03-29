@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/welcome_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:background="@color/primary"
+    >
+
+
+    <ImageView
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="48dp"
+
+
+        android:id="@+id/img"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/glyph"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+
+    <TextView
+        android:id="@+id/screen_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#ffffff"
+        android:gravity="bottom|center_horizontal"
+        android:text="Welcome"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+
+        android:layout_below="@+id/img"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/screen_desc"
+        android:text="The following steps will help you to get started with OwnTracks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#ffffff"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/screen_heading"
+        android:layout_alignLeft="@+id/screen_heading"
+        android:layout_alignStart="@+id/screen_heading" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="48dp"
+
+        android:background="@android:color/transparent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/view" />
+
+</RelativeLayout>

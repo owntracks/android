@@ -4,6 +4,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.Preferences;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,12 +22,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class ActivityLauncher extends ActivityBase {
 	private static final String TAG = "ActivityLauncher";
 
-	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+	private static final int RESULT_WIZZARD = 1;
+	private static final int RESULT_PLAY_SERVICES = 2;
+
 	private boolean autostart = false;
 
 	private ServiceConnection serviceApplicationConnection;
@@ -74,54 +78,63 @@ public class ActivityLauncher extends ActivityBase {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		runChecks();
+	}
 
-		checkPermissions();
+	private boolean checkSetup() {
+		if(Preferences.getSetupCompleted()) {
+			return true;
+		} else {
+			startActivityWelcome();
+			return false;
+		}
+	}
+
+
+
+	private void runChecks() {
+		checkSetup();
 		checkPlayServices();
 
-		if (this.playServicesOk)
+
+		if (checkSetup() && checkPlayServices())
 			launchChecksComplete();
+
 	}
+
 
 	private void checkPermissions() {
 	}
 
-	private void checkPlayServices() {
+	private boolean checkPlayServices() {
 
 		if (ServiceApplication.checkPlayServices()) {
-			this.playServicesOk = true;
-
+			return true;
 		} else {
-			this.playServicesOk = false;
-			int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+			GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
 
-			Log.e("checkPlayServices", "Google Play services not available. Result code " + resultCode);
 
-			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-
-				Dialog errorDialog = GooglePlayServicesUtil
-						.getErrorDialog(resultCode, this,
-								CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-				if (errorDialog != null) {
-					// Log.v(TAG, "Showing error recovery dialog");
-					ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-					errorFragment.setDialog(errorDialog);
-
-					FragmentTransaction transaction = getSupportFragmentManager()
-							.beginTransaction();
-					transaction.add(errorFragment,
-							"playServicesErrorFragmentEnable");
-					transaction.commitAllowingStateLoss();
-				}
+			int result = googleAPI.isGooglePlayServicesAvailable(this);
+			if (googleAPI.isUserResolvableError(result)) {
+				//googleAPI.getErrorDialog(this, result, RESULT_PLAY_SERVICES).show();
+				googleAPI.showErrorDialogFragment(this, result, RESULT_PLAY_SERVICES);
 			} else {
-				showQuitError();
+				showQuitError(GoogleApiAvailability.getInstance().getErrorString(result));
 			}
+
+			return false;
 		}
 	}
 
-	private void showQuitError() {
+
+
+
+
+
+
+	private void showQuitError(String error) {
 		AlertDialog.Builder popupBuilder = new AlertDialog.Builder(this);
-		popupBuilder.setMessage("Unable to activate Google Play Services");
+		popupBuilder.setMessage(error);
 		popupBuilder.setTitle("Error");
 		popupBuilder.setNegativeButton("Quit application",
 				new OnClickListener() {
@@ -134,8 +147,7 @@ public class ActivityLauncher extends ActivityBase {
 		ErrorDialogFragment errorFragment = new ErrorDialogFragment();
 		errorFragment.setDialog(popupBuilder.create());
 
-		FragmentTransaction transaction = getSupportFragmentManager()
-				.beginTransaction();
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(errorFragment, "playServicesErrorFragmentNotAvailable");
 		transaction.commitAllowingStateLoss();
 	}
@@ -143,15 +155,16 @@ public class ActivityLauncher extends ActivityBase {
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		Log.v(TAG, "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
-		if (requestCode == CONNECTION_FAILURE_RESOLUTION_REQUEST) {
+		if (requestCode == RESULT_PLAY_SERVICES) {
 			if (resultCode != RESULT_OK) {
-				Toast.makeText(this, "Google Play Services must be installed.",
-						Toast.LENGTH_SHORT).show();
-				checkPlayServices();
+				showQuitError("Google Play Services must be installed");
 			} else {
 				Log.v(TAG, "Play services activated successfully");
+				runChecks();
 			}
 			return;
+		} else if (resultCode == RESULT_WIZZARD) {
+			runChecks();
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);
@@ -180,6 +193,12 @@ public class ActivityLauncher extends ActivityBase {
 		};
 
 		bindService(i, this.serviceApplicationConnection, Context.BIND_AUTO_CREATE);
+	}
+	private void startActivityWelcome() {
+		Intent intent = new Intent(this.context, ActivityWelcome.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivityForResult(intent, RESULT_WIZZARD);
+
 	}
 
 	private void startActivityMain() {
