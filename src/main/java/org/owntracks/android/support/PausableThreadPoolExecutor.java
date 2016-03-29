@@ -121,7 +121,14 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     public void queue(MessageBase message) {
+        Log.v(TAG, "queue message");
+
         this.execute(message);
+    }
+
+    public void requeue(MessageBase message) {
+        Log.v(TAG, "requeueing message");
+        this.queue(message);
     }
 
     public interface ExecutorRunnable extends java.lang.Runnable{

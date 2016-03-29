@@ -161,13 +161,13 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 		publishMessage(message);
 	}
 
-
+boolean firstStart = true;
 	private void publishMessage(MessageBase message) {
 
 		MessageBase mm;
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
 		try {
-			if(EncryptionProvider.isPayloadEncryptionEnabled()) {
+			if(EncryptionProvider.isPayloadEncryptionEnabled() && !(message instanceof MessageEncrypted)) {
 				mm = new MessageEncrypted();
 				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(Parser.serializeSync(message)));
 			} else {
@@ -180,8 +180,19 @@ public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMe
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 
+			//DEBUG
+			if(firstStart) {
+				this.firstStart = false;
+					this.mqttClient = null;
+
+			}
+			if(this.mqttClient == null) {
+				Log.e(TAG, "forcing null of mqttclient");
+				this.pubPool.pause();
+				this.pubPool.requeue(message);
+			}
 			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
-			this.mqttClient.getTopic(message.getTopic()).publish(m);
+			this.mqttClient.publish(message.getTopic(), m);
 
 			// At this point, delivery is technically not completed. However, if the mqttClient didn't throw any errors, the message likely makes it to the broker
 			// We don't save any references between delivery tokens and messages to singal completion when deliveryComplete is called
