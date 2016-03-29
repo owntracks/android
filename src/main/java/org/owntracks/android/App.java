@@ -2,6 +2,7 @@ package org.owntracks.android;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
@@ -42,7 +43,7 @@ public class App extends Application  {
     private static SimpleDateFormat dateFormaterToday;
 
     private static Handler mainHanler;
-    private static ArrayMap<String, FusedContact> fusedContacts;
+    private static HashMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
     private static Activity currentActivity;
     private static boolean inForeground;
@@ -53,7 +54,7 @@ public class App extends Application  {
     public static final int MODE_ID_HTTP_PRIVATE=3;
 
 
-    public static ArrayMap<String, FusedContact> getFusedContacts() {
+    public static HashMap<String, FusedContact> getFusedContacts() {
         return fusedContacts;
     }
 
@@ -64,7 +65,7 @@ public class App extends Application  {
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
         mainHanler = new Handler(getMainLooper());
-        fusedContacts = new ArrayMap<>();
+        fusedContacts = new HashMap<>();
         contactsViewModel =  new ContactsViewModel();
 
         StatisticsProvider.initialize(this);

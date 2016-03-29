@@ -934,12 +934,28 @@ public class Preferences {
         if(sharedPreferences.getBoolean(Keys._FIST_START, true)) {
             Log.v(TAG, "Initial application launch");
             sharedPreferences.edit().putBoolean(Keys._FIST_START , false).commit();
+            sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , true).commit();
+
             String uuid = UUID.randomUUID().toString().toUpperCase();
             sharedPreferences.edit().putString(Keys._DEVICE_UUID, "A"+uuid.substring(1)).commit();
         } else {
             Log.v(TAG, "Consecutive application launch");
         }
     }
+
+
+    public static boolean getSetupCompleted() {
+        return !getBoolean(Keys._SETUP_NOT_COMPLETED, R.bool.valFalse);
+    }
+
+    public static void setSetupNotCompleted() {
+        setBoolean(Keys._SETUP_NOT_COMPLETED, true);
+
+    }
+    public static void setSetupCompleted() {
+        setBoolean(Keys._SETUP_NOT_COMPLETED, false);
+    }
+
 
     // Maybe make this configurable
     // For now it makes things easier to change
@@ -1049,6 +1065,7 @@ public class Preferences {
         public static final String _DEVICE_UUID                     = "deviceUUID";
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIST_START                      = "fistStart";
+        public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
 
     }
 

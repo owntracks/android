@@ -197,7 +197,6 @@
     <string name="snackbarDisconnectedError">Disconnected with error</string>
 
 
-
     <string name="geofenceLastTransition">Last transition:</string>
     <string name="ssid">SSID</string>
     <string name="idPager">Messages</string>
@@ -221,8 +220,8 @@
     </string-array>
 
 
-    <string name="mode_mqtt_private_label">Private</string>
-    <string name="mode_mqtt_public_label">Public</string>
+    <string name="mode_mqtt_private_label">Private MQTT</string>
+    <string name="mode_mqtt_public_label">Public MQTT</string>
 
     <string name="title_activity_activity_statistics">Statistics</string>
 
@@ -287,5 +286,16 @@
         <item>Select</item>
         <item>Clear</item>
     </string-array>
+
+
+
+
+    <string name="screen1_title">Unlimited Calls For You</string>
+    <string name="screen1_desc">Call your friends, family, Relatives free of cost anytime anywhere.</string>
+    <string name="screen2_title">Group Conversations</string>
+    <string name="screen2_desc">Create your own own group and share Photos, Videos etc. </string>
+    <string name="screen3_title">Synchronize with your laptop</string>
+    <string name="screen3_desc">Get notified with your calls and messages to your laptop</string>
+
 
 </resources>

@@ -35,9 +35,6 @@ import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterF
 
 public class ActivityContacts extends ActivityBase implements RecyclerViewAdapter.ClickHandler, RecyclerViewAdapter.LongClickHandler, BindingRecyclerViewAdapterFactory {
     private static final String TAG = "ActivityContacts";
-    private static final int PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST = 1;
-    private static final int PERMISSION_REQUEST_REPORT_LOCATION = 2;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,21 +58,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
         Drawer drawer = DrawerProvider.buildDrawer(this, toolbar);
 
 
-        //drawer = DrawerProvider.buildDrawer(this, toolbar, null, null, 0);
-        //rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
-
-        //adapter = new ContactsAdapter(App.getFusedContacts());
-        //b.rvContacts.setAdapter(adapter);
-
-
-        //boolean pauseOnScroll = false; // or true
-        //boolean pauseOnFling = true; // or false
-        //PauseOnScrollListener listener = new PauseOnScrollListener(imageLoader, pauseOnScroll, pauseOnFling);
-        //listView.setOnScrollListener(listener);
-
-
-        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_SETUP_FOREGROUND_LOCATION_REQUEST);
-
 
     }
 
@@ -94,30 +76,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
 
 
-    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
-        switch (action) {
-            case PERMISSION_REQUEST_REPORT_LOCATION:
-                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION " + granted);
-                if (granted) {
-                    ServiceProxy.runOrBind(this, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (ServiceProxy.getServiceLocator().getLastKnownLocation() == null)
-                                Toasts.showCurrentLocationNotAvailable();
-                            else
-                                ServiceProxy.getServiceLocator().reportLocationManually();
-                        }
-                    });
-                } else {
-                    Toasts.showLocationPermissionNotAvailable();
-                }
-
-
-        }
-    }
-
-
 
     @Override
     public void onResume() {
@@ -132,20 +90,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
-    }
-    @SuppressWarnings("unused")
-    public void onEventMainThread(Events.FusedContactUpdated e){
-        Log.v(TAG, "FusedContactUpdated. IDX: " + App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
-       // this.adapter.notifyItemInserted(App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
-      //  this.adapter.notifyDataSetChanged();
-    }
-    @SuppressWarnings("unused")
-    public void onEventMainThread(Events.FusedContactAdded e){
-        Log.v(TAG, "FusedContactAdded. IDX: " + App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
-
-       // this.adapter.notifyItemChanged(App.getFusedContacts().indexOfKey(e.getContact().getTopic()));
-      //  this.adapter.notifyDataSetChanged();
-
     }
 
 

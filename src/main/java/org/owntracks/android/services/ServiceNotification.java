@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
@@ -8,7 +9,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
@@ -128,6 +131,11 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationManager.cancel(NOTIFICATION_ID_EVENTS);
         notificationManager.cancel(NOTIFICATION_ID_MESSAGES);
+
+    }
+
+    private void clearNotificationPermission() {
+        notificationManager.cancel(NOTIFICATION_ID_PERMISSION);
 
     }
 
@@ -390,6 +398,14 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         updateNotificationOngoing();
     }
 
+    public void onEvent(Events.PermissionGranted e) {
+        Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
+        if(e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            clearNotificationPermission();
+        }
+    }
+
+
     public void onEvent(MessageLocation m) {
         Log.v(TAG, "onEvent MessageLocation");
         if(m.isOutgoing() && (lastPublishedLocationMessage == null || lastPublishedLocationMessage.getTst() <=  m.getTst())) {
@@ -420,10 +436,15 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderPermission = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityStatus.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilderPermission.setContentIntent(resultPendingIntent);
+        final Intent i = new Intent();
+        i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        i.addCategory(Intent.CATEGORY_DEFAULT);
+        i.setData(Uri.parse("package:" + context.getPackageName()));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        notificationBuilderPermission.setContentIntent(PendingIntent.getActivity(this.context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT));
+
 
 
         notificationBuilderPermission.setSmallIcon(R.drawable.ic_notification);
