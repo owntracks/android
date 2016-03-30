@@ -219,7 +219,6 @@
         <activity android:name=".activities.ActivityWelcome"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
