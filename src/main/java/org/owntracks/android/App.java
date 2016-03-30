@@ -77,13 +77,13 @@ public class App extends Application  {
         EncryptionProvider.initialize();
 		EventBus.getDefault().register(this);
 
-        // Background detection
-        registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-        registerScreenOnReceiver();
     }
 
-    public void registerLifecycleCallbacks() {
 
+    public static void enableForegroundBackgroundDetection() {
+        Log.v(TAG, "enableForegroundBackgroundDetection()");
+        instance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
+        instance.registerScreenOnReceiver();
     }
 
 

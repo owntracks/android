@@ -99,8 +99,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
         this.bottomSheetBehavior.setPeekHeight(0);
-        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
+        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
