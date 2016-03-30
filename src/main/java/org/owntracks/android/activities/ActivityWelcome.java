@@ -27,10 +27,12 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.services.ServiceApplication;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Toasts;
@@ -48,12 +50,106 @@ public class ActivityWelcome extends ActivityBase {
     ImageButton btnNext;
     boolean isOpaque = true;
 
+
+    private void startActivityMain() {
+        Intent intent = new Intent(this, App.getRootActivityClass());
+        startActivity(intent);
+    }
+
+    private boolean checkSetup() {
+        if(Preferences.getSetupCompleted()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private boolean checkPlayServices() {
+
+        if (ServiceApplication.checkPlayServices()) {
+            Log.v(TAG, "check checkPlayServices ok");
+
+            return true;
+        } else {
+            GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+
+
+            int result = googleAPI.isGooglePlayServicesAvailable(this);
+            if (googleAPI.isUserResolvableError(result)) {
+                //googleAPI.getErrorDialog(this, result, RESULT_PLAY_SERVICES).show();
+                googleAPI.showErrorDialogFragment(this, result, RESULT_PLAY_SERVICES);
+            } else {
+                showQuitError(GoogleApiAvailability.getInstance().getErrorString(result));
+            }
+
+            return false;
+        }
+    }
+
+
+    boolean checkSetup = false;
+    boolean checkPlay = false;
+    boolean checkPermission = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Window window = getWindow();
-        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
+
+
+
+        runChecks();
+
+        if(checkSetup ||  checkPlay || checkPermission) {
+            recoverChecks();
+        } else {
+            startActivityMain();
+        }
+    }
+
+    private void runChecks() {
+        if(!checkSetup())
+            checkSetup = true;
+        if(!checkPlayServices())
+            checkPlay = true;
+        if(!checkPermissions())
+            checkPermission = true;
+    }
+
+    private void recoverChecks() {
+        if(checkSetup) {
+            recoverSetup();
+            return;
+        }
+
+        if(checkPlay) {
+            recoverPlay();
+            return;
+        }
+        if(checkPermission) {
+            recoverPermission();
+            return;
+        }
+
+    }
+
+    private void recoverPermission() {
+        //TODO
+    }
+
+    private void recoverPlay() {
+        //TODO
+    }
+
+    private boolean checkPermissions() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void recoverSetup() {
+
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setContentView(R.layout.activity_welcome);
 
         btnNext = ImageButton.class.cast(findViewById(R.id.btn_next));
@@ -61,9 +157,7 @@ public class ActivityWelcome extends ActivityBase {
             @Override
             public void onClick(View v) {
                 pagerAdapter.getItem(pager.getCurrentItem()).onNextClicked();
-
                 pager.setCurrentItem(pager.getCurrentItem() + 1, true);
-
             }
         });
 
@@ -78,7 +172,7 @@ public class ActivityWelcome extends ActivityBase {
         pager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new ScreenSlideAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setPageTransformer(true, new CrossfadePageTransformer());
+        // pager.setPageTransformer(true, new CrossfadePageTransformer());
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -160,17 +254,14 @@ public class ActivityWelcome extends ActivityBase {
 
 
     private void endTutorial() {
-        Intent intent = new Intent(this, App.getRootActivityClass());
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
         Preferences.setSetupCompleted();
-        finish();
     }
 
     @Override
     public void onBackPressed() {
         if (pager.getCurrentItem() == 0) {
-            super.onBackPressed();
+            setResult(2);
+            finish();
         } else {
             pager.setCurrentItem(pager.getCurrentItem() - 1);
         }

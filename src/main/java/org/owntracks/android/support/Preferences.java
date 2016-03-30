@@ -934,6 +934,8 @@ public class Preferences {
         if(sharedPreferences.getBoolean(Keys._FIST_START, true)) {
             Log.v(TAG, "Initial application launch");
             sharedPreferences.edit().putBoolean(Keys._FIST_START , false).commit();
+
+            Log.v(TAG, "setting _SETUP_NOT_COMPLETED true");
             sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , true).commit();
 
             String uuid = UUID.randomUUID().toString().toUpperCase();
@@ -944,16 +946,15 @@ public class Preferences {
     }
 
 
+
     public static boolean getSetupCompleted() {
-        return !getBoolean(Keys._SETUP_NOT_COMPLETED, R.bool.valFalse);
+        // sharedPreferences because the value is independent from the selected mode
+        return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
 
-    public static void setSetupNotCompleted() {
-        setBoolean(Keys._SETUP_NOT_COMPLETED, true);
-
-    }
     public static void setSetupCompleted() {
-        setBoolean(Keys._SETUP_NOT_COMPLETED, false);
+        sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).commit();
+
     }
 
 
