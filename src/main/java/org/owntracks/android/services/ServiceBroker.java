@@ -190,6 +190,7 @@ boolean firstStart = true;
 				Log.e(TAG, "forcing null of mqttclient");
 				this.pubPool.pause();
 				this.pubPool.requeue(message);
+				return;
 			}
 			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
 			this.mqttClient.publish(message.getTopic(), m);
