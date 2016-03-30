@@ -82,6 +82,10 @@ public class App extends Application  {
         registerScreenOnReceiver();
     }
 
+    public void registerLifecycleCallbacks() {
+
+    }
+
 
 
     public static Context getContext() {

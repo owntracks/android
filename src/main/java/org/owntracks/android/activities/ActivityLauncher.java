@@ -17,25 +17,26 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityManagerCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class ActivityLauncher extends ActivityBase {
+public class ActivityLauncher extends AppCompatActivity {
 	private static final String TAG = "ActivityLauncher";
 
-	private static final int RESULT_WIZZARD = 1;
-	private static final int RESULT_PLAY_SERVICES = 2;
+	private static final int RESULT_WIZZARD = 1001;
+	private static final int RESULT_PLAY_SERVICES = 1002;
 
 	private boolean autostart = false;
 
 	private ServiceConnection serviceApplicationConnection;
 	private Context context;
-	private boolean playServicesOk = false;
 
 
 	public static class ErrorDialogFragment extends DialogFragment {
@@ -78,14 +79,18 @@ public class ActivityLauncher extends ActivityBase {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.v(TAG, "onResume");
+
 		runChecks();
 	}
 
 	private boolean checkSetup() {
 		if(Preferences.getSetupCompleted()) {
+			Log.v(TAG, "checkSetup ok");
 			return true;
 		} else {
 			startActivityWelcome();
+			Log.v(TAG, "started activitywelcome");
 			return false;
 		}
 	}
@@ -93,22 +98,20 @@ public class ActivityLauncher extends ActivityBase {
 
 
 	private void runChecks() {
-		checkSetup();
-		checkPlayServices();
-
-
-		if (checkSetup() && checkPlayServices())
-			launchChecksComplete();
-
+		Log.v(TAG, "runChecks");
+		if (checkSetup()) {
+			if(checkPlayServices()) {
+				launchChecksComplete();
+			}
+		}
 	}
 
-
-	private void checkPermissions() {
-	}
 
 	private boolean checkPlayServices() {
 
 		if (ServiceApplication.checkPlayServices()) {
+			Log.v(TAG, "check checkPlayServices ok");
+
 			return true;
 		} else {
 			GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
@@ -154,6 +157,9 @@ public class ActivityLauncher extends ActivityBase {
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+
 		Log.v(TAG, "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
 		if (requestCode == RESULT_PLAY_SERVICES) {
 			if (resultCode != RESULT_OK) {
@@ -163,11 +169,19 @@ public class ActivityLauncher extends ActivityBase {
 				runChecks();
 			}
 			return;
-		} else if (resultCode == RESULT_WIZZARD) {
-			runChecks();
+		}
+		else if (requestCode == RESULT_WIZZARD) {
+			Log.v(TAG, "requestCode wizzard resultCode: " + resultCode );
+
+				if(resultCode == 2) {
+					finish();
+					return;
+				} else if(resultCode == 3) {
+					runChecks();
+				}
+
 		}
 
-		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	private void quitApplication() {
@@ -195,20 +209,17 @@ public class ActivityLauncher extends ActivityBase {
 		bindService(i, this.serviceApplicationConnection, Context.BIND_AUTO_CREATE);
 	}
 	private void startActivityWelcome() {
-		Intent intent = new Intent(this.context, ActivityWelcome.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivityForResult(intent, RESULT_WIZZARD);
+		Intent intent = new Intent(this, ActivityWelcome.class);
+		//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
+		startActivityForResult(intent, RESULT_WIZZARD);
 	}
 
 	private void startActivityMain() {
-		startActivityFromClass(App.getRootActivityClass());
-	}
-
-	private void startActivityFromClass(Class<?> c) {
-		Intent intent = new Intent(this.context, c);
+		Intent intent = new Intent(this.context, App.getRootActivityClass());
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
+
 	}
 
 	@Override
