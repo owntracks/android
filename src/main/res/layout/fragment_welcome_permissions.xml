@@ -70,20 +70,22 @@
         android:gravity="center_horizontal"
         android:textSize="16sp"
         android:text="Permissions have been granted"
-         android:id="@+id/permissionGranted"
+        android:id="@+id/message"
         android:layout_above="@+id/view"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:visibility="gone"/>
+        android:visibility="visible"
+        android:layout_marginBottom="48dp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Grant permissions"
-        android:id="@+id/permissionRequest"
+        android:text="Fix"
+        android:id="@+id/button"
         android:layout_above="@+id/view"
-        android:visibility="gone"
-        android:layout_centerHorizontal="true" />
+        android:visibility="visible"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"/>
 
 
 </RelativeLayout>

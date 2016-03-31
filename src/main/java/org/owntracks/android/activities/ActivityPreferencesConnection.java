@@ -72,7 +72,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         if(resultCode == RESULT_OK && (requestCode == FILE_SELECT_CODE_TLS_CA_CRT_PATH || requestCode == FILE_SELECT_CODE_TLS_CLIENT_CRT_PATH )) {
             Uri uri = data.getData();
-
+            Log.v(TAG, "onActivityResult() for uri:  " + uri.toString());
                 if (requestCode == FILE_SELECT_CODE_TLS_CLIENT_CRT_PATH)
                     new ClientCrtCopyTask(preferencesFragment.get()).execute(uri);
                 else
@@ -361,7 +361,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                             tlsCaCrtNameView.setFocusable(true);
                                             tlsCaCrtNameView.setFocusableInTouchMode(true);
                                             tlsCaCrtNameView.requestFocus();
-                                            PopupMenu popup = new PopupMenu(FragmentPreferences.this.getActivity(), tlsCaCrtNameView);
+                                            PopupMenu popup = new PopupMenu(v.getContext(), tlsCaCrtNameView);
                                             popup.getMenuInflater().inflate(R.menu.picker, popup.getMenu());
                                             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                                 public boolean onMenuItemClick(MenuItem item) {
@@ -401,7 +401,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                             tlsClientCrtNameView.setFocusable(true);
                                             tlsClientCrtNameView.setFocusableInTouchMode(true);
                                             tlsClientCrtNameView.requestFocus();
-                                            PopupMenu popup = new PopupMenu(FragmentPreferences.this.getActivity(), tlsClientCrtNameView);
+                                            PopupMenu popup = new PopupMenu(v.getContext(), tlsClientCrtNameView);
                                             popup.getMenuInflater().inflate(R.menu.picker, popup.getMenu());
                                             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                                 public boolean onMenuItemClick(MenuItem item) {
@@ -604,8 +604,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         @SuppressWarnings("unused")
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState());
-            Toasts.showBrokerStateChange(e.getState());
+            Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState() + " cached " + cachedState);
+
 
             cachedState = e.getState(); // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
             updateDisconnectButton(e.getState());
@@ -734,8 +734,9 @@ public class ActivityPreferencesConnection extends ActivityBase {
         @Override
         protected String doInBackground(Uri... params) {
             try {
-                String path = ContentPathHelper.getPath(App.getContext(), params[0]);
-                String filename = ContentPathHelper.fullPathToFilename(path);
+                //String path = ContentPathHelper.getPath(App.getContext(), params[0]);
+                String filename = ContentPathHelper.uriToFilename(App.getContext(), params[0]);
+                Log.v(TAG, "filename for save is: " + filename);
 
                 InputStream inputStream = App.getContext().getContentResolver().openInputStream(params[0]);
                 FileOutputStream outputStream = App.getContext().openFileOutput(filename, Context.MODE_PRIVATE);

@@ -180,12 +180,7 @@ boolean firstStart = true;
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 
-			//DEBUG
-			if(firstStart) {
-				this.firstStart = false;
-					this.mqttClient = null;
 
-			}
 			if(this.mqttClient == null) {
 				Log.e(TAG, "forcing null of mqttclient");
 				this.pubPool.pause();

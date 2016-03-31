@@ -2,7 +2,6 @@ package org.owntracks.android.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -343,6 +341,34 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public boolean canEnablePagerNext() {
             return true;
         }
+
+        @Override
+        public void setUserVisibleHint(boolean isVisibleToUser) {
+            super.setUserVisibleHint(isVisibleToUser);
+
+            // Make sure that we are currently visible
+            if (this.isVisible()) {
+                // If we are becoming invisible, then...
+                if (!isVisibleToUser) {
+                    Log.d(TAG, this+ "isVisible && !isVisibleToUser");
+                    onHide();
+                } else {
+                    Log.d(TAG, this+ "isVisible && isVisibleToUser");
+                    onShow();
+
+                }
+            } else {
+                Log.d(TAG, "!isVisible");
+
+            }
+        }
+
+        protected void onHide() {
+        }
+
+        protected void onShow() {
+        }
+
     }
 
     public static class WelcomeFragment extends ScreenFragment {
@@ -451,8 +477,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
             ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_permissions, container, false);
 
-            button = (Button) v.findViewById(R.id.permissionRequest);
-            success = (TextView) v.findViewById(R.id.permissionGranted);
+            button = (Button) v.findViewById(R.id.button);
+            success = (TextView) v.findViewById(R.id.message);
 
 
 
@@ -473,90 +499,113 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     }
 
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-
-        Log.v(TAG, "onActivityResult. RequestCode = " + requestCode + ", resultCode " + resultCode);
-        if (requestCode == RECOVER_PLAY) {
-            if (resultCode != RESULT_OK) {
-                PlayFragment.getInstance().onPlayServicesUnavailableRecoverable();
-            } else {
-                PlayFragment.getInstance().onPlayServicesAvailable();
-
-            }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case RECOVER_PLAY:
+                Log.v(TAG, "onActivityResult" + requestCode + " " + resultCode);
+                return;
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
+
     private static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
         public static final int ID = 3;
         private static PlayFragment instance;
-        private Button recoverButton;
-        private TextView unavailable;
-        private TextView available;
+        private static GoogleApiAvailability googleAPI;
+        private Button button;
+        private TextView message;
 
         public static PlayFragment getInstance() {
             if(instance == null)
                 instance =  new PlayFragment();
 
             return instance;
+        }
 
+        private PlayFragment() {
+            super();
+            googleAPI = GoogleApiAvailability.getInstance();
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_play, container, false);
 
-             recoverButton = (Button) v.findViewById(R.id.recover);
-             unavailable = (TextView) v.findViewById(R.id.unavailable);
-             available = (TextView) v.findViewById(R.id.available);
-
-            final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
-
-            if(googleAPI.isUserResolvableError(resultCode)) {
-                onPlayServicesUnavailableRecoverable();
-                recoverButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
-                        try {
-                            p.send();
-                        } catch (PendingIntent.CanceledException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                });
-            } else {
-                onPlayServicesUnavailableNotRecoverable();
-            }
-
-
+            button = (Button) v.findViewById(R.id.recover);
+            message = (TextView) v.findViewById(R.id.message);
 
             return v;
         }
-        public void onPlayServicesUnavailableNotRecoverable() {
-            unavailable.setVisibility(View.VISIBLE);
-            available.setVisibility(View.GONE);
-            recoverButton.setVisibility(View.GONE);
+
+        protected void onHide() {
+        }
+
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
+            Log.v(TAG, "onShow " + resultCode);
+            if(resultCode == ConnectionResult.SUCCESS) {
+                onPlayServicesAvailable();
+            } else {
+                if(googleAPI.isUserResolvableError(resultCode)) {
+                    onPlayServicesUnavailableRecoverable(resultCode);
+                } else {
+                    onPlayServicesUnavailableNotRecoverable(resultCode);
+                }
+            }
+        }
+
+        public void onPlayServicesUnavailableNotRecoverable(int resultCode) {
+            Log.v(TAG, "onPlayServicesUnavailableNotRecoverable()");
+
+            message.setText(getString(R.string.play_services_not_available_not_recoverable));
+            button.setVisibility(View.VISIBLE);
+            button.setText(R.string.welcomeFixQuit);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().finish();
+                    System.exit(0);
+                }
+            });
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }
 
 
         public void onPlayServicesAvailable() {
-            unavailable.setVisibility(View.GONE);
-            available.setVisibility(View.VISIBLE);
-            recoverButton.setVisibility(View.GONE);
+            Log.v(TAG, "onPlayServicesAvailable()");
+            message.setText(getString(R.string.play_services_now_available));
+            button.setVisibility(View.GONE);
 
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
 
-        public void onPlayServicesUnavailableRecoverable() {
-            unavailable.setVisibility(View.VISIBLE);
-            available.setVisibility(View.GONE);
-            recoverButton.setVisibility(View.VISIBLE);
+        public void onPlayServicesUnavailableRecoverable(final int resultCode) {
+            Log.v(TAG, "onPlayServicesUnavailableRecoverable()");
+            message.setText(getString(R.string.play_services_not_available_recoverable));
+            button.setVisibility(View.VISIBLE);
+            button.setText(R.string.welcomeFixIssue);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
+                    try {
+                        p.send();
+                    } catch (PendingIntent.CanceledException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+            });
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }
@@ -634,5 +683,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             }
         }
     }
+
+
 
 }
