@@ -2,9 +2,13 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.owntracks.android.R;
 
 
 public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -18,6 +22,7 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         public View rootView;
         private OnViewHolderClickListener<ClickableViewHolder> onClickListener;
 
+        private Drawable defaultBackground;
         public ClickableViewHolder(View view) {
             super(view);
             this.rootView = view;
@@ -26,7 +31,22 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         }
 
         public void setSelected(boolean selected) {
-            this.rootView.setSelected(selected);
+            if(selected && !this.rootView.isSelected()) {
+                defaultBackground = this.rootView.getBackground();
+                this.rootView.setBackgroundDrawable(ContextCompat.getDrawable(this.rootView.getContext(), R.drawable.selectable_row));
+                this.rootView.setSelected(true);
+                return;
+            }
+
+            if(!selected && this.rootView.isSelected()) {
+                defaultBackground.setVisible(false, false);
+                this.rootView.setBackgroundDrawable(defaultBackground);
+                this.rootView.setSelected(false);
+                defaultBackground.setVisible(true, false);
+
+                return;
+            }
+
         }
 
         @Override
