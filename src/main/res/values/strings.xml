@@ -296,6 +296,12 @@
     <string name="screen2_desc">Create your own own group and share Photos, Videos etc. </string>
     <string name="screen3_title">Synchronize with your laptop</string>
     <string name="screen3_desc">Get notified with your calls and messages to your laptop</string>
+    <string name="welcomeFixIssue">Fix</string>
+    <string name="welcomeFixQuit">Quit</string>
+    <string name="play_services_now_available">Google Play Services are now available</string>
+
+    <string name="play_services_not_available_recoverable">Google Play Services are not enabled or not installed</string>
+    <string name="play_services_not_available_not_recoverable">Google Play Services are not available for your device</string>
 
 
 </resources>

@@ -47,7 +47,7 @@ import java.util.LinkedList;
 
 public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
-    public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION";
+    public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION"; //unused for now
     private static final String TAG ="ServiceNotification" ;
 
     private ServiceProxy context;
@@ -68,7 +68,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     private LinkedList<Spannable> notificationListEvents;
     private Notification notificationEvents;
 
-    // Message notifications
+    // Message notifications. Unused for now
     private NotificationCompat.Builder notificationBuilderMessages;
     private static final int NOTIFICATION_ID_MESSAGES = 3;
     private LinkedList<Spannable> notificationListMessages;

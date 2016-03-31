@@ -98,6 +98,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
+        binding.contactPeek.contactRow.setOnLongClickListener(bottomSheetLongClickListener);
         this.bottomSheetBehavior.setPeekHeight(0);
 
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
@@ -276,10 +277,10 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
 
-    private void updateContactLocation(FusedContact c) {
-        Log.v(TAG, "updateContactLocation: " + c.getTopic() + " hasLocation: " + c.hasLocation());
-        if (!c.hasLocation())
+    private void updateContactLocation(@Nullable FusedContact c) {
+        if (c == null || !c.hasLocation())
             return;
+        Log.v(TAG, "updateContactLocation: " + c.getTopic() + " hasLocation: " + c.hasLocation());
 
         Marker m = markers.get(c.getTopic());
 
@@ -295,9 +296,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void onAddInitialMarkers() {
-        Iterator it = App.getFusedContacts().entrySet().iterator();
-        while (it.hasNext()) {
-            updateContactLocation((FusedContact)((Map.Entry)it.next()).getValue());
+        for (Object o : App.getFusedContacts().entrySet()) {
+            updateContactLocation((FusedContact) ((Map.Entry) o).getValue());
         }
     }
     @SuppressWarnings("MissingPermission")
@@ -311,6 +311,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.map.setIndoorEnabled(false);
         this.map.setLocationSource(this.mapLocationSource);
         this.map.setMyLocationEnabled(true);
+        this.map.getUiSettings().setMyLocationButtonEnabled(false);
         this.map.setOnMapClickListener(this);
         this.map.setOnMarkerClickListener(this);
         this.map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -359,7 +360,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
         }
     });*/
-}
+    }
 
 
     @Override
@@ -404,13 +405,15 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void centerDevice() {
         if(!mapLocationSource.hasLocation())
             return;
-
         centerMap(this.mapLocationSource.getLastKnownLocation().getLatLng());
     }
 
-    private void centerContact(FusedContact contact) {
-        if(!contact.hasLocation())
+    private void centerContact(@Nullable FusedContact contact) {
+        if(contact == null || !contact.hasLocation())
             return;
+
+        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         centerMap(contact.getLatLng());
     }
@@ -424,14 +427,19 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         if(c == null)
             return;
 
+        actionSelectContact(c);
+        Log.v(TAG, "actionFollowContact()");
+
         this.mode = ACTION_FOLLOW_CONTACT;
-        updateContactLocation(c);
-        updateBottomSheetContact(c);
         centerMap(c.getLatLng());
     }
 
+
+
     private void actionFollowDevice() {
         this.mode = ACTION_FOLLOW_DEVICE;
+
+        deselectContact();
 
         if(!mapLocationSource.hasLocation()) {
             Toasts.showCurrentLocationNotAvailable();
@@ -446,7 +454,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onMapClick(LatLng latLng) {
-        this.mode = ACTION_FREE_ROAM;
         deselectContact();
     }
 
@@ -456,11 +463,17 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         return true;
     }
 
-    private void actionSelectContact(FusedContact fusedContact) {
+    private void actionSelectContact(@Nullable FusedContact fusedContact) {
+        Log.v(TAG, "actionSelectContact()");
+
+        if(fusedContact == null)
+            return;
+
         this.mode = ACTION_SELECT_CONTACT;
         updateContactLocation(fusedContact);
         updateBottomSheetContact(fusedContact);
     }
+
 
     private void updateBottomSheetContact(FusedContact fusedContact) {
         if(activeContact == fusedContact)
@@ -498,6 +511,19 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         }
     };
 
+    View.OnLongClickListener bottomSheetLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            actionFollowContact(activeContact);
+
+            if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+            return true;
+        }
+    };
+
+
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -522,13 +548,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         switch (item.getItemId()) {
             case R.id.menu_navigate:
                 actionNavigateToSelectedContact();
-                return true;
-            case R.id.menu_follow:
-                if(mode == ACTION_FREE_ROAM) {
-                    actionFollowContact(activeContact);
-                } else {
-                    mode = ACTION_FREE_ROAM;
-                }
                 return true;
 
             default:

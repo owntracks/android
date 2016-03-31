@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rttv="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="org.owntracks.android.App"/>
         <import type="android.view.View"/>
         <variable name="item" type="org.owntracks.android.model.FusedContact"/>
     </data>
 
-
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <include
+        android:transitionName="toolbar"
+        android:id="@+id/fragmentToolbar"
+        layout="@layout/toolbar"/>
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:layout_below="@+id/fragmentToolbar">
 
 
-        <include
-            android:transitionName="toolbar"
-            android:id="@+id/fragmentToolbar"
-            layout="@layout/toolbar"/>
 
         <com.google.android.gms.maps.MapView
             android:name="com.google.android.gms.maps.MapFragment"
@@ -48,13 +49,13 @@
             <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
 
 
-            <com.github.curioustechizen.ago.RelativeTimeTextView
+            <TextView
                 android:id="@+id/locationDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                rttv:reference_time="@{item.fusedLocationDate*1000}"
                 android:ellipsize="end"
                 android:singleLine="true"
+                android:text="@{App.formatDate(item.fusedLocationDate)}"
                 android:paddingLeft="72dp"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
@@ -195,4 +196,7 @@
 
 
     </android.support.design.widget.CoordinatorLayout>
+
+    </RelativeLayout>
+
 </layout>

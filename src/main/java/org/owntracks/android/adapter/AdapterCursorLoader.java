@@ -14,13 +14,19 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
     private final Context mContext;
     private OnViewHolderClickListener onViewHolderClickListener;
 
-    public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public View rootView;
         private OnViewHolderClickListener<ClickableViewHolder> onClickListener;
+
         public ClickableViewHolder(View view) {
             super(view);
             this.rootView = view;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        public void setSelected(boolean selected) {
+            this.rootView.setSelected(selected);
         }
 
         @Override
@@ -30,9 +36,18 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
         }
 
+        @Override
+        public boolean onLongClick(View v) {
+            if(onClickListener != null)
+                return this.onClickListener.onViewHolderLongClick(v, this);
+            return false;
+        }
+
         public void setOnViewHolderClickListener(OnViewHolderClickListener listener) {
             this.onClickListener = listener;
         }
+
+
     }
 
 
@@ -84,13 +99,17 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ClickableViewHolder v = onCreateItemViewHolder(parent,viewType);
-        if(onViewHolderClickListener != null)
+        if(onViewHolderClickListener != null) {
             v.setOnViewHolderClickListener(onViewHolderClickListener);
+        }
+
         return v;
     }
 
     public interface OnViewHolderClickListener<T extends ClickableViewHolder> {
         void onViewHolderClick(View rootView, T viewHolder);
+        boolean onViewHolderLongClick(View rootView, T viewHolder);
+
     }
 
 

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -214,4 +215,66 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         startActivity(detailIntent);
 
     }
+
+    @Override
+    public boolean onViewHolderLongClick(View rootView, AdapterWaypoints.ItemViewHolder viewHolder) {
+        mActionMode = startSupportActionMode( modeCallBack );
+        modeCallBack.setItemId(viewHolder.getItemId());
+        viewHolder.setSelected(true);
+        return true;
+    }
+
+
+    private ActionMode mActionMode;
+
+    private interface ActionCallback extends ActionMode.Callback {
+        void setItemId(long itemId);
+    }
+
+
+    // Define the callback when ActionMode is activated
+    private ActionCallback modeCallBack = new ActionCallback() {
+        long itemId;
+
+        @Override
+        public void setItemId(long itemId) {
+            this.itemId = itemId;
+        }
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.setTitle("Actions");
+            mode.getMenuInflater().inflate(R.menu.activity_waypoints_actionmode, menu);
+            return true;
+        }
+
+        // Called each time the action mode is shown.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.remove:
+                    remove(itemId);
+
+                    mode.finish(); // Action picked, so close the contextual menu
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null; // Clear current action mode
+        }
+    };
+
+
 }

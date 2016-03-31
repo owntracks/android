@@ -62,18 +62,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-        android:gravity="center_horizontal"
-        android:textSize="16sp"
-        android:text="Play services are now available"
-        android:id="@+id/available"
-        android:layout_above="@+id/view"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:visibility="gone"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="match_parent"
@@ -82,19 +70,23 @@
         android:gravity="center_horizontal"
         android:textSize="16sp"
         android:text="Play services are not available"
-        android:id="@+id/unavailable"
-        android:layout_above="@+id/view"
+        android:id="@+id/message"
+        android:visibility="visible"
+        android:layout_above="@+id/recover"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:visibility="gone"/>
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:layout_marginBottom="24dp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Recover"
+        android:text="Fix"
         android:id="@+id/recover"
         android:layout_above="@+id/view"
         android:visibility="gone"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"/>
 
 </RelativeLayout>
