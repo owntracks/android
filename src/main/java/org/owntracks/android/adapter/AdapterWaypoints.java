@@ -3,11 +3,15 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.curioustechizen.ago.RelativeTimeTextView;
@@ -40,13 +44,17 @@ public class AdapterWaypoints extends AdapterCursorLoader {
         public TextView mTitle;
         public TextView mText;
         public TextView  mMeta;
+        public LinearLayout mLayout;
 
         public ItemViewHolder(View view) {
             super(view);
             mTitle = (TextView)view.findViewById(R.id.title);
             mText =  (TextView)view.findViewById(R.id.text);
             mMeta =  (TextView)view.findViewById(R.id.meta);
+            mLayout =  (LinearLayout)view.findViewById(R.id.textview_container);
+
         }
+
     }
 
 

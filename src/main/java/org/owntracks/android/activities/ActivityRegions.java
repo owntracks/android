@@ -2,6 +2,7 @@ package org.owntracks.android.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -42,6 +43,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     private final int LOADER_ID = 1;
     private AdapterWaypoints listAdapter;
     private Drawer drawer;
+    private boolean actionMode;
 
     protected void onCreate(Bundle savedInstanceState) {
         startService(new Intent(this, ServiceProxy.class));
@@ -150,10 +152,13 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
 
     private void remove(long id) {
+
         Waypoint w = Dao.getWaypointDao().loadByRowId(id);
         Dao.getWaypointDao().delete(w);
         EventBus.getDefault().post(new Events.WaypointRemoved(w));
         Toasts.showWaypointRemovedToast();
+        if(mActionMode != null)
+            mActionMode.finish();
     }
 
     @Override
@@ -209,19 +214,32 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
     @Override
     public void onViewHolderClick(View rootView, AdapterWaypoints.ItemViewHolder viewHolder) {
-
-        Intent detailIntent = new Intent(this, ActivityRegion.class);
-        detailIntent.putExtra("keyId", viewHolder.getItemId());
-        startActivity(detailIntent);
-
+        if(mActionMode == null) {
+            Intent detailIntent = new Intent(this, ActivityRegion.class);
+            detailIntent.putExtra("keyId", viewHolder.getItemId());
+            startActivity(detailIntent);
+        } else {
+            selectActionModeItem(viewHolder);
+        }
     }
 
     @Override
     public boolean onViewHolderLongClick(View rootView, AdapterWaypoints.ItemViewHolder viewHolder) {
+        if(mActionMode != null)
+            return false;
+
         mActionMode = startSupportActionMode( modeCallBack );
+        Log.v(TAG, "startSupportActionMode " + viewHolder.getItemId());
+
+        selectActionModeItem(viewHolder);
+        return true;
+    }
+
+    private void selectActionModeItem(AdapterWaypoints.ItemViewHolder viewHolder) {
+        deselectAllItems();
         modeCallBack.setItemId(viewHolder.getItemId());
         viewHolder.setSelected(true);
-        return true;
+
     }
 
 
@@ -252,6 +270,10 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         // Called each time the action mode is shown.
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            // Fix statusbar color
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.secondary, getTheme()));
+            }
             return false; // Return false if nothing is done
         }
 
@@ -273,8 +295,20 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null; // Clear current action mode
+            deselectAllItems();
         }
     };
+
+    private void deselectAllItems() {
+        for (int i = 0; i < listAdapter.getItemCount(); i++) {
+            RecyclerView.ViewHolder holder = listView.findViewHolderForLayoutPosition(i);
+
+            if (holder != null) {
+                ((AdapterCursorLoader.ClickableViewHolder)holder).setSelected(false);
+            }
+        }
+
+    }
 
 
 }
