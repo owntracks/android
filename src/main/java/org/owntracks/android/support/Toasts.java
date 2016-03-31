@@ -40,8 +40,8 @@ public class Toasts {
 
         if (state == ServiceBroker.State.CONNECTED) {
             stringRes = R.string.snackbarConnected;
-        } else if (state == ServiceBroker.State.CONNECTING) {
-            stringRes = R.string.snackbarConnecting;
+        //} else if (state == ServiceBroker.State.CONNECTING) {
+        //    stringRes = R.string.snackbarConnecting;
         } else if (state == ServiceBroker.State.DISCONNECTED || state == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
             stringRes = R.string.snackbarDisconnected;
         } else if (state == ServiceBroker.State.DISCONNECTED_ERROR) {

@@ -3,6 +3,7 @@ package org.owntracks.android;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
@@ -30,6 +31,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.support.v4.util.ArrayMap;
+import android.support.v4.util.TimeUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -150,11 +152,15 @@ public class App extends Application  {
         mainHanler.post(r);
     }
 
+    public static String formatDate(long tstSeconds) {
+        return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
+    }
+
 	public static String formatDate(Date d) {
         if(DateUtils.isToday(d.getTime())) {
-            return instance.dateFormaterToday.format(d);
+            return dateFormaterToday.format(d);
         } else {
-            return instance.dateFormater.format(d);
+            return dateFormater.format(d);
         }
 	}
 

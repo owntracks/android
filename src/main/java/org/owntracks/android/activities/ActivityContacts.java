@@ -1,6 +1,7 @@
 package org.owntracks.android.activities;
 
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import org.owntracks.android.R;
 
 import org.owntracks.android.databinding.ActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.ServiceLocator;
+import org.owntracks.android.services.ServiceNotification;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
@@ -65,13 +68,6 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     @Override
     public void onStart() {
         super.onStart();
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                ServiceProxy.getServiceNotification().clearNotificationMessages();
-            }
-        });
-        EventBus.getDefault().registerSticky(this);
     }
 
 
@@ -88,7 +84,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
     @Override
     public void onStop() {
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
