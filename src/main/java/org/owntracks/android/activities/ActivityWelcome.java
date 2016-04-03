@@ -172,7 +172,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         for (int i = 0; i < pagerAdapter.getCount(); i++) {
             ImageView circle = new ImageView(this);
-            circle.setImageResource(R.drawable.ic_fiber_manual_record_white_18dp);
+            circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fiber_manual_record_white_18dp));
             circle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             circle.setAdjustViewBounds(true);
             circle.setPadding(padding, 0, padding, 0);
@@ -431,6 +431,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class PermissionFragment extends ScreenFragment {
         public static final int ID = 4;
         private static PermissionFragment instance;
+        private ImageView img;
 
         public static PermissionFragment getInstance() {
             if(instance == null)
@@ -457,6 +458,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             success.setVisibility(View.VISIBLE);
             button.setVisibility(View.GONE);
 
+            img.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_assignment_turned_in_white_48dp));
+
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
 
@@ -479,8 +482,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
             button = (Button) v.findViewById(R.id.button);
             success = (TextView) v.findViewById(R.id.message);
-
-
+            img = (ImageView) v.findViewById(R.id.img);
 
             if(!permissionsGranted()) {
                 onPermissionDenied();
@@ -510,12 +512,13 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
+    public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
         public static final int ID = 3;
         private static PlayFragment instance;
         private static GoogleApiAvailability googleAPI;
         private Button button;
         private TextView message;
+        private ImageView img;
 
         public static PlayFragment getInstance() {
             if(instance == null)
@@ -524,7 +527,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             return instance;
         }
 
-        private PlayFragment() {
+        public   PlayFragment() {
             super();
             googleAPI = GoogleApiAvailability.getInstance();
         }
@@ -533,6 +536,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_play, container, false);
 
+            img = (ImageView) v.findViewById(R.id.img);
             button = (Button) v.findViewById(R.id.recover);
             message = (TextView) v.findViewById(R.id.message);
 
@@ -583,7 +587,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             Log.v(TAG, "onPlayServicesAvailable()");
             message.setText(getString(R.string.play_services_now_available));
             button.setVisibility(View.GONE);
-
+            img.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_assignment_turned_in_white_48dp));
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
 
@@ -595,7 +599,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    googleAPI.getErrorDialog(getActivity(), resultCode, RECOVER_PLAY).show();
                     PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
                     try {
                         p.send();

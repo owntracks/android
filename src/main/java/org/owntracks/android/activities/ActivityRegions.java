@@ -78,26 +78,6 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                if (!(viewHolder instanceof AdapterWaypoints.ItemViewHolder)) return 0;
-                return super.getSwipeDirs(recyclerView, viewHolder);
-            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                remove(viewHolder.getItemId());
-            }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(listView);
-
     }
 
     private void requery() {

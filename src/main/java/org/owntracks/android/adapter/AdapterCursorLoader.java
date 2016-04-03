@@ -15,7 +15,6 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
     private static final String TAG = "AdapterCursorLoader";
     private static final String ID_COLUMN = "_id";
-    private final Context mContext;
     private OnViewHolderClickListener onViewHolderClickListener;
 
     public static class ClickableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -23,6 +22,7 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         private OnViewHolderClickListener<ClickableViewHolder> onClickListener;
 
         private Drawable defaultBackground;
+
         public ClickableViewHolder(View view) {
             super(view);
             this.rootView = view;
@@ -33,20 +33,19 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
         public void setSelected(boolean selected) {
             if(selected && !this.rootView.isSelected()) {
                 defaultBackground = this.rootView.getBackground();
-                this.rootView.setBackgroundDrawable(ContextCompat.getDrawable(this.rootView.getContext(), R.drawable.selectable_row));
+                this.rootView.setBackgroundResource(R.drawable.selectable_row);
                 this.rootView.setSelected(true);
-                return;
-            }
-
-            if(!selected && this.rootView.isSelected()) {
+            } else if(!selected && this.rootView.isSelected()) {
                 defaultBackground.setVisible(false, false);
-                this.rootView.setBackgroundDrawable(defaultBackground);
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    rootView.setBackgroundDrawable(defaultBackground);
+                } else {
+                    rootView.setBackground(defaultBackground);
+                }
+
                 this.rootView.setSelected(false);
                 defaultBackground.setVisible(true, false);
-
-                return;
             }
-
         }
 
         @Override
@@ -58,9 +57,7 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
         @Override
         public boolean onLongClick(View v) {
-            if(onClickListener != null)
-                return this.onClickListener.onViewHolderLongClick(v, this);
-            return false;
+            return onClickListener != null && this.onClickListener.onViewHolderLongClick(v, this);
         }
 
         public void setOnViewHolderClickListener(OnViewHolderClickListener listener) {
@@ -76,11 +73,9 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
 
     AdapterCursorLoader(Context context) {
-        mContext = context;
         mCursor = null;
         mDataValid = false;
         setHasStableIds(true);
-
     }
 
 

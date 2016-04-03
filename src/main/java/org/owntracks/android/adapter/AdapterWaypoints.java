@@ -6,20 +6,16 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.curioustechizen.ago.RelativeTimeTextView;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.WaypointDao;
-import org.w3c.dom.Text;
 
 import java.util.Date;
 
@@ -61,8 +57,7 @@ public class AdapterWaypoints extends AdapterCursorLoader {
     @Override
     public ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_waypoint, parent, false);
-        ItemViewHolder vh = new ItemViewHolder(itemView);
-        return vh;
+        return new ItemViewHolder(itemView);
     }
 
 
@@ -71,12 +66,9 @@ public class AdapterWaypoints extends AdapterCursorLoader {
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position) {
         ((ItemViewHolder)viewHolder).mTitle.setText(cursor.getString(cursor.getColumnIndex(WaypointDao.Properties.Description.columnName)));
 
-        //((ItemViewHolder) viewHolder).mDetails.setReferenceTime(cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName)) * 1000);
-        //((ItemViewHolder) viewHolder).mTime.setPrefix("#" + cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Channel.columnName)) + ", ");
         boolean geofence = cursor.getInt(cursor.getColumnIndex(WaypointDao.Properties.GeofenceRadius.columnName)) > 0;
         String uuid = cursor.getString(cursor.getColumnIndex(WaypointDao.Properties.BeaconUUID.columnName));
         boolean beaconUUID = uuid != null && uuid.length() > 0;
-        Log.v("AdapterWaypoints", "geofence " +geofence +  " uuid " + beaconUUID);
 
         if(geofence || beaconUUID) {
             long lastTriggered = cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName));
