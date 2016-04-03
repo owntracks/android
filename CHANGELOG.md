@@ -1,6 +1,15 @@
 OwnTracks Android App Release Notes
 ===================================
 
+## OwnTracks 0.6.11
+>Release date: 2016-04-03
+* [FIX] #350 - visual glitches on 4.0.4
+* [FIX] #341 - remove the *map center* button on the *Friends* page
+* [FIX] #339 - custom certificates couldn't be imported from certain locations
+* [NEW] - Follow mode doesn't work in certain cases. It now auto engages from Friends view and after long pressing on details on map.
+* [NEW] - Due to popular demand, regions can be deleted by long pressing them
+* [NEW] - Setup wizard that allows to set the mode prior to the first connection
+
 ## OwnTracks 0.6.10
 >Release date: 2016-03-28 for beta testers
 * [FIX] #338 - Bluetooth beacon functionality can cause battery drain

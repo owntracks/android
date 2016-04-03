@@ -296,6 +296,10 @@ public class Preferences {
         if(m.containsKey(Keys.MODE_ID))
             setMode((Integer) m.get(Keys.MODE_ID));
 
+        // Don't show setup on first start if a config has been imported
+        setSetupCompleted();
+
+
         for(String key : m.getKeys()) {
             try {
                 Log.v(TAG, "import for key: " + key + " with value: " + m.get(key));
