@@ -393,6 +393,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class ModeFragment extends ScreenFragment {
         public static final int ID = 2;
         private static ModeFragment modeInstance;
+        private ImageView img;
 
         public static ModeFragment getInstance() {
             if(modeInstance == null)
@@ -408,7 +409,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_mode, container, false);
             rg = (RadioGroup)v.findViewById(R.id.radioMode);
-
+            img = (ImageView)v.findViewById(R.id.img);
             return v;
         }
 
@@ -431,6 +432,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class PermissionFragment extends ScreenFragment {
         public static final int ID = 4;
         private static PermissionFragment instance;
+        private ImageView img;
 
         public static PermissionFragment getInstance() {
             if(instance == null)
@@ -456,6 +458,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onPermissionGranted() {
             success.setVisibility(View.VISIBLE);
             button.setVisibility(View.GONE);
+            img.setImageResource(R.drawable.ic_assignment_turned_in_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
@@ -463,6 +466,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onPermissionDenied() {
             success.setVisibility(View.GONE);
             button.setVisibility(View.VISIBLE);
+            img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }
@@ -479,7 +483,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
             button = (Button) v.findViewById(R.id.button);
             success = (TextView) v.findViewById(R.id.message);
-
+            img = (ImageView) v.findViewById(R.id.img);
 
 
             if(!permissionsGranted()) {
@@ -510,12 +514,13 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
+    public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
         public static final int ID = 3;
         private static PlayFragment instance;
         private static GoogleApiAvailability googleAPI;
         private Button button;
         private TextView message;
+        private ImageView img;
 
         public static PlayFragment getInstance() {
             if(instance == null)
@@ -524,7 +529,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             return instance;
         }
 
-        private PlayFragment() {
+        public PlayFragment() {
             super();
             googleAPI = GoogleApiAvailability.getInstance();
         }
@@ -535,7 +540,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
             button = (Button) v.findViewById(R.id.recover);
             message = (TextView) v.findViewById(R.id.message);
-
+            img = (ImageView) v.findViewById(R.id.img);
             return v;
         }
 
@@ -574,6 +579,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
                     System.exit(0);
                 }
             });
+            img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }
@@ -583,7 +589,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             Log.v(TAG, "onPlayServicesAvailable()");
             message.setText(getString(R.string.play_services_now_available));
             button.setVisibility(View.GONE);
-
+            img.setImageResource(R.drawable.ic_assignment_turned_in_white_48dp);
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
 
@@ -606,6 +612,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
                 }
             });
+            img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }

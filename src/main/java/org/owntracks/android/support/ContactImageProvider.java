@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
@@ -38,55 +39,16 @@ public class ContactImageProvider {
     }
 
 
-    private  static abstract class ContactBitmapWorkerTask extends AsyncTask<FusedContact, Void, Bitmap> {
-
-        public ContactBitmapWorkerTask() {
-        }
-
-
-        @Override
-        protected Bitmap doInBackground(FusedContact... params) {
-
-            Bitmap d;
-            FusedContact contact = params[0];
-            if(contact == null)
-                return null;
-                //throw new RuntimeException("no contact provided to ContactImageProvider");
-
-
-
-            if(contact.hasCard()) {
-                d = memoryCache.getLevelCard(contact.getTopic());
-                if(d != null) {
-                    return d;
-                }
-
-                if(contact.getMessageCard().hasFace()) {
-                    byte[] imageAsBytes = Base64.decode(contact.getMessageCard().getFace().getBytes(), Base64.DEFAULT);
-                    d = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length), FACE_DIMENSIONS, FACE_DIMENSIONS, true));
-                    contact.getMessageCard().setFace(null);
-                    memoryCache.putLevelCard(contact.getTopic(), d);
-                    return d;
-                }
-            }
-
-            d = memoryCache.getLevelTid(contact.getTopic());
-            if(d != null) {
-                return d;
-            }
-            d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), ColorGenerator.MATERIAL.getColor(contact.getTopic()), FACE_DIMENSIONS));
-            memoryCache.putLevelTid(contact.getTopic(), d);
-            return d;
-        }
-
-        protected abstract void onPostExecute(Bitmap result);
-
-    }
-    private static class ContactDrawableWorkerTaskForImageView extends ContactBitmapWorkerTask {
+    private static class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
         final WeakReference<ImageView> target;
 
         public ContactDrawableWorkerTaskForImageView(ImageView imageView) {
             target = new WeakReference<>(imageView);
+        }
+
+        @Override
+        protected Bitmap doInBackground(FusedContact... params) {
+            return getBitmapFromCache(params[0]);
         }
 
         protected void onPostExecute(Bitmap result) {
@@ -99,7 +61,7 @@ public class ContactImageProvider {
         }
 
     }
-    private static class ContactDrawableWorkerTaskForMarker extends ContactBitmapWorkerTask {
+    private static class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
         Marker target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
@@ -108,12 +70,18 @@ public class ContactImageProvider {
         }
 
         @Override
-        protected void onPostExecute(Bitmap result) {
+        protected BitmapDescriptor doInBackground(FusedContact... params) {
+            return BitmapDescriptorFactory.fromBitmap(getBitmapFromCache(params[0]));
+        }
+
+        @Override
+        protected void onPostExecute(BitmapDescriptor result) {
             Log.v(TAG, "ContactDrawableWorkerTaskForMarker onPostExecute() for marker: " + target);
 
             Marker marker = target;
             if(marker != null) {
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(result));
+                marker.setIcon(result);
+                marker.setVisible(true);
             }
         }
     }
@@ -121,7 +89,7 @@ public class ContactImageProvider {
 
     public static void setMarkerAsync(Marker marker, FusedContact contact) {
         Log.v(TAG, "setMarkerAsync() for " + contact + " and marker " + marker);
-        (new ContactDrawableWorkerTaskForMarker(marker)).execute(contact);
+        (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
     public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
@@ -130,6 +98,37 @@ public class ContactImageProvider {
     }
 
 
+    private static Bitmap getBitmapFromCache(FusedContact contact) {
+        Bitmap d;
+
+        if(contact == null)
+            return null;
+
+
+
+        if(contact.hasCard()) {
+            d = memoryCache.getLevelCard(contact.getTopic());
+            if(d != null) {
+                return d;
+            }
+
+            if(contact.getMessageCard().hasFace()) {
+                byte[] imageAsBytes = Base64.decode(contact.getMessageCard().getFace().getBytes(), Base64.DEFAULT);
+                d = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length), FACE_DIMENSIONS, FACE_DIMENSIONS, true));
+                contact.getMessageCard().setFace(null);
+                memoryCache.putLevelCard(contact.getTopic(), d);
+                return d;
+            }
+        }
+
+        d = memoryCache.getLevelTid(contact.getTopic());
+        if(d != null) {
+            return d;
+        }
+        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), ColorGenerator.MATERIAL.getColor(contact.getTopic()), FACE_DIMENSIONS));
+        memoryCache.putLevelTid(contact.getTopic(), d);
+        return d;
+    }
 
     public static void initialize(Context c){
         memoryCache = new ContactBitmapMemoryCache();
