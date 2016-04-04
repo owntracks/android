@@ -19,6 +19,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/coordinator"
         android:layout_below="@+id/fragmentToolbar">
 
 
@@ -43,6 +44,7 @@
             android:orientation="vertical"
             app:behavior_hideable="true"
             android:clickable="true"
+            app:behavior_peekHeight="1dp"
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
