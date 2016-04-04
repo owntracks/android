@@ -902,6 +902,12 @@ boolean firstStart = true;
 			if(!wakelock.isHeld())
 				wakelock.acquire();
 
+			if(comms == null) {
+				doStart();
+				return;
+			}
+
+
 			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
 
 				@Override
@@ -944,7 +950,8 @@ boolean firstStart = true;
         @Override
         public void start() {
             Log.v(TAG, "start " + this);
-            schedule(comms.getKeepAlive());
+			if(comms != null)
+	            schedule(comms.getKeepAlive());
         }
 
         @Override

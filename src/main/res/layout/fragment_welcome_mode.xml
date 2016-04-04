@@ -34,8 +34,6 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:gravity="bottom|center_horizontal"
-        android:layout_alignLeft="@+id/radioSex"
-        android:layout_alignStart="@+id/radioSex"
         android:layout_below="@+id/img" />
 
     <TextView

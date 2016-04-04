@@ -3,23 +3,17 @@ package org.owntracks.android.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.github.curioustechizen.ago.RelativeTimeTextView;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.db.WaypointDao;
-import org.w3c.dom.Text;
 
 import java.util.Date;
 

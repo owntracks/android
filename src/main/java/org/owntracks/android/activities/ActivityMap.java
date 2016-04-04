@@ -3,19 +3,16 @@ package org.owntracks.android.activities;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
-import android.databinding.ObservableList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +43,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Toasts;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class ActivityMap extends ActivityBase implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, PopupMenu.OnMenuItemClickListener {
@@ -99,7 +95,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
         binding.contactPeek.contactRow.setOnLongClickListener(bottomSheetLongClickListener);
-        this.bottomSheetBehavior.setPeekHeight(0);
+
+        hideBottomSheet();
 
         runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
@@ -226,7 +223,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
                 actionSelectContact(e);
             }
         } else {
-            updateContactLocation(e);
+            updateContactMarker(e);
         }
     }
 
@@ -247,7 +244,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     /*private void addContact(FusedContact c) {
         c.addOnPropertyChangedCallback(contactChangedCallback);
-        updateContactLocation(c);
+        updateContactMarker(c);
     }*/
 
 /*
@@ -259,12 +256,12 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
             if(observable instanceof FusedContact) {
                 if(Looper.myLooper() == Looper.getMainLooper())
-                    updateContactLocation((FusedContact)observable);
+                    updateContactMarker((FusedContact)observable);
                 else {
 
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            updateContactLocation((FusedContact) observable);
+                            updateContactMarker((FusedContact) observable);
                         }
                     });
                 }
@@ -277,17 +274,17 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
 
-    private void updateContactLocation(@Nullable FusedContact c) {
+    private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation())
             return;
-        Log.v(TAG, "updateContactLocation: " + c.getTopic() + " hasLocation: " + c.hasLocation());
+        Log.v(TAG, "updateContactMarker: " + c.getTopic() + " hasLocation: " + c.hasLocation());
 
         Marker m = markers.get(c.getTopic());
 
         if (m != null) {
             m.setPosition(c.getLatLng());
         } else {
-            m = map.addMarker(new MarkerOptions().snippet(c.getTopic()).position(c.getLatLng()).anchor(0.5f, 0.5f));
+            m = map.addMarker(new MarkerOptions().snippet(c.getTopic()).position(c.getLatLng()).anchor(0.5f, 0.5f).visible(false));
             markers.put(c.getTopic(), m);
         }
 
@@ -297,7 +294,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     private void onAddInitialMarkers() {
         for (Object o : App.getFusedContacts().entrySet()) {
-            updateContactLocation((FusedContact) ((Map.Entry) o).getValue());
+            updateContactMarker((FusedContact) ((Map.Entry) o).getValue());
         }
     }
     @SuppressWarnings("MissingPermission")
@@ -344,7 +341,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         @Override
         public void onItemRangeInserted(ObservableList<FusedContact> fusedContacts, int i, int i1) {
             Log.v(TAG, "ObservableList onItemRangeInserted" );
-            //updateContactLocation(fusedContacts.get(i)));
+            //updateContactMarker(fusedContacts.get(i)));
             Log.v(TAG, "contact added: " + fusedContacts.get(i));
             addContact(fusedContacts.get(i));
         }
@@ -408,15 +405,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         centerMap(this.mapLocationSource.getLastKnownLocation().getLatLng());
     }
 
-    private void centerContact(@Nullable FusedContact contact) {
-        if(contact == null || !contact.hasLocation())
-            return;
-
-        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-        centerMap(contact.getLatLng());
-    }
 
 
     private void centerMap(LatLng latLng) {
@@ -470,24 +458,27 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             return;
 
         this.mode = ACTION_SELECT_CONTACT;
-        updateContactLocation(fusedContact);
-        updateBottomSheetContact(fusedContact);
+        if(activeContact == fusedContact)
+            return;
+
+        activeContact = fusedContact;
+
+        updateContactMarker(fusedContact);
+        binding.setItem(fusedContact);
+        binding.contactPeek.setItem(fusedContact);
+
+
+        // bottomSheetBehavior.setState(State.HIDDEN) doesn't work due to a bug in the support library
+        // Set an initial height of 0 px to hide it instead and set it to 76dp on click instead.
+        // setPeekHeight takes real px as a value. We convert the appropriate value from 76dp
+       // Log.v(TAG, "setting peek height to: " + getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
+
+      //  bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        collapseBottomSheet();
     }
 
 
     private void updateBottomSheetContact(FusedContact fusedContact) {
-        if(activeContact == fusedContact)
-            return;
-        else
-            activeContact = fusedContact;
-
-        binding.setItem(fusedContact);
-        binding.contactPeek.setItem(fusedContact);
-        // bottomSheetBehavior.setState(State.HIDDEN) doesn't work due to a bug in the support library
-        // Set an initial height of 0 px to hide it instead and set it to 76dp on click instead.
-        // setPeekHeight takes real px as a value. We convert the appropriate value from 76dp
-        bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
 
@@ -504,9 +495,9 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         @Override
         public void onClick(View v) {
             if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                expandBottomSheet();
             else if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                collapseBottomSheet();
 
         }
     };
@@ -523,6 +514,37 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         }
     };
 
+    private void expandBottomSheet() {
+        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
+            @Override
+            public void run() {
+                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+    }
+
+    private void collapseBottomSheet() {
+        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
+            @Override
+            public void run() {
+                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
+                bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+    }
+
+    private void hideBottomSheet() {
+        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
+            @Override
+            public void run() {
+                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
+                bottomSheetBehavior.setPeekHeight(1);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+    }
 
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {

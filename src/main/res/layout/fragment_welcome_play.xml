@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_verified_user_white_48dp"
+        android:src="@drawable/ic_assignment_late_white_48dp"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
 
@@ -34,8 +34,6 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:gravity="bottom|center_horizontal"
-        android:layout_alignLeft="@+id/radioSex"
-        android:layout_alignStart="@+id/radioSex"
         android:layout_below="@+id/img" />
 
     <TextView
