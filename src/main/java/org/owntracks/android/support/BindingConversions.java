@@ -1,10 +1,6 @@
 package org.owntracks.android.support;
 
-import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
-import android.databinding.BindingMethod;
-import android.databinding.BindingMethods;
-
 
 public class BindingConversions {
     private static final String EMPTY_STRING = "";

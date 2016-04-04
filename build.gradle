@@ -48,7 +48,6 @@ dependencies {
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.3-SNAPSHOT'
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.2'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.0.0'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.0.0'
 

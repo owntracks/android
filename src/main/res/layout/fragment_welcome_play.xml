@@ -38,6 +38,7 @@
         android:layout_marginBottom="8dp"
         />
 
+
     <TextView
         android:id="@+id/screen_desc"
         android:text="Owntracks requires Google Play Services"
