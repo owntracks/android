@@ -7,5 +7,4 @@ public interface ServiceMessageEndpoint {
         void sendMessage(MessageBase message);
         void setMessageSenderCallback(MessageSender callback);
         void setMessageReceiverCallback(MessageReceiver callback);
-
 }

@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -21,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,7 +28,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceMessageMqtt;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContentPathHelper;
 import org.owntracks.android.support.Events;
@@ -151,7 +148,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         private static Menu mMenu;
         private MenuInflater mInflater;
-        ServiceBroker.State cachedState = null;
+        ServiceMessageMqtt.State cachedState = null;
         private String tlsCaCrtName;
         private String tlsClientCrtName;
 
@@ -604,7 +601,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         @SuppressWarnings("unused")
         public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            Log.v(TAG, "onEventMainThread StateChanged.ServiceBroker -> " + e.getState() + " cached " + cachedState);
+            Log.v(TAG, "onEventMainThread StateChanged.ServiceMessageMqtt -> " + e.getState() + " cached " + cachedState);
 
 
             cachedState = e.getState(); // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
@@ -638,7 +635,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceBroker() .reconnect();
+                            ServiceProxy.getServiceMessageMqtt() .reconnect();
                         }
                     };
                     new Thread(r).start();
@@ -649,7 +646,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceBroker().disconnect(true);
+                            ServiceProxy.getServiceMessageMqtt().disconnect(true);
 
                         }
                     };
@@ -660,7 +657,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             }
         }
 
-        public static void updateDisconnectButton(ServiceBroker.State state) {
+        public static void updateDisconnectButton(ServiceMessageMqtt.State state) {
             if (mMenu == null || state == null)
                 return;
 
@@ -669,8 +666,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
             if (disconnectButton == null)
                 return;
 
-            disconnectButton.setEnabled(state == ServiceBroker.State.CONNECTED);
-            disconnectButton.getIcon().setAlpha(state == ServiceBroker.State.CONNECTED ? 255 : 130);
+            disconnectButton.setEnabled(state == ServiceMessageMqtt.State.CONNECTED);
+            disconnectButton.getIcon().setAlpha(state == ServiceMessageMqtt.State.CONNECTED ? 255 : 130);
         }
 
         public static void updateConnectButton() {

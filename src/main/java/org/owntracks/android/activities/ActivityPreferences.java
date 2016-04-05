@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceBroker;
+import org.owntracks.android.services.ServiceMessageMqtt;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.EditIntegerPreference;
 import org.owntracks.android.support.EditStringPreference;
@@ -99,7 +99,7 @@ public class ActivityPreferences extends ActivityBase {
 
                     @Override
                     public void run() {
-                        ServiceProxy.getServiceBroker().reconnect();
+                        ServiceProxy.getServiceMessageMqtt().reconnect();
                     }
                 };
                 new Thread(r).start();
@@ -110,7 +110,7 @@ public class ActivityPreferences extends ActivityBase {
 
                     @Override
                     public void run() {
-                        ServiceProxy.getServiceBroker().disconnect(true);
+                        ServiceProxy.getServiceMessageMqtt().disconnect(true);
 
                     }
                 };
@@ -503,7 +503,7 @@ public class ActivityPreferences extends ActivityBase {
         }
 
         private  void setServerPreferenceSummary(PreferenceFragment c) {
-            setServerPreferenceSummary(c, ServiceBroker.getStateAsString(c.getActivity()));
+            setServerPreferenceSummary(c, ServiceMessageMqtt.getStateAsString(c.getActivity()));
         }
 
 

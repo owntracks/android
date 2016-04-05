@@ -2,10 +2,10 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
-import org.owntracks.android.db.Message;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceMessageMqtt;
 
 import android.location.Location;
 
@@ -231,17 +231,17 @@ public class Events {
 
 	public static class StateChanged {
 		public static class ServiceBroker extends E {
-			private final org.owntracks.android.services.ServiceBroker.State state;
+			private final ServiceMessageMqtt.State state;
 			private final Object extra;
 
-			public ServiceBroker(org.owntracks.android.services.ServiceBroker.State state,
+			public ServiceBroker(ServiceMessageMqtt.State state,
 					Object extra) {
 				super();
 				this.state = state;
 				this.extra = extra;
 			}
 
-			public org.owntracks.android.services.ServiceBroker.State getState() {
+			public ServiceMessageMqtt.State getState() {
 				return this.state;
 			}
 

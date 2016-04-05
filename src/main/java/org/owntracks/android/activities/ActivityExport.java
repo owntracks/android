@@ -11,7 +11,6 @@ import android.preference.PreferenceFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -23,12 +22,8 @@ import java.io.IOException;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Toasts;
 import org.owntracks.android.support.receiver.Parser;
 
 public class ActivityExport extends ActivityBase {

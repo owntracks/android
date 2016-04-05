@@ -389,12 +389,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
 	private void publishWaypointMessage(Waypoint w) {
-		if (ServiceProxy.getServiceBroker() == null) {
-			Log.e(TAG, "publishWaypointMessage called without a broker instance");
-		}
-
-
-
         MessageWaypoint message = MessageWaypoint.fromDaoObject(w);
 
 
@@ -415,10 +409,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 	private void reportLocation(String trigger) {
 
-		if (ServiceProxy.getServiceBroker() == null) {
-            Log.e(TAG, "reportLocation called without a broker instance");
-            return;
-		}
 
         Location l = getLastKnownLocation();
 		if (l == null) {

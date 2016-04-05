@@ -9,7 +9,6 @@ import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.model.ContactsViewModel;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.ServiceBroker;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
@@ -30,8 +29,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings.Secure;
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.TimeUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
