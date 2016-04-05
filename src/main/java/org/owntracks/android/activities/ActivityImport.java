@@ -175,7 +175,7 @@ public class ActivityImport extends ActivityBase {
                                 Runnable r = new Runnable() {
                                     @Override
                                     public void run() {
-                                        ServiceProxy.getServiceBroker().reconnect();
+                                        ServiceProxy.getServiceMessageMqtt().reconnect();
                                     }
                                 };
                                 new Thread(r).start();

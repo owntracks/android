@@ -484,7 +484,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     private void deselectContact() {
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        collapseBottomSheet();
         binding.setItem(null);
         activeContact = null;
     }
@@ -508,7 +508,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             actionFollowContact(activeContact);
 
             if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                collapseBottomSheet();
 
             return true;
         }

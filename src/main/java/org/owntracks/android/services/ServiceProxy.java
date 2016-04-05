@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
@@ -28,7 +29,8 @@ public class ServiceProxy extends ServiceBindable {
 
     public static final String SERVICE_APP = "A";
 	public static final String SERVICE_LOCATOR = "L";
-	public static final String SERVICE_BROKER = "B";
+	public static final String SERVICE_MESSAGE_MQTT = "SM";
+	public static final String SERVICE_MESSAGE_HTTP = "SH";
 	public static final String SERVICE_NOTIFICATION = "N";
 	public static final String SERVICE_BEACON = "BE";
 	public static final String SERVICE_MESSAGE = "M";
@@ -43,7 +45,9 @@ public class ServiceProxy extends ServiceBindable {
     private static boolean attemptingToBind = false;
 
 
-    @Override
+
+
+	@Override
 	public void onCreate() {
 		super.onCreate();
 	}
@@ -58,7 +62,6 @@ public class ServiceProxy extends ServiceBindable {
 		instantiateService(SERVICE_NOTIFICATION);
 
 		instantiateService(SERVICE_MESSAGE);
-
 
         instantiateService(SERVICE_LOCATOR);
         instantiateService(SERVICE_BEACON);
@@ -101,10 +104,13 @@ public class ServiceProxy extends ServiceBindable {
             case SERVICE_APP:
                 p = new ServiceApplication();
                 break;
-            case SERVICE_BROKER:
-                p = new ServiceBroker();
+            case SERVICE_MESSAGE_MQTT:
+                p = new ServiceMessageMqtt();
                 break;
-            case SERVICE_LOCATOR:
+			case SERVICE_MESSAGE_HTTP:
+				p = new ServiceMessageHttp();
+				break;
+			case SERVICE_LOCATOR:
                 p = new ServiceLocator();
                 break;
             case SERVICE_BEACON:
@@ -135,10 +141,13 @@ public class ServiceProxy extends ServiceBindable {
 		return (ServiceLocator) getService(SERVICE_LOCATOR);
 	}
 
-	public static ServiceBroker getServiceBroker() {
-		return (ServiceBroker) getService(SERVICE_BROKER);
+	public static ServiceMessageMqtt getServiceMessageMqtt() {
+		return (ServiceMessageMqtt) getService(SERVICE_MESSAGE_MQTT);
 	}
 
+	public static ServiceMessageHttp getServiceMessageHttp() {
+		return (ServiceMessageHttp) getService(SERVICE_MESSAGE_HTTP);
+	}
     public static ServiceBeacon getServiceBeacon() {
         return (ServiceBeacon) getService(SERVICE_BEACON);
     }
@@ -193,6 +202,10 @@ public class ServiceProxy extends ServiceBindable {
 
 		return PendingIntent.getService(c, 0, i, flags);
 
+	}
+
+	public static void stopService(ProxyableService service) {
+		//TODO
 	}
 
 	public final static class ServiceProxyConnection implements Closeable {

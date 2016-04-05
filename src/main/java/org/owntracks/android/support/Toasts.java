@@ -1,15 +1,10 @@
 package org.owntracks.android.support;
 
-import android.content.Intent;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.widget.Toast;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityPreferencesConnection;
-import org.owntracks.android.services.ServiceBroker;
-import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.services.ServiceMessageMqtt;
 
 public class Toasts {
     public static void showCurrentLocationNotAvailable(){
@@ -32,21 +27,21 @@ public class Toasts {
 
 
     private static Toast stateChangeToast;
-    public static void showBrokerStateChange(ServiceBroker.State state) {
+    public static void showBrokerStateChange(ServiceMessageMqtt.State state) {
         if(stateChangeToast != null)
             stateChangeToast.cancel();
 
         int stringRes = 0;
 
-        if (state == ServiceBroker.State.CONNECTED) {
+        if (state == ServiceMessageMqtt.State.CONNECTED) {
             stringRes = R.string.snackbarConnected;
-        //} else if (state == ServiceBroker.State.CONNECTING) {
+        //} else if (state == ServiceMessageMqtt.State.CONNECTING) {
         //    stringRes = R.string.snackbarConnecting;
-        } else if (state == ServiceBroker.State.DISCONNECTED || state == ServiceBroker.State.DISCONNECTED_USERDISCONNECT) {
+        } else if (state == ServiceMessageMqtt.State.DISCONNECTED || state == ServiceMessageMqtt.State.DISCONNECTED_USERDISCONNECT) {
             stringRes = R.string.snackbarDisconnected;
-        } else if (state == ServiceBroker.State.DISCONNECTED_ERROR) {
+        } else if (state == ServiceMessageMqtt.State.DISCONNECTED_ERROR) {
             stringRes = R.string.snackbarDisconnectedError;
-        } else if (state == ServiceBroker.State.DISCONNECTED_CONFIGINCOMPLETE) {
+        } else if (state == ServiceMessageMqtt.State.DISCONNECTED_CONFIGINCOMPLETE) {
             stringRes = R.string.snackbarConfigIncomplete;
         }
 

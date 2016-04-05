@@ -33,9 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
-import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
@@ -67,8 +65,8 @@ import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceBroker implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, ServiceMessageEndpoint {
-	private static final String TAG = "ServiceBroker";
+public class ServiceMessageMqtt implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, ServiceMessageEndpoint {
+	private static final String TAG = "ServiceMessageMqtt";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
 	private static final int MAX_INFLIGHT_MESSAGES = 10;
@@ -236,6 +234,7 @@ boolean firstStart = true;
 
 	@Override
 	public void onCreate(ServiceProxy p) {
+		Log.v(TAG, "loaded MQTT backend");
 		this.context = p;
 		this.workerThread = null;
 		initPausedPubPool();
@@ -281,13 +280,13 @@ boolean firstStart = true;
         if (intent == null)
 			return;
 
-		if(ServiceBroker.RECEIVER_ACTION_RECONNECT.equals(intent.getAction()) && !isConnected()) {
-			Log.v(TAG,	 "onStartCommand ServiceBroker.RECEIVER_ACTION_RECONNECT");
+		if(ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT.equals(intent.getAction()) && !isConnected()) {
+			Log.v(TAG,	 "onStartCommand ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT");
 			if(reconnectHandler != null)
 				doStart();
 
-		} else if(ServiceBroker.RECEIVER_ACTION_PING.equals(intent.getAction())) {
-			Log.v(TAG,	 "onStartCommand ServiceBroker.RECEIVER_ACTION_PING");
+		} else if(ServiceMessageMqtt.RECEIVER_ACTION_PING.equals(intent.getAction())) {
+			Log.v(TAG,	 "onStartCommand ServiceMessageMqtt.RECEIVER_ACTION_PING");
 
 			if(pingHandler != null)
 				pingHandler.ping(intent);
@@ -307,15 +306,15 @@ boolean firstStart = true;
 			public void run() {
 				Log.v(TAG, "running thread");
 				handleStart(force);
-				if (this == ServiceBroker.this.workerThread)
-					ServiceBroker.this.workerThread = null;
+				if (this == ServiceMessageMqtt.this.workerThread)
+					ServiceMessageMqtt.this.workerThread = null;
 			}
 
 			@Override
 			public void interrupt() {
 				Log.v(TAG, "worker thread interrupt");
-				if (this == ServiceBroker.this.workerThread)
-					ServiceBroker.this.workerThread = null;
+				if (this == ServiceMessageMqtt.this.workerThread)
+					ServiceMessageMqtt.this.workerThread = null;
 				super.interrupt();
 			}
 		};
@@ -682,7 +681,7 @@ boolean firstStart = true;
 	}
 
 	private void changeState(State newState, Exception e) {
-		//Log.d(TAG, "ServiceBroker state changed to: " + newState);
+		//Log.d(TAG, "ServiceMessageMqtt state changed to: " + newState);
 		state = newState;
 		EventBus.getDefault().postSticky(new Events.StateChanged.ServiceBroker(newState, e));
 	}
@@ -834,7 +833,7 @@ boolean firstStart = true;
 		public void onReceive(Context ctx, Intent intent) {
 			Log.v(TAG, "onReceive");
             if(networkWakelock == null )
-                networkWakelock = ((PowerManager) ServiceBroker.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
+                networkWakelock = ((PowerManager) ServiceMessageMqtt.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
 
             if (!networkWakelock.isHeld())
                 networkWakelock.acquire();
@@ -958,18 +957,18 @@ boolean firstStart = true;
         public void stop() {
             Log.v(TAG, "stop " + this);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_BROKER, ServiceBroker.RECEIVER_ACTION_PING, null));
+            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null));
         }
 
 		// Schedules a BroadcastIntent that will trigger a ping message when received.
-		// It will be received by ServiceBroker.onStartCommand which recreates the service in case it has been stopped
+		// It will be received by ServiceMessageMqtt.onStartCommand which recreates the service in case it has been stopped
 		// onStartCommand will then deliver the intent to the ping(...) method if the service was alive or it will trigger a new connection attempt
         @Override
         public void schedule(long delayInMilliseconds) {
 
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_BROKER, ServiceBroker.RECEIVER_ACTION_PING, null);
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
 			} else {
@@ -1006,7 +1005,7 @@ boolean firstStart = true;
             Log.v(TAG, "stoping reocnnect handler");
 			backoff = 0;
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null));
+            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null));
 
             if (hasStarted) {
                 hasStarted = false;
@@ -1017,7 +1016,7 @@ boolean firstStart = true;
 			Log.v(TAG, "scheduling reconnect handler");
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_BROKER, RECEIVER_ACTION_RECONNECT, null);
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
 			} else {

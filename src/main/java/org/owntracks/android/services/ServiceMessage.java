@@ -1,27 +1,9 @@
 package org.owntracks.android.services;
 
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.RemoteException;
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.eventbus.EventBus;
-
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.Region;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.owntracks.android.App;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
@@ -39,8 +21,6 @@ import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -50,9 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class ServiceMessage implements ProxyableService, MessageSender, MessageReceiver, IncomingMessageProcessor {
     private static final String TAG = "ServiceMessage";
 
-    private Context context;
     private ServiceMessageEndpoint endpoint;
-    private ObjectMapper mapper;
     private ThreadPoolExecutor pool;
 
 
@@ -62,17 +40,36 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     @Override
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "onCreate()");
-        this.context = c;
-        this.mapper = new ObjectMapper();
-        this.context = c;
         this.pool= new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        //TODO: change dynamically after mode change
+        onModeChanged(Preferences.getModeId());
 
-        this.endpoint = (ServiceMessageEndpoint) ServiceProxy.instantiateService(ServiceProxy.SERVICE_BROKER);
+
+    }
+
+    private void onModeChanged(int mode) {
+        Log.v(TAG, "onModeChanged: " + mode);
+        if(this.endpoint != null)
+            ServiceProxy.stopService((ProxyableService) endpoint);
+
+        if(mode == App.MODE_ID_HTTP_PRIVATE) {
+            Log.v(TAG, "loading http backend");
+            this.endpoint = (ServiceMessageHttp)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
+        } else {
+            Log.v(TAG, "loading mqtt backend");
+            this.endpoint = (ServiceMessageMqtt)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
+        }
+
+        Log.v(TAG, "endpoint instance: " + this.endpoint);
+        if(endpoint == null) {
+            Log.e(TAG, "unable to instantiate service for mode " + mode);
+            return;
+        }
+
         this.endpoint.setMessageReceiverCallback(this);
         this.endpoint.setMessageSenderCallback(this);
 
     }
-
 
     @Override
     public void onDestroy() {
@@ -95,6 +92,13 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     @Override
     public void sendMessage(MessageBase message) {
         message.setOutgoing();
+
+        if(endpoint == null) {
+            Log.e(TAG, "sendMessage called without a endpoint instance");
+            return;
+        }
+
+        Log.v(TAG, "sendMessage with endpoint " + endpoint);
         endpoint.sendMessage(message);
     }
 

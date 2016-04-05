@@ -38,14 +38,14 @@ public class Preferences {
     private static final String TAG = "Preferences";
 
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
-    public static final String FILENAME_HOSTED = "org.owntracks.android.preferences.hosted";
+    public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
     public static final String FILENAME_PUBLIC = "org.owntracks.android.preferences.public";
 
     private static SharedPreferences activeSharedPreferences;
     private static SharedPreferences sharedPreferences;
 
     private static SharedPreferences privateSharedPreferences;
-    private static SharedPreferences hostedSharedPreferences;
+    private static SharedPreferences httpSharedPreferences;
     private static SharedPreferences publicSharedPreferences;
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
@@ -54,6 +54,8 @@ public class Preferences {
     public static boolean isModeMqttPrivate(){ return modeId == App.MODE_ID_MQTT_PRIVATE; }
 
     public static boolean isModeMqttPublic(){ return modeId == App.MODE_ID_MQTT_PUBLIC; }
+
+    public static boolean isModeHttpPrivate(){ return modeId == App.MODE_ID_HTTP_PRIVATE; }
 
     public static String getDeviceUUID() {
         return deviceUUID;
@@ -64,7 +66,7 @@ public class Preferences {
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
-        hostedSharedPreferences = c.getSharedPreferences(FILENAME_HOSTED, Context.MODE_PRIVATE);
+        httpSharedPreferences = c.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE);
         publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
         handleFirstStart();
@@ -75,7 +77,7 @@ public class Preferences {
 
     public static void initMode(int active) {
         // Check for valid mode IDs and fallback to Private if an invalid mode is set
-        if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC) {
+        if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC || active == App.MODE_ID_HTTP_PRIVATE) {
             setMode(active, true);
         } else {
             setMode(App.MODE_ID_MQTT_PRIVATE, true);
@@ -103,12 +105,16 @@ public class Preferences {
             case App.MODE_ID_MQTT_PUBLIC:
                 activeSharedPreferences = publicSharedPreferences;
                 break;
+            case App.MODE_ID_HTTP_PRIVATE:
+                activeSharedPreferences = httpSharedPreferences;
+                break;
+
         }
         sharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
 
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
         privateSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
-        hostedSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
+        httpSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
         publicSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
 
         attachAllActivePreferenceChangeListeners();
@@ -142,6 +148,8 @@ public class Preferences {
             listener.onAttachAfterModeChanged();
         }
     }
+
+
 
 
 
@@ -208,9 +216,15 @@ public class Preferences {
     }
 
     public static String getString(String key,  int defId) {
-        return getString(key, defId, defId, false);
+        return getString(key, defId, defId, defId, false, false);
     }
-    public static String getString(String key,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
+    public static String getString(String key,  int defIdPrivate, int defIdPublic, int defIdHttp, boolean forceDefIdPublic, boolean forceDefIdHttp) {
+        Log.v(TAG, "getString for key " + key + " mode " + isModeHttpPrivate() + " " + httpSharedPreferences.getString(key, ""));
+        if (isModeHttpPrivate()) {
+
+            return forceDefIdHttp ? getStringRessource(defIdHttp) : getStringWithFallback(httpSharedPreferences, key, defIdHttp);
+        }
+
         if (isModeMqttPublic()) {
             return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, key, defIdPublic);
         }
@@ -469,7 +483,7 @@ public class Preferences {
     @Export(key =Keys.USERNAME, exportModeMqttPrivate =true)
     public static String getUsername() {
         // in public, the username is just used to build the topic public/user/$deviceId
-        return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, true);
+        return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, R.string.valEmpty, true, false);
     }
 
     @Export(key =Keys.AUTH, exportModeMqttPrivate =true)
@@ -593,7 +607,7 @@ public class Preferences {
 
     @Export(key =Keys.SUB_TOPIC, exportModeMqttPrivate =true)
     public static String getSubTopic() {
-        return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, true);
+        return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, R.string.valEmpty, true, false);
     }
 
     @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
@@ -806,11 +820,11 @@ public class Preferences {
     }
     @Export(key =Keys.HOST, exportModeMqttPrivate =true)
     public static String getHost() {
-        return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, true);
+        return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, R.string.valEmpty, true, false);
     }
     @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true)
     public static String getPassword() {
-        return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, false);
     }
 
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
@@ -824,12 +838,12 @@ public class Preferences {
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
     public static String getTlsCaCrtName() {
-        return getString(Keys.TLS_CA_CRT, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.TLS_CA_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
     }
 
     @Export(key =Keys.TLS_CLIENT_CRT, exportModeMqttPrivate =true)
     public static String getTlsClientCrtName() {
-        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, true);
+        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
     }
 
     @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
@@ -923,6 +937,17 @@ public class Preferences {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
 
+
+
+    @Import(key =Keys.URL)
+    public static void setUrl(String url) {
+        setString(Keys.URL, url);
+    }
+
+    @Export(key = Keys.URL, exportModeHttpPrivate = true)
+    public static String getUrl() {
+        return getString(Keys.URL, R.string.valEmpty);
+    }
     public static void setTlsClientCrtPassword(String password) {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
@@ -930,6 +955,8 @@ public class Preferences {
     public static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
+
+
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
@@ -1065,13 +1092,12 @@ public class Preferences {
         public static final String TRACKER_ID                       = "trackerId";
         public static final String USERNAME                         = "username";
         public static final String WS                               = "ws";
-
+        public static final String URL                              = "url";
         // Internal keys
         public static final String _DEVICE_UUID                     = "deviceUUID";
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIST_START                      = "fistStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
-
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -1080,6 +1106,7 @@ public class Preferences {
         String key();
         boolean exportModeMqttPrivate() default false;
         boolean exportModeMqttPublic() default false;
+        boolean exportModeHttpPrivate() default false;
     }
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)

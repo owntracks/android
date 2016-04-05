@@ -4,7 +4,6 @@ package org.owntracks.android.support;
         import android.util.Log;
 
         import org.owntracks.android.messages.MessageBase;
-        import org.owntracks.android.services.ServiceBroker;
 
         import java.util.concurrent.BlockingQueue;
         import java.util.concurrent.ThreadPoolExecutor;
