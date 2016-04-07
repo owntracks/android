@@ -24,7 +24,7 @@ import com.google.android.gms.location.Geofence;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityFeatured;
-import org.owntracks.android.activities.ActivityLauncher;
+import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
@@ -158,7 +158,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderOngoing = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
+        Intent resultIntent = new Intent(this.context, ActivityWelcome.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -210,7 +210,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderEvents = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
+        Intent resultIntent = new Intent(this.context, ActivityWelcome.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
