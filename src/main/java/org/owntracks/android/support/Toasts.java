@@ -54,4 +54,8 @@ public class Toasts {
     public static void showWaypointRemovedToast() {
         Toast.makeText(App.getContext(), App.getContext().getString(R.string.waypointRemoved), Toast.LENGTH_SHORT).show();
     }
+
+    public static void showContactLocationNotAvailable() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
+    }
 }
