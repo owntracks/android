@@ -92,6 +92,13 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
     @Override
     public void onClick(View v, Object viewModel) {
         Bundle b = new Bundle();
+
+        if(!FusedContact.class.cast(viewModel).hasLocation()) {
+            Toasts.showContactLocationNotAvailable();
+            return;
+        }
+
+
         b.putInt(ActivityMap.INTENT_KEY_ACTION, ActivityMap.ACTION_FOLLOW_CONTACT);
         b.putString(ActivityMap.INTENT_KEY_TOPIC, ((FusedContact) viewModel).getTopic());
         Log.v(TAG, "onClick. ActivityMap.INTENT_KEY_ACTION: " + ActivityMap.ACTION_FOLLOW_CONTACT);

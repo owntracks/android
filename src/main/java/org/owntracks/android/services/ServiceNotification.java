@@ -2,7 +2,6 @@ package org.owntracks.android.services;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,7 +11,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Message;
 import android.provider.Settings;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.text.Spannable;
@@ -20,15 +18,13 @@ import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.util.Log;
-import android.view.View;
 
 import com.google.android.gms.location.Geofence;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityFeatured;
-import org.owntracks.android.activities.ActivityLauncher;
-import org.owntracks.android.activities.ActivityStatus;
+import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
@@ -162,7 +158,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderOngoing = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
+        Intent resultIntent = new Intent(this.context, ActivityWelcome.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -214,7 +210,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         notificationBuilderEvents = new NotificationCompat.Builder(context);
 
-        Intent resultIntent = new Intent(this.context, ActivityLauncher.class);
+        Intent resultIntent = new Intent(this.context, ActivityWelcome.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

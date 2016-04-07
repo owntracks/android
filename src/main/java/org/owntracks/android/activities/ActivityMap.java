@@ -155,6 +155,9 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         super.onResume();
         this.mapView.onResume();
         de.greenrobot.event.EventBus.getDefault().registerSticky(this);
+
+        clearMap();
+        onAddInitialMarkers();
     }
 
 
@@ -235,6 +238,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.ModeChanged e) {
+        clearMap();
+    }
+
+    private void clearMap() {
+        Log.v(TAG, "clearing map");
         if(map != null) {
             map.clear();
             this.markers.clear();
@@ -412,7 +420,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void actionFollowContact(@Nullable FusedContact c) {
-        if(c == null)
+        if(c == null || !c.hasLocation())
             return;
 
         actionSelectContact(c);
@@ -518,6 +526,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "expandBottomSheet()");
                 ViewCompat.postInvalidateOnAnimation(binding.coordinator);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
@@ -528,6 +537,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "collapseBottomSheet()");
+
                 ViewCompat.postInvalidateOnAnimation(binding.coordinator);
                 bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -539,8 +550,10 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "hideBottomSheet()");
+
                 ViewCompat.postInvalidateOnAnimation(binding.coordinator);
-                bottomSheetBehavior.setPeekHeight(1);
+                bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_hidden));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
