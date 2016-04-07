@@ -1,8 +1,41 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.6.15
+>Release date: 2016-04-07
+* [FIX] #355 - Crash when picking a friend without a location
+* [FIX] #355 - Notification click doesn't open the app
+* [FIX] Map markers were not cleared on mode or broker change
+
+## OwnTracks 0.6.14
+>Release date: 2016-04-04
+* [FIX] some compatibility issues
+* [FIX] bottom sheet not expanding on older devices
+* [FIX] several possible crashes
+* [NEW] performance improvements for marker drawing
+
+## OwnTracks 0.6.13
+>Release date: 2016-04-04
+[FIX] Bottom sheet not appearing in lower APIs
+[FIX] Flicker in bottoms sheet when setting marker
+[FIX] Marker bitmap not decoded in background thread
+[FIX] Contact image provider async task stalled by other async tasks
+[FIX] Possible crash in ping Sender
+
+## OwnTracks 0.6.12
+>Release date: 2016-04-03
+[FIX] - #350 crash on lower API due to bug in google support library
+
+## OwnTracks 0.6.11
+>Release date: 2016-04-03
+* [FIX] #339 - custom certificates couldn't be imported from some locations
+* [FIX] #338 - beacon functionality can cause battery drain
+* [FIX] #344 - regions loose "shared" indicator on import enhancement
+* [NEW] follow mode is now automatically used from friends view and after long pressing on details on map
+* [NEW] regions can be deleted by long pressing them
+* [NEW] setup wizard that allows to set the mode prior to the first connection
 
 ## OwnTracks 0.6.10
->Release date: 2016-03-28 for beta testers
+>Release date: 2016-03-28
 * [FIX] #338 - Bluetooth beacon functionality can cause battery drain
 * [FIX] #344 - Waypoints loose "shared" indicator on import enhancement
 * [FIX] #343 - 0.6.9: waypoint export should say 'queued'
