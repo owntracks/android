@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceMessageMqtt;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.EditIntegerPreference;
@@ -144,23 +145,19 @@ public class ActivityPreferences extends ActivityBase {
 
             if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
-                addPreferencesFromResource(R.xml.preferences_root);
-                PreferenceScreen root = (PreferenceScreen) findPreference("root");
-                populatePreferencesScreen(root);
             } else if(Preferences.isModeMqttPublic()){
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
-                addPreferencesFromResource(R.xml.preferences_root);
-                PreferenceScreen root = (PreferenceScreen) findPreference("root"); 
-                populatePreferencesScreen(root); 
+            }  else if(Preferences.isModeHttpPrivate()) {
+                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HTTP);
             } else {
                 throw new RuntimeException("Unknown application mode");
             }
 
+            addPreferencesFromResource(R.xml.preferences_root);
+            PreferenceScreen root = (PreferenceScreen) findPreference("root");
+            populatePreferencesScreen(root);
 
             export = findPreference("export");
-
-
-
             repo = findPreference("repo");
             twitter = findPreference("twitter");
             community = findPreference("community");
@@ -287,7 +284,7 @@ public class ActivityPreferences extends ActivityBase {
         private void populateScreenReporting(PreferenceScreen screen) {
             addToolbar(screen);
             addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
-            addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedDataSummary, R.string.preferencesPubExtendedData, R.bool.valPubExtendedData);
+            addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedData, R.string.preferencesPubExtendedDataSummary, R.bool.valPubExtendedData);
         }
 
 
@@ -490,7 +487,7 @@ public class ActivityPreferences extends ActivityBase {
         }
 
         @SuppressWarnings("unused")
-        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+        public void onEventMainThread(Events.EndpointStateChanged e) {
             if ((e != null) && (e.getExtra() != null) && (e.getExtra() instanceof Exception)) {
                 if ((((Exception) e.getExtra()).getCause() != null))
                     setServerPreferenceSummary(this, getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause().getLocalizedMessage());
@@ -503,7 +500,7 @@ public class ActivityPreferences extends ActivityBase {
         }
 
         private  void setServerPreferenceSummary(PreferenceFragment c) {
-            setServerPreferenceSummary(c, ServiceMessageMqtt.getStateAsString(c.getActivity()));
+            setServerPreferenceSummary(c, ServiceMessage.getEndpointStateAsString());
         }
 
 
@@ -524,6 +521,10 @@ public class ActivityPreferences extends ActivityBase {
             case App.MODE_ID_MQTT_PUBLIC:
                 mode = c.getString(R.string.mode_mqtt_public_label);
                 break;
+            case App.MODE_ID_HTTP_PRIVATE:
+                mode = c.getString(R.string.mode_http_public_label);
+                break;
+
             default:
                 mode = c.getString(R.string.mode_mqtt_private_label);
                 break;

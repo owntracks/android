@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_frame"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        android:id="@+id/url"
+        android:inputType="textUri|textNoSuggestions"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesUrl"
+        android:hint="@string/preferencesUrl"
+        />
+
+
+</LinearLayout>

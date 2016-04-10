@@ -50,7 +50,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
     private StaticHandler handler;
     private MessageLocation lastPublishedLocationMessage;
-    private long lastPublishedLocationTst = 0;
     private NotificationManager notificationManager;
 
     // Ongoing notification
@@ -235,19 +234,16 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         if (!Preferences.getNotification())
             return;
 
-        String title;
-        String subtitle = ServiceMessageMqtt.getStateAsString(this.context);
-        long when = this.lastPublishedLocationTst;
-
+        String subtitle = ServiceMessage.getEndpointStateAsString();
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
-            title = this.lastPublishedLocationMessage.getGeocoder();
+            notificationBuilderOngoing.setContentTitle(this.lastPublishedLocationMessage.getGeocoder());
+            notificationBuilderOngoing.setWhen(this.lastPublishedLocationMessage.getTst());
+
         } else {
-            title = this.context.getString(R.string.app_name);
+            notificationBuilderOngoing.setContentTitle(this.context.getString(R.string.app_name));
         }
 
-        notificationBuilderOngoing.setContentTitle(title).setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
-        notificationBuilderOngoing.setWhen(when);
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary));
@@ -255,9 +251,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
             notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
-
-
-
+        notificationBuilderOngoing.setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
         this.notificationOngoing = notificationBuilderOngoing.build();
         this.context.startForeground(NOTIFICATION_ID_ONGOING, this.notificationOngoing);
     }
@@ -387,9 +381,9 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
+    public void onEventMainThread(Events.EndpointStateChanged e) {
         if (App.isInForeground())
-            Toasts.showBrokerStateChange(e.getState());
+            Toasts.showEndpointStateChange(e.getState());
 
         updateNotificationOngoing();
     }

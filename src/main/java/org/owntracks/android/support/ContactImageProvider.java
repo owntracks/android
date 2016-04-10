@@ -62,11 +62,11 @@ public class ContactImageProvider {
 
     }
     private static class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
-        Marker target;
+        WeakReference<Marker> target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
             Log.v(TAG, "setting new weak reference for: " + marker);
-            target = marker;
+            target = new WeakReference<Marker>(marker);
         }
 
         @Override
@@ -78,7 +78,7 @@ public class ContactImageProvider {
         protected void onPostExecute(BitmapDescriptor result) {
             Log.v(TAG, "ContactDrawableWorkerTaskForMarker onPostExecute() for marker: " + target);
 
-            Marker marker = target;
+            Marker marker = target.get();
             if(marker != null) {
                 marker.setIcon(result);
                 marker.setVisible(true);

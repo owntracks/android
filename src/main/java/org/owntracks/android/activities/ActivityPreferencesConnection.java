@@ -28,7 +28,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceMessageMqtt;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContentPathHelper;
 import org.owntracks.android.support.Events;
@@ -148,16 +148,16 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         private static Menu mMenu;
         private MenuInflater mInflater;
-        ServiceMessageMqtt.State cachedState = null;
+        ServiceMessage.EndpointState cachedState = null;
         private String tlsCaCrtName;
         private String tlsClientCrtName;
 
-        private void loadHostPreferences(final Activity a) {
+        private void loadHostPreferencesMqtt(final Activity a) {
             Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                         new MaterialDialog.Builder(a)
-                            .customView(R.layout.preferences_host, true)
+                            .customView(R.layout.preferences_host_mqtt, true)
                             .title(R.string.preferencesHost)
                             .positiveText(R.string.accept)
                             .negativeText(R.string.cancel)
@@ -215,6 +215,51 @@ public class ActivityPreferencesConnection extends ActivityBase {
             hostPreference = findPreference(getString(R.string.keyHost));
             hostPreference.setOnPreferenceClickListener(hostClickListener);
             wsVal = Preferences.getWs();
+
+        }
+
+        private void loadHostPreferencesHttp(final Activity a) {
+            Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_host_http, true)
+                            .title(R.string.preferencesHost)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
+
+                                    url.setText(Preferences.getUrl());
+                                    url.setFloatingLabelAlwaysShown(true);
+
+
+                                }
+                            })
+
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
+
+
+                                    Preferences.setUrl(url.getText().toString());
+                                }
+                            })
+
+                            .show();
+
+                    return true;
+                }
+            };
+
+
+            hostPreference = findPreference(getString(R.string.keyHost));
+            hostPreference.setOnPreferenceClickListener(hostClickListener);
 
         }
 
@@ -336,7 +381,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText tlsClientCrtPasswordView = (MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword);
 
 
-
+                                    d.findViewById(R.id.tlsWrapper).setVisibility(Preferences.isModeHttpPrivate() ? View.GONE : View.VISIBLE);
                                     tls.setChecked(tlsVal);
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -554,7 +599,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 addPreferencesFromResource(R.xml.preferences_private_connection);
 
 
-                loadHostPreferences(a);
+                loadHostPreferencesMqtt(a);
                 loadSecurityPreferences(a);
                 loadOptionsPreferences(a);
                 loadIdentificationPreferences(a);
@@ -562,6 +607,12 @@ public class ActivityPreferencesConnection extends ActivityBase {
             } else if (Preferences.isModeMqttPublic()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
                 addPreferencesFromResource(R.xml.preferences_public_connection);
+            } else if(Preferences.isModeHttpPrivate()) {
+                this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HTTP);
+                addPreferencesFromResource(R.xml.preferences_http_connection);
+                loadHostPreferencesHttp(a);
+                loadSecurityPreferences(a);
+
             } else {
                 throw new RuntimeException("Unknown application mode");
             }
@@ -600,8 +651,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
         }
 
         @SuppressWarnings("unused")
-        public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-            Log.v(TAG, "onEventMainThread StateChanged.ServiceMessageMqtt -> " + e.getState() + " cached " + cachedState);
+        public void onEventMainThread(Events.EndpointStateChanged e) {
+            Log.v(TAG, "onEventMainThread Events.EndpointStateChanged -> " + e.getState() + " cached " + cachedState);
 
 
             cachedState = e.getState(); // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
@@ -619,8 +670,13 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 return;
             }
 
+
+
             mMenu.clear();
-            mInflater.inflate(R.menu.preferences_connection, mMenu);
+           if(Preferences.isModeHttpPrivate())
+               return;
+
+            mInflater.inflate(R.menu.preferences_connection_mqtt, mMenu);
 
             updateDisconnectButton(cachedState);
             updateConnectButton();
@@ -657,7 +713,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             }
         }
 
-        public static void updateDisconnectButton(ServiceMessageMqtt.State state) {
+        public static void updateDisconnectButton(ServiceMessage.EndpointState state) {
             if (mMenu == null || state == null)
                 return;
 
@@ -666,8 +722,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
             if (disconnectButton == null)
                 return;
 
-            disconnectButton.setEnabled(state == ServiceMessageMqtt.State.CONNECTED);
-            disconnectButton.getIcon().setAlpha(state == ServiceMessageMqtt.State.CONNECTED ? 255 : 130);
+            disconnectButton.setEnabled(state == ServiceMessage.EndpointState.CONNECTED);
+            disconnectButton.getIcon().setAlpha(state == ServiceMessage.EndpointState.CONNECTED ? 255 : 130);
         }
 
         public static void updateConnectButton() {

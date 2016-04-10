@@ -80,6 +80,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private long zoom = ZOOM_LEVEL_STREET;
     private FusedContact activeContact;
     private FloatingActionButton fab;
+    private boolean handlingExtendExtras = false;
 
 
     @Override
@@ -153,9 +154,15 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     @Override
     public void onResume() {
         super.onResume();
+        Log.v(TAG, "onResume");
         this.mapView.onResume();
         de.greenrobot.event.EventBus.getDefault().registerSticky(this);
 
+
+
+    }
+
+    private void redrawMap() {
         clearMap();
         onAddInitialMarkers();
     }
@@ -244,7 +251,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void clearMap() {
         Log.v(TAG, "clearing map");
         if(map != null) {
-            map.clear();
+            this.map.clear();
             this.markers.clear();
         }
     }
@@ -331,7 +338,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
         });
 
-        onAddInitialMarkers();
+        redrawMap();
         onHandleIntentExtras();
 
 /*        App.getContactsViewModel().items.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<FusedContact>>() {
@@ -378,6 +385,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void onHandleIntentExtras() {
+        Log.v(TAG, "onHandleIntentExtras: " + intentExtras);
+
         if(intentExtras == null) {
             actionFollowDevice();
         } else {
@@ -394,6 +403,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
                     actionFollowDevice();
                     break;
             }
+            intentExtras = null;
         }
     }
     private void onDeviceLocationUpdated(GeocodableLocation l) {
@@ -476,7 +486,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         binding.contactPeek.setItem(fusedContact);
 
 
-        // bottomSheetBehavior.setState(State.HIDDEN) doesn't work due to a bug in the support library
+        // bottomSheetBehavior.setState(EndpointState.HIDDEN) doesn't work due to a bug in the support library
         // Set an initial height of 0 px to hide it instead and set it to 76dp on click instead.
         // setPeekHeight takes real px as a value. We convert the appropriate value from 76dp
        // Log.v(TAG, "setting peek height to: " + getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
@@ -492,7 +502,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     private void deselectContact() {
-        collapseBottomSheet();
+        hideBottomSheet();
         binding.setItem(null);
         activeContact = null;
     }

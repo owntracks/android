@@ -1,9 +1,11 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
 import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
@@ -30,10 +32,12 @@ import java.util.concurrent.TimeUnit;
 public class ServiceMessage implements ProxyableService, MessageSender, MessageReceiver, IncomingMessageProcessor {
     private static final String TAG = "ServiceMessage";
 
-    private ServiceMessageEndpoint endpoint;
+    private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor pool;
 
-
+    public enum EndpointState {
+        INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, EndpointState, DISCONNECTED_ERROR
+    }
 
 
 
@@ -49,25 +53,25 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     private void onModeChanged(int mode) {
         Log.v(TAG, "onModeChanged: " + mode);
-        if(this.endpoint != null)
+        if(endpoint != null)
             ServiceProxy.stopService((ProxyableService) endpoint);
 
         if(mode == App.MODE_ID_HTTP_PRIVATE) {
             Log.v(TAG, "loading http backend");
-            this.endpoint = (ServiceMessageHttp)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
+            endpoint = (ServiceMessageHttp)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
         } else {
             Log.v(TAG, "loading mqtt backend");
-            this.endpoint = (ServiceMessageMqtt)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
+            endpoint = (ServiceMessageMqtt)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
         }
 
-        Log.v(TAG, "endpoint instance: " + this.endpoint);
+        Log.v(TAG, "endpoint instance: " + endpoint);
         if(endpoint == null) {
             Log.e(TAG, "unable to instantiate service for mode " + mode);
             return;
         }
 
-        this.endpoint.setMessageReceiverCallback(this);
-        this.endpoint.setMessageSenderCallback(this);
+        endpoint.setMessageReceiverCallback(this);
+        endpoint.setMessageSenderCallback(this);
 
     }
 
@@ -206,5 +210,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     }
 
 
-
+    public static String getEndpointStateAsString() {
+        return endpoint != null ? endpoint.getStateAsString() : App.getContext().getString(R.string.noEndpointConfigured);
+    }
 }

@@ -52,8 +52,10 @@ import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
+import org.owntracks.android.services.ServiceMessage.EndpointState;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -82,7 +84,7 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	public void sendMessage(MessageBase message) {
 		Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
 
-		if(state == State.DISCONNECTED_CONFIGINCOMPLETE) {
+		if(state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
 			Log.e(TAG, "dropping outgoing message due to incomplete configuration");
 			return;
 		}
@@ -104,6 +106,8 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	public void setMessageReceiverCallback(MessageReceiver callback) {
 		this.messageReceiver = callback;
 	}
+
+
 
 
 	@Override
@@ -162,19 +166,10 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 boolean firstStart = true;
 	private void publishMessage(MessageBase message) {
 
-		MessageBase mm;
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
 		try {
-			if(EncryptionProvider.isPayloadEncryptionEnabled() && !(message instanceof MessageEncrypted)) {
-				mm = new MessageEncrypted();
-				((MessageEncrypted)mm).setdata(EncryptionProvider.encrypt(Parser.serializeSync(message)));
-			} else {
-				mm = message;
-			}
-
-
 			MqttMessage m = new MqttMessage();
-			m.setPayload(Parser.serializeSync(mm).getBytes());
+			m.setPayload(Parser.serializeSync(message).getBytes());
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 
@@ -185,7 +180,7 @@ boolean firstStart = true;
 				this.pubPool.requeue(message);
 				return;
 			}
-			Log.v(TAG, "publishing message " + mm + " to topic " + mm.getTopic() );
+			Log.v(TAG, "publishing message " + message + " to topic " + message.getTopic() );
 			this.mqttClient.publish(message.getTopic(), m);
 
 			// At this point, delivery is technically not completed. However, if the mqttClient didn't throw any errors, the message likely makes it to the broker
@@ -196,11 +191,13 @@ boolean firstStart = true;
 				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
 				this.pubPool.pause();
 			}
-		} catch (JsonProcessingException e) {
-			Log.e(TAG, "processMessage: JsonProcessingException");
-			e.printStackTrace();
 		} catch (MqttException e) {
 			Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
+			e.printStackTrace();
+		} catch (Parser.EncryptionException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.e(TAG, "processMessage: JsonProcessingException");
 			e.printStackTrace();
 		}
 
@@ -208,11 +205,8 @@ boolean firstStart = true;
 
 
 
-	public enum State {
-        INITIAL, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, DISCONNECTED_ERROR
-    }
 
-	private static State state = State.INITIAL;
+	private static ServiceMessage.EndpointState state = ServiceMessage.EndpointState.INITIAL;
 
 	private CustomMqttClient mqttClient;
 	private Thread workerThread;
@@ -240,7 +234,7 @@ boolean firstStart = true;
 		initPausedPubPool();
         this.persistenceStore = new CustomMemoryPersistence();
         this.reconnectHandler = new ReconnectHandler(context);
-        changeState(State.INITIAL);
+        changeState(EndpointState.INITIAL);
         doStart();
 
 
@@ -325,13 +319,13 @@ boolean firstStart = true;
 
 		Log.v(TAG, "handleStart: force == " + force);
         if(!Preferences.canConnect()) {
-			changeState(State.DISCONNECTED_CONFIGINCOMPLETE);
+			changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE);
 			return;
         }
 
 		// Respect user's wish to stay disconnected. Overwrite with force = true
 		// to reconnect manually afterwards
-		if ((state == State.DISCONNECTED_USERDISCONNECT) && !force) {
+		if ((state == EndpointState.DISCONNECTED_USERDISCONNECT) && !force) {
 			return;
 		}
 
@@ -343,7 +337,7 @@ boolean firstStart = true;
 		// Check if there is a data connection. If not, try again in some time.
 		if (!isOnline()) {
 			Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
-			changeState(State.DISCONNECTED_DATADISABLED);
+			changeState(EndpointState.DISCONNECTED_DATADISABLED);
 			reconnectHandler.start(); // we will try again to connect after some time
 			return;
 		}
@@ -363,11 +357,11 @@ boolean firstStart = true;
 
 	private boolean isDisconnected() {
 
-		return (state == State.INITIAL)
-				|| (state == State.DISCONNECTED)
-				|| (state == State.DISCONNECTED_USERDISCONNECT)
-				|| (state == State.DISCONNECTED_DATADISABLED)
-				|| (state == State.DISCONNECTED_ERROR)
+		return (state == EndpointState.INITIAL)
+				|| (state == EndpointState.DISCONNECTED)
+				|| (state == EndpointState.DISCONNECTED_USERDISCONNECT)
+				|| (state == EndpointState.DISCONNECTED_DATADISABLED)
+				|| (state == EndpointState.DISCONNECTED_ERROR)
 
 				// In some cases the internal state may diverge from the mqtt
 				// client state.
@@ -413,7 +407,7 @@ boolean firstStart = true;
 
 	private boolean connect() {
         this.workerThread = Thread.currentThread(); // We connect, so we're the worker thread
-        changeState(State.CONNECTING);
+        changeState(EndpointState.CONNECTING);
 		Log.v(TAG, "connect() mode: " + Preferences.getModeId());
 
 		error = null; // clear previous error on connect
@@ -463,7 +457,7 @@ boolean firstStart = true;
 			lastConnectionOptions.setCleanSession(connectedWithCleanSession);
 
 			this.mqttClient.connect(lastConnectionOptions);
-			changeState(State.CONNECTED);
+			changeState(EndpointState.CONNECTED);
 
 			return true;
 
@@ -628,9 +622,9 @@ boolean firstStart = true;
 			}
 
 			if (fromUser)
-				changeState(State.DISCONNECTED_USERDISCONNECT);
+				changeState(EndpointState.DISCONNECTED_USERDISCONNECT);
 			else
-				changeState(State.DISCONNECTED);
+				changeState(EndpointState.DISCONNECTED);
 		}
 	}
 
@@ -653,9 +647,9 @@ boolean firstStart = true;
 
 
         if (!isOnline()) {
-			changeState(State.DISCONNECTED_DATADISABLED);
+			changeState(EndpointState.DISCONNECTED_DATADISABLED);
         } else {
-			changeState(State.DISCONNECTED);
+			changeState(EndpointState.DISCONNECTED);
         }
 
         reconnectHandler.start();
@@ -673,17 +667,17 @@ boolean firstStart = true;
 
 	private void changeState(Exception e) {
 		error = e;
-		changeState(State.DISCONNECTED_ERROR, e);
+		changeState(EndpointState.DISCONNECTED_ERROR, e);
 	}
 
-	private void changeState(State newState) {
+	private void changeState(EndpointState newState) {
 		changeState(newState, null);
 	}
 
-	private void changeState(State newState, Exception e) {
+	private void changeState(EndpointState newState, Exception e) {
 		//Log.d(TAG, "ServiceMessageMqtt state changed to: " + newState);
 		state = newState;
-		EventBus.getDefault().postSticky(new Events.StateChanged.ServiceBroker(newState, e));
+		EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
 	}
 
 	private boolean isOnline() {
@@ -702,8 +696,8 @@ boolean firstStart = true;
 		return this.mqttClient != null && this.mqttClient.isConnected(  );
 	}
 
-	public static boolean isErrorState(State state) {
-		return state == State.DISCONNECTED_ERROR;
+	public static boolean isErrorState(EndpointState state) {
+		return state == EndpointState.DISCONNECTED_ERROR;
 	}
 
 	public static boolean hasError() {
@@ -712,7 +706,7 @@ boolean firstStart = true;
 
 	public boolean isConnecting() {
 		return (this.mqttClient != null)
-				&& (state == State.CONNECTING);
+				&& (state == EndpointState.CONNECTING);
 	}
 
 	@Override
@@ -720,10 +714,10 @@ boolean firstStart = true;
 		// disconnect immediately
 		disconnect(false);
 
-		changeState(State.DISCONNECTED);
+		changeState(EndpointState.DISCONNECTED);
 	}
 
-	public static State getState() {
+	public static EndpointState getState() {
 		return state;
 	}
 
@@ -735,8 +729,8 @@ boolean firstStart = true;
 
 	}
 
-	public static String getStateAsString(Context c)
-    {
+	@Override
+	public String getStateAsString() {
         int id;
         switch (getState()) {
             case CONNECTED:
@@ -764,7 +758,7 @@ boolean firstStart = true;
                 id = R.string.connectivityDisconnected;
 
         }
-        return c.getString(id);
+        return context.getString(id);
     }
 
 
