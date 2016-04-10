@@ -134,11 +134,6 @@ public class App extends Application  {
     }
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(Events.StateChanged.ServiceBroker e) {
-
-    }
-
-    @SuppressWarnings("unused")
     public void onEventMainThread(Events.ModeChanged e) {
         clearFusedContacts();
         ContactImageProvider.invalidateCache();

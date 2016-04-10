@@ -5,6 +5,7 @@ import java.util.Date;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceMessageMqtt;
 
 import android.location.Location;
@@ -229,19 +230,18 @@ public class Events {
 		public BrokerChanged() {}
 	}
 
-	public static class StateChanged {
-		public static class ServiceBroker extends E {
-			private final ServiceMessageMqtt.State state;
+	public static class EndpointStateChanged extends E {
+			private final ServiceMessage.EndpointState state;
 			private final Object extra;
 
-			public ServiceBroker(ServiceMessageMqtt.State state,
+			public EndpointStateChanged(ServiceMessage.EndpointState state,
 					Object extra) {
 				super();
 				this.state = state;
 				this.extra = extra;
 			}
 
-			public ServiceMessageMqtt.State getState() {
+			public ServiceMessage.EndpointState getState() {
 				return this.state;
 			}
 
@@ -249,7 +249,6 @@ public class Events {
 				return this.extra;
 			}
 
-		}
     }
 
     public static class PermissionGranted extends E {

@@ -72,11 +72,14 @@ public class ActivityExport extends ActivityBase {
     private static Preference.OnPreferenceClickListener exportToFile = new Preference.OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            String exportStr;
+            String exportStr = null;
             try {
                 exportStr = Parser.serializeSync(Preferences.exportToMessage());
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                return false;
+            } catch (Parser.EncryptionException e) {
                 e.printStackTrace();
                 return false;
             }

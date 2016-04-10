@@ -1,9 +1,11 @@
 package org.owntracks.android.support;
 
+import android.app.Service;
 import android.widget.Toast;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceMessageMqtt;
 
 public class Toasts {
@@ -27,21 +29,21 @@ public class Toasts {
 
 
     private static Toast stateChangeToast;
-    public static void showBrokerStateChange(ServiceMessageMqtt.State state) {
+    public static void showEndpointStateChange(ServiceMessage.EndpointState state) {
         if(stateChangeToast != null)
             stateChangeToast.cancel();
 
         int stringRes = 0;
 
-        if (state == ServiceMessageMqtt.State.CONNECTED) {
+        if (state == ServiceMessage.EndpointState.CONNECTED) {
             stringRes = R.string.snackbarConnected;
-        //} else if (state == ServiceMessageMqtt.State.CONNECTING) {
+        //} else if (state == ServiceMessageMqtt.EndpointState.CONNECTING) {
         //    stringRes = R.string.snackbarConnecting;
-        } else if (state == ServiceMessageMqtt.State.DISCONNECTED || state == ServiceMessageMqtt.State.DISCONNECTED_USERDISCONNECT) {
+        } else if (state == ServiceMessage.EndpointState.DISCONNECTED || state == ServiceMessage.EndpointState.DISCONNECTED_USERDISCONNECT) {
             stringRes = R.string.snackbarDisconnected;
-        } else if (state == ServiceMessageMqtt.State.DISCONNECTED_ERROR) {
+        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_ERROR) {
             stringRes = R.string.snackbarDisconnectedError;
-        } else if (state == ServiceMessageMqtt.State.DISCONNECTED_CONFIGINCOMPLETE) {
+        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
             stringRes = R.string.snackbarConfigIncomplete;
         }
 

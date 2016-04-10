@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="valModeId">2</integer>
+    <integer name="valModeId">0</integer>
 
 
 
@@ -69,11 +69,13 @@
     <bool name="valInfo" >true</bool>
 
     <string-array name="modeIds">
+        <item>3</item>
         <item>0</item>
         <item>2</item>
     </string-array>
 
     <string-array name="profileIds_readable">
+        <item>HTTP Private</item>
         <item>MQTT Private</item>
         <item>MQTT Public</item>
     </string-array>

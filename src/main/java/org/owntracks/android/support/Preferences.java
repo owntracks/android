@@ -307,10 +307,11 @@ public class Preferences {
 
         HashMap<String, Method> methods = getImportMethods();
 
-        if(m.containsKey(Keys.MODE_ID))
+        if(m.containsKey(Keys.MODE_ID)) {
             setMode((Integer) m.get(Keys.MODE_ID));
-
-        // Don't show setup on first start if a config has been imported
+            methods.remove(Keys.MODE_ID);
+        }
+        // Don't show setup if a config has been imported
         setSetupCompleted();
 
 
@@ -323,7 +324,7 @@ public class Preferences {
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
 
