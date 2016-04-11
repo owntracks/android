@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -22,6 +23,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
+import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -35,6 +37,16 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor pool;
 
+    public void reconnect() {
+        if(endpoint instanceof StatefulServiceMessageEndpoint)
+            StatefulServiceMessageEndpoint.class.cast(endpoint).reconnect();
+    }
+
+    public void disconnect() {
+        if(endpoint instanceof StatefulServiceMessageEndpoint)
+            StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
+    }
+
     public enum EndpointState {
         INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, EndpointState, DISCONNECTED_ERROR
     }
@@ -45,11 +57,10 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "onCreate()");
         this.pool= new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        //TODO: change dynamically after mode change
         onModeChanged(Preferences.getModeId());
-
-
     }
+
+
 
     private void onModeChanged(int mode) {
         Log.v(TAG, "onModeChanged: " + mode);
@@ -72,7 +83,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
         endpoint.setMessageReceiverCallback(this);
         endpoint.setMessageSenderCallback(this);
-
+        ServiceProxy.getServiceNotification().updateNotificationOngoing();
     }
 
     @Override
@@ -91,7 +102,10 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     }
 
-
+    @SuppressWarnings("unused")
+    public void onEvent(Events.ModeChanged event) {
+        onModeChanged(Preferences.getModeId());
+    }
     // ServiceMessage.MessageSender interface
     @Override
     public void sendMessage(MessageBase message) {

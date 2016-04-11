@@ -23,6 +23,7 @@ import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
+import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
@@ -45,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, ServiceMessageEndpoint {
+public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatelessMessageEndpoint {
 
     private static final String TAG = "ServiceMessageHttp";
     private static final String METHOD_POST = "POST";
@@ -302,5 +303,10 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void test() {
+
     }
 }

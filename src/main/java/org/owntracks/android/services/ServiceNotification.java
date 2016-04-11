@@ -40,6 +40,7 @@ import org.owntracks.android.support.Toasts;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
@@ -238,7 +239,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
             notificationBuilderOngoing.setContentTitle(this.lastPublishedLocationMessage.getGeocoder());
-            notificationBuilderOngoing.setWhen(this.lastPublishedLocationMessage.getTst());
+            notificationBuilderOngoing.setWhen(TimeUnit.SECONDS.toMillis(this.lastPublishedLocationMessage.getTst()));
 
         } else {
             notificationBuilderOngoing.setContentTitle(this.context.getString(R.string.app_name));

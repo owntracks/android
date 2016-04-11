@@ -51,6 +51,7 @@ import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
+import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
@@ -67,7 +68,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
-public class ServiceMessageMqtt implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, ServiceMessageEndpoint {
+public class ServiceMessageMqtt implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
 	private static final String TAG = "ServiceMessageMqtt";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -590,7 +591,7 @@ boolean firstStart = true;
 		}
     }
 
-	public void disconnect(boolean fromUser) {
+	private void disconnect(boolean fromUser) {
 		Log.v(TAG, "disconnect. from user: " + fromUser);
 
 		if (isConnecting()) {
@@ -663,6 +664,11 @@ boolean firstStart = true;
 	public void reconnect() {
 		disconnect(false);
 		doStart(true);
+	}
+
+	@Override
+	public void disconnect() {
+		disconnect(true);
 	}
 
 	private void changeState(Exception e) {
