@@ -691,7 +691,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceMessageMqtt() .reconnect();
+                            ServiceProxy.getServiceMessage().reconnect();
                         }
                     };
                     new Thread(r).start();
@@ -702,7 +702,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceMessageMqtt().disconnect(true);
+                            ServiceProxy.getServiceMessage().disconnect();
 
                         }
                     };

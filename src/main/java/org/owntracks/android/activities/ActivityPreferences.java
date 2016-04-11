@@ -91,40 +91,6 @@ public class ActivityPreferences extends ActivityBase {
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.connect:
-
-                Runnable r = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        ServiceProxy.getServiceMessageMqtt().reconnect();
-                    }
-                };
-                new Thread(r).start();
-                goToRoot();
-                return true;
-            case R.id.disconnect:
-                Runnable s = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        ServiceProxy.getServiceMessageMqtt().disconnect(true);
-
-                    }
-                };
-                new Thread(s).start();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-
-
     public static class FragmentPreferences extends PreferenceFragment {
         private static Preference version;
         private static Preference repo;
