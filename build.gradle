@@ -69,6 +69,9 @@ dependencies {
     compile 'com.joanzapata.android:android-iconify:1.0.10'
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+
+    compile "ch.acra:acra:4.8.5"
+
 }
 
 android {
@@ -108,7 +111,8 @@ android {
 
         }
         debug {
-            applicationIdSuffix '.debug'
+            proguardFiles '.proguard-project.txt'
+                    applicationIdSuffix '.debug'
             minifyEnabled false
         }
     }

@@ -902,6 +902,7 @@ boolean firstStart = true;
 				wakelock.acquire();
 
 			if(comms == null) {
+				Log.v(TAG, "comms is null, running doStart()");
 				doStart();
 				return;
 			}
@@ -966,14 +967,18 @@ boolean firstStart = true;
         @Override
         public void schedule(long delayInMilliseconds) {
 
-
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
+			long targetTstMs = System.currentTimeMillis() + delayInMilliseconds;
+			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null);
-			if (Build.VERSION.SDK_INT >= 19) {
-				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+			if (Build.VERSION.SDK_INT >= 23) {
+				alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetTstMs, p);
+			} else if (Build.VERSION.SDK_INT >= 19) {
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, targetTstMs, p);
 			} else {
-				alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
+				alarmManager.set(AlarmManager.RTC_WAKEUP, targetTstMs, p);
 			}
+
+			Log.v(TAG, "scheduled ping at tst " + (targetTstMs) +" (current: " + System.currentTimeMillis() +" /"+ delayInMilliseconds+ ")");
 
         }
     }
