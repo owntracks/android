@@ -15,7 +15,7 @@
     <bool name="valRemoteConfigurationPublic">false</bool>
     <bool name="valPubRetainPublic">false</bool>
     <bool name="valWsPublic">false</bool>
-    <integer name="valKeepalivePublic">3600</integer>
+    <integer name="valKeepalivePublic">120</integer>
     <integer name="valPubQosPublic">0</integer>
     <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
 
