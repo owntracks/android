@@ -80,7 +80,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private long zoom = ZOOM_LEVEL_STREET;
     private FusedContact activeContact;
     private FloatingActionButton fab;
-    private boolean handlingExtendExtras = false;
 
 
     @Override
@@ -156,15 +155,15 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         super.onResume();
         Log.v(TAG, "onResume");
         this.mapView.onResume();
+        onAddInitialMarkers();
+
         de.greenrobot.event.EventBus.getDefault().registerSticky(this);
-
-
 
     }
 
     private void redrawMap() {
-        clearMap();
-        onAddInitialMarkers();
+        //clearMap();
+        //onAddInitialMarkers();
     }
 
 
@@ -245,12 +244,13 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.ModeChanged e) {
-        clearMap();
+        redrawMap();
     }
 
     private void clearMap() {
-        Log.v(TAG, "clearing map");
+        Log.v(TAG, "clearMap");
         if(map != null) {
+            hideBottomSheet();
             this.map.clear();
             this.markers.clear();
         }
@@ -290,7 +290,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
 
     private void updateContactMarker(@Nullable FusedContact c) {
-        if (c == null || !c.hasLocation())
+        if (c == null || !c.hasLocation() || map == null)
             return;
         Log.v(TAG, "updateContactMarker: " + c.getTopic() + " hasLocation: " + c.hasLocation());
 
@@ -338,40 +338,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
         });
 
-        redrawMap();
+        onAddInitialMarkers();
         onHandleIntentExtras();
-
-/*        App.getContactsViewModel().items.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<FusedContact>>() {
-        @Override
-        public void onChanged(ObservableList<FusedContact> fusedContacts) {
-            Log.v(TAG, "ObservableList onChanged" );
-
-        }
-
-        @Override
-        public void onItemRangeChanged(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-
-        }
-
-        @Override
-        public void onItemRangeInserted(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-            Log.v(TAG, "ObservableList onItemRangeInserted" );
-            //updateContactMarker(fusedContacts.get(i)));
-            Log.v(TAG, "contact added: " + fusedContacts.get(i));
-            addContact(fusedContacts.get(i));
-        }
-
-        @Override
-        public void onItemRangeMoved(ObservableList<FusedContact> fusedContacts, int i, int i1, int i2) {
-            Log.v(TAG, "ObservableList onItemRangeMoved" );
-
-        }
-        @Override
-        public void onItemRangeRemoved(ObservableList<FusedContact> fusedContacts, int i, int i1) {
-            Log.v(TAG, "ObservableList onItemRangeRemoved" );
-
-        }
-    });*/
     }
 
 
@@ -563,8 +531,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
                 Log.v(TAG, "hideBottomSheet()");
 
                 ViewCompat.postInvalidateOnAnimation(binding.coordinator);
-                bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_hidden));
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                //bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_hidden));
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
     }
