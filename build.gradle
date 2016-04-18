@@ -13,11 +13,11 @@ buildscript {
 
 repositories {
     mavenCentral()
+    jcenter()
 
     maven { url 'https://repo.eclipse.org/content/repositories/paho-snapshots/' }
-    maven { url 'http://jcenter.bintray.com'}
     maven { url "https://jitpack.io" }
-    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 
     flatDir {
         dirs 'libs'
