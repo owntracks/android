@@ -890,6 +890,17 @@ boolean firstStart = true;
         private Context context;
 		private WakeLock wakelock;
 
+		private boolean releaseWakeLock() {
+			if(wakelock != null && wakelock.isHeld()){
+				Log.d(TAG, "Release lock ok(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
+
+				wakelock.release();
+				return true;
+			}
+			Log.d(TAG, "Release lock underlock or null (" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
+			return false;
+		}
+
         public void ping(Intent intent) {
 			Log.v(TAG, "sending");
 
@@ -901,9 +912,17 @@ boolean firstStart = true;
 			if(!wakelock.isHeld())
 				wakelock.acquire();
 
+			//DEBUG
+			comms = null;
+
 			if(comms == null) {
 				Log.v(TAG, "comms is null, running doStart()");
-				doStart();
+				PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
+				try {
+					p.send();
+				} catch (PendingIntent.CanceledException e) { } finally {
+					releaseWakeLock();
+				}
 				return;
 			}
 
@@ -913,26 +932,20 @@ boolean firstStart = true;
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					Log.d(TAG, "Success. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
-					if(wakelock != null && wakelock.isHeld()){
-						wakelock.release();
-					}
+					releaseWakeLock();
 				}
 
 				@Override
 				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
 					Log.d(TAG, "Failure. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
 
-					//Release wakelock when it is done.
-					if(wakelock != null && wakelock.isHeld()){
-						wakelock.release();
-					}
+					releaseWakeLock();
 				}
 			});
 
-			if (token == null) {
-				wakelock.release();
-			}
-        }
+			releaseWakeLock();
+
+		}
 
         public PingHandler(Context c) {
             if (c == null) {

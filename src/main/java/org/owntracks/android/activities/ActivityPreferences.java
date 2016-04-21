@@ -20,7 +20,6 @@ import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
@@ -28,8 +27,6 @@ import android.widget.LinearLayout;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceMessage;
-import org.owntracks.android.services.ServiceMessageMqtt;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.EditIntegerPreference;
 import org.owntracks.android.support.EditStringPreference;
 import org.owntracks.android.support.Events;
@@ -488,7 +485,7 @@ public class ActivityPreferences extends ActivityBase {
                 mode = c.getString(R.string.mode_mqtt_public_label);
                 break;
             case App.MODE_ID_HTTP_PRIVATE:
-                mode = c.getString(R.string.mode_http_public_label);
+                mode = c.getString(R.string.mode_http_private_label);
                 break;
 
             default:

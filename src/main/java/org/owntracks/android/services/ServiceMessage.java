@@ -1,8 +1,6 @@
 package org.owntracks.android.services;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -137,30 +135,32 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void onMessageReceived(MessageBase message) {
+        Log.v(TAG, "onMessageReceived(): " + message);
         message.setIncomingProcessor(this);
+        message.setIncoming();
         pool.execute(message);
 
     }
 
     @Override
     public void processMessage(MessageBase message) {
-        Log.v(TAG, "processMessage MessageBase (" + message.getTopic()+")");
+        Log.v(TAG, "processMessage MessageBase (" + message.getContactKey()+")");
     }
 
     public void processMessage(MessageUnknown message) {
-        Log.v(TAG, "processMessage MessageUnknown (" + message.getTopic()+")");
+        Log.v(TAG, "processMessage MessageUnknown (" + message.getContactKey()+")");
     }
 
 
     @Override
     public void processMessage(MessageLocation message) {
-        Log.v(TAG, "processMessage MessageLocation (" + message.getTopic()+")");
+        Log.v(TAG, "processMessage MessageLocation (" + message.getContactKey()+")");
 
         GeocodingProvider.resolve(message);
-        FusedContact c = App.getFusedContact(message.getTopic());
+        FusedContact c = App.getFusedContact(message.getContactKey());
 
         if (c == null) {
-            c = new FusedContact(message.getTopic());
+            c = new FusedContact(message.getContactKey());
             c.setMessageLocation(message);
             App.addFusedContact(c);
         } else {
@@ -171,11 +171,11 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processMessage(MessageCard message) {
-        Log.v(TAG, "processMessage MessageCard (" + message.getTopic() + ")");
-        FusedContact c = App.getFusedContact(message.getTopic());
+        Log.v(TAG, "processMessage MessageCard (" + message.getContactKey() + ")");
+        FusedContact c = App.getFusedContact(message.getContactKey());
 
         if (c == null) {
-            c = new FusedContact(message.getTopic());
+            c = new FusedContact(message.getContactKey());
             c.setMessageCard(message);
             App.addFusedContact(c);
         } else {
@@ -186,7 +186,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processMessage(MessageCmd message) {
-        Log.v(TAG, "processMessage MessageCmd (" + message.getTopic() + ")");
+        Log.v(TAG, "processMessage MessageCmd (" + message.getContactKey() + ")");
         if(!Preferences.getRemoteCommand()) {
             Log.e(TAG, "remote commands are disabled");
             return;
@@ -211,12 +211,12 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processMessage(MessageTransition message) {
-        Log.v(TAG, "processMessage MessageTransition (" + message.getTopic() + ")");
+        Log.v(TAG, "processMessage MessageTransition (" + message.getContactKey() + ")");
         ServiceProxy.getServiceNotification().processMessage(message);
     }
 
     public void processMessage(MessageConfiguration message) {
-        Log.v(TAG, "processMessage MessageConfiguration (" + message.getTopic()+")");
+        Log.v(TAG, "processMessage MessageConfiguration (" + message.getContactKey()+")");
         if(!Preferences.getRemoteConfiguration())
             return;
 

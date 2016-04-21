@@ -82,9 +82,13 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private FloatingActionButton fab;
 
 
+    private boolean onCreate = false;
+    private boolean onNewIntent = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.onCreate = true;
         this.markers = new HashMap<>();
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_map);
         this.mapView = binding.mapView;
@@ -155,15 +159,21 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         super.onResume();
         Log.v(TAG, "onResume");
         this.mapView.onResume();
-        onAddInitialMarkers();
 
-        de.greenrobot.event.EventBus.getDefault().registerSticky(this);
+
+        redrawMap();
+        if(intentExtras != null) {
+            onHandleIntentExtras();
+            intentExtras = null;
+        }
+
+        de.greenrobot.event.EventBus.getDefault().register(this);
 
     }
 
     private void redrawMap() {
-        //clearMap();
-        //onAddInitialMarkers();
+        clearMap();
+        onAddInitialMarkers();
     }
 
 
@@ -179,14 +189,12 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onStop() {
-
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
         this.mapView.onDestroy();
-
         super.onDestroy();
     }
 
@@ -292,15 +300,15 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation() || map == null)
             return;
-        Log.v(TAG, "updateContactMarker: " + c.getTopic() + " hasLocation: " + c.hasLocation());
+        Log.v(TAG, "updateContactMarker: " + c.getId() + " hasLocation: " + c.hasLocation());
 
-        Marker m = markers.get(c.getTopic());
+        Marker m = markers.get(c.getId());
 
         if (m != null) {
             m.setPosition(c.getLatLng());
         } else {
-            m = map.addMarker(new MarkerOptions().snippet(c.getTopic()).position(c.getLatLng()).anchor(0.5f, 0.5f).visible(false));
-            markers.put(c.getTopic(), m);
+            m = map.addMarker(new MarkerOptions().snippet(c.getId()).position(c.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            markers.put(c.getId(), m);
         }
 
         ContactImageProvider.setMarkerAsync(m, c);
@@ -347,8 +355,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         this.intentExtras = intent.getExtras();
-        if(map != null)
-            onHandleIntentExtras();
 
     }
 

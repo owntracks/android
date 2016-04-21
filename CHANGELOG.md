@@ -1,5 +1,20 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 0.7.1
+>Release date: 2016-05-18 for alpha testers
+* [NEW] Last published location in notification is now supported in HTTP mode
+* [FIX] Config export and import not working in HTTP mode
+* [FIX] State not set correctly in HTTP mode
+* [FIX] Crash due to race condition between clearing map and adding markers
+
+## OwnTracks 0.7.0
+>Release date: 2016-05-15 for alpha testers
+* [NEW] Early support for HTTP mode
+* [FIX] #355 - Crash when clicking friend without location
+* [FIX] #353 - WakeLock under-locked org.owntracks.android.wakelock.broker.ping
+* [FIX] Several other possible crashes
+
+
 ## OwnTracks 0.6.15
 >Release date: 2016-04-07
 * [FIX] #355 - Crash when picking a friend without a location

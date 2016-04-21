@@ -1,6 +1,8 @@
 package org.owntracks.android.services;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Base64;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +29,9 @@ import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,9 +65,27 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "loaded HTTP backend");
         this.context = c;
-        this.endpointUrl = getEndpointUrl();
 
         initPausedPubPool();
+        Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
+            @Override
+            public void onAttachAfterModeChanged() {
+
+            }
+
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if(Preferences.Keys.URL.equals(key))
+                    loadEndpointUrl();
+            }
+        });
+
+        loadEndpointUrl();
+    }
+
+    private void loadEndpointUrl() {
+        Log.v(TAG, "loadEndpointUrl()");
+        this.endpointUrl = getEndpointUrl();
 
     }
 
@@ -134,7 +156,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         this.pubPool = new PausableThreadPoolExecutor(1,1,1, TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         this.pubPool.setRejectedExecutionHandler(this);
         Log.v(TAG, "Executor created new executor instance: " + pubPool);
-        pubPool.resume(); // pause until client is setup and connected
+        pubPool.resume();
     }
 
 
@@ -148,7 +170,8 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     private void postMessage(MessageBase message) {
         Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
         try {
-            postMessage(Parser.serializeSync(message).getBytes());
+            if(postMessage(Parser.serializeSync(message).getBytes()))
+                messageSender.onMessageDelivered(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,10 +184,19 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         urlConnection.setRequestProperty( "Content-Length", Integer.toString( messageLenght ));
         urlConnection.setFixedLengthStreamingMode(messageLenght);
         urlConnection.setUseCaches( false );
+
+        if (urlConnection.getURL().getUserInfo() != null) {
+            urlConnection.setRequestProperty("Authorization", "Basic " + android.util.Base64.encodeToString(urlConnection.getURL().getUserInfo().getBytes(), Base64.NO_WRAP));
+        }
         return urlConnection;
     }
 
-    private void postMessage(byte[] message) {
+    private boolean postMessage(byte[] message) {
+        boolean r = false;
+        if(endpointUrl == null) {
+            changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
+            return r;
+        }
 
         HttpURLConnection urlConnection = null;
         try {
@@ -174,6 +206,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             setUrlConnectionProperties(urlConnection, message.length);
             boolean redirect = false;
             urlConnection.getOutputStream().write(message);
+
 
             // normally, 3xx is redirect
             int status = urlConnection.getResponseCode();
@@ -195,15 +228,29 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
                 setUrlConnectionProperties(urlConnection, message.length);
                 urlConnection.getOutputStream().write(message);
                 status = urlConnection.getResponseCode();
-                Log.e(TAG,"redirect: statusCode - " + status + " newUrl:"+newUrl);
-                Log.e(TAG,"statusCode for new session - " + status);
+                Log.d(TAG,"redirect: statusCode - " + status + " newUrl:"+newUrl);
+                Log.d(TAG,"statusCode for new session - " + status);
 
             }
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
+            InputStream is;
 
+            if (200 <= urlConnection.getResponseCode() && urlConnection.getResponseCode() <= 299) {
+                is = urlConnection.getInputStream();
+            } else {
+                is = urlConnection.getErrorStream();
+            }
+
+           // Log.v(TAG, "response: " + readFullyAsString(is));
             try {
-                MessageBase result = Parser.deserializeSync(urlConnection.getInputStream());
-                Log.v(TAG, "Response body: " + result);
+                MessageBase[] result = Parser.deserializeSyncArray(is);
+                Log.v(TAG, "deserialized messages: " + result.length);
+                for (MessageBase aResult : result) {
+                    Log.v(TAG, "deserialized message: " + message);
+                    messageReceiver.onMessageReceived(aResult);
+                }
+
 
             }catch (IOException e) {
                 Log.e(TAG, "result message could not be serialized");
@@ -211,23 +258,20 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             }
 
 
-
-            //TODO: parse returned message
-            //InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            //return new JSONObject(getResponseText(in));
-
+            r = true;
         } catch (SocketTimeoutException e) {
             //TODO: queue message
+            r= false;
         } catch (Exception e) {
             e.printStackTrace();
+            r= false;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
         }
+        return r;
     }
-
-
 
     @Override
     public void processMessage(MessageBase message) {
@@ -297,6 +341,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     public URL getEndpointUrl() {
         try {
             Log.v(TAG, "getEndpointUrl() - " +Preferences.getUrl() );
+            changeState(EndpointState.IDLE, null);
             return new URL(Preferences.getUrl());
         } catch (MalformedURLException e) {
             changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);

@@ -21,7 +21,7 @@ public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
 
-    private final String topic;
+    private final String id;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
 
@@ -38,10 +38,9 @@ public class FusedContact extends BaseObservable {
     }
 
 
-    public FusedContact(String topic) {
-        Log.v("FusedContact", "new contact allocated for topic: " + topic);
-        this.topic = topic;
-
+    public FusedContact(String id) {
+        Log.v("FusedContact", "new contact allocated for id: " + id);
+        this.id = id;
     }
 
 
@@ -53,14 +52,14 @@ public class FusedContact extends BaseObservable {
 
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
-        ContactImageProvider.invalidateCacheLevelCard(getTopic());
+        ContactImageProvider.invalidateCacheLevelCard(getId());
         notifyMessageCardPropertyChanged();
     }
 
     public void notifyMessageCardPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.imageProviderLevel);
-        this.notifyPropertyChanged(BR.topic);
+        this.notifyPropertyChanged(BR.id);
 
     }
 
@@ -72,7 +71,7 @@ public class FusedContact extends BaseObservable {
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
 
         this.notifyPropertyChanged(BR.trackerId);
-        this.notifyPropertyChanged(BR.topic);
+        this.notifyPropertyChanged(BR.id);
 
     }
 
@@ -94,7 +93,7 @@ public class FusedContact extends BaseObservable {
         if(hasLocation() && messageLocation.getTid() != null)
             return "Device-"+messageLocation.getTid();
 
-        return this.topic;
+        return this.id;
     }
 
     @BindingAdapter({"imageProviderLevel", "contact"})
@@ -129,12 +128,12 @@ public class FusedContact extends BaseObservable {
 
     @Bindable
     public String getTrackerId() {
-        return hasLocation() ? this.messageLocation.getTid() : getTopic().substring(getTopic().length()-2).replace("/","");
+        return hasLocation() ? this.messageLocation.getTid() : getId().substring(getId().length()-2).replace("/","");
     }
 
     @Bindable
-    public String getTopic() {
-        return topic;
+    public String getId() {
+        return id;
     }
 
     private static float convertDpToPixel(float dp) {
@@ -144,4 +143,7 @@ public class FusedContact extends BaseObservable {
     public LatLng getLatLng() {
         return new LatLng(this.messageLocation.getLatitude(), this.messageLocation.getLongitude());
     }
+
+
+
 }
