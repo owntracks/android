@@ -21,6 +21,21 @@ public class Parser {
         mapper = new ObjectMapper();
 
     }
+    public static String serializeSync(@NonNull MessageBase message) throws IOException, EncryptionException {
+        return pipelineEncrypt(pipelineSerialize(message));
+    }
+
+    public static MessageBase deserializeSync(@NonNull byte[] input) throws IOException, EncryptionException {
+        return pipelineDecrypt(pipelineDeserialize(input));
+    }
+
+    //
+    public static MessageBase[] deserializeSyncArray(@NonNull InputStream input ) throws IOException {
+        return pipelineDeserializeArray(input);
+    }
+
+
+
 
 
 
@@ -33,19 +48,18 @@ public class Parser {
         return m;
     }
 
-    private static MessageBase pipelineDeserialize(InputStream input) throws IOException, EncryptionException {
+    private static MessageBase pipelineDeserialize(InputStream input) throws IOException {
         return mapper.readValue(input, MessageBase.class);
     }
-    private static MessageBase pipelineDeserialize(@NonNull byte[] input) throws IOException, EncryptionException {
+    private static MessageBase pipelineDeserialize(@NonNull byte[] input) throws IOException {
         return mapper.readValue(input, MessageBase.class);
     }
 
-    public static MessageBase deserializeSync(@NonNull InputStream input ) throws IOException, EncryptionException {
-        return pipelineDecrypt(pipelineDeserialize(input));
+    private static MessageBase[] pipelineDeserializeArray(@NonNull byte[] input) throws IOException {
+        return mapper.readValue(input, MessageBase[].class);
     }
-
-    public static MessageBase deserializeSync(@NonNull byte[] input) throws IOException, EncryptionException {
-        return pipelineDecrypt(pipelineDeserialize(input));
+    private static MessageBase[] pipelineDeserializeArray(InputStream input) throws IOException {
+        return mapper.readValue(input, MessageBase[].class);
     }
 
     private static String pipelineSerialize(@NonNull MessageBase input) throws IOException, EncryptionException {
@@ -61,9 +75,6 @@ public class Parser {
         return input;
     }
 
-    public static String serializeSync(@NonNull MessageBase message) throws IOException, EncryptionException {
-        return pipelineEncrypt(pipelineSerialize(message));
-    }
 
     public static class EncryptionException extends Exception {
         public EncryptionException(String s) {

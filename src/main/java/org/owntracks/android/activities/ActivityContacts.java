@@ -1,7 +1,6 @@
 package org.owntracks.android.activities;
 
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -9,9 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
@@ -23,15 +19,10 @@ import org.owntracks.android.R;
 
 import org.owntracks.android.databinding.ActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.services.ServiceNotification;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.DrawerProvider;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.RecyclerViewAdapter;
 import org.owntracks.android.support.Toasts;
 
-import de.greenrobot.event.EventBus;
 import me.tatarka.bindingcollectionadapter.BindingRecyclerViewAdapter;
 import me.tatarka.bindingcollectionadapter.ItemViewArg;
 import me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory;
@@ -100,7 +91,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
 
         b.putInt(ActivityMap.INTENT_KEY_ACTION, ActivityMap.ACTION_FOLLOW_CONTACT);
-        b.putString(ActivityMap.INTENT_KEY_TOPIC, ((FusedContact) viewModel).getTopic());
+        b.putString(ActivityMap.INTENT_KEY_TOPIC, ((FusedContact) viewModel).getId());
         Log.v(TAG, "onClick. ActivityMap.INTENT_KEY_ACTION: " + ActivityMap.ACTION_FOLLOW_CONTACT);
         Log.v(TAG, "onClick. ActivityMap.INTENT_KEY_TOPIC: " + b.getString(ActivityMap.INTENT_KEY_TOPIC));
 

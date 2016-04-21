@@ -43,7 +43,7 @@
                     android:paddingBottom="4dp" />
 
                 <TextView
-                    android:id="@+id/topic"
+                    android:id="@+id/id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/na"

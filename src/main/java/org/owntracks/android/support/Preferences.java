@@ -165,7 +165,7 @@ public class Preferences {
 
 
 
-    //public static String getKey(int resId) {
+    //public static String getContactKey(int resId) {
     //    return App.getContext().getString(resId);
     //}
 
@@ -276,7 +276,7 @@ public class Preferences {
         activeSharedPreferences.edit().remove(key).commit();
     }
 
-    @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true)
+    @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
     public static int getModeId() { return modeId; }
 
 
@@ -309,7 +309,7 @@ public class Preferences {
 
         if(m.containsKey(Keys.MODE_ID)) {
             setMode((Integer) m.get(Keys.MODE_ID));
-            methods.remove(Keys.MODE_ID);
+            m.removeKey(Keys.MODE_ID);
         }
         // Don't show setup if a config has been imported
         setSetupCompleted();
@@ -331,66 +331,6 @@ public class Preferences {
         if(m.hasWaypoints()) {
             importWaypointsFromJson(m.getWaypoints());
         }
-
-
-
-
-/*
-
-
-
-
-
-        Log.v(TAG, "importFromMessage: " +  json.toString());
-
-        try { setMode(json.getInt(getStringRessource(R.string.keyModeId))); } catch (JSONException e) {}
-        try { setDeviceId(json.getString(getStringRessource(R.string.keyDeviceId))); } catch (JSONException e) {}
-        try { setClientId(json.getString(getStringRessource(R.string.keyClientId))); } catch (JSONException e) {}
-        try { setHost(json.getString(getStringRessource(R.string.keyHost))); } catch (JSONException e) {}
-        try { setPort(json.getInt(getStringRessource(R.string.keyPort))); } catch (JSONException e) {}
-        try { setPassword(json.getString(getStringRessource(R.string.keyPassword))); } catch (JSONException e) {}
-        try { setUsername(json.getString(getStringRessource(R.string.keyUsername))); } catch (JSONException e) {}
-        try { setPubQos(json.getInt(getStringRessource(R.string.keyPubQos))); } catch (JSONException e) {}
-        try { setKeepalive(json.getInt(getStringRessource(R.string.keyKeepalive))); } catch (JSONException e) {}
-        try { setPubRetain(json.getBoolean(getStringRessource(R.string.keyPubRetain))); } catch (JSONException e) {}
-        try { setTls(json.getBoolean(getStringRessource(R.string.keyTls))); } catch (JSONException e) {}
-        try { setTlsCaCrt(json.getString(getStringRessource(R.string.keyTlsCaCrt))); } catch (JSONException e) {}
-        try { setTlsClientCrt(json.getString(getStringRessource(R.string.keyTlsClientCrt))); } catch (JSONException e) {}
-        try { setTlsClientCrtPassword(json.getString(getStringRessource(R.string.keyTlsClientCrtPassword))); } catch (JSONException e) {}
-
-        try { setLocatorDisplacement(json.getInt(getStringRessource(R.string.keyLocatorDisplacement))); } catch (JSONException e) {}
-        try { setLocatorInterval(json.getInt(getStringRessource(R.string.keyLocatorInterval))); } catch (JSONException e) {}
-        try { setAuth(json.getBoolean(getStringRessource(R.string.keyAuth))); } catch (JSONException e) {}
-        try { setPubLocationExtendedData(json.getBoolean(getStringRessource(R.string.keyPubIncludeBattery))); } catch (JSONException e) {}
-        try { setPub(json.getBoolean(getStringRessource(R.string.keyPub))); } catch (JSONException e) {}
-        try { setDeviceTopicBase(json.getString(getStringRessource(R.string.keyPubTopicBase))); } catch (JSONException e) {}
-        try { setNotification(json.getBoolean(getStringRessource(R.string.keyNotification))); } catch (JSONException e) {}
-        try { setNotificationLocation(json.getBoolean(getStringRessource(R.string.keyNotificationLocation))); } catch (JSONException e) {}
-        try { setNotificationEvents(json.getBoolean(getStringRessource(R.string.keyNotificationEvents))); } catch (JSONException e) {}
-
-        try { setSubTopic(json.getString(getStringRessource(R.string.keySubTopic))); } catch (JSONException e) {}
-        try { setAutostartOnBoot(json.getBoolean(getStringRessource(R.string.keyAutostartOnBoot))); } catch (JSONException e) {}
-        try { setLocatorAccuracyBackground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyBackground))); } catch (JSONException e) {}
-        try { setLocatorAccuracyForeground(json.getInt(getStringRessource(R.string.keyLocatorAccuracyForeground))); } catch (JSONException e) {}
-        try { setRemoteCommandReportLocation(json.getBoolean(getStringRessource(R.string.keyRemoteCommandReportLocation))); } catch (JSONException e) {}
-        try { setRemoteConfiguration(json.getBoolean(getStringRessource(R.string.keyRemoteConfiguration))); } catch (JSONException e) {}
-        try { setCleanSession(json.getBoolean(getStringRessource(R.string.keyCleanSession))); } catch (JSONException e) {}
-        try { setTrackerId(json.getString(getStringRessource(R.string.keyTrackerId))); } catch (JSONException e) {}   // TO BE TESTED
-        try { setBeaconBackgroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconBackgroundScanPeriod))); } catch (JSONException e) {}
-        try { setBeaconForegroundScanPeriod(json.getInt(getStringRessource(R.string.keyBeaconForegroundScanPeriod))); } catch (JSONException e) {}
-        try { setInfo(json.getBoolean(getStringRessource(R.string.keyInfo))); } catch (JSONException e) {}
-
-        try {
-            JSONArray j = json.getJSONArray("waypoints");
-            if (j != null) {
-                //importWaypointsFromJson(j);
-            } else {
-                Log.v(TAG, "no valid waypoints");
-            }
-        } catch(JSONException e){
-            Log.v(TAG, "waypoints invalid with exception: " + e);
-
-        }*/
     }
 
     public static MessageWaypointCollection waypointsToJSON() {
@@ -431,12 +371,12 @@ public class Preferences {
         }
     }
 
-    @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true)
+    @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getRemoteConfiguration() {
         return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
     }
 
-    @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true)
+    @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getRemoteCommand() {
         return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
@@ -456,18 +396,18 @@ public class Preferences {
         setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
     }
 
-    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true)
+    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getCleanSession() {
         return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
     }
 
 
-    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true)
+    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getPubLocationExtendedData() {
         return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData, R.bool.valPubExtendedData, false);
     }
 
-    @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeMqttPublic =true)
+    @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
     public static int getLocatorDisplacement() {
         return getInt(Keys.LOCATOR_DISPLACEMENT, R.integer.valLocatorDisplacement);
     }
@@ -476,7 +416,7 @@ public class Preferences {
         return TimeUnit.SECONDS.toMillis(getLocatorInterval());
     }
 
-    @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeMqttPublic =true)
+    @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
     public static int getLocatorInterval() {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
@@ -876,37 +816,37 @@ public class Preferences {
     }
 
 
-    @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static boolean getAutostartOnBoot() {
         return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
     }
 
-    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static int getLocatorAccuracyForeground() {
         return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
-    @Export(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true )
     public static int getBeaconBackgroundScanPeriod() {
         return getInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, R.integer.valBeaconBackgroundScanPeriod);
     }
 
-    @Export(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static int getBeaconForegroundScanPeriod() {
         return getInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, R.integer.valBeaconForegroundScanPeriod);
     }
 
-    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static int getLocatorAccuracyBackground() {
         return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
-    @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static String getCustomBeaconLayout() {
         return getString(Keys.BEACON_LAYOUT, R.string.valEmpty);
     }
 
-    @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static int getBeaconMode() {
         return getInt(Keys.BEACON_MODE, R.integer.valBeaconMode);
     }
@@ -918,7 +858,7 @@ public class Preferences {
     }
 
 
-    @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static boolean getBeaconRangingEnabled() {
         return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
     }
@@ -933,7 +873,6 @@ public class Preferences {
         setBoolean(Keys.INFO, info);
     }
 
-    @Export(key =Keys.TLS_CLIENT_CRT_PASSWORD, exportModeMqttPrivate =true)
     public static String getTlsClientCrtPassword() {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
@@ -1124,7 +1063,7 @@ public class Preferences {
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
                     Export annotInstance = method.getAnnotation(Export.class);
-                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic()) {
+                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic() ||getModeId() == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
                         methods.add(method);
                     }
                 }

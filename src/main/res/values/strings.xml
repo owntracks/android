@@ -305,7 +305,7 @@
     <string name="noEndpointConfigured">No endpoint configured</string>
     <string name="connectivityIdle">Idle</string>
     <string name="preferencesUrl">Url</string>
-    <string name="mode_http_public_label">Private HTTP</string>
+    <string name="mode_http_private_label">Private HTTP</string>
 
 
 </resources>

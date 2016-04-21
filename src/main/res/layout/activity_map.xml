@@ -140,10 +140,10 @@
                 style="@style/ListItemSecondary"/>
 
             <TextView
-                android:id="@+id/topic"
+                android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{item.topic ?? @string/na}"
+                android:text="@{item.id ?? @string/na}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"

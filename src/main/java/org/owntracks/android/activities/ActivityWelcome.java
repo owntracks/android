@@ -84,6 +84,15 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         finish();
     }
 
+    private void startActivityPreferences() {
+        App.enableForegroundBackgroundDetection();
+        Intent intent = new Intent(this, ActivityPreferences.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+
     private boolean checkSetup() {
         return Preferences.getSetupCompleted();
     }
@@ -256,10 +265,15 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private void onBtnDoneClick() {
-        if(checkSetup)
+        if(checkSetup) {
             Preferences.setSetupCompleted();
-        startActivityMain();
-
+            if(!Preferences.isModeMqttPublic())
+                startActivityPreferences();
+            else
+                startActivityMain();
+        } else {
+            startActivityMain();
+        }
     }
 
 
@@ -421,6 +435,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
                 Preferences.setMode(App.MODE_ID_MQTT_PRIVATE);
             } else if(checkedId == R.id.radioModeMqttPublic){
                 Preferences.setMode(App.MODE_ID_MQTT_PUBLIC);
+            } else if(checkedId == R.id.radioModeHttpPrivate) {
+                Preferences.setMode(App.MODE_ID_HTTP_PRIVATE);
             }
 
 

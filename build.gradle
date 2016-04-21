@@ -112,7 +112,7 @@ android {
         }
         debug {
             proguardFiles '.proguard-project.txt'
-                    applicationIdSuffix '.debug'
+            applicationIdSuffix '.debug'
             minifyEnabled false
         }
     }
