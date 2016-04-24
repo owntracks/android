@@ -75,6 +75,7 @@
                 app:met_primaryColor="@color/accent"
                 android:id="@+id/latitude"
                 android:inputType="numberDecimal|numberSigned"
+                android:digits="-0123456789."
                 app:met_helperText=""/>
 
 
@@ -90,6 +91,7 @@
                 app:met_primaryColor="@color/accent"
                 android:id="@+id/longitude"
                 android:inputType="numberDecimal|numberSigned"
+                android:digits="-0123456789."
                 app:met_helperText=""/>
 
 
