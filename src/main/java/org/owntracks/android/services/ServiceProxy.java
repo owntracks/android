@@ -86,6 +86,7 @@ public class ServiceProxy extends ServiceBindable {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int r = super.onStartCommand(intent, flags, startId);
 		ProxyableService s = getServiceForIntent(intent);
+		Log.v(TAG, "onStartCommand getServiceForIntent:"+s);
 		if (s != null)
 			s.onStartCommand(intent, flags, startId);
 		return r;
@@ -105,7 +106,7 @@ public class ServiceProxy extends ServiceBindable {
                 p = new ServiceApplication();
                 break;
             case SERVICE_MESSAGE_MQTT:
-                p = new ServiceMessageMqtt();
+                p = new ServiceMessageMqttExperimental();
                 break;
 			case SERVICE_MESSAGE_HTTP:
 				p = new ServiceMessageHttp();

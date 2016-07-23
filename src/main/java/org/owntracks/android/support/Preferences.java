@@ -1029,10 +1029,11 @@ public class Preferences {
         public static final String TLS_CA_CRT                       = "tlsCaCrt";
         public static final String TLS_CLIENT_CRT                   = "tlsClientCrt";
         public static final String TLS_CLIENT_CRT_PASSWORD          = "tlsClientCrtPassword";
-        public static final String TRACKER_ID                       = "trackerId";
+        public static final String TRACKER_ID                       = "tid";
         public static final String USERNAME                         = "username";
         public static final String WS                               = "ws";
         public static final String URL                              = "url";
+
         // Internal keys
         public static final String _DEVICE_UUID                     = "deviceUUID";
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";

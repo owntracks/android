@@ -70,7 +70,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
             endpoint = (ServiceMessageHttp)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
         } else {
             Log.v(TAG, "loading mqtt backend");
-            endpoint = (ServiceMessageMqtt)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
+            endpoint = (ServiceMessageMqttExperimental)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
         }
 
         Log.v(TAG, "endpoint instance: " + endpoint);
@@ -156,7 +156,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     public void processMessage(MessageLocation message) {
         Log.v(TAG, "processMessage MessageLocation (" + message.getContactKey()+")");
 
-        GeocodingProvider.resolve(message);
+        //GeocodingProvider.resolve(message);
         FusedContact c = App.getFusedContact(message.getContactKey());
 
         if (c == null) {

@@ -84,7 +84,17 @@ public class MessageLocation extends MessageBase  {
 
     @JsonIgnore
     public String getGeocoder() {
-        return geocoder != null ? geocoder : (getLatitude() + " : " + getLongitude());
+        return hasGeocoder() ? geocoder : getGeocoderFallback();
+    }
+
+    @JsonIgnore
+    public String getGeocoderFallback() {
+        return (getLatitude() + " : " + getLongitude());
+    }
+
+    @JsonIgnore
+    public boolean hasGeocoder() {
+        return geocoder != null;
     }
 
     @JsonIgnore

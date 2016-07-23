@@ -468,6 +468,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
     private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
+        Log.v(TAG, "handleWaypoint u:" +update + " r:"+remove);
         if(update && remove)
             throw new IllegalArgumentException("update and remove cannot be true at the same time");
 
@@ -489,15 +490,15 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 			return;
 
 		List<Geofence> fences = new ArrayList<>();
-
 		for (Waypoint w : loadWaypointsForCurrentModeWithValidGeofence()) {
 
+            Log.v(TAG, "requestGeofences - " + w.getDescription());
 			// if id is null, waypoint is not added yet
 			if (w.getGeofenceId() == null) {
 				w.setGeofenceId(UUID.randomUUID().toString());
 				this.waypointDao.update(w);
-			} else {
-				continue;
+                Log.v(TAG, "new fence found without UUID");
+
 			}
 
             Geofence geofence = new Geofence.Builder()

@@ -172,7 +172,11 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         try {
             if(postMessage(Parser.serializeSync(message).getBytes()))
                 messageSender.onMessageDelivered(message);
-        } catch (Exception e) {
+        } catch (SocketTimeoutException e) {
+            pubPool.requeue(message);
+        } catch (Parser.EncryptionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -191,7 +195,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         return urlConnection;
     }
 
-    private boolean postMessage(byte[] message) {
+    private boolean postMessage(byte[] message) throws SocketTimeoutException{
         boolean r = false;
         if(endpointUrl == null) {
             changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
@@ -232,7 +236,6 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
                 Log.d(TAG,"statusCode for new session - " + status);
 
             }
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
             InputStream is;
 
@@ -242,7 +245,6 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
                 is = urlConnection.getErrorStream();
             }
 
-           // Log.v(TAG, "response: " + readFullyAsString(is));
             try {
                 MessageBase[] result = Parser.deserializeSyncArray(is);
                 Log.v(TAG, "deserialized messages: " + result.length);
@@ -259,12 +261,13 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
 
 
             r = true;
-        } catch (SocketTimeoutException e) {
-            //TODO: queue message
-            r= false;
-        } catch (Exception e) {
+
+        } catch (ProtocolException e) {
             e.printStackTrace();
-            r= false;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
