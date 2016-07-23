@@ -40,6 +40,7 @@ import org.owntracks.android.support.Toasts;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
 public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
@@ -260,7 +261,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
     public void addNotificationEvents(MessageTransition message) {
 
-        FusedContact c = App.getFusedContact(message.getTopic());
+        FusedContact c = App.getFusedContact(message.getContactKey());
 
         String name;
         String dateStr = dateFormater.format(new Date());
@@ -277,7 +278,7 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
             name = message.getTid();
 
             if (name == null) {
-                name = message.getTopic();
+                name = message.getContactKey();
             }
         }
 
@@ -300,8 +301,12 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
 
         InboxStyle style  = new InboxStyle();
-        for (Spannable text : this.notificationListEvents)
-            style.addLine(text);
+
+
+        ListIterator<Spannable> iter = this.notificationListEvents.listIterator();
+        while(iter.hasNext()){
+            style.addLine(iter.next());
+        }
 
         String title = context.getString(R.string.events);
         style.setBigContentTitle(title);

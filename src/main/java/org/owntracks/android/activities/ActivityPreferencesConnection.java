@@ -787,6 +787,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         @Override
         protected String doInBackground(Uri... params) {
             try {
+                Log.v(TAG, "CopyTask with URI: " + params[0]);
                 //String path = ContentPathHelper.getPath(App.getContext(), params[0]);
                 String filename = ContentPathHelper.uriToFilename(App.getContext(), params[0]);
                 Log.v(TAG, "filename for save is: " + filename);
@@ -801,7 +802,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 }
                 inputStream.close();
                 outputStream.close();
-                Log.v(TAG, "copied file private storage: " + filename);
+                Log.v(TAG, "copied file to private storage: " + filename);
 
                 return filename;
 

@@ -39,12 +39,14 @@ public class Toasts {
             stringRes = R.string.snackbarConnected;
         //} else if (state == ServiceMessageMqtt.EndpointState.CONNECTING) {
         //    stringRes = R.string.snackbarConnecting;
-        } else if (state == ServiceMessage.EndpointState.DISCONNECTED || state == ServiceMessage.EndpointState.DISCONNECTED_USERDISCONNECT) {
+        } else if (state == ServiceMessage.EndpointState.DISCONNECTED || state == ServiceMessage.EndpointState.DISCONNECTED_USERDISCONNECT ) {
             stringRes = R.string.snackbarDisconnected;
         } else if (state == ServiceMessage.EndpointState.DISCONNECTED_ERROR) {
             stringRes = R.string.snackbarDisconnectedError;
         } else if (state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
             stringRes = R.string.snackbarConfigIncomplete;
+        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_DATADISABLED) {
+            stringRes = R.string.connectivityDisconnectedDataDisabled;
         }
 
         if(stringRes!=0) {

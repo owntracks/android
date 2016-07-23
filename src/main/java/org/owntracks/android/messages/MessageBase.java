@@ -46,6 +46,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         private int direction = DIRECTION_INCOMING;
         private static final int DIRECTION_INCOMING = 1;
         private static final int DIRECTION_OUTGOING = 2;
+        private String tid;
 
         @JsonIgnore
         public boolean getRetained() {
@@ -73,6 +74,15 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         private WeakReference<OutgoingMessageProcessor> _processorOut;
 
         @JsonIgnore
+        public String getContactKey() {
+                if(_mqtt_topic != null)
+                        return _mqtt_topic;
+                if(tid != null)
+                        return tid;
+                return
+                        "unknown";
+        }
+
         public String getTopic() {
                 return _mqtt_topic;
         }
@@ -145,5 +155,14 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonIgnore
         public boolean isOutgoing() {
                 return !isIncoming();
+        }
+
+        // JSON properties
+        public String getTid() {
+                return tid;
+        }
+
+        public void setTid(String tid) {
+                this.tid = tid;
         }
 }

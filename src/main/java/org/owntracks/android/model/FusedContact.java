@@ -5,6 +5,7 @@ import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,38 +13,38 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
+import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.GeocodingProvider;
 
 
 public class FusedContact extends BaseObservable {
     private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
 
-    private final String topic;
+    private final String id;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
 
+    private Integer imageProvider = 0;
+
     @Bindable
-    private
-    Integer imageProviderLevel = IMAGE_PROVIDER_LEVEL_TID;
-    private static final Integer IMAGE_PROVIDER_LEVEL_TID =0;
-
-    public Integer getImageProviderLevel() {
-        return imageProviderLevel;
-    }
-    public void setImageProviderLevel(Integer newLevel) {
-        imageProviderLevel = newLevel;
+    public Integer getImageProvider() {
+        return imageProvider;
     }
 
 
-    public FusedContact(String topic) {
-        Log.v("FusedContact", "new contact allocated for topic: " + topic);
-        this.topic = topic;
-
+    @Bindable
+    public void setImageProvider(Integer imageProvider) {
+        this.imageProvider = imageProvider;
     }
 
+    public FusedContact(String id) {
+        Log.v("FusedContact", "new contact allocated for id: " + id);
+        this.id = id;
+    }
 
     public void setMessageLocation(MessageLocation messageLocation) {
         this.messageLocation = messageLocation;
@@ -53,26 +54,27 @@ public class FusedContact extends BaseObservable {
 
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
-        ContactImageProvider.invalidateCacheLevelCard(getTopic());
+
+        ContactImageProvider.invalidateCacheLevelCard(getId());
         notifyMessageCardPropertyChanged();
     }
 
     public void notifyMessageCardPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
-        this.notifyPropertyChanged(BR.imageProviderLevel);
-        this.notifyPropertyChanged(BR.topic);
+        this.notifyPropertyChanged(BR.imageProvider);
+
+        this.notifyPropertyChanged(BR.id);
 
     }
 
     public void notifyMessageLocationPropertyChanged() {
         Log.v(TAG, "notifyMessageLocationPropertyChanged");
         this.notifyPropertyChanged(BR.fusedName);
-        this.notifyPropertyChanged(BR.fusedLocation);
         this.notifyPropertyChanged(BR.fusedLocationDate);
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
 
         this.notifyPropertyChanged(BR.trackerId);
-        this.notifyPropertyChanged(BR.topic);
+        this.notifyPropertyChanged(BR.id);
 
     }
 
@@ -82,6 +84,7 @@ public class FusedContact extends BaseObservable {
         return messageCard;
     }
 
+    @Bindable
     public MessageLocation getMessageLocation() {
         return messageLocation;
     }
@@ -94,18 +97,22 @@ public class FusedContact extends BaseObservable {
         if(hasLocation() && messageLocation.getTid() != null)
             return "Device-"+messageLocation.getTid();
 
-        return this.topic;
+        return this.id;
     }
 
-    @BindingAdapter({"imageProviderLevel", "contact"})
-    public static void displayFaceInViewAsync(ImageView view, Integer imageProviderLevel, FusedContact c) {
+    @BindingAdapter({"imageProvider", "contact"})
+    public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
         ContactImageProvider.setImageViewAsync(view, c);
 
     }
 
-    @Bindable
-    public String getFusedLocation() {
-        return this.hasLocation() ? this.messageLocation.getGeocoder() : null;
+    @BindingAdapter({"android:text", "messageLocation"})
+    public static void displayFusedLocationInViewAsync(TextView view,  FusedContact c, MessageLocation m) {
+        Log.v(TAG, "displayFusedLocationInViewAsync for contact: " +  m);
+        if(m != null)
+            GeocodingProvider.resolve(m, view);
+        else
+            view.setText(R.string.na);
     }
 
     @Bindable
@@ -129,12 +136,12 @@ public class FusedContact extends BaseObservable {
 
     @Bindable
     public String getTrackerId() {
-        return hasLocation() ? this.messageLocation.getTid() : getTopic().substring(getTopic().length()-2).replace("/","");
+        return hasLocation() ? this.messageLocation.getTid() : getId().substring(getId().length()-2).replace("/","");
     }
 
     @Bindable
-    public String getTopic() {
-        return topic;
+    public String getId() {
+        return id;
     }
 
     private static float convertDpToPixel(float dp) {
@@ -144,4 +151,7 @@ public class FusedContact extends BaseObservable {
     public LatLng getLatLng() {
         return new LatLng(this.messageLocation.getLatitude(), this.messageLocation.getLongitude());
     }
+
+
+
 }
