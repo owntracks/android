@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.owntracks.android"
-    android:versionCode="0701"
-    android:versionName="0.7.01">
+    android:versionCode="0703"
+    android:versionName="0.7.03">
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -167,6 +167,8 @@
         <service
             android:name=".services.ServiceProxy"
             android:enabled="true"
+            android:exported="false" />
+        <service android:name="org.eclipse.paho.android.service.MqttService" android:enabled="true"
             android:exported="false" />
 
         <receiver

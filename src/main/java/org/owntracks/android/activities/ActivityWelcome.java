@@ -622,7 +622,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
                     googleAPI.getErrorDialog(getActivity(), resultCode, RECOVER_PLAY).show();
                     PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
                     try {
-                        p.send();
+                        if(p != null)
+                            p.send();
                     } catch (PendingIntent.CanceledException e) {
                         e.printStackTrace();
                     }

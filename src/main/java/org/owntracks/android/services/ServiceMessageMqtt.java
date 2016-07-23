@@ -272,13 +272,11 @@ boolean firstStart = true;
 
 	@Override
 	public void onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null)
-			return;
+		Log.v(TAG, "onStartCommand intent:"+intent.getAction());
 
-		if(ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT.equals(intent.getAction()) && !isConnected()) {
+		if(ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT.equals(intent.getAction())) {
 			Log.v(TAG,	 "onStartCommand ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT");
-			if(reconnectHandler != null)
-				doStart();
+			doStart();
 
 		} else if(ServiceMessageMqtt.RECEIVER_ACTION_PING.equals(intent.getAction())) {
 			Log.v(TAG,	 "onStartCommand ServiceMessageMqtt.RECEIVER_ACTION_PING");
@@ -288,7 +286,6 @@ boolean firstStart = true;
 			else
 				doStart();
 		}
-        return;
 	}
 
 	private void doStart() {
@@ -318,7 +315,8 @@ boolean firstStart = true;
 
 	void handleStart(boolean force) {
 
-		Log.v(TAG, "handleStart: force == " + force);
+
+		Log.v(TAG, "handleStart: force:" + force);
         if(!Preferences.canConnect()) {
 			changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE);
 			return;
@@ -331,25 +329,31 @@ boolean firstStart = true;
 		}
 
 		if (isConnecting()) {
-			Log.d(TAG, "handleStart: isConnecting == true");
+			Log.d(TAG, "handleStart: isConnecting:true");
 			return;
 		}
 
 		// Check if there is a data connection. If not, try again in some time.
 		if (!isOnline()) {
-			Log.e(TAG, "handleStart: isBackgroundDataEnabled == false");
+			Log.e(TAG, "handleStart: isOnline:false");
 			changeState(EndpointState.DISCONNECTED_DATADISABLED);
-			reconnectHandler.start(); // we will try again to connect after some time
+			unregisterNetConnReceiver(); //ignore further network changes. Reconnect handler will try to connect periodically
+
+			if(pingHandler != null) {
+				pingHandler.stop();
+			}
+			reconnectHandler.schedule(); // we will try again to connect after some time
 			return;
 		}
 
 		if (isDisconnected()) {
-				Log.v(TAG, "handleStart: isOnline() == true");
+				Log.v(TAG, "handleStart: isDisconnected:true");
+				changeState(EndpointState.DISCONNECTED);
 
 				if (connect())
 					onConnect();
-				else
-					reconnectHandler.start();
+				else // connect didn't work
+					reconnectHandler.schedule();
 
 		} else {
 			Log.d(TAG, "handleStart: isDisconnected() == false");
@@ -591,13 +595,8 @@ boolean firstStart = true;
 		}
     }
 
-	private void disconnect(boolean fromUser) {
-		Log.v(TAG, "disconnect. from user: " + fromUser);
-
-		if (isConnecting()) {
-            return;
-        }
-
+	private void unregisterNetConnReceiver()
+	{
 		try {
 			if (this.netConnReceiver != null) {
 				this.context.unregisterReceiver(this.netConnReceiver);
@@ -607,6 +606,16 @@ boolean firstStart = true;
 		} catch (Exception eee) {
 			Log.e(TAG, "Unregistering netConnReceiver failed", eee);
 		}
+	}
+
+	private void disconnect(boolean fromUser) {
+		Log.v(TAG, "disconnect. from user: " + fromUser);
+
+		if (isConnecting()) {
+            return;
+        }
+
+		unregisterNetConnReceiver();
 
 		try {
 			if (isConnected()) {
@@ -632,28 +641,23 @@ boolean firstStart = true;
 	@Override
 	public void connectionLost(Throwable t) {
 		Log.e(TAG, "connectionLost: " + t.toString());
-        t.printStackTrace();
+		t.printStackTrace();
 		pubPool.pause();
 		// we protect against the phone switching off while we're doing this
 		// by requesting a wake lock - we request the minimum possible wake
 		// lock - just enough to keep the CPU running until we've finished
 
 
-
-        if(connectionWakelock == null )
+		if(connectionWakelock == null )
             connectionWakelock = ((PowerManager) this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_CONNECTIONLOST);
 
         if (!connectionWakelock.isHeld())
             connectionWakelock.acquire();
 
 
-        if (!isOnline()) {
-			changeState(EndpointState.DISCONNECTED_DATADISABLED);
-        } else {
-			changeState(EndpointState.DISCONNECTED);
-        }
 
-        reconnectHandler.start();
+		doStart();
+
 
         if(connectionWakelock.isHeld())
             connectionWakelock.release();
@@ -693,7 +697,7 @@ boolean firstStart = true;
         if(netInfo != null && netInfo.isAvailable() && netInfo.isConnected()) {
             return true;
         } else {
-            Log.e(TAG, "isONline == true. activeNetworkInfo: "+ (netInfo != null) +", available=" + (netInfo != null && netInfo.isAvailable()) + ", connected: " + (netInfo != null && netInfo.isConnected()));
+            Log.e(TAG, "isOnline == false. activeNetworkInfo: "+ (netInfo != null) +", available:" + (netInfo != null && netInfo.isAvailable()) + ", connected:" + (netInfo != null && netInfo.isConnected()));
             return false;
         }
 	}
@@ -832,18 +836,32 @@ boolean firstStart = true;
 		@Override
 		public void onReceive(Context ctx, Intent intent) {
 			Log.v(TAG, "onReceive");
-            if(networkWakelock == null )
+			if(networkWakelock == null )
                 networkWakelock = ((PowerManager) ServiceMessageMqtt.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
 
             if (!networkWakelock.isHeld())
                 networkWakelock.acquire();
 
-			//if (isOnline() && !isConnected() && !isConnecting()) {
-			if (!isConnected() && !isConnecting()) {
+			if (!isOnline() || (!isConnected() && !isConnecting())) {
+				Log.v(TAG, "not connnected");
 
-			//Log.v(TAG, "NetworkConnectionIntentReceiver: triggering doStart");
-                doStart();
-            }
+				// mqttClient is a bit slow to notice that there is no connection anymore
+				if (workerThread != null) {
+					workerThread.interrupt();
+				}
+
+				mqttClient = null;
+
+				//MQTT Client will not notice that the connection was lost for some time if the network went away
+				Log.v(TAG, "running doStart");
+				doStart(true);
+
+
+
+
+			} else {
+				Log.v(TAG, "already connected");
+			}
 
             if(networkWakelock.isHeld())
                 networkWakelock.release();
@@ -913,7 +931,7 @@ boolean firstStart = true;
 				wakelock.acquire();
 
 			//DEBUG
-			comms = null;
+			//comms = null;
 
 			if(comms == null) {
 				Log.v(TAG, "comms is null, running doStart()");
@@ -921,6 +939,8 @@ boolean firstStart = true;
 				try {
 					p.send();
 				} catch (PendingIntent.CanceledException e) { } finally {
+					Log.v(TAG, "releaseWakeLock 1");
+
 					releaseWakeLock();
 				}
 				return;
@@ -932,18 +952,19 @@ boolean firstStart = true;
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					Log.d(TAG, "Success. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
+					Log.v(TAG, "releaseWakeLock 2 onSuccess");
+
 					releaseWakeLock();
 				}
 
 				@Override
 				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
 					Log.d(TAG, "Failure. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
+					Log.v(TAG, "releaseWakeLock 3 onFailure");
 
 					releaseWakeLock();
 				}
 			});
-
-			releaseWakeLock();
 
 		}
 
@@ -998,7 +1019,7 @@ boolean firstStart = true;
 
     class ReconnectHandler {
 		private static final String TAG = "ReconnectHandler";
-		private static final int BACKOFF_INTERVAL_MAX = 6; // Will try to reconnect after 1, 2, 4, 8, 16, 32, 64 minutes
+		private static final int BACKOFF_INTERVAL_MAX = 6;
 		private int backoff = 0;
 
 		private final Context context;
@@ -1009,18 +1030,11 @@ boolean firstStart = true;
             this.context = context;
         }
 
-        public void start() {
-            if(hasStarted)
-                return;
 
-            Log.v(TAG, "start");
 
-			schedule();
-            hasStarted = true;
-        }
 
         public void stop() {
-            Log.v(TAG, "stoping reocnnect handler");
+            Log.v(TAG, "stopping reconnect handler");
 			backoff = 0;
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
             alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null));
@@ -1030,10 +1044,11 @@ boolean firstStart = true;
             }
         }
 
-        private void schedule() {
-			Log.v(TAG, "scheduling reconnect handler");
+        public void schedule() {
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(1);
+			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
+			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
+
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
@@ -1044,7 +1059,8 @@ boolean firstStart = true;
 			if(backoff <= BACKOFF_INTERVAL_MAX)
 				backoff++;
 		}
-    }
+
+	}
 
     private static final class CustomMemoryPersistence implements MqttClientPersistence {
         private static Hashtable data;
