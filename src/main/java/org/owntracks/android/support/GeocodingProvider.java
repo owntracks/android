@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.services.ServiceNotification;
@@ -21,14 +22,24 @@ public class GeocodingProvider {
     private static final Double RUN_SECOND = 2d;
 
     public static void resolve(MessageLocation m) {
-        MessageLocationResolverTask.execute(m, RUN_FIRST);
+        //MessageLocationResolverTask.execute(m, RUN_FIRST);
     }
+
+    public static void resolve(MessageLocation m, TextView tv) {
+        if(m.hasGeocoder()) {
+            tv.setText(m.getGeocoder());
+        } else {
+            tv.setText(m.getGeocoderFallback()); // will print lat : lon until Geocoder is available
+            TextViewLocationResolverTask.execute(m, tv, RUN_FIRST);
+        }
+    }
+
 
     public static void resolve(MessageLocation m, ServiceNotification s) {
         NotificationLocationResolverTask.execute(m, s, RUN_FIRST);
     }
 
-    private static class NotificationLocationResolverTask extends MessageLocationResolverTask {
+        private static class NotificationLocationResolverTask extends MessageLocationResolverTask {
 
         private final WeakReference<ServiceNotification> service;
 
@@ -53,6 +64,33 @@ public class GeocodingProvider {
             }
         }
     }
+
+    private static class TextViewLocationResolverTask extends MessageLocationResolverTask {
+
+        private final WeakReference<TextView> textView;
+
+        public static void execute(MessageLocation m, TextView tv, double run) {
+            (new TextViewLocationResolverTask(m, tv)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+        }
+
+
+        public TextViewLocationResolverTask(MessageLocation m, TextView tv) {
+            super(m);
+            this.textView = new WeakReference<>(tv);
+
+        }
+
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            MessageLocation m = this.message.get();
+            TextView s = this.textView.get();
+            if(m!=null && s!=null) {
+                s.setText(result);
+            }
+        }
+    }
+
     private static class MessageLocationResolverTask extends ResolverTask {
         public static void execute(MessageLocation m, double run) {
             (new MessageLocationResolverTask(m)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);

@@ -14,7 +14,6 @@ import com.google.android.gms.maps.model.LatLng;
 public class MessageLocation extends MessageBase  {
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
-    private String tid;
     private String t;
     private int batt;
     private int acc;
@@ -41,15 +40,7 @@ public class MessageLocation extends MessageBase  {
         return 0;
     }
 
-    // JSON properties
-    public String getTid() {
-        return tid;
-    }
 
-    public void setTid(String tid) {
-        this.tid = tid;
-        notifyContactPropertyChanged();
-    }
 
     public String getT() {
         return t;
@@ -93,7 +84,17 @@ public class MessageLocation extends MessageBase  {
 
     @JsonIgnore
     public String getGeocoder() {
-        return geocoder != null ? geocoder : (getLatitude() + " : " + getLongitude());
+        return hasGeocoder() ? geocoder : getGeocoderFallback();
+    }
+
+    @JsonIgnore
+    public String getGeocoderFallback() {
+        return (getLatitude() + " : " + getLongitude());
+    }
+
+    @JsonIgnore
+    public boolean hasGeocoder() {
+        return geocoder != null;
     }
 
     @JsonIgnore
@@ -127,6 +128,11 @@ public class MessageLocation extends MessageBase  {
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processMessage(this);
+    }
+
+    public void setTid(String tid) {
+        super.setTid(tid);
+        notifyContactPropertyChanged();
     }
 
 }

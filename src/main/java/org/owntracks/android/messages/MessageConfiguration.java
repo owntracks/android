@@ -78,6 +78,11 @@ public class MessageConfiguration extends MessageBase{
     }
 
     @JsonIgnore
+    public void removeKey(String key) {
+        map.remove(key);
+    }
+
+    @JsonIgnore
     public boolean hasWaypoints() {
         return waypoints != null && waypoints.size() > 0;
     }

@@ -2,6 +2,7 @@ package org.owntracks.android.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.location.Geofence;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
@@ -51,10 +52,12 @@ public class MessageTransition extends MessageBase{
         this.tid = tid;
     }
 
+    @JsonProperty("t")
     public String getTrigger() {
         return trigger;
     }
 
+    @JsonProperty("t")
     public void setTrigger(String trigger) {
         this.trigger = trigger;
     }

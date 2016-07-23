@@ -13,11 +13,11 @@ buildscript {
 
 repositories {
     mavenCentral()
+    jcenter()
 
     maven { url 'https://repo.eclipse.org/content/repositories/paho-snapshots/' }
-    maven { url 'http://jcenter.bintray.com'}
     maven { url "https://jitpack.io" }
-    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 
     flatDir {
         dirs 'libs'
@@ -34,10 +34,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.android.support:recyclerview-v7:24.1.1'
-
     // Play Services libraries
     compile 'com.google.android.gms:play-services-maps:9.2.1'
     compile 'com.google.android.gms:play-services-location:9.2.1'
+    compile 'com.google.android.gms:play-services-places:9.2.1'
     compile 'com.google.android.gms:play-services-base:9.2.1'
 
 
@@ -45,11 +45,13 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'de.greenrobot:greendao:2.0.0'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.3-SNAPSHOT'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.2'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.0.0'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.0.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-SNAPSHOT'
+    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1-20160623.113843-1'
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
+    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
+    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
@@ -57,18 +59,20 @@ dependencies {
         transitive = true
     }
     compile 'com.mikepenz:materialdrawer:5.0.5@aar'
-    compile 'com.mikepenz:materialize:0.8.2@aar'
-    compile 'com.mikepenz:iconics-core:2.5.1@aar'
-    compile 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
-    compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') {
+    compile 'com.mikepenz:materialize:0.8.8@aar'
+    compile 'com.mikepenz:iconics-core:2.5.11@aar'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
         transitive = true
     }
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.7@aar') {
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') {
         transitive = true
     }
     compile 'com.joanzapata.android:android-iconify:1.0.10'
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+
+    compile "ch.acra:acra:4.8.5"
+
 }
 
 android {
@@ -108,6 +112,7 @@ android {
 
         }
         debug {
+            proguardFiles '.proguard-project.txt'
             applicationIdSuffix '.debug'
             minifyEnabled false
         }

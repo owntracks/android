@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.model.ContactsViewModel;
@@ -28,12 +31,14 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
 
+@ReportsCrashes(formUri = "https://alr.st/acra/acra.php", reportType = HttpSender.Type.JSON)
 public class App extends Application  {
     private static final String TAG = "App";
 
@@ -66,6 +71,9 @@ public class App extends Application  {
         mainHanler = new Handler(getMainLooper());
         fusedContacts = new HashMap<>();
         contactsViewModel =  new ContactsViewModel();
+
+
+        ACRA.init(this);
 
         StatisticsProvider.initialize(this);
         Preferences.initialize(this);
@@ -104,8 +112,8 @@ public class App extends Application  {
 
 
     public static void addFusedContact(final FusedContact c) {
-        Log.v(TAG, "addFusedContact: " + c.getTopic());
-        fusedContacts.put(c.getTopic(), c);
+        Log.v(TAG, "addFusedContact: " + c.getId());
+        fusedContacts.put(c.getId(), c);
 
         postOnMainHandler(new Runnable() {
             @Override
@@ -166,6 +174,10 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
+    public static boolean getDeveloperMode() {
+        return Settings.Secure.getInt(instance.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+    }
+
     @SuppressWarnings("unused")
     public void onEvent(Events.BrokerChanged e) {
         clearFusedContacts();
@@ -224,6 +236,7 @@ public class App extends Application  {
 
             App.runningActivities++;
             currentActivity = activity;
+            Log.v(TAG, "App.runningActivities: " + App.runningActivities);
             if (App.runningActivities == 1) App.onEnterForeground();
         }
 
@@ -231,6 +244,7 @@ public class App extends Application  {
             Log.v(TAG, "onActivityStopped:" + activity);
             App.runningActivities--;
             if(currentActivity == activity)  currentActivity = null;
+            Log.v(TAG, "App.runningActivities: " + App.runningActivities);
             if (App.runningActivities == 0) App.onEnterBackground();
         }
 

@@ -107,7 +107,7 @@ public class ContactImageProvider {
 
 
         if(contact.hasCard()) {
-            d = memoryCache.getLevelCard(contact.getTopic());
+            d = memoryCache.getLevelCard(contact.getId());
             if(d != null) {
                 return d;
             }
@@ -116,17 +116,17 @@ public class ContactImageProvider {
                 byte[] imageAsBytes = Base64.decode(contact.getMessageCard().getFace().getBytes(), Base64.DEFAULT);
                 d = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length), FACE_DIMENSIONS, FACE_DIMENSIONS, true));
                 contact.getMessageCard().setFace(null);
-                memoryCache.putLevelCard(contact.getTopic(), d);
+                memoryCache.putLevelCard(contact.getId(), d);
                 return d;
             }
         }
 
-        d = memoryCache.getLevelTid(contact.getTopic());
+        d = memoryCache.getLevelTid(contact.getId());
         if(d != null) {
             return d;
         }
-        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), ColorGenerator.MATERIAL.getColor(contact.getTopic()), FACE_DIMENSIONS));
-        memoryCache.putLevelTid(contact.getTopic(), d);
+        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), contact.getId()!=null ? ColorGenerator.MATERIAL.getColor(contact.getId()) : ColorGenerator.MATERIAL.getRandomColor(), FACE_DIMENSIONS));
+        memoryCache.putLevelTid(contact.getId(), d);
         return d;
     }
 
