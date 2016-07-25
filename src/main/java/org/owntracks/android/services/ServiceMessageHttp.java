@@ -2,21 +2,22 @@ package org.owntracks.android.services;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
@@ -24,25 +25,16 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
-import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,17 +46,20 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
 
     private static final String TAG = "ServiceMessageHttp";
     private static final String METHOD_POST = "POST";
-    private URL endpointUrl;
+    private String endpointUrl;
     private PausableThreadPoolExecutor pubPool;
     private MessageSender messageSender;
     private MessageReceiver messageReceiver;
     private ServiceProxy context;
     private Exception error;
+    private GcmNetworkManager mGcmNetworkManager;
 
     @Override
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "loaded HTTP backend");
         this.context = c;
+
+        mGcmNetworkManager = GcmNetworkManager.getInstance(context);
 
         initPausedPubPool();
         Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
@@ -194,8 +189,30 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         }
         return urlConnection;
     }
-
+int i = 0;
     private boolean postMessage(byte[] message) throws SocketTimeoutException{
+        Log.v(TAG, "postMessage()");
+        Bundle b = new Bundle();
+        b.putByteArray(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY, message);
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_URL, endpointUrl);
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_USERNAME, endpointUrl);
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_PASSWORD, endpointUrl);
+
+        Task task = new OneoffTask.Builder()
+                .setService(ServiceMessageHttpGcm.class)
+                .setTag("m"+i++)
+                .setExecutionWindow(0L, 30)
+
+                .setRequiredNetwork(Task.NETWORK_STATE_ANY)
+                .setExtras(b)
+                .setUpdateCurrent(false)
+                .setPersisted(false)
+                .setRequiresCharging(false)
+                .build();
+        GcmNetworkManager.getInstance(context).schedule(task);
+
+
+        /*
         boolean r = false;
         if(endpointUrl == null) {
             changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
@@ -273,7 +290,8 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
                 urlConnection.disconnect();
             }
         }
-        return r;
+        return r;*/
+        return true;
     }
 
     @Override
@@ -341,20 +359,9 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     }
 
 
-    public URL getEndpointUrl() {
-        try {
-            Log.v(TAG, "getEndpointUrl() - " +Preferences.getUrl() );
-            changeState(EndpointState.IDLE, null);
-            return new URL(Preferences.getUrl());
-        } catch (MalformedURLException e) {
-            changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
-            e.printStackTrace();
-        }
-        return null;
+    public String getEndpointUrl() {
+        return Preferences.getUrl();
     }
 
-    @Override
-    public void test() {
 
-    }
 }
