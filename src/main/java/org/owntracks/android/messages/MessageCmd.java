@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
@@ -75,12 +74,12 @@ public class MessageCmd extends MessageBase{
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processIncomingMessage(this);
     }
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processOutgoingMessage(this);
     }
 
     @Override

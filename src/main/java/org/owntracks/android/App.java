@@ -37,6 +37,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 @ReportsCrashes(formUri = "https://alr.st/acra/acra.php", reportType = HttpSender.Type.JSON)
 public class App extends Application  {
@@ -65,6 +66,17 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
+
+        if (BuildConfig.DEBUG) {
+
+            Timber.plant(new Timber.DebugTree() {
+                @Override
+                protected String createStackElementTag(StackTraceElement element) {
+                    return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
+
+                }
+            });
+        }
         instance = this;
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
@@ -74,7 +86,6 @@ public class App extends Application  {
 
 
         ACRA.init(this);
-
         StatisticsProvider.initialize(this);
         Preferences.initialize(this);
         Parser.initialize(this);

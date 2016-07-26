@@ -1,19 +1,11 @@
 package org.owntracks.android.messages;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.android.gms.location.Geofence;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.owntracks.android.App;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.Preferences;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -87,12 +79,12 @@ public class MessageWaypoint extends MessageBase{
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processIncomingMessage(this);
     }
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processOutgoingMessage(this);
     }
 
 

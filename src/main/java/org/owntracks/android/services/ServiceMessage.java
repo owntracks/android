@@ -14,7 +14,6 @@ import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
@@ -23,6 +22,7 @@ import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 
+import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +33,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     private static final String TAG = "ServiceMessage";
 
     private static ServiceMessageEndpoint endpoint;
-    private ThreadPoolExecutor pool;
+    private ThreadPoolExecutor incomingMessageProcessorExecutor;
 
     public void reconnect() {
         if(endpoint instanceof StatefulServiceMessageEndpoint)
@@ -54,7 +54,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     @Override
     public void onCreate(ServiceProxy c) {
         Log.v(TAG, "onCreate()");
-        this.pool= new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onModeChanged(Preferences.getModeId());
     }
 
@@ -105,56 +105,85 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
         onModeChanged(Preferences.getModeId());
     }
     // ServiceMessage.MessageSender interface
+
+    HashMap<Long, MessageBase> outgoingQueue = new HashMap<>();
+
     @Override
     public void sendMessage(MessageBase message) {
+        Log.v(TAG, "sendMessage() - endpoint:" + endpoint);
+
         message.setOutgoing();
 
         if(endpoint == null) {
-            Log.e(TAG, "sendMessage called without a endpoint instance");
             return;
         }
 
-        Log.v(TAG, "sendMessage with endpoint " + endpoint);
-        endpoint.sendMessage(message);
-    }
-
-    @Override
-    public void onMessageDelivered(MessageBase message) {
-        Log.v(TAG, "message delivered: " + message + " " + message.isOutgoing());
-
-        if(message instanceof MessageLocation) {
-            de.greenrobot.event.EventBus.getDefault().post(message);
+        if(endpoint.sendMessage(message)) {
+            this.onMessageQueued(message);
         }
     }
 
-    @Override
-    public void onMessageQueued(MessageBase message) {
-        Log.v(TAG, "message delivered: " + message);
 
+
+    @Override
+    public void onMessageDelivered(Long messageId) {
+
+        MessageBase m = outgoingQueue.remove(messageId);
+        if(m == null) {
+            Log.e(TAG, "onMessageDelivered()- messageId:"+messageId + ", error: called for unqueued message");
+        } else {
+            Log.v(TAG, "onMessageDelivered()-  messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+            if(m instanceof MessageLocation) {
+                de.greenrobot.event.EventBus.getDefault().post(m);
+            }
+        }
+        Log.v(TAG, "onMessageDelivered()-  queueKeys:" + outgoingQueue.keySet().toString());
+    }
+
+    private void onMessageQueued(MessageBase m) {
+        outgoingQueue.put(m.getMessageId(), m);
+        Log.v(TAG, "onMessageQueued()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+
+    }
+
+    @Override
+    public void onMessageDeliveryFailed(Long messageId) {
+
+        MessageBase m = outgoingQueue.remove(messageId);
+        if(m == null) {
+            Log.e(TAG, "onMessageDeliveryFailed()- messageId:"+messageId + ", error: called for unqueued message");
+        } else {
+            Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+            if(m.getOutgoingTTL() > 0)  {
+                Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", action: requeued");
+                sendMessage(m);
+            } else {
+                Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", action: discarded due to expired ttl");
+
+            }
+        }
     }
 
     @Override
     public void onMessageReceived(MessageBase message) {
-        Log.v(TAG, "onMessageReceived(): " + message);
         message.setIncomingProcessor(this);
         message.setIncoming();
-        pool.execute(message);
-
+        incomingMessageProcessorExecutor.execute(message);
     }
 
     @Override
-    public void processMessage(MessageBase message) {
-        Log.v(TAG, "processMessage MessageBase (" + message.getContactKey()+")");
+    public void processIncomingMessage(MessageBase message) {
+        Log.v(TAG, "processIncomingMessage MessageBase (" + message.getContactKey()+")");
     }
 
-    public void processMessage(MessageUnknown message) {
-        Log.v(TAG, "processMessage MessageUnknown (" + message.getContactKey()+")");
+    public void processIncomingMessage(MessageUnknown message) {
+        Log.v(TAG, "processIncomingMessage MessageUnknown (" + message.getContactKey()+")");
     }
 
 
     @Override
-    public void processMessage(MessageLocation message) {
-        Log.v(TAG, "processMessage MessageLocation (" + message.getContactKey()+")");
+    public void processIncomingMessage(MessageLocation message) {
+        Log.v(TAG, "processIncomingMessage MessageLocation (" + message.getContactKey()+")");
 
         //GeocodingProvider.resolve(message);
         FusedContact c = App.getFusedContact(message.getContactKey());
@@ -164,14 +193,16 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
             c.setMessageLocation(message);
             App.addFusedContact(c);
         } else {
-            c.setMessageLocation(message);
-            App.updateFusedContact(c);
+
+            //Only update contact with new location if the location message is different from the one that is already set
+            if(c.setMessageLocation(message))
+                App.updateFusedContact(c);
         }
     }
 
     @Override
-    public void processMessage(MessageCard message) {
-        Log.v(TAG, "processMessage MessageCard (" + message.getContactKey() + ")");
+    public void processIncomingMessage(MessageCard message) {
+        Log.v(TAG, "processIncomingMessage MessageCard (" + message.getContactKey() + ")");
         FusedContact c = App.getFusedContact(message.getContactKey());
 
         if (c == null) {
@@ -185,8 +216,8 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     }
 
     @Override
-    public void processMessage(MessageCmd message) {
-        Log.v(TAG, "processMessage MessageCmd (" + message.getContactKey() + ")");
+    public void processIncomingMessage(MessageCmd message) {
+        Log.v(TAG, "processIncomingMessage MessageCmd (" + message.getContactKey() + ")");
         if(!Preferences.getRemoteCommand()) {
             Log.e(TAG, "remote commands are disabled");
             return;
@@ -210,13 +241,13 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     }
 
     @Override
-    public void processMessage(MessageTransition message) {
-        Log.v(TAG, "processMessage MessageTransition (" + message.getContactKey() + ")");
+    public void processIncomingMessage(MessageTransition message) {
+        Log.v(TAG, "processIncomingMessage MessageTransition (" + message.getContactKey() + ")");
         ServiceProxy.getServiceNotification().processMessage(message);
     }
 
-    public void processMessage(MessageConfiguration message) {
-        Log.v(TAG, "processMessage MessageConfiguration (" + message.getContactKey()+")");
+    public void processIncomingMessage(MessageConfiguration message) {
+        Log.v(TAG, "processIncomingMessage MessageConfiguration (" + message.getContactKey()+")");
         if(!Preferences.getRemoteConfiguration())
             return;
 

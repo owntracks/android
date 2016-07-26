@@ -1,15 +1,28 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.tool.util.L;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.util.Base64;
-import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
@@ -20,9 +33,7 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
@@ -33,35 +44,47 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatelessMessageEndpoint {
 
     private static final String TAG = "ServiceMessageHttp";
     private static final String METHOD_POST = "POST";
     private String endpointUrl;
-    private PausableThreadPoolExecutor pubPool;
+    private String endpointUserInfo;
+
+
     private MessageSender messageSender;
     private MessageReceiver messageReceiver;
     private ServiceProxy context;
     private Exception error;
-    private GcmNetworkManager mGcmNetworkManager;
+    private static OkHttpClient mHttpClient = new OkHttpClient();
+    public static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
+    private ThreadPoolExecutor mOutgoingMessageProcessorExecutor;
+    private int i;
+    private PowerManager powerManager;
+    private ConnectivityManager connectivityManager;
 
     @Override
     public void onCreate(ServiceProxy c) {
-        Log.v(TAG, "loaded HTTP backend");
+        Timber.v("loaded HTTP backend");
         this.context = c;
 
-        mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        this.mOutgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
 
-        initPausedPubPool();
+
+        powerManager = PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE));
+        connectivityManager =  ConnectivityManager.class.cast(context.getSystemService(Context.CONNECTIVITY_SERVICE));
+
+
         Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
             @Override
             public void onAttachAfterModeChanged() {
@@ -79,8 +102,24 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     }
 
     private void loadEndpointUrl() {
-        Log.v(TAG, "loadEndpointUrl()");
-        this.endpointUrl = getEndpointUrl();
+        URL endpoint = null;
+        try {
+            endpoint = new URL(Preferences.getUrl());
+            changeState(EndpointState.IDLE, null);
+        } catch (MalformedURLException e) {
+            changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
+            return;
+        }
+
+        this.endpointUserInfo = endpoint.getUserInfo();
+
+        if (this.endpointUserInfo != null && this.endpointUserInfo.length() > 0) {
+            this.endpointUrl = endpoint.toString().replace(endpointUserInfo+"@", "");
+        } else {
+            this.endpointUrl = endpoint.toString();
+        }
+        Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
+
 
     }
 
@@ -142,19 +181,6 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     public void onStartCommand(Intent intent, int flags, int startId) {
 
     }
-    private void initPausedPubPool() {
-        Log.v(TAG, "Executor initPausedPubPool with new paused queue");
-        if(pubPool != null && !pubPool.isShutdown()) {
-            Log.v(TAG, "Executor shutting down existing executor " + pubPool);
-            pubPool.shutdownNow();
-        }
-        this.pubPool = new PausableThreadPoolExecutor(1,1,1, TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        this.pubPool.setRejectedExecutionHandler(this);
-        Log.v(TAG, "Executor created new executor instance: " + pubPool);
-        pubPool.resume();
-    }
-
-
 
     @Override
     public void onEvent(Events.Dummy event) {
@@ -162,170 +188,175 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     }
 
 
+
     private void postMessage(MessageBase message) {
-        Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
+
         try {
-            if(postMessage(Parser.serializeSync(message).getBytes()))
-                messageSender.onMessageDelivered(message);
-        } catch (SocketTimeoutException e) {
-            pubPool.requeue(message);
-        } catch (Parser.EncryptionException e) {
+
+            String wireMessage = Parser.serializeSync(message);
+
+            boolean idleMode =  false;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                idleMode = powerManager.isDeviceIdleMode();
+            }
+
+            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+            boolean networkAvailable = netInfo != null && netInfo.isConnected();
+
+            // If the device is in idle mode (Doze), send the message via GCM Network Manager. The message is automatically send during a maintenance period
+            // If the device is not in idle mode and network is available, send the message directly. If we already tried to send it directly before (TTL == 0), send it via GCM network manager
+            // If the device is not in idle mode but no network is available, send the message via GCM Network Manager.  The message is automatically send when a connection is available.
+
+            if(idleMode) {
+                Timber.v("messageId:%s, strategy:indirect, reason:idle", message.getMessageId());
+                prepareAndPostIndirect(wireMessage, message);
+            } else if (networkAvailable && message.getOutgoingTTL() > 0 && Preferences.getHttpSchedulerAllowDirectStrategy()){
+                Timber.v("messageId:%s, strategy:direct", message.getMessageId());
+                prepareAndPostDirect(wireMessage, message);
+
+            } else {
+                Timber.v("messageId:%s, strategy:indirect, reason:network_fail/ttl_fail", message.getMessageId());
+                prepareAndPostIndirect(wireMessage, message);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
+            messageSender.onMessageDeliveryFailed(message.getMessageId());
+        }
+
+    }
+
+
+    public static int postMessage(String body, String url, @Nullable String userInfo, Context c, Long messageId) {
+        Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
+
+        Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
+
+        if(userInfo != null) {
+            request.header("Authorization", "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
+        }
+
+        try {
+             Response r = mHttpClient.newCall(request.build()).execute();
+
+             //We got a response, treat as delivered successful
+             if(r != null ) {
+                try {
+                    MessageBase[] result = Parser.deserializeSyncArray(r.body().byteStream());
+                    for (MessageBase aResult : result) {
+                        onMessageReceived(aResult);
+                    }
+
+                //Non JSON return value
+                } catch (JsonParseException e) {
+                    Timber.e("error:JsonParseException responseCode:%s", r.code());
+                }
+                return onMessageDelivered(c, messageId);
+            } else {
+                return onMessageDeliveryFailed(c, messageId);
+            }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            return onMessageDeliveryFailed(c, messageId);
         }
     }
 
-    private HttpURLConnection setUrlConnectionProperties(HttpURLConnection urlConnection, int messageLenght) throws ProtocolException {
-        urlConnection.setRequestMethod(METHOD_POST);
-        urlConnection.setRequestProperty( "Content-Type", "application/json");
-        urlConnection.setRequestProperty( "charset", "utf-8");
-        urlConnection.setRequestProperty( "Content-Length", Integer.toString( messageLenght ));
-        urlConnection.setFixedLengthStreamingMode(messageLenght);
-        urlConnection.setUseCaches( false );
-
-        if (urlConnection.getURL().getUserInfo() != null) {
-            urlConnection.setRequestProperty("Authorization", "Basic " + android.util.Base64.encodeToString(urlConnection.getURL().getUserInfo().getBytes(), Base64.NO_WRAP));
+    private static int onMessageDelivered(@NotNull Context c, @Nullable Long messageId) {
+        if(messageId == null || messageId == 0) {
+            Timber.e("messageId:null");
+            return GcmNetworkManager.RESULT_SUCCESS;
         }
-        return urlConnection;
+
+        ServiceProxy.getServiceMessageHttp().messageSender.onMessageDelivered(messageId);
+        return GcmNetworkManager.RESULT_SUCCESS;
     }
-int i = 0;
-    private boolean postMessage(byte[] message) throws SocketTimeoutException{
-        Log.v(TAG, "postMessage()");
+
+    private static int onMessageDeliveryFailed(@NotNull Context c, Long messageId) {
+        if(messageId == null || messageId == 0) {
+            Timber.e("messageId:null");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+
+        //GCM Network Manager will automaticall retry sending if the message
+        if(c instanceof ServiceMessageHttpGcm) {
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        } else {
+            ServiceProxy.getServiceMessageHttp().messageSender.onMessageDeliveryFailed(messageId);
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+    }
+
+
+    private static void onMessageReceived(@NotNull MessageBase message) {
+        ServiceProxy.getServiceMessageHttp().messageReceiver.onMessageReceived(message);
+    }
+
+
+
+
+    private boolean prepareAndPostDirect(String wireMessage, @NotNull MessageBase message) {
+        Timber.v("messageId:%s", message.getMessageId());
+
+        postMessage(wireMessage, this.endpointUrl, this.endpointUserInfo, context, message.getMessageId());
+        return true;
+    }
+
+
+    private boolean prepareAndPostIndirect(String wireMessage, @NotNull MessageBase message) {
+        Timber.v("messageId:%s", message.getMessageId());
         Bundle b = new Bundle();
-        b.putByteArray(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY, message);
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_URL, endpointUrl);
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_USERNAME, endpointUrl);
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_PASSWORD, endpointUrl);
+
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_USERINFO, this.endpointUserInfo);
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_URL, this.endpointUrl);
+        b.putLong(ServiceMessageHttpGcm.BUNDLE_KEY_MESSAGE_ID, message.getMessageId());
+        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY, wireMessage);
 
         Task task = new OneoffTask.Builder()
                 .setService(ServiceMessageHttpGcm.class)
-                .setTag("m"+i++)
-                .setExecutionWindow(0L, 30)
-
-                .setRequiredNetwork(Task.NETWORK_STATE_ANY)
+                .setTag("owntracks_mid_"+message.getMessageId())
+                .setExecutionWindow(0, 5)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setExtras(b)
                 .setUpdateCurrent(false)
                 .setPersisted(false)
                 .setRequiresCharging(false)
                 .build();
         GcmNetworkManager.getInstance(context).schedule(task);
-
-
-        /*
-        boolean r = false;
-        if(endpointUrl == null) {
-            changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
-            return r;
-        }
-
-        HttpURLConnection urlConnection = null;
-        try {
-            // create connection
-            urlConnection = (HttpURLConnection) endpointUrl.openConnection();
-
-            setUrlConnectionProperties(urlConnection, message.length);
-            boolean redirect = false;
-            urlConnection.getOutputStream().write(message);
-
-
-            // normally, 3xx is redirect
-            int status = urlConnection.getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                        || status == HttpURLConnection.HTTP_MOVED_PERM
-                        || status == HttpURLConnection.HTTP_SEE_OTHER)
-                    redirect = true;
-            }
-
-            Log.e(TAG,"HttpURLConnection: statusCode - " + status);
-
-            if (redirect) {
-                // get redirect url from "location" header field
-                String newUrl = urlConnection.getHeaderField("Location");
-
-                // open the new connnection again
-                urlConnection = (HttpURLConnection) new URL(newUrl).openConnection();
-                setUrlConnectionProperties(urlConnection, message.length);
-                urlConnection.getOutputStream().write(message);
-                status = urlConnection.getResponseCode();
-                Log.d(TAG,"redirect: statusCode - " + status + " newUrl:"+newUrl);
-                Log.d(TAG,"statusCode for new session - " + status);
-
-            }
-
-            InputStream is;
-
-            if (200 <= urlConnection.getResponseCode() && urlConnection.getResponseCode() <= 299) {
-                is = urlConnection.getInputStream();
-            } else {
-                is = urlConnection.getErrorStream();
-            }
-
-            try {
-                MessageBase[] result = Parser.deserializeSyncArray(is);
-                Log.v(TAG, "deserialized messages: " + result.length);
-                for (MessageBase aResult : result) {
-                    Log.v(TAG, "deserialized message: " + message);
-                    messageReceiver.onMessageReceived(aResult);
-                }
-
-
-            }catch (IOException e) {
-                Log.e(TAG, "result message could not be serialized");
-                e.printStackTrace();
-            }
-
-
-            r = true;
-
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-        return r;*/
         return true;
     }
 
     @Override
-    public void processMessage(MessageBase message) {
+    public void processOutgoingMessage(MessageBase message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageCmd message) {
+    public void processOutgoingMessage(MessageCmd message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageEvent message) {
+    public void processOutgoingMessage(MessageEvent message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageLocation message) {
+    public void processOutgoingMessage(MessageLocation message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageTransition message) {
+    public void processOutgoingMessage(MessageTransition message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageWaypoint message) {
+    public void processOutgoingMessage(MessageWaypoint message) {
         postMessage(message);
     }
 
     @Override
-    public void processMessage(MessageWaypoints message) {
+    public void processOutgoingMessage(MessageWaypoints message) {
         postMessage(message);
     }
 
@@ -335,16 +366,10 @@ int i = 0;
     }
 
     @Override
-    public void sendMessage(MessageBase message) {
-        Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
-
-
+    public boolean sendMessage(MessageBase message) {
         message.setOutgoingProcessor(this);
-        Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
-        StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
-
-        this.pubPool.queue(message);
-        this.messageSender.onMessageQueued(message);
+        this.mOutgoingMessageProcessorExecutor.execute(message);
+        return true;
     }
 
     private void changeState(Exception e) {
@@ -353,15 +378,10 @@ int i = 0;
     }
 
     private void changeState(EndpointState newState, Exception e) {
-        //Log.d(TAG, "ServiceMessageMqtt state changed to: " + newState);
         state = newState;
         EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
     }
 
-
-    public String getEndpointUrl() {
-        return Preferences.getUrl();
-    }
 
 
 }

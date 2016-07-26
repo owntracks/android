@@ -5,11 +5,8 @@ import android.databinding.Bindable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
-
-import java.lang.ref.WeakReference;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageCard extends MessageBase{
@@ -50,12 +47,12 @@ public class MessageCard extends MessageBase{
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processIncomingMessage(this);
     }
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processOutgoingMessage(this);
     }
 
 }

@@ -426,8 +426,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         if(Preferences.getPubLocationExtendedData())
             message.setBatt(App.getBatteryLevel());
 
-        Log.v(TAG, "handing location message to servicemessage");
-
 		ServiceProxy.getServiceMessage().sendMessage(message);
 
 	}

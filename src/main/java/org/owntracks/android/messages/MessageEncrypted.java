@@ -19,12 +19,12 @@ public class MessageEncrypted extends MessageBase{
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processIncomingMessage(this);
     }
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processMessage(this);
+        handler.processOutgoingMessage(this);
     }
 
     @Override
