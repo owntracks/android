@@ -34,8 +34,25 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         protected static final String TAG = "MessageBase";
         public static final String ACTION_REPORT_LOCATION = "reportLocation";
 
-
+        @JsonIgnore
         private String _mqtt_topic;
+
+        @JsonIgnore
+        public long getMessageId() {
+                return _messageId;
+        }
+
+        @JsonIgnore
+        private Long _messageId = System.currentTimeMillis();
+
+        @JsonIgnore
+        private int _outgoingTTL = 2;
+
+        @JsonIgnore
+        public int getOutgoingTTL() {
+                return _outgoingTTL;
+        }
+
 
         @JsonIgnore
         private int _mqtt_qos;
@@ -94,6 +111,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
 
         @Override
         public void run(){
+
                 // If the message is enqueued to a ThreadPoolExecutor, stopping that executor results in the first queued message runnable being run
                 // We check if the running thread is shutting down and don't submit that messagfe to the message handler
                 if(cancelOnRun)
@@ -101,8 +119,10 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
 
                 if(_processorIn != null && _processorIn.get() !=  null)
                         processIncomingMessage(_processorIn.get());
-                if(_processorOut != null && _processorOut.get() !=  null)
+                if(_processorOut != null && _processorOut.get() !=  null) {
+                        _outgoingTTL --;
                         processOutgoingMessage(_processorOut.get());
+                }
         }
 
         @Override
@@ -145,6 +165,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonIgnore
         public void setOutgoing() {
                 this.direction = DIRECTION_OUTGOING;
+
         }
 
         @JsonIgnore

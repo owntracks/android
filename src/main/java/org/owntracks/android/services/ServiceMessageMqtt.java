@@ -82,12 +82,12 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	private MessageReceiver messageReceiver;
 
 	@Override
-	public void sendMessage(MessageBase message) {
+	public boolean sendMessage(MessageBase message) {
 		Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
 
 		if(state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
 			Log.e(TAG, "dropping outgoing message due to incomplete configuration");
-			return;
+			return false;
 		}
 
 		message.setOutgoingProcessor(this);
@@ -95,7 +95,7 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
 
 		this.pubPool.queue(message);
-		this.messageSender.onMessageQueued(message);
+		return true;
 	}
 
 	@Override
@@ -112,24 +112,24 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 
 
 	@Override
-	public void processMessage(MessageBase message) {
+	public void processOutgoingMessage(MessageBase message) {
 		message.setTopic(Preferences.getPubTopicBase());
 		publishMessage(message);
 	}
 
 	@Override
-	public void processMessage(MessageCmd message) {
+	public void processOutgoingMessage(MessageCmd message) {
 		message.setTopic(Preferences.getPubTopicCommands());
 		publishMessage(message);
 	}
 
 	@Override
-	public void processMessage(MessageEvent message) {
+	public void processOutgoingMessage(MessageEvent message) {
 		publishMessage(message);
 	}
 
 	@Override
-	public void processMessage(MessageLocation message) {
+	public void processOutgoingMessage(MessageLocation message) {
 		message.setTopic(Preferences.getPubTopicLocations());
 		message.setQos(Preferences.getPubQosLocations());
 		message.setRetained(Preferences.getPubRetainLocations());
@@ -138,7 +138,7 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	}
 
 	@Override
-	public void processMessage(MessageTransition message) {
+	public void processOutgoingMessage(MessageTransition message) {
 		message.setTopic(Preferences.getPubTopicEvents());
 		message.setQos(Preferences.getPubQosEvents());
 		message.setRetained(Preferences.getPubRetainEvents());
@@ -147,7 +147,7 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	}
 
 	@Override
-	public void processMessage(MessageWaypoint message) {
+	public void processOutgoingMessage(MessageWaypoint message) {
 		message.setTopic(Preferences.getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
@@ -156,7 +156,7 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	}
 
 	@Override
-	public void processMessage(MessageWaypoints message) {
+	public void processOutgoingMessage(MessageWaypoints message) {
 		message.setTopic(Preferences.getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
@@ -186,19 +186,19 @@ boolean firstStart = true;
 
 			// At this point, delivery is technically not completed. However, if the mqttClient didn't throw any errors, the message likely makes it to the broker
 			// We don't save any references between delivery tokens and messages to singal completion when deliveryComplete is called
-			this.messageSender.onMessageDelivered(message);
+			this.messageSender.onMessageDelivered(message.getMessageId());
 
 			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
 				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
 				this.pubPool.pause();
 			}
 		} catch (MqttException e) {
-			Log.e(TAG, "processMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
+			Log.e(TAG, "processIncomingMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
 			e.printStackTrace();
 		} catch (Parser.EncryptionException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			Log.e(TAG, "processMessage: JsonProcessingException");
+			Log.e(TAG, "processIncomingMessage: JsonProcessingException");
 			e.printStackTrace();
 		}
 
@@ -249,7 +249,7 @@ boolean firstStart = true;
 		m.setTopic("owntracks/binarybucks/e");
 		m.setTid("e");
 
-		ServiceProxy.getServiceParser().processMessage(m);*/
+		ServiceProxy.getServiceParser().processIncomingMessage(m);*/
 	}
 
 	private void initPausedPubPool() {
@@ -1046,7 +1046,7 @@ boolean firstStart = true;
 
         public void schedule() {
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
+			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(30);
 			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
 
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);

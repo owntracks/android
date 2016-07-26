@@ -149,10 +149,6 @@ public class Preferences {
         }
     }
 
-
-
-
-
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -175,10 +171,10 @@ public class Preferences {
 
     public static boolean getBoolean(String key, int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
         if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  publicSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
+            return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
         }
 
-        return privateSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
+        return activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
     }
 
     public static boolean getBooleanRessource(int resId) {
@@ -191,10 +187,10 @@ public class Preferences {
     }
     public static int getInt(String key,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
         if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getIntResource(defIdPublic) :  publicSharedPreferences.getInt(key, getIntResource(defIdPrivate));
+            return forceDefIdPublic ? getIntResource(defIdPublic) :  activeSharedPreferences.getInt(key, getIntResource(defIdPublic));
         }
 
-        return privateSharedPreferences.getInt(key, getIntResource(defIdPrivate));
+        return activeSharedPreferences.getInt(key, getIntResource(defIdPrivate));
     }
     public static int getIntResource(int resId) {
         return App.getContext().getResources().getInteger(resId);
@@ -219,9 +215,7 @@ public class Preferences {
         return getString(key, defId, defId, defId, false, false);
     }
     public static String getString(String key,  int defIdPrivate, int defIdPublic, int defIdHttp, boolean forceDefIdPublic, boolean forceDefIdHttp) {
-        Log.v(TAG, "getString for key " + key + " mode " + isModeHttpPrivate() + " " + httpSharedPreferences.getString(key, ""));
         if (isModeHttpPrivate()) {
-
             return forceDefIdHttp ? getStringRessource(defIdHttp) : getStringWithFallback(httpSharedPreferences, key, defIdHttp);
         }
 
@@ -879,6 +873,20 @@ public class Preferences {
 
 
 
+
+    @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeMqttPrivate =false, exportModeMqttPublic = false, exportModeHttpPrivate =true)
+    public static boolean getHttpSchedulerAllowDirectStrategy() {
+        return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valFalse);
+    }
+
+    @Import(key =Keys.HTTP_SCHEDULER_DIRECT)
+    public static void setHttpSchedulerAllowDirectStrategy(boolean aBoolean) {
+        setBoolean(Keys.HTTP_SCHEDULER_DIRECT, aBoolean, false);
+    }
+
+
+
+
     @Import(key =Keys.URL)
     public static void setUrl(String url) {
         setString(Keys.URL, url);
@@ -896,11 +904,8 @@ public class Preferences {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
 
-
-
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
-    // This has no use yet but may be useful later
     public static void handleFirstStart() {
         if(sharedPreferences.getBoolean(Keys._FIST_START, true)) {
             Log.v(TAG, "Initial application launch");
@@ -1039,6 +1044,10 @@ public class Preferences {
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIST_START                      = "fistStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
+
+
+        // DEBUG AND TESTING
+        public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
     }
 
     @Retention(RetentionPolicy.RUNTIME)

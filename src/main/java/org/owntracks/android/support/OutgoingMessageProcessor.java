@@ -14,13 +14,13 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 
 public interface OutgoingMessageProcessor {
-    void processMessage(MessageBase message);
-    void processMessage(MessageCmd message);
-    void processMessage(MessageEvent message);
-    void processMessage(MessageLocation message);
-    void processMessage(MessageTransition message);
-    void processMessage(MessageWaypoint message);
-    void processMessage(MessageWaypoints message);
+    void processOutgoingMessage(MessageBase message);
+    void processOutgoingMessage(MessageCmd message);
+    void processOutgoingMessage(MessageEvent message);
+    void processOutgoingMessage(MessageLocation message);
+    void processOutgoingMessage(MessageTransition message);
+    void processOutgoingMessage(MessageWaypoint message);
+    void processOutgoingMessage(MessageWaypoints message);
 
 
 }

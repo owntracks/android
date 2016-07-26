@@ -416,7 +416,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
             Log.v(TAG, "PubCallback onSuccess");
-            messageSender.onMessageDelivered((MessageBase) (asyncActionToken.getUserContext()));
+            messageSender.onMessageDelivered(MessageBase.class.cast(asyncActionToken.getUserContext()).getMessageId());
 
         }
 
@@ -429,25 +429,25 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
 
 
     @Override
-    public void processMessage(MessageBase message) {
+    public void processOutgoingMessage(MessageBase message) {
         message.setTopic(Preferences.getPubTopicBase());
         publishMessage(message);
     }
 
     @Override
-    public void processMessage(MessageCmd message) {
+    public void processOutgoingMessage(MessageCmd message) {
         message.setTopic(Preferences.getPubTopicCommands());
         publishMessage(message);
     }
 
     @Override
-    public void processMessage(MessageEvent message) {
+    public void processOutgoingMessage(MessageEvent message) {
         message.setTopic(Preferences.getPubTopicEvents());
         publishMessage(message);
     }
 
     @Override
-    public void processMessage(MessageLocation message) {
+    public void processOutgoingMessage(MessageLocation message) {
         message.setTopic(Preferences.getPubTopicLocations());
         message.setQos(Preferences.getPubQosLocations());
         message.setRetained(Preferences.getPubRetainLocations());
@@ -456,19 +456,19 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
     }
 
     @Override
-    public void processMessage(MessageTransition message) {
+    public void processOutgoingMessage(MessageTransition message) {
         message.setTopic(Preferences.getPubTopicEvents());
         publishMessage(message);
     }
 
     @Override
-    public void processMessage(MessageWaypoint message) {
+    public void processOutgoingMessage(MessageWaypoint message) {
         message.setTopic(Preferences.getPubTopicWaypoints());
         publishMessage(message);
     }
 
     @Override
-    public void processMessage(MessageWaypoints message) {
+    public void processOutgoingMessage(MessageWaypoints message) {
         message.setTopic(Preferences.getPubTopicWaypoints());
         publishMessage(message);
     }
@@ -495,7 +495,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
 
 
     @Override
-    public void sendMessage(MessageBase message) {
+    public boolean sendMessage(MessageBase message) {
         Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
 
 
@@ -504,7 +504,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
         StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
 
         this.pubPool.queue(message);
-        this.messageSender.onMessageQueued(message);
+        return true;
     }
 
     private String getBaseTopic(MessageBase message, String topic){

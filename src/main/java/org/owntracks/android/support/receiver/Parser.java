@@ -35,7 +35,9 @@ public class Parser {
     }
 
 
-
+    public static MessageBase[] deserializeSyncArray(@NonNull byte[] input) throws IOException {
+        return pipelineDeserializeArray(input);
+    }
 
 
 

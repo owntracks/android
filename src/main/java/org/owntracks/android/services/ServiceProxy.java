@@ -246,7 +246,7 @@ public class ServiceProxy extends ServiceBindable {
 	}
 
 	public static void runOrBind(Context context, Runnable runnable) {
-		if ((instance != null) && (getServiceConnection() != null)) {
+		if (((instance != null) && (getServiceConnection() != null)) || context instanceof ServiceProxy) {
 
             runnable.run();
 			return;

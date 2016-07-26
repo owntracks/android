@@ -300,7 +300,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation() || map == null)
             return;
-        Log.v(TAG, "updateContactMarker: " + c.getId() + " hasLocation: " + c.hasLocation());
 
         Marker m = markers.get(c.getId());
 

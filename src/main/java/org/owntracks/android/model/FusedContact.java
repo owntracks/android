@@ -42,14 +42,20 @@ public class FusedContact extends BaseObservable {
     }
 
     public FusedContact(String id) {
-        Log.v("FusedContact", "new contact allocated for id: " + id);
+        Log.v(TAG, "new contact allocated for id: " + id);
         this.id = id;
     }
 
-    public void setMessageLocation(MessageLocation messageLocation) {
+    public boolean setMessageLocation(MessageLocation messageLocation) {
+        if(this.messageLocation != null && this.messageLocation.getTst() == messageLocation.getTst())
+            return false;
+
+
+
         this.messageLocation = messageLocation;
         this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
         notifyMessageLocationPropertyChanged();
+        return true;
     }
 
     public void setMessageCard(MessageCard messageCard) {
@@ -68,7 +74,6 @@ public class FusedContact extends BaseObservable {
     }
 
     public void notifyMessageLocationPropertyChanged() {
-        Log.v(TAG, "notifyMessageLocationPropertyChanged");
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.fusedLocationDate);
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
@@ -108,7 +113,6 @@ public class FusedContact extends BaseObservable {
 
     @BindingAdapter({"android:text", "messageLocation"})
     public static void displayFusedLocationInViewAsync(TextView view,  FusedContact c, MessageLocation m) {
-        Log.v(TAG, "displayFusedLocationInViewAsync for contact: " +  m);
         if(m != null)
             GeocodingProvider.resolve(m, view);
         else

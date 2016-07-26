@@ -15,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -65,7 +64,6 @@ public class ContactImageProvider {
         WeakReference<Marker> target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
-            Log.v(TAG, "setting new weak reference for: " + marker);
             target = new WeakReference<Marker>(marker);
         }
 
@@ -76,7 +74,6 @@ public class ContactImageProvider {
 
         @Override
         protected void onPostExecute(BitmapDescriptor result) {
-            Log.v(TAG, "ContactDrawableWorkerTaskForMarker onPostExecute() for marker: " + target);
 
             Marker marker = target.get();
             if(marker != null) {
@@ -88,7 +85,6 @@ public class ContactImageProvider {
 
 
     public static void setMarkerAsync(Marker marker, FusedContact contact) {
-        Log.v(TAG, "setMarkerAsync() for " + contact + " and marker " + marker);
         (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
@@ -177,7 +173,6 @@ public class ContactImageProvider {
     }
 
     public static void invalidateCache() {
-        Log.v(TAG, "invalidateCache()");
         memoryCache.clear();
     }
     private static Bitmap getRoundedShape(Bitmap bitmap) {
