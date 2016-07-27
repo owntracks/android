@@ -19,8 +19,16 @@ public class StatisticsProvider  {
     public static final String SERVICE_LOCATOR_PLAY_CONNECTED = "SERVICE_LOCATOR_PLAY_CONNECTED";
     public static final String SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE = "SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE";
     public static final String SERVICE_BROKER_QUEUE_LENGTH = "SERVICE_BROKER_QUEUE_LENGTH";
+    public static final String BACKEND_LAST_MESSAGE = "BACKEND_LAST_MESSAGE";
+    public static final String BACKEND_LAST_MESSAGE_TST = "BACKEND_LAST_MESSAGE_TST";
 
     private static InternalProviderInterface provider = new Provider();
+    public static void setString(String key, String value) {
+        provider.setString(key, value);
+    }
+    public static String getString(String key) {
+        return provider.getString(key);
+    }
 
 
     public static void setInt(String key, int value) {
@@ -48,7 +56,8 @@ public class StatisticsProvider  {
         Integer getInt(String key);
         void setTime(String key);
         Date getTime(String key);
-
+        void setString(String key, String value);
+        String getString(String key);
     }
 
     public static class Provider implements InternalProviderInterface {
@@ -62,7 +71,14 @@ public class StatisticsProvider  {
         public Integer getInt(String key) {
             return counter.containsKey(key) ? (Integer) counter.get(key) : 0;
         }
+        public void setString(String key, String value) {
+            counter.put(key, value);
+        }
 
+        @NonNull
+        public String getString(String key) {
+            return counter.containsKey(key) ? (String) counter.get(key) : "";
+        }
         public void setTime(String key) {
             counter.put(key, new Date());
         }

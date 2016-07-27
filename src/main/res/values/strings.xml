@@ -306,6 +306,7 @@
     <string name="connectivityIdle">Idle</string>
     <string name="preferencesUrl">Url</string>
     <string name="mode_http_private_label">Private HTTP (beta)</string>
+    <string name="messageQueued">message queued</string>
 
 
 </resources>

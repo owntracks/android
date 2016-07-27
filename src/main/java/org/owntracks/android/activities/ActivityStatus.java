@@ -37,6 +37,10 @@ public class ActivityStatus extends ActivityBase {
     private void set() {
         ((TextView)findViewById(R.id.permissionLocation)).setText( (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) ? "granted" : "denied");
         ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.APP_START)));
+        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.APP_START)));
+        ((TextView)findViewById(R.id.backendStatus)).setText(String.format("%s %s", App.formatDate(StatisticsProvider.getTime(StatisticsProvider.BACKEND_LAST_MESSAGE_TST)), StatisticsProvider.getString(StatisticsProvider.BACKEND_LAST_MESSAGE)));
+
+
         ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE)));
         ((TextView)findViewById(R.id.serviceBrokerQueueLength)).setText(Integer.toString(StatisticsProvider.getInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH)));
 
