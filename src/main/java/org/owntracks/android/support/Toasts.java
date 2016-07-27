@@ -62,4 +62,8 @@ public class Toasts {
     public static void showContactLocationNotAvailable() {
         Toast.makeText(App.getContext(), App.getContext().getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
     }
+
+    public static void showMessageQueued() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.messageQueued), Toast.LENGTH_SHORT).show();
+    }
 }

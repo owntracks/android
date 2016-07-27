@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -740,7 +741,7 @@ boolean firstStart = true;
 	}
 
 	@Override
-	public String getStateAsString() {
+	public String getConnectionState() {
         int id;
         switch (getState()) {
             case CONNECTED:
@@ -772,10 +773,7 @@ boolean firstStart = true;
     }
 
 
-
-
-
-    public Exception getError() {
+	public Exception getError() {
         return error;
     }
 

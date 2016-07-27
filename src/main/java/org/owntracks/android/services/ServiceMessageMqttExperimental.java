@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.Intent;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -331,7 +332,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
     }
 
     @Override
-    public String getStateAsString() {
+    public String getConnectionState() {
         int id;
         switch (getState()) {
             case IDLE:
@@ -358,7 +359,6 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
         }
         return context.getString(id);
     }
-
 
 
     @Override

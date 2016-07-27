@@ -2,6 +2,7 @@ package org.owntracks.android.support;
 
 import android.util.Log;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -12,11 +13,13 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateFactory;
+import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.CertificateException;
 
@@ -69,10 +72,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     public SocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         this(new SocketFactoryOptions());
     }
+
+
+    private TrustManagerFactory tmf;
+
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Log.v(this.toString(), "initializing CustomSocketFactory");
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
 
@@ -123,9 +130,13 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
         // Create an SSLContext that uses our TrustManager
         SSLContext context = SSLContext.getInstance("TLSv1.2");
-        context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+        context.init(kmf.getKeyManagers(), getTrustManagers(), null);
         this.factory= context.getSocketFactory();
 
+    }
+
+    public TrustManager[] getTrustManagers() {
+        return tmf.getTrustManagers();
     }
 
     @Override
@@ -141,14 +152,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     @Override
     public Socket createSocket() throws IOException{
         SSLSocket r = (SSLSocket)this.factory.createSocket();
-        r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
-        r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 
@@ -156,28 +167,28 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     public Socket createSocket(String host, int port) throws IOException {
 
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
-        r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(new String[]{"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[]{ "TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
-        r.setEnabledProtocols(new String[] {"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
         return r;
     }
 }

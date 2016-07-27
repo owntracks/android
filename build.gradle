@@ -50,7 +50,7 @@ dependencies {
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-SNAPSHOT'
     compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1-20160623.113843-1'
 
-    compile 'com.squareup.okhttp:okhttp:2.7.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'

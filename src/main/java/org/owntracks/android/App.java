@@ -85,7 +85,6 @@ public class App extends Application  {
         contactsViewModel =  new ContactsViewModel();
 
 
-        ACRA.init(this);
         StatisticsProvider.initialize(this);
         Preferences.initialize(this);
         Parser.initialize(this);
@@ -99,7 +98,6 @@ public class App extends Application  {
 
 
     public static void enableForegroundBackgroundDetection() {
-        Log.v(TAG, "enableForegroundBackgroundDetection()");
         instance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         instance.registerScreenOnReceiver();
     }
@@ -123,7 +121,6 @@ public class App extends Application  {
 
 
     public static void addFusedContact(final FusedContact c) {
-        Log.v(TAG, "addFusedContact: " + c.getId());
         fusedContacts.put(c.getId(), c);
 
         postOnMainHandler(new Runnable() {
@@ -141,9 +138,7 @@ public class App extends Application  {
 
 
     public static void clearFusedContacts() {
-        Log.v(TAG, "clearing fusedContacts");
         fusedContacts.clear();
-
         postOnMainHandler(new Runnable() {
             @Override
             public void run() {
@@ -157,7 +152,6 @@ public class App extends Application  {
         clearFusedContacts();
         ContactImageProvider.invalidateCache();
     }
-
 
     private static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
@@ -185,17 +179,12 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
-    public static boolean getDeveloperMode() {
-        return Settings.Secure.getInt(instance.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
-    }
-
     @SuppressWarnings("unused")
     public void onEvent(Events.BrokerChanged e) {
         clearFusedContacts();
     }
 
     private static void onEnterForeground() {
-        Log.v(TAG, "onEnterForeground");
         inForeground = true;
         ServiceProxy.runOrBind(getContext(), new Runnable() {
 
@@ -208,7 +197,6 @@ public class App extends Application  {
     }
 
     private static void onEnterBackground() {
-        Log.v(TAG, "onEnterBackground");
         inForeground = false;
         ServiceProxy.runOrBind(getContext(), new Runnable() {
 
@@ -243,19 +231,15 @@ public class App extends Application  {
      */
     private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
-            Log.v(TAG, "onActivityStarted:" + activity);
 
             App.runningActivities++;
             currentActivity = activity;
-            Log.v(TAG, "App.runningActivities: " + App.runningActivities);
             if (App.runningActivities == 1) App.onEnterForeground();
         }
 
         public void onActivityStopped(Activity activity) {
-            Log.v(TAG, "onActivityStopped:" + activity);
             App.runningActivities--;
             if(currentActivity == activity)  currentActivity = null;
-            Log.v(TAG, "App.runningActivities: " + App.runningActivities);
             if (App.runningActivities == 0) App.onEnterBackground();
         }
 
@@ -267,15 +251,12 @@ public class App extends Application  {
     }
     private void registerScreenOnReceiver() {
         final IntentFilter theFilter = new IntentFilter();
-        /** System Defined Broadcast */
+
+        // System Defined Broadcast
         theFilter.addAction(Intent.ACTION_SCREEN_ON);
         theFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
         // Sets foreground and background modes based on device lock and unlock if the app is active
-
-
-
-
         BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -302,6 +283,4 @@ public class App extends Application  {
         getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
 
     }
-
-
 }

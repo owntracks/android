@@ -133,6 +133,31 @@
             <TextView
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
+                android:id="@+id/backendStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/na"
+                android:ellipsize="none"
+                android:singleLine="false"
+                style="@style/ListItemPrimary" />
+
+
+            <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:id="@+id/tv8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Endpoint last message"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
+
+
+            <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:id="@+id/serviceBrokerQueueLength"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,11 +172,13 @@
                 android:id="@+id/tv12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Queued messages"
+                android:text="Endpoint queue"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
+
+
 
             <View
                 android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.Intent;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -17,6 +18,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Toasts;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
@@ -27,6 +29,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
 
 
 public class ServiceMessage implements ProxyableService, MessageSender, MessageReceiver, IncomingMessageProcessor {
@@ -143,7 +146,8 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     private void onMessageQueued(MessageBase m) {
         outgoingQueue.put(m.getMessageId(), m);
         Log.v(TAG, "onMessageQueued()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
-
+        if(m instanceof MessageLocation && MessageLocation.REPORT_TYPE_USER.equals(MessageLocation.class.cast(m).getT()))
+            Toasts.showMessageQueued();
     }
 
     @Override
@@ -151,15 +155,14 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
         MessageBase m = outgoingQueue.remove(messageId);
         if(m == null) {
-            Log.e(TAG, "onMessageDeliveryFailed()- messageId:"+messageId + ", error: called for unqueued message");
+            Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
         } else {
-            Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+            Timber.e("type:base, messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m.getOutgoingTTL() > 0)  {
-                Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", action: requeued");
+                Timber.e("type:base, messageId:%s, action: requeued",m.getMessageId() );
                 sendMessage(m);
             } else {
-                Log.v(TAG, "onMessageDeliveryFailed()- messageId:" + m.getMessageId()+", action: discarded due to expired ttl");
-
+                Timber.e("type:base, messageId:%s, action: discarded due to expired ttl",m.getMessageId() );
             }
         }
     }
@@ -173,17 +176,17 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processIncomingMessage(MessageBase message) {
-        Log.v(TAG, "processIncomingMessage MessageBase (" + message.getContactKey()+")");
+        Timber.v("type:base, key:%s", message.getContactKey());
     }
 
     public void processIncomingMessage(MessageUnknown message) {
-        Log.v(TAG, "processIncomingMessage MessageUnknown (" + message.getContactKey()+")");
+        Timber.v("type:unknown, key:%s", message.getContactKey());
     }
 
 
     @Override
     public void processIncomingMessage(MessageLocation message) {
-        Log.v(TAG, "processIncomingMessage MessageLocation (" + message.getContactKey()+")");
+        Timber.v("type:location, key:%s", message.getContactKey());
 
         //GeocodingProvider.resolve(message);
         FusedContact c = App.getFusedContact(message.getContactKey());
@@ -202,7 +205,6 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processIncomingMessage(MessageCard message) {
-        Log.v(TAG, "processIncomingMessage MessageCard (" + message.getContactKey() + ")");
         FusedContact c = App.getFusedContact(message.getContactKey());
 
         if (c == null) {
@@ -217,9 +219,8 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processIncomingMessage(MessageCmd message) {
-        Log.v(TAG, "processIncomingMessage MessageCmd (" + message.getContactKey() + ")");
         if(!Preferences.getRemoteCommand()) {
-            Log.e(TAG, "remote commands are disabled");
+            Timber.e("remote commands are disabled");
             return;
         }
 
@@ -228,9 +229,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
         } else if(message.getAction().equals(MessageCmd.ACTION_WAYPOINTS)) {
             ServiceProxy.getServiceApplication().publishWaypointsMessage();
         } else if(message.getAction().equals(MessageCmd.ACTION_SET_WAYPOINTS)) {
-            Log.v(TAG, "ACTION_SET_WAYPOINTS received");
             MessageWaypointCollection waypoints = message.getWaypoints();
-            Log.v(TAG, "waypoints: " + waypoints);
             if(waypoints == null)
                 return;
 
@@ -242,12 +241,10 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void processIncomingMessage(MessageTransition message) {
-        Log.v(TAG, "processIncomingMessage MessageTransition (" + message.getContactKey() + ")");
         ServiceProxy.getServiceNotification().processMessage(message);
     }
 
     public void processIncomingMessage(MessageConfiguration message) {
-        Log.v(TAG, "processIncomingMessage MessageConfiguration (" + message.getContactKey()+")");
         if(!Preferences.getRemoteConfiguration())
             return;
 
@@ -256,6 +253,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
 
     public static String getEndpointStateAsString() {
-        return endpoint != null ? endpoint.getStateAsString() : App.getContext().getString(R.string.noEndpointConfigured);
+        return endpoint != null ? endpoint.getConnectionState() : App.getContext().getString(R.string.noEndpointConfigured);
     }
+
 }

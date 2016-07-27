@@ -10,17 +10,13 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.util.Base64;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 import org.antlr.v4.runtime.misc.NotNull;
 import org.owntracks.android.R;
@@ -34,24 +30,40 @@ import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.SocketFactory;
+import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.X509TrustManager;
+
 import de.greenrobot.event.EventBus;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import timber.log.Timber;
 
 public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatelessMessageEndpoint {
@@ -66,10 +78,9 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     private MessageReceiver messageReceiver;
     private ServiceProxy context;
     private Exception error;
-    private static OkHttpClient mHttpClient = new OkHttpClient();
+    private static OkHttpClient mHttpClient;
     public static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
     private ThreadPoolExecutor mOutgoingMessageProcessorExecutor;
-    private int i;
     private PowerManager powerManager;
     private ConnectivityManager connectivityManager;
 
@@ -80,10 +91,8 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
 
         this.mOutgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
 
-
         powerManager = PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE));
         connectivityManager =  ConnectivityManager.class.cast(context.getSystemService(Context.CONNECTIVITY_SERVICE));
-
 
         Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
             @Override
@@ -95,11 +104,69 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if(Preferences.Keys.URL.equals(key))
                     loadEndpointUrl();
+                if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
+                    loadHTTPClient();
             }
         });
 
         loadEndpointUrl();
+        loadHTTPClient();
     }
+
+    private void loadHTTPClient() {
+
+
+        //  ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)//
+//                .tlsVersions(TlsVersion.TLS_1_2)
+        //              .build();
+        // mHttpClient.setConnectionSpecs(Collections.singletonList(spec));
+
+        String tlsCaCrt = Preferences.getTlsCaCrtName();
+        String tlsClientCrt = Preferences.getTlsClientCrtName();
+
+
+        SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+
+        if (tlsCaCrt.length() > 0) {
+            try {
+                socketFactoryOptions.withCaInputStream(context.openFileInput(tlsCaCrt));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (tlsClientCrt.length() > 0)	{
+            try {
+                socketFactoryOptions.withClientP12InputStream(context.openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        try {
+            SocketFactory f = new SocketFactory(socketFactoryOptions);
+            mHttpClient = new OkHttpClient.Builder().sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]).build();
+
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+    }
+
 
     private void loadEndpointUrl() {
         URL endpoint = null;
@@ -142,7 +209,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     }
 
     @Override
-    public String getStateAsString() {
+    public String getConnectionState() {
         int id;
         switch (getState()) {
             case IDLE:
@@ -170,6 +237,12 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
         return context.getString(id);
     }
 
+
+    private static void setLastState(String message) {
+        StatisticsProvider.setString(StatisticsProvider.BACKEND_LAST_MESSAGE, message);
+        StatisticsProvider.setTime(StatisticsProvider.BACKEND_LAST_MESSAGE_TST);
+
+    }
 
 
     @Override
@@ -208,19 +281,26 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             // If the device is not in idle mode but no network is available, send the message via GCM Network Manager.  The message is automatically send when a connection is available.
 
             if(idleMode) {
+                setLastState("TX1:queued/1");
                 Timber.v("messageId:%s, strategy:indirect, reason:idle", message.getMessageId());
                 prepareAndPostIndirect(wireMessage, message);
+
             } else if (networkAvailable && message.getOutgoingTTL() > 0 && Preferences.getHttpSchedulerAllowDirectStrategy()){
+                setLastState("TX1:queued/2");
                 Timber.v("messageId:%s, strategy:direct", message.getMessageId());
                 prepareAndPostDirect(wireMessage, message);
 
+
             } else {
-                Timber.v("messageId:%s, strategy:indirect, reason:network_fail/ttl_fail", message.getMessageId());
+                setLastState("TX1:queued/3");
+                Timber.v("messageId:%s, strategy:indirect, reason:network_fail/ttl_fail/no_override", message.getMessageId());
                 prepareAndPostIndirect(wireMessage, message);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            setLastState("TX1: "+ e.getClass().getSimpleName());
+
             messageSender.onMessageDeliveryFailed(message.getMessageId());
         }
 
@@ -241,14 +321,18 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
 
              //We got a response, treat as delivered successful
              if(r != null ) {
-                try {
+
+                 try {
                     MessageBase[] result = Parser.deserializeSyncArray(r.body().byteStream());
-                    for (MessageBase aResult : result) {
+                     setLastState("TX:"+r.code() + ", RX:" + result.length);
+
+                     for (MessageBase aResult : result) {
                         onMessageReceived(aResult);
                     }
 
                 //Non JSON return value
-                } catch (JsonParseException e) {
+                } catch (IOException e) {
+                    setLastState("TX2:"+r.code() + ", RX:JsonParseException");
                     Timber.e("error:JsonParseException responseCode:%s", r.code());
                 }
                 return onMessageDelivered(c, messageId);
@@ -257,6 +341,9 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
+            setLastState("TX2:IOException");
+
             return onMessageDeliveryFailed(c, messageId);
         }
     }
@@ -277,7 +364,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             return GcmNetworkManager.RESULT_FAILURE;
         }
 
-        //GCM Network Manager will automaticall retry sending if the message
+        //GCM Network Manager will automatically retry sending if the message
         if(c instanceof ServiceMessageHttpGcm) {
             return GcmNetworkManager.RESULT_RESCHEDULE;
         } else {
