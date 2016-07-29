@@ -94,6 +94,7 @@ public class ActivityPreferences extends ActivityBase {
         private static Preference twitter;
         private static Preference community;
         private Preference export;
+
         static String ver;
         private Preference documentation;
 
@@ -121,6 +122,7 @@ public class ActivityPreferences extends ActivityBase {
             populatePreferencesScreen(root);
 
             export = findPreference("export");
+
             repo = findPreference("repo");
             twitter = findPreference("twitter");
             community = findPreference("community");

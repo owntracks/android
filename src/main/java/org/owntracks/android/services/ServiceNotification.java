@@ -33,8 +33,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ReverseGeocodingTask;
-import org.owntracks.android.support.StaticHandler;
-import org.owntracks.android.support.StaticHandlerInterface;
 import org.owntracks.android.support.Toasts;
 
 import java.text.SimpleDateFormat;
@@ -43,14 +41,13 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
-public class ServiceNotification implements ProxyableService, StaticHandlerInterface {
+public class ServiceNotification implements ProxyableService {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
     public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION"; //unused for now
     private static final String TAG ="ServiceNotification" ;
 
     private ServiceProxy context;
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
-    private StaticHandler handler;
     private MessageLocation lastPublishedLocationMessage;
     private NotificationManager notificationManager;
 
@@ -113,7 +110,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
 
         };
 
-        this.handler = new StaticHandler(this);
 
         Preferences.registerOnPreferenceChangedListener(this.preferencesChangedListener);
         setupNotifications();
@@ -362,18 +358,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
     }
 
 
-    @Override
-    public void handleHandlerMessage(Message msg) {
-        switch (msg.what) {
-            case ReverseGeocodingTask.GEOCODER_RESULT:
-                geocoderAvailableForLocation(((GeocodableLocation) msg.obj));
-                break;
-        }
-
-    }
-
-    private void geocoderAvailableForLocation(GeocodableLocation l) {
-    }
 
     private boolean isLastPublishedLocationWithGeocoderAvailable() {
         return this.lastPublishedLocationMessage != null && this.lastPublishedLocationMessage.getGeocoder() != null;
@@ -436,8 +420,6 @@ public class ServiceNotification implements ProxyableService, StaticHandlerInter
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         notificationBuilderPermission.setContentIntent(PendingIntent.getActivity(this.context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT));
-
-
 
         notificationBuilderPermission.setSmallIcon(R.drawable.ic_notification);
         notificationBuilderPermission.setGroup(NOTIFICATION_ID_PERMISSION + "");

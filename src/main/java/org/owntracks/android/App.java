@@ -153,7 +153,7 @@ public class App extends Application  {
         ContactImageProvider.invalidateCache();
     }
 
-    private static void postOnMainHandler(Runnable r) {
+    public static void postOnMainHandler(Runnable r) {
         mainHanler.post(r);
     }
 

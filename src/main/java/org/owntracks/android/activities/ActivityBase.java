@@ -96,7 +96,7 @@ public abstract class ActivityBase extends AppCompatActivity  {
     public void onStart() {
         if(disablesAnimation)
             overridePendingTransition(0, 0);
-        else
+        else if(App.isInForeground())
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
 
 

@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -278,6 +279,21 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
 	private void requestLocationUpdates() {
+        if(Looper.myLooper() == Looper.getMainLooper()) {
+            ServiceProxy.runOnServiceHandler(new Runnable() {
+                @Override
+                public void run() {
+                    requestLocationUpdatesAsync();
+                }
+            });
+        } else {
+            requestLocationUpdatesAsync();
+        }
+
+    }
+
+    private void requestLocationUpdatesAsync() {
+
         if (!isReady() || !hasConnectedGoogleApiClient()) {
             Log.e(TAG, "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;

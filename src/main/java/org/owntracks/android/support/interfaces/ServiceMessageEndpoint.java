@@ -10,4 +10,5 @@ public interface ServiceMessageEndpoint {
         void setMessageSenderCallback(MessageSender callback);
         void setMessageReceiverCallback(MessageReceiver callback);
         String getConnectionState();
+        boolean acceptsMessages();
 }

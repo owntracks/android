@@ -63,10 +63,21 @@ public class ActivityExport extends ActivityBase {
 
             findPreference("exportToFile").setOnPreferenceClickListener(exportToFile);
             findPreference("exportWaypointsToEndpoint").setOnPreferenceClickListener(exportWaypointsToEndpoint);
+            findPreference("import").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(context, ActivityImport.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
+                    startActivity(intent);
+                    return true;
+                }
+            });
 
         }
 
     }
+
 
 
     private static Preference.OnPreferenceClickListener exportToFile = new Preference.OnPreferenceClickListener() {
@@ -137,7 +148,6 @@ public class ActivityExport extends ActivityBase {
             return false;
         }
     };
-
 
 
     @Override
