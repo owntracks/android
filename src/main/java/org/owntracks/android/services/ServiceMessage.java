@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.app.Service;
 import android.content.Intent;
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -56,24 +57,23 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void onCreate(ServiceProxy c) {
-        Log.v(TAG, "onCreate()");
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onModeChanged(Preferences.getModeId());
     }
 
 
-
+    // TODO: destroy old service after mode change
     private void onModeChanged(int mode) {
-        Log.v(TAG, "onModeChanged: " + mode);
+        Timber.v("mode:" + mode);
         if(endpoint != null)
             ServiceProxy.stopService((ProxyableService) endpoint);
 
         if(mode == App.MODE_ID_HTTP_PRIVATE) {
             Log.v(TAG, "loading http backend");
-            endpoint = (ServiceMessageHttp)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
+            endpoint = ServiceProxy.getServiceMessageHttp();
         } else {
             Log.v(TAG, "loading mqtt backend");
-            endpoint = (ServiceMessageMqttExperimental)ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
+            endpoint = ServiceProxy.getServiceMessageMqtt();
         }
 
         Log.v(TAG, "endpoint instance: " + endpoint);
@@ -117,7 +117,8 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
         message.setOutgoing();
 
-        if(endpoint == null) {
+        if(endpoint == null || !endpoint.acceptsMessages()) {
+            Timber.e("no endpoint or endpoint does not yet accept messages");
             return;
         }
 
@@ -251,9 +252,12 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
         Preferences.importFromMessage(message);
     }
 
+    public static boolean hasEndpoint() {
+        return endpoint != null;
+    }
 
     public static String getEndpointStateAsString() {
-        return endpoint != null ? endpoint.getConnectionState() : App.getContext().getString(R.string.noEndpointConfigured);
+        return hasEndpoint() ? endpoint.getConnectionState() : App.getContext().getString(R.string.connectivityDisconnectedConfigIncomplete);
     }
 
 }

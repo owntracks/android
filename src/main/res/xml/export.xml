@@ -12,5 +12,10 @@
         android:title="@string/exportWaypointsToEndpoint"
         android:summary="@string/exportWaypointsToEndpointSummary">
     </Preference>
+    <Preference
+        android:key="import"
+        android:title="@string/importConfig"
+        android:summary="@string/importConfig">
+    </Preference>
 
 </PreferenceScreen>

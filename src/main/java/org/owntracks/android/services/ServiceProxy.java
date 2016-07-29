@@ -10,14 +10,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
+import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
+import org.owntracks.android.support.receiver.BootCompleteReceiver;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 public class ServiceProxy extends ServiceBindable {
 	private static final String TAG = "ServiceProxy";
@@ -43,28 +49,65 @@ public class ServiceProxy extends ServiceBindable {
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
+	private static boolean bgInitialized = false;
+	private static HandlerThread mServiceHandlereThread;
+	private static Handler mServiceHandler;
 
+	public static void setBgInitialized() {
+		synchronized (ServiceProxy.class) {
+			bgInitialized = true;
+		}
+	}
 
+	private static boolean getBgInitialized() {
+		synchronized (ServiceProxy.class) {
+			return bgInitialized;
+		}
 
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		this.mServiceHandlereThread = new HandlerThread("ServiceThread");
+		this.mServiceHandlereThread.start();
+		this.mServiceHandler = new Handler(this.mServiceHandlereThread.getLooper());
+
 	}
 
 	@Override
 	protected void onStartOnce() {
 		instance = this;
 
+
+
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				instantiateService(SERVICE_APP);
+				instantiateService(SERVICE_NOTIFICATION);
+				instantiateService(SERVICE_LOCATOR);
+				instantiateService(SERVICE_MESSAGE);
+				instantiateService(SERVICE_BEACON);
+				setBgInitialized();
+				App.postOnMainHandler(new Runnable() {
+					@Override
+					public void run() {
+
+						runQueue();
+					}
+				});
+			}
+		};
+
+
+		Thread r = new Thread(runnable);
+		r.start();
+
 		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
 
-		instantiateService(SERVICE_APP);
-		instantiateService(SERVICE_NOTIFICATION);
 
-		instantiateService(SERVICE_MESSAGE);
 
-        instantiateService(SERVICE_LOCATOR);
-        instantiateService(SERVICE_BEACON);
 	}
 
 	public static ServiceProxy getInstance() {
@@ -106,7 +149,7 @@ public class ServiceProxy extends ServiceBindable {
                 p = new ServiceApplication();
                 break;
             case SERVICE_MESSAGE_MQTT:
-                p = new ServiceMessageMqttExperimental();
+                p = new ServiceMessageMqtt();
                 break;
 			case SERVICE_MESSAGE_HTTP:
 				p = new ServiceMessageHttp();
@@ -209,6 +252,10 @@ public class ServiceProxy extends ServiceBindable {
 		//TODO
 	}
 
+	public static void runOnServiceHandler(Runnable runnable) {
+		mServiceHandler.post(runnable);
+	}
+
 	public final static class ServiceProxyConnection implements Closeable {
 		private final Context context;
 		private final ServiceConnection serviceConnection;
@@ -245,8 +292,16 @@ public class ServiceProxy extends ServiceBindable {
 		return connection;
 	}
 
+
+	private static void runQueue() {
+		for (Runnable r : runQueue)
+			r.run();
+		runQueue.clear();
+
+	}
+
 	public static void runOrBind(Context context, Runnable runnable) {
-		if (((instance != null) && (getServiceConnection() != null)) || context instanceof ServiceProxy) {
+		if (((instance != null ) && (getServiceConnection() != null)) || context instanceof ServiceProxy) {
 
             runnable.run();
 			return;
@@ -264,11 +319,10 @@ public class ServiceProxy extends ServiceBindable {
 
                     bound = true;
                     attemptingToBind = false;
-
-					for (Runnable r : runQueue)
-						r.run();
-					runQueue.clear();
-
+					if(getBgInitialized())
+						runQueue();
+					else
+						Timber.d("service connected but bgInitialized not finished");
 				}
 			};
 			connection = new ServiceProxyConnection(context, c);

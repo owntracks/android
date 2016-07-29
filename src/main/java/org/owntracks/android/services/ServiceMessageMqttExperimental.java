@@ -360,6 +360,11 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
         return context.getString(id);
     }
 
+    @Override
+    public boolean acceptsMessages() {
+        return this.client != null;
+    }
+
 
     @Override
     public void onDestroy() {
@@ -398,7 +403,6 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
             m.setQos(message.getQos());
             m.setRetained(message.getRetained());
 
-            Log.v(TAG, "buffered messages " + client.getBufferedMessageCount());
 
 
             IMqttDeliveryToken pubToken = client.publish(message.getTopic(), m);

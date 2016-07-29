@@ -66,4 +66,8 @@ public class Toasts {
     public static void showMessageQueued() {
         Toast.makeText(App.getContext(), App.getContext().getString(R.string.messageQueued), Toast.LENGTH_SHORT).show();
     }
+
+    public static void showEndpointNotConfigured() {
+        Toast.makeText(App.getContext(), App.getContext().getString(R.string.connectivityDisconnectedConfigIncomplete), Toast.LENGTH_SHORT).show();
+    }
 }

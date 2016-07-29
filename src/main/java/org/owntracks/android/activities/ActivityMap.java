@@ -36,6 +36,7 @@ import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceLocator;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.DrawerProvider;
@@ -91,12 +92,14 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.onCreate = true;
         this.markers = new HashMap<>();
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_map);
+
         this.mapView = binding.mapView;
+        this.mapView.requestTransparentRegion(this.mapView);
+
         this.mapView.onCreate(savedInstanceState);
         this.mapView.getMapAsync(this);
         //this.fab = binding.fab;
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
-        this.bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
         binding.contactPeek.contactRow.setOnLongClickListener(bottomSheetLongClickListener);
 
@@ -254,6 +257,13 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onEventMainThread(Events.ModeChanged e) {
         redrawMap();
     }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(Events.EndpointStateChanged e) {
+        if(e.getState() == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE)
+            Toasts.showEndpointNotConfigured();
+    }
+
 
     private void clearMap() {
         Log.v(TAG, "clearMap");
@@ -458,13 +468,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         binding.setItem(fusedContact);
         binding.contactPeek.setItem(fusedContact);
 
-
-        // bottomSheetBehavior.setState(EndpointState.HIDDEN) doesn't work due to a bug in the support library
-        // Set an initial height of 0 px to hide it instead and set it to 76dp on click instead.
-        // setPeekHeight takes real px as a value. We convert the appropriate value from 76dp
-       // Log.v(TAG, "setting peek height to: " + getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
-
-      //  bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         collapseBottomSheet();
     }
 
@@ -506,59 +509,21 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     };
 
     private void expandBottomSheet() {
-        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
-            @Override
-            public void run() {
-                Log.v(TAG, "expandBottomSheet()");
-                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     private void collapseBottomSheet() {
-        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
-            @Override
-            public void run() {
-                Log.v(TAG, "collapseBottomSheet()");
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
-                bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height));
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
-        });
+
     }
 
     private void hideBottomSheet() {
-        ViewCompat.postOnAnimation(binding.coordinator, new Runnable() {
-            @Override
-            public void run() {
-                Log.v(TAG, "hideBottomSheet()");
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-                ViewCompat.postInvalidateOnAnimation(binding.coordinator);
-                //bottomSheetBehavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_hidden));
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            }
-        });
     }
 
 
-    BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
-        public void onStateChanged(@NonNull View bottomSheet, int newState) {
-            // React to state change
-            //Log.e("onStateChanged", "onStateChanged:" + newState);
-            //if ( newState == BottomSheetBehavior.STATE_COLLAPSED) {
-            //    fab.show();
-            //} else if(newState == BottomSheetBehavior.STATE_HIDDEN){
-            //    fab.hide();
-            //}
-        }
-
-        @Override
-        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-        }
-
-    };
 
     // Popup menu click
     @Override

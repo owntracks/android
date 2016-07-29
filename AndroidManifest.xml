@@ -25,8 +25,8 @@
     <!-- For BLE beacon detection -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
-    <!-- Access to broker certificates in private storage on older APIs -->
+        />
+    <!-- Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- To locate the device -->
@@ -36,8 +36,6 @@
     <!-- To access Google Play Services -->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
-    <!-- Crash reporting -->
-    <uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
 
     <application
         android:name=".App"

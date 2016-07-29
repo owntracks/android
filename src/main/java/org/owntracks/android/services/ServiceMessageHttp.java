@@ -67,9 +67,6 @@ import okhttp3.Response;
 import timber.log.Timber;
 
 public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatelessMessageEndpoint {
-
-    private static final String TAG = "ServiceMessageHttp";
-    private static final String METHOD_POST = "POST";
     private String endpointUrl;
     private String endpointUserInfo;
 
@@ -235,6 +232,11 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
 
         }
         return context.getString(id);
+    }
+
+    @Override
+    public boolean acceptsMessages() {
+        return mHttpClient != null;
     }
 
 

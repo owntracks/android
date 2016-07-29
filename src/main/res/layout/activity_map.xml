@@ -44,7 +44,7 @@
             android:orientation="vertical"
             app:behavior_hideable="true"
             android:clickable="true"
-            app:behavior_peekHeight="1dp"
+            app:behavior_peekHeight="72dp"
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 

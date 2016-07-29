@@ -772,6 +772,11 @@ boolean firstStart = true;
         return context.getString(id);
     }
 
+	@Override
+	public boolean acceptsMessages() {
+		return this.mqttClient != null;
+	}
+
 
 	public Exception getError() {
         return error;
