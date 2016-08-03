@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 public abstract class ServiceBindable extends Service {
 	private static final String TAG = "ServiceBindable";
@@ -24,7 +25,9 @@ public abstract class ServiceBindable extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.v(TAG, "onBind");
 		if (!this.started) {
+			Log.v(TAG, "onStartOnce");
 			this.started = true;
 			onStartOnce();
 		}

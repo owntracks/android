@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,6 +15,7 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -21,9 +23,11 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
@@ -32,6 +36,7 @@ import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
@@ -51,7 +56,6 @@ import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.MessageReceiver;
 import org.owntracks.android.support.interfaces.MessageSender;
-import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
@@ -59,6 +63,7 @@ import org.owntracks.android.services.ServiceMessage.EndpointState;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -68,8 +73,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
-public class ServiceMessageMqtt implements MqttCallback, ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
+public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
 	private static final String TAG = "ServiceMessageMqtt";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -81,6 +87,8 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 	private PausableThreadPoolExecutor pubPool;
 	private MessageSender messageSender;
 	private MessageReceiver messageReceiver;
+	private BroadcastReceiver idleReceiver;
+	private PowerManager powerManager;
 
 	@Override
 	public boolean sendMessage(MessageBase message) {
@@ -165,7 +173,82 @@ public class ServiceMessageMqtt implements MqttCallback, ProxyableService, Outgo
 		publishMessage(message);
 	}
 
-boolean firstStart = true;
+
+	private IMqttActionListener iCallbackPublish = new IMqttActionListener() {
+
+		@Override
+		public void onSuccess(IMqttToken token) {
+			if(!(token instanceof MessageBase))
+				return;
+
+			Timber.v("messageId: %s", MessageBase.class.cast(token).getMessageId());
+			messageSender.onMessageDelivered(MessageBase.class.cast(token.getUserContext()).getMessageId());
+
+		}
+
+		@Override
+		public void onFailure(IMqttToken token, Throwable exception) {
+			if(!(token instanceof MessageBase))
+				return;
+
+			Timber.v("messageId: %s", MessageBase.class.cast(token).getMessageId());
+			exception.printStackTrace();
+		}
+	};
+
+	private MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
+		@Override
+		public void connectComplete(boolean reconnect, String serverURI) {
+		}
+
+		@Override
+		public void deliveryComplete(IMqttDeliveryToken token) {
+			if(!(token instanceof MessageBase))
+				return;
+
+			Timber.v("messageId: %s", MessageBase.class.cast(token.getUserContext()).getMessageId());
+
+			if(pubPool.isPaused() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
+				Timber.v("resuming pubPool that was paused due to back pressure. Currently outstanding tokens: %s", mqttClient.getPendingDeliveryTokens().length);
+				pubPool.resume();
+			}
+
+
+		}
+
+		@Override
+		public void connectionLost(Throwable cause) {
+			Timber.e(cause, "");
+			pubPool.pause();
+			//pingHandler.stop(); Ping handler is automatically stopped by mqttClient
+			reconnectHandler.schedule();
+
+		}
+
+		@Override
+		public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+			try {
+				MessageBase m = Parser.deserializeSync(message.getPayload());
+				if(!m.isValidMessage()) {
+					Timber.e("message failed validation: %s", message.getPayload());
+					return;
+				}
+
+				m.setTopic(getBaseTopic(m, topic));
+				m.setRetained(message.isRetained());
+				m.setQos(message.getQos());
+				messageReceiver.onMessageReceived(m);
+			} catch (JsonParseException e) {
+				Timber.e(e, "payload:%s ", new String(message.getPayload()));
+			}
+
+		}
+
+	};
+
+
+
 	private void publishMessage(MessageBase message) {
 
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
@@ -183,11 +266,9 @@ boolean firstStart = true;
 				return;
 			}
 			Log.v(TAG, "publishing message " + message + " to topic " + message.getTopic() );
-			this.mqttClient.publish(message.getTopic(), m);
-
-			// At this point, delivery is technically not completed. However, if the mqttClient didn't throw any errors, the message likely makes it to the broker
-			// We don't save any references between delivery tokens and messages to singal completion when deliveryComplete is called
-			this.messageSender.onMessageDelivered(message.getMessageId());
+			IMqttDeliveryToken pubToken = this.mqttClient.publish(message.getTopic(), m);
+			pubToken.setActionCallback(iCallbackPublish);
+			pubToken.setUserContext(message);
 
 			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
 				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
@@ -214,9 +295,7 @@ boolean firstStart = true;
 	private Thread workerThread;
 	private static Exception error;
     private MqttClientPersistence persistenceStore;
-	private BroadcastReceiver netConnReceiver;
     private WakeLock networkWakelock;
-    private WakeLock connectionWakelock;
     private ReconnectHandler reconnectHandler;
 	private PingHandler pingHandler;
 	private boolean connectedWithCleanSession;
@@ -236,9 +315,11 @@ boolean firstStart = true;
 		initPausedPubPool();
         this.persistenceStore = new CustomMemoryPersistence();
         this.reconnectHandler = new ReconnectHandler(context);
-        changeState(EndpointState.INITIAL);
-        doStart();
+		this.powerManager = PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE));
 
+		changeState(EndpointState.INITIAL);
+        doStart();
+		registerReceiver();
 
 		// Testing
 		/*MessageLocation m = new MessageLocation();
@@ -338,7 +419,6 @@ boolean firstStart = true;
 		if (!isOnline()) {
 			Log.e(TAG, "handleStart: isOnline:false");
 			changeState(EndpointState.DISCONNECTED_DATADISABLED);
-			unregisterNetConnReceiver(); //ignore further network changes. Reconnect handler will try to connect periodically
 
 			if(pingHandler != null) {
 				pingHandler.stop();
@@ -399,9 +479,9 @@ boolean firstStart = true;
 			Log.v(TAG, "init() connect string: " + connectString);
 
             this.pingHandler = new PingHandler(context);
-            this.mqttClient = new CustomMqttClient(connectString, cid, persistenceStore, pingHandler);
-			this.mqttClient.setCallback(this);
-
+			this.mqttClient = new CustomMqttClient(connectString, cid, persistenceStore, pingHandler);
+			this.mqttClient.setCallback(iCallbackClient);
+			Timber.v("clientInstance:%s", this.mqttClient);
 		} catch (Exception e) {
 			// something went wrong!
 			this.mqttClient = null;
@@ -462,7 +542,7 @@ boolean firstStart = true;
 			connectedWithCleanSession = Preferences.getCleanSession();
 			lastConnectionOptions.setCleanSession(connectedWithCleanSession);
 
-			this.mqttClient.connect(lastConnectionOptions);
+			this.mqttClient.connect(lastConnectionOptions).waitForCompletion();
 			changeState(EndpointState.CONNECTED);
 
 			return true;
@@ -503,11 +583,6 @@ boolean firstStart = true;
 		reconnectHandler.stop();
 
 		// Establish observer to monitor wifi and radio connectivity
-		if (this.netConnReceiver == null) {
-			this.netConnReceiver = new NetworkConnectionIntentReceiver();
-			this.context.registerReceiver(this.netConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-		}
-
 		if (connectedWithCleanSession)
 			onCleanSessionConnect();
 		else
@@ -570,8 +645,9 @@ boolean firstStart = true;
             Log.v(TAG, "subscribe() - Will subscribe to: " + s);
         }
 		try {
+			int qos[] = getSubTopicsQos(topics);
 
-			this.mqttClient.subscribe(topics);
+			this.mqttClient.subscribe(topics, qos);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -579,7 +655,13 @@ boolean firstStart = true;
     }
 
 
-    private void unsubscribe(String[] topics) {
+	private int[] getSubTopicsQos(String[] topics) {
+		int[] qos = new int[topics.length];
+		Arrays.fill(qos, 2);
+		return qos;
+	}
+
+	private void unsubscribe(String[] topics) {
 		if(!isConnected()) {
 			Log.e(TAG, "subscribe when not connected");
 			return;
@@ -596,18 +678,6 @@ boolean firstStart = true;
 		}
     }
 
-	private void unregisterNetConnReceiver()
-	{
-		try {
-			if (this.netConnReceiver != null) {
-				this.context.unregisterReceiver(this.netConnReceiver);
-				this.netConnReceiver = null;
-			}
-
-		} catch (Exception eee) {
-			Log.e(TAG, "Unregistering netConnReceiver failed", eee);
-		}
-	}
 
 	private void disconnect(boolean fromUser) {
 		Log.v(TAG, "disconnect. from user: " + fromUser);
@@ -616,7 +686,7 @@ boolean firstStart = true;
             return;
         }
 
-		unregisterNetConnReceiver();
+		pingHandler.stop();
 
 		try {
 			if (isConnected()) {
@@ -637,31 +707,6 @@ boolean firstStart = true;
 			else
 				changeState(EndpointState.DISCONNECTED);
 		}
-	}
-
-	@Override
-	public void connectionLost(Throwable t) {
-		Log.e(TAG, "connectionLost: " + t.toString());
-		t.printStackTrace();
-		pubPool.pause();
-		// we protect against the phone switching off while we're doing this
-		// by requesting a wake lock - we request the minimum possible wake
-		// lock - just enough to keep the CPU running until we've finished
-
-
-		if(connectionWakelock == null )
-            connectionWakelock = ((PowerManager) this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_CONNECTIONLOST);
-
-        if (!connectionWakelock.isHeld())
-            connectionWakelock.acquire();
-
-
-
-		doStart();
-
-
-        if(connectionWakelock.isHeld())
-            connectionWakelock.release();
 	}
 
 
@@ -724,7 +769,7 @@ boolean firstStart = true;
 	public void onDestroy() {
 		// disconnect immediately
 		disconnect(false);
-
+		unregisterReceiver();
 		changeState(EndpointState.DISCONNECTED);
 	}
 
@@ -784,34 +829,6 @@ boolean firstStart = true;
 
 
 
-	@Override
-	public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-		try {
-			MessageBase m = Parser.deserializeSync(message.getPayload());
-			if(!m.isValidMessage()) {
-				Log.e(TAG, "message failed validation: " + message.getPayload());
-				return;
-			}
-
-			m.setTopic(getBaseTopic(m, topic));
-			m.setRetained(message.isRetained());
-			m.setQos(message.getQos());
-			this.messageReceiver.onMessageReceived(m);
-			if(m instanceof MessageUnknown) {
-				Log.v(TAG, "unknown message topic: " + topic +" payload: " + new String(message.getPayload()));
-			}
-
-		} catch (Exception e) {
-
-			Log.e(TAG, "JSON parser exception for message: " + new String(message.getPayload()));
-			Log.e(TAG, e.getMessage() +" " + e.getCause());
-
-			e.printStackTrace();
-		}
-	}
-
-
 	private String getBaseTopic(MessageBase message, String topic){
 
 		if (message.getBaseTopicSuffix() != null && topic.endsWith(message.getBaseTopicSuffix())) {
@@ -820,58 +837,6 @@ boolean firstStart = true;
 			return topic;
 		}
 	}
-
-
-
-	@Override
-	public void deliveryComplete(IMqttDeliveryToken messageToken) {
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
-
-		if(this.pubPool.isPaused() && this.mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
-			Log.v(TAG, "resuming pubPool that was paused due to backPreassure. Currently outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
-			this.pubPool.resume();
-		}
-    }
-
-	private class NetworkConnectionIntentReceiver extends BroadcastReceiver {
-		private static final String TAG = "NetworkConnectionIntent";
-
-		@Override
-		public void onReceive(Context ctx, Intent intent) {
-			Log.v(TAG, "onReceive");
-			if(networkWakelock == null )
-                networkWakelock = ((PowerManager) ServiceMessageMqtt.this.context.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_NETWORK);
-
-            if (!networkWakelock.isHeld())
-                networkWakelock.acquire();
-
-			if (!isOnline() || (!isConnected() && !isConnecting())) {
-				Log.v(TAG, "not connnected");
-
-				// mqttClient is a bit slow to notice that there is no connection anymore
-				if (workerThread != null) {
-					workerThread.interrupt();
-				}
-
-				mqttClient = null;
-
-				//MQTT Client will not notice that the connection was lost for some time if the network went away
-				Log.v(TAG, "running doStart");
-				doStart(true);
-
-
-
-
-			} else {
-				Log.v(TAG, "already connected");
-			}
-
-            if(networkWakelock.isHeld())
-                networkWakelock.release();
-        }
-	}
-
-
 
 	public void onEvent(Events.Dummy e) {
 	}
@@ -897,14 +862,46 @@ boolean firstStart = true;
 
 
     // Custom blocking MqttClient that allows to specify a MqttPingSender
-    private static final class CustomMqttClient extends MqttClient {
+    private static final class CustomMqttClient extends MqttAsyncClient {
         public CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence, MqttPingSender pingSender) throws MqttException {
-            super(serverURI, clientId, persistence);// Have to call do the AsyncClient init twice as there is no other way to setup a client with a ping sender (thanks Paho)
-            aClient = new MqttAsyncClient(serverURI, clientId, persistence, pingSender);
+            super(serverURI, clientId, persistence, pingSender);// Have to call do the AsyncClient init twice as there is no other way to setup a client with a ping sender (thanks Paho)
         }
     }
 
-    class PingHandler implements MqttPingSender {
+	@TargetApi(Build.VERSION_CODES.M)
+	private void onDeviceIdleChanged() {
+		if(powerManager.isDeviceIdleMode()) {
+			Timber.v("idleMode: enabled");
+		} else {
+			Timber.v("idleMode: disabled");
+
+		}
+	}
+
+	private void unregisterReceiver() {
+		if(idleReceiver != null)
+			context.unregisterReceiver(idleReceiver);
+	}
+
+
+	private void registerReceiver() {
+		IntentFilter filter = new IntentFilter();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			filter.addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
+
+			idleReceiver = new BroadcastReceiver() {
+				@Override
+				public void onReceive(Context context, Intent intent) {
+					onDeviceIdleChanged();
+				}
+			};
+			context.registerReceiver(idleReceiver, filter);
+		}
+
+	}
+
+
+	class PingHandler implements MqttPingSender {
         static final String TAG = "PingHandler";
 
         private ClientComms comms;
@@ -926,8 +923,7 @@ boolean firstStart = true;
 			Log.v(TAG, "sending");
 
 			if (wakelock == null) {
-				PowerManager pm = (PowerManager) context.getSystemService(ServiceProxy.POWER_SERVICE);
-				wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_PING);
+				wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_PING);
 			}
 
 			if(!wakelock.isHeld())
@@ -1007,9 +1003,7 @@ boolean firstStart = true;
 			long targetTstMs = System.currentTimeMillis() + delayInMilliseconds;
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null);
-			if (Build.VERSION.SDK_INT >= 23) {
-				alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetTstMs, p);
-			} else if (Build.VERSION.SDK_INT >= 19) {
+			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, targetTstMs, p);
 			} else {
 				alarmManager.set(AlarmManager.RTC_WAKEUP, targetTstMs, p);
@@ -1049,7 +1043,12 @@ boolean firstStart = true;
 
         public void schedule() {
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds = (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(30);
+			long delayInMilliseconds;
+			if(BuildConfig.DEBUG)
+				 delayInMilliseconds = TimeUnit.SECONDS.toMillis(10);
+			else
+				delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(30);
+
 			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
 
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
