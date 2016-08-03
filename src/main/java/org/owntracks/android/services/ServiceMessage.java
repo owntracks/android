@@ -1,8 +1,11 @@
 package org.owntracks.android.services;
 
-import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.support.v4.util.Pair;
+import android.content.IntentFilter;
+import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -59,26 +62,27 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     public void onCreate(ServiceProxy c) {
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onModeChanged(Preferences.getModeId());
+
     }
 
 
-    // TODO: destroy old service after mode change
+
     private void onModeChanged(int mode) {
-        Timber.v("mode:" + mode);
+        Timber.v("mode:%s", mode);
         if(endpoint != null)
             ServiceProxy.stopService((ProxyableService) endpoint);
 
         if(mode == App.MODE_ID_HTTP_PRIVATE) {
-            Log.v(TAG, "loading http backend");
-            endpoint = ServiceProxy.getServiceMessageHttp();
+            Timber.d("loading http backend");
+            endpoint = (ServiceMessageEndpoint) ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
         } else {
-            Log.v(TAG, "loading mqtt backend");
-            endpoint = ServiceProxy.getServiceMessageMqtt();
+            Timber.d("loading mqtt backend");
+            endpoint = (ServiceMessageEndpoint) ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
         }
 
-        Log.v(TAG, "endpoint instance: " + endpoint);
+        Timber.v("endpoint instance: %s", endpoint);
         if(endpoint == null) {
-            Log.e(TAG, "unable to instantiate service for mode " + mode);
+            Timber.e("unable to instantiate service for mode:%s", mode);
             return;
         }
 
@@ -89,7 +93,6 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void onDestroy() {
-
     }
 
     @Override
@@ -257,6 +260,7 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     }
 
     public static String getEndpointStateAsString() {
+
         return hasEndpoint() ? endpoint.getConnectionState() : App.getContext().getString(R.string.connectivityDisconnectedConfigIncomplete);
     }
 

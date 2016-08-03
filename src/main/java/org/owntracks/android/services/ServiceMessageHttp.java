@@ -171,6 +171,7 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
             endpoint = new URL(Preferences.getUrl());
             changeState(EndpointState.IDLE, null);
         } catch (MalformedURLException e) {
+            e.printStackTrace();
             changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE, null);
             return;
         }
@@ -309,9 +310,13 @@ public class ServiceMessageHttp implements ProxyableService, OutgoingMessageProc
     }
 
 
-    public static int postMessage(String body, String url, @Nullable String userInfo, Context c, Long messageId) {
+    public static int postMessage(String body, @Nullable  String url, @Nullable String userInfo, Context c, Long messageId) {
         Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
 
+        if(url == null) {
+            Timber.e("url not configured. messageId:%s", messageId);
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
         Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
 
         if(userInfo != null) {

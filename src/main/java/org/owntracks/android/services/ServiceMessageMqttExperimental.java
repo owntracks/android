@@ -53,10 +53,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 import static org.owntracks.android.services.ServiceMessage.EndpointState.*;
 
-public class ServiceMessageMqttExperimental implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint{
+public class ServiceMessageMqttExperimental implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint, MqttCallbackExtended {
 
     private static final String TAG = "ServiceMessageMqttE";
     private PausableThreadPoolExecutor pubPool;
@@ -175,9 +176,12 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
         try {
             this.client = new MqttAndroidClient(context, getConnectUri(), getConnectClientId());
             this.client.setCallback(iClientCallback);
+            this.client.setCallback(this);
+            this.client.setTraceEnabled(true);
+
             changeState(CONNECTING);
             client.connect(getConnectOptions(), null, iCallbackConnection);
-        } catch (MqttException e) {
+        } catch (Exception e) {
             changeState(e);
             e.printStackTrace();
         }
@@ -324,7 +328,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
     }
 
 
-    private static EndpointState state = EndpointState.IDLE;
+    private static EndpointState state = IDLE;
 
 
     public static EndpointState getState() {
@@ -483,6 +487,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
     }
 
     private void changeState(Throwable e) {
+        Timber.e(e, "error");
         error = e;
         changeState(DISCONNECTED_ERROR, e);
     }
@@ -536,6 +541,27 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
             } catch (MqttException e) {
                 e.printStackTrace();
             }
+
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+        Timber.e(cause, "connectionLost");
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        Timber.d("");
+
+    }
+
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
 
     }
 }

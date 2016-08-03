@@ -43,6 +43,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 public class ServiceLocator implements ProxyableService, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = "ServiceLocator";
@@ -500,6 +501,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
 	private void requestGeofences() {
+        Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 		if (!isReady())
 			return;
 

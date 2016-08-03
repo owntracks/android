@@ -13,13 +13,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 
 import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
-import org.owntracks.android.support.receiver.BootCompleteReceiver;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
@@ -50,7 +47,7 @@ public class ServiceProxy extends ServiceBindable {
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
 	private static boolean bgInitialized = false;
-	private static HandlerThread mServiceHandlereThread;
+	private static HandlerThread mServiceHandlerThread;
 	private static Handler mServiceHandler;
 
 	public static void setBgInitialized() {
@@ -69,9 +66,9 @@ public class ServiceProxy extends ServiceBindable {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		this.mServiceHandlereThread = new HandlerThread("ServiceThread");
-		this.mServiceHandlereThread.start();
-		this.mServiceHandler = new Handler(this.mServiceHandlereThread.getLooper());
+		mServiceHandlerThread = new HandlerThread("ServiceThread");
+		mServiceHandlerThread.start();
+		mServiceHandler = new Handler(mServiceHandlerThread.getLooper());
 
 	}
 
@@ -80,10 +77,11 @@ public class ServiceProxy extends ServiceBindable {
 		instance = this;
 
 
-
+		Log.v("foo", "posting runnables");
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				Timber.d("instantiating services async");
 				instantiateService(SERVICE_APP);
 				instantiateService(SERVICE_NOTIFICATION);
 				instantiateService(SERVICE_LOCATOR);
@@ -100,13 +98,8 @@ public class ServiceProxy extends ServiceBindable {
 			}
 		};
 
-
-		Thread r = new Thread(runnable);
-		r.start();
-
+		mServiceHandler.post(runnable);
 		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
-
-
 
 	}
 
@@ -140,6 +133,7 @@ public class ServiceProxy extends ServiceBindable {
 	}
 
 	public static ProxyableService instantiateService(String id) {
+		Timber.v("service:%s", id);
 		if (services.containsKey(id))
 			return services.get(id);
 
@@ -294,6 +288,7 @@ public class ServiceProxy extends ServiceBindable {
 
 
 	private static void runQueue() {
+		Timber.v("queue length:%s", runQueue.size());
 		for (Runnable r : runQueue)
 			r.run();
 		runQueue.clear();
