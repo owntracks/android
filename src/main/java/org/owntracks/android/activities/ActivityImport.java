@@ -17,11 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.receiver.Parser;
+import org.owntracks.android.support.Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

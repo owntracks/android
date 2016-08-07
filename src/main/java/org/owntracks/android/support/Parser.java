@@ -1,4 +1,4 @@
-package org.owntracks.android.support.receiver;
+package org.owntracks.android.support;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

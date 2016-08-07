@@ -14,8 +14,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +22,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.receiver.Parser;
+import org.owntracks.android.support.Parser;
 
 public class ActivityExport extends ActivityBase {
     private static final String TAG = "ActivityExport";
