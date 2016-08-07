@@ -19,14 +19,12 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/coordinator"
         android:layout_below="@+id/fragmentToolbar">
 
 
 
         <com.google.android.gms.maps.MapView
             android:name="com.google.android.gms.maps.MapFragment"
-            android:id="@+id/mapView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
@@ -37,7 +35,6 @@
 
         <LinearLayout
 
-            android:id="@+id/bottomSheetLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/background"
@@ -48,11 +45,10 @@
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
-            <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
+            <include layout="@layout/row_contact"/>
 
 
             <TextView
-                android:id="@+id/locationDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -64,7 +60,6 @@
                 style="@style/ListItemPrimary"/>
 
             <TextView
-                android:id="@+id/locationDateLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/contactDetailsReportedTime"
@@ -78,7 +73,6 @@
 
 
             <TextView
-                android:id="@+id/acc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{item.fusedLocationAccuracy +'m'}"
@@ -92,7 +86,6 @@
 
 
             <TextView
-                android:id="@+id/accLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/contactDetailsAccuracy"
@@ -115,7 +108,6 @@
 
 
             <TextView
-                android:id="@+id/tid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{item.trackerId ?? @string/na}"
@@ -128,7 +120,6 @@
 
 
             <TextView
-                android:id="@+id/tidLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/contactDetailsTrackerId"
@@ -140,7 +131,6 @@
                 style="@style/ListItemSecondary"/>
 
             <TextView
-                android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{item.id ?? @string/na}"
@@ -152,7 +142,6 @@
                 style="@style/ListItemPrimary"/>
 
             <TextView
-                android:id="@+id/topicLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/contactDetailsTopic"
@@ -167,7 +156,6 @@
                 android:layout_marginLeft="58dp"
                 android:layout_marginBottom="8dp"
 
-                android:id="@+id/moreButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:adjustViewBounds="true"

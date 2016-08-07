@@ -107,7 +107,7 @@ android {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             jniLibs.srcDir 'jniLibs'
-            java.srcDirs = ['src/main/java']
+            java.srcDirs = ['src/main/java', 'build/generated/source/greendao/org/owntracks/android/db']
 
 
         }

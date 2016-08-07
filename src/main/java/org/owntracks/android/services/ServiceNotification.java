@@ -225,14 +225,14 @@ public class ServiceNotification implements ProxyableService {
             notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
     }
-    private void updateNotificationOngoing(ServiceMessage.EndpointState state) {
+    public void  updateNotificationOngoing() {
+        updateNotificationOngoing(ServiceMessage.EndpointState.INITIAL);
     }
 
-    public void  updateNotificationOngoing() {
+    private void updateNotificationOngoing(ServiceMessage.EndpointState state) {
         if (!Preferences.getNotification())
             return;
 
-        String subtitle = ServiceMessage.getEndpointStateAsString();
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
             notificationBuilderOngoing.setContentTitle(this.lastPublishedLocationMessage.getGeocoder());

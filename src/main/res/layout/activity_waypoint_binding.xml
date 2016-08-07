@@ -46,7 +46,6 @@
                     android:gravity="bottom"
                     android:inputType="textVisiblePassword"
                     android:textSize="24sp"
-                    android:id="@+id/description"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -79,7 +78,6 @@
                         app:met_floatingLabel="normal"
                         app:met_baseColor="@color/textPrimary"
                         app:met_primaryColor="@color/accent"
-                        android:id="@+id/latitude"
                         android:inputType="numberDecimal"
                         android:text="@{item.geofenceLatitude}"
                         app:met_helperText=""/>
@@ -90,7 +88,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/longitude"
-                        android:id="@+id/longitude"
                         android:text="@{item.geofenceLongitude}"
                         android:inputType="numberDecimal"
                         app:met_floatingLabel="normal"
@@ -106,7 +103,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/radius"
-                        android:id="@+id/radius"
                         android:digits="0123456789"
                         android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.geofenceRadius)}'
                         android:inputType="numberDecimal"
@@ -123,7 +119,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/beaconUUID"
-                        android:id="@+id/beaconUUID"
                         android:inputType="textVisiblePassword"
                         android:text='@{item.beaconUUID}'
 
@@ -139,7 +134,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/beaconMajor"
-                        android:id="@+id/beaconMajor"
                         android:inputType="numberDecimal"
                         android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMajor)}'
                         app:met_floatingLabel="normal"
@@ -155,7 +149,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/beaconMinor"
-                        android:id="@+id/beaconMinor"
                         android:inputType="numberDecimal"
                         android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMinor)}'
                         app:met_floatingLabel="normal"
@@ -171,7 +164,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/ssid"
-                        android:id="@+id/ssid"
                         android:inputType="textVisiblePassword"
                         app:met_floatingLabel="normal"
                         app:met_baseColor="@color/textPrimary"
@@ -181,7 +173,6 @@
 
 
                 <RelativeLayout
-                    android:id="@+id/shareWrapper"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -193,11 +184,9 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="@string/share"
-                        android:textSize="18sp"
-                        android:id="@+id/descShare"/>
+                        android:textSize="18sp" />
                     <Switch
 
-                        android:id="@+id/share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
