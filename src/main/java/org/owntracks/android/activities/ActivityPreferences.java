@@ -21,12 +21,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.support.EditIntegerPreference;
 import org.owntracks.android.support.EditStringPreference;
 import org.owntracks.android.support.Events;

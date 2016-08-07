@@ -7,7 +7,6 @@ import android.util.Log;
 
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.SecretBox;
-import org.owntracks.android.R;
 
 
 public class EncryptionProvider {

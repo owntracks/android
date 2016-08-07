@@ -1,8 +1,6 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
-import android.util.Log;
 
-import org.owntracks.android.support.CanceableRunnable;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
