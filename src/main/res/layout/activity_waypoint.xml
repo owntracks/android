@@ -46,6 +46,7 @@
                     android:gravity="bottom"
                     android:inputType="textVisiblePassword"
                     android:textSize="24sp"
+                    android:id="@+id/description"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -67,112 +68,120 @@
                 android:orientation="vertical"
                 android:layout_marginEnd="@dimen/default_spacing"
                 android:layout_marginRight="@dimen/default_spacing">
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        app:met_iconLeft="@drawable/ic_location"
-                        android:layout_marginTop="20dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/latitude"
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        android:inputType="numberDecimal"
-                        android:text="@{item.geofenceLatitude}"
-                        app:met_helperText=""/>
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    app:met_iconLeft="@drawable/ic_location"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/latitude"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    android:id="@+id/latitude"
+                    android:inputType="numberDecimal"
+                    android:text="@{item.geofenceLatitude}"
+                    app:met_helperText=""/>
 
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/longitude"
-                        android:text="@{item.geofenceLongitude}"
-                        android:inputType="numberDecimal"
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_location"
-                        app:met_helperText=""/>
-
-
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/radius"
-                        android:digits="0123456789"
-                        android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.geofenceRadius)}'
-                        android:inputType="numberDecimal"
-                        app:met_helperText="Meters"
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_radius"
-                        />
-
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/beaconUUID"
-                        android:inputType="textVisiblePassword"
-                        android:text='@{item.beaconUUID}'
-
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_radius"
-                        />
-
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/beaconMajor"
-                        android:inputType="numberDecimal"
-                        android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMajor)}'
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_radius"
-                        />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/longitude"
+                    android:id="@+id/longitude"
+                    android:text="@{item.geofenceLongitude}"
+                    android:inputType="numberDecimal"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_location"
+                    app:met_helperText=""/>
 
 
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/beaconMinor"
-                        android:inputType="numberDecimal"
-                        android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMinor)}'
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_radius"
-                        />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/radius"
+                    android:id="@+id/radius"
+                    android:digits="0123456789"
+                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.geofenceRadius)}'
+                    android:inputType="numberDecimal"
+                    app:met_helperText="Meters"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_radius"
+                    />
 
-                    <com.rengwuxian.materialedittext.MaterialEditText
-                        android:visibility="gone"
-                        android:layout_marginLeft="@dimen/default_spacing_half"
-                        android:layout_marginStart="@dimen/default_spacing_half"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/ssid"
-                        android:inputType="textVisiblePassword"
-                        app:met_floatingLabel="normal"
-                        app:met_baseColor="@color/textPrimary"
-                        app:met_primaryColor="@color/accent"
-                        app:met_iconLeft="@drawable/ic_radius"
-                        />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/beaconUUID"
+                    android:id="@+id/beaconUUID"
+                    android:inputType="textVisiblePassword"
+                    android:text='@{item.beaconUUID}'
+
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_radius"
+                    />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/beaconMajor"
+                    android:id="@+id/beaconMajor"
+                    android:inputType="numberDecimal"
+                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMajor)}'
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_radius"
+                    />
+
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/beaconMinor"
+                    android:id="@+id/beaconMinor"
+                    android:inputType="numberDecimal"
+                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMinor)}'
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_radius"
+                    />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:visibility="gone"
+                    android:layout_marginLeft="@dimen/default_spacing_half"
+                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/ssid"
+                    android:id="@+id/ssid"
+                    android:inputType="textVisiblePassword"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    app:met_iconLeft="@drawable/ic_radius"
+                    />
 
 
                 <RelativeLayout
+                    android:id="@+id/shareWrapper"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -184,9 +193,11 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="@string/share"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:id="@+id/descShare"/>
                     <Switch
 
+                        android:id="@+id/share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"

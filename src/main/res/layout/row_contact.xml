@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
+        android:id="@+id/contactRow"
         android:minHeight="72dp">
 
         <ImageView
@@ -40,6 +41,7 @@
 
             <TextView
 
+                android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{item.fusedName}"
@@ -48,6 +50,7 @@
                 style="@style/ListItemPrimary" />
 
             <TextView
+                android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:messageLocation="@{item.messageLocation}"

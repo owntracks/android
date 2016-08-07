@@ -39,6 +39,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
+
 public class ServiceNotification implements ProxyableService {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
     public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION"; //unused for now
@@ -245,7 +247,7 @@ public class ServiceNotification implements ProxyableService {
 
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
-            notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary));
+            notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
             notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
             notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -262,7 +264,7 @@ public class ServiceNotification implements ProxyableService {
 
         String name;
         String dateStr = dateFormater.format(new Date());
-        String transition =  context.getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionentering : R.string.transitionleaving);
+        String transition =  context.getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving);
         String location = message.getDesc();
 
         if (location == null) {
@@ -402,7 +404,7 @@ public class ServiceNotification implements ProxyableService {
     }
 
     public void onMessageLocationGeocoderResult(MessageLocation m) {
-
+        Timber.v("for location: %s", m.getGeocoder());
         if (m == lastPublishedLocationMessage) {
             updateNotificationOngoing();
         }
