@@ -212,7 +212,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             };
 
 
-            hostPreference = findPreference(getString(R.string.keyHost));
+            hostPreference = findPreference(getString(R.string.preferencesKeyHost));
             hostPreference.setOnPreferenceClickListener(hostClickListener);
             wsVal = Preferences.getWs();
 
@@ -258,7 +258,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             };
 
 
-            hostPreference = findPreference(getString(R.string.keyHost));
+            hostPreference = findPreference(getString(R.string.preferencesKeyHost));
             hostPreference.setOnPreferenceClickListener(hostClickListener);
 
         }
@@ -347,7 +347,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             };
 
             authenticationVal = Preferences.getAuth();
-            identificationPreference = findPreference(getString(R.string.keyIdentification));
+            identificationPreference = findPreference(getString(R.string.preferencesKeyIdentification));
             identificationPreference.setOnPreferenceClickListener(identificationClickListener);
 
         }
@@ -520,7 +520,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 }
             };
             tlsVal = Preferences.getTls();
-            securityPreference = findPreference(getString(R.string.keySecurity));
+            securityPreference = findPreference(getString(R.string.preferencesKeySecurity));
             securityPreference.setOnPreferenceClickListener(securityListener);
 
         }
@@ -580,7 +580,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             };
 
             cleansessionVal = Preferences.getCleanSession();
-            optionsPreference = findPreference(getString(R.string.keyOptions));
+            optionsPreference = findPreference(getString(R.string.preferencesKeyParameters));
             optionsPreference.setOnPreferenceClickListener(optionsClickListener);
         }
 

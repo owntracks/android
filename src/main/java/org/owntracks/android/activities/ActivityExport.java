@@ -55,7 +55,6 @@ public class ActivityExport extends ActivityBase {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             final Activity a = getActivity();
-            PackageManager pm = a.getPackageManager();
 
             addPreferencesFromResource(R.xml.export);
 
@@ -81,7 +80,7 @@ public class ActivityExport extends ActivityBase {
     private static Preference.OnPreferenceClickListener exportToFile = new Preference.OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            String exportStr = null;
+            String exportStr;
             try {
                 exportStr = Parser.serializeSync(Preferences.exportToMessage());
             } catch (IOException e) {

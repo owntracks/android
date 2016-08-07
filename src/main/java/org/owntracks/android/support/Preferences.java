@@ -313,10 +313,6 @@ public class Preferences {
             try {
                 Log.v(TAG, "import for key: " + key + " with value: " + m.get(key));
                 methods.get(key).invoke(null, m.get(key));
-            } catch (IllegalAccessException e)  {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -983,9 +979,7 @@ public class Preferences {
             try {
                 //If the underlying method is static, then the specified obj argument is ignored. It may be null.
                 cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

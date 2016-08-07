@@ -398,8 +398,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_intro, container, false);
-            return v;
+            return (ViewGroup) inflater.inflate(R.layout.fragment_welcome_intro, container, false);
         }
     }
 
@@ -661,11 +660,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_done, container, false);
-
-
-
-            return v;
+            return (ViewGroup) inflater.inflate(R.layout.fragment_welcome_done, container, false);
         }
     }
 

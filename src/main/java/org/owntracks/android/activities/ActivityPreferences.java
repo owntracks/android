@@ -205,34 +205,8 @@ public class ActivityPreferences extends ActivityBase {
                 }
             };
 
-            //Fix toolbars for PreferenceScreens on demand
-            Preference.OnPreferenceClickListener genericListener = new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(final android.preference.Preference preference) {
-                    if(!(preference instanceof PreferenceScreen))
-                        return false;
 
-                    final Dialog dialog = ((PreferenceScreen)preference).getDialog();
-                    LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
-                    final Toolbar bar = (Toolbar) LayoutInflater.from(preference.getContext()).inflate(R.layout.toolbar, root, false);
-                    root.addView(bar, 0); // insert at top
-
-                    bar.setTitle(preference.getTitle());
-                    bar.setNavigationOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    return false;
-                }
-            };
             findPreference("connectionScreen").setOnPreferenceClickListener(connectionListener);
-           // findPreference("reportingScreen").setOnPreferenceClickListener(genericListener);
-           // findPreference("notificationScreen").setOnPreferenceClickListener(genericListener);
-            // findPreference("advancedScreen").setOnPreferenceClickListener(genericListener);
-            // findPreference("informationScreen").setOnPreferenceClickListener(genericListener);
         }
 
         private void populatePreferencesScreen(PreferenceScreen root) {
