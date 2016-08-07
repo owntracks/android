@@ -17,24 +17,14 @@
     <bool name="valWsPublic">false</bool>
     <integer name="valKeepalivePublic">120</integer>
     <integer name="valPubQosPublic">0</integer>
-    <string name="valGeohashMsgTopicPublic" formatted="false">msg/+/%s</string>
 
     <bool name="valInfoPublic" >true</bool>
-
-
-
-    <integer name="valKeepaliveHosted">3600</integer>
 
 
     <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
     <string name="valSubTopic">owntracks/+/+</string>
 
-
-
-    <string name="valTrackerId">""</string>
-
     <integer name="valPort">8883</integer>
-    <integer name="valPubInterval">300</integer>
 
     <integer name="valPubQos">1</integer>
     <integer name="valKeepalive">3600</integer>
@@ -50,7 +40,6 @@
 
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
-    <bool name="valCleanSessionPrivate">false</bool>
     <bool name="valPubExtendedData">true</bool>
     <bool name="valNotification">true</bool>
     <bool name="valNotificationLocation">true</bool>
@@ -58,8 +47,6 @@
 
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
-    <bool name="valConnectionAdvancedMode">false</bool>
-    <bool name="valZeroLenghClientIdEnabled">false</bool>
     <bool name="valAuth">true</bool>
     <bool name="valRemoteCommand">true</bool>
     <bool name="valRemoteConfiguration">true</bool>
@@ -86,13 +73,7 @@
         <item>2</item>
         <item>3</item>
     </string-array>
-    <string-array name="qos">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
 
-    <integer name="valZero">0</integer>
     <string name="valEmpty">""</string>
 
 </resources>

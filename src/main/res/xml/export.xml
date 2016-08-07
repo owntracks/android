@@ -14,8 +14,8 @@
     </Preference>
     <Preference
         android:key="import"
-        android:title="@string/importConfig"
-        android:summary="@string/importConfig">
+        android:title="@string/preferencesImportFile"
+        android:summary="@string/preferencesImportFileSummary">
     </Preference>
 
 </PreferenceScreen>
