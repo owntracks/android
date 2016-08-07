@@ -40,7 +40,6 @@ public class EncryptionProvider {
 
     public static void initialize() {
         initializeSecretBox();
-        SecretBoxManager m = new SecretBoxManager();
     }
 
     public static String decrypt(String cyphertextb64) {

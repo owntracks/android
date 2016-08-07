@@ -7,7 +7,7 @@
             android:defaultValue="@integer/valModeId"
             android:entries="@array/profileIds_readable"
             android:entryValues="@array/modeIds"
-            android:key="@string/keyModeId"
+            android:key="@string/preferencesKeyModeId"
             android:title="@string/preferencesProfileId" />
 
 </PreferenceScreen>

@@ -169,4 +169,10 @@
     <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
 
 
+    <string name="preferencesKeyModeId">mode</string>
+    <string name="preferencesKeyHost">host</string>
+    <string name="preferencesKeyIdentification">identification</string>
+    <string name="preferencesKeySecurity">security</string>
+    <string name="preferencesKeyParameters">parameters</string>
+
 </resources>

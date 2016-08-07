@@ -59,8 +59,7 @@ public class RecyclerViewAdapter<T> extends BindingRecyclerViewAdapter<T> implem
 
     @Override
     public ViewDataBinding onCreateBinding(LayoutInflater inflater, @LayoutRes int layoutId, ViewGroup viewGroup) {
-        ViewDataBinding binding = super.onCreateBinding(inflater, layoutId, viewGroup);
-        return binding;
+        return super.onCreateBinding(inflater, layoutId, viewGroup);
     }
 
     @Override

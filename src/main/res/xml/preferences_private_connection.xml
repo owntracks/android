@@ -7,23 +7,23 @@
         android:defaultValue="@integer/valModeId"
         android:entries="@array/profileIds_readable"
         android:entryValues="@array/modeIds"
-        android:key="@string/keyModeId"
+        android:key="@string/preferencesKeyModeId"
         android:title="@string/preferencesProfileId"
         />
 
     <Preference
-        android:key="@string/keyHost"
+        android:key="host"
         android:title="@string/preferencesHost" />
 
     <Preference
-        android:key="@string/keyIdentification"
+        android:key="@string/preferencesKeyIdentification"
         android:title="@string/preferencesIdentification" />
 
     <Preference
-        android:key="@string/keySecurity"
+        android:key="@string/preferencesKeySecurity"
         android:title="@string/preferencesSecurity" />
     <Preference
-        android:key="@string/keyOptions"
+        android:key="@string/preferencesKeyParameters"
         android:title="@string/preferencesOptions"/>
 
 </PreferenceScreen>
