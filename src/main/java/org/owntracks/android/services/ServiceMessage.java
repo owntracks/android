@@ -1,6 +1,8 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -55,7 +57,25 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     }
 
     public enum EndpointState {
-        INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, ERROR, ERROR_DATADISABLED, ERROR_CONFIGURATION
+        INITIAL,
+        IDLE,
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTING,
+        DISCONNECTED,
+        DISCONNECTED_USERDISCONNECT,
+        ERROR,
+        ERROR_DATADISABLED,
+        ERROR_CONFIGURATION;
+
+        public String getLabel(Context context) {
+            Resources res = context.getResources();
+            int resId = res.getIdentifier(this.name(), "string", context.getPackageName());
+            if (0 != resId) {
+                return (res.getString(resId));
+            }
+            return (name());
+        }
     }
 
 
@@ -273,35 +293,5 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         Preferences.importFromMessage(message);
     }
 
-    public static String getEndpointStateAsString() {
-        int id;
-        switch (endpointState) {
-            case CONNECTED:
-                id = R.string.connectivityConnected;
-                break;
-            case CONNECTING:
-                id = R.string.connectivityConnecting;
-                break;
-            case DISCONNECTING:
-                id = R.string.connectivityDisconnecting;
-                break;
-            case DISCONNECTED_USERDISCONNECT:
-                id = R.string.connectivityDisconnectedUserDisconnect;
-                break;
-            case ERROR_DATADISABLED:
-                id = R.string.connectivityDisconnectedDataDisabled;
-                break;
-            case ERROR:
-                id = R.string.error;
-                break;
-            case ERROR_CONFIGURATION:
-                id = R.string.connectivityDisconnectedConfigIncomplete;
-                break;
-            default:
-                id = R.string.connectivityDisconnected;
-
-        }
-        return App.getContext().getString(id);
-    }
 
 }
