@@ -233,6 +233,7 @@ public class ServiceNotification implements ProxyableService {
         if (!Preferences.getNotification())
             return;
 
+        String subtitle = state.getLabel(context);
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
             notificationBuilderOngoing.setContentTitle(this.lastPublishedLocationMessage.getGeocoder());
