@@ -44,7 +44,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
-import org.owntracks.android.support.receiver.Parser;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 
 import java.io.FileNotFoundException;

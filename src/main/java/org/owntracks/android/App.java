@@ -16,7 +16,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.support.receiver.Parser;
+import org.owntracks.android.support.Parser;
 
 import android.app.Activity;
 import android.app.Application;
@@ -28,10 +28,8 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
