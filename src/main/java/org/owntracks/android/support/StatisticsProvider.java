@@ -1,16 +1,12 @@
 package org.owntracks.android.support;
 
-import android.content.Context;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 
 public class StatisticsProvider  {

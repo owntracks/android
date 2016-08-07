@@ -13,7 +13,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateFactory;
-import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.net.ssl.KeyManagerFactory;

@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 
-import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.services.ServiceNotification;
 

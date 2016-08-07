@@ -6,7 +6,6 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceMessage;
-import org.owntracks.android.services.ServiceMessageMqtt;
 
 import android.location.Location;
 

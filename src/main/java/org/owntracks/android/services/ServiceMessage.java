@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import org.owntracks.android.App;
-import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;

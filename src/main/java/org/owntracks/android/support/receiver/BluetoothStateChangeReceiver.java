@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import org.owntracks.android.services.ServiceProxy;
-
 public class BluetoothStateChangeReceiver extends BroadcastReceiver{
     private static final String TAG = "BluetoothStateChangeReceiver";
 

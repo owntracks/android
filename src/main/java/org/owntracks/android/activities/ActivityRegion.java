@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.ActivityWaypointBindingBinding;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
@@ -82,7 +81,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
 
         //setContentView(R.layout.activity_waypoint);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_waypoint_binding);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_waypoint);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);

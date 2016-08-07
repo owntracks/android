@@ -2,7 +2,6 @@ package org.owntracks.android.support;
 
 import android.content.Context;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;

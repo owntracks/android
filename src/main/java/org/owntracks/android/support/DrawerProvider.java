@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 
-import android.app.Activity;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityBase;
 import org.owntracks.android.activities.ActivityContacts;
-import org.owntracks.android.activities.ActivityFeatured;
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.activities.ActivityPreferences;
 import org.owntracks.android.activities.ActivityStatus;

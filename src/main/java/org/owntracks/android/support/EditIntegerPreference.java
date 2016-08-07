@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import android.util.AttributeSet;
 
