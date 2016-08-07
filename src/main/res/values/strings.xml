@@ -174,5 +174,19 @@
     <string name="preferencesKeyIdentification">identification</string>
     <string name="preferencesKeySecurity">security</string>
     <string name="preferencesKeyParameters">parameters</string>
+    <string name="transitionEntering">entering</string>
+    <string name="transitionLeaving">leaving</string>
+
+
+    <string name="INITIAL">"Initializing</string>
+    <string name="IDLE">Idle</string>
+    <string name="CONNECTING">Connecting</string>
+    <string name="CONNECTED">Connected</string>
+    <string name="DISCONNECTING">Disconnecting</string>
+    <string name="DISCONNECTED">Disconnected</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
+    <string name="ERROR">Error</string>
+    <string name="ERROR_DATADISABLED">Data cnnection not available </string>
+    <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
 
 </resources>

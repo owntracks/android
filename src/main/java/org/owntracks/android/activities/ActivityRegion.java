@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.databinding.ActivityWaypointBinding;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
@@ -66,7 +67,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     private MenuItem saveButton;
 
     // Thanks Google for not providing a getter for the value of switches.
-    private ActivityWaypointBindingBinding binding;
+    private ActivityWaypointBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
