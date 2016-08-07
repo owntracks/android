@@ -1,12 +1,10 @@
 package org.owntracks.android.support;
 
-import android.app.Service;
 import android.widget.Toast;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceMessage;
-import org.owntracks.android.services.ServiceMessageMqtt;
 
 public class Toasts {
     public static void showCurrentLocationNotAvailable(){
@@ -41,11 +39,11 @@ public class Toasts {
         //    stringRes = R.string.snackbarConnecting;
         } else if (state == ServiceMessage.EndpointState.DISCONNECTED || state == ServiceMessage.EndpointState.DISCONNECTED_USERDISCONNECT ) {
             stringRes = R.string.snackbarDisconnected;
-        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_ERROR) {
+        } else if (state == ServiceMessage.EndpointState.ERROR) {
             stringRes = R.string.snackbarDisconnectedError;
-        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
+        } else if (state == ServiceMessage.EndpointState.ERROR_CONFIGURATION) {
             stringRes = R.string.snackbarConfigIncomplete;
-        } else if (state == ServiceMessage.EndpointState.DISCONNECTED_DATADISABLED) {
+        } else if (state == ServiceMessage.EndpointState.ERROR_DATADISABLED) {
             stringRes = R.string.connectivityDisconnectedDataDisabled;
         }
 

@@ -1,7 +1,8 @@
-package org.owntracks.android.services;
+package org.owntracks.android.support.interfaces;
 
 import android.content.Intent;
 
+import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 
 public interface ProxyableService {

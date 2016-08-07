@@ -9,13 +9,13 @@ import org.owntracks.android.App;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.db.WaypointDao.Properties;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.interfaces.ProxyableService;
 
 import android.Manifest;
 import android.content.Intent;
@@ -143,7 +143,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     public void enteredWifiNetwork(String ssid) {
         Log.v(TAG, "matching waypoints against SSID " + ssid);
 
-        List<Waypoint> ws = this.waypointDao.queryBuilder().where(Properties.ModeId.eq(Preferences.getModeId()), Properties.WifiSSID.like("TestSSID")).build().list();
+        List<Waypoint> ws = this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId()), WaypointDao.Properties.WifiSSID.like("TestSSID")).build().list();
 
         for (Waypoint w : ws) {
             Log.v(TAG, "matched waypoint with ssid " + w.getDescription());
@@ -170,7 +170,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT){
                 for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
-                    Waypoint w = this.waypointDao.queryBuilder().where(Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
+                    Waypoint w = this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
 
                     if (w != null) {
                         Log.v(TAG, "Waypoint triggered " + w.getDescription() + " transition: " + transition);
@@ -630,7 +630,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     }
 
     private List<Waypoint> loadWaypointsForModeIdWithValidGeofence(int modeId) {
-        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId), Properties.GeofenceLatitude.isNotNull(), Properties.GeofenceLongitude.isNotNull(), Properties.GeofenceRadius.isNotNull(), Properties.GeofenceRadius.gt(0)).build().list();
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(modeId), WaypointDao.Properties.GeofenceLatitude.isNotNull(), WaypointDao.Properties.GeofenceLongitude.isNotNull(), WaypointDao.Properties.GeofenceRadius.isNotNull(), WaypointDao.Properties.GeofenceRadius.gt(0)).build().list();
     }
 
 	private boolean isWaypointWithValidGeofence(Waypoint w) {

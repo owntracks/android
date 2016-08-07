@@ -12,22 +12,15 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.util.Pair;
 import android.util.Log;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
@@ -37,25 +30,19 @@ import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.BuildConfig;
-import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageEncrypted;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.support.interfaces.MessageReceiver;
-import org.owntracks.android.support.interfaces.MessageSender;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
@@ -75,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
-public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
+public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
 	private static final String TAG = "ServiceMessageMqtt";
 	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -85,40 +72,33 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 	private ServiceProxy context;
 
 	private PausableThreadPoolExecutor pubPool;
-	private MessageSender messageSender;
-	private MessageReceiver messageReceiver;
 	private BroadcastReceiver idleReceiver;
 	private PowerManager powerManager;
+	private ServiceMessage service;
+
+	@Override
+	public void onSetService(ServiceMessage service) {
+		this.service = service;
+		changeState(EndpointState.INITIAL);
+		doStart();
+	}
 
 	@Override
 	public boolean sendMessage(MessageBase message) {
 		Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
 
-		if(state == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE) {
+		if(state == ServiceMessage.EndpointState.ERROR_CONFIGURATION) {
 			Log.e(TAG, "dropping outgoing message due to incomplete configuration");
 			return false;
 		}
 
 		message.setOutgoingProcessor(this);
 		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, pubPool.getQueueLength());
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, pubPool.getQueueLength());
 
 		this.pubPool.queue(message);
 		return true;
 	}
-
-	@Override
-	public void setMessageSenderCallback(MessageSender callback) {
-		this.messageSender = callback;
-	}
-
-	@Override
-	public void setMessageReceiverCallback(MessageReceiver callback) {
-		this.messageReceiver = callback;
-	}
-
-
-
 
 	@Override
 	public void processOutgoingMessage(MessageBase message) {
@@ -182,7 +162,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 				return;
 
 			Timber.v("messageId: %s", MessageBase.class.cast(token).getMessageId());
-			messageSender.onMessageDelivered(MessageBase.class.cast(token.getUserContext()).getMessageId());
+			service.onMessageDelivered(MessageBase.class.cast(token.getUserContext()).getMessageId());
 
 		}
 
@@ -238,9 +218,9 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 				m.setTopic(getBaseTopic(m, topic));
 				m.setRetained(message.isRetained());
 				m.setQos(message.getQos());
-				messageReceiver.onMessageReceived(m);
-			} catch (JsonParseException e) {
-				Timber.e(e, "payload:%s ", new String(message.getPayload()));
+				service.onMessageReceived(m);
+			} catch (Exception e) {
+				Timber.e("payload:%s ", new String(message.getPayload()));
 			}
 
 		}
@@ -295,7 +275,6 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 	private Thread workerThread;
 	private static Exception error;
     private MqttClientPersistence persistenceStore;
-    private WakeLock networkWakelock;
     private ReconnectHandler reconnectHandler;
 	private PingHandler pingHandler;
 	private boolean connectedWithCleanSession;
@@ -305,33 +284,14 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 
 
-
-
-	@Override
-	public void onCreate(ServiceProxy p) {
-		Log.v(TAG, "loaded MQTT backend");
-		this.context = p;
-		this.workerThread = null;
-		initPausedPubPool();
+	public void onCreate(ServiceProxy context) {
+		Timber.v("loaded MQTT endoint");
+		this.context = context;
         this.persistenceStore = new CustomMemoryPersistence();
         this.reconnectHandler = new ReconnectHandler(context);
 		this.powerManager = PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE));
-
-		changeState(EndpointState.INITIAL);
-        doStart();
+		initPausedPubPool();
 		registerReceiver();
-
-		// Testing
-		/*MessageLocation m = new MessageLocation();
-		m.setLat(52.4251861);
-		m.setLon(9.7330908);
-		m.setAcc(100);
-		m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-		m.setT("m");
-		m.setTopic("owntracks/binarybucks/e");
-		m.setTid("e");
-
-		ServiceProxy.getServiceParser().processIncomingMessage(m);*/
 	}
 
 	private void initPausedPubPool() {
@@ -400,7 +360,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 		Log.v(TAG, "handleStart: force:" + force);
         if(!Preferences.canConnect()) {
-			changeState(EndpointState.DISCONNECTED_CONFIGINCOMPLETE);
+			changeState(EndpointState.ERROR_CONFIGURATION);
 			return;
         }
 
@@ -418,7 +378,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 		// Check if there is a data connection. If not, try again in some time.
 		if (!isOnline()) {
 			Log.e(TAG, "handleStart: isOnline:false");
-			changeState(EndpointState.DISCONNECTED_DATADISABLED);
+			changeState(EndpointState.ERROR_DATADISABLED);
 
 			if(pingHandler != null) {
 				pingHandler.stop();
@@ -446,8 +406,8 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 		return (state == EndpointState.INITIAL)
 				|| (state == EndpointState.DISCONNECTED)
 				|| (state == EndpointState.DISCONNECTED_USERDISCONNECT)
-				|| (state == EndpointState.DISCONNECTED_DATADISABLED)
-				|| (state == EndpointState.DISCONNECTED_ERROR)
+				|| (state == EndpointState.ERROR_DATADISABLED)
+				|| (state == EndpointState.ERROR)
 
 				// In some cases the internal state may diverge from the mqtt
 				// client state.
@@ -562,7 +522,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
             m.setWill(Preferences.getPubTopicBase(true), lwt.toString().getBytes(), 0, false);
-        } catch(JSONException e) {}
+        } catch(JSONException ignored) {}
 
 	}
 
@@ -632,10 +592,6 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 	}
 
 
-    private void subscribe(String topic)  {
-        subscribe(new String[]{topic});
-    }
-
     private void subscribe(String[] topics) {
 		if(!isConnected()) {
             Log.e(TAG, "subscribe when not connected");
@@ -661,6 +617,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 		return qos;
 	}
 
+	@SuppressWarnings("unused")
 	private void unsubscribe(String[] topics) {
 		if(!isConnected()) {
 			Log.e(TAG, "subscribe when not connected");
@@ -723,7 +680,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 	private void changeState(Exception e) {
 		error = e;
-		changeState(EndpointState.DISCONNECTED_ERROR, e);
+		changeState(EndpointState.ERROR, e);
 	}
 
 	private void changeState(EndpointState newState) {
@@ -731,9 +688,8 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 	}
 
 	private void changeState(EndpointState newState, Exception e) {
-		//Log.d(TAG, "ServiceMessageMqtt state changed to: " + newState);
 		state = newState;
-		EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
+		service.onEndpointStateChanged(newState, e);
 	}
 
 	private boolean isOnline() {
@@ -750,14 +706,6 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 	public boolean isConnected() {
 		return this.mqttClient != null && this.mqttClient.isConnected(  );
-	}
-
-	public static boolean isErrorState(EndpointState state) {
-		return state == EndpointState.DISCONNECTED_ERROR;
-	}
-
-	public static boolean hasError() {
-		return error != null;
 	}
 
 	public boolean isConnecting() {
@@ -777,49 +725,9 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 		return state;
 	}
 
-	public static String getErrorMessage() {
-		if (hasError() && (error.getCause() != null))
-			return "Error: " + error.getCause().getLocalizedMessage();
-		else
-			return "Error: " + ServiceProxy.getInstance().getString(R.string.na);
-
-	}
-
 	@Override
-	public String getConnectionState() {
-        int id;
-        switch (getState()) {
-            case CONNECTED:
-                id = R.string.connectivityConnected;
-                break;
-            case CONNECTING:
-                id = R.string.connectivityConnecting;
-                break;
-            case DISCONNECTING:
-                id = R.string.connectivityDisconnecting;
-                break;
-            case DISCONNECTED_USERDISCONNECT:
-                id = R.string.connectivityDisconnectedUserDisconnect;
-                break;
-            case DISCONNECTED_DATADISABLED:
-                id = R.string.connectivityDisconnectedDataDisabled;
-                break;
-            case DISCONNECTED_ERROR:
-                id = R.string.error;
-                break;
-			case DISCONNECTED_CONFIGINCOMPLETE:
-				id = R.string.connectivityDisconnectedConfigIncomplete;
-				break;
-            default:
-                id = R.string.connectivityDisconnected;
-
-        }
-        return context.getString(id);
-    }
-
-	@Override
-	public boolean acceptsMessages() {
-		return this.mqttClient != null;
+	public boolean isReady() {
+		return this.service != null && this.mqttClient != null;
 	}
 
 
@@ -838,13 +746,14 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public void onEvent(Events.Dummy e) {
 	}
 
 
 	public void clearQueues() {
 		initPausedPubPool();
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_BROKER_QUEUE_LENGTH, 0);
+		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, 0);
     }
 
 	@SuppressWarnings("unused")
@@ -929,17 +838,15 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 			if(!wakelock.isHeld())
 				wakelock.acquire();
 
-			//DEBUG
-			//comms = null;
-
 			if(comms == null) {
 				Log.v(TAG, "comms is null, running doStart()");
-				PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
+				PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
 				try {
 					p.send();
-				} catch (PendingIntent.CanceledException e) { } finally {
-					Log.v(TAG, "releaseWakeLock 1");
+				} catch (PendingIntent.CanceledException ignored) {
 
+				} finally {
+					Log.v(TAG, "releaseWakeLock 1");
 					releaseWakeLock();
 				}
 				return;
@@ -991,7 +898,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
         public void stop() {
             Log.v(TAG, "stop " + this);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null));
+            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, ServiceMessageMqtt.RECEIVER_ACTION_PING, null));
         }
 
 		// Schedules a BroadcastIntent that will trigger a ping message when received.
@@ -1002,7 +909,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 			long targetTstMs = System.currentTimeMillis() + delayInMilliseconds;
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE_MQTT, ServiceMessageMqtt.RECEIVER_ACTION_PING, null);
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, ServiceMessageMqtt.RECEIVER_ACTION_PING, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, targetTstMs, p);
 			} else {
@@ -1034,7 +941,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
             Log.v(TAG, "stopping reconnect handler");
 			backoff = 0;
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null));
+            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null));
 
             if (hasStarted) {
                 hasStarted = false;
@@ -1051,7 +958,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
 			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
 
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE_MQTT, RECEIVER_ACTION_RECONNECT, null);
+			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
 			} else {
@@ -1078,6 +985,7 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
             }
         }
 
+		@SuppressWarnings("unused")
         private Integer getSize(){
             return data.size();
         }
@@ -1089,20 +997,16 @@ public class ServiceMessageMqtt implements ProxyableService, OutgoingMessageProc
 
         @Override
         public void put(String key, MqttPersistable persistable) throws MqttPersistenceException {
-            Log.v(TAG, "put key " + key);
-
             data.put(key, persistable);
         }
 
         @Override
         public MqttPersistable get(String key) throws MqttPersistenceException {
-            Log.v(TAG, "get key " + key);
             return (MqttPersistable)data.get(key);
         }
 
         @Override
         public void remove(String key) throws MqttPersistenceException {
-            Log.v(TAG, "removing key " + key);
             data.remove(key);
         }
 

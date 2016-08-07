@@ -1,12 +1,12 @@
 package org.owntracks.android.services;
 
 import org.owntracks.android.App;
-import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandlerInterface;
+import org.owntracks.android.support.interfaces.ProxyableService;
 
 import android.content.Intent;
 import android.os.Message;

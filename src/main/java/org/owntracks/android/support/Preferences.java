@@ -982,7 +982,7 @@ public class Preferences {
 
             try {
                 //If the underlying method is static, then the specified obj argument is ignored. It may be null.
-                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null, null));
+                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {

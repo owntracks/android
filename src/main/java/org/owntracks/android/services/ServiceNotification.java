@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
@@ -28,12 +27,11 @@ import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ReverseGeocodingTask;
 import org.owntracks.android.support.Toasts;
+import org.owntracks.android.support.interfaces.ProxyableService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -227,6 +225,8 @@ public class ServiceNotification implements ProxyableService {
             notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
     }
+    private void updateNotificationOngoing(ServiceMessage.EndpointState state) {
+    }
 
     public void  updateNotificationOngoing() {
         if (!Preferences.getNotification())
@@ -367,16 +367,23 @@ public class ServiceNotification implements ProxyableService {
     @Override
     public void onEvent(Events.Dummy event) { }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(Events.ModeChanged e) {
+        updateNotificationOngoing(e.getNewModeId());
+    }
 
+    private void updateNotificationOngoing(int newModeId) {
 
+    }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.EndpointStateChanged e) {
         if (App.isInForeground())
             Toasts.showEndpointStateChange(e.getState());
 
-        updateNotificationOngoing();
+        updateNotificationOngoing(e.getState());
     }
+
 
     public void onEvent(Events.PermissionGranted e) {
         Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );

@@ -51,52 +51,14 @@
 	public static *** w(...);    
 }
 
-# --------------------------------------------------------------------
-# Crashlytics
-# --------------------------------------------------------------------
-# http://support.crashlytics.com/knowledgebase/articles/202143-eclipse-with-proguard
--keepattributes SourceFile,LineNumberTable
-
 
 # --------------------------------------------------------------------
-# REMOVE all Log messages except warnings and errors
+# KEEP GREENDAO
 # --------------------------------------------------------------------
--assumenosideeffects class android.util.Log {
-    public static *** d(...);
-    public static *** v(...);
-    public static *** i(...);
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
+	public static java.lang.String TABLENAME;
 }
-
-
-# --------------------------------------------------------------------
-# KEEP ACRA
-# --------------------------------------------------------------------
-
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class com.android.vending.licensing.ILicensingService
--keepclasseswithmembernames class * {
-    native <methods>;
-}
--keepclasseswithmembernames class * {
-    public <init>(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembernames class * {
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable {
-  public static final android.os.Parcelable$Creator *;
-}
-
-
-
-
-
+-keep class **$Properties
+-dontwarn org.greenrobot.greendao.database.**
+-dontwarn org.greenrobot.greendao.rx.**
 

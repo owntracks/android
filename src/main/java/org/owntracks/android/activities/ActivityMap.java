@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -260,7 +258,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.EndpointStateChanged e) {
-        if(e.getState() == ServiceMessage.EndpointState.DISCONNECTED_CONFIGINCOMPLETE)
+        if(e.getState() == ServiceMessage.EndpointState.ERROR_CONFIGURATION)
             Toasts.showEndpointNotConfigured();
     }
 
@@ -274,39 +272,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         }
     }
 
-
-    /*private void addContact(FusedContact c) {
-        c.addOnPropertyChangedCallback(contactChangedCallback);
-        updateContactMarker(c);
-    }*/
-
-/*
-    private Observable.OnPropertyChangedCallback contactChangedCallback = new Observable.OnPropertyChangedCallback() {
-        @Override
-        public void onPropertyChanged(final Observable observable, int i) {
-            Log.v(TAG, "onPropertyChanged " + observable);
-
-
-            if(observable instanceof FusedContact) {
-                if(Looper.myLooper() == Looper.getMainLooper())
-                    updateContactMarker((FusedContact)observable);
-                else {
-
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            updateContactMarker((FusedContact) observable);
-                        }
-                    });
-                }
-            }
-
-        }
-    };
-
-*/
-
-
-
     private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation() || map == null)
             return;
@@ -316,7 +281,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         if (m != null) {
             m.setPosition(c.getLatLng());
         } else {
-            m = map.addMarker(new MarkerOptions().snippet(c.getId()).position(c.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            m = map.addMarker(new MarkerOptions().position(c.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            m.setTag(c);
             markers.put(c.getId(), m);
         }
 
@@ -329,8 +295,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             updateContactMarker((FusedContact) ((Map.Entry) o).getValue());
         }
     }
+
     @SuppressWarnings("MissingPermission")
-    // Map uses custom provider that handles missing permissions
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.v(TAG, "onMapReady()");
@@ -358,7 +324,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         onAddInitialMarkers();
         onHandleIntentExtras();
     }
-
 
     @Override
     public void onNewIntent(Intent intent) {
@@ -398,15 +363,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     }
 
-
-
     private void centerDevice() {
         if(!mapLocationSource.hasLocation())
             return;
         centerMap(this.mapLocationSource.getLastKnownLocation().getLatLng());
     }
-
-
 
     private void centerMap(LatLng latLng) {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -423,8 +384,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         centerMap(c.getLatLng());
     }
 
-
-
     private void actionFollowDevice() {
         this.mode = ACTION_FOLLOW_DEVICE;
 
@@ -439,8 +398,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
-
-
     @Override
     public void onMapClick(LatLng latLng) {
         deselectContact();
@@ -448,7 +405,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        actionSelectContact(App.getFusedContact(marker.getSnippet()));
+        actionSelectContact(FusedContact.class.cast(marker.getTag()));
         return true;
     }
 
@@ -472,17 +429,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
-    private void updateBottomSheetContact(FusedContact fusedContact) {
-    }
-
-
-
     private void deselectContact() {
         hideBottomSheet();
         binding.setItem(null);
         activeContact = null;
     }
-
 
     View.OnClickListener bottomSheetClickListener = new View.OnClickListener() {
         // On click on the bottom sheet itself
@@ -514,13 +465,10 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     private void collapseBottomSheet() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-
     }
 
     private void hideBottomSheet() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
     }
 
 
@@ -536,10 +484,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             default:
                 return false;
         }
-
     }
-
-
 
     private static class MapLocationSource implements LocationSource {
         private static final String TAG = "MapLocationSource";
@@ -575,41 +520,4 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             return this.lastKnownLocation;
         }
     }
-
-
-
-
-/*    public void onEventMainThread(Events.CurrentLocationUpdated e) {
-
-        if(currentLocationMarker != null) {
-            this.currentLocationMarker.setPoint(e.getGeocodableLocation().getLatLng());
-            this.currentLocationMarker.updateDrawingPosition();
-
-
-        } else {
-            this.currentLocationMarker = new com.mapbox.mapboxsdk.overlay.Marker("", "", e.getGeocodableLocation().getLatLng());
-            Drawable markerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.current_location_marker);
-            Bitmap bitmap = Bitmap.createBitmap(markerDrawable.getIntrinsicWidth(), markerDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            markerDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            markerDrawable.draw(canvas);
-
-            this.currentLocationMarker.setMarker(new BitmapDrawable(getActivity().getResources(), bitmap));
-            this.currentLocationMarker.setAnchor(new PointF(0.5f, 0.5f));
-            this.mapView.addMarker(this.currentLocationMarker);
-        }
-
-
-        if (isFollowingCurrentLocation())
-            selectCurrentLocation(SELECT_CENTER_AND_ZOOM, true, ZOOM_LEVEL_NEIGHBORHOOD);
-    }
-
-
-    private void centerContact(FusedContact contact) {
-
-    }
-
-    private void centerDeviceLocation() {
-
-    }*/
 }

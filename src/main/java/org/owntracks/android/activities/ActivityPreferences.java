@@ -451,28 +451,17 @@ public class ActivityPreferences extends ActivityBase {
             super.onDestroy();
         }
 
-        @SuppressWarnings("unused")
-        public void onEventMainThread(Events.EndpointStateChanged e) {
-            if ((e != null) && (e.getExtra() != null) && (e.getExtra() instanceof Exception)) {
-                if ((((Exception) e.getExtra()).getCause() != null))
-                    setServerPreferenceSummary(this, getResources().getString(R.string.error) + ": " + ((Exception) e.getExtra()).getCause().getLocalizedMessage());
-                else
-                    setServerPreferenceSummary(this, getResources().getString(R.string.error) + ": " + e.getExtra().toString());
+        public void onEvent(Events.ModeChanged event) {
+            setServerPreferenceSummary(this);
 
-            } else {
-                setServerPreferenceSummary(this);
-            }
-        }
-
-        private  void setServerPreferenceSummary(PreferenceFragment c) {
-            setServerPreferenceSummary(c, ServiceMessage.getEndpointStateAsString());
         }
 
 
-        private  void setServerPreferenceSummary(PreferenceFragment f, String s) {
 
-            f.findPreference("connectionScreen").setSummary(getModeIdReadable(getActivity()) + " - "+ s);
-            ((BaseAdapter) ((PreferenceScreen) f.findPreference("root")).getRootAdapter()).notifyDataSetChanged(); //Have to redraw the list to reflect summary change
+        private  void setServerPreferenceSummary(PreferenceFragment f) {
+
+            f.findPreference("connectionScreen").setSummary(getModeIdReadable(getActivity()));
+            //((BaseAdapter) ((PreferenceScreen) f.findPreference("root")).getRootAdapter()).notifyDataSetChanged(); //Have to redraw the list to reflect summary change
         }
     }
 
@@ -497,7 +486,6 @@ public class ActivityPreferences extends ActivityBase {
         return mode;
 
     }
-
 
 
 }

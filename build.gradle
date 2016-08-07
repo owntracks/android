@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.0.0'
 
     }
 }
@@ -25,6 +26,7 @@ repositories {
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 
 dependencies {
@@ -35,17 +37,18 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.android.support:recyclerview-v7:24.1.1'
+
     // Play Services libraries
-    compile 'com.google.android.gms:play-services-gcm:9.2.1'
-    compile 'com.google.android.gms:play-services-maps:9.2.1'
-    compile 'com.google.android.gms:play-services-location:9.2.1'
-    compile 'com.google.android.gms:play-services-places:9.2.1'
-    compile 'com.google.android.gms:play-services-base:9.2.1'
+    compile 'com.google.android.gms:play-services-gcm:9.4.0'
+    compile 'com.google.android.gms:play-services-maps:9.4.0'
+    compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-places:9.4.0'
+    compile 'com.google.android.gms:play-services-base:9.4.0'
 
 
     // Utility libraries
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'de.greenrobot:greendao:2.0.0'
+    compile 'org.greenrobot:greendao:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-SNAPSHOT'
     compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1-20160623.113843-1'
@@ -76,8 +79,6 @@ dependencies {
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
-    compile "ch.acra:acra:4.8.5"
-
 }
 
 android {
@@ -106,6 +107,8 @@ android {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             jniLibs.srcDir 'jniLibs'
+            java.srcDirs = ['src/main/java', 'build/generated/source/greendao']
+
 
         }
     }
@@ -123,17 +126,12 @@ android {
         }
     }
 
-
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-
-    }
     dexOptions {
         preDexLibraries = false
     }
 
+}
+
+greendao {
+    schemaVersion 15
 }
