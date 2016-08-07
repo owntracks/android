@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
-import org.acra.sender.HttpSender;
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.model.ContactsViewModel;
@@ -39,7 +36,6 @@ import android.util.Log;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
-@ReportsCrashes(formUri = "https://alr.st/acra/acra.php", reportType = HttpSender.Type.JSON)
 public class App extends Application  {
     private static final String TAG = "App";
 

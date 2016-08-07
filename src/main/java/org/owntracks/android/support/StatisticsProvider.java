@@ -18,9 +18,9 @@ public class StatisticsProvider  {
     public static final String SERVICE_PROXY_START = "SERVICE_PROXY_START";
     public static final String SERVICE_LOCATOR_PLAY_CONNECTED = "SERVICE_LOCATOR_PLAY_CONNECTED";
     public static final String SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE = "SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE";
-    public static final String SERVICE_BROKER_QUEUE_LENGTH = "SERVICE_BROKER_QUEUE_LENGTH";
-    public static final String BACKEND_LAST_MESSAGE = "BACKEND_LAST_MESSAGE";
-    public static final String BACKEND_LAST_MESSAGE_TST = "BACKEND_LAST_MESSAGE_TST";
+    public static final String SERVICE_MESSAGE_QUEUE_LENGTH = "SERVICE_MESSAGE_QUEUE_LENGTH";
+    public static final String SERVICE_MESSAGE_BACKEND_LAST_STATUS = "SERVICE_MESSAGE_BACKEND_LAST_STATUS";
+    public static final String SERVICE_MESSAGE_BACKEND_LAST_STATUS_TST = "SERVICE_MESSAGE_BACKEND_LAST_STATUS_TST";
 
     private static InternalProviderInterface provider = new Provider();
     public static void setString(String key, String value) {

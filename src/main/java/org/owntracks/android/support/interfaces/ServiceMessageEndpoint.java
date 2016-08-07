@@ -1,14 +1,10 @@
 package org.owntracks.android.support.interfaces;
 
-import android.support.v4.util.Pair;
-
 import org.owntracks.android.messages.MessageBase;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.services.ServiceMessage;
 
-public interface ServiceMessageEndpoint {
+public interface ServiceMessageEndpoint extends ProxyableService {
+        void onSetService(ServiceMessage service);
         boolean sendMessage(MessageBase message);
-        void setMessageSenderCallback(MessageSender callback);
-        void setMessageReceiverCallback(MessageReceiver callback);
-        String getConnectionState();
-        boolean acceptsMessages();
+        boolean isReady();
 }

@@ -1,11 +1,6 @@
 package org.owntracks.android.services;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
-import android.os.PowerManager;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -20,11 +15,10 @@ import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.Toasts;
-import org.owntracks.android.support.interfaces.MessageReceiver;
-import org.owntracks.android.support.interfaces.MessageSender;
+import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 
@@ -33,14 +27,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 
-public class ServiceMessage implements ProxyableService, MessageSender, MessageReceiver, IncomingMessageProcessor {
+public class ServiceMessage implements ProxyableService, IncomingMessageProcessor {
     private static final String TAG = "ServiceMessage";
 
     private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
+    private static EndpointState endpointState = EndpointState.INITIAL;
+    private Exception endpointError;
+    private ServiceProxy context;
 
     public void reconnect() {
         if(endpoint instanceof StatefulServiceMessageEndpoint)
@@ -52,14 +50,19 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
             StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
     }
 
+    public ServiceProxy getContext() {
+        return context;
+    }
+
     public enum EndpointState {
-        INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, DISCONNECTED_DATADISABLED, DISCONNECTED_CONFIGINCOMPLETE, EndpointState, DISCONNECTED_ERROR
+        INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, DISCONNECTED_USERDISCONNECT, ERROR, ERROR_DATADISABLED, ERROR_CONFIGURATION
     }
 
 
 
     @Override
     public void onCreate(ServiceProxy c) {
+        this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onModeChanged(Preferences.getModeId());
 
@@ -70,25 +73,34 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     private void onModeChanged(int mode) {
         Timber.v("mode:%s", mode);
         if(endpoint != null)
-            ServiceProxy.stopService((ProxyableService) endpoint);
+            endpoint.onDestroy();
 
-        if(mode == App.MODE_ID_HTTP_PRIVATE) {
-            Timber.d("loading http backend");
-            endpoint = (ServiceMessageEndpoint) ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_HTTP);
-        } else {
-            Timber.d("loading mqtt backend");
-            endpoint = (ServiceMessageEndpoint) ServiceProxy.instantiateService(ServiceProxy.SERVICE_MESSAGE_MQTT);
-        }
 
-        Timber.v("endpoint instance: %s", endpoint);
+        endpoint = instantiateEndpoint(mode);
+
         if(endpoint == null) {
             Timber.e("unable to instantiate service for mode:%s", mode);
-            return;
+        }
+    }
+
+    private ServiceMessageEndpoint instantiateEndpoint(int id) {
+        ServiceMessageEndpoint p;
+        switch (id) {
+            case App.MODE_ID_HTTP_PRIVATE:
+                p = new ServiceMessageHttp();
+                break;
+            case App.MODE_ID_MQTT_PRIVATE:
+            case App.MODE_ID_MQTT_PUBLIC:
+                p = new ServiceMessageMqtt();
+                break;
+            default:
+                return null;
         }
 
-        endpoint.setMessageReceiverCallback(this);
-        endpoint.setMessageSenderCallback(this);
-        ServiceProxy.getServiceNotification().updateNotificationOngoing();
+        p.onCreate(context);
+        p.onSetService(this);
+        EventBus.getDefault().registerSticky(p);
+        return p;
     }
 
     @Override
@@ -97,7 +109,8 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
     @Override
     public void onStartCommand(Intent intent, int flags, int startId) {
-
+        if(endpoint != null)
+            endpoint.onStartCommand(intent, flags, startId);
     }
 
     @SuppressWarnings("unused")
@@ -110,17 +123,15 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
     public void onEvent(Events.ModeChanged event) {
         onModeChanged(Preferences.getModeId());
     }
-    // ServiceMessage.MessageSender interface
 
-    HashMap<Long, MessageBase> outgoingQueue = new HashMap<>();
+    private HashMap<Long, MessageBase> outgoingQueue = new HashMap<>();
 
-    @Override
     public void sendMessage(MessageBase message) {
         Log.v(TAG, "sendMessage() - endpoint:" + endpoint);
 
         message.setOutgoing();
 
-        if(endpoint == null || !endpoint.acceptsMessages()) {
+        if(endpoint == null || !endpoint.isReady()) {
             Timber.e("no endpoint or endpoint does not yet accept messages");
             return;
         }
@@ -132,10 +143,10 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
 
 
 
-    @Override
     public void onMessageDelivered(Long messageId) {
 
         MessageBase m = outgoingQueue.remove(messageId);
+        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
         if(m == null) {
             Log.e(TAG, "onMessageDelivered()- messageId:"+messageId + ", error: called for unqueued message");
         } else {
@@ -144,20 +155,23 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
                 de.greenrobot.event.EventBus.getDefault().post(m);
             }
         }
-        Log.v(TAG, "onMessageDelivered()-  queueKeys:" + outgoingQueue.keySet().toString());
+        Log.v(TAG, "onMessageDelivered()-  queueKeys:" +  outgoingQueue.keySet().toString());
     }
 
     private void onMessageQueued(MessageBase m) {
         outgoingQueue.put(m.getMessageId(), m);
+        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
+
         Log.v(TAG, "onMessageQueued()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
         if(m instanceof MessageLocation && MessageLocation.REPORT_TYPE_USER.equals(MessageLocation.class.cast(m).getT()))
             Toasts.showMessageQueued();
     }
 
-    @Override
     public void onMessageDeliveryFailed(Long messageId) {
 
         MessageBase m = outgoingQueue.remove(messageId);
+        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
+
         if(m == null) {
             Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
         } else {
@@ -171,12 +185,18 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
         }
     }
 
-    @Override
     public void onMessageReceived(MessageBase message) {
         message.setIncomingProcessor(this);
         message.setIncoming();
         incomingMessageProcessorExecutor.execute(message);
     }
+
+    public void onEndpointStateChanged(EndpointState newState, Exception e) {
+        endpointState = newState;
+        endpointError = e; 
+        EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
+    }
+
 
     @Override
     public void processIncomingMessage(MessageBase message) {
@@ -228,19 +248,17 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
             return;
         }
 
-        if(message.getAction().equals(MessageCmd.ACTION_REPORT_LOCATION) ) {
-            ServiceProxy.getServiceLocator().reportLocationResponse();
-        } else if(message.getAction().equals(MessageCmd.ACTION_WAYPOINTS)) {
-            ServiceProxy.getServiceApplication().publishWaypointsMessage();
-        } else if(message.getAction().equals(MessageCmd.ACTION_SET_WAYPOINTS)) {
-            MessageWaypointCollection waypoints = message.getWaypoints();
-            if(waypoints == null)
-                return;
-
-            Preferences.importWaypointsFromJson(waypoints);
-
+        switch (message.getAction()) {
+            case MessageCmd.ACTION_REPORT_LOCATION:
+                ServiceProxy.getServiceLocator().reportLocationResponse();
+                break;
+            case MessageCmd.ACTION_WAYPOINTS:
+                ServiceProxy.getServiceApplication().publishWaypointsMessage();
+                break;
+            case MessageCmd.ACTION_SET_WAYPOINTS:
+                Preferences.importWaypointsFromJson(message.getWaypoints());
+                break;
         }
-
     }
 
     @Override
@@ -255,13 +273,35 @@ public class ServiceMessage implements ProxyableService, MessageSender, MessageR
         Preferences.importFromMessage(message);
     }
 
-    public static boolean hasEndpoint() {
-        return endpoint != null;
-    }
-
     public static String getEndpointStateAsString() {
+        int id;
+        switch (endpointState) {
+            case CONNECTED:
+                id = R.string.connectivityConnected;
+                break;
+            case CONNECTING:
+                id = R.string.connectivityConnecting;
+                break;
+            case DISCONNECTING:
+                id = R.string.connectivityDisconnecting;
+                break;
+            case DISCONNECTED_USERDISCONNECT:
+                id = R.string.connectivityDisconnectedUserDisconnect;
+                break;
+            case ERROR_DATADISABLED:
+                id = R.string.connectivityDisconnectedDataDisabled;
+                break;
+            case ERROR:
+                id = R.string.error;
+                break;
+            case ERROR_CONFIGURATION:
+                id = R.string.connectivityDisconnectedConfigIncomplete;
+                break;
+            default:
+                id = R.string.connectivityDisconnected;
 
-        return hasEndpoint() ? endpoint.getConnectionState() : App.getContext().getString(R.string.connectivityDisconnectedConfigIncomplete);
+        }
+        return App.getContext().getString(id);
     }
 
 }

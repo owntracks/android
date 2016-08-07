@@ -17,6 +17,7 @@ import android.util.Log;
 
 import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import de.greenrobot.event.EventBus;
@@ -26,14 +27,10 @@ public class ServiceProxy extends ServiceBindable {
 	private static final String TAG = "ServiceProxy";
 
     public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
-    public static final String WAKELOCK_TAG_BROKER_NETWORK = "org.owntracks.android.wakelock.broker.network";
-    public static final String WAKELOCK_TAG_BROKER_CONNECTIONLOST = "org.owntracks.android.wakelock.broker.connectionlost";
 
 
     public static final String SERVICE_APP = "A";
 	public static final String SERVICE_LOCATOR = "L";
-	public static final String SERVICE_MESSAGE_MQTT = "SM";
-	public static final String SERVICE_MESSAGE_HTTP = "SH";
 	public static final String SERVICE_NOTIFICATION = "N";
 	public static final String SERVICE_BEACON = "BE";
 	public static final String SERVICE_MESSAGE = "M";
@@ -47,7 +44,6 @@ public class ServiceProxy extends ServiceBindable {
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
 	private static boolean bgInitialized = false;
-	private static HandlerThread mServiceHandlerThread;
 	private static Handler mServiceHandler;
 
 	public static void setBgInitialized() {
@@ -66,7 +62,7 @@ public class ServiceProxy extends ServiceBindable {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mServiceHandlerThread = new HandlerThread("ServiceThread");
+		HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
 		mServiceHandlerThread.start();
 		mServiceHandler = new Handler(mServiceHandlerThread.getLooper());
 
@@ -142,12 +138,6 @@ public class ServiceProxy extends ServiceBindable {
             case SERVICE_APP:
                 p = new ServiceApplication();
                 break;
-            case SERVICE_MESSAGE_MQTT:
-                p = new ServiceMessageMqtt();
-                break;
-			case SERVICE_MESSAGE_HTTP:
-				p = new ServiceMessageHttp();
-				break;
 			case SERVICE_LOCATOR:
                 p = new ServiceLocator();
                 break;
@@ -179,13 +169,6 @@ public class ServiceProxy extends ServiceBindable {
 		return (ServiceLocator) getService(SERVICE_LOCATOR);
 	}
 
-	public static ServiceMessageMqtt getServiceMessageMqtt() {
-		return (ServiceMessageMqtt) getService(SERVICE_MESSAGE_MQTT);
-	}
-
-	public static ServiceMessageHttp getServiceMessageHttp() {
-		return (ServiceMessageHttp) getService(SERVICE_MESSAGE_HTTP);
-	}
     public static ServiceBeacon getServiceBeacon() {
         return (ServiceBeacon) getService(SERVICE_BEACON);
     }
