@@ -3,6 +3,7 @@ package org.owntracks.android;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.activities.ActivityMap;
@@ -26,9 +27,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -44,6 +48,8 @@ public class App extends Application  {
     private static SimpleDateFormat dateFormaterToday;
 
     private static Handler mainHandler;
+    private static Handler backgroundHandler;
+
     private static HashMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
     private static Activity currentActivity;
@@ -52,7 +58,7 @@ public class App extends Application  {
 
     public static final int MODE_ID_MQTT_PRIVATE =0;
     public static final int MODE_ID_MQTT_PUBLIC =2;
-    public static final int MODE_ID_HTTP_PRIVATE=3;
+    public static final int MODE_ID_HTTP_PRIVATE = 3;
 
 
     public static HashMap<String, FusedContact> getFusedContacts() {
@@ -62,9 +68,8 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Log.d(TAG, "profile / APP onCreate start" + System.currentTimeMillis());
+        Log.d(TAG, "trace / App onCreate start" + System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
-
             Timber.plant(new Timber.DebugTree() {
                 @Override
                 protected String createStackElementTag(StackTraceElement element) {
@@ -73,25 +78,46 @@ public class App extends Application  {
                 }
             });
         }
+
         instance = this;
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
+
+        HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
+        mServiceHandlerThread.start();
+
+        backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
         fusedContacts = new HashMap<>();
-        StatisticsProvider.initialize(App.getInstance());
         contactsViewModel =  new ContactsViewModel();
-        Preferences.initialize(App.getInstance());
-        Parser.initialize(App.getInstance());
-        ContactImageProvider.initialize(App.getInstance());
-        GeocodingProvider.initialize(App.getInstance());
-        Dao.initialize(App.getInstance());
-        EncryptionProvider.initialize();
 
+        checkFirstStart();
 
+        backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "trace / App async init start" + System.currentTimeMillis());
 
+                StatisticsProvider.initialize(App.getInstance());
+                Preferences.initialize(App.getInstance());
+                Parser.initialize(App.getInstance());
+                ContactImageProvider.initialize(App.getInstance());
+                GeocodingProvider.initialize(App.getInstance());
+                Dao.initialize(App.getInstance());
+                EncryptionProvider.initialize();
+                Log.d(TAG, "trace / App async init end" + System.currentTimeMillis());
 
-		//EventBus.getDefault().register(this);
-        Log.d(TAG, "profile / APP onCreate done" + System.currentTimeMillis());
+                ServiceProxy.runOrBind(instance, new Runnable() {
+                    @Override
+                    public void run() {
+                        Timber.v("trace loading services %s", System.currentTimeMillis());
+                    }
+                });
+            }
+        });
+
+        //EventBus.getDefault().register(this);
+        Log.d(TAG, "trace / App onCreate done" + System.currentTimeMillis());
 
     }
 
@@ -152,9 +178,22 @@ public class App extends Application  {
         ContactImageProvider.invalidateCache();
     }
 
+    public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
+        mainHandler.postDelayed(r, delayMilis);
+    }
+
     public static void postOnMainHandler(Runnable r) {
         mainHandler.post(r);
     }
+
+    public static void postOnBackgroundHandlerDelayed(Runnable r, long delayMilis) {
+        backgroundHandler.postDelayed(r, delayMilis);
+    }
+
+    public static void postOnBackgroundHandler(Runnable r) {
+        backgroundHandler.post(r);
+    }
+
 
     public static String formatDate(long tstSeconds) {
         return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
@@ -282,4 +321,22 @@ public class App extends Application  {
         getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
 
     }
+
+
+    // Checks if the app is started for the first time.
+    // On every new install this returns true for the first time and false afterwards
+    private void checkFirstStart() {
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if(p.getBoolean(Preferences.Keys._FIST_START, true)) {
+            Log.v(TAG, "Initial application launch");
+            String uuid = UUID.randomUUID().toString().toUpperCase();
+
+            p.edit().putBoolean(Preferences.Keys._FIST_START , false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
+
+        } else {
+            Log.v(TAG, "Consecutive application launch");
+        }
+    }
+
 }

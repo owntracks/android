@@ -44,7 +44,6 @@ public class ServiceProxy extends ServiceBindable {
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
 	private static boolean bgInitialized = false;
-	private static Handler mServiceHandler;
 
 	public static void setBgInitialized() {
 		synchronized (ServiceProxy.class) {
@@ -64,7 +63,6 @@ public class ServiceProxy extends ServiceBindable {
 		super.onCreate();
 		HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
 		mServiceHandlerThread.start();
-		mServiceHandler = new Handler(mServiceHandlerThread.getLooper());
 
 	}
 
@@ -73,11 +71,10 @@ public class ServiceProxy extends ServiceBindable {
 		instance = this;
 
 
-		Log.v("foo", "posting runnables");
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				Timber.d("instantiating services async");
+				Timber.d("loading services");
 				instantiateService(SERVICE_APP);
 				instantiateService(SERVICE_NOTIFICATION);
 				instantiateService(SERVICE_LOCATOR);
@@ -94,7 +91,7 @@ public class ServiceProxy extends ServiceBindable {
 			}
 		};
 
-		mServiceHandler.post(runnable);
+		App.postOnBackgroundHandler(runnable);
 		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
 
 	}
@@ -229,9 +226,6 @@ public class ServiceProxy extends ServiceBindable {
 		//TODO
 	}
 
-	public static void runOnServiceHandler(Runnable runnable) {
-		mServiceHandler.post(runnable);
-	}
 
 	public final static class ServiceProxyConnection implements Closeable {
 		private final Context context;

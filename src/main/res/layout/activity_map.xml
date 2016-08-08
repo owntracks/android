@@ -23,15 +23,10 @@
             android:layout_below="@+id/fragmentToolbar">
 
 
-            <fragment
-                android:name="com.google.android.gms.maps.MapFragment"
-                android:id="@+id/mapView"
+            <FrameLayout
+                android:id="@+id/mapContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-
-
-
-
 
 
             <LinearLayout
@@ -181,23 +176,6 @@
 
 
             </LinearLayout>
-
-            <!--        <android.support.design.widget.FloatingActionButton
-                        android:id= "@+id/fab"
-                        android:layout_width= "wrap_content"
-                        android:layout_height= "wrap_content"
-                        android:layout_marginRight= "16dp"
-                        android:layout_marginEnd= "16dp"
-                        android:src= "@drawable/ic_contact_link"
-                        android:visibility="gone"
-
-                        app:layout_anchor= "@id/bottomSheetLayout"
-                        app:layout_anchorGravity= "top|right"  />-->
-
-
-
         </android.support.design.widget.CoordinatorLayout>
-
     </RelativeLayout>
-
 </layout>
