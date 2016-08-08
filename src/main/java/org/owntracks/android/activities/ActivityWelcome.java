@@ -53,6 +53,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_Owntracks_Splash);
         super.onCreate(savedInstanceState);
 
 

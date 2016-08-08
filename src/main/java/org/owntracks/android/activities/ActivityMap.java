@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -70,7 +73,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private GoogleMap map;
     private ActivityMapBinding binding;
     private HashMap<String, Marker> markers;
-    private MapView mapView;
+    private MapFragment mapView;
     private Bundle intentExtras;
     private MapLocationSource mapLocationSource;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -91,12 +94,18 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         this.markers = new HashMap<>();
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_map);
 
-        this.mapView = binding.mapView;
-        this.mapView.requestTransparentRegion(this.mapView);
 
-        this.mapView.onCreate(savedInstanceState);
-        this.mapView.getMapAsync(this);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initMap();
+            }
+        }, 5000);
+
         //this.fab = binding.fab;
+
+
+
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         binding.contactPeek.contactRow.setOnClickListener(bottomSheetClickListener);
         binding.contactPeek.contactRow.setOnLongClickListener(bottomSheetLongClickListener);
@@ -123,6 +132,13 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
         });
     }
+
+        private void initMap() {
+
+            this.mapView =  (MapFragment) getFragmentManager().findFragmentById(R.id.mapView);
+            this.mapView.getMapAsync(this);
+
+        }
 
     private void showPopupMenu(View v) {
 
@@ -159,7 +175,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onResume() {
         super.onResume();
         Log.v(TAG, "onResume");
-        this.mapView.onResume();
+            this.mapView.onResume();
 
 
         redrawMap();
@@ -320,6 +336,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
                 return null;
             }
         });
+
 
         onAddInitialMarkers();
         onHandleIntentExtras();

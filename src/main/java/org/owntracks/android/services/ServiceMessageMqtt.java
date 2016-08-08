@@ -158,11 +158,16 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		@Override
 		public void onSuccess(IMqttToken token) {
-			if(!(token instanceof MessageBase))
+			if(!(token.getUserContext() instanceof MessageBase))
 				return;
 
-			Timber.v("messageId: %s", MessageBase.class.cast(token).getMessageId());
+			Timber.v("messageId: %s", MessageBase.class.cast(token.getUserContext()).getMessageId());
 			service.onMessageDelivered(MessageBase.class.cast(token.getUserContext()).getMessageId());
+
+			if(pubPool.isPaused() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
+				Timber.v("resuming pubPool that was paused due to back pressure. Currently outstanding tokens: %s", mqttClient.getPendingDeliveryTokens().length);
+				pubPool.resume();
+			}
 
 		}
 
@@ -173,26 +178,19 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 			Timber.v("messageId: %s", MessageBase.class.cast(token).getMessageId());
 			exception.printStackTrace();
+			service.onMessageDeliveryFailed(MessageBase.class.cast(token.getUserContext()).getMessageId());
 		}
 	};
 
 	private MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
 		@Override
 		public void connectComplete(boolean reconnect, String serverURI) {
+			Timber.v("reconnect:%s, serverUri:%s", reconnect, serverURI);
 		}
 
 		@Override
 		public void deliveryComplete(IMqttDeliveryToken token) {
-			if(!(token instanceof MessageBase))
-				return;
-
-			Timber.v("messageId: %s", MessageBase.class.cast(token.getUserContext()).getMessageId());
-
-			if(pubPool.isPaused() && mqttClient.getPendingDeliveryTokens().length <= MAX_INFLIGHT_MESSAGES) {
-				Timber.v("resuming pubPool that was paused due to back pressure. Currently outstanding tokens: %s", mqttClient.getPendingDeliveryTokens().length);
-				pubPool.resume();
-			}
-
+			//Handled by iCallbackPublish
 
 		}
 

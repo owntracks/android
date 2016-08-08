@@ -23,8 +23,7 @@
             android:layout_below="@+id/fragmentToolbar">
 
 
-
-            <com.google.android.gms.maps.MapView
+            <fragment
                 android:name="com.google.android.gms.maps.MapFragment"
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"

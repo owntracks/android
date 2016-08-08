@@ -62,3 +62,4 @@
 -dontwarn org.greenrobot.greendao.database.**
 -dontwarn org.greenrobot.greendao.rx.**
 
+ -dontwarn *
