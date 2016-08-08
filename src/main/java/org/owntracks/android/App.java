@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.activities.ActivityMap;
+import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.model.ContactsViewModel;
 import org.owntracks.android.model.FusedContact;
@@ -14,9 +15,9 @@ import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.support.Parser;
 
 import android.app.Activity;
 import android.app.Application;
@@ -30,6 +31,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
@@ -41,7 +43,7 @@ public class App extends Application  {
     private static SimpleDateFormat dateFormater;
     private static SimpleDateFormat dateFormaterToday;
 
-    private static Handler mainHanler;
+    private static Handler mainHandler;
     private static HashMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
     private static Activity currentActivity;
@@ -60,7 +62,7 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
-
+        Log.d(TAG, "profile / APP onCreate start" + System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
 
             Timber.plant(new Timber.DebugTree() {
@@ -74,19 +76,22 @@ public class App extends Application  {
         instance = this;
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
-        mainHanler = new Handler(getMainLooper());
+        mainHandler = new Handler(getMainLooper());
         fusedContacts = new HashMap<>();
+        StatisticsProvider.initialize(App.getInstance());
         contactsViewModel =  new ContactsViewModel();
-
-
-        StatisticsProvider.initialize(this);
-        Preferences.initialize(this);
-        Parser.initialize(this);
-        ContactImageProvider.initialize(this);
-        GeocodingProvider.initialize(this);
-        Dao.initialize(this);
+        Preferences.initialize(App.getInstance());
+        Parser.initialize(App.getInstance());
+        ContactImageProvider.initialize(App.getInstance());
+        GeocodingProvider.initialize(App.getInstance());
+        Dao.initialize(App.getInstance());
         EncryptionProvider.initialize();
-		EventBus.getDefault().register(this);
+
+
+
+
+		//EventBus.getDefault().register(this);
+        Log.d(TAG, "profile / APP onCreate done" + System.currentTimeMillis());
 
     }
 
@@ -148,7 +153,7 @@ public class App extends Application  {
     }
 
     public static void postOnMainHandler(Runnable r) {
-        mainHanler.post(r);
+        mainHandler.post(r);
     }
 
     public static String formatDate(long tstSeconds) {

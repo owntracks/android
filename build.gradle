@@ -114,13 +114,14 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            proguardFiles 'proguard-project.txt'
+            minifyEnabled true
             zipAlignEnabled true
             applicationIdSuffix ''
 
         }
         debug {
-            proguardFiles '.proguard-project.txt'
+            proguardFiles 'proguard-project.txt'
             applicationIdSuffix '.debug'
             minifyEnabled false
         }

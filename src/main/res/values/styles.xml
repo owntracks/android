@@ -19,6 +19,9 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="Theme.Owntracks" parent="Theme.Owntracks.Base"/>
+    <style name="Theme.Owntracks.Splash" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
 
 
     <style name="Theme.Owntracks.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
