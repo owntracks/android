@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,8 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,6 +44,8 @@ import org.owntracks.android.support.Toasts;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import timber.log.Timber;
 
 public class ActivityMap extends ActivityBase implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, PopupMenu.OnMenuItemClickListener {
     private static final String TAG = "ActivityMap";
@@ -81,28 +81,31 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private int mode = ACTION_FOLLOW_DEVICE;
     private long zoom = ZOOM_LEVEL_STREET;
     private FusedContact activeContact;
-    private FloatingActionButton fab;
 
 
     private boolean onCreate = false;
     private boolean onNewIntent = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Timber.v("trace/start %s", System.currentTimeMillis());
+
+
+        ActivityWelcome.runChecks(this);
+        Timber.v("trace/checks end %s", System.currentTimeMillis());
+
         super.onCreate(savedInstanceState);
         this.onCreate = true;
         this.markers = new HashMap<>();
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_map);
 
-
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+        App.postOnMainHandlerDelayed(new Runnable() {
             @Override
             public void run() {
-                initMap();
+                initMapDelayed();
             }
-        }, 5000);
-
-        //this.fab = binding.fab;
+        }, 50);
 
 
 
@@ -112,7 +115,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
         hideBottomSheet();
 
-        runActionWithLocationPermissionCheck(PERMISSION_REQUEST_USER_LOCATION);
 
         toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
@@ -131,14 +133,11 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
             }
         });
+        Timber.v("trace/end %s", System.currentTimeMillis());
+
     }
 
-        private void initMap() {
 
-            this.mapView =  (MapFragment) getFragmentManager().findFragmentById(R.id.mapView);
-            this.mapView.getMapAsync(this);
-
-        }
 
     private void showPopupMenu(View v) {
 
@@ -171,19 +170,22 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     }
 
+    private boolean hasMap() {
+        return this.map != null ;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         Log.v(TAG, "onResume");
-            this.mapView.onResume();
+        if(hasMap()) {
+            redrawMap();
+            if (intentExtras != null) {
+                onHandleIntentExtras();
+                intentExtras = null;
+            }
 
-
-        redrawMap();
-        if(intentExtras != null) {
-            onHandleIntentExtras();
-            intentExtras = null;
         }
-
         de.greenrobot.event.EventBus.getDefault().register(this);
 
     }
@@ -198,7 +200,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     @Override
     public void onPause() {
         super.onPause();
-        this.mapView.onPause();
 
         de.greenrobot.event.EventBus.getDefault().unregister(this);
 
@@ -211,7 +212,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @Override
     public void onDestroy() {
-        this.mapView.onDestroy();
         super.onDestroy();
     }
 
@@ -312,13 +312,24 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         }
     }
 
+
+    private void initMapDelayed() {
+        Timber.v("trace start %s", System.currentTimeMillis());
+
+        FragmentManager fm = getSupportFragmentManager();
+        SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
+        fm.beginTransaction().replace(R.id.mapContainer, supportMapFragment).commit();
+
+        supportMapFragment.getMapAsync(this);
+        Timber.v("trace end %s", System.currentTimeMillis());
+
+    }
+
     @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.v(TAG, "onMapReady()");
-
+        Timber.v("trace start %s", System.currentTimeMillis());
         this.map = googleMap;
-        this.map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         this.map.setIndoorEnabled(false);
         this.map.setLocationSource(this.mapLocationSource);
         this.map.setMyLocationEnabled(true);
@@ -337,9 +348,13 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
         });
 
+        Timber.v("trace pre marker %s", System.currentTimeMillis());
 
         onAddInitialMarkers();
         onHandleIntentExtras();
+
+        Timber.v("trace post %s", System.currentTimeMillis());
+
     }
 
     @Override
@@ -350,7 +365,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
     private void onHandleIntentExtras() {
-        Log.v(TAG, "onHandleIntentExtras: " + intentExtras);
+        Timber.v("trace start %s", System.currentTimeMillis());
 
         if(intentExtras == null) {
             actionFollowDevice();
@@ -370,6 +385,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
             intentExtras = null;
         }
+        Timber.v("trace end %s", System.currentTimeMillis());
+
     }
     private void onDeviceLocationUpdated(GeocodableLocation l) {
         this.mapLocationSource.updateWithLocation(l);
@@ -512,6 +529,8 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         public void activate(OnLocationChangedListener onLocationChangedListener) {
             Log.v(TAG, "activate()");
             listener = onLocationChangedListener;
+            if(lastKnownLocation != null)
+                this.listener.onLocationChanged(lastKnownLocation);
         }
 
         @Override

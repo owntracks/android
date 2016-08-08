@@ -217,7 +217,13 @@
             android:name=".activities.ActivityMap"
             android:clearTaskOnLaunch="true"
             android:label="@string/title_activity_map"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".activities.ActivityFeatured"
             android:label="@string/title_activity_featured"
@@ -231,10 +237,6 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         ></activity>
     </application>
 

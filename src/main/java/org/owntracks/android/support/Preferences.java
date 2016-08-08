@@ -69,7 +69,6 @@ public class Preferences {
         httpSharedPreferences = c.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE);
         publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
-        handleFirstStart();
         deviceUUID = sharedPreferences.getString(Keys._DEVICE_UUID, "undefined-uuid");
         initMode(sharedPreferences.getInt(Keys.MODE_ID, getIntResource(R.integer.valModeId)));
     }
@@ -898,23 +897,6 @@ public class Preferences {
 
     public static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
-    }
-
-    // Checks if the app is started for the first time.
-    // On every new install this returns true for the first time and false afterwards
-    public static void handleFirstStart() {
-        if(sharedPreferences.getBoolean(Keys._FIST_START, true)) {
-            Log.v(TAG, "Initial application launch");
-            sharedPreferences.edit().putBoolean(Keys._FIST_START , false).commit();
-
-            Log.v(TAG, "setting _SETUP_NOT_COMPLETED true");
-            sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , true).commit();
-
-            String uuid = UUID.randomUUID().toString().toUpperCase();
-            sharedPreferences.edit().putString(Keys._DEVICE_UUID, "A"+uuid.substring(1)).commit();
-        } else {
-            Log.v(TAG, "Consecutive application launch");
-        }
     }
 
 

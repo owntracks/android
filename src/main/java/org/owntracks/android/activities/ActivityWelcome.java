@@ -3,6 +3,7 @@ package org.owntracks.android.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -41,6 +42,9 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     private static final int PERMISSION_REQUEST_USER_LOCATION = 2;
     private static final int RECOVER_PLAY = 1001;
+    private static final java.lang.String BUNDLE_KEY_SETUP = "s";
+    private static final java.lang.String BUNDLE_KEY_PLAY = "pl";
+    private static final java.lang.String BUNDLE_KEY_PERMISSIONS = "pe";
 
     ViewPager pager;
     FragmentAdapter pagerAdapter;
@@ -53,18 +57,28 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.Theme_Owntracks_Splash);
         super.onCreate(savedInstanceState);
 
 
-        runChecks();
+        Bundle b = getIntent().getExtras();
+        if(b == null)
+            b = runChecks();
 
-        if(checkSetup ||  checkPlay || checkPermission) {
+        if(hasFailedChecks(b)) {
             Log.v(TAG, "one or more checks failed");
+
+            checkSetup = b.getBoolean(BUNDLE_KEY_SETUP);
+            checkPlay = b.getBoolean(BUNDLE_KEY_PLAY);
+            checkPermission = b.getBoolean(BUNDLE_KEY_PERMISSIONS);
+
             recoverChecks();
         } else {
             startActivityMain();
         }
+    }
+
+    public static boolean hasFailedChecks(Bundle b) {
+        return b.getBoolean(BUNDLE_KEY_SETUP) ||  b.getBoolean(BUNDLE_KEY_PLAY) || b.getBoolean(BUNDLE_KEY_PERMISSIONS);
     }
 
     @Override
@@ -92,31 +106,47 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         finish();
     }
 
-
-    private boolean checkSetup() {
+    private static void startActivityWelcome(Context c, Bundle b) {
+        Intent intent = new Intent(c, ActivityWelcome.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtras(b);
+        c.startActivity(intent);
+    }
+    private static boolean checkSetup() {
         return Preferences.getSetupCompleted();
     }
 
-    private boolean checkPlayServices() {
-        return  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
+    private static boolean checkPlayServices() {
+        return  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
     }
 
-    private boolean checkPermissions() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    private static boolean checkPermissions() {
+        return ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void runChecks() {
+    private static Bundle runChecks() {
+        Bundle b = new Bundle();
         if(!checkSetup()) {
-            checkSetup = true;
+            b.putBoolean(BUNDLE_KEY_SETUP, true);
         }
         if(!checkPlayServices()) {
-            checkPlay = true;
+            b.putBoolean(BUNDLE_KEY_PLAY, true);
         }
         if(!checkPermissions()) {
-            checkPermission = true;
+            b.putBoolean(BUNDLE_KEY_PERMISSIONS, true);
         }
+        return b;
     }
 
+
+    public static boolean runChecks(Context c) {
+        Bundle b = runChecks();
+        if(hasFailedChecks(b)) {
+            startActivityWelcome(c, b);
+            return true;
+        }
+        return false;
+    }
     private void recoverChecks() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -288,6 +318,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             }
         }
     }
+
+
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {
         private ArrayList<Integer> pagerAdapterIds ;

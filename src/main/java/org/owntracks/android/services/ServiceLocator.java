@@ -281,12 +281,12 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 	private void requestLocationUpdates() {
         if(Looper.myLooper() == Looper.getMainLooper()) {
-            ServiceProxy.runOnServiceHandler(new Runnable() {
+            App.postOnBackgroundHandlerDelayed (new Runnable() {
                 @Override
                 public void run() {
                     requestLocationUpdatesAsync();
                 }
-            });
+            }, 500);
         } else {
             requestLocationUpdatesAsync();
         }
