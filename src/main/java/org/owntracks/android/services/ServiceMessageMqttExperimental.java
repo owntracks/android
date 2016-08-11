@@ -102,7 +102,7 @@ public class ServiceMessageMqttExperimental implements ProxyableService, Outgoin
 
             // TLS
             if (Preferences.getTls()) {
-                String tlsCaCrt = Preferences.getTlsCaCrtName();sva
+                String tlsCaCrt = Preferences.getTlsCaCrtName();
                 String tlsClientCrt = Preferences.getTlsClientCrtName();
 
                 SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();

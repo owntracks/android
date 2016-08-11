@@ -135,4 +135,18 @@ public class MessageLocation extends MessageBase  {
         notifyContactPropertyChanged();
     }
 
+    @Override
+    public String toString() {
+        return "MessageLocation{" +
+                "t='" + t + '\'' +
+                ", batt=" + batt +
+                ", acc=" + acc +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                ", tst=" + tst +
+                ", geocoder='" + geocoder + '\'' +
+                ", _contact=" + _contact +
+                ", point=" + point +
+                '}';
+    }
 }

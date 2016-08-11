@@ -15,6 +15,10 @@
             android:title="@string/preferencesHost" />
 
         <Preference
+            android:key="@string/keyIdentification"
+            android:title="@string/preferencesIdentification" />
+
+        <Preference
             android:key="@string/keySecurity"
             android:title="@string/preferencesSecurity" />
 </PreferenceScreen>
