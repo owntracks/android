@@ -53,6 +53,9 @@ dependencies {
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
 
+    // Barcode integration
+    compile 'com.google.zxing:android-integration:3.2.1'
+
     // Widget libraries
     compile 'com.github.rengwuxian:MaterialEditText:2.1.4'
     compile('com.mikepenz:fastadapter:1.1.2@aar') {

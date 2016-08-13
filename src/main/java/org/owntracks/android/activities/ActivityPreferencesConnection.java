@@ -19,11 +19,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
@@ -77,7 +80,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
 
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -151,6 +153,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
         ServiceMessage.EndpointState cachedState = null;
         private String tlsCaCrtName;
         private String tlsClientCrtName;
+        private BarcodeScanListener barcodeCallback;
+
+        private interface BarcodeScanListener {
+            void onBarcodeScanResult(String url);
+        }
 
         private void loadHostPreferencesMqtt(final Activity a) {
             Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
@@ -236,7 +243,20 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     url.setText(Preferences.getUrl());
                                     url.setFloatingLabelAlwaysShown(true);
 
-
+                                    Button scanBtn = (Button) d.findViewById(R.id.scan_button);
+                                    scanBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            barcodeCallback = new BarcodeScanListener() {
+                                                public void onBarcodeScanResult(String input) {
+                                                    Log.v(TAG, "Receiving barcode url");
+                                                    url.setText(input);
+                                                }
+                                            };
+                                            IntentIntegrator integrator = new IntentIntegrator(FragmentPreferences.this);
+                                            integrator.initiateScan();
+                                        }
+                                    });
                                 }
                             })
 
@@ -833,7 +853,21 @@ public class ActivityPreferencesConnection extends ActivityBase {
             setTlsClientCrtName("");
         }
 
-
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (requestCode == IntentIntegrator.REQUEST_CODE) {
+                try {
+                    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                    if (barcodeCallback != null) {
+                        barcodeCallback.onBarcodeScanResult(result.getContents());
+                    }
+                    barcodeCallback = null;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error calling barcode scanner onBarcodeScanResult: " + e);
+                }
+            }
+            super.onActivityResult(requestCode, resultCode, data);
+        }
 
     }
 
