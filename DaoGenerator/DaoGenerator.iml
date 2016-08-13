@@ -29,5 +29,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="greendao-generator-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="freemarker-2.3.22" level="project" />
+    <orderEntry type="library" exported="" name="DaoGenerator.DaoGenerator" level="project" />
   </component>
 </module>

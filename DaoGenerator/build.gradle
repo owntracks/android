@@ -6,6 +6,9 @@ project(':DaoGenerator') {
 
     repositories {
         mavenCentral()
+        maven {
+            url "https://jitpack.io"
+        }
     }
 
 
