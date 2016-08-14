@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="root"
+        android:title="@string/preferencesServer">
+
+    <org.owntracks.android.support.ListIntegerPreference
+        android:defaultValue="@integer/valModeId"
+        android:entries="@array/profileIds_readable"
+        android:entryValues="@array/modeIds"
+        android:key="@string/preferencesKeyModeId"
+        android:title="@string/preferencesProfileId"
+        />
+
+    <Preference
+        android:key="host"
+        android:title="@string/preferencesHost" />
+
+    <Preference
+        android:key="@string/preferencesKeyIdentification"
+        android:title="@string/preferencesIdentification" />
+
+    <Preference
+        android:key="@string/preferencesKeySecurity"
+        android:title="@string/preferencesSecurity" />
+    <Preference
+        android:key="@string/preferencesKeyParameters"
+        android:title="@string/preferencesOptions"/>
+
+</PreferenceScreen>
