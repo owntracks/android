@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.owntracks.android.App;
@@ -37,8 +38,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
-    private static EndpointState endpointState = EndpointState.INITIAL;
-    private Exception endpointError;
+
     private ServiceProxy context;
 
     public void reconnect() {
@@ -83,8 +83,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void onCreate(ServiceProxy c) {
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        onEndpointStateChanged(EndpointState.INITIAL, null);
         onModeChanged(Preferences.getModeId());
-
     }
 
 
@@ -210,9 +210,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         incomingMessageProcessorExecutor.execute(message);
     }
 
-    public void onEndpointStateChanged(EndpointState newState, Exception e) {
-        endpointState = newState;
-        endpointError = e; 
+    public void onEndpointStateChanged(EndpointState newState, @Nullable  Exception e) {
+        Timber.v("new state:%s",newState);
         EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
     }
 

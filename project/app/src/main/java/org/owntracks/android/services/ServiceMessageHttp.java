@@ -127,15 +127,6 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
     }
 
-    private static EndpointState state = EndpointState.IDLE;
-
-
-    public static EndpointState getState() {
-        return state;
-    }
-
-
-
     @Override
     public boolean isReady() {
         return mHttpClient != null;

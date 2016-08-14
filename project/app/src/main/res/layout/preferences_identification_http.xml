@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/deviceId"
+        android:inputType="textVisiblePassword"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesDeviceName"
+        app:met_floatingLabelAlwaysShown="true"
+        />
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/trackerId"
+        android:inputType="textVisiblePassword"
+        app:met_baseColor="@color/textPrimary"
+        app:met_maxCharacters="2"
+        app:met_primaryColor="@color/accent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="@string/preferencesTrackerId"
+        app:met_floatingLabelAlwaysShown="true"
+        android:maxLength="2"
+        />
+
+</LinearLayout>

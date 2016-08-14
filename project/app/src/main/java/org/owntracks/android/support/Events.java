@@ -8,6 +8,7 @@ import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceMessage;
 
 import android.location.Location;
+import android.support.annotation.Nullable;
 
 public class Events {
 
@@ -233,8 +234,7 @@ public class Events {
 			private final ServiceMessage.EndpointState state;
 			private final Object extra;
 
-			public EndpointStateChanged(ServiceMessage.EndpointState state,
-					Object extra) {
+			public EndpointStateChanged(ServiceMessage.EndpointState state, @Nullable  Object extra) {
 				super();
 				this.state = state;
 				this.extra = extra;
@@ -244,7 +244,7 @@ public class Events {
 				return this.state;
 			}
 
-			public Object getExtra() {
+			@Nullable  public Object getExtra() {
 				return this.extra;
 			}
 

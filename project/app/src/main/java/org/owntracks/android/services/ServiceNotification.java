@@ -48,13 +48,14 @@ public class ServiceNotification implements ProxyableService {
 
     private ServiceProxy context;
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
-    private MessageLocation lastPublishedLocationMessage;
     private NotificationManager notificationManager;
 
     // Ongoing notification
     private static final int NOTIFICATION_ID_ONGOING = 1;
     private NotificationCompat.Builder notificationBuilderOngoing;
     private Notification notificationOngoing;
+    private MessageLocation notificationOngoingLastLocationCache;
+    private ServiceMessage.EndpointState notificationOngoingLastStateCache = ServiceMessage.EndpointState.INITIAL;
 
     // Event notification
     private static final int NOTIFICATION_ID_EVENTS = 2;
@@ -228,25 +229,22 @@ public class ServiceNotification implements ProxyableService {
         }
     }
     public void  updateNotificationOngoing() {
-        updateNotificationOngoing(ServiceMessage.EndpointState.INITIAL);
-    }
-
-    private void updateNotificationOngoing(ServiceMessage.EndpointState state) {
+        Timber.v("enabled:%s, state:%s", Preferences.getNotification(), notificationOngoingLastStateCache.getLabel(context));
         if (!Preferences.getNotification())
             return;
 
-        String subtitle = state.getLabel(context);
+        String subtitle = notificationOngoingLastStateCache.getLabel(context);
 
         if (isLastPublishedLocationWithGeocoderAvailable() && Preferences.getNotificationLocation()) {
-            notificationBuilderOngoing.setContentTitle(this.lastPublishedLocationMessage.getGeocoder());
-            notificationBuilderOngoing.setWhen(TimeUnit.SECONDS.toMillis(this.lastPublishedLocationMessage.getTst()));
+            notificationBuilderOngoing.setContentTitle(this.notificationOngoingLastLocationCache.getGeocoder());
+            notificationBuilderOngoing.setWhen(TimeUnit.SECONDS.toMillis(this.notificationOngoingLastLocationCache.getTst()));
 
         } else {
             notificationBuilderOngoing.setContentTitle(this.context.getString(R.string.app_name));
         }
 
 
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
             notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
             notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
             notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
@@ -363,7 +361,7 @@ public class ServiceNotification implements ProxyableService {
 
 
     private boolean isLastPublishedLocationWithGeocoderAvailable() {
-        return this.lastPublishedLocationMessage != null && this.lastPublishedLocationMessage.getGeocoder() != null;
+        return this.notificationOngoingLastLocationCache != null && this.notificationOngoingLastLocationCache.getGeocoder() != null;
     }
 
 
@@ -376,7 +374,7 @@ public class ServiceNotification implements ProxyableService {
     }
 
     private void updateNotificationOngoing(int newModeId) {
-
+        updateNotificationOngoing();
     }
 
     @SuppressWarnings("unused")
@@ -384,7 +382,8 @@ public class ServiceNotification implements ProxyableService {
         if (App.isInForeground())
             Toasts.showEndpointStateChange(e.getState());
 
-        updateNotificationOngoing(e.getState());
+        notificationOngoingLastStateCache = e.getState();
+        updateNotificationOngoing();
     }
 
 
@@ -397,15 +396,15 @@ public class ServiceNotification implements ProxyableService {
 
 
     public void onEvent(MessageLocation m) {
-        if(m.isOutgoing() && (lastPublishedLocationMessage == null || lastPublishedLocationMessage.getTst() <=  m.getTst())) {
-            this.lastPublishedLocationMessage = m;
+        if(m.isOutgoing() && (notificationOngoingLastLocationCache == null || notificationOngoingLastLocationCache.getTst() <=  m.getTst())) {
+            this.notificationOngoingLastLocationCache = m;
             GeocodingProvider.resolve(m, this);
         }
     }
 
     public void onMessageLocationGeocoderResult(MessageLocation m) {
         Timber.v("for location: %s", m.getGeocoder());
-        if (m == lastPublishedLocationMessage) {
+        if (m == notificationOngoingLastLocationCache) {
             updateNotificationOngoing();
         }
     }

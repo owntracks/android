@@ -31,26 +31,8 @@ public class Toasts {
         if(stateChangeToast != null)
             stateChangeToast.cancel();
 
-        int stringRes = 0;
-
-        if (state == ServiceMessage.EndpointState.CONNECTED) {
-            stringRes = R.string.snackbarConnected;
-        //} else if (state == ServiceMessageMqtt.EndpointState.CONNECTING) {
-        //    stringRes = R.string.snackbarConnecting;
-        } else if (state == ServiceMessage.EndpointState.DISCONNECTED || state == ServiceMessage.EndpointState.DISCONNECTED_USERDISCONNECT ) {
-            stringRes = R.string.snackbarDisconnected;
-        } else if (state == ServiceMessage.EndpointState.ERROR) {
-            stringRes = R.string.snackbarDisconnectedError;
-        } else if (state == ServiceMessage.EndpointState.ERROR_CONFIGURATION) {
-            stringRes = R.string.snackbarConfigIncomplete;
-        } else if (state == ServiceMessage.EndpointState.ERROR_DATADISABLED) {
-            stringRes = R.string.connectivityDisconnectedDataDisabled;
-        }
-
-        if(stringRes!=0) {
-            stateChangeToast = Toast.makeText(App.getContext(), stringRes, Toast.LENGTH_SHORT);
-            stateChangeToast.show();
-        }
+        stateChangeToast = Toast.makeText(App.getContext(), state.getLabel(App.getContext()), Toast.LENGTH_SHORT);
+        stateChangeToast.show();
     }
 
     public static void showWaypointRemovedToast() {
