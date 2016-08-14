@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map;
 import android.support.annotation.NonNull;
 
 import org.owntracks.android.data.model.Contact;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.contacts.ContactsMvvm;
 
@@ -24,8 +25,9 @@ import java.util.List;
 public interface MapMvvm {
 
     interface View extends MvvmView {
-        void updateMarker(List<Contact> contacts);
-        void updateMarker(Contact contact);
+        void updateMarker(List<FusedContact> contacts);
+        void updateMarker(FusedContact contact);
+        void removeMarker(FusedContact c);
     }
 
     interface ViewModel extends ContactsMvvm.ViewModel<View> {

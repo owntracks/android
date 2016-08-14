@@ -23,6 +23,7 @@ import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityWaypointBinding;
@@ -37,7 +38,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandlerInterface;
 import org.owntracks.android.support.Toasts;
 
-import de.greenrobot.event.EventBus;
 
 
 public class ActivityRegion extends ActivityBase implements StaticHandlerInterface {

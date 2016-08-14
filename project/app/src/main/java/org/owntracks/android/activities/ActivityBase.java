@@ -13,11 +13,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Events;
 
-import de.greenrobot.event.EventBus;
 
 public abstract class ActivityBase extends AppCompatActivity  {
     private static final String TAG = "ActivityBase";

@@ -89,7 +89,6 @@ dependencies {
 
 
     // Utility libraries
-    compile 'de.greenrobot:eventbus:2.4.0'  // deprecated. use annotation based 3.0 instead
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.0.1'

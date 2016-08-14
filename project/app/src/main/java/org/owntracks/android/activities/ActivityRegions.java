@@ -18,6 +18,9 @@ import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.AdapterWaypoints;
@@ -31,7 +34,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
 import org.owntracks.android.support.Toasts;
 
-import de.greenrobot.event.EventBus;
 
 
 public class ActivityRegions extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
@@ -145,22 +147,22 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         return true;
     }
 
-
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.WaypointAdded e) {
         requery();
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.WaypointTransition e) {
         requery();
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.WaypointRemoved e) {
         requery();
     }
-    @SuppressWarnings("unused")
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.WaypointUpdated e) {
         requery();
     }

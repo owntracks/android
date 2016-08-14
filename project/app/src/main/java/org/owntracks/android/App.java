@@ -2,10 +2,12 @@ package org.owntracks.android;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.components.AppComponent;
@@ -31,6 +33,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.databinding.ObservableMap;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,7 +43,6 @@ import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import de.greenrobot.event.EventBus;
 import io.realm.Realm;
 import timber.log.Timber;
 
@@ -54,7 +56,7 @@ public class App extends Application  {
     private static Handler mainHandler;
     private static Handler backgroundHandler;
 
-    private static HashMap<String, FusedContact> fusedContacts;
+    //private static HashMap<String, FusedContact> fusedContacts;
     private static ContactsViewModel contactsViewModel;
     private static Activity currentActivity;
     private static boolean inForeground;
@@ -67,8 +69,8 @@ public class App extends Application  {
     private static AppComponent sAppComponent = null;
 
 
-    public static HashMap<String, FusedContact> getFusedContacts() {
-        return fusedContacts;
+    public static ObservableMap<String, FusedContact> getFusedContacts() {
+        return sAppComponent.contactsRepo().getAll();
     }
 
     @Override
@@ -100,7 +102,6 @@ public class App extends Application  {
 
         backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
-        fusedContacts = new HashMap<>();
         contactsViewModel =  new ContactsViewModel();
 
         checkFirstStart();
@@ -148,7 +149,7 @@ public class App extends Application  {
 	}
 
     public static FusedContact getFusedContact(String topic) {
-        return fusedContacts.get(topic);
+        return sAppComponent.contactsRepo().getById(topic);
     }
 
     public static ContactsViewModel getContactsViewModel() {
@@ -157,7 +158,8 @@ public class App extends Application  {
 
 
     public static void addFusedContact(final FusedContact c) {
-        fusedContacts.put(c.getId(), c);
+        //fusedContacts.put(c.getId(), c);
+        sAppComponent.contactsRepo().put(c.getId(), c);
 
         postOnMainHandler(new Runnable() {
             @Override
@@ -174,7 +176,7 @@ public class App extends Application  {
 
 
     public static void clearFusedContacts() {
-        fusedContacts.clear();
+        sAppComponent.contactsRepo().clearAll();
         postOnMainHandler(new Runnable() {
             @Override
             public void run() {
@@ -183,7 +185,7 @@ public class App extends Application  {
         });
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
         clearFusedContacts();
         ContactImageProvider.invalidateCache();
@@ -228,7 +230,7 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
-    @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.BrokerChanged e) {
         clearFusedContacts();
     }

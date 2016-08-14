@@ -15,6 +15,7 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 
 import org.antlr.v4.runtime.misc.NotNull;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
@@ -158,7 +159,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
     }
 
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) {
 
     }

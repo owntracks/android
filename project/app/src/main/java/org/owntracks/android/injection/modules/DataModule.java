@@ -1,5 +1,9 @@
 package org.owntracks.android.injection.modules;
 
+import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.MemoryContactsRepo;
+
+import dagger.Binds;
 import dagger.Module;
 
 /* Copyright 2016 Patrick Löwenstein
@@ -18,7 +22,7 @@ import dagger.Module;
 @Module
 public abstract class DataModule {
 
-    //@Binds
-    //abstract ContactsRepo bindCountryRepo(RealmContactsRepo realmCountryRepo);
+    @Binds
+    abstract ContactsRepo bindContactsRepo(MemoryContactsRepo memoryContactsRepo);
 
 }

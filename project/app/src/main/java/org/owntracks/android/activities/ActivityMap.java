@@ -29,6 +29,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mikepenz.materialdrawer.Drawer;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityMapBinding;
@@ -186,7 +189,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
 
         }
-        de.greenrobot.event.EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
 
     }
 
@@ -201,7 +204,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onPause() {
         super.onPause();
 
-        de.greenrobot.event.EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
 
     }
 
@@ -248,7 +251,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     }
 
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(FusedContact e) {
         if (e == activeContact) {
             if(mode == ACTION_FOLLOW_CONTACT)
@@ -261,18 +264,18 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
         }
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onEventMainThread(Events.CurrentLocationUpdated e) {
         onDeviceLocationUpdated(e.getGeocodableLocation());
     }
 
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
         clearMap();
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.EndpointStateChanged e) {
         if(e.getState() == ServiceMessage.EndpointState.ERROR_CONFIGURATION)
             Toasts.showEndpointNotConfigured();

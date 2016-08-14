@@ -33,5 +33,5 @@ public interface AppComponent {
     Resources resources();
 
     Realm realm();
-    //ContactsRepo countryRepo();
+    ContactsRepo contactsRepo();
 }

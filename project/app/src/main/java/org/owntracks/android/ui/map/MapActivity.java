@@ -17,6 +17,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.data.model.Contact;
 import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.databinding.UiActivityMapBinding;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,6 +25,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -45,8 +48,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
+        Timber.v("setAndBindContentView");
         setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
 
         setSupportActionBar(binding.toolbar);
@@ -68,6 +73,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Timber.v("onMapReady");
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
         this.mMap.setLocationSource(mMapLocationSource);
@@ -93,16 +99,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public void onMapClick(LatLng latLng) {
         viewModel.onMapClick();
     }
-
-    @Override
-    public void updateMarker(@NonNull List<Contact> contacts) {
-
-    }
-
-    @Override
-    public void updateMarker(@NonNull Contact contact) {
-    }
-
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -137,4 +133,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         }
     };
 
+    @Override
+    public void updateMarker(List<FusedContact> contacts) {
+        Timber.v("updating list");
+    }
+
+    @Override
+    public void updateMarker(FusedContact contact) {
+        Timber.v("updating single");
+
+    }
+
+    @Override
+    public void removeMarker(FusedContact c) {
+        Timber.v("removing single");
+
+    }
 }
