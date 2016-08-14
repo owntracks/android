@@ -22,8 +22,10 @@ project/local.properties
 project/proguard/
 
 # Android Studio workspace
-project/.idea/workspace.xml
-project/.idea/libraries
+project/.idea
+project/.idea
+project/*.iml
+project/app/*.iml
 
 # Mac
 .DS_Store
