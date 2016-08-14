@@ -352,7 +352,73 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         }
 
+        private void loadIdentificationHttpPreferences(final Activity a) {
+            Preference.OnPreferenceClickListener identificationClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(a)
+                            .customView(R.layout.preferences_identification_http, true)
+                            .title(R.string.preferencesIdentification)
+                            .positiveText(R.string.accept)
+                            .negativeText(R.string.cancel)
+                            .showListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
+                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
+                                    deviceId.setHint(Preferences.getDeviceIdDefault());
+                                    deviceId.setText(Preferences.getDeviceId(false));
+                                    trackerId.setText(Preferences.getTrackerId(false));
+                                    trackerId.setHint(Preferences.getTrackerIdDefault());
+
+                                    deviceId.addTextChangedListener(new TextWatcher() {
+                                        @Override
+                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                        }
+
+                                        @Override
+                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                            if (s.length() >= 2)
+                                                trackerId.setHint(s.toString().substring(deviceId.length() - 2));
+                                            else
+                                                trackerId.setHint(Preferences.getTrackerIdDefault());
+                                        }
+
+                                        @Override
+                                        public void afterTextChanged(Editable s) {
+
+                                        }
+                                    });
+
+                                }
+                            })
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
+                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
+                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
+
+                                    Preferences.setDeviceId(deviceId.getText().toString());
+                                        Preferences.setTrackerId(trackerId.getText().toString());
+
+                                    updateConnectButton();
+                                }
+                            })
+
+                            .show();
+
+                    return true;
+                }
+            };
+
+            //identificationPreference = findPreference(getString(R.string.preferencesKeyIdentification));
+            //identificationPreference.setOnPreferenceClickListener(identificationClickListener);
+
+        }
 
 
 
@@ -611,6 +677,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HTTP);
                 addPreferencesFromResource(R.xml.preferences_http_connection);
                 loadHostPreferencesHttp(a);
+                loadIdentificationHttpPreferences(a);
                 loadSecurityPreferences(a);
 
             } else {
