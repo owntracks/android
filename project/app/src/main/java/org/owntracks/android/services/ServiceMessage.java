@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
@@ -29,7 +31,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 
@@ -118,7 +119,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
         p.onCreate(context);
         p.onSetService(this);
-        EventBus.getDefault().registerSticky(p);
+        EventBus.getDefault().register(p);
         return p;
     }
 
@@ -132,13 +133,12 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             endpoint.onStartCommand(intent, flags, startId);
     }
 
-    @SuppressWarnings("unused")
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) {
 
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(sticky = true)
     public void onEvent(Events.ModeChanged event) {
         onModeChanged(Preferences.getModeId());
     }
@@ -171,7 +171,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         } else {
             Log.v(TAG, "onMessageDelivered()-  messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
             if(m instanceof MessageLocation) {
-                de.greenrobot.event.EventBus.getDefault().post(m);
+                EventBus.getDefault().post(m);
             }
         }
         Log.v(TAG, "onMessageDelivered()-  queueKeys:" +  outgoingQueue.keySet().toString());

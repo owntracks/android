@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 
@@ -26,8 +27,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.Log;
 
-
-import de.greenrobot.event.EventBus;
 
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;

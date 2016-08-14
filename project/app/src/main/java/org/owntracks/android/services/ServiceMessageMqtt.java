@@ -27,6 +27,9 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.BuildConfig;
@@ -59,7 +62,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
@@ -744,7 +746,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		}
 	}
 
-	@SuppressWarnings("unused")
+	@Subscribe
 	public void onEvent(Events.Dummy e) {
 	}
 
@@ -754,14 +756,14 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, 0);
     }
 
-	@SuppressWarnings("unused")
+	@Subscribe
 	public void onEvent(Events.ModeChanged e) {
 		Log.v(TAG, "ModeChanged. Disconnecting and draining message queue");
         disconnect(false);
         clearQueues();
     }
 
-	@SuppressWarnings("unused")
+	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {
         clearQueues();
     }

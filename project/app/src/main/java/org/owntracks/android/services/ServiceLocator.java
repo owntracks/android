@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
@@ -42,7 +44,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 public class ServiceLocator implements ProxyableService, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -350,7 +351,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 	}
 
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) {
 
     }
@@ -448,27 +449,32 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointAdded e) {
 		handleWaypoint(e.getWaypoint(), false, false);
 	}
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointUpdated e) {
 		handleWaypoint(e.getWaypoint(), true, false);
 	}
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointRemoved e) {
 		handleWaypoint(e.getWaypoint(), false, true);
 	}
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.ModeChanged e) {
         removeGeofencesByWaypoint(loadWaypointsForModeId(e.getOldModeId()));
         requestGeofences();
     }
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.PermissionGranted e) {
         Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
         if(!hasLocationPermission && e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {

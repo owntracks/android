@@ -20,6 +20,8 @@ import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityFeatured;
@@ -365,10 +367,10 @@ public class ServiceNotification implements ProxyableService {
     }
 
 
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) { }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
         updateNotificationOngoing(e.getNewModeId());
     }
@@ -377,7 +379,7 @@ public class ServiceNotification implements ProxyableService {
         updateNotificationOngoing();
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.EndpointStateChanged e) {
         if (App.isInForeground())
             Toasts.showEndpointStateChange(e.getState());
@@ -386,7 +388,7 @@ public class ServiceNotification implements ProxyableService {
         updateNotificationOngoing();
     }
 
-
+    @Subscribe
     public void onEvent(Events.PermissionGranted e) {
         Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
         if(e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -394,7 +396,7 @@ public class ServiceNotification implements ProxyableService {
         }
     }
 
-
+    @Subscribe
     public void onEvent(MessageLocation m) {
         if(m.isOutgoing() && (notificationOngoingLastLocationCache == null || notificationOngoingLastLocationCache.getTst() <=  m.getTst())) {
             this.notificationOngoingLastLocationCache = m;

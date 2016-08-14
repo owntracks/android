@@ -29,6 +29,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.ServiceMessage;
@@ -41,8 +44,6 @@ import org.owntracks.android.support.Toasts;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-
-import de.greenrobot.event.EventBus;
 
 public class ActivityPreferencesConnection extends ActivityBase {
     private static final String TAG = "ActivityPreferencesCon";
@@ -659,7 +660,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void onStart() {
             super.onStart();
             Log.v(TAG, "onStart registerSticky");
-            EventBus.getDefault().registerSticky(this);
+            EventBus.getDefault().register(this);
         }
 
         @Override
@@ -675,8 +676,10 @@ public class ActivityPreferencesConnection extends ActivityBase {
             super.onDestroy();
         }
 
-        @SuppressWarnings("unused")
-        public void onEventMainThread(Events.EndpointStateChanged e) {
+
+
+        @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+        public void onEvent(Events.EndpointStateChanged e) {
             Log.v(TAG, "onEventMainThread Events.EndpointStateChanged -> " + e.getState() + " cached " + cachedState);
 
 

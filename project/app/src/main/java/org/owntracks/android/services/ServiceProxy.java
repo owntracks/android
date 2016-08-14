@@ -15,12 +15,12 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.receiver.ReceiverProxy;
 
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 public class ServiceProxy extends ServiceBindable {
@@ -154,7 +154,7 @@ public class ServiceProxy extends ServiceBindable {
 
 		services.put(id, p);
 		p.onCreate(instance);
-		EventBus.getDefault().registerSticky(p);
+		EventBus.getDefault().register(p);
 		return p;
 	}
 

@@ -18,6 +18,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
@@ -107,7 +108,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     }
 
     @SuppressWarnings("unused")
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) {
 
     }

@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
@@ -33,7 +34,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
     public void onStartCommand(Intent intent, int flags, int startId) {
     }
 
-    @Override
+    @Subscribe
     public void onEvent(Events.Dummy event) {
 
     }

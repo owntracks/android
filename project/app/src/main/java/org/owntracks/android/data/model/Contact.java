@@ -1,8 +1,12 @@
 package org.owntracks.android.data.model;
 
-/**
- * Created by alexander on 2016-08-13.
- */
-public class Contact {
-    // dummy
+import android.databinding.BaseObservable;
+
+import org.owntracks.android.model.FusedContact;
+
+
+public class Contact extends FusedContact{
+    public Contact(String id) {
+        super(id);
+    }
 }

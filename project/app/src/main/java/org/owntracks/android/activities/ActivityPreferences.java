@@ -23,6 +23,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.EditIntegerPreference;
@@ -31,8 +33,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ToolbarPreference;
-
-import de.greenrobot.event.EventBus;
 
 public class ActivityPreferences extends ActivityBase {
     private static final String TAG = "ActivityPreferences";
@@ -409,7 +409,7 @@ public class ActivityPreferences extends ActivityBase {
         @Override
         public void onStart() {
             super.onStart();
-            EventBus.getDefault().registerSticky(this);
+            EventBus.getDefault().register(this);
         }
 
         @Override
@@ -423,6 +423,7 @@ public class ActivityPreferences extends ActivityBase {
             super.onDestroy();
         }
 
+        @Subscribe(sticky = true)
         public void onEvent(Events.ModeChanged event) {
             setServerPreferenceSummary(this);
 

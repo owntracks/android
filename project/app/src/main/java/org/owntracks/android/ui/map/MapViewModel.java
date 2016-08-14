@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map;
 
 import android.content.Context;
+import android.databinding.ObservableMap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,11 +12,14 @@ import org.owntracks.android.data.model.Contact;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.contacts.ContactsViewModel;
 
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 
 /* Copyright 2016 Patrick Löwenstein
@@ -38,17 +42,20 @@ public class MapViewModel extends ContactsViewModel<MapMvvm.View> implements Map
 
 
     private final Context ctx;
+    private final ContactsRepo contactsRepo;
 
-    private ArrayList<String> borderList = null;
-    private Contact contact;
+    private Contact activeContact;
     private int mBottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
+    private ObservableMap<String, FusedContact> contacts;
 
 
     @Inject
-    public MapViewModel(@AppContext Context context) {
+    public MapViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
         super(context);
-        this.ctx = context.getApplicationContext();
+        Timber.v("onCreate");
 
+        this.ctx = context.getApplicationContext();
+        this.contactsRepo = contactsRepo;
     }
 
     @Override
@@ -93,8 +100,25 @@ public class MapViewModel extends ContactsViewModel<MapMvvm.View> implements Map
 
     @Override
     public void onMapReady() {
-        Log.v("MVM", "onMapReady");
+        Timber.v("onMapReady");
     }
+
+    private void subscribeToContactChanges() {
+         contacts = contactsRepo.getAll();
+        contacts.addOnMapChangedCallback(new ContactsRepoSubscriber());
+    }
+
+    private class ContactsRepoSubscriber extends ObservableMap.OnMapChangedCallback<ObservableMap<String, FusedContact>, String, FusedContact>{
+        @Override
+        public void onMapChanged(ObservableMap<String, FusedContact> map, String s) {
+            FusedContact c = map.get(s);
+            if(c == null)
+                getView().removeMarker(c);
+            else
+                getView().updateMarker(c);
+        }
+    }
+
 
     @Override
     public void onMapMarkerClick(@NonNull Contact c) {
