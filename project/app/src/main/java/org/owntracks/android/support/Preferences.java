@@ -21,6 +21,7 @@ import org.owntracks.android.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.Log;
@@ -1076,4 +1077,12 @@ public class Preferences {
         }
         return methods;
     }
+
+    @Nullable
+    public static String getStringOrNull(@NonNull String key) {
+        String st = Preferences.getString(key, R.string.valEmpty);
+        return (st != null && !st.isEmpty()) ? st : null;
+    }
+
+
 }
