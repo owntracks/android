@@ -55,8 +55,10 @@ import okhttp3.Response;
 import timber.log.Timber;
 
 public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMessageProcessor {
-    private static final String HEADER_USERNAME = "X-Limit-User";
-    private static final String HEADER_DEVICE = "X-Limit-Device";
+    // Headers according to https://github.com/owntracks/recorder#http-mode
+    private static final String HEADER_USERNAME = "X-Limit-U";
+    private static final String HEADER_DEVICE = "X-Limit-D";
+
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static String headerUsername;
     private static String headerDevice;
