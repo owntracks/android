@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="valModeId">0</integer>
+
+
+
+    <string name="valPubTopicPublic" formatted="false">public/%s/%s</string>
+    <string name="valSubTopicPublic">public/+/+</string>
+    <string name="valUsernamePublic">user</string>
+    <string name="valHostPublic">public-mqtt.owntracks.org</string>
+    <integer name="valPortPublic">8889</integer>
+    <bool name="valCleanSessionPublic">true</bool>
+    <bool name="valAuthPublic">false</bool>
+    <bool name="valTlsPublic">true</bool>
+    <bool name="valRemoteConfigurationPublic">false</bool>
+    <bool name="valPubRetainPublic">false</bool>
+    <bool name="valWsPublic">false</bool>
+    <integer name="valKeepalivePublic">120</integer>
+    <integer name="valPubQosPublic">0</integer>
+
+    <bool name="valInfoPublic" >true</bool>
+
+
+    <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
+    <string name="valSubTopic">owntracks/+/+</string>
+
+    <integer name="valPort">8883</integer>
+
+    <integer name="valPubQos">1</integer>
+    <integer name="valKeepalive">3600</integer>
+    <integer name="valLocatorDisplacement">500</integer>
+    <integer name="valLocatorInterval">900</integer>
+    <integer name="valLocatorAccuracyBackground">1</integer>
+    <integer name="valLocatorAccuracyForeground">0</integer>
+
+    <integer name="valBeaconBackgroundScanPeriod">30</integer>
+    <integer name="valBeaconForegroundScanPeriod">0</integer>
+    <integer name="valBeaconMode">0</integer>
+
+
+    <bool name="valPub">true</bool>
+    <bool name="valCleanSession">false</bool>
+    <bool name="valPubExtendedData">true</bool>
+    <bool name="valNotification">true</bool>
+    <bool name="valNotificationLocation">true</bool>
+    <bool name="valNotificationEvents">true</bool>
+
+    <bool name="valPubRetain">true</bool>
+    <bool name="valAutostartOnBoot">true</bool>
+    <bool name="valAuth">true</bool>
+    <bool name="valRemoteCommand">true</bool>
+    <bool name="valRemoteConfiguration">true</bool>
+    <bool name="valBeaconRangingEnabled">false</bool>
+    <bool name="valTls">true</bool>
+    <bool name="valWs">false</bool>
+    <bool name="valInfo" >true</bool>
+
+    <string-array name="modeIds">
+        <item>3</item>
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="profileIds_readable">
+        <item>HTTP Private</item>
+        <item>MQTT Private</item>
+        <item>MQTT Public</item>
+    </string-array>
+
+    <string-array name="locatorAccuracy">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="valEmpty">""</string>
+
+</resources>

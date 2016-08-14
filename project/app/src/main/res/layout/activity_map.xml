@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="org.owntracks.android.App"/>
+        <import type="android.view.View"/>
+        <variable name="item" type="org.owntracks.android.model.FusedContact"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include
+            android:transitionName="toolbar"
+            android:id="@+id/fragmentToolbar"
+            layout="@layout/toolbar"/>
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/coordinator"
+            android:layout_below="@+id/fragmentToolbar">
+
+
+            <FrameLayout
+                android:id="@+id/mapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+
+            <LinearLayout
+
+                android:id="@+id/bottomSheetLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background"
+                android:orientation="vertical"
+                app:behavior_hideable="true"
+                android:clickable="true"
+                app:behavior_peekHeight="72dp"
+                app:layout_behavior="@string/bottom_sheet_behavior"
+                android:elevation="6dp">
+
+                <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
+
+
+                <TextView
+                    android:id="@+id/locationDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@{App.formatDate(item.fusedLocationDate)}"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemPrimary"/>
+
+                <TextView
+                    android:id="@+id/locationDateLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsReportedTime"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemSecondary"/>
+
+
+
+                <TextView
+                    android:id="@+id/acc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.fusedLocationAccuracy +'m'}"
+                    android:textSize="16sp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemPrimary"/>
+
+
+                <TextView
+                    android:id="@+id/accLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsAccuracy"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemSecondary"/>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:background="#E4E4E4"/>
+
+
+
+
+
+                <TextView
+                    android:id="@+id/tid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.trackerId ?? @string/na}"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemPrimary"/>
+
+
+                <TextView
+                    android:id="@+id/tidLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsTrackerId"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemSecondary"/>
+
+                <TextView
+                    android:id="@+id/id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.id ?? @string/na}"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemPrimary"/>
+
+                <TextView
+                    android:id="@+id/topicLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contactDetailsTopic"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    style="@style/ListItemSecondary"/>
+
+                <ImageView
+                    android:layout_marginLeft="58dp"
+                    android:layout_marginBottom="8dp"
+
+                    android:id="@+id/moreButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_more_horiz_black_24dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:padding="12dp"
+                    android:tint="@color/buttonTint"
+                    android:tintMode="src_in"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+
+            </LinearLayout>
+        </android.support.design.widget.CoordinatorLayout>
+    </RelativeLayout>
+</layout>

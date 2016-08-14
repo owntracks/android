@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Owntracks</string>
+    <string name="preferencesServer">"Connection"</string>
+    <string name="preferencesHost">"Host"</string>
+    <string name="preferencesPort">"Port"</string>
+    <string name="preferencesWebsocket">Use WebSockets</string>
+    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesBrokerAuth">"Authentication"</string>
+    <string name="preferencesBrokerPassword">"Password"</string>
+
+
+    <string name="preferencesCaCrtPath">CA certificate</string>
+    <string name="preferencesClientCrtPath">Client certificate</string>
+    <string name="preferencesClientCrtPassword">Client certificate password</string>
+
+    <string name="preferencesLicenses">"Thanks"</string>
+    <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
+    <string name="preferencesNotification">Notifications</string>
+    <string name="preferencesNotificationEvents">Events </string>
+    <string name="preferencesNotificationEventsSummary">Notify about received events </string>
+    <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
+    <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
+    <string name="preferencesNotificationLocation">"Last reported location"</string>
+
+    <string name="preferencesAdvanced">"Advanced"</string>
+    <string name="preferencesVersion">"Version"</string>
+    <string name="preferencesReporting">"Reporting"</string>
+    <string name="preferencesBackroundUpdates">Automatic location reporting</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
+    <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
+    <string name="preferencesLocatorDisplacement">Locator background  displacement</string>
+    <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
+    <string name="preferencesLocatorInterval">Locator background interval</string>
+    <string name="preferencesLocatorIntervalSummary">Seconds between location updates</string>
+    <string name="preferencesInfo">Information</string>
+    <string name="preferencesRepository">Source Code</string>
+    <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
+    <string name="preferencesDocumentation">Documentation</string>
+    <string name="preferencesDocumentationSummary">owntracks.org/booklet/</string>
+    <string name="preferencesTwitter">Twitter</string>
+    <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
+    <string name="preferencesCommunity">Community</string>
+    <string name="preferencesCommunitySummary">community.owntracks.org</string>
+    <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
+    <string name="preferencesEncryptionKey">Encryption Key</string>
+
+
+
+
+    <string name="na">Not available</string>
+    <string name="currentLocation">Use current location</string>
+    <string name="share">Share</string>
+    <string name="save">"Save"</string>
+    <string name="cancel">"Cancel"</string>
+    <string name="preferencesCleanSessionEnabled">Clean Session</string>
+    <string name="publish">Report</string>
+    <string name="preferencesPubExtendedDataSummary">Include extended data in location reports</string>
+    <string name="preferencesPubExtendedData">Extended data</string>
+    <string name="preferencesAutostartSummary">Automatically start on device boot</string>
+    <string name="preferencesAutostart">Autostart</string>
+    <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
+    <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
+    <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
+    <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the foreground</string>
+    <string name="preferencesRemoteCommand">Remote commands</string>
+    <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
+    <string name="description">Description</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="radius">Radius</string>
+    <string name="addWaypoint">Add waypoint</string>
+    <string name="export">Export</string>
+    <string name="exportConfiguration">Export preferences</string>
+    <string name="preferencesExport">Export</string>
+    <string name="contactLocationUnknown">No location is available</string>
+    <string name="menuContactNavigate">Navigate</string>
+    <string name="contactDetailsLocation">Location</string>
+    <string name="contactDetailsAccuracy">Accuracy</string>
+    <string name="contactDetailsReportedTime">Reported</string>
+    <string name="contactDetailsTopic">Topic</string>
+    <string name="contactDetailsName">Name</string>
+    <string name="waypointListPlaceholder">No waypoints defined yet</string>
+    <string name="geofenceActive">Geofence enabled</string>
+    <string name="waypointRemove">Remove</string>
+    <string name="importConfig">Import</string>
+    <string name="importWarning">The following preference values will be imported:</string>
+    <string name="tls">TLS</string>
+    <string name="preferencesSecurity">Security</string>
+    <string name="accept">Accept</string>
+    <string name="preferencesIdentification">Identification</string>
+    <string name="preferencesOptions">Parameters</string>
+    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="seconds">Seconds</string>
+    <string name="preferencesProfileId">Mode</string>
+    <string name="snackbarConnected">Connected</string>
+    <string name="snackbarDisconnected">Disconnected</string>
+    <string name="snackbarDisconnectedError">Disconnected with error</string>
+
+
+    <string name="ssid">SSID</string>
+    <string-array name="locatorAccuracy_readable">
+        <item>High power</item>
+        <item>Balanced power</item>
+        <item>Low power</item>
+        <item>No power</item>
+    </string-array>
+
+
+    <string name="mode_mqtt_private_label">Private MQTT</string>
+    <string name="mode_mqtt_public_label">Public MQTT</string>
+
+    <string name="refresh">Refresh</string>
+    <string name="connectivityDisconnectedConfigIncomplete">Connection not configured</string>
+
+    <string name="snackbarImportCompleted">Preferences imported</string>
+    <string name="snackbarConfigIncomplete">Configuration incomplete</string>
+    <string name="aLocation">a location</string>
+    <string name="events">Events</string>
+    <string name="notificationMessageTitle">Messages</string>
+    <string name="beaconUUID">UUID</string>
+    <string name="beaconMajor">Major</string>
+    <string name="beaconMinor">Minor</string>
+    <string name="locationPermissionNotAvailable">Location access denied</string>
+    <string name="title_activity_regions">Regions</string>
+    <string name="title_activity_region">Region</string>
+    <string name="title_activity_featured">Featured</string>
+    <string name="title_activity_map">Map</string>
+    <string name="title_activity_contacts">Friends</string>
+    <string name="title_activity_status">Status</string>
+    <string name="title_activity_preferences">Preferences</string>
+    <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
+    <string name="successCopyCertificate">Certificate copied to internal storage</string>
+    <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
+    <string name="preferencesCategoryNotificatinBackground">Background notifications</string>
+    <string name="preferencesCategoryAdvancedServices">Services</string>
+    <string name="preferencesCategoryAdvancedLocator">Locator</string>
+    <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
+    <string name="preferencesCategoryAdvancedMisc">Misc</string>
+    <string name="contactDetailsTrackerId">Tracker ID</string>
+    <string name="waypointRemoved">Region removed</string>
+
+    <string name="preferencesImportFile">Import configuration</string>
+    <string name="preferencesImportFileSummary">Import configuration from file</string>
+    <string name="preferencesExportToFile">Export configuration</string>
+    <string name="preferencesExportToFileSummary">Export configuration to file</string>
+    <string name="exportWaypointsToEndpoint">Export Waypoints</string>
+    <string name="exportWaypointsToEndpointSummary">Export waypoints to service</string>
+    <string name="preferencesExportFailed">Preferences export failed</string>
+    <string name="preferencesExportSuccess">Export successful</string>
+    <string name="geofenceAndBeaconInactive">Geofence and beacon disabled</string>
+    <string name="geofenceAndBeaconActive">Geofence and beacon enabled</string>
+    <string name="beaconActive">Beacon enabled</string>
+    <string name="preferencesExportQueued">Export queued</string>
+
+
+    <string name="welcomeFixIssue">Fix</string>
+    <string name="welcomeFixQuit">Quit</string>
+    <string name="play_services_now_available">Google Play Services are now available</string>
+
+    <string name="play_services_not_available_recoverable">Google Play Services are not enabled or not installed</string>
+    <string name="play_services_not_available_not_recoverable">Google Play Services are not available for your device</string>
+    <string name="preferencesUrl">Url</string>
+    <string name="mode_http_private_label">Private HTTP (beta)</string>
+    <string name="messageQueued">message queued</string>
+
+
+    <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
+
+
+    <string name="preferencesKeyModeId">mode</string>
+    <string name="preferencesKeyHost">host</string>
+    <string name="preferencesKeyIdentification">identification</string>
+    <string name="preferencesKeySecurity">security</string>
+    <string name="preferencesKeyParameters">parameters</string>
+    <string name="transitionEntering">entering</string>
+    <string name="transitionLeaving">leaving</string>
+
+
+    <string name="INITIAL">"Initializing</string>
+    <string name="IDLE">Idle</string>
+    <string name="CONNECTING">Connecting</string>
+    <string name="CONNECTED">Connected</string>
+    <string name="DISCONNECTING">Disconnecting</string>
+    <string name="DISCONNECTED">Disconnected</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
+    <string name="ERROR">Error</string>
+    <string name="ERROR_DATADISABLED">Data cnnection not available </string>
+    <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
+    <string name="errorPreferencesImportFailed">Import failed</string>
+
+</resources>
