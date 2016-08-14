@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,21 +17,30 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Toasts;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class ActivityImport extends ActivityBase {
+import timber.log.Timber;
+
+public class  ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
+    public static final int REQUEST_CODE = 1;
 
     private TextView input;
     private MessageConfiguration configJSON = null;
+    private MenuItem saveButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +61,7 @@ public class ActivityImport extends ActivityBase {
         final String action = intent.getAction();
         Log.v(TAG, "action: " + intent.getAction());
 
+
         if(Intent.ACTION_VIEW.equals(action)) {
             Log.v(TAG, "action ok, getting data uri");
 
@@ -61,19 +72,52 @@ public class ActivityImport extends ActivityBase {
                 extractPreferences(uri);
 
             }
+        } else {
+            Intent pickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            pickerIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            pickerIntent.setType("*/*");
+
+            try {
+                startActivityForResult(Intent.createChooser(pickerIntent, "Select a file"), ActivityImport.REQUEST_CODE);
+            } catch (android.content.ActivityNotFoundException ex) {
+                // Potentially direct the user to the Market with a Dialog
+            }
+
         }
 
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+        super.onActivityResult(requestCode, resultCode, resultIntent);
+        Log.v(TAG, "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
+        switch(requestCode) {
+            case ActivityImport.REQUEST_CODE: {
+                if(resultCode == RESULT_OK) {
+                    extractPreferences(resultIntent.getData());
+                } else {
+                    finish();
+                }
+
+
+                break;
+            }
+        }
+    }
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_export, menu);
 
-        MenuItem saveButton = menu.findItem(R.id.save);
-        saveButton.setEnabled(configJSON != null);
-        saveButton.getIcon().setAlpha(configJSON != null ? 255 : 130);
-
+        saveButton = menu.findItem(R.id.save);
+        tintMenu();
         return true;
+    }
+
+    private void tintMenu() {
+        if(saveButton != null) {
+            saveButton.setEnabled(configJSON != null);
+            saveButton.getIcon().setAlpha(configJSON != null ? 255 : 130);
+        }
     }
 
     @Override
@@ -118,10 +162,18 @@ public class ActivityImport extends ActivityBase {
     private void extractPreferences(Uri uri){
 
         try{
+            BufferedReader r;
+            if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
+                // Note: left here to avoid breaking compatibility.  May be removed
+                // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
+                Timber.v("using file:/ uri");
+                r  = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
+            } else {
+                Timber.v("using content:/ uri");
+                InputStream stream =  getContentResolver().openInputStream(uri);
+                r = new BufferedReader(new InputStreamReader(stream));
+            }
 
-             InputStream stream =  getContentResolver().openInputStream(uri);
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(stream));
             StringBuilder total = new StringBuilder();
 
             try {
@@ -137,82 +189,22 @@ public class ActivityImport extends ActivityBase {
 
             Log.v(TAG, "file content: " + total);
 
-
-            if(total == null) {
-                throw new Error("Unable to read content");
-            }
-
             configJSON= (MessageConfiguration) Parser.deserializeSync(total.toString().getBytes());
-            if(configJSON == null || !(configJSON instanceof MessageConfiguration)) {
+            if(configJSON == null) {
                 throw new Error("Unable to parse content");
             }
 
 
-            //            Log.v(TAG, "parsing to JSON");
-//            StringifiedJSONObject j = new StringifiedJSONObject(fileContent);
-
-//            Log.v(TAG, "json: " + j.toString());
-
 
             input.setText(formatString(Parser.serializeSync(configJSON)));
-/*
-            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.preferencesImportFile))
-                    .setMessage(filePath)
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // ???
-                        }
-                    })
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            try {
-
-                                Preferences.importFromMessage(new StringifiedJSONObject(fileContent));
-                                Runnable r = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ServiceProxy.getServiceMessageMqtt().reconnect();
-                                    }
-                                };
-                                new Thread(r).start();
-
-                            } catch (JSONException e) {
-                                importPreferenceResultDialog("Preferences import failed!");
-                            }
-
-                            importPreferenceResultDialog("Preferences imported successfully !");
-                        }
-                    });
-
-            Dialog dialog = builder.create();
-            dialog.show();
-*/
-
+            tintMenu();
         }catch(Exception e){
+            Timber.e(e, "import exception ");
+            finish();
+            Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
 
-            Log.e("Export", "importPreferenceDialog exception: " +e);
-            importPreferenceResultDialog("Error", "Preferences import failed!");
         }
 
-    }
-
-    private void importPreferenceResultDialog(String title, String message){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                });
-
-        Dialog dialog = builder.create();
-        dialog.show();
     }
 
     private static String formatString(String text){

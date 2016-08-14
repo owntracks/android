@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
+def versionMajor = 1
+def versionMinor = 1
+def versionPatch = 1
+def versionBuild = 1
+
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
@@ -9,8 +15,8 @@ android {
         applicationId "org.owntracks.android"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
     buildTypes {
         release {

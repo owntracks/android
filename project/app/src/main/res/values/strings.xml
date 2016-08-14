@@ -188,5 +188,6 @@
     <string name="ERROR">Error</string>
     <string name="ERROR_DATADISABLED">Data cnnection not available </string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
+    <string name="errorPreferencesImportFailed">Import failed</string>
 
 </resources>
