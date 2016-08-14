@@ -7,8 +7,10 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.owntracks.android.activities.ActivityMap;
-import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.db.Dao;
+import org.owntracks.android.injection.components.AppComponent;
+import org.owntracks.android.injection.components.DaggerAppComponent;
+import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.model.ContactsViewModel;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.ServiceProxy;
@@ -28,6 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,12 +41,13 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import de.greenrobot.event.EventBus;
+import io.realm.Realm;
 import timber.log.Timber;
 
 public class App extends Application  {
     private static final String TAG = "App";
 
-    private static App instance;
+    private static App sInstance;
     private static SimpleDateFormat dateFormater;
     private static SimpleDateFormat dateFormaterToday;
 
@@ -59,6 +63,8 @@ public class App extends Application  {
     public static final int MODE_ID_MQTT_PRIVATE =0;
     public static final int MODE_ID_MQTT_PUBLIC =2;
     public static final int MODE_ID_HTTP_PRIVATE = 3;
+
+    private static AppComponent sAppComponent = null;
 
 
     public static HashMap<String, FusedContact> getFusedContacts() {
@@ -79,7 +85,13 @@ public class App extends Application  {
             });
         }
 
-        instance = this;
+        sInstance = this;
+        sInstance = this;
+        sAppComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+
+
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
 
@@ -103,7 +115,7 @@ public class App extends Application  {
         EncryptionProvider.initialize();
         Log.d(TAG, "trace / App async init end" + System.currentTimeMillis());
 
-        ServiceProxy.runOrBind(instance, new Runnable() {
+        ServiceProxy.runOrBind(sInstance, new Runnable() {
             @Override
             public void run() {
                 Timber.v("trace loading services %s", System.currentTimeMillis());
@@ -115,20 +127,25 @@ public class App extends Application  {
 
     }
 
+    public static App getInstance() { return sInstance; }
+
+    public static AppComponent getAppComponent() { return sAppComponent; }
+
+    public static Realm getRealm() { return sAppComponent.realm(); }
+
+    public static Resources getRes() { return sInstance.getResources(); }
+
 
     public static void enableForegroundBackgroundDetection() {
-        instance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-        instance.registerScreenOnReceiver();
+        sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
+        sInstance.registerScreenOnReceiver();
     }
 
 
 
     public static Context getContext() {
-		return instance;
+		return sInstance;
 	}
-    public static App getInstance() {
-        return instance;
-    }
 
     public static FusedContact getFusedContact(String topic) {
         return fusedContacts.get(topic);
@@ -202,7 +219,7 @@ public class App extends Application  {
 	}
 
 	public static String getAndroidId() {
-		return Secure.getString(instance.getContentResolver(), Secure.ANDROID_ID);
+		return Secure.getString(sInstance.getContentResolver(), Secure.ANDROID_ID);
 	}
 
 	public static int getBatteryLevel() {
@@ -261,7 +278,7 @@ public class App extends Application  {
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background
      */
-    private static final class LifecycleCallbacks implements ActivityLifecycleCallbacks {
+    private static final class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
 
             App.runningActivities++;

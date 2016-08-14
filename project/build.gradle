@@ -7,7 +7,10 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "io.realm:realm-gradle-plugin:1.1.0"
         classpath 'org.greenrobot:greendao-gradle-plugin:3.0.0'
+
     }
 }
 
