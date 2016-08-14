@@ -2,20 +2,30 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="root">>
 
-        <Preference
-            android:key="exportToFile"
-            android:title="@string/preferencesExportToFile"
-            android:summary="@string/preferencesExportToFileSummary">
-        </Preference>
+    <Preference
+        android:key="exportToFile"
+        android:title="@string/preferencesExportToFile"
+        android:summary="@string/preferencesExportToFileSummary">
+    </Preference>
+    <Preference
+        android:key="exportToQRCode"
+        android:title="@string/preferencesExportToQRCode"
+        android:summary="@string/preferencesExportToQRCodeSummary">
+    </Preference>
     <Preference
         android:key="exportWaypointsToEndpoint"
         android:title="@string/exportWaypointsToEndpoint"
         android:summary="@string/exportWaypointsToEndpointSummary">
     </Preference>
     <Preference
-        android:key="import"
+        android:key="importFromFile"
         android:title="@string/preferencesImportFile"
         android:summary="@string/preferencesImportFileSummary">
+    </Preference>
+    <Preference
+        android:key="importFromQRCode"
+        android:title="@string/preferencesImportQRCode"
+        android:summary="@string/preferencesImportQRCodeSummary">
     </Preference>
 
 </PreferenceScreen>

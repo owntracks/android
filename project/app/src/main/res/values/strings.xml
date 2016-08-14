@@ -141,9 +141,9 @@
     <string name="contactDetailsTrackerId">Tracker ID</string>
     <string name="waypointRemoved">Region removed</string>
 
-    <string name="preferencesImportFile">Import configuration</string>
+    <string name="preferencesImportFile">Import configuration from file</string>
     <string name="preferencesImportFileSummary">Import configuration from file</string>
-    <string name="preferencesExportToFile">Export configuration</string>
+    <string name="preferencesExportToFile">Export configuration to file</string>
     <string name="preferencesExportToFileSummary">Export configuration to file</string>
     <string name="exportWaypointsToEndpoint">Export Waypoints</string>
     <string name="exportWaypointsToEndpointSummary">Export waypoints to service</string>
@@ -189,5 +189,14 @@
     <string name="ERROR_DATADISABLED">Data cnnection not available </string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
+    <string name="qr_export_code">QR export code</string>
+    <string name="export_qrcode_title">Export QR Code</string>
+    <string name="preferencesExportToQRCode">Export configuration to QR code</string>
+    <string name="preferencesExportToQRCodeSummary">Export configuration to QR code</string>
+    <string name="preferencesExportQRCodeGenerating">Generating a QR code…</string>
+    <string name="dialog_close">Close</string>
+    <string name="preferencesImportQRCode">Import configuration from QR code</string>
+    <string name="preferencesImportQRCodeSummary">Import configuration from QR code</string>
+    <string name="qrcode_error">Error reading QR code, please try again</string>
 
 </resources>
