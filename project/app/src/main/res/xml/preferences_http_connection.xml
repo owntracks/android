@@ -13,6 +13,9 @@
         <Preference
             android:key="@string/preferencesKeyHost"
             android:title="@string/preferencesHost" />
+        <Preference
+            android:key="@string/preferencesKeyIdentification"
+            android:title="@string/preferencesIdentification" />
 
         <Preference
             android:key="@string/preferencesKeySecurity"

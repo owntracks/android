@@ -19,11 +19,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
@@ -47,6 +50,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
     private static boolean modeSwitch = false;
     public static final String KEY_MODE_CHANGED = "modeChanged";
     private WeakReference<FragmentPreferences> preferencesFragment;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,6 +156,12 @@ public class ActivityPreferencesConnection extends ActivityBase {
         private String tlsCaCrtName;
         private String tlsClientCrtName;
 
+        private BarcodeScanListener barcodeCallback;
+
+        private interface BarcodeScanListener {
+            void onBarcodeScanResult(String url);
+        }
+
         private void loadHostPreferencesMqtt(final Activity a) {
             Preference.OnPreferenceClickListener hostClickListener = new Preference.OnPreferenceClickListener() {
                 @Override
@@ -235,6 +245,21 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                                     url.setText(Preferences.getUrl());
                                     url.setFloatingLabelAlwaysShown(true);
+                                    url.setLongClickable(true);
+                                    url.setOnLongClickListener(new View.OnLongClickListener() {
+                                        @Override
+                                        public boolean onLongClick(View view) {
+                                            barcodeCallback = new BarcodeScanListener() {
+                                                public void onBarcodeScanResult(String input) {
+                                                    Log.v(TAG, "Receiving barcode url");
+                                                    url.setText(input);
+                                                }
+                                            };
+                                            IntentIntegrator integrator = new IntentIntegrator(FragmentPreferences.this);
+                                            integrator.initiateScan();
+                                            return true;
+                                        }
+                                    });
 
 
                                 }
@@ -352,73 +377,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         }
 
-        private void loadIdentificationHttpPreferences(final Activity a) {
-            Preference.OnPreferenceClickListener identificationClickListener = new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new MaterialDialog.Builder(a)
-                            .customView(R.layout.preferences_identification_http, true)
-                            .title(R.string.preferencesIdentification)
-                            .positiveText(R.string.accept)
-                            .negativeText(R.string.cancel)
-                            .showListener(new DialogInterface.OnShowListener() {
-                                @Override
-                                public void onShow(DialogInterface dialog) {
-                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
-                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
-
-                                    deviceId.setHint(Preferences.getDeviceIdDefault());
-                                    deviceId.setText(Preferences.getDeviceId(false));
-                                    trackerId.setText(Preferences.getTrackerId(false));
-                                    trackerId.setHint(Preferences.getTrackerIdDefault());
-
-                                    deviceId.addTextChangedListener(new TextWatcher() {
-                                        @Override
-                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                                        }
-
-                                        @Override
-                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                            if (s.length() >= 2)
-                                                trackerId.setHint(s.toString().substring(deviceId.length() - 2));
-                                            else
-                                                trackerId.setHint(Preferences.getTrackerIdDefault());
-                                        }
-
-                                        @Override
-                                        public void afterTextChanged(Editable s) {
-
-                                        }
-                                    });
-
-                                }
-                            })
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    MaterialDialog d = MaterialDialog.class.cast(dialog);
-                                    final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
-                                    final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
-
-                                    Preferences.setDeviceId(deviceId.getText().toString());
-                                        Preferences.setTrackerId(trackerId.getText().toString());
-
-                                    updateConnectButton();
-                                }
-                            })
-
-                            .show();
-
-                    return true;
-                }
-            };
-
-            //identificationPreference = findPreference(getString(R.string.preferencesKeyIdentification));
-            //identificationPreference.setOnPreferenceClickListener(identificationClickListener);
-
-        }
 
 
 
@@ -677,7 +635,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HTTP);
                 addPreferencesFromResource(R.xml.preferences_http_connection);
                 loadHostPreferencesHttp(a);
-                loadIdentificationHttpPreferences(a);
+                loadIdentificationPreferences(a);
                 loadSecurityPreferences(a);
 
             } else {
@@ -833,6 +791,21 @@ public class ActivityPreferencesConnection extends ActivityBase {
             setTlsClientCrtName("");
         }
 
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (requestCode == IntentIntegrator.REQUEST_CODE) {
+                try {
+                    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                    if (barcodeCallback != null) {
+                        barcodeCallback.onBarcodeScanResult(result.getContents());
+                    }
+                    barcodeCallback = null;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error calling barcode scanner onBarcodeScanResult: " + e);
+                }
+            }
+            super.onActivityResult(requestCode, resultCode, data);
+        }
 
 
     }

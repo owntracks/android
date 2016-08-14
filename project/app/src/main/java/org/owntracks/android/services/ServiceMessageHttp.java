@@ -54,6 +54,12 @@ import okhttp3.Response;
 import timber.log.Timber;
 
 public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMessageProcessor {
+    private static final String HEADER_USERNAME = "X-Limit-User";
+    private static final String HEADER_DEVICE = "X-Limit-Device";
+    private static final String HEADER_AUTHORIZATION = "Authorization";
+    private static String headerUsername;
+    private static String headerDevice;
+
     private String endpointUrl;
     private String endpointUserInfo;
 
@@ -101,6 +107,8 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | IOException | UnrecoverableKeyException | CertificateException e) {
             e.printStackTrace();
         }
+        headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
+        headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
 
@@ -207,8 +215,18 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         }
         Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
 
-        if(userInfo != null) {
-            request.header("Authorization", "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
+         if(userInfo != null) {
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
+        } else if(Preferences.getAuth()) {
+             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((Preferences.getUsername()+":"+Preferences.getPassword()).getBytes(), Base64.NO_WRAP));
+
+         }
+        
+        if(headerUsername != null) {
+            request.header(HEADER_USERNAME, headerUsername);
+        }
+        if(headerDevice != null) {
+            request.header(HEADER_DEVICE, headerDevice);
         }
 
         try {
@@ -242,6 +260,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
             return onMessageDeliveryFailed(c, messageId);
         }
     }
+
 
     private static int onMessageDelivered(@NotNull Context c, @Nullable Long messageId) {
         if(messageId == null || messageId == 0) {
@@ -353,6 +372,13 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
                     loadEndpointUrl();
                 if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
                     loadHTTPClient();
+                if(Preferences.Keys.USERNAME.equals(key))
+                    headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
+                if(Preferences.Keys.DEVICE_ID.equals(key))
+                    headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
+
+
+
             }
         });
 
