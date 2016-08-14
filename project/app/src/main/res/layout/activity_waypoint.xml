@@ -80,8 +80,9 @@
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
                     android:id="@+id/latitude"
-                    android:inputType="numberDecimal"
-                    android:text="@{item.geofenceLatitude}"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:digits="-0123456789."
+                android:text="@{item.geofenceLatitude}"
                     app:met_helperText=""/>
 
                 <com.rengwuxian.materialedittext.MaterialEditText
@@ -92,7 +93,8 @@
                     android:hint="@string/longitude"
                     android:id="@+id/longitude"
                     android:text="@{item.geofenceLongitude}"
-                    android:inputType="numberDecimal"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:digits="-0123456789."
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
