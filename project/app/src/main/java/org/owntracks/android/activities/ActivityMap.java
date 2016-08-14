@@ -269,7 +269,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     @SuppressWarnings("unused")
     public void onEventMainThread(Events.ModeChanged e) {
-        redrawMap();
+        clearMap();
     }
 
     @SuppressWarnings("unused")
@@ -503,6 +503,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
 
     private void hideBottomSheet() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
     }
 
 

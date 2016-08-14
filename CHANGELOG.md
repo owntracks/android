@@ -14,7 +14,6 @@ OwnTracks Android App Release Notes
 * [FIX] #353 - WakeLock under-locked org.owntracks.android.wakelock.broker.ping
 * [FIX] Several other possible crashes
 
-
 ## OwnTracks 0.6.15
 >Release date: 2016-04-07
 * [FIX] #355 - Crash when picking a friend without a location
@@ -42,18 +41,17 @@ OwnTracks Android App Release Notes
 
 ## OwnTracks 0.6.11
 >Release date: 2016-04-03
+* [FIX] #350 - visual glitches on 4.0.4
+* [FIX] #344 - regions loose "shared" indicator on import enhancement
+* [FIX] #341 - remove the *map center* button on the *Friends* page
 * [FIX] #339 - custom certificates couldn't be imported from some locations
 * [FIX] #338 - beacon functionality can cause battery drain
-* [FIX] #344 - regions loose "shared" indicator on import enhancement
 * [NEW] follow mode is now automatically used from friends view and after long pressing on details on map
 * [NEW] regions can be deleted by long pressing them
 * [NEW] setup wizard that allows to set the mode prior to the first connection
 
 ## OwnTracks 0.6.11
 >Release date: 2016-04-03
-* [FIX] #350 - visual glitches on 4.0.4
-* [FIX] #341 - remove the *map center* button on the *Friends* page
-* [FIX] #339 - custom certificates couldn't be imported from certain locations
 * [NEW] - Follow mode doesn't work in certain cases. It now auto engages from Friends view and after long pressing on details on map.
 * [NEW] - Due to popular demand, regions can be deleted by long pressing them
 * [NEW] - Setup wizard that allows to set the mode prior to the first connection
@@ -131,11 +129,8 @@ OwnTracks Android App Release Notes
 * [NEW] - Improved handling of certificates  
 * [NEW] - Added support for symmetric payload encryption  
 * [NEW] - Improved reconnect behaviour (#271, #297, #302)  
-
 * [FIX] #294 - Android app doesn't suscribe right topic for Messages
 * [FIX] #289 - Go back from THANKS Menu
-
-
 
 ## OwnTracks 0.5.23
 >Release date: 2015-10-11 for beta testers
