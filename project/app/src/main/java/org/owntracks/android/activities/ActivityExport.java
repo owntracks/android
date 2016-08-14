@@ -63,6 +63,7 @@ public class ActivityExport extends ActivityBase {
             findPreference("import").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
+
                     Intent intent = new Intent(context, ActivityImport.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
