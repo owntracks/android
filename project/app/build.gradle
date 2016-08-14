@@ -1,10 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'realm-android'
 apply plugin: 'org.greenrobot.greendao'
 
 def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 1
 def versionBuild = 1
+ext.daggerVersion = '2.6'
+ext.playLibVersion = '9.4.0'
+ext.okHttpVersion = '3.4.1'
+ext.supportLibVersion = '24.1.1'
 
 
 android {
@@ -50,9 +56,14 @@ android {
             storePassword '__DEBUG__'
         }
     }
-
+    packagingOptions {
+        // Remove unneeded Realm native libs (nearly no devices use these)
+        exclude 'lib/armeabi/librealm-jni.so'
+        exclude 'lib/mips/librealm-jni.so'
+        exclude 'lib/x86/librealm-jni.so'
+        exclude 'lib/x86_64/librealm-jni.so'
+    }
 }
-
 repositories {
     maven { url 'https://repo.eclipse.org/content/repositories/paho-snapshots/' }
     maven { url "https://jitpack.io" }
@@ -60,24 +71,27 @@ repositories {
 }
 
 dependencies {
+
     compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
 
     // Support libraries
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:design:24.1.1'
-    compile 'com.android.support:recyclerview-v7:24.1.1'
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
 
     // Play Services libraries
-    compile 'com.google.android.gms:play-services-gcm:9.4.0'
-    compile 'com.google.android.gms:play-services-maps:9.4.0'
-    compile 'com.google.android.gms:play-services-location:9.4.0'
-    compile 'com.google.android.gms:play-services-places:9.4.0'
-    compile 'com.google.android.gms:play-services-base:9.4.0'
+    compile "com.google.android.gms:play-services-gcm:${playLibVersion}"
+    compile "com.google.android.gms:play-services-maps:${playLibVersion}"
+    compile "com.google.android.gms:play-services-location:${playLibVersion}"
+    compile "com.google.android.gms:play-services-places:${playLibVersion}"
+    compile "com.google.android.gms:play-services-base:${playLibVersion}"
 
 
     // Utility libraries
-    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'de.greenrobot:eventbus:2.4.0'  // deprecated. use annotation based 3.0 instead
+    compile 'org.greenrobot:eventbus:3.0.0'
+
     compile 'org.greenrobot:greendao:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-SNAPSHOT'
@@ -110,6 +124,13 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
     compile "ch.acra:acra:4.8.5"
+
+    apt 'com.google.guava:guava:19.0' // needed by Dagger
+    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    compile "com.google.dagger:dagger:${daggerVersion}"
+
+    compile 'io.reactivex:rxjava:1.1.8'
+    compile 'io.reactivex:rxandroid:1.2.1'
 
 }
 
