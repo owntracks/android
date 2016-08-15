@@ -39,4 +39,5 @@ project/app/src/main/res/values-v1/apis.xml
 
 apk/
 project/android.iml
-project/android-release.apk
+*.apk
+*.iml
