@@ -6,7 +6,7 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 1
-def versionBuild = 1
+def versionBuild = 2
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '9.4.0'
 ext.okHttpVersion = '3.4.1'
@@ -133,3 +133,6 @@ dependencies {
 
 }
 
+greendao {
+    schemaVersion 15
+}
