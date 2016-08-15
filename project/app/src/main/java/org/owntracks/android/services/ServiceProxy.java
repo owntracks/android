@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -271,11 +273,14 @@ public class ServiceProxy extends ServiceBindable {
 		runQueue.clear();
 
 	}
-
-	public static void runOrBind(Context context, Runnable runnable) {
+	public static void bind(@NonNull  Context context) {
+		runOrBind(context, null);
+	}
+	public static void runOrBind(@NonNull  Context context, @Nullable Runnable runnable) {
 		if (((instance != null ) && (getServiceConnection() != null)) || context instanceof ServiceProxy) {
 
-            runnable.run();
+			if(runnable != null)
+            	runnable.run();
 			return;
 		}
 
@@ -299,8 +304,8 @@ public class ServiceProxy extends ServiceBindable {
 			};
 			connection = new ServiceProxyConnection(context, c);
 		}
-
-		runQueue.addLast(runnable);
+		if(runnable != null)
+			runQueue.addLast(runnable);
 
         try {
             if (!attemptingToBind) { // Prevent accidental bind during close
