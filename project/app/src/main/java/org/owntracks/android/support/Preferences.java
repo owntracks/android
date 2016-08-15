@@ -649,8 +649,13 @@ public class Preferences {
     @Import(key =Keys.NOTIFICATION)
     private static void setNotification(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION, aBoolean);
-
     }
+
+    @Import(key =Keys.NOTIFICATION_HIGHER_PRIORITY)
+    private static void setNotificationHigherPriority(boolean aBoolean) {
+        setBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, aBoolean);
+    }
+
     @Import(key =Keys.NOTIFICATION_LOCATION)
     private static void setNotificationLocation(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_LOCATION, aBoolean);
@@ -776,10 +781,17 @@ public class Preferences {
         return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
     }
 
-    @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
+    @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static boolean getNotification() {
         return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
     }
+
+    @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
+    public static boolean getNotificationHigherPriority() {
+        return getBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, R.bool.valNotificationHigherPriority);
+    }
+
+
 
     @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static boolean getNotificationLocation() {
@@ -994,6 +1006,7 @@ public class Preferences {
         public static final String MODE_ID                          = "mode";
         public static final String NOTIFICATION                     = "notification";
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
+        public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
         public static final String PASSWORD                         = "password";
         public static final String PORT                             = "port";
