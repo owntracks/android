@@ -228,6 +228,7 @@ public class ServiceNotification implements ProxyableService {
             notificationBuilderEvents.setPriority(Notification.PRIORITY_MIN);
             notificationBuilderEvents.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
+
         }
     }
     public void  updateNotificationOngoing() {
@@ -248,10 +249,16 @@ public class ServiceNotification implements ProxyableService {
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
-            notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
             notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
+
+        if(Preferences.getNotificationHigherPriority())
+            notificationBuilderOngoing.setPriority(Notification.PRIORITY_DEFAULT);
+        else
+            notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
+
+        notificationBuilderOngoing.setOngoing(true);
         notificationBuilderOngoing.setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
         this.notificationOngoing = notificationBuilderOngoing.build();
         this.context.startForeground(NOTIFICATION_ID_ONGOING, this.notificationOngoing);
