@@ -16,6 +16,7 @@ import com.google.android.gms.gcm.Task;
 
 import org.antlr.v4.runtime.misc.NotNull;
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
@@ -209,13 +210,22 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         }
     }
 
-    public static int postMessage(String body, @Nullable  String url, @Nullable String userInfo, Context c, Long messageId) {
+    public static int postMessage(final String body, @Nullable final String url, @Nullable final String userInfo, final Context c, final Long messageId) {
         Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
 
         if(url == null) {
             Timber.e("url not configured. messageId:%s", messageId);
             return GcmNetworkManager.RESULT_FAILURE;
         }
+
+        if(c instanceof ServiceMessageHttpGcm && mHttpClient == null) {
+            Timber.e("sevice not available. Binding and rescheduling GCM task");
+            ServiceProxy.bind(App.getContext());
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }
+
+
+
         Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
 
          if(userInfo != null) {
