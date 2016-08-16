@@ -167,7 +167,7 @@ public class  ActivityImport extends ActivityBase {
                 // Note: left here to avoid breaking compatibility.  May be removed
                 // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
                 Timber.v("using file:/ uri");
-                r  = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
+                r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
             } else {
                 Timber.v("using content:/ uri");
                 InputStream stream =  getContentResolver().openInputStream(uri);
