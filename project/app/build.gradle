@@ -104,6 +104,8 @@ dependencies {
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
     compile 'com.jakewharton.timber:timber:4.1.2'
 
+    compile 'org.antlr:antlr4-runtime:4.5.3'
+
     // Widget libraries
     compile 'com.github.rengwuxian:MaterialEditText:2.1.4'
     compile('com.mikepenz:fastadapter:1.1.2@aar') {
