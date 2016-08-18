@@ -26,8 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.owntracks.android.App;
@@ -117,7 +115,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private static boolean checkPlayServices() {
-        return  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
+        return true;
+ //       return  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
     }
 
     private static boolean checkPermissions() {
@@ -564,7 +563,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
         public static final int ID = 3;
         private static PlayFragment instance;
-        private static GoogleApiAvailability googleAPI;
+//        private static GoogleApiAvailability googleAPI;
         private Button button;
         private TextView message;
         private ImageView img;
@@ -579,7 +578,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         public PlayFragment() {
             super();
-            googleAPI = GoogleApiAvailability.getInstance();
+//            googleAPI = GoogleApiAvailability.getInstance();
         }
 
         @Override
@@ -601,18 +600,18 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onResume() {
             super.onResume();
 
-            final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
-            Log.v(TAG, "onShow " + resultCode);
-            if(resultCode == ConnectionResult.SUCCESS) {
+ //           final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+ //           final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
+ //           Log.v(TAG, "onShow " + resultCode);
+ //           if(resultCode == ConnectionResult.SUCCESS) {
                 onPlayServicesAvailable();
-            } else {
-                if(googleAPI.isUserResolvableError(resultCode)) {
-                    onPlayServicesUnavailableRecoverable(resultCode);
-                } else {
-                    onPlayServicesUnavailableNotRecoverable(resultCode);
-                }
-            }
+ //           } else {
+ //               if(googleAPI.isUserResolvableError(resultCode)) {
+ //                   onPlayServicesUnavailableRecoverable(resultCode);
+ //               } else {
+ //                   onPlayServicesUnavailableNotRecoverable(resultCode);
+//                }
+ //           }
         }
 
         public void onPlayServicesUnavailableNotRecoverable(int resultCode) {
@@ -647,6 +646,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
+            /*
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -662,6 +662,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
                 }
             });
+            */
             img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
