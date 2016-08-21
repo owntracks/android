@@ -16,17 +16,19 @@
 #   public *;
 #}
 
-# Ignore InnerClass errors in Paho library https://github.com/eclipse/paho.mqtt.android/issues/79
+# PAHO (https://github.com/eclipse/paho.mqtt.android/issues/79)
 -keepattributes InnerClasses
--dontoptimize
+-keepattributes EnclosingMethod
 
-# Greeodao
--keepclassmembers class * extends de.greenrobot.dao.AbstractDao {
-public static java.lang.String TABLENAME;
+# GREENDAO
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
+    public static java.lang.String TABLENAME;
 }
 -keep class **$Properties
+-dontwarn org.greenrobot.greendao.database.**
+-dontwarn org.greenrobot.greendao.rx.**
 
-# Eventbus
+# EVENTBUS
 -keepattributes *Annotation*
 -keepclassmembers class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;
@@ -38,7 +40,42 @@ public static java.lang.String TABLENAME;
     <init>(java.lang.Throwable);
 }
 
+# JACKSON
+-keepattributes *Annotation*,EnclosingMethod,Signature
+-keepnames class com.fasterxml.jackson.** { *; }
+ -dontwarn com.fasterxml.jackson.databind.**
+ -keep class org.codehaus.** { *; }
+ -keepclassmembers public final enum org.codehaus.jackson.annotate.JsonAutoDetect$Visibility {
+ public static final org.codehaus.jackson.annotate.JsonAutoDetect$Visibility *; }
+-keep public class your.class.** {
+  public void set*(***);
+  public *** get*();
+}
+
+# OKHTTP
+-dontwarn okhttp3.**
 -dontwarn okio.**
--dontwarn org.greenrobot.**
--dontwarn com.fasterxml.**
+
+# RxJava:
+# rxjava
+-keep class rx.schedulers.Schedulers {
+    public static <methods>;
+}
+-keep class rx.schedulers.ImmediateScheduler {
+    public <methods>;
+}
+-keep class rx.schedulers.TestScheduler {
+    public <methods>;
+}
+-keep class rx.schedulers.Schedulers {
+    public static ** test();
+}
+-keepclassmembers class rx.internal.util.* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    long producerNode;
+    long consumerNode;
+}
 -dontwarn rx.internal.util.unsafe.**

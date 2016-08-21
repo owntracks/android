@@ -136,17 +136,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void updateMarker(List<FusedContact> contacts) {
         Timber.v("updating list");
+        for (FusedContact c : contacts) {
+           updateMarker(c);
+        }
     }
 
     @Override
     public void updateMarker(FusedContact contact) {
-        Timber.v("updating single");
+        Timber.v("updating single id:%s", contact.getId());
 
     }
 
     @Override
-    public void removeMarker(FusedContact c) {
-        Timber.v("removing single");
+    public void removeMarker(String key) {
+        Timber.v("removing single id:%s", key);
 
     }
 }
