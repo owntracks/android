@@ -11,6 +11,8 @@ import org.owntracks.android.injection.modules.NetModule;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 
+import javax.inject.Singleton;
+
 import dagger.Component;
 import io.realm.Realm;
 
