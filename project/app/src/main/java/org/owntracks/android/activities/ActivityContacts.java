@@ -75,7 +75,7 @@ public class ActivityContacts extends ActivityBase implements RecyclerViewAdapte
 
     @Override
     public void onStop() {
-        //EventBus.getDefault().unregister(this);
+        //App.getEventBus().unregister(this);
         super.onStop();
     }
 

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
@@ -177,7 +178,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                         Log.v(TAG, "Waypoint triggered " + w.getDescription() + " transition: " + transition);
                         w.setLastTriggered(System.currentTimeMillis());
                         this.waypointDao.update(w);
-                        EventBus.getDefault().postSticky(new Events.WaypointTransition(w, transition));
+                        App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                         publishTransitionMessage(w, event.getTriggeringLocation(), transition);
                     }
                 }
@@ -349,6 +350,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             Log.e(TAG, "Received unknown intent action: " + intent.getAction());
         }
 
+
 	}
 
     @Subscribe
@@ -365,7 +367,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         }
         lastKnownLocation = location;
 
-        EventBus.getDefault().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
+        App.getEventBus().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));
 
         if (shouldPublishLocation())
             reportLocation();
@@ -449,19 +451,19 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
     @SuppressWarnings("unused")
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
 		handleWaypoint(e.getWaypoint(), false, false);
 	}
 
     @SuppressWarnings("unused")
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointUpdated e) {
 		handleWaypoint(e.getWaypoint(), true, false);
 	}
 
     @SuppressWarnings("unused")
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointRemoved e) {
 		handleWaypoint(e.getWaypoint(), false, true);
 	}

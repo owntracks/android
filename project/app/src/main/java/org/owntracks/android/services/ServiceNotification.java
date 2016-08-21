@@ -388,9 +388,13 @@ public class ServiceNotification implements ProxyableService {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.EndpointStateChanged e) {
-        if (App.isInForeground())
-            Toasts.showEndpointStateChange(e.getState());
+        if (App.isInForeground()) {
+            // Prevent double toasts when no connection can be established
+            if(notificationOngoingLastStateCache == ServiceMessage.EndpointState.ERROR && e.getState() != ServiceMessage.EndpointState.DISCONNECTED)
+                Toasts.showEndpointStateChange(e.getState());
 
+
+        }
         notificationOngoingLastStateCache = e.getState();
         updateNotificationOngoing();
     }
