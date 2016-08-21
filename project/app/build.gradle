@@ -94,8 +94,7 @@ dependencies {
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-SNAPSHOT'
-    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1-20160623.113843-1'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20160821.041725-20'
 
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
 
@@ -104,6 +103,7 @@ dependencies {
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
     compile 'com.jakewharton.timber:timber:4.1.2'
+
 
     // Widget libraries
     compile 'com.github.rengwuxian:MaterialEditText:2.1.4'
@@ -133,6 +133,12 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
 
 }
+apt {
+    arguments {
+        eventBusIndex "org.owntracks.android.EventBusIndex"
+    }
+}
+
 
 greendao {
     schemaVersion 15
