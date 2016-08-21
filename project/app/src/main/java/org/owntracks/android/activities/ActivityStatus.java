@@ -11,12 +11,19 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.StatisticsProvider;
 
 public class ActivityStatus extends ActivityBase {
 
+
+    private TextView backendStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,7 @@ public class ActivityStatus extends ActivityBase {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        backendStatus = (TextView) findViewById(R.id.backendStatus);
 
 
         set();
@@ -37,8 +45,6 @@ public class ActivityStatus extends ActivityBase {
     private void set() {
         ((TextView)findViewById(R.id.permissionLocation)).setText( (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) ? "granted" : "denied");
         ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.APP_START)));
-        ((TextView)findViewById(R.id.appStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.APP_START)));
-        ((TextView)findViewById(R.id.backendStatus)).setText(String.format("%s %s", App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_MESSAGE_BACKEND_LAST_STATUS_TST)), StatisticsProvider.getString(StatisticsProvider.SERVICE_MESSAGE_BACKEND_LAST_STATUS)));
 
 
         ((TextView)findViewById(R.id.serviceLocatorOnLocationChangeDate)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE)));
@@ -75,6 +81,32 @@ public class ActivityStatus extends ActivityBase {
         }
 
         return status;
+    }
+
+    private ServiceMessage.EndpointState previousState;
+
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.EndpointStateChanged e) {
+        if (!(previousState == ServiceMessage.EndpointState.ERROR && e.getExtra() == ServiceMessage.EndpointState.DISCONNECTED)) {
+            if (e.getState() == ServiceMessage.EndpointState.ERROR && e.getExtra() != null && e.getExtra() instanceof Exception)
+                backendStatus.setText(String.format("%s %s: %s", App.formatDate(e.getDate()), e.getState().getLabel(this), Exception.class.cast(e.getExtra()).getCause().getMessage()));
+            else
+                backendStatus.setText(String.format("%s %s", App.formatDate(e.getDate()), e.getState().getLabel(this)));
+        }
+        previousState = e.getState();
+
+    }
+
+    @Override
+    public void onPause() {
+        App.getEventBus().unregister(this);
+        super.onPause();
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        App.getEventBus().register(this);
     }
 
     @Override

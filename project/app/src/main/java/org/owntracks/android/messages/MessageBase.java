@@ -95,7 +95,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
                 if(tid != null)
                         return tid;
                 return
-                        "unknown";
+                        "NOKEY";
         }
 
         public String getTopic() {

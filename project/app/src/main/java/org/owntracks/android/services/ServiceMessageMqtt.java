@@ -32,6 +32,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
@@ -535,7 +536,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		// Check if we're connecting to the same broker that we were already connected to
 		String connectionId = getConnectionId();
 		if(lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
-			EventBus.getDefault().post(new Events.BrokerChanged());
+			App.getEventBus().post(new Events.BrokerChanged());
 			lastConnectionId = connectionId;
 			Log.v(TAG, "lastConnectionId changed to: " + lastConnectionId);
 		}
