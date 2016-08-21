@@ -110,10 +110,11 @@ public class MapViewModel extends ContactsViewModel<MapMvvm.View> implements Map
 
     private class ContactsRepoSubscriber extends ObservableMap.OnMapChangedCallback<ObservableMap<String, FusedContact>, String, FusedContact>{
         @Override
-        public void onMapChanged(ObservableMap<String, FusedContact> map, String s) {
-            FusedContact c = map.get(s);
+        public void onMapChanged(ObservableMap<String, FusedContact> map, String key) {
+            FusedContact c = map.get(key);
+            Timber.v("changedKey:%s", key);
             if(c == null)
-                getView().removeMarker(c);
+                getView().removeMarker(key);
             else
                 getView().updateMarker(c);
         }
