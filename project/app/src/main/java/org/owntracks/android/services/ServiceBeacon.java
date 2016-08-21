@@ -98,7 +98,8 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
     @Override
     public void onDestroy() {
-
+        if(beaconManager != null && beaconManager.isBound(this))
+            beaconManager.unbind(this);
     }
 
 
