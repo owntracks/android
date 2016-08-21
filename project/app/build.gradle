@@ -10,7 +10,7 @@ def versionBuild = 2
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '9.4.0'
 ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '24.1.1'
+ext.supportLibVersion = '24.2.0'
 
 
 android {
