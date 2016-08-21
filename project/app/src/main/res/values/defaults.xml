@@ -4,10 +4,10 @@
 
 
 
-    <string name="valPubTopicPublic" formatted="false">public/%s/%s</string>
-    <string name="valSubTopicPublic">public/+/+</string>
-    <string name="valUsernamePublic">user</string>
-    <string name="valHostPublic">public-mqtt.owntracks.org</string>
+    <string name="valPubTopicPublic" formatted="false" translatable="false">public/%s/%s</string>
+    <string name="valSubTopicPublic" translatable="false">public/+/+</string>
+    <string name="valUsernamePublic" translatable="false">user</string>
+    <string name="valHostPublic" translatable="false">public-mqtt.owntracks.org</string>
     <integer name="valPortPublic">8889</integer>
     <bool name="valCleanSessionPublic">true</bool>
     <bool name="valAuthPublic">false</bool>
@@ -21,8 +21,8 @@
     <bool name="valInfoPublic" >true</bool>
 
 
-    <string name="valPubTopic" formatted="false">owntracks/%s/%s</string>
-    <string name="valSubTopic">owntracks/+/+</string>
+    <string name="valPubTopic" formatted="false" translatable="false">owntracks/%s/%s</string>
+    <string name="valSubTopic" translatable="false">owntracks/+/+</string>
 
     <integer name="valPort">8883</integer>
 
@@ -75,6 +75,6 @@
         <item>3</item>
     </string-array>
 
-    <string name="valEmpty">""</string>
+    <string name="valEmpty" translatable="false">""</string>
 
 </resources>

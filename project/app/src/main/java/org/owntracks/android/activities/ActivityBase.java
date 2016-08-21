@@ -48,7 +48,7 @@ public abstract class ActivityBase extends AppCompatActivity  {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            EventBus.getDefault().post(new Events.PermissionGranted(permissions[0])); // Notify about changed permissions
+            App.getEventBus().post(new Events.PermissionGranted(permissions[0])); // Notify about changed permissions
 
             onRunActionWithPermissionCheck(requestCode, true);
         } else {

@@ -189,7 +189,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
             }
 
         }
-        EventBus.getDefault().register(this);
+        App.getEventBus().register(this);
 
     }
 
@@ -204,7 +204,7 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     public void onPause() {
         super.onPause();
 
-        EventBus.getDefault().unregister(this);
+        App.getEventBus().unregister(this);
 
     }
 

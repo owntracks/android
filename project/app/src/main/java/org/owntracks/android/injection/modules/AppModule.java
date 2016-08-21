@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import org.greenrobot.eventbus.EventBus;
+import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -53,9 +56,8 @@ public class AppModule {
     @Provides
     @PerApplication
     EventBus provideEventbus() {
-        Timber.v("loading EventBus with index");
-        EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).installDefaultEventBus();
-        return EventBus.getDefault();
+        Timber.v("loading bus with index");
+        return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).build();
     }
 
 
