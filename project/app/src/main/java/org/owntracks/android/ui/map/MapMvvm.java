@@ -27,7 +27,7 @@ public interface MapMvvm {
     interface View extends MvvmView {
         void updateMarker(List<FusedContact> contacts);
         void updateMarker(FusedContact contact);
-        void removeMarker(FusedContact c);
+        void removeMarker(String key);
     }
 
     interface ViewModel extends ContactsMvvm.ViewModel<View> {

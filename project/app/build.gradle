@@ -10,7 +10,7 @@ def versionBuild = 2
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '9.4.0'
 ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '24.1.1'
+ext.supportLibVersion = '24.2.0'
 
 
 android {
@@ -28,11 +28,10 @@ android {
         release {
             minifyEnabled false
             zipAlignEnabled true
-
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            proguardFiles '.proguard-project.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
             minifyEnabled false
         }
@@ -90,6 +89,8 @@ dependencies {
 
     // Utility libraries
     compile 'org.greenrobot:eventbus:3.0.0'
+    apt 'org.greenrobot:eventbus-annotation-processor:3.0.1'
+
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
@@ -103,8 +104,6 @@ dependencies {
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
     compile 'com.jakewharton.timber:timber:4.1.2'
-
-    compile 'org.antlr:antlr4-runtime:4.5.3'
 
     // Widget libraries
     compile 'com.github.rengwuxian:MaterialEditText:2.1.4'

@@ -86,8 +86,6 @@ public class App extends Application  {
                 }
             });
         }
-
-        sInstance = this;
         sInstance = this;
         sAppComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
@@ -136,6 +134,9 @@ public class App extends Application  {
 
     public static Resources getRes() { return sInstance.getResources(); }
 
+    public static EventBus getEventBus() {
+        return sAppComponent.eventBus();
+    }
 
     public static void enableForegroundBackgroundDetection() {
         sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
