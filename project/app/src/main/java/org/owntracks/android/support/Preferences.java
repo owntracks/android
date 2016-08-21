@@ -119,7 +119,7 @@ public class Preferences {
         attachAllActivePreferenceChangeListeners();
 
         if(!init) {
-            EventBus.getDefault().post(new Events.ModeChanged(oldModeId,modeId));
+            App.getEventBus().post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
 
@@ -351,12 +351,12 @@ public class Preferences {
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
                     Log.v(TAG, "removing existing waypoint with same tst before adding it");
                     dao.delete(e);
-                    EventBus.getDefault().post(new Events.WaypointRemoved(e));
+                    App.getEventBus().post(new Events.WaypointRemoved(e));
                 }
             }
 
             dao.insert(w);
-            EventBus.getDefault().post(new Events.WaypointAdded(w));
+            App.getEventBus().post(new Events.WaypointAdded(w));
         }
     }
 

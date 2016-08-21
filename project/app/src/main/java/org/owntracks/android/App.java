@@ -92,6 +92,7 @@ public class App extends Application  {
                 .build();
 
 
+
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
 
@@ -121,7 +122,7 @@ public class App extends Application  {
             }
         });
 
-        //EventBus.getDefault().register(this);
+        //App.getEventBus().register(this);
         Log.d(TAG, "trace / App onCreate done" + System.currentTimeMillis());
 
     }
@@ -168,11 +169,11 @@ public class App extends Application  {
                 contactsViewModel.items.add(c);
             }
         });
-        EventBus.getDefault().post(c);
+        App.getEventBus().post(c);
     }
 
     public static void updateFusedContact(FusedContact c) {
-        EventBus.getDefault().post(c);
+        App.getEventBus().post(c);
     }
 
 

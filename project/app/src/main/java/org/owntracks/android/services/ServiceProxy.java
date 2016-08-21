@@ -105,7 +105,7 @@ public class ServiceProxy extends ServiceBindable {
 	@Override
 	public void onDestroy() {
 		for (ProxyableService p : services.values()) {
-			EventBus.getDefault().unregister(p);
+			App.getEventBus().unregister(p);
 			p.onDestroy();
 		}
 
@@ -156,7 +156,10 @@ public class ServiceProxy extends ServiceBindable {
 
 		services.put(id, p);
 		p.onCreate(instance);
-		EventBus.getDefault().register(p);
+		App.getEventBus().register(p);
+
+		Timber.v("subscribed to messagelocation:%s", App.getEventBus().hasSubscriberForEvent(org.owntracks.android.messages.MessageLocation.class));
+
 		return p;
 	}
 

@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.Drawer;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.adapter.AdapterCursorLoader;
 import org.owntracks.android.adapter.AdapterWaypoints;
@@ -113,7 +114,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
     @Override
     public void onPause() {
-        EventBus.getDefault().unregister(this);
+        App.getEventBus().unregister(this);
         super.onPause();
     }
 
@@ -135,7 +136,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         Waypoint w = Dao.getWaypointDao().loadByRowId(id);
         Dao.getWaypointDao().delete(w);
-        EventBus.getDefault().post(new Events.WaypointRemoved(w));
+        App.getEventBus().post(new Events.WaypointRemoved(w));
         Toasts.showWaypointRemovedToast();
         if(mActionMode != null)
             mActionMode.finish();
@@ -188,7 +189,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         this.listView.removeAllViews(); // Clear out all views to prevent zombie view causing https://github.com/owntracks/android/issues/248
         registerForContextMenu(this.listView);
         requery();
-        EventBus.getDefault().register(this);
+        App.getEventBus().register(this);
     }
 
 
