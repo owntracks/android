@@ -38,3 +38,7 @@ public static java.lang.String TABLENAME;
     <init>(java.lang.Throwable);
 }
 
+-dontwarn okio.**
+-dontwarn org.greenrobot.**
+-dontwarn com.fasterxml.**
+-dontwarn rx.internal.util.unsafe.**
