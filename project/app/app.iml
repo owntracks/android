@@ -175,12 +175,12 @@
     <orderEntry type="library" exported="" name="play-services-location-9.4.0" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.10" level="project" />
     <orderEntry type="library" exported="" name="commons-0.8.5.8" level="project" />
-    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.1.1-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="dagger-2.6" level="project" />
     <orderEntry type="library" exported="" name="okio-1.9.0" level="project" />
     <orderEntry type="library" exported="" name="acra-4.8.5" level="project" />
     <orderEntry type="library" exported="" name="support-v4-24.1.1" level="project" />
     <orderEntry type="library" exported="" name="design-24.1.1" level="project" />
+    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.1.1-20160821.041725-20" level="project" />
     <orderEntry type="library" exported="" name="realm-android-library-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="adapters-1.1" level="project" />
     <orderEntry type="library" exported="" name="realm-annotations-1.1.0" level="project" />
@@ -193,7 +193,6 @@
     <orderEntry type="library" exported="" name="play-services-iid-9.4.0" level="project" />
     <orderEntry type="library" exported="" name="rxjava-1.1.8" level="project" />
     <orderEntry type="library" exported="" name="core-0.8.5.8" level="project" />
-    <orderEntry type="library" exported="" name="org.eclipse.paho.android.service-1.1.1-20160623.113843-1" level="project" />
     <orderEntry type="library" exported="" name="materialdrawer-5.0.5" level="project" />
     <orderEntry type="library" exported="" name="android-iconify-1.0.10" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-24.1.1" level="project" />

@@ -3,6 +3,7 @@ package org.owntracks.android.injection.components;
 import android.content.Context;
 import android.content.res.Resources;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.DataModule;
@@ -34,4 +35,6 @@ public interface AppComponent {
 
     Realm realm();
     ContactsRepo contactsRepo();
+    EventBus eventBus();
+
 }
