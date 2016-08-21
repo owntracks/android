@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
@@ -12,6 +13,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import timber.log.Timber;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -47,6 +49,15 @@ public class AppModule {
     Resources provideResources() {
         return mApp.getResources();
     }
+
+    @Provides
+    @PerApplication
+    EventBus provideEventbus() {
+        Timber.v("loading EventBus with index");
+        EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).installDefaultEventBus();
+        return EventBus.getDefault();
+    }
+
 
     @Provides
     @PerApplication
