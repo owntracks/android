@@ -159,14 +159,14 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     private void add(Waypoint w) {
         long id = this.dao.insert(w);
         Log.v(TAG, "added waypoint with id: " + id);
-        EventBus.getDefault().post(new Events.WaypointAdded(w)); // For ServiceLocator update
-        //EventBus.getDefault().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
+        App.getEventBus().post(new Events.WaypointAdded(w)); // For ServiceLocator update
+        //App.getEventBus().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     private void update(Waypoint w) {
         this.dao.update(w);
-        EventBus.getDefault().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
-        //EventBus.getDefault().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
+        App.getEventBus().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
+        //App.getEventBus().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
 

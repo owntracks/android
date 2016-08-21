@@ -409,12 +409,12 @@ public class ActivityPreferences extends ActivityBase {
         @Override
         public void onStart() {
             super.onStart();
-            EventBus.getDefault().register(this);
+            App.getEventBus().register(this);
         }
 
         @Override
         public void onStop() {
-            EventBus.getDefault().unregister(this);
+            App.getEventBus().unregister(this);
             super.onStop();
         }
 

@@ -13,6 +13,8 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.data.model.Contact;
 import org.owntracks.android.databinding.ActivityMapBinding;
@@ -116,13 +118,13 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             mListener = onLocationChangedListener;
             if(mLocation != null)
                 this.mListener.onLocationChanged(mLocation);
-            EventBus.getDefault().register(this);
+            App.getEventBus().register(this);
         }
 
         @Override
         public void deactivate() {
             mListener = null;
-            EventBus.getDefault().unregister(this);
+            App.getEventBus().unregister(this);
         }
 
         @Subscribe(threadMode = ThreadMode.MAIN)

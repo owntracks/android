@@ -119,7 +119,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
         p.onCreate(context);
         p.onSetService(this);
-        EventBus.getDefault().register(p);
+        App.getEventBus().register(p);
         return p;
     }
 
@@ -171,7 +171,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         } else {
             Log.v(TAG, "onMessageDelivered()-  messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
             if(m instanceof MessageLocation) {
-                EventBus.getDefault().post(m);
+                App.getEventBus().post(m);
             }
         }
         Log.v(TAG, "onMessageDelivered()-  queueKeys:" +  outgoingQueue.keySet().toString());
@@ -212,7 +212,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     public void onEndpointStateChanged(EndpointState newState, @Nullable  Exception e) {
         Timber.v("new state:%s",newState);
-        EventBus.getDefault().postSticky(new Events.EndpointStateChanged(newState, e));
+        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState, e));
     }
 
 
