@@ -84,7 +84,7 @@ dependencies {
     compile "com.google.android.gms:play-services-maps:${playLibVersion}"
     compile "com.google.android.gms:play-services-location:${playLibVersion}"
     compile "com.google.android.gms:play-services-places:${playLibVersion}"
-    compile "com.google.android.gms:play-services-base:${playLibVersion}"
+    //compile "com.google.android.gms:play-services-base:${playLibVersion}"
 
 
     // Utility libraries

@@ -2,7 +2,6 @@ package org.owntracks.android.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,6 +31,8 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.PausableViewPager;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.wrapper.GoogleApiAvailability;
+import org.owntracks.android.wrapper.GoogleApiAvailabilityWrapper;
 
 import java.util.ArrayList;
 
@@ -43,6 +44,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     private static final java.lang.String BUNDLE_KEY_SETUP = "s";
     private static final java.lang.String BUNDLE_KEY_PLAY = "pl";
     private static final java.lang.String BUNDLE_KEY_PERMISSIONS = "pe";
+
+    private static GoogleApiAvailability googleAPI;
 
     ViewPager pager;
     FragmentAdapter pagerAdapter;
@@ -59,11 +62,11 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
 
         Bundle b = getIntent().getExtras();
-        if(b == null)
+        if(b == null) {  //first start
             b = runChecks();
-
+        }
         if(hasFailedChecks(b)) {
-            Log.v(TAG, "one or more checks failed");
+            Log.v(TAG, "one or more earlier failed checks discovered");
 
             checkSetup = b.getBoolean(BUNDLE_KEY_SETUP);
             checkPlay = b.getBoolean(BUNDLE_KEY_PLAY);
@@ -76,6 +79,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     public static boolean hasFailedChecks(Bundle b) {
+        b.putBoolean(BUNDLE_KEY_PLAY, true); //FIXME DEBUG override play check state to always launch PlayFragment
+
         return b.getBoolean(BUNDLE_KEY_SETUP) ||  b.getBoolean(BUNDLE_KEY_PLAY) || b.getBoolean(BUNDLE_KEY_PERMISSIONS);
     }
 
@@ -115,8 +120,16 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private static boolean checkPlayServices() {
-        return true;
- //       return  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
+        try {
+            Class.forName("com.google.android.gms.common.GoogleApiAvailability", false, ActivityWelcome.class.getClassLoader());
+            googleAPI = GoogleApiAvailabilityWrapper.getInstance();
+        } catch(ClassNotFoundException e) {
+            googleAPI = GoogleApiAvailability.getInstance(); // untested edge case if not compiled in as binary dependency
+        }
+
+        //TODO check if overridden or not
+
+        return  googleAPI.isGooglePlayServicesAvailable(App.getContext()) == GoogleApiAvailability.SUCCESS;
     }
 
     private static boolean checkPermissions() {
@@ -430,7 +443,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return (ViewGroup) inflater.inflate(R.layout.fragment_welcome_intro, container, false);
+            return inflater.inflate(R.layout.fragment_welcome_intro, container, false);
         }
     }
 
@@ -553,9 +566,10 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case RECOVER_PLAY:
+            case RECOVER_PLAY: {
                 Log.v(TAG, "onActivityResult" + requestCode + " " + resultCode);
                 return;
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -563,7 +577,6 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
         public static final int ID = 3;
         private static PlayFragment instance;
-//        private static GoogleApiAvailability googleAPI;
         private Button button;
         private TextView message;
         private ImageView img;
@@ -578,7 +591,6 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         public PlayFragment() {
             super();
-//            googleAPI = GoogleApiAvailability.getInstance();
         }
 
         @Override
@@ -600,18 +612,17 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onResume() {
             super.onResume();
 
- //           final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
- //           final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
- //           Log.v(TAG, "onShow " + resultCode);
- //           if(resultCode == ConnectionResult.SUCCESS) {
+            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
+            Log.v(TAG, "onShow " + resultCode);
+            if(resultCode == GoogleApiAvailability.SUCCESS) {
                 onPlayServicesAvailable();
- //           } else {
- //               if(googleAPI.isUserResolvableError(resultCode)) {
- //                   onPlayServicesUnavailableRecoverable(resultCode);
- //               } else {
- //                   onPlayServicesUnavailableNotRecoverable(resultCode);
-//                }
- //           }
+            } else {
+                if(googleAPI.isUserResolvableError(resultCode)) {
+                    onPlayServicesUnavailableRecoverable(resultCode);
+                } else {
+                    onPlayServicesUnavailableNotRecoverable(resultCode);
+                }
+            }
         }
 
         public void onPlayServicesUnavailableNotRecoverable(int resultCode) {
@@ -646,23 +657,8 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
-            /*
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    googleAPI.getErrorDialog(getActivity(), resultCode, RECOVER_PLAY).show();
-                    PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
-                    try {
-                        if(p != null)
-                            p.send();
-                    } catch (PendingIntent.CanceledException e) {
-                        e.printStackTrace();
-                    }
+            googleAPI.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY);
 
-
-                }
-            });
-            */
             img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
@@ -694,7 +690,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return (ViewGroup) inflater.inflate(R.layout.fragment_welcome_done, container, false);
+            return inflater.inflate(R.layout.fragment_welcome_done, container, false);
         }
     }
 
