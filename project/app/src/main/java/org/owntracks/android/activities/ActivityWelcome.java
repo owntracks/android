@@ -79,8 +79,6 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     public static boolean hasFailedChecks(Bundle b) {
-        b.putBoolean(BUNDLE_KEY_PLAY, true); //FIXME DEBUG override play check state to always launch PlayFragment
-
         return b.getBoolean(BUNDLE_KEY_SETUP) ||  b.getBoolean(BUNDLE_KEY_PLAY) || b.getBoolean(BUNDLE_KEY_PERMISSIONS);
     }
 
@@ -127,9 +125,10 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             googleAPI = GoogleApiAvailability.getInstance(); // untested edge case if not compiled in as binary dependency
         }
 
-        //TODO check if overridden or not
+        boolean playOverride=Preferences.getPlayOverride();
+        boolean playAvailable=googleAPI.isGooglePlayServicesAvailable(App.getContext()) == GoogleApiAvailability.SUCCESS;
 
-        return  googleAPI.isGooglePlayServicesAvailable(App.getContext()) == GoogleApiAvailability.SUCCESS;
+        return  playAvailable || playOverride;
     }
 
     private static boolean checkPermissions() {

@@ -21,11 +21,12 @@
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
 
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/icon_description_warning" />
 
     <TextView
         android:id="@+id/screen_heading"
-        android:text="Permissions"
+        android:text="@string/permissions_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -38,7 +39,7 @@
 
     <TextView
         android:id="@+id/screen_desc"
-        android:text="Owntracks requires access to your location. Please grant this permision before continuing."
+        android:text="@string/permissions_description"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
 
@@ -67,7 +68,7 @@
         android:textColor="#ffffff"
         android:gravity="center_horizontal"
         android:textSize="16sp"
-        android:text="Permissions have been granted"
+        android:text="@string/permissions_granted"
         android:id="@+id/message"
         android:layout_above="@+id/view"
         android:layout_alignParentLeft="true"
@@ -78,7 +79,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fix"
+        android:text="@string/welcomeFixIssue"
         android:id="@+id/button"
         android:layout_above="@+id/view"
         android:visibility="visible"
