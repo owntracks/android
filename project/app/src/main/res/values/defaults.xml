@@ -48,6 +48,7 @@
 
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
+    <bool name="valPlayOverride">false</bool>
     <bool name="valAuth">true</bool>
     <bool name="valRemoteCommand">true</bool>
     <bool name="valRemoteConfiguration">true</bool>
@@ -63,9 +64,9 @@
     </string-array>
 
     <string-array name="profileIds_readable">
-        <item>HTTP Private</item>
-        <item>MQTT Private</item>
-        <item>MQTT Public</item>
+        <item>@string/mode_http_private_label</item>
+        <item>@string/mode_mqtt_private_label</item>
+        <item>@string/mode_mqtt_public_label</item>
     </string-array>
 
     <string-array name="locatorAccuracy">

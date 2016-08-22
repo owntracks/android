@@ -4,18 +4,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 
@@ -923,6 +920,14 @@ public class Preferences {
 
     }
 
+    public static boolean getPlayOverride() {
+        return activeSharedPreferences.getBoolean(Keys.PLAY_OVERRIDE, false);
+    }
+
+    public static void setPlayOverride(boolean playOverride) {
+        activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).commit();
+    }
+
 
     // Maybe make this configurable
     // For now it makes things easier to change
@@ -1009,6 +1014,7 @@ public class Preferences {
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
         public static final String PASSWORD                         = "password";
+        public static final String PLAY_OVERRIDE                    = "playOverride";
         public static final String PORT                             = "port";
         public static final String PUB                              = "pub";
         public static final String PUB_EXTENDED_DATA                = "pubExtendedData";
@@ -1031,7 +1037,7 @@ public class Preferences {
         // Internal keys
         public static final String _DEVICE_UUID                     = "deviceUUID";
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
-        public static final String _FIST_START                      = "fistStart";
+        public static final String _FIRST_START                     = "firstStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
 
 

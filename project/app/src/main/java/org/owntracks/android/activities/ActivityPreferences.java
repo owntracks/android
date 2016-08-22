@@ -242,6 +242,7 @@ public class ActivityPreferences extends ActivityBase {
             PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
             screen.addPreference(misc);
             addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
+            addSwitchPreference(misc, Preferences.Keys.PLAY_OVERRIDE, R.string.preferencesPlayOverride, R.string.preferencesPlayOverrideSummary, R.bool.valPlayOverride);
 
 
         }

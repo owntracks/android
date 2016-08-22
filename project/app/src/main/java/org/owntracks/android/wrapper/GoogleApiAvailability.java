@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityWelcome;
+import org.owntracks.android.support.Preferences;
 
 public class GoogleApiAvailability {
     private static final String TAG = "GooglePlayCheck";
@@ -52,12 +54,13 @@ public class GoogleApiAvailability {
 
         builder.setPositiveButton(R.string.play_override_continue, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Log.d(TAG, "User clicked OK button"); //TODO write overridePlay to sharedPreferences
+                Preferences.setPlayOverride(true);
+                ActivityWelcome.PlayFragment.getInstance().onPlayServicesAvailable();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Log.d(TAG, "User clicked Cancel button"); //TODO do nothing
+                // do nothing
             }
         });
 

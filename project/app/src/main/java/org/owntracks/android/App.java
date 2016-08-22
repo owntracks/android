@@ -343,11 +343,11 @@ public class App extends Application  {
     private void checkFirstStart() {
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if(p.getBoolean(Preferences.Keys._FIST_START, true)) {
+        if(p.getBoolean(Preferences.Keys._FIRST_START, true)) {
             Log.v(TAG, "Initial application launch");
             String uuid = UUID.randomUUID().toString().toUpperCase();
 
-            p.edit().putBoolean(Preferences.Keys._FIST_START , false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
+            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
 
         } else {
             Log.v(TAG, "Consecutive application launch");
