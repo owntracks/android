@@ -1,7 +1,6 @@
 package org.owntracks.android.activities;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,11 +18,7 @@ import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -72,10 +67,12 @@ public class ActivityPreferences extends ActivityBase {
 
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getTitle());
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(getTitle());
+        }
         loadFragment();
 
 
@@ -220,7 +217,7 @@ public class ActivityPreferences extends ActivityBase {
 
         private void populateScreenReporting(PreferenceScreen screen) {
             addToolbar(screen);
-            addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
+            addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackgroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
             addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedData, R.string.preferencesPubExtendedDataSummary, R.bool.valPubExtendedData);
         }
 
@@ -258,7 +255,7 @@ public class ActivityPreferences extends ActivityBase {
             addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION_LOCATION, R.string.preferencesNotificationLocation, R.string.preferencesNotificationLocationSummary, R.bool.valNotificationLocation);
 
 
-            PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificatinBackground);
+            PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificationBackground);
             screen.addPreference(background);
             addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
 

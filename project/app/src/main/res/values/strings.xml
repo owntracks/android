@@ -27,7 +27,7 @@
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
-    <string name="preferencesBackroundUpdates">Automatic location reporting</string>
+    <string name="preferencesBackgroundUpdates">Automatic location reporting</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator background displacement</string>
@@ -133,7 +133,7 @@
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
     <string name="successCopyCertificate">Certificate copied to internal storage</string>
     <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
-    <string name="preferencesCategoryNotificatinBackground">Background notifications</string>
+    <string name="preferencesCategoryNotificationBackground">Background notifications</string>
     <string name="preferencesCategoryAdvancedServices">Services</string>
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
@@ -193,5 +193,7 @@
     <string name="welcome_play_description">Owntracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
     <string name="play_services_not_available_general">Google Play Services are not available</string>
+    <string name="play_override_continue">Yes, continue on own risk</string>
+    <string name="play_override_question">It seems, Google Play Services cannot be used on your device. If you continue, this app is operating in unsupported mode, certain features may not be available.</string>
 
 </resources>
