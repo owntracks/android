@@ -25,7 +25,7 @@ public class GoogleApiAvailability {
     protected static GoogleApiAvailability instance;
 
     public int isGooglePlayServicesAvailable(Context context) {
-        Timber.d("isGooglePlayServicesAvailable Wrapper" + API_UNAVAILABLE);
+        Timber.d("%s", API_UNAVAILABLE);
 
         return API_UNAVAILABLE;
     }
@@ -38,7 +38,7 @@ public class GoogleApiAvailability {
     }
 
     public boolean isUserResolvableError(int errorCode) {
-        Timber.d("isUserResolvableError Wrapper" + errorCode);
+        Timber.d("%s",errorCode);
         // Always resolvable (by overriding)
         return true;
     }
