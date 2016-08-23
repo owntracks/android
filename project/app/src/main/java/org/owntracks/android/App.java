@@ -73,7 +73,7 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Timber.d("trace / App onCreate start" + System.currentTimeMillis());
+        Timber.d("trace / App onCreate start %s", System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
@@ -110,7 +110,7 @@ public class App extends Application  {
         GeocodingProvider.initialize(App.getInstance());
         Dao.initialize(App.getInstance());
         EncryptionProvider.initialize();
-        Timber.d("trace / App async init end" + System.currentTimeMillis());
+        Timber.d("trace / App async init end %s", System.currentTimeMillis());
 
         ServiceProxy.runOrBind(sInstance, new Runnable() {
             @Override
@@ -120,7 +120,7 @@ public class App extends Application  {
         });
 
         //App.getEventBus().register(this);
-        Timber.d("trace / App onCreate done" + System.currentTimeMillis());
+        Timber.d("trace / App onCreate done %s", System.currentTimeMillis());
 
     }
 

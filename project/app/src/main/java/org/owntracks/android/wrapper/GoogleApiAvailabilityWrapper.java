@@ -26,7 +26,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
 
     @Override
     public final boolean isUserResolvableError(int errorCode) {
-        Timber.d("isUserResolvableError Wrapper " + errorCode);
+        Timber.d("%s", errorCode);
 
         boolean resolvable=wrappedInstance.isUserResolvableError(errorCode);
 
