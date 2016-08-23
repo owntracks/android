@@ -57,7 +57,7 @@
     <bool name="valWs">false</bool>
     <bool name="valInfo" >true</bool>
 
-    <string-array name="modeIds">
+    <string-array name="modeIds" translatable="false">
         <item>3</item>
         <item>0</item>
         <item>2</item>
@@ -69,7 +69,7 @@
         <item>@string/mode_mqtt_public_label</item>
     </string-array>
 
-    <string-array name="locatorAccuracy">
+    <string-array name="locatorAccuracy" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>
