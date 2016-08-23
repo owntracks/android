@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +35,9 @@ import org.owntracks.android.wrapper.GoogleApiAvailabilityWrapper;
 
 import java.util.ArrayList;
 
-public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageChangeListener {
-    private static final String TAG = "ActivityWelcome";
+import timber.log.Timber;
 
+public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageChangeListener {
     private static final int PERMISSION_REQUEST_USER_LOCATION = 2;
     private static final int RECOVER_PLAY = 1001;
     private static final java.lang.String BUNDLE_KEY_SETUP = "s";
@@ -66,7 +65,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             b = runChecks();
         }
         if(hasFailedChecks(b)) {
-            Log.v(TAG, "one or more earlier failed checks discovered");
+            Timber.v("one or more earlier failed checks discovered");
 
             checkSetup = b.getBoolean(BUNDLE_KEY_SETUP);
             checkPlay = b.getBoolean(BUNDLE_KEY_PLAY);
@@ -205,7 +204,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         pager.addOnPageChangeListener(this);
 
         buildPagerCircles();
-        Log.v(TAG, "recoverChecks finished");
+        Timber.v("recoverChecks finished");
 
         //onPageSelected(0);
 
@@ -261,7 +260,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     @Override
     public void onPageSelected(int position) {
-        Log.v(TAG, "onPageSelected");
+        Timber.v("onPageSelected");
         setIndicator(position);
         if (position == pagerAdapter.getCount()-1) {
 
@@ -352,7 +351,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public ScreenFragment getItem(int position) {
             ScreenFragment fragment = null;
             int fragmentId = pagerAdapterIds.get(position);
-            Log.v(TAG, "getItem " + position + " / fragmentId: " +fragmentId);
+            Timber.v("getItem " + position + " / fragmentId: " +fragmentId);
             switch (fragmentId) {
                 case WelcomeFragment.ID:
                     fragment = WelcomeFragment.getInstance();
@@ -407,15 +406,15 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             if (this.isVisible()) {
                 // If we are becoming invisible, then...
                 if (!isVisibleToUser) {
-                    Log.d(TAG, this+ "isVisible && !isVisibleToUser");
+                    Timber.d(this+ "isVisible && !isVisibleToUser");
                     onHide();
                 } else {
-                    Log.d(TAG, this+ "isVisible && isVisibleToUser");
+                    Timber.d(this+ "isVisible && isVisibleToUser");
                     onShow();
 
                 }
             } else {
-                Log.d(TAG, "!isVisible");
+                Timber.d("!isVisible");
 
             }
         }
@@ -566,7 +565,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case RECOVER_PLAY: {
-                Log.v(TAG, "onActivityResult" + requestCode + " " + resultCode);
+                Timber.v("onActivityResult" + requestCode + " " + resultCode);
                 return;
             }
         }
@@ -612,7 +611,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             super.onResume();
 
             final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
-            Log.v(TAG, "onShow " + resultCode);
+            Timber.v("onShow " + resultCode);
             if(resultCode == GoogleApiAvailability.SUCCESS) {
                 onPlayServicesAvailable();
             } else {
@@ -625,7 +624,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         }
 
         public void onPlayServicesUnavailableNotRecoverable(int resultCode) {
-            Log.v(TAG, "onPlayServicesUnavailableNotRecoverable()");
+            Timber.v("onPlayServicesUnavailableNotRecoverable()");
 
             message.setText(getString(R.string.play_services_not_available_not_recoverable));
             button.setVisibility(View.VISIBLE);
@@ -644,7 +643,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
 
         public void onPlayServicesAvailable() {
-            Log.v(TAG, "onPlayServicesAvailable()");
+            Timber.v("onPlayServicesAvailable()");
             message.setText(getString(R.string.play_services_now_available));
             button.setVisibility(View.GONE);
             img.setImageResource(R.drawable.ic_assignment_turned_in_white_48dp);
@@ -652,7 +651,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         }
 
         public void onPlayServicesUnavailableRecoverable(final int resultCode) {
-            Log.v(TAG, "onPlayServicesUnavailableRecoverable()");
+            Timber.v("onPlayServicesUnavailableRecoverable()");
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
