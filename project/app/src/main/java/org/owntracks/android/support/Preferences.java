@@ -22,8 +22,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.util.Log;
-
 
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
@@ -31,9 +29,9 @@ import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
 
-public class Preferences {
-    private static final String TAG = "Preferences";
+import timber.log.Timber;
 
+public class Preferences {
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
     public static final String FILENAME_PUBLIC = "org.owntracks.android.preferences.public";
@@ -59,7 +57,7 @@ public class Preferences {
     }
 
     public static void initialize(Context c){
-        Log.v(TAG, "preferences initializing");
+        Timber.v("preferences initializing");
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -84,12 +82,12 @@ public class Preferences {
         setMode(active, false);
     }
     private static void setMode(int active, boolean init){
-        Log.v(TAG, "setMode: " + active);
+        Timber.v("setMode: " + active);
 
         if(!init && modeId == active)
             return;
 
-        Log.v(TAG, "setting mode to: " + active);
+        Timber.v("setting mode to: " + active);
 
         detachAllActivePreferenceChangeListeners();
         int oldModeId = modeId;
@@ -235,7 +233,7 @@ public class Preferences {
     }
     public static void setString(String key, String value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Log.e(TAG, "setting of key denied in the current mode: " + key);
+            Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
         activeSharedPreferences.edit().putString(key, value).commit();
@@ -246,7 +244,7 @@ public class Preferences {
     }
     public static void setInt(String key, int value, boolean allowSetWhenPublic) {
         if((isModeMqttPublic() && !allowSetWhenPublic)) {
-            Log.e(TAG, "setting of key denied in the current mode: " + key);
+            Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
         activeSharedPreferences.edit().putInt(key, value).commit();
@@ -256,7 +254,7 @@ public class Preferences {
     }
     public static void setBoolean(String key, boolean value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Log.e(TAG, "setting of key denied in the current mode: " + key);
+            Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
         activeSharedPreferences.edit().putBoolean(key, value).commit();
@@ -307,7 +305,7 @@ public class Preferences {
 
         for(String key : m.getKeys()) {
             try {
-                Log.v(TAG, "import for key: " + key + " with value: " + m.get(key));
+                Timber.v("import for key: " + key + " with value: " + m.get(key));
                 methods.get(key).invoke(null, m.get(key));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -333,7 +331,7 @@ public class Preferences {
         if(j == null)
             return;
 
-        Log.v(TAG, "importing " + j.size()+" waypoints");
+        Timber.v("importing " + j.size()+" waypoints");
         WaypointDao dao = Dao.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
@@ -341,12 +339,12 @@ public class Preferences {
             Waypoint w = m.toDaoObject();
 
             for(Waypoint e : deviceWaypoints) {
-                Log.v(TAG, "existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
-                Log.v(TAG, "new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+                Timber.v("existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
+                Timber.v("new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
 
                 // remove exisiting waypoint before importing new one
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
-                    Log.v(TAG, "removing existing waypoint with same tst before adding it");
+                    Timber.v("removing existing waypoint with same tst before adding it");
                     dao.delete(e);
                     App.getEventBus().post(new Events.WaypointRemoved(e));
                 }
@@ -920,10 +918,12 @@ public class Preferences {
 
     }
 
+    @Export(key = Keys.PLAY_OVERRIDE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static boolean getPlayOverride() {
         return activeSharedPreferences.getBoolean(Keys.PLAY_OVERRIDE, false);
     }
 
+    @Import(key = Keys.PLAY_OVERRIDE)
     public static void setPlayOverride(boolean playOverride) {
         activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).commit();
     }
@@ -970,9 +970,9 @@ public class Preferences {
         for(Method m : methods) {
             m.setAccessible(true);
 
-            Log.v(TAG,"method for config key: " + m.getAnnotation(Export.class).key());
-            Log.v(TAG,"calling method: " + m.getName());
-            Log.v(TAG,"return type: " + m.getReturnType());
+            Timber.v("method for config key: " + m.getAnnotation(Export.class).key());
+            Timber.v("calling method: " + m.getName());
+            Timber.v("return type: " + m.getReturnType());
             ;
 
             try {

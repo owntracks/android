@@ -5,10 +5,10 @@ import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
+
+import timber.log.Timber;
 
 public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
-    private static final String TAG = "GooglePlayCheck";
     private static com.google.android.gms.common.GoogleApiAvailability wrappedInstance;
 
     @Override
@@ -26,7 +26,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
 
     @Override
     public final boolean isUserResolvableError(int errorCode) {
-        Log.d(TAG, "isUserResolvableError Wrapper " + errorCode);
+        Timber.d("isUserResolvableError Wrapper " + errorCode);
 
         boolean resolvable=wrappedInstance.isUserResolvableError(errorCode);
 

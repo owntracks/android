@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,8 +13,9 @@ import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.support.Preferences;
 
+import timber.log.Timber;
+
 public class GoogleApiAvailability {
-    private static final String TAG = "GooglePlayCheck";
 
     public static final int SUCCESS = 0;
     public static final int API_UNAVAILABLE = 16;
@@ -25,7 +25,7 @@ public class GoogleApiAvailability {
     protected static GoogleApiAvailability instance;
 
     public int isGooglePlayServicesAvailable(Context context) {
-        Log.d(TAG, "isGooglePlayServicesAvailable Wrapper" + API_UNAVAILABLE);
+        Timber.d("isGooglePlayServicesAvailable Wrapper" + API_UNAVAILABLE);
 
         return API_UNAVAILABLE;
     }
@@ -38,7 +38,7 @@ public class GoogleApiAvailability {
     }
 
     public boolean isUserResolvableError(int errorCode) {
-        Log.d(TAG, "isUserResolvableError Wrapper" + errorCode);
+        Timber.d("isUserResolvableError Wrapper" + errorCode);
         // Always resolvable (by overriding)
         return true;
     }

@@ -17,7 +17,6 @@ import android.support.annotation.BoolRes;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
@@ -29,9 +28,9 @@ import org.owntracks.android.support.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ToolbarPreference;
 
-public class ActivityPreferences extends ActivityBase {
-    private static final String TAG = "ActivityPreferences";
+import timber.log.Timber;
 
+public class ActivityPreferences extends ActivityBase {
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
 
@@ -39,12 +38,12 @@ public class ActivityPreferences extends ActivityBase {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
-        Log.v(TAG, "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
+        Timber.v("onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
             case (REQUEST_CODE_CONNECTION) : {
-                Log.v(TAG, "onActivityResult with REQUEST_CODE_CONNECTION");
+                Timber.v("onActivityResult with REQUEST_CODE_CONNECTION");
                 if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
-                    Log.v(TAG,"recreating ActivityPreferences due to mode change");
+                    Timber.v("recreating ActivityPreferences due to mode change");
                  //   this.recreate();
                  //   this.overridePendingTransition(0, 0);
                     loadFragment();
@@ -100,7 +99,7 @@ public class ActivityPreferences extends ActivityBase {
             final Activity a = getActivity();
             PackageManager pm = a.getPackageManager();
 
-            Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
+            Timber.v("Prepping preferences: " + Preferences.getModeId());
 
             if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
@@ -191,7 +190,7 @@ public class ActivityPreferences extends ActivityBase {
 
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Log.v(TAG, "startActivityForResult ActivityPreferencesConnection");
+                    Timber.v("startActivityForResult ActivityPreferencesConnection");
                     Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
@@ -270,7 +269,8 @@ public class ActivityPreferences extends ActivityBase {
         private void setDependency(PreferenceScreen root, String dependingKey, String dependsOnKey) {
             try {
                 root.findPreference(dependingKey).setDependency(dependsOnKey);
-            } catch (IllegalStateException e) {Log.e(TAG, "Preference dependency could not be setup from: " + dependingKey + " to " + dependsOnKey);}
+            } catch (IllegalStateException e) {
+                Timber.e("Preference dependency could not be setup from: " + dependingKey + " to " + dependsOnKey);}
         }
 
 
