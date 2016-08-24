@@ -115,7 +115,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private static boolean checkPlayServices() {
-        return  GoogleApiAvailability.checkPlayServices(App.getContext());
+        return  GoogleApiAvailability.checkPlayServices(App.getContext(), true);
     }
 
     private static boolean checkPermissions() {
@@ -631,7 +631,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
-            GoogleApiAvailability.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY);
+            GoogleApiAvailability.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY, this);
 
             img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 

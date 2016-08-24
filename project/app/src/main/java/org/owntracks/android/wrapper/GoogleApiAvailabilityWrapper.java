@@ -57,9 +57,9 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
     @Override
     public Dialog getErrorDialog(Activity activity, int errorCode, int requestCode) {
         final Dialog errorDialog;
-        final Dialog overrideDialog = GoogleApiAvailabilityWrapper.super.getErrorDialog(activity, errorCode, requestCode);
+        final Dialog overrideDialog = super.getErrorDialog(activity, errorCode, requestCode);
 
-        if (errorCode == GoogleApiAvailability.SERVICE_INVALID) { // usual case, if no play services installed
+        if (errorCode == GoogleApiAvailability.SERVICE_INVALID || errorCode == API_UNAVAILABLE) { // usual case, if no play services installed
             errorDialog = overrideDialog;
         } else {
             errorDialog = wrappedInstance.getErrorDialog(activity, errorCode, requestCode, new DialogInterface.OnCancelListener() {
