@@ -11,9 +11,7 @@ import timber.log.Timber;
 public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
     private static com.google.android.gms.common.GoogleApiAvailability wrappedInstance;
 
-    @Override
-    public int isGooglePlayServicesAvailable(Context context) {
-        return wrappedInstance.isGooglePlayServicesAvailable(context);
+    protected GoogleApiAvailabilityWrapper() {
     }
 
     public static GoogleApiAvailabilityWrapper getInstance() {
@@ -25,15 +23,35 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
     }
 
     @Override
+    public boolean isWrapper() {
+        return true;
+    }
+
+    @Override
+    public int isGooglePlayServicesAvailable(Context context) {
+        if(wrappedInstance.getOpenSourceSoftwareLicenseInfo(context)==null){
+            //this way, we don't get a Warning in the Logs GooglePlayServicesUtil: Cannot find Google Play services package name.
+            return API_UNAVAILABLE;
+        } else {
+            return wrappedInstance.isGooglePlayServicesAvailable(context);
+        }
+    }
+
+    @Override
     public final boolean isUserResolvableError(int errorCode) {
-        Timber.d("%s", errorCode);
+        Timber.d("error code is %s", errorCode);
 
-        boolean resolvable=wrappedInstance.isUserResolvableError(errorCode);
+        boolean resolvable = wrappedInstance.isUserResolvableError(errorCode);
 
-        if(!resolvable){
-            resolvable=super.isUserResolvableError(errorCode);
+        if (!resolvable) {
+            resolvable = super.isUserResolvableError(errorCode);
         }
         return resolvable;
+    }
+
+    @Override
+    public PendingIntent getErrorResolutionPendingIntent(Context context, int errorCode, int requestCode) {
+        return wrappedInstance.getErrorResolutionPendingIntent(context, errorCode, requestCode);
     }
 
     @Override
@@ -41,7 +59,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
         final Dialog errorDialog;
         final Dialog overrideDialog = GoogleApiAvailabilityWrapper.super.getErrorDialog(activity, errorCode, requestCode);
 
-        if (errorCode == GoogleApiAvailability.SERVICE_INVALID){ // usual case, if no play services installed
+        if (errorCode == GoogleApiAvailability.SERVICE_INVALID) { // usual case, if no play services installed
             errorDialog = overrideDialog;
         } else {
             errorDialog = wrappedInstance.getErrorDialog(activity, errorCode, requestCode, new DialogInterface.OnCancelListener() {
@@ -52,17 +70,6 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
                     }
             );
         }
-
         return errorDialog;
-    }
-
-    @Override
-    public PendingIntent getErrorResolutionPendingIntent(Context context, int errorCode, int requestCode) {
-        return wrappedInstance.getErrorResolutionPendingIntent(context, errorCode, requestCode);
-    }
-
-    @Override
-    public boolean isWrapper(){
-        return true;
     }
 }

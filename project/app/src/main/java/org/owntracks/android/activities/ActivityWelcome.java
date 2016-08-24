@@ -31,7 +31,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.support.PausableViewPager;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.wrapper.GoogleApiAvailability;
-import org.owntracks.android.wrapper.GoogleApiAvailabilityWrapper;
+import org.owntracks.android.wrapper.GoogleApiAvailabilityResponder;
 
 import java.util.ArrayList;
 
@@ -43,8 +43,6 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     private static final java.lang.String BUNDLE_KEY_SETUP = "s";
     private static final java.lang.String BUNDLE_KEY_PLAY = "pl";
     private static final java.lang.String BUNDLE_KEY_PERMISSIONS = "pe";
-
-    private static GoogleApiAvailability googleAPI;
 
     ViewPager pager;
     FragmentAdapter pagerAdapter;
@@ -117,17 +115,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private static boolean checkPlayServices() {
-        try {
-            Class.forName("com.google.android.gms.common.GoogleApiAvailability", false, ActivityWelcome.class.getClassLoader());
-            googleAPI = GoogleApiAvailabilityWrapper.getInstance();
-        } catch(ClassNotFoundException e) {
-            googleAPI = GoogleApiAvailability.getInstance(); // untested edge case if not compiled in as binary dependency
-        }
-
-        boolean playOverride=Preferences.getPlayOverride();
-        boolean playAvailable=googleAPI.isGooglePlayServicesAvailable(App.getContext()) == GoogleApiAvailability.SUCCESS;
-
-        return  playAvailable || playOverride;
+        return  GoogleApiAvailability.checkPlayServices(App.getContext());
     }
 
     private static boolean checkPermissions() {
@@ -351,7 +339,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public ScreenFragment getItem(int position) {
             ScreenFragment fragment = null;
             int fragmentId = pagerAdapterIds.get(position);
-            Timber.v("getItem " + position + " / fragmentId: " +fragmentId);
+            Timber.v("getItem %s / fragmentId: %s", position, fragmentId);
             switch (fragmentId) {
                 case WelcomeFragment.ID:
                     fragment = WelcomeFragment.getInstance();
@@ -406,10 +394,10 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             if (this.isVisible()) {
                 // If we are becoming invisible, then...
                 if (!isVisibleToUser) {
-                    Timber.d(this+ "isVisible && !isVisibleToUser");
+                    Timber.d("%s isVisible && !isVisibleToUser", this);
                     onHide();
                 } else {
-                    Timber.d(this+ "isVisible && isVisibleToUser");
+                    Timber.d("%s isVisible && isVisibleToUser", this);
                     onShow();
 
                 }
@@ -565,14 +553,14 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case RECOVER_PLAY: {
-                Timber.v("onActivityResult" + requestCode + " " + resultCode);
+                Timber.v("%s %s", requestCode, resultCode);
                 return;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener {
+    public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener, GoogleApiAvailabilityResponder {
         public static final int ID = 3;
         private static PlayFragment instance;
         private Button button;
@@ -584,11 +572,6 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
                 instance =  new PlayFragment();
 
             return instance;
-        }
-
-
-        public PlayFragment() {
-            super();
         }
 
         @Override
@@ -610,19 +593,10 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onResume() {
             super.onResume();
 
-            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
-            Timber.v("onShow " + resultCode);
-            if(resultCode == GoogleApiAvailability.SUCCESS) {
-                onPlayServicesAvailable();
-            } else {
-                if(googleAPI.isUserResolvableError(resultCode)) {
-                    onPlayServicesUnavailableRecoverable(resultCode);
-                } else {
-                    onPlayServicesUnavailableNotRecoverable(resultCode);
-                }
-            }
+            GoogleApiAvailability.checkPlayServices(this);
         }
 
+        @Override
         public void onPlayServicesUnavailableNotRecoverable(int resultCode) {
             Timber.v("onPlayServicesUnavailableNotRecoverable()");
 
@@ -642,6 +616,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         }
 
 
+        @Override
         public void onPlayServicesAvailable() {
             Timber.v("onPlayServicesAvailable()");
             message.setText(getString(R.string.play_services_now_available));
@@ -650,12 +625,13 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             ActivityWelcome.class.cast(getActivity()).enablePagerNext();
         }
 
+        @Override
         public void onPlayServicesUnavailableRecoverable(final int resultCode) {
             Timber.v("onPlayServicesUnavailableRecoverable()");
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
-            googleAPI.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY);
+            GoogleApiAvailability.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY);
 
             img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
 

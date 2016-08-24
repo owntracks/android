@@ -24,23 +24,39 @@ public class GoogleApiAvailability {
 
     protected static GoogleApiAvailability instance;
 
-    public int isGooglePlayServicesAvailable(Context context) {
-        Timber.d("%s", API_UNAVAILABLE);
-
-        return API_UNAVAILABLE;
+    protected GoogleApiAvailability(){
     }
 
     public static GoogleApiAvailability getInstance() {
         if (instance == null) {
-            instance = new GoogleApiAvailability();
+            try {
+                Class.forName("com.google.android.gms.common.GoogleApiAvailability", false, ActivityWelcome.class.getClassLoader());
+                instance = GoogleApiAvailabilityWrapper.getInstance();
+            } catch(ClassNotFoundException e) {
+                instance = new GoogleApiAvailability(); // untested edge case if not compiled in as binary dependency
+            }
         }
         return instance;
+    }
+
+    public boolean isWrapper() {
+        return false;
+    }
+
+    public int isGooglePlayServicesAvailable(Context context) {
+        Timber.d("lalala fallback default unavailable %s", API_UNAVAILABLE);
+
+        return API_UNAVAILABLE;
     }
 
     public boolean isUserResolvableError(int errorCode) {
         Timber.d("%s",errorCode);
         // Always resolvable (by overriding)
         return true;
+    }
+
+    public PendingIntent getErrorResolutionPendingIntent(Context context, int errorCode, int requestCode) {
+        return null;
     }
 
     public Dialog getErrorDialog(Activity activity, int errorCode, int requestCode) {
@@ -50,12 +66,21 @@ public class GoogleApiAvailability {
     public Dialog getOverrideDialog(Activity activity, int errorCode, int requestCode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
+        final GoogleApiAvailabilityResponder responder;
+        if(activity instanceof GoogleApiAvailabilityResponder) {
+            responder = GoogleApiAvailabilityResponder.class.cast(activity);
+        } else {
+            responder = null;
+        }
+
         builder.setMessage(R.string.play_override_question);
 
         builder.setPositiveButton(R.string.play_override_continue, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Preferences.setPlayOverride(true);
-                ActivityWelcome.PlayFragment.getInstance().onPlayServicesAvailable();
+                if(responder != null) {
+                    responder.onPlayServicesAvailable();
+                }
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -67,24 +92,6 @@ public class GoogleApiAvailability {
         return builder.create();
     }
 
-    public PendingIntent getErrorResolutionPendingIntent(Context context, int errorCode, int requestCode) {
-        return null;
-    }
-
-    public boolean isWrapper() {
-        return false;
-    }
-
-    public void provisionRecoveryButton(Button button, final Activity activity, final int errorCode, final int requestCode) {
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getErrorDialog(activity, errorCode, requestCode).show();
-                tryErrorResolution(activity, errorCode, requestCode);
-            }
-        });
-    }
-
     protected void tryErrorResolution(final Activity activity, final int resultCode, final int requestCode){
         PendingIntent p = getErrorResolutionPendingIntent(activity, resultCode, requestCode);
         try {
@@ -94,5 +101,39 @@ public class GoogleApiAvailability {
         } catch (PendingIntent.CanceledException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void provisionRecoveryButton(Button button, final Activity activity, final int errorCode, final int requestCode) {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getInstance().getErrorDialog(activity, errorCode, requestCode).show();
+                getInstance().tryErrorResolution(activity, errorCode, requestCode);
+            }
+        });
+    }
+
+    public static boolean checkPlayServices(Context context) {
+        boolean playAvailable = (getInstance().isGooglePlayServicesAvailable(context) == GoogleApiAvailability.SUCCESS);
+        boolean playOverride = Preferences.getPlayOverride();
+
+        return playAvailable || playOverride;
+    }
+
+    public static boolean checkPlayServices(GoogleApiAvailabilityResponder responder) {
+        boolean playAvailable = checkPlayServices(responder.getContext());
+
+        if(playAvailable) {
+            responder.onPlayServicesAvailable();
+        } else {
+            int resultCode = getInstance().isGooglePlayServicesAvailable(responder.getContext());
+
+            if(getInstance().isUserResolvableError(resultCode)) {
+                responder.onPlayServicesUnavailableRecoverable(resultCode);
+            } else {
+                responder.onPlayServicesUnavailableNotRecoverable(resultCode);
+            }
+        }
+        return playAvailable;
     }
 }
