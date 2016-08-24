@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import timber.log.Timber;
 
 public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
+    public static int GOOGLE_PLAY_SERVICES_VERSION_CODE;
+
     private static com.google.android.gms.common.GoogleApiAvailability wrappedInstance;
 
     protected GoogleApiAvailabilityWrapper() {
@@ -18,6 +20,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
         if (instance == null) {
             instance = new GoogleApiAvailabilityWrapper();
             wrappedInstance = com.google.android.gms.common.GoogleApiAvailability.getInstance();
+            GOOGLE_PLAY_SERVICES_VERSION_CODE = com.google.android.gms.common.GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE;
         }
         return (GoogleApiAvailabilityWrapper) instance;
     }
@@ -31,7 +34,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
     public int isGooglePlayServicesAvailable(Context context) {
         if(wrappedInstance.getOpenSourceSoftwareLicenseInfo(context)==null){
             //this way, we don't get a Warning in the Logs GooglePlayServicesUtil: Cannot find Google Play services package name.
-            return API_UNAVAILABLE;
+            return SERVICE_MISSING;
         } else {
             return wrappedInstance.isGooglePlayServicesAvailable(context);
         }
@@ -59,7 +62,7 @@ public class GoogleApiAvailabilityWrapper extends GoogleApiAvailability {
         final Dialog errorDialog;
         final Dialog overrideDialog = super.getErrorDialog(activity, errorCode, requestCode);
 
-        if (errorCode == GoogleApiAvailability.SERVICE_INVALID || errorCode == API_UNAVAILABLE) { // usual case, if no play services installed
+        if (errorCode == SERVICE_MISSING || errorCode == GoogleApiAvailability.SERVICE_INVALID || errorCode == API_UNAVAILABLE) { // usual case, if no play services installed
             errorDialog = overrideDialog;
         } else {
             errorDialog = wrappedInstance.getErrorDialog(activity, errorCode, requestCode, new DialogInterface.OnCancelListener() {

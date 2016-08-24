@@ -18,9 +18,13 @@ import timber.log.Timber;
 public class GoogleApiAvailability {
 
     public static final int SUCCESS = 0;
-    public static final int API_UNAVAILABLE = 16;
+    public static final int SERVICE_MISSING = 1;
+    public static final int SERVICE_VERSION_UPDATE_REQUIRED = 2;
+    public static final int SERVICE_DISABLED = 3;
     public static final int SERVICE_INVALID = 9;
+    public static final int API_UNAVAILABLE = 16;
 
+    public static final int GOOGLE_PLAY_SERVICES_VERSION_CODE = 0;
 
     protected static GoogleApiAvailability instance;
     private GoogleApiAvailabilityResponder responder;
@@ -45,7 +49,7 @@ public class GoogleApiAvailability {
     }
 
     public int isGooglePlayServicesAvailable(Context context) {
-        return API_UNAVAILABLE;
+        return SERVICE_MISSING;
     }
 
     public boolean isUserResolvableError(int errorCode) {
