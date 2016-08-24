@@ -23,6 +23,7 @@ public class GoogleApiAvailability {
 
 
     protected static GoogleApiAvailability instance;
+    private GoogleApiAvailabilityResponder responder;
 
     protected GoogleApiAvailability(){
     }
@@ -44,8 +45,6 @@ public class GoogleApiAvailability {
     }
 
     public int isGooglePlayServicesAvailable(Context context) {
-        Timber.d("lalala fallback default unavailable %s", API_UNAVAILABLE);
-
         return API_UNAVAILABLE;
     }
 
@@ -65,13 +64,6 @@ public class GoogleApiAvailability {
 
     public Dialog getOverrideDialog(Activity activity, int errorCode, int requestCode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-
-        final GoogleApiAvailabilityResponder responder;
-        if(activity instanceof GoogleApiAvailabilityResponder) {
-            responder = GoogleApiAvailabilityResponder.class.cast(activity);
-        } else {
-            responder = null;
-        }
 
         builder.setMessage(R.string.play_override_question);
 
@@ -103,7 +95,9 @@ public class GoogleApiAvailability {
         }
     }
 
-    public static void provisionRecoveryButton(Button button, final Activity activity, final int errorCode, final int requestCode) {
+    public static void provisionRecoveryButton(Button button, final Activity activity, final int errorCode, final int requestCode, GoogleApiAvailabilityResponder responder) {
+        getInstance().setResponder(responder);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,14 +108,18 @@ public class GoogleApiAvailability {
     }
 
     public static boolean checkPlayServices(Context context) {
+        return checkPlayServices(context, false);
+    }
+
+    public static boolean checkPlayServices(Context context, boolean acceptOverride) {
         boolean playAvailable = (getInstance().isGooglePlayServicesAvailable(context) == GoogleApiAvailability.SUCCESS);
         boolean playOverride = Preferences.getPlayOverride();
 
-        return playAvailable || playOverride;
+        return playAvailable || (acceptOverride && playOverride);
     }
 
     public static boolean checkPlayServices(GoogleApiAvailabilityResponder responder) {
-        boolean playAvailable = checkPlayServices(responder.getContext());
+        boolean playAvailable = checkPlayServices(responder.getContext(), true);
 
         if(playAvailable) {
             responder.onPlayServicesAvailable();
@@ -135,5 +133,9 @@ public class GoogleApiAvailability {
             }
         }
         return playAvailable;
+    }
+
+    public void setResponder(GoogleApiAvailabilityResponder responder){
+        this.responder=responder;
     }
 }

@@ -12,13 +12,10 @@ import org.owntracks.android.support.interfaces.ProxyableService;
 import android.content.Intent;
 import android.os.Message;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import org.owntracks.android.wrapper.GoogleApiAvailability;
 
 public class ServiceApplication implements ProxyableService, StaticHandlerInterface {
-    private static final String TAG = "ServiceApplication";
 
-    private static boolean playServicesAvailable;
     private ServiceProxy context;
     @Override
     public void onCreate(ServiceProxy context) {
@@ -45,10 +42,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
     }
 
 	public static boolean checkPlayServices() {
-            GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-            int result = googleAPI.isGooglePlayServicesAvailable(App.getContext());
-        return result == ConnectionResult.SUCCESS;
-
+        return GoogleApiAvailability.checkPlayServices(App.getContext());
     }
 
     public boolean publishWaypointsMessage() {
