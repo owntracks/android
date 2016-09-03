@@ -75,6 +75,25 @@ OwnTracks Android App Release Notes
 * [NEW] Websocket support in private mode
 * [NEW] Geocoder in notification
 
+## OwnTracks 0.6.10
+>Release date: 2016-03-28 for beta testers
+* [FIX] #338 - Bluetooth beacon functionality can cause battery drain
+* [FIX] #344 - Waypoints loose "shared" indicator on import enhancement
+* [FIX] #343 - 0.6.9: waypoint export should say 'queued'
+* [FIX] #341 - remove the *map center* button on the *Friends* page
+
+## OwnTracks 0.6.09
+>Release date: 2016-03-25
+* [FIX] #339 - Latest Android version doesn't accept CA and client crts
+* [FIX] #338 - crash on preferences click
+
+## OwnTracks 0.6.08
+>Release date: 2016-03-25 for alpha testers
+* [FIX] Changed enabled waypoint label (again)
+* [FIX] Notification action to report location
+* [NEW] Websocket support in private mode
+* [NEW] Geocoder in notification
+
 ## OwnTracks 0.6.07
 >Release date: 2016-03-24 for alpha testers
 * [FIX] Changed enabled waypoint label

@@ -17,6 +17,7 @@
         android:title="@string/preferencesNotification" >
 
     </PreferenceScreen>
+    
     <PreferenceScreen
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced" >

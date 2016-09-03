@@ -175,6 +175,10 @@
         <service android:name="org.eclipse.paho.android.service.MqttService" android:enabled="true"
             android:exported="false" />
 
+        <service
+            android:name=".services.ServiceWidget"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+        
         <receiver
             android:name=".support.receiver.BootCompleteReceiver"
             android:enabled="true"
@@ -193,7 +197,19 @@
                 <action android:name="org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:icon="@drawable/ic_locations"
+            android:label="Owntracks waypoints"
+            android:name=".widget.LClocWidgetProvider"
+            android:previewImage="@drawable/appwidget_preview" >
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
         <activity
             android:name=".activities.ActivityStatus"
             android:label="@string/title_activity_status"

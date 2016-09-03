@@ -3,6 +3,7 @@ package org.owntracks.android;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
@@ -23,6 +24,8 @@ import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.MessageWaypointCollection;
+import org.owntracks.android.widget.LClocWidgetProvider;
 
 import android.app.Activity;
 import android.app.Application;
@@ -34,14 +37,18 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.databinding.ObservableMap;
+import android.content.ComponentName;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
+import android.support.v4.util.ArrayMap;
+import android.support.v4.util.TimeUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.appwidget.AppWidgetManager;
 
 import io.realm.Realm;
 import timber.log.Timber;
@@ -57,6 +64,7 @@ public class App extends Application  {
     private static Handler backgroundHandler;
 
     //private static HashMap<String, FusedContact> fusedContacts;
+    private static HashMap<String, MessageWaypointCollection> contactWaypoints;
     private static ContactsViewModel contactsViewModel;
     private static Activity currentActivity;
     private static boolean inForeground;
@@ -73,6 +81,10 @@ public class App extends Application  {
         return sAppComponent.contactsRepo().getAll();
     }
 
+    public static MessageWaypointCollection getContactWaypoints(FusedContact c) {
+        return contactWaypoints.get(c.getId());
+    }
+    
     @Override
 	public void onCreate() {
 		super.onCreate();
@@ -102,6 +114,7 @@ public class App extends Application  {
         backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
         contactsViewModel =  new ContactsViewModel();
+        contactWaypoints = new HashMap<>();
 
         checkFirstStart();
 
@@ -167,15 +180,29 @@ public class App extends Application  {
             @Override
             public void run() {
                 contactsViewModel.items.add(c);
+                
+                if (Preferences.getEnableWidget())
+                    ServiceProxy.getServiceApplication().requestWaypoints(c);
             }
         });
         App.getEventBus().post(c);
     }
 
-    public static void updateFusedContact(FusedContact c) {
+    public static void updateFusedContact(final FusedContact c) {
         App.getEventBus().post(c);
+        
+        if (contactWaypoints.containsKey(c.getId()))
+            updateWidget(getContext());
+        else
+            // Request waypoints if not available yet
+            postOnMainHandler(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (Preferences.getEnableWidget())
+                            ServiceProxy.getServiceApplication().requestWaypoints(c);
+                    }
+                });
     }
-
 
     public static void clearFusedContacts() {
         sAppComponent.contactsRepo().clearAll();
@@ -187,6 +214,26 @@ public class App extends Application  {
         });
     }
 
+    public static void updateContactWaypoints(FusedContact c, MessageWaypointCollection wayps) {
+        contactWaypoints.put(c.getId(), wayps);
+        updateWidget(getContext());
+    }
+
+    // Update the widgets data provider
+    private static void updateWidget(Context context) {
+        if (Preferences.getEnableWidget()) {
+            AppWidgetManager appWidget = AppWidgetManager.getInstance(context);
+            int [] widgetIds = appWidget.getAppWidgetIds(new ComponentName(context, LClocWidgetProvider.class));
+            Log.d(TAG, "Updating widget");
+            appWidget.notifyAppWidgetViewDataChanged(widgetIds, R.id.stack_widget_view);
+        }
+    }
+    
+    // Accessor from other classes
+    public static void notifyWidgetUpdate() {
+        updateWidget(getContext());
+    }
+    
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
         clearFusedContacts();

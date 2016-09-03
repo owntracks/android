@@ -3,14 +3,17 @@ package org.owntracks.android.services;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageWaypoints;
+import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StaticHandlerInterface;
 import org.owntracks.android.support.interfaces.ProxyableService;
+import org.owntracks.android.model.FusedContact;
 
 import android.content.Intent;
 import android.os.Message;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -61,5 +64,13 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
 
         ServiceProxy.getServiceMessage().sendMessage(m);
         return true;
+    }
+
+    public void requestWaypoints(FusedContact c) {
+        MessageCmd cmd = new MessageCmd();
+        Log.d(TAG, "requesting waypoints for " + c.getId());
+        cmd.setTopic(c.getId());
+        cmd.setAction("waypoints");
+        ServiceProxy.getServiceMessage().sendMessage(cmd);
     }
 }

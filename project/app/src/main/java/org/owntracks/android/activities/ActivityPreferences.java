@@ -205,7 +205,6 @@ public class ActivityPreferences extends ActivityBase {
                 }
             };
 
-
             findPreference("connectionScreen").setOnPreferenceClickListener(connectionListener);
         }
 
@@ -262,6 +261,10 @@ public class ActivityPreferences extends ActivityBase {
             screen.addPreference(background);
             addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
 
+            PreferenceCategory widget = getCategory(R.string.preferencesCategoryWidget);
+            screen.addPreference(widget);
+            addSwitchPreference(widget, Preferences.Keys.ENABLE_WIDGET, R.string.preferencesEnableWidget,
+                                R.string.preferencesEnableWidgetSummary, R.bool.valEnableWidget);
         }
 
         private void setupDependencies(PreferenceScreen root) {
