@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="valFalse">false</bool>
-    <bool name="valWsEnable">true</bool>
-    <bool name="valWsDisable">false</bool>
 </resources>

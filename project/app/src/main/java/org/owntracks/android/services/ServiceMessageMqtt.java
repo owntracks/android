@@ -110,7 +110,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	}
 
 	@Override
-	public void processMessage(MessageCmd message) {
+	public void processOutgoingMessage(MessageCmd message) {
         if (!message.isOutgoing() || (message.getTopic() == null))
             // Do not overwrite topic for commands sent to others
             message.setTopic(Preferences.getPubTopicCommands());

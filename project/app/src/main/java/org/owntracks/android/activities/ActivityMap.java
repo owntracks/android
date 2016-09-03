@@ -295,7 +295,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
     private void updateContactMarker(@Nullable FusedContact c) {
         if (c == null || !c.hasLocation() || map == null)
             return;
-        Log.v(TAG, "updateContactMarker: " + c.getTopic() + " hasLocation: " + c.hasLocation());
 
         Marker m = markers.get(c.getId());
 
@@ -483,8 +482,6 @@ public class ActivityMap extends ActivityBase implements OnMapReadyCallback, Goo
                 expandBottomSheet();
             else if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
                 collapseBottomSheet();
-
-            return true;
         }
     };
 

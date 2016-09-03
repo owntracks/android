@@ -14,7 +14,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 
-import org.antlr.v4.runtime.misc.NotNull;
+//import org.antlr.v4.runtime.misc.NotNull;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
@@ -275,7 +275,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
     }
 
 
-    private static int onMessageDelivered(@NotNull Context c, @Nullable Long messageId) {
+    private static int onMessageDelivered(Context c, @Nullable Long messageId) {
         if(messageId == null || messageId == 0) {
             Timber.e("messageId:null");
             return GcmNetworkManager.RESULT_SUCCESS;
@@ -285,7 +285,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
-    private static int onMessageDeliveryFailed(@NotNull Context c, Long messageId) {
+    private static int onMessageDeliveryFailed(Context c, Long messageId) {
         if(messageId == null || messageId == 0) {
             Timber.e("messageId:null");
             return GcmNetworkManager.RESULT_FAILURE;
@@ -300,18 +300,18 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         }
     }
 
-    private static void onMessageReceived(@NotNull MessageBase message) {
+    private static void onMessageReceived(MessageBase message) {
         ServiceProxy.getServiceMessage().onMessageReceived(message);
     }
 
 
-    private boolean prepareAndPostDirect(String wireMessage, @NotNull MessageBase message) {
+    private boolean prepareAndPostDirect(String wireMessage, MessageBase message) {
         Timber.v("messageId:%s", message.getMessageId());
         postMessage(wireMessage, this.endpointUrl, this.endpointUserInfo, context, message.getMessageId());
         return true;
     }
 
-    private boolean prepareAndPostIndirect(String wireMessage, @NotNull MessageBase message) {
+    private boolean prepareAndPostIndirect(String wireMessage, MessageBase message) {
         Timber.v("messageId:%s", message.getMessageId());
         Bundle b = new Bundle();
 

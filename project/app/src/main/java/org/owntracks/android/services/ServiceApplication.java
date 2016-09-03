@@ -68,8 +68,8 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
 
     public void requestWaypoints(FusedContact c) {
         MessageCmd cmd = new MessageCmd();
-        Log.d(TAG, "requesting waypoints for " + c.getTopic());
-        cmd.setTopic(c.getTopic());
+        Log.d(TAG, "requesting waypoints for " + c.getId());
+        cmd.setTopic(c.getId());
         cmd.setAction("waypoints");
         ServiceProxy.getServiceMessage().sendMessage(cmd);
     }

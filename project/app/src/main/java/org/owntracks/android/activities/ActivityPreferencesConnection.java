@@ -203,7 +203,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText host = (MaterialEditText) d.findViewById(R.id.host);
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
-                                    final CheckBox wsEnable = (CheckBox)d.findViewById(R.id.wsEnable);
 
 
                                     Preferences.setHost(host.getText().toString());

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/appwidget_dark_bg"
+              android:id="@+id/widget_item_layout">
+  <TextView
+      android:layout_width="180dp"
+      android:layout_height="wrap_content"
+	  android:gravity="center"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:ellipsize="marquee"
+      android:scrollHorizontally="true"
+      android:singleLine="true"
+      android:id="@+id/widget_item_name" />
+  
+  <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:rowCount="1"
+              android:columnCount="3"
+              android:stretchMode="columnWidth"
+              android:gravity="center"
+              android:numColumns="auto_fit"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/stack_widget_item">
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_height="30dp"
+               android:layout_width="30dp"
+               android:scaleType="centerInside"
+               android:layout_gravity="center_vertical"
+               android:paddingLeft="5dp"
+               android:paddingRight="0dp"
+               android:id="@+id/widget_from_view" />
+    
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_height="28dp"
+               android:layout_width="120dp"
+               android:paddingLeft="0dp"
+               android:paddingRight="0dp"
+               android:id="@+id/widget_img_view" />
+
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_height="30dp"
+               android:layout_width="30dp"
+               android:scaleType="centerInside"
+               android:layout_gravity="center_vertical"
+               android:paddingLeft="0dp"
+               android:paddingRight="5dp"
+               android:id="@+id/widget_to_view" />
+  </GridLayout>
+  <TextView
+      android:layout_width="180dp"
+      android:layout_height="wrap_content"
+	  android:gravity="center"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:id="@+id/widget_item_wayps" />
+</LinearLayout>

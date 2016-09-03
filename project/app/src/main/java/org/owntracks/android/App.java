@@ -24,7 +24,6 @@ import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.support.receiver.Parser;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.widget.LClocWidgetProvider;
 
@@ -83,7 +82,7 @@ public class App extends Application  {
     }
 
     public static MessageWaypointCollection getContactWaypoints(FusedContact c) {
-        return contactWaypoints.get(c.getTopic());
+        return contactWaypoints.get(c.getId());
     }
     
     @Override
@@ -189,10 +188,10 @@ public class App extends Application  {
         App.getEventBus().post(c);
     }
 
-    public static void updateFusedContact(FusedContact c) {
+    public static void updateFusedContact(final FusedContact c) {
         App.getEventBus().post(c);
         
-        if (contactWaypoints.containsKey(c.getTopic()))
+        if (contactWaypoints.containsKey(c.getId()))
             updateWidget(getContext());
         else
             // Request waypoints if not available yet
@@ -216,7 +215,7 @@ public class App extends Application  {
     }
 
     public static void updateContactWaypoints(FusedContact c, MessageWaypointCollection wayps) {
-        contactWaypoints.put(c.getTopic(), wayps);
+        contactWaypoints.put(c.getId(), wayps);
         updateWidget(getContext());
     }
 
@@ -257,10 +256,6 @@ public class App extends Application  {
         backgroundHandler.post(r);
     }
 
-
-    public static String formatDate(long tstSeconds) {
-        return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
-    }
 
     public static String formatDate(long tstSeconds) {
         return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
