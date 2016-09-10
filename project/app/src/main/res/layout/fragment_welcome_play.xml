@@ -21,11 +21,12 @@
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
 
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/icon_description_warning" />
 
     <TextView
         android:id="@+id/screen_heading"
-        android:text="Google Play Services"
+        android:text="@string/welcome_play_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -40,7 +41,7 @@
 
     <TextView
         android:id="@+id/screen_desc"
-        android:text="Owntracks requires Google Play Services"
+        android:text="@string/welcome_play_description"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
 
@@ -69,7 +70,7 @@
         android:textColor="#ffffff"
         android:gravity="center_horizontal"
         android:textSize="16sp"
-        android:text="Play services are not available"
+        android:text="@string/play_services_not_available_general"
         android:id="@+id/message"
         android:visibility="visible"
         android:layout_above="@+id/recover"
@@ -82,7 +83,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fix"
+        android:text="@string/welcomeFixIssue"
         android:id="@+id/recover"
         android:layout_above="@+id/view"
         android:visibility="gone"

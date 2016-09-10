@@ -2,11 +2,11 @@
 <resources>
     <string name="app_name">Owntracks</string>
     <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesHost">"Host"</string>
-    <string name="preferencesPort">"Port"</string>
+    <string name="preferencesHost" translatable="false">"Host"</string>
+    <string name="preferencesPort" translatable="false">"Port"</string>
     <string name="preferencesWebsocket">Use WebSockets</string>
     <string name="preferencesUserUsername">"Username"</string>
-    <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesDeviceName" translatable="false">"Device ID"</string>
     <string name="preferencesBrokerAuth">"Authentication"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
 
@@ -28,21 +28,21 @@
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesBackroundUpdates">Automatic location reporting</string>
-    <string name="preferencesTrackerId">Tracker ID</string>
+    <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
-    <string name="preferencesLocatorDisplacement">Locator background  displacement</string>
+    <string name="preferencesLocatorDisplacement">Locator background displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
     <string name="preferencesLocatorInterval">Locator background interval</string>
     <string name="preferencesLocatorIntervalSummary">Seconds between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
-    <string name="preferencesRepositorySummary">github.com/owntracks/android</string>
+    <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary">owntracks.org/booklet/</string>
-    <string name="preferencesTwitter">Twitter</string>
-    <string name="preferencesTwitterSummary">twitter.com/owntracks</string>
+    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet/</string>
+    <string name="preferencesTwitter" translatable="false">Twitter</string>
+    <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesCommunity">Community</string>
-    <string name="preferencesCommunitySummary">community.owntracks.org</string>
+    <string name="preferencesCommunitySummary" translatable="false">community.owntracks.org</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
 
@@ -81,19 +81,19 @@
     <string name="contactDetailsLocation">Location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsReportedTime">Reported</string>
-    <string name="contactDetailsTopic">Topic</string>
+    <string name="contactDetailsTopic" translatable="false">Topic</string>
     <string name="contactDetailsName">Name</string>
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
     <string name="importConfig">Import</string>
     <string name="importWarning">The following preference values will be imported:</string>
-    <string name="tls">TLS</string>
+    <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Security</string>
     <string name="accept">Accept</string>
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesOptions">Parameters</string>
-    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesKeepalive" translatable="false">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
     <string name="snackbarConnected">Connected</string>
@@ -101,7 +101,7 @@
     <string name="snackbarDisconnectedError">Disconnected with error</string>
 
 
-    <string name="ssid">SSID</string>
+    <string name="ssid" translatable="false">SSID</string>
     <string-array name="locatorAccuracy_readable">
         <item>High power</item>
         <item>Balanced power</item>
@@ -121,9 +121,9 @@
     <string name="aLocation">a location</string>
     <string name="events">Events</string>
     <string name="notificationMessageTitle">Messages</string>
-    <string name="beaconUUID">UUID</string>
-    <string name="beaconMajor">Major</string>
-    <string name="beaconMinor">Minor</string>
+    <string name="beaconUUID" translatable="false">UUID</string>
+    <string name="beaconMajor" translatable="false">Major</string>
+    <string name="beaconMinor" translatable="false">Minor</string>
     <string name="locationPermissionNotAvailable">Location access denied</string>
     <string name="title_activity_regions">Regions</string>
     <string name="title_activity_region">Region</string>
@@ -140,7 +140,7 @@
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
-    <string name="contactDetailsTrackerId">Tracker ID</string>
+    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
     <string name="waypointRemoved">Region removed</string>
 
     <string name="preferencesImportFile">Import configuration</string>
@@ -163,7 +163,7 @@
 
     <string name="play_services_not_available_recoverable">Google Play Services are not enabled or not installed</string>
     <string name="play_services_not_available_not_recoverable">Google Play Services are not available for your device</string>
-    <string name="preferencesUrl">Url</string>
+    <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">Private HTTP (beta)</string>
     <string name="messageQueued">message queued</string>
 
@@ -171,11 +171,11 @@
     <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
 
 
-    <string name="preferencesKeyModeId">mode</string>
-    <string name="preferencesKeyHost">host</string>
-    <string name="preferencesKeyIdentification">identification</string>
-    <string name="preferencesKeySecurity">security</string>
-    <string name="preferencesKeyParameters">parameters</string>
+    <string name="preferencesKeyModeId" translatable="false">mode</string>
+    <string name="preferencesKeyHost" translatable="false">host</string>
+    <string name="preferencesKeyIdentification" translatable="false">identification</string>
+    <string name="preferencesKeySecurity" translatable="false">security</string>
+    <string name="preferencesKeyParameters" translatable="false">parameters</string>
     <string name="transitionEntering">entering</string>
     <string name="transitionLeaving">leaving</string>
 
@@ -188,8 +188,12 @@
     <string name="DISCONNECTED">Disconnected</string>
     <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
     <string name="ERROR">Error</string>
-    <string name="ERROR_DATADISABLED">Data connection not available </string>
+    <string name="ERROR_DATADISABLED">Data connection not available</string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
+    <string name="welcome_play_heading" translatable="false">Google Play Services</string>
+    <string name="welcome_play_description">Owntracks requires Google Play Services</string>
+    <string name="icon_description_warning">Warning</string>
+    <string name="play_services_not_available_general">Google Play Services are not available</string>
 
 </resources>
