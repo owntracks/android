@@ -3,6 +3,8 @@ package org.owntracks.android.messages;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.Preferences;
+
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
@@ -139,12 +141,7 @@ public class MessageLocation extends MessageBase  {
     }
 
     public boolean isValidMessage() {
-        // Ignore stale location messages older than 7 days
-        Timber.v("current %s", System.currentTimeMillis());
-        Timber.v("tst %s", tst);
-        Timber.v("7 %s", TimeUnit.DAYS.toMillis(7));
-
-        return (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(7);
+        return Preferences.getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(Preferences.getIgnoreStaleLocations() );
     }
 
 }

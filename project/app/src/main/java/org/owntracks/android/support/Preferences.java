@@ -432,6 +432,16 @@ public class Preferences {
         return deviceId;
     }
 
+    @Export(key =Keys.IGNORE_STALE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public static int getIgnoreStaleLocations() {
+        return getInt(Keys.IGNORE_STALE_LOCATIONS, R.integer.valIgnoreStaleLocations);
+    }
+
+    @Export(key =Keys.IGNORE_STALE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public static void setIgnoreSTaleLocations(int days) {
+        setInt(Keys.IGNORE_STALE_LOCATIONS, days, false);
+    }
+
     // Not used on public, as many people might use the same device type
     public static String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
@@ -997,11 +1007,11 @@ public class Preferences {
         public static final String BEACON_LAYOUT                    = "beaconLayout";
         public static final String BEACON_RANGING                   = "ranging";
         public static final String BEACON_MODE                      = "beaconMode";
-
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String HOST                             = "host";
+        public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
         public static final String INFO                             = "info";
         public static final String KEEPALIVE                        = "keepalive";
         public static final String LOCATOR_ACCURACY_BACKGROUND      = "locatorAccuracyBackground";
