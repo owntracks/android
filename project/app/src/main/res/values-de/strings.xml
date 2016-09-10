@@ -84,8 +84,10 @@
         <item>Kein Energieverbrauch</item>
     </string-array>
 
-    <string name="mode_mqtt_private_label">Persönliches MQTT</string>
-    <string name="mode_mqtt_public_label">Öffentliches MQTT</string>
+    <string name="mode_mqtt_private_label">Privater Modus</string>
+    <string name="mode_mqtt_public_label">Öffentlicher Modus</string>
+    <string name="mode_http_private_label">HTTP modues</string>
+
     <string name="refresh">Aktualisieren</string>
     <string name="connectivityDisconnectedConfigIncomplete">Verbindung nicht konfiguriert</string>
     <string name="snackbarImportCompleted">Einstellungen importiert</string>
@@ -95,13 +97,13 @@
     <string name="events">Ereignisse</string>
     <string name="notificationMessageTitle">Nachrichten</string>
     <string name="locationPermissionNotAvailable">Standortzugriff verweigert</string>
-    <string name="title_activity_regions">Bereiche</string>
-    <string name="title_activity_region">Bereich</string>
+    <string name="title_activity_regions">Regionen</string>
+    <string name="title_activity_region">Region</string>
     <string name="title_activity_map">Karte</string>
     <string name="title_activity_contacts">Freunde</string>
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Einstellungen</string>
-    <string name="unableToCopyCertificate">Kopieren des Zertifikats aauf internen Speicher unmöglich</string>
+    <string name="unableToCopyCertificate">Kopieren des Zertifikats auf internen Speicher unmöglich</string>
     <string name="successCopyCertificate">Zertifikat in internen Speicher kopiert</string>
     <string name="preferencesCategoryNotificationOngoing">Dauerhafte Benachrichtigung</string>
     <string name="preferencesCategoryNotificationBackground">Hintergrund-Benachrichtigungen</string>
@@ -109,7 +111,7 @@
     <string name="preferencesCategoryAdvancedLocator">Ortung</string>
     <string name="preferencesCategoryAdvancedEncryption">Verschlüsselung</string>
     <string name="preferencesCategoryAdvancedMisc">Weiteres</string>
-    <string name="waypointRemoved">Bereich entfernt</string>
+    <string name="waypointRemoved">Region entfernt</string>
     <string name="preferencesImportFile">Konfiguration importieren</string>
     <string name="preferencesImportFileSummary">Konfiguration aus Datei importieren</string>
     <string name="preferencesExportToFile">Konfiguration exportieren</string>
@@ -127,7 +129,6 @@
     <string name="play_services_now_available">Google Play-Dienste sind jetzt verfügbar</string>
     <string name="play_services_not_available_recoverable">Google Play-Dienste sind nicht aktiviert oder installiert</string>
     <string name="play_services_not_available_not_recoverable">Google Play-Dienste sind für Dein Gerät nicht verfügbar</string>
-    <string name="mode_http_private_label">Persönliches HTTP (beta)</string>
     <string name="messageQueued">Nachricht eingereiht</string>
     <string name="connectivityDisconnectedDataDisabled">"Getrennt: Datenverbindung inaktiv"</string>
     <string name="transitionEntering">betrete</string>
@@ -152,7 +153,7 @@
     <string name="welcome_heading">Willkommen</string>
     <string name="welcome_description">Die folgenden Schritte werden Dir helfen, Owntracks einzurichten</string>
     <string name="preferencesPlayOverride">Google Play-Dienste übergehen</string>
-    <string name="preferencesPlayOverrideSummary">Google Play-Dienste nicht verwenden. Neustart erforderlich. Warnung: Keine Entwicklerunterstützung in diesem Modus! Einge Funktionen werden nicht verfügbar sein.</string>
+    <string name="preferencesPlayOverrideSummary">Google Play-Dienste nicht verwenden. Neustart erforderlich. Warnung: Keine Entwicklerunterstützung in diesem Modus! Einige Funktionen werden nicht verfügbar sein.</string>
     <string name="mqtt_private_description">Verbinde Dich mit Deinem eigenen, privaten Owntracks-Server und teile Deine Poisition mit Familie oder Freunden</string>
     <string name="mqtt_public_description">Teste Owntracks und teile Deine Position anonym mit anderen Nutzern</string>
     <string name="mode_heading">Modus</string>
