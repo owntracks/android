@@ -22,11 +22,12 @@
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
 
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/icon_description_cloud"/>
 
     <TextView
         android:id="@+id/screen_heading"
-        android:text="Mode"
+        android:text="@string/mode_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -40,7 +41,7 @@
 
     <TextView
         android:id="@+id/screen_desc"
-        android:text="Owntracks can run in one of several modes. Select the mode that best suites your needs"
+        android:text="@string/mode_description"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
 
@@ -83,14 +84,14 @@
             android:gravity="center_horizontal"
             android:textSize="16sp"
 
-            android:text="Try out Owntracks and share your location anonymously with other users" />
+            android:text="@string/mqtt_public_description" />
 
         <android.support.v7.widget.AppCompatRadioButton
             android:textColor="#ffffff"
             android:id="@+id/radioModeMqttPublic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Public MQTT"
+            android:text="@string/mode_mqtt_public_label"
             app:buttonTint="@color/md_white_1000"
             android:checked="true"
             android:layout_gravity="center_horizontal"
@@ -105,7 +106,7 @@
             android:gravity="center_horizontal"
             android:textSize="16sp"
 
-            android:text="Connect to your own private OwnTracks setup and share your location with family or friends"
+            android:text="@string/mqtt_private_description"
              />
 
         <android.support.v7.widget.AppCompatRadioButton

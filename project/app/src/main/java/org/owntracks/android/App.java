@@ -41,13 +41,10 @@ import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import timber.log.Timber;
 
 public class App extends Application  {
-    private static final String TAG = "App";
-
     private static App sInstance;
     private static SimpleDateFormat dateFormater;
     private static SimpleDateFormat dateFormaterToday;
@@ -74,7 +71,7 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Log.d(TAG, "trace / App onCreate start" + System.currentTimeMillis());
+        Timber.d("trace / App onCreate start %s", System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
@@ -110,7 +107,7 @@ public class App extends Application  {
         GeocodingProvider.initialize(App.getInstance());
         Dao.initialize(App.getInstance());
         EncryptionProvider.initialize();
-        Log.d(TAG, "trace / App async init end" + System.currentTimeMillis());
+        Timber.d("trace / App async init end %s", System.currentTimeMillis());
 
         ServiceProxy.runOrBind(sInstance, new Runnable() {
             @Override
@@ -120,7 +117,7 @@ public class App extends Application  {
         });
 
         //App.getEventBus().register(this);
-        Log.d(TAG, "trace / App onCreate done" + System.currentTimeMillis());
+        Timber.d("trace / App onCreate done %s", System.currentTimeMillis());
 
     }
 
@@ -311,14 +308,14 @@ public class App extends Application  {
     private void checkFirstStart() {
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if(p.getBoolean(Preferences.Keys._FIST_START, true)) {
-            Log.v(TAG, "Initial application launch");
+        if(p.getBoolean(Preferences.Keys._FIRST_START, true)) {
+            Timber.v("Initial application launch");
             String uuid = UUID.randomUUID().toString().toUpperCase();
 
-            p.edit().putBoolean(Preferences.Keys._FIST_START , false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
+            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
 
         } else {
-            Log.v(TAG, "Consecutive application launch");
+            Timber.v("Consecutive application launch");
         }
     }
 

@@ -8,8 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import org.owntracks.android.wrapper.GoogleApiAvailability;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -62,22 +61,27 @@ public class ActivityStatus extends ActivityBase {
         String status;
         int playAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         switch (playAvailable) {
-            case ConnectionResult.SERVICE_MISSING:
+            case GoogleApiAvailability.SERVICE_MISSING:
+            case GoogleApiAvailability.API_UNAVAILABLE:
                 status = "Not available";
                 break;
 
-            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
+            case GoogleApiAvailability.SERVICE_VERSION_UPDATE_REQUIRED:
                 status = "Update required";
                 break;
 
-            case ConnectionResult.SERVICE_DISABLED:
-            case ConnectionResult.SERVICE_INVALID:
+            case GoogleApiAvailability.SERVICE_DISABLED:
+            case GoogleApiAvailability.SERVICE_INVALID:
                 status = "Inactive";
                 break;
 
             default:
                 status = "Available ("+ GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE + ")";
                 break;
+        }
+
+        if (GoogleApiAvailability.getInstance().isWrapper()){
+            status+=" (wrapped)";
         }
 
         return status;

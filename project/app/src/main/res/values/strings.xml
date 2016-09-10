@@ -27,7 +27,7 @@
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
-    <string name="preferencesBackroundUpdates">Automatic location reporting</string>
+    <string name="preferencesBackgroundUpdates">Automatic location reporting</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator background displacement</string>
@@ -60,6 +60,8 @@
     <string name="preferencesPubExtendedData">Extended data</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
+    <string name="preferencesPlayOverrideSummary">Do not use Google Play Services. Needs restart. Warning: unsupported mode! Some features will be not available.</string>
+    <string name="preferencesPlayOverride">Override Google Play Services</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
@@ -135,7 +137,7 @@
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
     <string name="successCopyCertificate">Certificate copied to internal storage</string>
     <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
-    <string name="preferencesCategoryNotificatinBackground">Background notifications</string>
+    <string name="preferencesCategoryNotificationBackground">Background notifications</string>
     <string name="preferencesCategoryAdvancedServices">Services</string>
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
@@ -191,9 +193,25 @@
     <string name="ERROR_DATADISABLED">Data connection not available</string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
-    <string name="welcome_play_heading" translatable="false">Google Play Services</string>
+    <string name="welcome_play_heading">Google Play Services</string>
     <string name="welcome_play_description">Owntracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
     <string name="play_services_not_available_general">Google Play Services are not available</string>
+    <string name="play_override_continue">Yes, continue at own risk</string>
+    <string name="play_override_question">It seems, Google Play Services cannot be used on your device. If you continue, this app is operating in unsupported mode, certain features may not be available.</string>
+    <string name="welcome_heading">Welcome</string>
+    <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
+    <string name="mode_heading">Mode</string>
+    <string name="mode_description">Owntracks can run in one of several modes. Select the mode that best suites your needs</string>
+    <string name="mqtt_public_description">Try out Owntracks and share your location anonymously with other users</string>
+    <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
+    <string name="permissions_heading">Permissions</string>
+    <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
+    <string name="permissions_granted">Permissions have been granted</string>
+    <string name="icon_description_cloud">Cloud</string>
+    <string name="icon_description_owntracks">Owntracks</string>
+    <string name="enjoy_description">Enjoy Owntracks</string>
+    <string name="done_heading">Done</string>
+    <string name="icon_description_done">Done</string>
 
 </resources>
