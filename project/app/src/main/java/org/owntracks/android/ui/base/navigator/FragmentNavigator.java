@@ -1,8 +1,13 @@
 package org.owntracks.android.ui.base.navigator;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
+import com.mikepenz.materialdrawer.Drawer;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -26,12 +31,17 @@ public class FragmentNavigator extends BaseNavigator {
     }
 
     @Override
-    final FragmentActivity getActivity() {
-        return fragment.getActivity();
+    final AppCompatActivity getActivity() {
+        return AppCompatActivity.class.cast(fragment.getActivity());
     }
 
     @Override
     final FragmentManager getChildFragmentManager() {
         return fragment.getChildFragmentManager();
+    }
+
+    @Override
+    public Drawer attachDrawer(@NonNull Toolbar toolbar) {
+        throw new UnsupportedOperationException("Fragments cannot attach to a drawer");
     }
 }

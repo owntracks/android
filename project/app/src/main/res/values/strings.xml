@@ -76,6 +76,8 @@
     <string name="preferencesExport">Export</string>
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
+    <string name="menuCurrentLoction">Current location</string>
+
     <string name="contactDetailsLocation">Location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsReportedTime">Reported</string>

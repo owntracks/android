@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'realm-android'
 apply plugin: 'org.greenrobot.greendao'
 
 def versionMajor = 1
@@ -29,11 +28,13 @@ android {
             minifyEnabled false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
         debug {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
             minifyEnabled false
+
         }
 
     }
@@ -54,13 +55,6 @@ android {
             storeFile file('./debug-keystore.jks')
             storePassword '__DEBUG__'
         }
-    }
-    packagingOptions {
-        // Remove unneeded Realm native libs (nearly no devices use these)
-        exclude 'lib/armeabi/librealm-jni.so'
-        exclude 'lib/mips/librealm-jni.so'
-        exclude 'lib/x86/librealm-jni.so'
-        exclude 'lib/x86_64/librealm-jni.so'
     }
 }
 repositories {
@@ -100,8 +94,7 @@ dependencies {
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
+    compile 'com.github.nitrico.lastadapter:lastadapter:1.2.1'
     compile 'com.jakewharton.timber:timber:4.1.2'
 
 
@@ -123,14 +116,9 @@ dependencies {
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
-    compile "ch.acra:acra:4.8.5"
-
     apt 'com.google.guava:guava:19.0' // needed by Dagger
     apt "com.google.dagger:dagger-compiler:${daggerVersion}"
     compile "com.google.dagger:dagger:${daggerVersion}"
-
-    compile 'io.reactivex:rxjava:1.1.8'
-    compile 'io.reactivex:rxandroid:1.2.1'
 
 }
 apt {

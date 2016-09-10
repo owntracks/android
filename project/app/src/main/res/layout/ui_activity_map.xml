@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable name="vm" type="org.owntracks.android.ui.map.MapViewModel" />
+        <import type="org.owntracks.android.App"/>
         <import type="android.view.View" />
     </data>
 
@@ -26,14 +28,13 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         </android.support.design.widget.AppBarLayout>
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/map"
+        <FrameLayout
+            android:id="@+id/mapContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
 
         <LinearLayout
-
             android:id="@+id/bottomSheetLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +46,7 @@
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
-            <include android:id="@+id/contactPeek" layout="@layout/row_contact"/>
+            <include bind:contact="@{vm.contact}" android:id="@+id/contactPeek" layout="@layout/ui_row_contact"/>
 
 
             <TextView
@@ -54,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@string/na"
+                android:text="@{App.formatDate(vm.contact.fusedLocationDate)}"
                 android:paddingLeft="72dp"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
@@ -64,7 +65,7 @@
                 android:id="@+id/locationDateLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@string/contactDetailsReportedTime"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -78,7 +79,7 @@
                 android:id="@+id/acc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@{vm.contact.fusedLocationAccuracy}"
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -92,7 +93,7 @@
                 android:id="@+id/accLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@string/contactDetailsAccuracy"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -115,7 +116,7 @@
                 android:id="@+id/tid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@{vm.contact.trackerId}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -128,7 +129,7 @@
                 android:id="@+id/tidLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@string/contactDetailsTrackerId"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -140,7 +141,7 @@
                 android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.fusedContactId}"
+                android:text="@{vm.contact.id}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -152,7 +153,7 @@
                 android:id="@+id/topicLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@string/contactDetailsTopic"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -169,14 +170,13 @@
                 android:layout_height="48dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                android:text="@string/na"
+                android:src="@drawable/ic_more_horiz_black_24dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:padding="12dp"
                 android:tint="@color/buttonTint"
                 android:tintMode="src_in"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 />
-
 
         </LinearLayout>
 

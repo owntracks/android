@@ -166,7 +166,7 @@ public class Events {
 			this.l = l;
 		}
 
-		public GeocodableLocation getGeocodableLocation() {
+		public GeocodableLocation getLocation() {
 			return this.l;
 		}
 

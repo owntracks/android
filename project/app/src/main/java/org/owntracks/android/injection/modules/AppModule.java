@@ -14,8 +14,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import timber.log.Timber;
 
 /* Copyright 2016 Patrick Löwenstein
@@ -58,20 +56,6 @@ public class AppModule {
     EventBus provideEventbus() {
         Timber.v("loading bus with index");
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).build();
-    }
-
-
-    @Provides
-    @PerApplication
-    static RealmConfiguration provideRealmConfiguration(@AppContext Context context) {
-        RealmConfiguration.Builder builder = new RealmConfiguration.Builder(context);
-        if(BuildConfig.DEBUG) { builder = builder.deleteRealmIfMigrationNeeded(); }
-        return builder.build();
-    }
-
-    @Provides
-    static Realm provideRealm(RealmConfiguration realmConfiguration) {
-        return Realm.getInstance(realmConfiguration);
     }
 
 }

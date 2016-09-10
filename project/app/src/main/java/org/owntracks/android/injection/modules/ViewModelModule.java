@@ -26,8 +26,8 @@ public abstract class ViewModelModule {
 
     // Activities
     @Binds
-    abstract MapMvvm.ViewModel bindMapViewModel(MapViewModel detailViewModel);
+    abstract MapMvvm.ViewModel bindMapViewModel(MapViewModel mapViewModel);
 
     @Binds
-    abstract ContactsMvvm.ViewModel bindContactsViewModel(ContactsViewModel detailViewModel);
+    abstract ContactsMvvm.ViewModel bindContactsViewModel(ContactsViewModel contactsViewModel);
 }

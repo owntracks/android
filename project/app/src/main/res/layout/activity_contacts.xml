@@ -2,14 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable
-            name="viewModel"
-            type="org.owntracks.android.model.ContactsViewModel"/>
-        <variable
-            name="adapterFactory"
-            type="me.tatarka.bindingcollectionadapter.factories.BindingRecyclerViewAdapterFactory"/>
-
-        <import type="me.tatarka.bindingcollectionadapter.LayoutManagers" />
 
     </data>
 
@@ -25,9 +17,6 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:adapter="@{adapterFactory}"
-            app:layoutManager="@{LayoutManagers.linear()}"
-            app:items="@{viewModel.items}"
-            app:itemView="@{viewModel.itemView}" />
+             />
     </LinearLayout>
 </layout>

@@ -1,5 +1,9 @@
 package org.owntracks.android.ui.contacts;
 
+import android.databinding.ObservableList;
+import android.databinding.ObservableMap;
+
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
@@ -19,11 +23,12 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 public interface ContactsMvvm {
 
     interface View extends MvvmView {
-
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        String getFusedName();
-        String getFusedLocation();
+        ObservableList<FusedContact> getRecyclerItems();
+
+        void onContactClick(FusedContact cast);
+        void onContactLongClick(FusedContact cast);
     }
 }

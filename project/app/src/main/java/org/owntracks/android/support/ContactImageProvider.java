@@ -149,24 +149,24 @@ public class ContactImageProvider {
             cacheLevelTid = new ArrayMap<>();
         }
 
-        public void putLevelCard(String key, Bitmap value) {
+        public synchronized void putLevelCard(String key, Bitmap value) {
             cacheLevelCard.put(key, value);
             cacheLevelTid.remove(key);
         }
-        public void putLevelTid(String key, Bitmap value) {
+        public synchronized void putLevelTid(String key, Bitmap value) {
             cacheLevelTid.put(key, value);
         }
-        public Bitmap getLevelCard(String key) {
+        public synchronized Bitmap getLevelCard(String key) {
             return cacheLevelCard.get(key);
         }
-        public Bitmap getLevelTid(String key) {
+        public synchronized Bitmap getLevelTid(String key) {
             return cacheLevelTid.get(key);
         }
-        public void clear() {
+        public synchronized void clear() {
             cacheLevelCard.clear();
             cacheLevelTid.clear();
         }
-        public void clearLevelCard(String key) {
+        public synchronized void clearLevelCard(String key) {
             cacheLevelCard.remove(key);
 
         }

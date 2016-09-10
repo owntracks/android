@@ -1,45 +1,56 @@
 package org.owntracks.android.ui.contacts;
 
 import android.content.Context;
+import android.databinding.ObservableList;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.owntracks.android.BR;
+import org.owntracks.android.R;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.ui.base.view.MvvmView;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
+import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
 
 @PerActivity
-public class ContactsViewModel<V extends MvvmView> extends BaseViewModel<V> implements ContactsMvvm.ViewModel<V> {
+public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implements ContactsMvvm.ViewModel<ContactsMvvm.View> {
 
+    private final ContactsRepo contactsRepo;
 
     @Inject
-    public ContactsViewModel(@AppContext Context context) {
+    public ContactsViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
+        this.contactsRepo = contactsRepo;
+
+    }
+
+    public void attachView(@NonNull ContactsMvvm.View view, @Nullable Bundle savedInstanceState) {
+        super.attachView(view, savedInstanceState);
+    }
+
+
+
+    @Override
+    public ObservableList<FusedContact> getRecyclerItems() {
+        return contactsRepo.getAllAsList();
+    }
+
+    @Override
+    public void onContactClick(FusedContact c) {
+        Bundle b = new Bundle();
+       // b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, );
+       // navigator.get().startActivity(MapActivity.class, );
+
 
     }
 
     @Override
-    public String getFusedName() {
-        return null;
-    }
+    public void onContactLongClick(FusedContact cast) {
 
-    @Override
-    public String getFusedLocation() {
-        return null;
     }
 }

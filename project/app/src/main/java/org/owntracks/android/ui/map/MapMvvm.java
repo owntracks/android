@@ -1,10 +1,12 @@
 package org.owntracks.android.ui.map;
 
+import android.databinding.ObservableMap;
 import android.support.annotation.NonNull;
 
 import org.owntracks.android.data.model.Contact;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
+import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.contacts.ContactsMvvm;
 
 import java.util.List;
@@ -25,20 +27,29 @@ import java.util.List;
 public interface MapMvvm {
 
     interface View extends MvvmView {
-        void updateMarker(List<FusedContact> contacts);
-        void updateMarker(FusedContact contact);
-        void removeMarker(String key);
+        void setBottomSheetExpanded();
+        void setBottomSheetCollapsed();
+        void setBottomSheetHidden();
+
+        void contactUpdate(FusedContact contact);
+        void contactUpdateActive();
+
+        void setModeContact();
+        void modeDevice();
     }
 
-    interface ViewModel extends ContactsMvvm.ViewModel<View> {
-        String getFusedAccuracy();
-        String getFusedTimestamp();
-        String getFusedContactId();
-        int getBottomSheetState();
+    interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
+        FusedContact getContact();
+        List<FusedContact> getContacts();
+
 
         void onMapReady();
-        void onMapMarkerClick(@NonNull Contact c);
+        void onMarkerClick(@NonNull String contactId);
         void onMapClick();
+        void onBottomSheetLongClick();
+        void onBottomSheetClick();
+        void onMenuCenterDeviceClicked();
 
+        void restore(String contactId);
     }
 }
