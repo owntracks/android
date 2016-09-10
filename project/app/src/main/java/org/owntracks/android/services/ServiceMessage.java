@@ -228,35 +228,13 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Override
     public void processIncomingMessage(MessageLocation message) {
-        Timber.v("type:location, key:%s", message.getContactKey());
+        App.getContactsRepo().update(message.getContactKey(),message);
 
-        //GeocodingProvider.resolve(message);
-        FusedContact c = App.getFusedContact(message.getContactKey());
-
-        if (c == null) {
-            c = new FusedContact(message.getContactKey());
-            c.setMessageLocation(message);
-            App.addFusedContact(c);
-        } else {
-
-            //Only update contact with new location if the location message is different from the one that is already set
-            if(c.setMessageLocation(message))
-                App.updateFusedContact(c);
-        }
     }
 
     @Override
     public void processIncomingMessage(MessageCard message) {
-        FusedContact c = App.getFusedContact(message.getContactKey());
-
-        if (c == null) {
-            c = new FusedContact(message.getContactKey());
-            c.setMessageCard(message);
-            App.addFusedContact(c);
-        } else {
-            c.setMessageCard(message);
-            App.updateFusedContact(c);
-        }
+        App.getContactsRepo().update(message.getContactKey(),message);
     }
 
     @Override

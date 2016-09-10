@@ -4,11 +4,14 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
+
+import timber.log.Timber;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageLocation extends MessageBase  {
@@ -133,6 +136,15 @@ public class MessageLocation extends MessageBase  {
     public void setTid(String tid) {
         super.setTid(tid);
         notifyContactPropertyChanged();
+    }
+
+    public boolean isValidMessage() {
+        // Ignore stale location messages older than 7 days
+        Timber.v("current %s", System.currentTimeMillis());
+        Timber.v("tst %s", tst);
+        Timber.v("7 %s", TimeUnit.DAYS.toMillis(7));
+
+        return (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(7);
     }
 
 }

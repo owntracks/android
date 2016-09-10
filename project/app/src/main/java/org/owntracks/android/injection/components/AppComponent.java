@@ -14,7 +14,6 @@ import org.owntracks.android.injection.scopes.PerApplication;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import io.realm.Realm;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -35,7 +34,6 @@ public interface AppComponent {
     @AppContext Context context();
     Resources resources();
 
-    Realm realm();
     ContactsRepo contactsRepo();
     EventBus eventBus();
 

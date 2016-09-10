@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.base.navigator.Navigator;
 

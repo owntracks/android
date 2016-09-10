@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.base;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -7,18 +8,23 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.support.Events;
+import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-import io.realm.Realm;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -38,7 +44,7 @@ import io.realm.Realm;
  * This class provides the binding and the view model to the subclass. The
  * view model is injected and the binding is created when the content view is set.
  * Each subclass therefore has to call the following code in onCreate():
- *    activityComponent().inject(this);
+ *    ()activityComponent.inject(this);
  *    setAndBindContentView(R.layout.my_activity_layout, savedInstanceState);
  *
  * After calling these methods, the binding and the view model is initialized.
@@ -52,12 +58,16 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
     protected B binding;
     @Inject protected V viewModel;
-
-    // Always open a Realm in an Activity for avoiding open/close
-    // overhead (a Realm instance is cached for each thread)
-    @Inject Realm realm;
+    @Inject protected EventBus eventBus;
+    @Inject protected Provider<Navigator> navigator;
 
     private ActivityComponent mActivityComponent;
+
+    protected boolean hasEventBus = true;
+
+    protected void setHasEventBus(boolean enable) {
+        hasEventBus = enable;
+    }
 
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
@@ -92,11 +102,29 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     protected void onDestroy() {
         super.onDestroy();
         if(viewModel != null) { viewModel.detachView(); }
-        if(realm != null) { realm.close(); }
         binding = null;
         viewModel = null;
         mActivityComponent = null;
-        realm = null;
-
     }
+
+
+    public void onResume() {
+        super.onResume();
+
+        if(hasEventBus && !eventBus.isRegistered(viewModel))
+            eventBus.register(viewModel);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if(eventBus.isRegistered(viewModel))
+            eventBus.unregister(viewModel);
+    }
+
+    protected Bundle getExtrasBundle(Intent intent) {
+        return intent.getBundleExtra(Navigator.EXTRA_ARGS);
+    }
+
 }

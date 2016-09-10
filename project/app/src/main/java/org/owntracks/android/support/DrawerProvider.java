@@ -15,12 +15,13 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityBase;
-import org.owntracks.android.activities.ActivityContacts;
-import org.owntracks.android.activities.ActivityMap;
 import org.owntracks.android.activities.ActivityPreferences;
 import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.activities.ActivityRegions;
+import org.owntracks.android.ui.contacts.ContactsActivity;
+import org.owntracks.android.ui.map.MapActivity;
 
+@Deprecated
 public class DrawerProvider {
     private static final String TAG = "DrawerProvider";
 
@@ -80,8 +81,8 @@ public class DrawerProvider {
                  .withStickyFooterShadow(false)
                  .withStickyFooterDivider(true)
                 .addDrawerItems(
-                        drawerItemForClass(activity, ActivityMap.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
-                        drawerItemForClass(activity, ActivityContacts.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
+                        drawerItemForClass(activity, MapActivity.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
+                        drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
                       //  TODO: drawerItemForClass(activity, ActivityFeatured.class, R.string.title_activity_featured, R.drawable.ic_info_black_24dp)
                         drawerItemForClass(activity, ActivityRegions.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp)
 

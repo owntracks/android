@@ -1,21 +1,22 @@
 package org.owntracks.android.ui.map;
 
 import android.content.Context;
-import android.databinding.ObservableMap;
+import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.util.Log;
 
-import org.owntracks.android.data.model.Contact;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.ui.contacts.ContactsViewModel;
+import org.owntracks.android.support.Events;
+import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,23 +38,22 @@ import timber.log.Timber;
  * limitations under the License. */
 
 @PerActivity
-public class MapViewModel extends ContactsViewModel<MapMvvm.View> implements MapMvvm.ViewModel {
+public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View> {
 
-
+    private static final int MODE_CENTER_DEVICE = 1;
+    private static final int MODE_CENTER_CONTACT = 1;
 
     private final Context ctx;
     private final ContactsRepo contactsRepo;
 
-    private Contact activeContact;
-    private int mBottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
-    private ObservableMap<String, FusedContact> contacts;
+    private FusedContact activeContact;
 
+    int mode = MODE_CENTER_DEVICE;
+    private boolean mapReady = false;
 
     @Inject
     public MapViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
-        super(context);
         Timber.v("onCreate");
-
         this.ctx = context.getApplicationContext();
         this.contactsRepo = contactsRepo;
     }
@@ -66,85 +66,98 @@ public class MapViewModel extends ContactsViewModel<MapMvvm.View> implements Map
     public void restoreInstanceState(@NonNull Bundle savedInstanceState) {
     }
 
-    public void attachView(@NonNull MapMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
-    }
-
-
-        @Override
+    @Override
     public void detachView() {
         super.detachView();
     }
 
+    public void attachView(@NonNull MapMvvm.View view, @Nullable Bundle savedInstanceState) {
+        super.attachView(view, savedInstanceState);
 
-    @Override
-    public int getBottomSheetState() {
-        return mBottomSheetState;
-    }
-
-
-    @Override
-    public String getFusedAccuracy() {
-        return "acc";
     }
 
     @Override
-    public String getFusedTimestamp() {
-        return "tst";
+    @Bindable
+    public FusedContact getContact() {
+        return activeContact;
     }
 
     @Override
-    public String getFusedContactId() {
-        return "id";
+    public List<FusedContact> getContacts() {
+        return this.contactsRepo.getAllAsList();
+    }
+
+    private void setContact(FusedContact c) {
     }
 
     @Override
     public void onMapReady() {
-        Timber.v("onMapReady");
-    }
+        Timber.v("map is ready mode: %s", mode);
+        this.mapReady = true;
 
-    private void subscribeToContactChanges() {
-         contacts = contactsRepo.getAll();
-        contacts.addOnMapChangedCallback(new ContactsRepoSubscriber());
-    }
-
-    private class ContactsRepoSubscriber extends ObservableMap.OnMapChangedCallback<ObservableMap<String, FusedContact>, String, FusedContact>{
-        @Override
-        public void onMapChanged(ObservableMap<String, FusedContact> map, String key) {
-            FusedContact c = map.get(key);
-            Timber.v("changedKey:%s", key);
-            if(c == null)
-                getView().removeMarker(key);
-            else
-                getView().updateMarker(c);
-        }
     }
 
 
     @Override
-    public void onMapMarkerClick(@NonNull Contact c) {
-
+    public void restore(@NonNull String contactId) {
+        Timber.v("restoring contact id:%s", contactId);
+        activateContact(contactId);
     }
+
+    @Override
+    public void onMarkerClick(@NonNull String contactId) {
+        activateContact(contactId);
+    }
+
 
     @Override
     public void onMapClick() {
-        hideBottomSheet();
+        clearContact();
     }
 
-    private void hideBottomSheet() {
-        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    private void expandBottomSheet() {
-        setBottomSheetState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-    private void collapseBottomSheet() {
-        setBottomSheetState(BottomSheetBehavior.STATE_COLLAPSED);
+    @Override
+    public void onBottomSheetLongClick() {
+        getView().setModeContact();
     }
 
 
-    public void setBottomSheetState(int bottomSheetState) {
-        this.mBottomSheetState = bottomSheetState;
-        notifyChange();
+    private void activateContact(@NonNull String contactId) {
+        activeContact = contactsRepo.getById(contactId);
+        Timber.v("contactId:%s, obj:%s ", contactId, activeContact);
+
+        notifyPropertyChanged(BR.contact);
+        getView().setBottomSheetCollapsed();
+        getView().setModeContact();
+
     }
+
+    private void clearContact() {
+        activeContact = null;
+        notifyPropertyChanged(BR.contact);
+        getView().setBottomSheetHidden();
+    }
+
+    @Override
+    public void onBottomSheetClick() {
+        getView().setBottomSheetExpanded();
+    }
+
+    @Override
+    public void onMenuCenterDeviceClicked() {
+        mode = MODE_CENTER_DEVICE;
+        getView().modeDevice();
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(FusedContact c) {
+
+        if(c != activeContact)
+            getView().contactUpdate(c);
+        else
+            getView().contactUpdateActive();
+
+    }
+
 }

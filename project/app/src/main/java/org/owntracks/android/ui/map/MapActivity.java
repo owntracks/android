@@ -1,85 +1,277 @@
 package org.owntracks.android.ui.map;
 
-import android.location.Location;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.PopupMenu;
+import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.data.model.Contact;
-import org.owntracks.android.databinding.ActivityMapBinding;
 import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.services.ServiceLocator;
+import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.ui.base.navigator.Navigator;
 
-import java.util.List;
+import java.util.WeakHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 import timber.log.Timber;
 
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
-public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
+public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private Menu menu = null;
+    private static final long ZOOM_LEVEL_WOLRD = 1;
+    private static final long ZOOM_LEVEL_CONTINENT = 5;
+    private static final long ZOOM_LEVEL_CITY = 10;
+    private static final long ZOOM_LEVEL_STREET = 15;
+    private static final long ZOOM_LEVEL_BUILDING = 20;
+    public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
+
     private GoogleMap mMap;
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+    private MapLocationSource mMapLocationSource;
+
+
+    private static boolean FLAG_STATE_MAP_READY = false;
+    private static boolean FLAG_STATE_LOCATION_READY = false;
+
+    private static boolean FLAG_DATA_UPDATED_DEVICE = false;
+    private static boolean FLAG_DATA_UPDATED_CONTACT_ACTIVE = false;
+    private static boolean FLAG_DATA_UPDATED_CONTACT_ALL = false;
+
+    private static final int FLAG_ACTION_MODE_FREE = 0;
+    private static final int FLAG_ACTION_MODE_DEVICE = 1;
+    private static final int FLAG_ACTION_MODE_CONTACT = 2;
+    private static int FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
+
+    private String activeContactId;
+
+    // EVENT ENGINE ACTIONS
+    private void queueActionModeDevice() {
+        FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
+        FLAG_DATA_UPDATED_DEVICE = true;  // misuse data update flag to center if ready
+        executePendingActions();
+    }
+
+    private void queueActionModeContact() {
+        FLAG_ACTION_MODE = FLAG_ACTION_MODE_CONTACT;
+        executePendingActions();
+    }
+
+
+    private void queueActionModeFree() {
+        FLAG_ACTION_MODE = FLAG_ACTION_MODE_FREE;
+        executePendingActions();
+    }
+
+
+    private void queueActionMapUpdate() {
+        FLAG_DATA_UPDATED_CONTACT_ALL = true;
+        executePendingActions();
+    }
+
+
+    private void executePendingActions() {
+        if(!FLAG_STATE_MAP_READY) {
+            return;
+        }
+
+        // MAP NEEDS UPDATE. HANDLE BEFORE VIEW UPDATES
+        if(FLAG_DATA_UPDATED_CONTACT_ALL) {
+            FLAG_DATA_UPDATED_CONTACT_ALL = false;
+            doUpdateMarkerAll();
+        }
+        // DEVICE OR ACTIVE CONTACT UPDATED. UPDATE VIEW
+        if(FLAG_STATE_LOCATION_READY && FLAG_DATA_UPDATED_DEVICE && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
+            FLAG_DATA_UPDATED_DEVICE = false;
+            doCenterDevice();
+        } else if (FLAG_DATA_UPDATED_CONTACT_ACTIVE && (FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT)) {
+            FLAG_DATA_UPDATED_CONTACT_ACTIVE = false;
+            doCenterContact();
+        }
+
+
+
+
+    }
+
+
+    // EVENT ENGINE STATE CALLBACKS
+    private void onLocationSourceUpdated() {
+        FLAG_STATE_LOCATION_READY = true;
+        FLAG_DATA_UPDATED_DEVICE = true;
+        executePendingActions();
+    }
+
+    private void onStateMapReady() {
+        FLAG_STATE_MAP_READY = true;
+        FLAG_DATA_UPDATED_CONTACT_ALL = true;
+        executePendingActions();
+    }
+
+
+    private void onActiveContactUpdated() {
+        FLAG_DATA_UPDATED_CONTACT_ACTIVE = true;
+        executePendingActions();
+    }
+
+    @Inject
+    protected Provider<Navigator> navigator;
+
+    WeakHashMap<String, Marker> mMarkers = new WeakHashMap <String,Marker>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        Timber.v("setAndBindContentView");
         setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
+
 
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setTitle(getTitle());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        binding.map.getMapAsync(this);
+        navigator.get().attachDrawer(binding.toolbar);
+
+        FragmentManager fm = getSupportFragmentManager();
+        SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
+        this.mMapLocationSource = new MapLocationSource();
+
+        App.postOnMainHandlerDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initMapDelayed();
+            }
+        }, 500);
+
+        this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
+        binding.contactPeek.contactRow.setOnClickListener(this);
+        binding.contactPeek.contactRow.setOnLongClickListener(this);
+        binding.moreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(v);
+
+            }
+        });
+
+        setBottomSheetHidden();
+
+
+    }
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntentExtras(intent);
     }
 
+
+
+
+    private void handleIntentExtras(Intent intent) {
+        Timber.v("handleIntentExtras");
+
+        Bundle b = getExtrasBundle(intent);
+        if(b != null) {
+            Timber.v("intent has extras from navigator");
+            String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
+            if(contactId != null) {
+                viewModel.restore(contactId);
+            }
+        }
+    }
+
+
     @Override
+    public void onResume() {
+        super.onResume();
+        queueActionMapUpdate();
+        handleIntentExtras(getIntent());
+
+    }
+    public void initMapDelayed() {
+        Timber.v("trace start %s", System.currentTimeMillis());
+
+        FragmentManager fm = getSupportFragmentManager();
+        SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
+        fm.beginTransaction().replace(R.id.mapContainer, supportMapFragment).commit();
+
+        supportMapFragment.getMapAsync(this);
+        Timber.v("trace end %s", System.currentTimeMillis());
+
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_map, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_report) {
+
+
+            PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
+            try {
+                p.send();
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
+            return true;
+        } else if (itemId == R.id.menu_mylocation) {
+            viewModel.onMenuCenterDeviceClicked();
+            return true;
+        } else if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return false;
     }
 
-
+    // MAP CALLBACKS
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Timber.v("onMapReady");
+
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
         this.mMap.setLocationSource(mMapLocationSource);
-        //this.map.setMyLocationEnabled(true);
+        this.mMap.setMyLocationEnabled(true);
         this.mMap.getUiSettings().setMyLocationButtonEnabled(false);
         this.mMap.setOnMapClickListener(this);
         this.mMap.setOnMarkerClickListener(this);
@@ -94,31 +286,101 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
                 return null;
             }
         });
+        onStateMapReady();
         viewModel.onMapReady();
+
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
+        queueActionModeFree();
         viewModel.onMapClick();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(marker.getTag() != null)
-            viewModel.onMapMarkerClick(Contact.class.cast(marker.getTag()));
+        if(marker.getTag() != null) {
+            viewModel.onMarkerClick(String.class.cast(marker.getTag()));
+        }
         return true;
     }
 
-    LocationSource mMapLocationSource = new LocationSource() {
+    // MAP INTERACTION
+    private void doCenterDevice() {
+        doUpdateCamera(mMapLocationSource.getLatLng(), ZOOM_LEVEL_STREET);
+
+    }
+
+    private void doCenterContact() {
+        doUpdateCamera(viewModel.getContact().getLatLng(), ZOOM_LEVEL_STREET);
+    }
+
+    private void doUpdateCamera(LatLng latLng, long zoom) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    }
+
+    private void doUpdateMarkerAll() {
+        for (Object c : viewModel.getContacts()) {
+            doUpdateMarkerSingle(FusedContact.class.cast(c));
+        }
+    }
+
+    private void doUpdateMarkerSingle(@NonNull FusedContact contact) {
+        Timber.v("updating single id:%s", contact.getId());
+
+        if (!contact.hasLocation() || mMap == null)
+            return;
+
+        Marker m = mMarkers.get(contact.getId());
+
+        if (m != null) {
+            m.setPosition(contact.getLatLng());
+        } else {
+            m = mMap.addMarker(new MarkerOptions().position(contact.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            m.setTag(contact.getId());
+            mMarkers.put(contact.getId(), m);
+        }
+
+        ContactImageProvider.setMarkerAsync(m, contact);
+
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_navigate:
+                FusedContact c = viewModel.getContact();
+                if(c != null && c.hasLocation()) {
+                    LatLng l = c.getLatLng();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
+                }
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+
+    public class MapLocationSource implements LocationSource {
         LocationSource.OnLocationChangedListener mListener;
-        Location mLocation;
+        GeocodableLocation mLocation;
+
+        public MapLocationSource() {
+            super();
+            App.getEventBus().register(this);
+        }
 
         @Override
         public void activate(OnLocationChangedListener onLocationChangedListener) {
             mListener = onLocationChangedListener;
             if(mLocation != null)
                 this.mListener.onLocationChanged(mLocation);
-            App.getEventBus().register(this);
         }
 
         @Override
@@ -127,31 +389,89 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             App.getEventBus().unregister(this);
         }
 
-        @Subscribe(threadMode = ThreadMode.MAIN)
-        public void update(@NonNull Location l) {
-            this.mLocation = l;
+        @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
+        public void update(Events.CurrentLocationUpdated l) {
+            Timber.v("update to location: %s", l.getLocation().toLatLonString());
+            this.mLocation = l.getLocation();
             if(mListener != null)
-                this.mListener.onLocationChanged(l);
+                this.mListener.onLocationChanged(this.mLocation);
+            onLocationSourceUpdated();
         }
+
+        public boolean isAvailable() {
+            return mLocation != null;
+        }
+
+        public GeocodableLocation getLocation() {
+            return mLocation;
+        }
+        public LatLng getLatLng() {
+            return mLocation.getLatLng();
+        }
+
     };
 
+    // BOTTOM SHEET CALLBACKS
     @Override
-    public void updateMarker(List<FusedContact> contacts) {
-        Timber.v("updating list");
-        for (FusedContact c : contacts) {
-           updateMarker(c);
-        }
+    public void onClick(View view) {
+        viewModel.onBottomSheetClick();
     }
 
     @Override
-    public void updateMarker(FusedContact contact) {
-        Timber.v("updating single id:%s", contact.getId());
+    public boolean onLongClick(View view) {
+        viewModel.onBottomSheetLongClick();
+        return true;
+    }
+
+    @Override
+    public void setBottomSheetExpanded() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    @Override
+    public void setBottomSheetCollapsed() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
     }
 
     @Override
-    public void removeMarker(String key) {
-        Timber.v("removing single id:%s", key);
+    public void setBottomSheetHidden() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+
+    @Override
+    public void contactUpdate(FusedContact c) {
+        doUpdateMarkerSingle(c);
+    }
+
+    @Override
+    public void contactUpdateActive() {
+        onActiveContactUpdated();
+        doUpdateMarkerSingle(viewModel.getContact());
+
 
     }
+
+    @Override
+    public void modeDevice() {
+        queueActionModeDevice();
+    }
+
+
+    @Override
+    public void setModeContact() {
+        queueActionModeContact();
+    }
+
+
+    private void showPopupMenu(View v) {
+
+
+        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(this);
+        popupMenu.show();
+    }
+
 }

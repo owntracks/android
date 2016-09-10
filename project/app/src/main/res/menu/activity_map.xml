@@ -15,7 +15,7 @@
         android:icon="@drawable/ic_mylocation"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:title="@string/publish"/>
+        android:title="@string/menuCurrentLoction"/>
 
 
 </menu>

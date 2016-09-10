@@ -569,7 +569,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		List<String> topics = new ArrayList<>();
 		String subTopicBase = Preferences.getSubTopic();
 
-		if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
+		if(subTopicBase.equals(" ")) // Don't subscribe if base topic is invalid
+			return;
+		else if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
 			topics.add(subTopicBase);
 		} else {
 

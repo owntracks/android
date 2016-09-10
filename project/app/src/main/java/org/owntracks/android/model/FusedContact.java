@@ -3,6 +3,7 @@ package org.owntracks.android.model;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,7 +42,7 @@ public class FusedContact extends BaseObservable {
         this.imageProvider = imageProvider;
     }
 
-    public FusedContact(String id) {
+    public FusedContact(@NonNull String id) {
         Log.v(TAG, "new contact allocated for id: " + id);
         this.id = id;
     }
@@ -144,7 +145,7 @@ public class FusedContact extends BaseObservable {
     }
 
     @Bindable
-    public String getId() {
+    public @NonNull String getId() {
         return id;
     }
 

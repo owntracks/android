@@ -11,6 +11,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+
+import org.owntracks.android.R;
+import org.owntracks.android.ui.base.BaseActivity;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -27,7 +31,7 @@ import android.support.v4.app.FragmentTransaction;
  * limitations under the License. */
 public abstract class BaseNavigator implements Navigator {
 
-    abstract FragmentActivity getActivity();
+    abstract AppCompatActivity getActivity();
     abstract FragmentManager getChildFragmentManager();
 
     @Override
