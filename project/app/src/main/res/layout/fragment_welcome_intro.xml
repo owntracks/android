@@ -22,7 +22,8 @@
         android:paddingRight="16dp"
         android:layout_gravity="center"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/icon_description_owntracks" />
 
 
     <TextView
@@ -32,7 +33,7 @@
         android:textSize="24sp"
         android:textColor="#ffffff"
         android:gravity="bottom|center_horizontal"
-        android:text="Welcome"
+        android:text="@string/welcome_heading"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:layout_marginBottom="8dp"
@@ -42,7 +43,7 @@
 
     <TextView
         android:id="@+id/screen_desc"
-        android:text="The following steps will help you to get started with OwnTracks"
+        android:text="@string/welcome_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"

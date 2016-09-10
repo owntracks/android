@@ -1,7 +1,6 @@
 package org.owntracks.android.activities;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,12 +17,7 @@ import android.support.annotation.BoolRes;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -34,9 +28,9 @@ import org.owntracks.android.support.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ToolbarPreference;
 
-public class ActivityPreferences extends ActivityBase {
-    private static final String TAG = "ActivityPreferences";
+import timber.log.Timber;
 
+public class ActivityPreferences extends ActivityBase {
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
 
@@ -44,12 +38,12 @@ public class ActivityPreferences extends ActivityBase {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
-        Log.v(TAG, "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
+        Timber.v("onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
             case (REQUEST_CODE_CONNECTION) : {
-                Log.v(TAG, "onActivityResult with REQUEST_CODE_CONNECTION");
+                Timber.v("onActivityResult with REQUEST_CODE_CONNECTION");
                 if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
-                    Log.v(TAG,"recreating ActivityPreferences due to mode change");
+                    Timber.v("recreating ActivityPreferences due to mode change");
                  //   this.recreate();
                  //   this.overridePendingTransition(0, 0);
                     loadFragment();
@@ -72,10 +66,12 @@ public class ActivityPreferences extends ActivityBase {
 
         toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getTitle());
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(getTitle());
+        }
         loadFragment();
 
 
@@ -103,7 +99,7 @@ public class ActivityPreferences extends ActivityBase {
             final Activity a = getActivity();
             PackageManager pm = a.getPackageManager();
 
-            Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
+            Timber.v("Prepping preferences: " + Preferences.getModeId());
 
             if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
@@ -194,7 +190,7 @@ public class ActivityPreferences extends ActivityBase {
 
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Log.v(TAG, "startActivityForResult ActivityPreferencesConnection");
+                    Timber.v("startActivityForResult ActivityPreferencesConnection");
                     Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
@@ -220,7 +216,7 @@ public class ActivityPreferences extends ActivityBase {
 
         private void populateScreenReporting(PreferenceScreen screen) {
             addToolbar(screen);
-            addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
+            addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackgroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
             addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedData, R.string.preferencesPubExtendedDataSummary, R.bool.valPubExtendedData);
         }
 
@@ -245,6 +241,7 @@ public class ActivityPreferences extends ActivityBase {
             PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
             screen.addPreference(misc);
             addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
+            addSwitchPreference(misc, Preferences.Keys.PLAY_OVERRIDE, R.string.preferencesPlayOverride, R.string.preferencesPlayOverrideSummary, R.bool.valPlayOverride);
 
 
         }
@@ -258,7 +255,7 @@ public class ActivityPreferences extends ActivityBase {
             addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION_LOCATION, R.string.preferencesNotificationLocation, R.string.preferencesNotificationLocationSummary, R.bool.valNotificationLocation);
 
 
-            PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificatinBackground);
+            PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificationBackground);
             screen.addPreference(background);
             addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
 
@@ -272,7 +269,8 @@ public class ActivityPreferences extends ActivityBase {
         private void setDependency(PreferenceScreen root, String dependingKey, String dependsOnKey) {
             try {
                 root.findPreference(dependingKey).setDependency(dependsOnKey);
-            } catch (IllegalStateException e) {Log.e(TAG, "Preference dependency could not be setup from: " + dependingKey + " to " + dependsOnKey);}
+            } catch (IllegalStateException e) {
+                Timber.e("Preference dependency could not be setup from: " + dependingKey + " to " + dependsOnKey);}
         }
 
 
