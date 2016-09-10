@@ -127,7 +127,8 @@ public class ActivityNavigator extends BaseNavigator {
                     }
                 }).withSelectedItem(activity.getClass().hashCode())
                 .withCloseOnClick(true)
-                .withDelayDrawerClickEvent(200)
+                .withDelayDrawerClickEvent(350)
+                .withDelayOnDrawerClose(0)
                 .build();
     }
 }

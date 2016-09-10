@@ -63,6 +63,12 @@
         </activity>
 
         <activity
+            android:name=".activities.ActivityPreferences"
+            android:parentActivityName=".ui.map.MapActivity"
+            android:configChanges="orientation"
+            android:label="@string/preferencesServer"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.ActivityPreferencesConnection"
             android:configChanges="orientation"
             android:label="@string/preferencesServer"

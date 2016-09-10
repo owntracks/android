@@ -112,8 +112,9 @@ public class DrawerProvider {
                     }
                 }).withSelectedItem(activity.getClass().hashCode())
                  .withCloseOnClick(true)
-                 .withDelayOnDrawerClose(200)
-                .build();
+                 .withDelayDrawerClickEvent(350)
+                 .withDelayOnDrawerClose(0)
+                 .build();
 
 
     }
