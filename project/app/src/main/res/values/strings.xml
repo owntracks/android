@@ -120,7 +120,7 @@
 
     <string name="snackbarImportCompleted">Preferences imported</string>
     <string name="snackbarConfigIncomplete">Configuration incomplete</string>
-    <string name="aLocation">a location</string>
+    <string name="aLocation">a region</string>
     <string name="events">Events</string>
     <string name="notificationMessageTitle">Messages</string>
     <string name="beaconUUID" translatable="false">UUID</string>
