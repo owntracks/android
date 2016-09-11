@@ -53,7 +53,7 @@
     <string name="latitude">Breite</string>
     <string name="longitude">Länge</string>
     <string name="radius">Radius</string>
-    <string name="addWaypoint">Wegpunkt hinzufügen</string>
+    <string name="addWaypoint">Region hinzufügen</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Einstellungen exportieren</string>
     <string name="preferencesExport">Export</string>
@@ -63,11 +63,11 @@
     <string name="contactDetailsAccuracy">Genauigkeit</string>
     <string name="contactDetailsReportedTime">Gemeldet</string>
     <string name="contactDetailsName">Name</string>
-    <string name="waypointListPlaceholder">Bisher keine Wegpunkte angelegt</string>
+    <string name="waypointListPlaceholder">Keine Regionen angelegt</string>
     <string name="geofenceActive">Geofence aktiv</string>
     <string name="waypointRemove">Entfernen</string>
     <string name="importConfig">Import</string>
-    <string name="importWarning">Die folgenden Einstellungs-Werte werden importiert</string>
+    <string name="importWarning">Die folgenden Einstellungen werden importiert</string>
     <string name="preferencesSecurity">Sicherheit</string>
     <string name="accept">Übernehmen</string>
     <string name="preferencesIdentification">Identifikation</string>
@@ -84,16 +84,16 @@
         <item>Kein Energieverbrauch</item>
     </string-array>
 
-    <string name="mode_mqtt_private_label">Privater Modus</string>
-    <string name="mode_mqtt_public_label">Öffentlicher Modus</string>
-    <string name="mode_http_private_label">HTTP modues</string>
+    <string name="mode_mqtt_private_label">MQTT Privat</string>
+    <string name="mode_mqtt_public_label">MQTT Öffentlich</string>
+    <string name="mode_http_private_label">HTTP Privat</string>
 
     <string name="refresh">Aktualisieren</string>
     <string name="connectivityDisconnectedConfigIncomplete">Verbindung nicht konfiguriert</string>
     <string name="snackbarImportCompleted">Einstellungen importiert</string>
     <string name="snackbarConfigIncomplete">Konfiguration unvollständig</string>
 
-    <string name="aLocation">ein Standort</string>
+    <string name="aLocation">eine Region</string>
     <string name="events">Ereignisse</string>
     <string name="notificationMessageTitle">Nachrichten</string>
     <string name="locationPermissionNotAvailable">Standortzugriff verweigert</string>
@@ -103,7 +103,7 @@
     <string name="title_activity_contacts">Freunde</string>
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Einstellungen</string>
-    <string name="unableToCopyCertificate">Kopieren des Zertifikats auf internen Speicher unmöglich</string>
+    <string name="unableToCopyCertificate">Kopieren des Zertifikats auf internen Speicher fehlgeschlagen</string>
     <string name="successCopyCertificate">Zertifikat in internen Speicher kopiert</string>
     <string name="preferencesCategoryNotificationOngoing">Dauerhafte Benachrichtigung</string>
     <string name="preferencesCategoryNotificationBackground">Hintergrund-Benachrichtigungen</string>
@@ -116,8 +116,8 @@
     <string name="preferencesImportFileSummary">Konfiguration aus Datei importieren</string>
     <string name="preferencesExportToFile">Konfiguration exportieren</string>
     <string name="preferencesExportToFileSummary">Konfiguration in Datei exportieren</string>
-    <string name="exportWaypointsToEndpoint">Wegpunkte exportieren</string>
-    <string name="exportWaypointsToEndpointSummary">Wegpunkte an Dienst exportieren</string>
+    <string name="exportWaypointsToEndpoint">Regionen exportieren</string>
+    <string name="exportWaypointsToEndpointSummary">Regionen an Server exportieren</string>
     <string name="preferencesExportFailed">Einstellungs-Export fehlgeschlagen</string>
     <string name="preferencesExportSuccess">Export erfolgreich</string>
     <string name="geofenceAndBeaconInactive">Geofence und Beacon inaktiv</string>
@@ -131,10 +131,10 @@
     <string name="play_services_not_available_not_recoverable">Google Play-Dienste sind für Dein Gerät nicht verfügbar</string>
     <string name="messageQueued">Nachricht eingereiht</string>
     <string name="connectivityDisconnectedDataDisabled">"Getrennt: Datenverbindung inaktiv"</string>
-    <string name="transitionEntering">betrete</string>
-    <string name="transitionLeaving">verlasse</string>
+    <string name="transitionEntering">betritt</string>
+    <string name="transitionLeaving">verlässt</string>
     <string name="INITIAL">Initialisieren</string>
-    <string name="IDLE">Leerlauf</string>
+    <string name="IDLE">Aktiv</string>
     <string name="CONNECTING">Verbinden</string>
     <string name="CONNECTED">Verbunden</string>
     <string name="DISCONNECTING">Trennen</string>
