@@ -1,19 +1,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical"
-android:layout_width="match_parent"
-android:layout_height="wrap_content" >
-
-<include layout="@layout/toolbar" />
-
-<org.owntracks.android.support.RecyclerView
-    android:id="@+id/listView"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    />
-<TextView android:id="@+id/placeholder"
-    android:gravity="center"
-    android:visibility="gone"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:text="@string/waypointListPlaceholder" />
+    android:layout_height="wrap_content">
+
+    <android.support.design.widget.AppBarLayout
+        android:elevation="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <org.owntracks.android.support.RecyclerView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        />
+    <TextView android:id="@+id/placeholder"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/waypointListPlaceholder" />
 </LinearLayout>

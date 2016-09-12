@@ -231,19 +231,6 @@ public class App extends Application  {
         return inForeground;
     }
 
-    public static Activity getCurrentActivity() {
-        return currentActivity;
-    }
-
-    public static void removeContact(FusedContact contact) {
-        //TODO
-    }
-
-    public static Class<?> getRootActivityClass(){
-        return MapActivity.class;
-    }
-
-
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background
      */

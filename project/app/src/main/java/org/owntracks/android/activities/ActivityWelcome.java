@@ -30,6 +30,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.PausableViewPager;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.wrapper.GoogleApiAvailability;
 import org.owntracks.android.wrapper.GoogleApiAvailabilityResponder;
 
@@ -90,7 +91,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
     private void startActivityMain() {
         App.enableForegroundBackgroundDetection();
-        Intent intent = new Intent(this, App.getRootActivityClass());
+        Intent intent = new Intent(this, MapActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
@@ -123,6 +124,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private static Bundle runChecks() {
+        Timber.v("running checks");
         Bundle b = new Bundle();
         if(!checkSetup()) {
             b.putBoolean(BUNDLE_KEY_SETUP, true);

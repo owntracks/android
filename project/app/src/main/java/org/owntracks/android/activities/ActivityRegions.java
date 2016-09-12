@@ -59,9 +59,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_waypoints);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getTitle());
+        setSupportToolbar();
         drawer = DrawerProvider.buildDrawer(this, toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

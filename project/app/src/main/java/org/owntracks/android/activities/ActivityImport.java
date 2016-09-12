@@ -1,17 +1,13 @@
 package org.owntracks.android.activities;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,12 +15,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Toasts;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -45,13 +39,8 @@ public class  ActivityImport extends ActivityBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getResources().getString(R.string.importConfig));
 
-
+        setSupportToolbar();
 
         input = (TextView) findViewById(R.id.input);
 

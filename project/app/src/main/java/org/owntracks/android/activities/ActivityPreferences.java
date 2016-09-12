@@ -64,14 +64,10 @@ public class ActivityPreferences extends ActivityBase {
 
 
 
-        toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
-        if(getSupportActionBar()!=null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(getTitle());
-        }
+        setSupportToolbar();
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         loadFragment();
 
 

@@ -59,11 +59,10 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         setContentView(R.layout.activity_preferences);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getTitle());
+        setSupportToolbar();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         preferencesFragment = new WeakReference<>(new FragmentPreferences());
         getFragmentManager().beginTransaction().replace(R.id.content_frame, preferencesFragment.get(), "preferences").commit();
 

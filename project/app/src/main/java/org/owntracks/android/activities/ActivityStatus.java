@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import org.owntracks.android.wrapper.GoogleApiAvailability;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -28,7 +27,7 @@ public class ActivityStatus extends ActivityBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status);
-        setupSupportToolbar();
+        setSupportToolbar();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
