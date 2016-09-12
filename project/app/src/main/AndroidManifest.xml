@@ -64,8 +64,10 @@
 
         <activity
             android:name=".activities.ActivityPreferences"
-            android:parentActivityName=".ui.map.MapActivity"
-            android:configChanges="orientation"
+            android:label="@string/title_activity_preferences"
+            android:parentActivityName=".ui.map.MapActivity" />
+
+        android:configChanges="orientation"
             android:label="@string/preferencesServer"
             android:screenOrientation="portrait" />
         <activity
@@ -203,26 +205,18 @@
             android:clearTaskOnLaunch="true"
             android:label=""
             android:launchMode="singleTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
-        <activity
-            android:name=".activities.ActivityFeatured"
-            android:label="@string/title_activity_featured"
-            android:launchMode="singleTop"
-            android:parentActivityName=".ui.map.MapActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.map.MapActivity" />
         </activity>
         <activity android:name=".activities.ActivityWelcome"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
-        ></activity>
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            ></activity>
     </application>
 
 </manifest>

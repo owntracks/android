@@ -3,7 +3,6 @@ package org.owntracks.android.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -35,14 +34,9 @@ public class ActivityExport extends ActivityBase {
         context = this;
         setContentView(R.layout.activity_export);
 
-        setupSupportToolbar();
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        setSupportToolbar();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-        toolbar = (Toolbar)findViewById(R.id.fragmentToolbar);
-        setSupportActionBar(toolbar);
 
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new FragmentPreferencesExport(), "exportOreferences").commit();
 

@@ -24,7 +24,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityFeatured;
 import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
@@ -171,37 +170,6 @@ public class ServiceNotification implements ProxyableService {
 
 
     }
-
-
-    @SuppressLint("NewApi")
-    private void setupNotificationMessages() {
-        if (!Preferences.getNotification())
-            return;
-
-        notificationBuilderMessages = new NotificationCompat.Builder(context);
-
-        Intent resultIntent = new Intent(this.context, ActivityFeatured.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this.context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilderMessages.setContentIntent(resultPendingIntent);
-        notificationBuilderMessages.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION, null));
-        notificationBuilderMessages.setSortKey("b");
-
-        notificationBuilderMessages.setSmallIcon(R.drawable.ic_notification);
-        notificationBuilderMessages.setGroup(NOTIFICATION_ID_MESSAGES + "");
-        notificationBuilderMessages.setAutoCancel(true);
-        notificationBuilderMessages.setShowWhen(false);
-
-
-        //if (android.os.Build.VERSION.SDK_INT >= 21) {
-            notificationBuilderMessages.setColor(ContextCompat.getColor(context, R.color.primary));
-            notificationBuilderMessages.setPriority(Notification.PRIORITY_MIN);
-            notificationBuilderMessages.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderMessages.setVisibility(Notification.VISIBILITY_PUBLIC);
-        //}
-
-    }
-
 
     @SuppressLint("NewApi")
     private void setupNotificationEvents() {

@@ -13,12 +13,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Events;
 
 
+@Deprecated
 public abstract class ActivityBase extends AppCompatActivity  {
     private static final String TAG = "ActivityBase";
     protected static final java.lang.String DISABLES_ANIMATION = "disablesAnimation";
@@ -113,23 +113,15 @@ public abstract class ActivityBase extends AppCompatActivity  {
 
     }
 
-    void setupSupportToolbar() {
-        setupSupportToolbar(true);
+    void setSupportToolbar() {
+        setSupportToolbar(false);
     }
 
-    private void setupSupportToolbar(boolean hideTitle) {
-        toolbar = (Toolbar) findViewById(R.id.fragmentToolbar);
+    void setSupportToolbar(boolean hideTitle) {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(!hideTitle);
-    }
-
-    void goToRoot() {
-
-        Intent i = new Intent(this, App.getRootActivityClass());
-        i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
-        supportFinishAfterTransition();
     }
 
 }

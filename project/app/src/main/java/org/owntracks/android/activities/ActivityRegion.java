@@ -83,9 +83,8 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
         //setContentView(R.layout.activity_waypoint);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_waypoint);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        setSupportToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

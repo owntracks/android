@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
@@ -155,6 +156,8 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
+        ActivityWelcome.runChecks(this);
+
         activityComponent().inject(this);
         setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
 
