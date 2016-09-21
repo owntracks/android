@@ -10,12 +10,14 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import timber.log.Timber;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageLocation extends MessageBase  {
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";

@@ -2,6 +2,7 @@ package org.owntracks.android.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.IncomingMessageProcessor;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageWaypoint extends MessageBase{
     public static final String BASETOPIC_SUFFIX = "/event";
 

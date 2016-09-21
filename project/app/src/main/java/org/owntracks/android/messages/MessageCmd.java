@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageCmd extends MessageBase{
     private static final String BASETOPIC_SUFFIX = "/cmd";
     private String action;
