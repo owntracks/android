@@ -2,6 +2,7 @@ package org.owntracks.android.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.location.Geofence;
 
@@ -9,6 +10,7 @@ import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageTransition extends MessageBase{
     public static final String BASETOPIC_SUFFIX = "/event";
     public static final String EVENT_ENTER = "enter";

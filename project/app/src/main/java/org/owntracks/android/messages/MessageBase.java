@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true) // Don't fail on deserialization if an unknown attribute is encountered
-@JsonInclude(JsonInclude.Include.NON_EMPTY) // Don't serialize attributes with null values
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 @JsonSubTypes({
         @JsonSubTypes.Type(value=MessageLocation.class, name="location"),
@@ -30,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
         protected static final String TAG = "MessageBase";
-        public static final String ACTION_REPORT_LOCATION = "reportLocation";
 
         @JsonIgnore
         private String _mqtt_topic;
@@ -176,11 +174,12 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
                 return !isIncoming();
         }
 
-        // JSON properties
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getTid() {
                 return tid;
         }
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public void setTid(String tid) {
                 this.tid = tid;
         }

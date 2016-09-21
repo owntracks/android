@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY) // Don't serialize attributes with empty values
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class MessageConfiguration extends MessageBase{
     private static final String BASETOPIC_SUFFIX = "/cmd";
 
@@ -22,6 +23,7 @@ public class MessageConfiguration extends MessageBase{
 
 
     @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MessageWaypointCollection waypoints;
 
     @Override
@@ -45,9 +47,8 @@ public class MessageConfiguration extends MessageBase{
 
     @JsonAnySetter
     public void set(String key, Object value) {
-        if(value instanceof String && ((String) value).isEmpty())
+        if(value instanceof String && value.equals(""))
             return;
-
         map.put(key, value);
     }
 
@@ -86,6 +87,5 @@ public class MessageConfiguration extends MessageBase{
     public boolean hasWaypoints() {
         return waypoints != null && waypoints.size() > 0;
     }
-
 
 }
