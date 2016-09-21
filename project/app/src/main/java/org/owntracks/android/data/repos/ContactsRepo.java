@@ -22,4 +22,5 @@ public interface ContactsRepo {
     void update(String id, MessageLocation m);
     void update(String id, MessageCard m);
 
+    long getRevision();
 }

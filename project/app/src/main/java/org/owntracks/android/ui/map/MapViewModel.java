@@ -87,6 +87,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         return this.contactsRepo.getAllAsList();
     }
 
+    @Override
+    public long getContactsRevision() {
+        return contactsRepo.getRevision();
+    }
+
+
     private void setContact(FusedContact c) {
     }
 
@@ -101,12 +107,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void restore(@NonNull String contactId) {
         Timber.v("restoring contact id:%s", contactId);
-        activateContact(contactId);
+        activateContact(contactId, true);
     }
 
     @Override
     public void onMarkerClick(@NonNull String contactId) {
-        activateContact(contactId);
+        activateContact(contactId, false);
     }
 
 
@@ -117,17 +123,17 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void onBottomSheetLongClick() {
-        getView().setModeContact();
+        getView().setModeContact(true);
     }
 
 
-    private void activateContact(@NonNull String contactId) {
+    private void activateContact(@NonNull String contactId, boolean center) {
         activeContact = contactsRepo.getById(contactId);
         Timber.v("contactId:%s, obj:%s ", contactId, activeContact);
 
         notifyPropertyChanged(BR.contact);
         getView().setBottomSheetCollapsed();
-        getView().setModeContact();
+        getView().setModeContact(center);
 
     }
 
@@ -135,6 +141,11 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         activeContact = null;
         notifyPropertyChanged(BR.contact);
         getView().setBottomSheetHidden();
+    }
+
+
+    private void clearMap() {
+        getView().clearMarker();
     }
 
     @Override
@@ -145,7 +156,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onMenuCenterDeviceClicked() {
         mode = MODE_CENTER_DEVICE;
-        getView().modeDevice();
+        getView().setModeDevice();
     }
 
 
@@ -160,4 +171,9 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.ModeChanged e) {
+        clearMap();
+        clearContact();
+    }
 }

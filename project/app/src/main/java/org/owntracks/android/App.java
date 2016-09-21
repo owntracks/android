@@ -115,8 +115,7 @@ public class App extends Application  {
                 Timber.v("trace loading services %s", System.currentTimeMillis());
             }
         });
-
-        //App.getEventBus().register(this);
+        App.getEventBus().register(this);
         Timber.d("trace / App onCreate done %s", System.currentTimeMillis());
 
     }

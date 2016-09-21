@@ -1,7 +1,5 @@
 package org.owntracks.android.data.repos;
 
-import android.annotation.SuppressLint;
-import android.database.Observable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableArrayMap;
 import android.databinding.ObservableList;
@@ -9,14 +7,10 @@ import android.databinding.ObservableMap;
 import android.support.annotation.NonNull;
 
 import org.owntracks.android.App;
-import org.owntracks.android.data.model.Contact;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -26,6 +20,12 @@ import timber.log.Timber;
 public class MemoryContactsRepo implements ContactsRepo {
     ObservableMap<String, FusedContact> mMap;
     ObservableList<FusedContact> mList;
+
+    private static final long MAJOR_STEP = 1000000;
+    private long majorRevision = 0;
+    private long revision = 0;
+
+
 
     @Inject
     public MemoryContactsRepo() {
@@ -64,12 +64,15 @@ public class MemoryContactsRepo implements ContactsRepo {
         mMap.put(id, contact);
         mList.add(contact);
         Timber.v("new contact added:%s", id);
+        revision++;
     }
 
     @Override
     public void clearAll() {
         mMap.clear();
         mList.clear();
+        majorRevision-=MAJOR_STEP;
+        revision = 0;
     }
 
     @Override
@@ -77,15 +80,16 @@ public class MemoryContactsRepo implements ContactsRepo {
         FusedContact c = mMap.remove(id);
         if(c != null)
             mList.remove(c);
+        majorRevision-=MAJOR_STEP;
+        revision = 0;
     }
-
-
 
     @Override
     public void update(String id, MessageCard m) {
         FusedContact c = getByIdLazy(id);
         c.setMessageCard(m);
         App.getEventBus().post(c);
+        revision++;
     }
 
     @Override
@@ -95,5 +99,14 @@ public class MemoryContactsRepo implements ContactsRepo {
             c.setMessageLocation(m);
         App.getEventBus().post(c);
         Timber.v("contact length %s", mList.size());
+        revision++;
     }
+
+    // Allows for quickly checking if items in the repo were updated/added (getRevison > savedRevision) or removed (getRevision < savedRevision)
+    public long getRevision() {
+        return majorRevision+revision;
+    }
+
+
+
 }
