@@ -129,7 +129,6 @@
     <string name="locationPermissionNotAvailable">Location access denied</string>
     <string name="title_activity_regions">Regions</string>
     <string name="title_activity_region">Region</string>
-    <string name="title_activity_featured">Featured</string>
     <string name="title_activity_map">Map</string>
     <string name="title_activity_contacts">Friends</string>
     <string name="title_activity_status">Status</string>
