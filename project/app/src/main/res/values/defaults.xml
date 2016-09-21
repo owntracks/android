@@ -21,6 +21,8 @@
 
 
     <bool name="valInfoPublic" >true</bool>
+    <bool name="valSub" >true</bool>
+    <bool name="valSubPublic" >true</bool>
 
 
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%s/%s</string>

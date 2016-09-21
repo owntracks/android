@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -30,6 +31,7 @@ import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
 
 import timber.log.Timber;
+
 
 public class Preferences {
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
@@ -104,12 +106,12 @@ public class Preferences {
                 break;
 
         }
-        sharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
+        sharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
 
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
-        privateSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
-        httpSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
-        publicSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).commit();
+        privateSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
+        httpSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
+        publicSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
 
         attachAllActivePreferenceChangeListeners();
 
@@ -236,7 +238,7 @@ public class Preferences {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putString(key, value).commit();
+        activeSharedPreferences.edit().putString(key, value).apply();
     }
 
     public static void setInt(String key, int value) {
@@ -247,7 +249,7 @@ public class Preferences {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putInt(key, value).commit();
+        activeSharedPreferences.edit().putInt(key, value).apply();
     }
     public static void setBoolean(String key, boolean value) {
         setBoolean(key, value, true);
@@ -257,11 +259,11 @@ public class Preferences {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
-        activeSharedPreferences.edit().putBoolean(key, value).commit();
+        activeSharedPreferences.edit().putBoolean(key, value).apply();
     }
 
     public static void clearKey(String key) {
-        activeSharedPreferences.edit().remove(key).commit();
+        activeSharedPreferences.edit().remove(key).apply();
     }
 
     @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
@@ -305,8 +307,14 @@ public class Preferences {
 
         for(String key : m.getKeys()) {
             try {
-                Timber.v("import for key: " + key + " with value: " + m.get(key));
-                methods.get(key).invoke(null, m.get(key));
+                Object value = m.get(key);
+
+                Timber.v("import for key %s:%s", key, value);
+                if(value==null) {
+                    Timber.v("clearing value for key %s", key);
+                    clearKey(key);
+                } else
+                   methods.get(key).invoke(null, m.get(key));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -544,6 +552,17 @@ public class Preferences {
     public static String getSubTopic() {
         return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, R.string.valEmpty, true, false);
     }
+
+    @Export(key =Keys.SUB, exportModeMqttPrivate =true)
+    public static boolean getSub() {
+        return getBoolean(Keys.SUB, R.bool.valSub, R.bool.valSubPublic, true);
+    }
+
+    @Import(key =Keys.SUB)
+    private static void setSub(boolean sub) {
+        setBoolean(Keys.SUB, sub, false);
+    }
+
 
     @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public static String getTrackerId() {
@@ -924,7 +943,7 @@ public class Preferences {
     }
 
     public static void setSetupCompleted() {
-        sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).commit();
+        sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).apply();
 
     }
 
@@ -935,7 +954,7 @@ public class Preferences {
 
     @Import(key = Keys.PLAY_OVERRIDE)
     public static void setPlayOverride(boolean playOverride) {
-        activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).commit();
+        activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).apply();
     }
 
 
