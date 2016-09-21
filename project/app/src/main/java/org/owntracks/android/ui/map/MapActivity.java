@@ -34,6 +34,7 @@ import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceLocator;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
@@ -59,6 +60,13 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     private static final long ZOOM_LEVEL_BUILDING = 20;
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
 
+
+
+    @Inject
+    protected Provider<Navigator> navigator;
+
+    WeakHashMap<String, Marker> mMarkers = new WeakHashMap <>();
+
     private GoogleMap mMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private MapLocationSource mMapLocationSource;
@@ -75,8 +83,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     private static final int FLAG_ACTION_MODE_DEVICE = 1;
     private static final int FLAG_ACTION_MODE_CONTACT = 2;
     private static int FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
-
-    private String activeContactId;
+    private Menu mMenu;
 
     // EVENT ENGINE ACTIONS
     private void queueActionModeDevice() {
@@ -85,11 +92,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         executePendingActions();
     }
 
-    private void queueActionModeContact() {
+    private void queueActionModeContact(boolean center) {
         FLAG_ACTION_MODE = FLAG_ACTION_MODE_CONTACT;
+        FLAG_DATA_UPDATED_CONTACT_ACTIVE = center;
         executePendingActions();
     }
-
 
     private void queueActionModeFree() {
         FLAG_ACTION_MODE = FLAG_ACTION_MODE_FREE;
@@ -133,6 +140,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         FLAG_STATE_LOCATION_READY = true;
         FLAG_DATA_UPDATED_DEVICE = true;
         executePendingActions();
+        enableLocationMenus();
     }
 
     private void onStateMapReady() {
@@ -147,11 +155,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         executePendingActions();
     }
 
-    @Inject
-    protected Provider<Navigator> navigator;
-
-    WeakHashMap<String, Marker> mMarkers = new WeakHashMap <String,Marker>();
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
@@ -161,14 +164,9 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         activityComponent().inject(this);
         setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
 
+        setSupportToolbar(binding.toolbar);
+        setDrawer(binding.toolbar);
 
-        setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setTitle(getTitle());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        navigator.get().attachDrawer(binding.toolbar);
-
-        FragmentManager fm = getSupportFragmentManager();
-        SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
         this.mMapLocationSource = new MapLocationSource();
 
         App.postOnMainHandlerDelayed(new Runnable() {
@@ -238,9 +236,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_map, menu);
+        this.mMenu = menu;
+        if(!FLAG_STATE_LOCATION_READY)
+            disableLocationMenus();
         return true;
     }
 
+    private void disableLocationMenus() {
+        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
+        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
+    }
+    private void enableLocationMenus() {
+        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
+        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
@@ -322,10 +331,27 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
+    long repoRevision = -1;
     private void doUpdateMarkerAll() {
+        long newRepoRevision = viewModel.getContactsRevision();
+
+        if(repoRevision < newRepoRevision) {
+            Timber.v("repoRevision:%s, newRepoRevision:%s => updating marker", repoRevision, newRepoRevision);
+            addMarker();
+        } else if(repoRevision > newRepoRevision) {
+            Timber.v("repoRevision:%s, newRepoRevision:%s => reinitializing marker", repoRevision, newRepoRevision);
+            clearMarker();
+            addMarker();
+        }
+        repoRevision = newRepoRevision;
+    }
+
+    private void addMarker() {
         for (Object c : viewModel.getContacts()) {
             doUpdateMarkerSingle(FusedContact.class.cast(c));
         }
+        repoRevision = viewModel.getContactsRevision();;
+
     }
 
     private void doUpdateMarkerSingle(@NonNull FusedContact contact) {
@@ -446,25 +472,34 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void contactUpdate(FusedContact c) {
         doUpdateMarkerSingle(c);
+        repoRevision = viewModel.getContactsRevision();;
     }
 
     @Override
     public void contactUpdateActive() {
         onActiveContactUpdated();
         doUpdateMarkerSingle(viewModel.getContact());
+        repoRevision = viewModel.getContactsRevision();;
 
 
     }
 
     @Override
-    public void modeDevice() {
+    public void setModeDevice() {
         queueActionModeDevice();
     }
 
+    @Override
+    public void clearMarker() {
+        if(FLAG_STATE_MAP_READY)
+            mMap.clear();
+        mMarkers.clear();
+    }
+
 
     @Override
-    public void setModeContact() {
-        queueActionModeContact();
+    public void setModeContact(boolean center) {
+        queueActionModeContact(center);
     }
 
 

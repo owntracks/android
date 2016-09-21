@@ -34,14 +34,15 @@ public interface MapMvvm {
         void contactUpdate(FusedContact contact);
         void contactUpdateActive();
 
-        void setModeContact();
-        void modeDevice();
+        void setModeContact(boolean center);
+        void setModeDevice();
+        void clearMarker();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         FusedContact getContact();
         List<FusedContact> getContacts();
-
+        long getContactsRevision();
 
         void onMapReady();
         void onMarkerClick(@NonNull String contactId);
