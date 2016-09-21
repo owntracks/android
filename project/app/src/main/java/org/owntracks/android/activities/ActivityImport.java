@@ -42,6 +42,7 @@ public class  ActivityImport extends ActivityBase {
         setContentView(R.layout.activity_import);
 
         setSupportToolbar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         input = (TextView) findViewById(R.id.input);
 
