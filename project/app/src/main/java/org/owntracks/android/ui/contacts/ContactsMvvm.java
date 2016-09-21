@@ -26,9 +26,7 @@ public interface ContactsMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        ObservableList<FusedContact> getRecyclerItems();
-
-        void onContactClick(FusedContact cast);
-        void onContactLongClick(FusedContact cast);
+        ObservableList<FusedContact> getContacts();
+        void onContactClick(FusedContact contact);
     }
 }

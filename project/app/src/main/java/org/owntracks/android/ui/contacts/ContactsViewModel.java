@@ -17,6 +17,8 @@ import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 
 @PerActivity
 public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implements ContactsMvvm.ViewModel<ContactsMvvm.View> {
@@ -33,24 +35,18 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
         super.attachView(view, savedInstanceState);
     }
 
-
-
     @Override
-    public ObservableList<FusedContact> getRecyclerItems() {
+    public ObservableList<FusedContact> getContacts() {
         return contactsRepo.getAllAsList();
     }
 
     @Override
     public void onContactClick(FusedContact c) {
+        if(!c.hasLocation())
+            return;
+
         Bundle b = new Bundle();
-       // b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, );
-       // navigator.get().startActivity(MapActivity.class, );
-
-
-    }
-
-    @Override
-    public void onContactLongClick(FusedContact cast) {
-
+        b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, c.getId());
+        navigator.get().startActivity(MapActivity.class, b);
     }
 }

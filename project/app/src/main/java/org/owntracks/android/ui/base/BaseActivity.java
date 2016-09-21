@@ -6,14 +6,17 @@ import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
+import org.owntracks.android.R;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
@@ -64,6 +67,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     private ActivityComponent mActivityComponent;
 
     protected boolean hasEventBus = true;
+    private Toolbar toolbar;
 
     protected void setHasEventBus(boolean enable) {
         hasEventBus = enable;
@@ -88,6 +92,26 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         }
 
         return mActivityComponent;
+    }
+
+    protected void setSupportToolbar(@NonNull Toolbar toolbar) {
+        setSupportToolbar(toolbar, true, true);
+    }
+
+    void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
+        setSupportActionBar(toolbar);
+        if(showTitle)
+          getSupportActionBar().setTitle(getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(showHome);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
+
+    }
+
+
+    protected void setDrawer(@NonNull Toolbar toolbar) {
+        navigator.get().attachDrawer(toolbar);
     }
 
     @Override
