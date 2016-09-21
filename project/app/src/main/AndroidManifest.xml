@@ -199,7 +199,7 @@
         <activity
             android:name=".ui.contacts.ContactsActivity"
             android:clearTaskOnLaunch="true"
-            android:label="Contacts"
+            android:label="@string/title_activity_contacts"
             android:launchMode="singleTask" >
         </activity>
         <activity
