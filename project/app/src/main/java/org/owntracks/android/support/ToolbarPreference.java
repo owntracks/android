@@ -45,7 +45,6 @@ public class ToolbarPreference extends Preference {
         });
 
 
-
         return layout;
     }
 
