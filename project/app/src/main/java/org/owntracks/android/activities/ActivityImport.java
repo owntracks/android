@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -130,6 +131,9 @@ public class  ActivityImport extends ActivityBase {
 
        // importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
         Snackbar s = Snackbar.make(findViewById(R.id.frame), R.string.snackbarImportCompleted, Snackbar.LENGTH_LONG);
+        TextView textView = (TextView) s.getView().findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.WHITE   );
+
         s.setAction("Restart", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
