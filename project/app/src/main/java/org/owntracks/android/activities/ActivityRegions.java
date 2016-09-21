@@ -60,6 +60,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         setContentView(R.layout.activity_waypoints);
         setSupportToolbar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawer = DrawerProvider.buildDrawer(this, toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
