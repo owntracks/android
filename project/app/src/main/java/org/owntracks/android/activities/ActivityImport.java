@@ -183,14 +183,14 @@ public class  ActivityImport extends ActivityBase {
 
             Log.v(TAG, "file content: " + total);
 
-            configJSON= (MessageConfiguration) Parser.deserializeSync(total.toString().getBytes());
+            configJSON= (MessageConfiguration) Parser.fromJson(total.toString().getBytes());
             if(configJSON == null) {
                 throw new Error("Unable to parse content");
             }
 
 
 
-            input.setText(formatString(Parser.serializeSync(configJSON)));
+            input.setText(formatString(Parser.toJson(configJSON)));
             tintMenu();
         }catch(Exception e){
             Timber.e(e, "import exception ");

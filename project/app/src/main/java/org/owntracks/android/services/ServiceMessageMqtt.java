@@ -27,9 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
@@ -210,7 +208,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		public void messageArrived(String topic, MqttMessage message) throws Exception {
 
 			try {
-				MessageBase m = Parser.deserializeSync(message.getPayload());
+				MessageBase m = Parser.fromJson(message.getPayload());
 				if(!m.isValidMessage()) {
 					Timber.e("message failed validation: %s", message.getPayload());
 					return;
@@ -235,7 +233,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
 		try {
 			MqttMessage m = new MqttMessage();
-			m.setPayload(Parser.serializeSync(message).getBytes());
+			m.setPayload(Parser.toJson(message).getBytes());
 			m.setQos(message.getQos());
 			m.setRetained(message.getRetained());
 

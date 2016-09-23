@@ -171,8 +171,9 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
         try {
 
-            String wireMessage = Parser.serializeSync(message);
+            String wireMessage = Parser.toJson(message);
 
+            Timber.d("outgoing message:%s", wireMessage);
             boolean idleMode =  false;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 idleMode = powerManager.isDeviceIdleMode();
@@ -247,9 +248,11 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
              //We got a response, treat as delivered successful
              if(r != null ) {
-
+                 Timber.v("got HTTP response");
                  try {
-                    MessageBase[] result = Parser.deserializeSyncArray(r.body().byteStream());
+                     Timber.v("code: %s, streaming response to parser", r.code() );
+
+                     MessageBase[] result = Parser.fromJson(r.body().byteStream());
                      setLastState("TX:"+r.code() + ", RX:" + result.length);
 
                      for (MessageBase aResult : result) {
@@ -260,8 +263,12 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
                 } catch (IOException e) {
                     setLastState("TX2:"+r.code() + ", RX:JsonParseException");
                     Timber.e("error:JsonParseException responseCode:%s", r.code());
-                }
-                return onMessageDelivered(c, messageId);
+                } catch (Parser.EncryptionException e) {
+                     setLastState("TX2:"+r.code() + ", RX:EncryptionException");
+                     Timber.e("error:EncryptionException");
+
+                 }
+                 return onMessageDelivered(c, messageId);
             } else {
                 return onMessageDeliveryFailed(c, messageId);
             }
