@@ -92,10 +92,12 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     private void onModeChanged(int mode) {
         Timber.v("mode:%s", mode);
-        if(endpoint != null)
+        if(endpoint != null) {
+            Timber.v("destroying endpoint");
             endpoint.onDestroy();
+        }
 
-
+        Timber.v("instantiating new endpoint");
         endpoint = instantiateEndpoint(mode);
 
         if(endpoint == null) {
@@ -125,6 +127,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Override
     public void onDestroy() {
+        if(endpoint != null)
+            endpoint.onDestroy();
     }
 
     @Override
