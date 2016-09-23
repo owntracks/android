@@ -266,19 +266,18 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         return context.bindService(intent, serviceConnection, i);
     }
 
-    public void enableForegroundMode() {
+    void onEnterForeground() {
         if(beaconManager != null) {
             Log.v(TAG, "enabling foreground mode");
             beaconManager.setBackgroundMode(false);
         }
     }
 
-    public void enableBackgroundMode() {
+    void onEnterBackground() {
         if(beaconManager != null) {
             Log.v(TAG, "enabling background mode");
             beaconManager.setBackgroundMode(true);
         }
 
     }
-
 }

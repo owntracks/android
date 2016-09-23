@@ -65,8 +65,8 @@ import timber.log.Timber;
 
 public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
 	private static final String TAG = "ServiceMessageMqtt";
-	public static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
-    public static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
+	private static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
+    private static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
 	private static final int MAX_INFLIGHT_MESSAGES = 10;
 
 
@@ -716,8 +716,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	@Override
 	public void onDestroy() {
-		// disconnect immediately
+		Log.v(TAG, "disconnecting and draining message queue");
 		disconnect(false);
+		//TODO, clear queue
 		unregisterReceiver();
 		changeState(EndpointState.DISCONNECTED);
 	}
@@ -757,12 +758,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, 0);
     }
 
-	@Subscribe
-	public void onEvent(Events.ModeChanged e) {
-		Log.v(TAG, "ModeChanged. Disconnecting and draining message queue");
-        disconnect(false);
-        clearQueues();
-    }
 
 	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {

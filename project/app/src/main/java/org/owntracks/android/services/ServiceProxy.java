@@ -4,10 +4,15 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import android.app.Activity;
+import android.app.Application;
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,8 +62,9 @@ public class ServiceProxy extends ServiceBindable {
 		synchronized (ServiceProxy.class) {
 			return bgInitialized;
 		}
-
 	}
+
+
 
 	@Override
 	public void onCreate() {
@@ -320,5 +326,23 @@ public class ServiceProxy extends ServiceBindable {
             e.printStackTrace();
             attemptingToBind = false;
         }
+	}
+
+	public static void onEnterForeground() {
+		if(bgInitialized) {
+			getServiceLocator().onEnterForeground();
+			getServiceBeacon().onEnterForeground();
+		}
+	}
+
+	public static void onEnterBackground() {
+		if(bgInitialized) {
+			getServiceLocator().onEnterBackground();
+			getServiceBeacon().onEnterBackground();
+		}
+	}
+
+	public static boolean isInForeground() {
+		return App.isInForeground();
 	}
 }
