@@ -44,7 +44,6 @@ public interface MapMvvm {
         List<FusedContact> getContacts();
         long getContactsRevision();
 
-        void onMapReady();
         void onMarkerClick(@NonNull String contactId);
         void onMapClick();
         void onBottomSheetLongClick();

@@ -188,16 +188,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         });
 
         setBottomSheetHidden();
-
-
     }
+
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleIntentExtras(intent);
     }
 
-
+    @Override
+    public void onPause(){
+        super.onPause();
+        // Save current repo state so we ca apply updates to contacts on resume
+        repoRevision = viewModel.getContactsRevision();
+    }
 
 
     private void handleIntentExtras(Intent intent) {
@@ -299,8 +303,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             }
         });
         onStateMapReady();
-        viewModel.onMapReady();
-
     }
 
     @Override
@@ -333,6 +335,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     long repoRevision = -1;
     private void doUpdateMarkerAll() {
+        Timber.v("repoRevision:%s", repoRevision);
         long newRepoRevision = viewModel.getContactsRevision();
 
         if(repoRevision < newRepoRevision) {
@@ -342,6 +345,8 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             Timber.v("repoRevision:%s, newRepoRevision:%s => reinitializing marker", repoRevision, newRepoRevision);
             clearMarker();
             addMarker();
+        } else {
+            Timber.v("no update");
         }
         repoRevision = newRepoRevision;
     }
@@ -471,17 +476,15 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     @Override
     public void contactUpdate(FusedContact c) {
+        Timber.v("id:%s",c.getId());
         doUpdateMarkerSingle(c);
-        repoRevision = viewModel.getContactsRevision();;
     }
 
     @Override
     public void contactUpdateActive() {
+        Timber.v("");
         onActiveContactUpdated();
         doUpdateMarkerSingle(viewModel.getContact());
-        repoRevision = viewModel.getContactsRevision();;
-
-
     }
 
     @Override
@@ -501,7 +504,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public void setModeContact(boolean center) {
         queueActionModeContact(center);
     }
-
 
     private void showPopupMenu(View v) {
 
