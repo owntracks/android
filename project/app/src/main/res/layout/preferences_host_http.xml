@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content_frame"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    >
 
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:met_baseColor="@color/textPrimary"
         app:met_primaryColor="@color/accent"
@@ -18,7 +18,26 @@
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesUrl"
         android:hint="@string/preferencesUrl"
-        />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/scanButton"
+        android:layout_toStartOf="@+id/scanButton" />
+
+    <ImageView
+        android:id="@+id/scanButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_qrcode_grey600_36dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:padding="12dp"
+        android:tint="@color/buttonTint"
+        android:tintMode="src_in"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
-</LinearLayout>
+</RelativeLayout>
