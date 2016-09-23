@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -77,7 +76,7 @@ public class ActivityExport extends ActivityBase {
         public boolean onPreferenceClick(Preference preference) {
             String exportStr;
             try {
-                exportStr = Parser.serializeSync(Preferences.exportToMessage());
+                exportStr = Parser.toJson(Preferences.exportToMessage());
             } catch (IOException e) {
                 Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
