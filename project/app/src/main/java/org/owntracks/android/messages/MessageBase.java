@@ -1,5 +1,6 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
+import android.support.annotation.NonNull;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
@@ -87,6 +88,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         private WeakReference<OutgoingMessageProcessor> _processorOut;
 
         @JsonIgnore
+        @NonNull
         public String getContactKey() {
                 if(_mqtt_topic != null)
                         return _mqtt_topic;
@@ -177,6 +179,11 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getTid() {
                 return tid;
+        }
+
+        @JsonIgnore
+        public boolean hasTid() {
+                return getTid() != null;
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
