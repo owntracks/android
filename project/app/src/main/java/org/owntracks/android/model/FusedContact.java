@@ -4,6 +4,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,9 +21,7 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 
-
 public class FusedContact extends BaseObservable {
-    private static final int FACE_HEIGHT_SCALE = (int) convertDpToPixel(48);
     private static final String TAG = "FusedContact";
 
     private final String id;
@@ -42,9 +41,9 @@ public class FusedContact extends BaseObservable {
         this.imageProvider = imageProvider;
     }
 
-    public FusedContact(@NonNull String id) {
+    public FusedContact(@Nullable String id) {
         Log.v(TAG, "new contact allocated for id: " + id);
-        this.id = id;
+        this.id = id != null ? id : "NOID";
     }
 
     public boolean setMessageLocation(MessageLocation messageLocation) {
@@ -66,7 +65,7 @@ public class FusedContact extends BaseObservable {
         notifyMessageCardPropertyChanged();
     }
 
-    public void notifyMessageCardPropertyChanged() {
+    private void notifyMessageCardPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.imageProvider);
 
@@ -97,13 +96,10 @@ public class FusedContact extends BaseObservable {
 
     @Bindable
     public String getFusedName() {
-        if(hasCard() && messageCard.hasName())
-            return messageCard.getName();
-
-        if(hasLocation() && messageLocation.getTid() != null)
-            return "Device-"+messageLocation.getTid();
-
-        return this.id;
+        if(hasCard() && getMessageCard().hasName())
+            return getMessageCard().getName();
+        else
+            return "Device-"+getTrackerId();
     }
 
     @BindingAdapter({"imageProvider", "contact"})
@@ -140,9 +136,20 @@ public class FusedContact extends BaseObservable {
 
 
     @Bindable
+    @NonNull
     public String getTrackerId() {
-        return hasLocation() ? this.messageLocation.getTid() : getId().substring(getId().length()-2).replace("/","");
+        if(hasLocation() && getMessageLocation().hasTid())
+            return getMessageLocation().getTid();
+        else {
+            String id = getId().replace("/","");
+            if(id.length() > 2) {
+                return id.substring(id.length() - 2);
+            }
+            else
+                return id;
+        }
     }
+
 
     @Bindable
     public @NonNull String getId() {
@@ -156,7 +163,5 @@ public class FusedContact extends BaseObservable {
     public LatLng getLatLng() {
         return new LatLng(this.messageLocation.getLatitude(), this.messageLocation.getLongitude());
     }
-
-
 
 }
