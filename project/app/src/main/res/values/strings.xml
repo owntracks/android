@@ -83,7 +83,7 @@
     <string name="contactDetailsLocation">Location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsReportedTime">Reported</string>
-    <string name="contactDetailsTopic" translatable="false">Topic</string>
+    <string name="contactDetailsTopic">Identifier</string>
     <string name="contactDetailsName">Name</string>
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
