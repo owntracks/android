@@ -103,7 +103,7 @@ public class App extends Application  {
         GeocodingProvider.initialize(App.getInstance());
         Dao.initialize(App.getInstance());
         EncryptionProvider.initialize();
-        Timber.d("trace / App async init end %s", System.currentTimeMillis());
+        getEventBus().register(this);
 
         ServiceProxy.runOrBind(sInstance, new Runnable() {
             @Override
@@ -111,8 +111,6 @@ public class App extends Application  {
                 Timber.v("trace loading services %s", System.currentTimeMillis());
             }
         });
-        App.getEventBus().register(this);
-        Timber.d("trace / App onCreate done %s", System.currentTimeMillis());
 
     }
 
@@ -199,27 +197,12 @@ public class App extends Application  {
 
     private static void onEnterForeground() {
         inForeground = true;
-        ServiceProxy.runOrBind(getContext(), new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.getServiceLocator().enableForegroundMode();
-                ServiceProxy.getServiceBeacon().enableForegroundMode();
-            }
-        });
+        ServiceProxy.onEnterForeground();
     }
 
     private static void onEnterBackground() {
         inForeground = false;
-        ServiceProxy.runOrBind(getContext(), new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.getServiceLocator().enableBackgroundMode();
-                ServiceProxy.getServiceBeacon().enableBackgroundMode();
-
-            }
-        });
+        ServiceProxy.onEnterBackground();
     }
 
     public static boolean isInForeground() {
