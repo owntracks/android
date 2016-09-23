@@ -5,16 +5,12 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.Toolbar;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -23,15 +19,13 @@ import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.ActivityWaypointBinding;
+import org.owntracks.android.databinding.ActivityRegionBinding;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -46,28 +40,11 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     private static final int REQUEST_PLACE_PICKER = 19283;
     private static final int PERMISSION_REQUEST_USE_CURRENT = 1;
     private WaypointDao dao;
-    private TextWatcher requiredForSave;
-    private GeocodableLocation currentLocation;
-    private Handler handler;
-    private TextView waypointListPlaceholder;
-    private int waypointLocalLastIdx = 0;
-    private int waypointLocalMonitoringLastIdx = 0;
-    private boolean localHeaderAdded = false;
-    private boolean localMonitoringHeaderAdded = false;
-
-    private static final Integer WAYPOINT_TYPE_LOCAL = 0;
-    private static final Integer WAYPOINT_TYPE_LOCAL_MONITORING = 2;
-
-
     private Waypoint waypoint;
     private boolean update = true;
 
-
-    private Switch share;
     private MenuItem saveButton;
-
-    // Thanks Google for not providing a getter for the value of switches.
-    private ActivityWaypointBinding binding;
+    private ActivityRegionBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +59,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
 
 
         //setContentView(R.layout.activity_waypoint);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_waypoint);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_region);
 
         setSupportToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -107,7 +84,7 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     }
 
     private void setupListenerAndRequiredFields() {
-        requiredForSave = new SimpleTextChangeListener() {
+        TextWatcher requiredForSave = new SimpleTextChangeListener() {
             @Override
             public void onChanged(String s) {
                 conditionallyEnableSaveButton();
