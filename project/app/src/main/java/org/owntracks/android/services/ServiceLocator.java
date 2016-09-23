@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -53,12 +52,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     public static final String RECEIVER_ACTION_GEOFENCE_TRANSITION = "org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION";
     public static final String RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL = "org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL";
 
-    GoogleApiClient googleApiClient;
+    private GoogleApiClient googleApiClient;
     private ServiceProxy context;
 
     private LocationRequest mLocationRequest;
     private boolean ready = false;
-    private boolean foreground = App.isInForeground();
     private Location lastKnownLocation;
     private long lastPublish;
     private WaypointDao waypointDao;
@@ -88,12 +86,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (
-                        key.equals(Preferences.Keys.PUB) ||
-                                key.equals(Preferences.Keys.LOCATOR_INTERVAL) ||
-                                key.equals(Preferences.Keys.LOCATOR_DISPLACEMENT) ||
-                                key.equals(Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND) ||
-                                key.equals(Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND)) {
-                    handlePreferences();
+                        key.equals(Preferences.Keys.LOCATOR_INTERVAL) ||
+                        key.equals(Preferences.Keys.LOCATOR_DISPLACEMENT) ||
+                        key.equals(Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND) ||
+                        key.equals(Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND)) {
+                    requestLocationUpdates();
                 }
 
             }
@@ -117,7 +114,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         App.postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
-                initLocationRequest();
+                requestLocationUpdates();
                 removeGeofences();
                 requestGeofences();
             }
@@ -146,24 +143,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		return this.lastKnownLocation;
 	}
 
-
-    public void enteredWifiNetwork(String ssid) {
-        Log.v(TAG, "matching waypoints against SSID " + ssid);
-
-        List<Waypoint> ws = this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId()), WaypointDao.Properties.WifiSSID.like("TestSSID")).build().list();
-
-        for (Waypoint w : ws) {
-            Log.v(TAG, "matched waypoint with ssid " + w.getDescription());
-           publishSsidTransitionMessage(w);
-           w.setLastTriggered(System.currentTimeMillis()/1000);
-           this.waypointDao.update(w);
-        }
-
-
-
-    }
-
-	public void onFenceTransition(Intent intent) {
+    private void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Log.v(TAG, "onFenceTransistion");
         if(event != null){
@@ -191,25 +171,16 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         }
 	}
 
-
-
 	private boolean shouldPublishLocation() {
         if(!Preferences.getPub())
             return false;
 
-        if (!this.foreground)
+        if (!ServiceProxy.isInForeground())
             return true;
 
         // Publishes are throttled to 30 seconds when in the foreground to not spam the server
         return (System.currentTimeMillis() - this.lastPublish) > TimeUnit.SECONDS.toMillis(30);
     }
-
-
-
-
-	private void initLocationRequest() {
-		requestLocationUpdates();
-	}
 
 
 
@@ -262,10 +233,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 	}
 
-	protected void handlePreferences() {
-		requestLocationUpdates();
-	}
-
 	private void disableLocationUpdates() {
 
 		if (hasConnectedGoogleApiClient()) {
@@ -286,6 +253,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		}
 	}
 
+    // Ensures location updates are not requested on main thread
 	private void requestLocationUpdates() {
         if(Looper.myLooper() == Looper.getMainLooper()) {
             App.postOnBackgroundHandlerDelayed (new Runnable() {
@@ -311,10 +279,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
         disableLocationUpdates();
 
-        Log.v(TAG, "requestLocationUpdates fg:" + this.foreground + " app fg:" + App.isInForeground());
         try {
 
-            if (this.foreground)
+            if (ServiceProxy.isInForeground())
                 setupForegroundLocationRequest();
             else
                 setupBackgroundLocationRequest();
@@ -367,7 +334,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     public void onLocationChanged(Location location) {
         Log.v(TAG, "onLocationChanged");
 
-        if(!isForeground()) {
+        if(!ServiceProxy.isInForeground()) {
             StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
         }
         lastKnownLocation = location;
@@ -378,13 +345,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             reportLocation();
     }
 
-	public void enableForegroundMode() {
-		this.foreground = true;
+	void onEnterForeground() {
 		requestLocationUpdates();
 	}
 
-	public void enableBackgroundMode() {
-		this.foreground = false;
+	void onEnterBackground() {
         requestLocationUpdates();
 	}
 
@@ -407,11 +372,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
         ServiceProxy.getServiceMessage().sendMessage(message);
 	}
-    private void publishSsidTransitionMessage(Waypoint w) {
-
-    }
-
-
 
 	private void publishWaypointMessage(Waypoint w) {
         MessageWaypoint message = MessageWaypoint.fromDaoObject(w);
@@ -420,15 +380,15 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         ServiceProxy.getServiceMessage().sendMessage(message);
 	}
 
-    public void reportLocationManually() {
+    private void reportLocationManually() {
         reportLocation(MessageLocation.REPORT_TYPE_USER); // manual publish requested by the user
     }
 
-    public void reportLocationResponse() {
+    void reportLocationResponse() {
         reportLocation(MessageLocation.REPORT_TYPE_RESPONSE); // response to a "reportLocation" request
     }
 
-    public void reportLocation() {
+    private void reportLocation() {
         reportLocation(null); // automatic publish after a location change
 	}
 
@@ -651,15 +611,12 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		return (w.getGeofenceRadius() != null) && (w.getGeofenceRadius() > 0);
 	}
 
-    public boolean isReady() {
+    private boolean isReady() {
         return ready;
     }
 
-    public boolean isForeground() {
-        return foreground;
-    }
 
-    public boolean hasConnectedGoogleApiClient () {
+    private boolean hasConnectedGoogleApiClient() {
         return this.googleApiClient != null && this.googleApiClient.isConnected() && !this.googleApiClient.isConnecting();
     }
 
