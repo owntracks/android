@@ -123,9 +123,9 @@
     <string name="aLocation">a region</string>
     <string name="events">Events</string>
     <string name="notificationMessageTitle">Messages</string>
-    <string name="beaconUUID" translatable="false">UUID</string>
-    <string name="beaconMajor" translatable="false">Major</string>
-    <string name="beaconMinor" translatable="false">Minor</string>
+    <string name="beaconUUID" translatable="false">Beacon UUID</string>
+    <string name="beaconMajor" translatable="false">Beacon major</string>
+    <string name="beaconMinor" translatable="false">Beacon minor</string>
     <string name="locationPermissionNotAvailable">Location access denied</string>
     <string name="title_activity_regions">Regions</string>
     <string name="title_activity_region">Region</string>
@@ -165,7 +165,7 @@
     <string name="play_services_not_available_recoverable">Google Play Services are not enabled or not installed</string>
     <string name="play_services_not_available_not_recoverable">Google Play Services are not available for your device</string>
     <string name="preferencesUrl" translatable="false">URL</string>
-    <string name="mode_http_private_label">Private HTTP (beta)</string>
+    <string name="mode_http_private_label">Private HTTP</string>
     <string name="messageQueued">message queued</string>
 
 
