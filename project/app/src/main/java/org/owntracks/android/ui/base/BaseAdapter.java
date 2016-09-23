@@ -16,8 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -332,7 +330,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
     }
 
     public interface ClickListener<T> {
-        void onClick(@NotNull T object , @NotNull View view, boolean longClick);
+        void onClick(@NonNull T object , @NonNull View view, boolean longClick);
     }
 
     protected void setClickListener(ClickListener listener) {

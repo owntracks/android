@@ -1,11 +1,11 @@
 package org.owntracks.android.ui.contacts;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
-import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiActivityContactsBinding;
 import org.owntracks.android.model.FusedContact;
@@ -34,7 +34,7 @@ public class ContactsActivity extends BaseActivity<UiActivityContactsBinding, Co
 
 
     @Override
-    public void onClick(@NotNull FusedContact object, @NotNull View view, boolean longClick) {
+    public void onClick(@NonNull FusedContact object, @NonNull View view, boolean longClick) {
         viewModel.onContactClick(object);
     }
 }

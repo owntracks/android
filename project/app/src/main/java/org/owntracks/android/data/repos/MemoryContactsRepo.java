@@ -5,6 +5,7 @@ import android.databinding.ObservableArrayMap;
 import android.databinding.ObservableList;
 import android.databinding.ObservableMap;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.util.SimpleArrayMap;
 
@@ -45,7 +46,7 @@ public class MemoryContactsRepo implements ContactsRepo {
         return mMap.get(id);
     }
 
-    private @NonNull FusedContact getByIdLazy(String id) {
+    private @NonNull FusedContact getByIdLazy(@NonNull String id) {
         FusedContact c = getById(id);
 
         if (c == null) {
@@ -81,7 +82,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
-    public void update(String id, MessageCard m) {
+    public void update(@NonNull String id, @NonNull MessageCard m) {
         FusedContact c = getByIdLazy(id);
         c.setMessageCard(m);
         App.getEventBus().post(c);
@@ -89,7 +90,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
-    public void update(String id, MessageLocation m) {
+    public void update(@NonNull String id, @NonNull MessageLocation m) {
         FusedContact c = getByIdLazy(id);
         if(c.getMessageLocation() != m)
             c.setMessageLocation(m);

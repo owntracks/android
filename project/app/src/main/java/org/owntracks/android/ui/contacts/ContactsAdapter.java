@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.contacts;
 
 import android.databinding.ObservableList;
+import android.support.annotation.NonNull;
 import android.view.View;
 
-import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.model.FusedContact;
@@ -19,7 +19,7 @@ class ContactsAdapter extends BaseAdapter<FusedContact> {
     }
 
     interface ClickListener extends BaseAdapter.ClickListener<FusedContact> {
-        void onClick(@NotNull FusedContact object , @NotNull View view, boolean longClick);
+        void onClick(@NonNull FusedContact object , @NonNull View view, boolean longClick);
     }
 
 }
