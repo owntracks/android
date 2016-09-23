@@ -16,7 +16,6 @@ import android.support.annotation.ArrayRes;
 import android.support.annotation.BoolRes;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
-import android.support.v7.widget.Toolbar;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
@@ -121,7 +120,9 @@ public class ActivityPreferences extends ActivityBase {
 
 
 
-            try { ver = pm.getPackageInfo(a.getPackageName(), 0).versionName; } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
+            try {
+                ver = pm.getPackageInfo(a.getPackageName(), 0).versionName + " (" + pm.getPackageInfo(a.getPackageName(), 0).versionCode+")";
+            } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
             version.setSummary(ver);
 
             export.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
