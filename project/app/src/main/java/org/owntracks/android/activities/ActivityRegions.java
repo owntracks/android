@@ -18,7 +18,6 @@ import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -58,9 +57,10 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_waypoints);
-        setSupportToolbar();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_regions);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getTitle());
         drawer = DrawerProvider.buildDrawer(this, toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
