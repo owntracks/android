@@ -24,7 +24,6 @@ public class EncryptionProvider {
     }
 
     private static void initializeSecretBox() {
-        Preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         String encryptionKey = Preferences.getEncryptionKey();
         enabled = encryptionKey != null && encryptionKey.length() > 0;
         Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
@@ -40,6 +39,7 @@ public class EncryptionProvider {
     }
 
     public static void initialize() {
+        Preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         initializeSecretBox();
     }
 
@@ -72,13 +72,13 @@ public class EncryptionProvider {
 
         @Override
         public void onAttachAfterModeChanged() {
-            initialize();
+            initializeSecretBox();
         }
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if(Preferences.Keys._ENCRYPTION_KEY.equals(key))
-                initialize();
+                initializeSecretBox();
         }
     }
 }
