@@ -64,10 +64,6 @@ public class App extends Application  {
     private static AppComponent sAppComponent = null;
 
 
-    public static ObservableMap<String, FusedContact> getFusedContacts() {
-        return sAppComponent.contactsRepo().getAllAsMap();
-    }
-
     @Override
 	public void onCreate() {
 		super.onCreate();
