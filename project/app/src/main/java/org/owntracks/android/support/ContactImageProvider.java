@@ -16,9 +16,8 @@ import android.os.AsyncTask;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
+import timber.log.Timber;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
@@ -121,7 +120,7 @@ public class ContactImageProvider {
         if(d != null) {
             return d;
         }
-        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), contact.getId()!=null ? ColorGenerator.MATERIAL.getColor(contact.getId()) : ColorGenerator.MATERIAL.getRandomColor(), FACE_DIMENSIONS));
+        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), TextDrawable.ColorGenerator.MATERIAL.getColor(contact.getId()), FACE_DIMENSIONS));
         memoryCache.putLevelTid(contact.getId(), d);
         return d;
     }
