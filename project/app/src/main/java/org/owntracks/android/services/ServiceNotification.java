@@ -50,11 +50,11 @@ public class ServiceNotification implements ProxyableService {
     private ServiceProxy context;
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
     private NotificationManager notificationManager;
+    private SimpleDateFormat dateFormater;
 
     // Ongoing notification
     private static final int NOTIFICATION_ID_ONGOING = 1;
     private NotificationCompat.Builder notificationBuilderOngoing;
-    private Notification notificationOngoing;
     private MessageLocation notificationOngoingLastLocationCache;
     private ServiceMessage.EndpointState notificationOngoingLastStateCache = ServiceMessage.EndpointState.INITIAL;
 
@@ -62,20 +62,10 @@ public class ServiceNotification implements ProxyableService {
     private static final int NOTIFICATION_ID_EVENTS = 2;
     private NotificationCompat.Builder notificationBuilderEvents;
     private LinkedList<Spannable> notificationListEvents;
-    private Notification notificationEvents;
-
-    // Message notifications. Unused for now
-    private NotificationCompat.Builder notificationBuilderMessages;
-    private static final int NOTIFICATION_ID_MESSAGES = 3;
-    private LinkedList<Spannable> notificationListMessages;
-    private Notification notificationMessages;
-    private SimpleDateFormat dateFormater;
-
 
     // Permission notification
     private NotificationCompat.Builder notificationBuilderPermission;
     private static final int NOTIFICATION_ID_PERMISSION = 4;
-    private Notification notificationPermission;
 
 
 
@@ -83,7 +73,6 @@ public class ServiceNotification implements ProxyableService {
     public void onCreate(ServiceProxy c) {
         this.context = c;
         this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        this.notificationListMessages = new LinkedList<>();
         this.notificationListEvents = new LinkedList<>();
 
 
@@ -112,7 +101,6 @@ public class ServiceNotification implements ProxyableService {
 
         };
 
-
         Preferences.registerOnPreferenceChangedListener(this.preferencesChangedListener);
         setupNotifications();
         updateNotifications();
@@ -125,7 +113,6 @@ public class ServiceNotification implements ProxyableService {
             this.context.stopForeground(true);
 
         notificationManager.cancel(NOTIFICATION_ID_EVENTS);
-        notificationManager.cancel(NOTIFICATION_ID_MESSAGES);
 
     }
 
@@ -228,8 +215,7 @@ public class ServiceNotification implements ProxyableService {
 
         notificationBuilderOngoing.setOngoing(true);
         notificationBuilderOngoing.setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
-        this.notificationOngoing = notificationBuilderOngoing.build();
-        this.context.startForeground(NOTIFICATION_ID_ONGOING, this.notificationOngoing);
+        this.context.startForeground(NOTIFICATION_ID_ONGOING, notificationBuilderOngoing.build());
     }
 
 
@@ -294,43 +280,15 @@ public class ServiceNotification implements ProxyableService {
     }
 
 
-    public void clearNotificationMessages() {
-        this.notificationListMessages.clear();
-        notificationManager.cancel(NOTIFICATION_ID_MESSAGES);
-    }
-
-    public void updateNotificationMessage() {
-        if(this.notificationListMessages.size() == 0)
-            return;
-
-        InboxStyle style = new NotificationCompat.InboxStyle();
-        for (Spannable text : this.notificationListMessages)
-            style.addLine(text);
-
-        String title = context.getString(R.string.notificationMessageTitle);
-        style.setBigContentTitle(title);
-
-        context.getString(R.string.notificationMessageTitle);
-        notificationBuilderMessages.setStyle(style);
-        notificationBuilderMessages.setContentText(notificationListMessages.getFirst());
-        notificationBuilderMessages.setContentTitle(title);
-        notificationBuilderMessages.setNumber(notificationListMessages.size());
-
-        notificationManager.notify(NOTIFICATION_ID_MESSAGES, notificationBuilderMessages.build());
-    }
-
-
     @Override
     public void onDestroy() {
-        clearNotificationMessages();
         clearNotificationTransitions();
+        Preferences.unregisterOnPreferenceChangedListener(this.preferencesChangedListener);
     }
 
     @Override
     public void onStartCommand(Intent intent, int flags, int startId) {
-        if (ServiceNotification.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION.equals(intent.getAction())) {
-            clearNotificationMessages();
-        } else if (ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION.equals(intent.getAction())) {
+        if (ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION.equals(intent.getAction())) {
             clearNotificationTransitions();
         }
     }
