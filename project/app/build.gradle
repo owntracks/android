@@ -130,7 +130,6 @@ dependencies {
     }
     compile 'com.joanzapata.android:android-iconify:1.0.10'
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
-    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
     apt 'com.google.guava:guava:19.0' // needed by Dagger
     apt "com.google.dagger:dagger-compiler:${daggerVersion}"
