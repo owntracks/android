@@ -114,9 +114,14 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
 
         this.ready = true;
-        initLocationRequest();
-        removeGeofences();
-        requestGeofences();
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                initLocationRequest();
+                removeGeofences();
+                requestGeofences();
+            }
+        });
     }
 
     @Override
@@ -527,8 +532,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
-					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setNotificationResponsiveness(30*1000)
+					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(30))
+                    .setNotificationResponsiveness((int)TimeUnit.SECONDS.toMillis(30))
 					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
