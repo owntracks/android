@@ -21,6 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -242,13 +244,14 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                 public void onShow(DialogInterface dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
+                                    final ImageView scanButton = (ImageView) d.findViewById(R.id.scanButton);
 
                                     url.setText(Preferences.getUrl());
                                     url.setFloatingLabelAlwaysShown(true);
-                                    url.setLongClickable(true);
-                                    url.setOnLongClickListener(new View.OnLongClickListener() {
+
+                                    scanButton.setOnClickListener(new View.OnClickListener() {
                                         @Override
-                                        public boolean onLongClick(View view) {
+                                        public void onClick(View view) {
                                             barcodeCallback = new BarcodeScanListener() {
                                                 public void onBarcodeScanResult(String input) {
                                                     Log.v(TAG, "Receiving barcode url");
@@ -257,7 +260,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                             };
                                             IntentIntegrator integrator = new IntentIntegrator(FragmentPreferences.this);
                                             integrator.initiateScan();
-                                            return true;
+
                                         }
                                     });
 
