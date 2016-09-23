@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.BR;
-import org.owntracks.android.R;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
@@ -16,8 +14,6 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
 
 
 @PerActivity
@@ -37,7 +33,7 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
 
     @Override
     public ObservableList<FusedContact> getContacts() {
-        return contactsRepo.getAllAsList();
+        return contactsRepo.getAll();
     }
 
     @Override

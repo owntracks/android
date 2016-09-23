@@ -84,7 +84,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public List<FusedContact> getContacts() {
-        return this.contactsRepo.getAllAsList();
+        return this.contactsRepo.getAll();
     }
 
     @Override
@@ -95,14 +95,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     private void setContact(FusedContact c) {
     }
-
-    @Override
-    public void onMapReady() {
-        Timber.v("map is ready mode: %s", mode);
-        this.mapReady = true;
-
-    }
-
 
     @Override
     public void restore(@NonNull String contactId) {
