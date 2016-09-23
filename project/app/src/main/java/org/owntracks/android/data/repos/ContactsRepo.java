@@ -11,9 +11,7 @@ import org.owntracks.android.model.FusedContact;
 
 
 public interface ContactsRepo {
-    ObservableMap<String, FusedContact> getAllAsMap();
-    ObservableList<FusedContact> getAllAsList();
-
+    ObservableList<FusedContact> getAll();
     FusedContact getById(String id);
 
     void clearAll();

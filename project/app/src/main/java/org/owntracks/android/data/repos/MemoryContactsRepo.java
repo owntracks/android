@@ -5,6 +5,8 @@ import android.databinding.ObservableArrayMap;
 import android.databinding.ObservableList;
 import android.databinding.ObservableMap;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
+import android.support.v4.util.SimpleArrayMap;
 
 import org.owntracks.android.App;
 import org.owntracks.android.injection.scopes.PerApplication;
@@ -18,28 +20,23 @@ import timber.log.Timber;
 
 @PerApplication
 public class MemoryContactsRepo implements ContactsRepo {
-    ObservableMap<String, FusedContact> mMap;
-    ObservableList<FusedContact> mList;
-
+    private static final int LOAD_FACTOR = 20;
     private static final long MAJOR_STEP = 1000000;
+
+    private SimpleArrayMap<String, FusedContact> mMap;
+    private ObservableList<FusedContact> mList;
+
     private long majorRevision = 0;
     private long revision = 0;
 
-
-
     @Inject
     public MemoryContactsRepo() {
-        mMap = new ObservableArrayMap<>();
+        mMap = new SimpleArrayMap<>(LOAD_FACTOR);
         mList = new ObservableArrayList<>();
     }
 
     @Override
-    public ObservableMap<String, FusedContact> getAllAsMap() {
-        return mMap;
-    }
-
-    @Override
-    public ObservableList<FusedContact> getAllAsList() {
+    public ObservableList<FusedContact> getAll() {
         return mList;
     }
 
@@ -47,7 +44,6 @@ public class MemoryContactsRepo implements ContactsRepo {
     public FusedContact getById(String id) {
         return mMap.get(id);
     }
-
 
     private @NonNull FusedContact getByIdLazy(String id) {
         FusedContact c = getById(id);
@@ -98,7 +94,6 @@ public class MemoryContactsRepo implements ContactsRepo {
         if(c.getMessageLocation() != m)
             c.setMessageLocation(m);
         App.getEventBus().post(c);
-        Timber.v("contact length %s", mList.size());
         revision++;
     }
 
@@ -106,7 +101,4 @@ public class MemoryContactsRepo implements ContactsRepo {
     public long getRevision() {
         return majorRevision+revision;
     }
-
-
-
 }
