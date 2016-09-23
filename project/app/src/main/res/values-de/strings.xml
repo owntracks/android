@@ -166,6 +166,7 @@
     <string name="done_heading">Fertig</string>
     <string name="enjoy_description">Viel Spaß mit Owntracks</string>
     <string name="icon_description_done">Fertig</string>
-    <string name="title_activity_featured">Besonderheiten</string>
+    <string name="title_activity_import">Konfigurations import</string>
+    <string name="menuCurrentLoction">Aktuelle position</string>
 
 </resources>
