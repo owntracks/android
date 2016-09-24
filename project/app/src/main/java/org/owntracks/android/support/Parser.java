@@ -23,10 +23,14 @@ public class Parser {
         defaultMapper = new ObjectMapper();
         arrayCompatMapper = new ObjectMapper();
         arrayCompatMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-
     }
+
+    public static String toJsonPlain(@NonNull MessageBase message) throws IOException {
+        return defaultMapper.writeValueAsString(message);
+    }
+
     public static String toJson(@NonNull MessageBase message) throws IOException, EncryptionException {
-        return encrypt(defaultMapper.writeValueAsString(message));
+        return encrypt(toJsonPlain(message));
     }
 
     // Accepts {plain} as byte array

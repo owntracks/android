@@ -76,12 +76,9 @@ public class ActivityExport extends ActivityBase {
         public boolean onPreferenceClick(Preference preference) {
             String exportStr;
             try {
-                exportStr = Parser.toJson(Preferences.exportToMessage());
+                exportStr = Parser.toJsonPlain(Preferences.exportToMessage());
             } catch (IOException e) {
                 Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-                return false;
-            } catch (Parser.EncryptionException e) {
                 e.printStackTrace();
                 return false;
             }
