@@ -263,13 +263,12 @@ public class ServiceProxy extends Service {
 
 
 	public static PendingIntent getPendingIntentForService(Context c,
-			String targetServiceId, String action, Bundle extras) {
+			int targetServiceId, String action, Bundle extras) {
 		return getPendingIntentForService(c, targetServiceId, action, extras,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
-	public static PendingIntent getPendingIntentForService(Context c,
-			String targetServiceId, String action, Bundle extras, int flags) {
+	public static PendingIntent getPendingIntentForService(Context c, int targetServiceId, String action, Bundle extras, int flags) {
 		Intent i = new Intent().setClass(c, ServiceProxy.class);
 		i.setAction(action);
 
