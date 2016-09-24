@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -39,16 +40,16 @@ public class ServiceProxy extends Service {
     public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
 
 
-    public static final String SERVICE_APP = "A";
-	public static final String SERVICE_LOCATOR = "L";
-	public static final String SERVICE_NOTIFICATION = "N";
-	public static final String SERVICE_BEACON = "BE";
-	public static final String SERVICE_MESSAGE = "M";
+    public static final int SERVICE_APP = 0;
+	public static final int SERVICE_LOCATOR = 1;
+	public static final int SERVICE_NOTIFICATION = 2;
+	public static final int SERVICE_BEACON = 3;
+	public static final int SERVICE_MESSAGE = 4;
 
 
 	public static final String KEY_SERVICE_ID = "srvID";
 	private static ServiceProxy instance;
-	private static final HashMap<String, ProxyableService> services = new HashMap<>();
+	private static final ProxyableService[] services = new ProxyableService[5];
 	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
@@ -121,11 +122,12 @@ public class ServiceProxy extends Service {
 	@Override
 	public void onDestroy() {
 		Timber.v("");
-		for (ProxyableService p : services.values()) {
-			App.getEventBus().unregister(p);
-			p.onDestroy();
+		for ( int i = 1; i <= 4; i ++ ) {
+			App.getEventBus().unregister(services[i]);
+			services[i].onDestroy();
+			services[i]=null;
 		}
-
+		bgInitialized = false;
 		if (this.binder != null) {
 			this.binder.close();
 			this.binder = null;
@@ -174,16 +176,17 @@ public class ServiceProxy extends Service {
 
 	}
 
-	public static ProxyableService getService(String id) {
-		return services.get(id);
+	public static ProxyableService getService(int id) {
+		return services[id];
 	}
 
-	public static ProxyableService instantiateService(String id) {
+	public static ProxyableService instantiateService(int id) {
 		Timber.v("service:%s", id);
-		if (services.containsKey(id))
-			return services.get(id);
+		ProxyableService p = services[id];
 
-		ProxyableService p = null;
+		if (p != null)
+			return p;
+
         switch (id) {
             case SERVICE_APP:
                 p = new ServiceApplication();
@@ -205,7 +208,7 @@ public class ServiceProxy extends Service {
 		if(p == null)
 			return null;
 
-		services.put(id, p);
+		services[id] = p;
 		p.onCreate(instance);
 		App.getEventBus().register(p);
 
@@ -234,8 +237,8 @@ public class ServiceProxy extends Service {
 
 
 	public static ProxyableService getServiceForIntent(Intent i) {
-		if ((i != null) && (i.getStringExtra(KEY_SERVICE_ID) != null))
-			return getService(i.getStringExtra(KEY_SERVICE_ID));
+		if ((i != null) && (i.getIntExtra(KEY_SERVICE_ID, -1) != -1))
+			return getService(i.getIntExtra(KEY_SERVICE_ID, -1));
 		else
 			return null;
 
