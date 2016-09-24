@@ -76,6 +76,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	private BroadcastReceiver idleReceiver;
 	private PowerManager powerManager;
 	private ServiceMessage service;
+	private boolean receiverRegisterd = false;
 
 	@Override
 	public void onSetService(ServiceMessage service) {
@@ -637,8 +638,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	private void disconnect(boolean fromUser) {
 
 		Timber.v("disconnect. user:%s", fromUser);
-		Thread.dumpStack();
-
 		if (isConnecting()) {
             return;
         }
@@ -784,7 +783,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	}
 
 	private void unregisterReceiver() {
-		if(idleReceiver != null)
+		if(idleReceiver != null && receiverRegisterd)
 			context.unregisterReceiver(idleReceiver);
 	}
 
@@ -801,6 +800,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 				}
 			};
 			context.registerReceiver(idleReceiver, filter);
+			receiverRegisterd = true;
 		}
 
 	}
