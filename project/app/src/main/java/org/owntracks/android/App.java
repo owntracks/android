@@ -104,13 +104,7 @@ public class App extends Application  {
         Dao.initialize(App.getInstance());
         EncryptionProvider.initialize();
         getEventBus().register(this);
-
-        ServiceProxy.runOrBind(sInstance, new Runnable() {
-            @Override
-            public void run() {
-                Timber.v("trace loading services %s", System.currentTimeMillis());
-            }
-        });
+        startService(new Intent(this, ServiceProxy.class));
 
     }
 
