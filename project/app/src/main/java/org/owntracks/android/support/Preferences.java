@@ -908,7 +908,7 @@ public class Preferences {
 
     @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeMqttPrivate =false, exportModeMqttPublic = false, exportModeHttpPrivate =true)
     public static boolean getHttpSchedulerAllowDirectStrategy() {
-        return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valFalse);
+        return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valTrue);
     }
 
     @Import(key =Keys.HTTP_SCHEDULER_DIRECT)
