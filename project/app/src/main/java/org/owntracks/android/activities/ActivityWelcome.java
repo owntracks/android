@@ -31,8 +31,8 @@ import org.owntracks.android.R;
 import org.owntracks.android.support.PausableViewPager;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.map.MapActivity;
-import org.owntracks.android.wrapper.GoogleApiAvailability;
-import org.owntracks.android.wrapper.GoogleApiAvailabilityResponder;
+import org.owntracks.android.support.unfree.GoogleApiAvailability;
+import org.owntracks.android.support.unfree.GoogleApiAvailabilityResponder;
 
 import java.util.ArrayList;
 
