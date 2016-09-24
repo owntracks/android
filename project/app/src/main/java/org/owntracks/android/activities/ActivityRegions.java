@@ -20,8 +20,10 @@ import com.mikepenz.materialdrawer.Drawer;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.greenrobot.greendao.query.Query;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.waypoints.AdapterCursorLoader;
 import org.owntracks.android.ui.waypoints.AdapterWaypoints;
 import org.owntracks.android.db.Dao;
@@ -90,7 +92,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return Dao.getDb().query(Dao.getWaypointDao().getTablename(), Dao.getWaypointDao().getAllColumns(), null, null, null, null, CURSOR_ORDER);
+                return Dao.getWaypointDao().queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId())).buildCursor().query();
             }
         };
     }
