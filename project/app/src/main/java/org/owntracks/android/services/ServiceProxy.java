@@ -244,11 +244,11 @@ public class ServiceProxy extends Service {
 
 	}
 
-	public static PendingIntent getBroadcastIntentForService(Context c,  String targetServiceId, String action, Bundle extras) {
+	public static PendingIntent getBroadcastIntentForService(Context c,  int targetServiceId, String action, Bundle extras) {
 		return getBroadcastIntentForService(c, targetServiceId, action, extras, -1);
 	}
 
-	public static PendingIntent getBroadcastIntentForService(Context c,  String targetServiceId, String action, Bundle extras, int flags) {
+	public static PendingIntent getBroadcastIntentForService(Context c,  int targetServiceId, String action, Bundle extras, int flags) {
 		Intent i = new Intent().setClass(c, ReceiverProxy.class);
 		i.setAction(action);
 
