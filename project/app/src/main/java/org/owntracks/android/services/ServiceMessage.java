@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
@@ -85,12 +87,12 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onEndpointStateChanged(EndpointState.INITIAL, null);
-        onModeChanged(Preferences.getModeId());
+        endpoint = instantiateEndpoint(Preferences.getModeId());
     }
 
 
 
-    private void onModeChanged(int mode) {
+    private ServiceMessageEndpoint instantiateEndpoint(int mode) {
         Timber.v("mode:%s", mode);
         if(endpoint != null) {
             Timber.v("destroying endpoint");
@@ -98,16 +100,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         }
 
         Timber.v("instantiating new endpoint");
-        endpoint = instantiateEndpoint(mode);
-
-        if(endpoint == null) {
-            Timber.e("unable to instantiate service for mode:%s", mode);
-        }
-    }
-
-    private ServiceMessageEndpoint instantiateEndpoint(int id) {
-        ServiceMessageEndpoint p;
-        switch (id) {
+        ServiceMessageEndpoint p = null;
+        switch (mode) {
             case App.MODE_ID_HTTP_PRIVATE:
                 p = new ServiceMessageHttp();
                 break;
@@ -115,8 +109,11 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             case App.MODE_ID_MQTT_PUBLIC:
                 p = new ServiceMessageMqtt();
                 break;
-            default:
-                return null;
+        }
+
+        if(p == null) {
+            Timber.e("unable to instantiate endpoint for mode:%s", mode);
+            return null;
         }
 
         p.onCreate(context);
@@ -127,14 +124,15 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Override
     public void onDestroy() {
+        Timber.d("onDestroy");
         if(endpoint != null)
             endpoint.onDestroy();
     }
 
     @Override
-    public void onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent) {
         if(endpoint != null)
-            endpoint.onStartCommand(intent, flags, startId);
+            endpoint.onStartCommand(intent);
     }
 
     @Subscribe
@@ -142,20 +140,26 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     }
 
-    @Subscribe(sticky = true)
+    @Subscribe
     public void onEvent(Events.ModeChanged event) {
-        onModeChanged(Preferences.getModeId());
+        endpoint = instantiateEndpoint(Preferences.getModeId());
     }
 
-    private HashMap<Long, MessageBase> outgoingQueue = new HashMap<>();
+    private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
-    public void sendMessage(MessageBase message) {
-        Log.v(TAG, "sendMessage() - endpoint:" + endpoint);
+    void sendMessage(MessageBase message) {
+        Timber.v("endpoint:%s, message:%s",endpoint, message);
 
         message.setOutgoing();
 
-        if(endpoint == null || !endpoint.isReady()) {
-            Timber.e("no endpoint or endpoint does not yet accept messages");
+        if(endpoint == null) {
+            Timber.e("no endpoint");
+            return;
+        }
+
+        if(!endpoint.isReady()) {
+            Timber.e("endpoint is not ready: %s", endpoint);
+            endpoint.probe();
             return;
         }
 
@@ -167,8 +171,9 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
 
     public void onMessageDelivered(Long messageId) {
+        MessageBase m = outgoingQueue.get(messageId);
+        outgoingQueue.remove(messageId);
 
-        MessageBase m = outgoingQueue.remove(messageId);
         StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
         if(m == null) {
             Log.e(TAG, "onMessageDelivered()- messageId:"+messageId + ", error: called for unqueued message");
@@ -178,7 +183,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
                 App.getEventBus().post(m);
             }
         }
-        Log.v(TAG, "onMessageDelivered()-  queueKeys:" +  outgoingQueue.keySet().toString());
     }
 
     private void onMessageQueued(MessageBase m) {
@@ -192,7 +196,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     public void onMessageDeliveryFailed(Long messageId) {
 
-        MessageBase m = outgoingQueue.remove(messageId);
+        MessageBase m = outgoingQueue.get(messageId);
+        outgoingQueue.remove(messageId);
         StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
 
         if(m == null) {

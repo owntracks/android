@@ -11,7 +11,7 @@ public interface ProxyableService {
 
 	void onDestroy();
 
-	void onStartCommand(Intent intent, int flags, int startId);
+	void onStartCommand(Intent intent);
 
 	@Subscribe
 	void onEvent(Events.Dummy event);

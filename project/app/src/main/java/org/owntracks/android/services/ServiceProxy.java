@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import java.io.Closeable;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -8,12 +9,14 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -30,7 +33,7 @@ import org.owntracks.android.support.receiver.ReceiverProxy;
 
 import timber.log.Timber;
 
-public class ServiceProxy extends ServiceBindable {
+public class ServiceProxy extends Service {
 	private static final String TAG = "ServiceProxy";
 
     public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
@@ -52,6 +55,12 @@ public class ServiceProxy extends ServiceBindable {
     private static boolean attemptingToBind = false;
 	private static boolean bgInitialized = false;
 
+
+
+
+	protected boolean started;
+	protected ServiceBinder binder;
+
 	public static void setBgInitialized() {
 		synchronized (ServiceProxy.class) {
 			bgInitialized = true;
@@ -69,26 +78,27 @@ public class ServiceProxy extends ServiceBindable {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		this.binder = new ServiceBinder(this);
 		HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
 		mServiceHandlerThread.start();
 
 	}
 
-	@Override
-	protected void onStartOnce() {
+	private void onStartOnce(@Nullable final Intent intent) {
 		instance = this;
-
+		Timber.v("");
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				Timber.d("loading services");
+				instantiateService(SERVICE_MESSAGE);
 				instantiateService(SERVICE_APP);
 				instantiateService(SERVICE_NOTIFICATION);
 				instantiateService(SERVICE_LOCATOR);
-				instantiateService(SERVICE_MESSAGE);
 				instantiateService(SERVICE_BEACON);
 				setBgInitialized();
+				deliverIntentToService(intent);
 				App.postOnMainHandler(new Runnable() {
 					@Override
 					public void run() {
@@ -110,23 +120,58 @@ public class ServiceProxy extends ServiceBindable {
 
 	@Override
 	public void onDestroy() {
+		Timber.v("");
 		for (ProxyableService p : services.values()) {
 			App.getEventBus().unregister(p);
 			p.onDestroy();
 		}
 
-		super.onDestroy();
-
+		if (this.binder != null) {
+			this.binder.close();
+			this.binder = null;
+		}
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		int r = super.onStartCommand(intent, flags, startId);
+		super.onStartCommand(intent, flags, startId);
+		start(intent);
+		return Service.START_STICKY;
+	}
+
+	void start(@Nullable final Intent intent) {
+
+		if (getBgInitialized() && intent != null) {
+			Timber.v("case:1/direct");
+			// start was already called and services are setup. Deliver intent to service if there is one
+			deliverIntentToService(intent);
+		} else if(started && intent != null) {
+			Timber.v("case:2/started/notrdy");
+			// start was already called but services are not yet ready to handle intent.
+			// Race condition were new intent is received before services are ready.
+			// Intent is queued into queue of runnables that run when all services are ready. See onStartOnce();
+			runQueue.addLast(new Runnable() {
+				@Override
+				public void run() {
+					Timber.v("delivering intent to service ");
+					deliverIntentToService(intent);
+				}
+			});
+		} else {
+			Timber.v("case:3/notstarted");
+			// start services and deliver intent when ready.
+			started = true;
+			onStartOnce(intent);
+		}
+	}
+
+
+	private void deliverIntentToService(@Nullable Intent intent) {
 		ProxyableService s = getServiceForIntent(intent);
-		Log.v(TAG, "onStartCommand getServiceForIntent:"+s);
-		if (s != null)
-			s.onStartCommand(intent, flags, startId);
-		return r;
+		Log.v(TAG, "deliverIntentToService getServiceForIntent:"+s);
+		if (s != null && intent != null)
+			s.onStartCommand(intent);
+
 	}
 
 	public static ProxyableService getService(String id) {
@@ -258,7 +303,7 @@ public class ServiceProxy extends ServiceBindable {
 			}
 		}
 
-		public ServiceConnection getServiceConnection() {
+		ServiceConnection getServiceConnection() {
 			return this.serviceConnection;
 		}
 
@@ -345,4 +390,30 @@ public class ServiceProxy extends ServiceBindable {
 	public static boolean isInForeground() {
 		return App.isInForeground();
 	}
+
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Timber.v("");
+		start(intent);
+		return this.binder;
+	}
+
+	public class ServiceBinder extends Binder {
+		private WeakReference<ServiceProxy> mService;
+
+		ServiceBinder(ServiceProxy serviceBindable) {
+			this.mService = new WeakReference<>(serviceBindable);
+		}
+
+		public ServiceProxy getService() {
+			return this.mService.get();
+		}
+
+		void close() {
+			this.mService = null;
+		}
+	}
+
+
 }

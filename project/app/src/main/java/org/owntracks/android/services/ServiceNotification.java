@@ -287,7 +287,7 @@ public class ServiceNotification implements ProxyableService {
     }
 
     @Override
-    public void onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent) {
         if (ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION.equals(intent.getAction())) {
             clearNotificationTransitions();
         }

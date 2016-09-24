@@ -144,6 +144,11 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         return mHttpClient != null;
     }
 
+    @Override
+    public void probe() {
+        Timber.d("endpointUrl:%s, httpClient:%s", this.endpointUrl, this.mHttpClient);
+    }
+
 
     private static void setLastState(String message) {
         StatisticsProvider.setString(StatisticsProvider.SERVICE_MESSAGE_BACKEND_LAST_STATUS, message);
@@ -158,7 +163,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
     }
 
     @Override
-    public void onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent) {
 
     }
 

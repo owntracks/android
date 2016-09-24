@@ -104,7 +104,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
     @Override
-    public void onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent) {
 
     }
 

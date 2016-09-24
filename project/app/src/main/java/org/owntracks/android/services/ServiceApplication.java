@@ -28,7 +28,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
     }
 
     @Override
-    public void onStartCommand(Intent intent, int flags, int startId) {
+    public void onStartCommand(Intent intent) {
     }
 
     @Subscribe
