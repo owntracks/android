@@ -1,4 +1,4 @@
-package org.owntracks.android.wrapper;
+package org.owntracks.android.support.unfree;
 
 import android.app.Activity;
 import android.app.Dialog;

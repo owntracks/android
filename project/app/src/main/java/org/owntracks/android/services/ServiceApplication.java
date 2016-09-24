@@ -12,7 +12,7 @@ import org.owntracks.android.support.interfaces.ProxyableService;
 import android.content.Intent;
 import android.os.Message;
 
-import org.owntracks.android.wrapper.GoogleApiAvailability;
+import org.owntracks.android.support.unfree.GoogleApiAvailability;
 
 public class ServiceApplication implements ProxyableService, StaticHandlerInterface {
 
