@@ -1,4 +1,4 @@
-package org.owntracks.android.adapter;
+package org.owntracks.android.ui.waypoints;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 
 import org.owntracks.android.R;
 
-
+// TODO: refactor to MVVM pattern
+@Deprecated
 public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = "AdapterCursorLoader";

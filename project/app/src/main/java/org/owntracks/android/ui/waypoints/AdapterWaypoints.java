@@ -1,4 +1,4 @@
-package org.owntracks.android.adapter;
+package org.owntracks.android.ui.waypoints;
 
 
 import android.content.Context;
@@ -15,7 +15,8 @@ import org.owntracks.android.db.WaypointDao;
 
 import java.util.Date;
 
-
+// TODO: refactor to MVVM pattern
+@Deprecated
 public class AdapterWaypoints extends AdapterCursorLoader {
     private String labelGeofence;
     private String labelBeacon = "Beacon active";
