@@ -2,31 +2,22 @@ package org.owntracks.android.services;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.util.HashMap;
 import java.util.LinkedList;
 
-import android.app.Activity;
-import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ProxyableService;
@@ -93,11 +84,11 @@ public class ServiceProxy extends Service {
 			@Override
 			public void run() {
 				Timber.d("loading services");
-				instantiateService(SERVICE_MESSAGE);
-				instantiateService(SERVICE_APP);
-				instantiateService(SERVICE_NOTIFICATION);
-				instantiateService(SERVICE_LOCATOR);
-				instantiateService(SERVICE_BEACON);
+				loadService(SERVICE_MESSAGE);
+				loadService(SERVICE_APP);
+				loadService(SERVICE_NOTIFICATION);
+				loadService(SERVICE_LOCATOR);
+				loadService(SERVICE_BEACON);
 				setBgInitialized();
 				deliverIntentToService(intent);
 				App.postOnMainHandler(new Runnable() {
@@ -176,11 +167,7 @@ public class ServiceProxy extends Service {
 
 	}
 
-	public static ProxyableService getService(int id) {
-		return services[id];
-	}
-
-	public static ProxyableService instantiateService(int id) {
+	public static ProxyableService loadService(int id) {
 		Timber.v("service:%s", id);
 		ProxyableService p = services[id];
 
@@ -218,27 +205,27 @@ public class ServiceProxy extends Service {
 	}
 
 	public static ServiceApplication getServiceApplication() {
-		return (ServiceApplication) getService(SERVICE_APP);
+		return (ServiceApplication) loadService(SERVICE_APP);
 	}
 
 	public static ServiceLocator getServiceLocator() {
-		return (ServiceLocator) getService(SERVICE_LOCATOR);
+		return (ServiceLocator) loadService(SERVICE_LOCATOR);
 	}
 
     public static ServiceBeacon getServiceBeacon() {
-        return (ServiceBeacon) getService(SERVICE_BEACON);
+        return (ServiceBeacon) loadService(SERVICE_BEACON);
     }
 	public static ServiceNotification getServiceNotification() {
-		return (ServiceNotification) getService(SERVICE_NOTIFICATION);
+		return (ServiceNotification) loadService(SERVICE_NOTIFICATION);
 	}
 	public static ServiceMessage getServiceMessage() {
-		return (ServiceMessage) getService(SERVICE_MESSAGE);
+		return (ServiceMessage) loadService(SERVICE_MESSAGE);
 	}
 
 
 	public static ProxyableService getServiceForIntent(Intent i) {
 		if ((i != null) && (i.getIntExtra(KEY_SERVICE_ID, -1) != -1))
-			return getService(i.getIntExtra(KEY_SERVICE_ID, -1));
+			return loadService(i.getIntExtra(KEY_SERVICE_ID, -1));
 		else
 			return null;
 
@@ -297,6 +284,7 @@ public class ServiceProxy extends Service {
 
 		@Override
 		public void close() {
+			Timber.e("service connection closed");
             attemptingToBind = false;
 
             if (bound) {
@@ -305,7 +293,7 @@ public class ServiceProxy extends Service {
 			}
 		}
 
-		ServiceConnection getServiceConnection() {
+		public ServiceConnection getServiceConnection() {
 			return this.serviceConnection;
 		}
 
@@ -349,7 +337,7 @@ public class ServiceProxy extends Service {
 
 				@Override
 				public void onServiceConnected(ComponentName name, IBinder binder) {
-
+					instance = ServiceBinder.class.cast(binder).getService(); // this leaks the service but we actually want that
                     bound = true;
                     attemptingToBind = false;
 					if(getBgInitialized())
