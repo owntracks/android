@@ -86,15 +86,12 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	@Override
 	public boolean sendMessage(MessageBase message) {
-		Log.v(TAG, "sendMessage base: " + message + " " + message.getClass());
-
 		if(state == ServiceMessage.EndpointState.ERROR_CONFIGURATION) {
-			Log.e(TAG, "dropping outgoing message due to incomplete configuration");
+			Timber.e("dropping outgoing message due to incomplete configuration");
 			return false;
 		}
 
 		message.setOutgoingProcessor(this);
-		Log.v(TAG, "enqueueing message to pubPool. running: " + pubPool.isRunning() + ", q size:" + pubPool.getQueue().size());
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, pubPool.getQueueLength());
 
 		this.pubPool.queue(message);
@@ -312,7 +309,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	}
 
 	@Override
-	public void onStartCommand(Intent intent, int flags, int startId) {
+	public void onStartCommand(Intent intent) {
 		Log.v(TAG, "onStartCommand intent:"+intent.getAction());
 
 		if(ServiceMessageMqtt.RECEIVER_ACTION_RECONNECT.equals(intent.getAction())) {
@@ -638,7 +635,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 
 	private void disconnect(boolean fromUser) {
-		Log.v(TAG, "disconnect. from user: " + fromUser);
+
+		Timber.v("disconnect. user:%s", fromUser);
+		Thread.dumpStack();
 
 		if (isConnecting()) {
             return;
@@ -690,7 +689,8 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	private void changeState(EndpointState newState, Exception e) {
 		state = newState;
-		service.onEndpointStateChanged(newState, e);
+		if(service != null)
+			service.onEndpointStateChanged(newState, e);
 	}
 
 	private boolean isOnline() {
@@ -720,7 +720,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		disconnect(false);
 		//TODO, clear queue
 		unregisterReceiver();
-		changeState(EndpointState.DISCONNECTED);
+		this.service = null; // clear reference to service
 	}
 
 	public static EndpointState getState() {
@@ -805,6 +805,14 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	}
 
+
+	@Override
+	public void probe() {
+		Timber.d("mqttClient:%s, mqttClient.isConnected:%s, state:%s, reconnectHandlerEngaged:%s, pubPool.isRunning:%s", mqttClient!=null, mqttClient != null && mqttClient.isConnected(), getState(), reconnectHandler.hasStarted, pubPool.isRunning());
+
+		if(error != null)
+			Timber.e(error, "hasError");
+	}
 
 	class PingHandler implements MqttPingSender {
         static final String TAG = "PingHandler";
@@ -945,6 +953,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
         }
 
         public void schedule() {
+			hasStarted = true;
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			long delayInMilliseconds;
 			if(BuildConfig.DEBUG)
@@ -1020,6 +1029,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
         public boolean containsKey(String key) throws MqttPersistenceException {
             return data.containsKey(key);
         }
-    }
 
+
+
+	}
 }
+
