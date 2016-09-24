@@ -46,18 +46,14 @@ public class  ActivityImport extends ActivityBase {
 
         input = (TextView) findViewById(R.id.input);
 
-        Log.v(TAG, "checking for import intent");
         // Look for Import Preference File Intent
         final Intent intent = getIntent();
         final String action = intent.getAction();
-        Log.v(TAG, "action: " + intent.getAction());
 
 
         if(Intent.ACTION_VIEW.equals(action)) {
-            Log.v(TAG, "action ok, getting data uri");
 
             Uri uri = intent.getData();
-            Log.v(TAG, "uri: " + uri);
 
             if (uri != null) {
                 extractPreferences(uri);
