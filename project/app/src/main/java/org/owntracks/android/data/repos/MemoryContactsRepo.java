@@ -52,9 +52,14 @@ public class MemoryContactsRepo implements ContactsRepo {
         return c;
     }
 
-    private synchronized void put(String id, FusedContact contact) {
+    private synchronized void put(String id, final FusedContact contact) {
         mMap.put(id, contact);
-        mList.add(contact);
+        App.postOnMainHandler(new Runnable() {
+            @Override
+            public void run() {
+                mList.add(contact);
+            }
+        });
         Timber.v("new contact added:%s", id);
         revision++;
     }
@@ -62,16 +67,29 @@ public class MemoryContactsRepo implements ContactsRepo {
     @Override
     public synchronized void clearAll() {
         mMap.clear();
-        mList.clear();
+        App.postOnMainHandler(new Runnable() {
+            @Override
+            public void run() {
+                mList.clear();
+            }
+        });
+
         majorRevision-=MAJOR_STEP;
         revision = 0;
     }
 
     @Override
     public synchronized void remove(String id) {
-        FusedContact c = mMap.remove(id);
-        if(c != null)
-            mList.remove(c);
+        final FusedContact c = mMap.remove(id);
+        if(c != null) {
+            App.postOnMainHandler(new Runnable() {
+                @Override
+                public void run() {
+                    mList.remove(c);
+                }
+            });
+
+        }
         majorRevision-=MAJOR_STEP;
         revision = 0;
     }

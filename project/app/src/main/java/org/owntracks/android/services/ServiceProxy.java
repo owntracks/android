@@ -168,12 +168,12 @@ public class ServiceProxy extends Service {
 	}
 
 	public static ProxyableService loadService(int id) {
-		Timber.v("service:%s", id);
 		ProxyableService p = services[id];
 
 		if (p != null)
 			return p;
 
+		Timber.v("lazyloading:%s", id);
         switch (id) {
             case SERVICE_APP:
                 p = new ServiceApplication();
