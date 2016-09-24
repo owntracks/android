@@ -28,7 +28,7 @@ import com.nineoldandroids.view.ViewHelper;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.support.PausableViewPager;
+import org.owntracks.android.support.widgets.PausableViewPager;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.support.unfree.GoogleApiAvailability;

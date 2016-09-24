@@ -3,7 +3,7 @@
         android:key="root"
         android:title="@string/preferencesServer">
 
-    <org.owntracks.android.support.ListIntegerPreference
+    <org.owntracks.android.support.widgets.ListIntegerPreference
         android:defaultValue="@integer/valModeId"
         android:entries="@array/profileIds_readable"
         android:entryValues="@array/modeIds"

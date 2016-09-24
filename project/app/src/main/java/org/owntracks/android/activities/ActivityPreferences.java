@@ -20,12 +20,12 @@ import android.support.annotation.StringRes;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.support.EditIntegerPreference;
-import org.owntracks.android.support.EditStringPreference;
+import org.owntracks.android.support.widgets.EditIntegerPreference;
+import org.owntracks.android.support.widgets.EditStringPreference;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.ListIntegerPreference;
+import org.owntracks.android.support.widgets.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.ToolbarPreference;
+import org.owntracks.android.support.widgets.ToolbarPreference;
 
 import timber.log.Timber;
 

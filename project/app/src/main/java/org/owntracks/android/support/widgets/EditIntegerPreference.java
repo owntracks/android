@@ -1,10 +1,12 @@
-package org.owntracks.android.support;
+package org.owntracks.android.support.widgets;
 
 import android.content.Context;
 
 import android.util.AttributeSet;
 
-public class EditIntegerPreference extends org.owntracks.android.support.EditStringPreference {
+import org.owntracks.android.support.Preferences;
+
+public class EditIntegerPreference extends EditStringPreference {
 
     public EditIntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

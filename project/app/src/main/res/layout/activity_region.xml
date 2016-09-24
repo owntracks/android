@@ -108,7 +108,7 @@
                     android:hint="@string/radius"
                     android:id="@+id/radius"
                     android:digits="0123456789"
-                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.geofenceRadius)}'
+                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertIntegerToString(item.geofenceRadius)}'
                     android:inputType="numberDecimal"
                     app:met_helperText="Meters"
                     app:met_floatingLabel="normal"
@@ -143,7 +143,7 @@
                     android:hint="@string/beaconMajor"
                     android:id="@+id/beaconMajor"
                     android:inputType="numberDecimal"
-                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMajor)}'
+                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertIntegerToString(item.beaconMajor)}'
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
@@ -160,7 +160,7 @@
                     android:hint="@string/beaconMinor"
                     android:id="@+id/beaconMinor"
                     android:inputType="numberDecimal"
-                    android:text='@{org.owntracks.android.support.BindingConversions.convertIntegerToString(item.beaconMinor)}'
+                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertIntegerToString(item.beaconMinor)}'
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"

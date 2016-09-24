@@ -6,20 +6,16 @@ import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StaticHandlerInterface;
 import org.owntracks.android.support.interfaces.ProxyableService;
 
 import android.content.Intent;
-import android.os.Message;
 
 import org.owntracks.android.support.unfree.GoogleApiAvailability;
 
-public class ServiceApplication implements ProxyableService, StaticHandlerInterface {
+public class ServiceApplication implements ProxyableService {
 
-    private ServiceProxy context;
     @Override
     public void onCreate(ServiceProxy context) {
-        this.context = context;
         checkPlayServices();
     }
 
@@ -35,13 +31,7 @@ public class ServiceApplication implements ProxyableService, StaticHandlerInterf
     public void onEvent(Events.Dummy event) {
 
     }
-
-
-    @Override
-    public void handleHandlerMessage(Message msg) {
-    }
-
-	public static boolean checkPlayServices() {
+    public static boolean checkPlayServices() {
         return GoogleApiAvailability.checkPlayServices(App.getContext());
     }
 

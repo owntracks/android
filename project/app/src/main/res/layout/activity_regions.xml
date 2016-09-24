@@ -17,7 +17,7 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
     </android.support.design.widget.AppBarLayout>
 
-    <org.owntracks.android.support.RecyclerView
+    <org.owntracks.android.support.widgets.RecyclerView
         android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

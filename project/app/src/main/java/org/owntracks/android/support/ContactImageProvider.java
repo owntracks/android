@@ -16,7 +16,6 @@ import android.os.AsyncTask;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
-import timber.log.Timber;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -24,6 +23,8 @@ import com.google.android.gms.maps.model.Marker;
 
 import org.owntracks.android.App;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.widgets.TextDrawable;
+
 import java.lang.ref.WeakReference;
 
 public class ContactImageProvider {

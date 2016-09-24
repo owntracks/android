@@ -28,11 +28,11 @@ import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DividerItemDecoration;
+import org.owntracks.android.support.widgets.DividerItemDecoration;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
-import org.owntracks.android.support.Toasts;
+import org.owntracks.android.support.widgets.Toasts;
 
 
 
@@ -40,7 +40,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     private static final String TAG = "ActivityRegions";
     private static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
     private Toolbar toolbar;
-    private org.owntracks.android.support.RecyclerView listView;
+    private org.owntracks.android.support.widgets.RecyclerView listView;
     private final int LOADER_ID = 1;
     private AdapterWaypoints listAdapter;
     private Drawer drawer;
@@ -68,7 +68,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         listAdapter = new AdapterWaypoints(this);
         listAdapter.setOnViewHolderClickListener(this);
-        listView = (org.owntracks.android.support.RecyclerView) findViewById(R.id.listView);
+        listView = (org.owntracks.android.support.widgets.RecyclerView) findViewById(R.id.listView);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(listAdapter);
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));

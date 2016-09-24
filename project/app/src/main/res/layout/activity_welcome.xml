@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     >
 
-    <org.owntracks.android.support.PausableViewPager
+    <org.owntracks.android.support.widgets.PausableViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

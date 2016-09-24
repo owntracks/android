@@ -50,10 +50,6 @@ public class ActivityStatus extends ActivityBase {
 
 
         ((TextView)findViewById(R.id.serviceProxyStart)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_PROXY_START)));
-        ((TextView)findViewById(R.id.serviceLocatorPlay)).setText(App.formatDate(StatisticsProvider.getTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED)));
-        ((TextView)findViewById(R.id.playServicesStatus)).setText(getPlayServicesStatus());
-
-
     }
 
     private String getPlayServicesStatus() {
