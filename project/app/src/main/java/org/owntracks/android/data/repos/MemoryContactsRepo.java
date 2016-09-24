@@ -1,12 +1,8 @@
 package org.owntracks.android.data.repos;
 
 import android.databinding.ObservableArrayList;
-import android.databinding.ObservableArrayMap;
 import android.databinding.ObservableList;
-import android.databinding.ObservableMap;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v4.util.SimpleArrayMap;
 
 import org.owntracks.android.App;
@@ -16,7 +12,6 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 
 import javax.inject.Inject;
-
 import timber.log.Timber;
 
 @PerApplication
@@ -31,7 +26,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     private long revision = 0;
 
     @Inject
-    public MemoryContactsRepo() {
+    MemoryContactsRepo() {
         mMap = new SimpleArrayMap<>(LOAD_FACTOR);
         mList = new ObservableArrayList<>();
     }
@@ -57,7 +52,7 @@ public class MemoryContactsRepo implements ContactsRepo {
         return c;
     }
 
-    private void put(String id, FusedContact contact) {
+    private synchronized void put(String id, FusedContact contact) {
         mMap.put(id, contact);
         mList.add(contact);
         Timber.v("new contact added:%s", id);
@@ -65,7 +60,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
-    public void clearAll() {
+    public synchronized void clearAll() {
         mMap.clear();
         mList.clear();
         majorRevision-=MAJOR_STEP;
@@ -73,7 +68,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
-    public void remove(String id) {
+    public synchronized void remove(String id) {
         FusedContact c = mMap.remove(id);
         if(c != null)
             mList.remove(c);
