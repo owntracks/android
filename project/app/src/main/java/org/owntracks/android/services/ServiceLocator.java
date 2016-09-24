@@ -29,7 +29,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 
 import com.google.android.gms.common.ConnectionResult;
@@ -101,13 +100,13 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e(TAG, "GoogleApiClient connection failed with result: " + connectionResult);
+        Timber.e("GoogleApiClient connection failed. Connection result: %s", connectionResult);
         this.ready = false;
     }
 
     @Override
     public void onConnected(Bundle arg0) {
-        Log.e(TAG, "GoogleApiClient is now connected");
+        Timber.v("GoogleApiClient is now connected");
         StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
 
         this.ready = true;
@@ -123,7 +122,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.v(TAG, "GoogleApiClient connection suspended");
+        Timber.d("GoogleApiClient connection suspended");
         this.ready = false;
     }
 
@@ -145,27 +144,24 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     private void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
-        Log.v(TAG, "onFenceTransistion");
+        Timber.v("");
         if(event != null){
             if(event.hasError()) {
-                Log.e(TAG, "Geofence event has error: " + event.getErrorCode());
+                Timber.e("geofence event has error: %s", event.getErrorCode());
                 return;
             }
 
             int transition = event.getGeofenceTransition();
+            for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
-            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER || transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
+                Waypoint w = this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
 
-                    Waypoint w = this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
-
-                    if (w != null) {
-                        Log.v(TAG, "Waypoint triggered " + w.getDescription() + " transition: " + transition);
-                        w.setLastTriggered(System.currentTimeMillis());
-                        this.waypointDao.update(w);
-                        App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
-                        publishTransitionMessage(w, event.getTriggeringLocation(), transition);
-                    }
+                if (w != null) {
+                    Timber.v("waypoint triggered:%s transition:%s", w.getDescription(),transition);
+                    w.setLastTriggered(System.currentTimeMillis());
+                    this.waypointDao.update(w);
+                    App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
+                    publishTransitionMessage(w, event.getTriggeringLocation(), transition);
                 }
             }
         }
@@ -185,25 +181,25 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
 	private void setupBackgroundLocationRequest() {
-        //Log.v(TAG, "setupBackgroundLocationRequest");
+        //Timber.v("setupBackgroundLocationRequest");
 
         this.mLocationRequest = LocationRequest.create();
 
         if(Preferences.getLocatorAccuracyBackground() == 0) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            Timber.v("PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 1) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            Timber.v("PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyBackground() == 2) {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_LOW_POWER");
+            Timber.v("PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(TAG, "setupBackgroundLocationRequest PRIORITY_NO_POWER");
+            Timber.v("PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
-        Log.v(TAG, "setupBackgroundLocationRequest interval: " + Preferences.getLocatorIntervalMillis());
-        Log.v(TAG, "setupBackgroundLocationRequest displacement: " + Preferences.getLocatorDisplacement());
+        Timber.v("setupBackgroundLocationRequest interval: %s",Preferences.getLocatorIntervalMillis());
+        Timber.v("setupBackgroundLocationRequest displacement: %s",Preferences.getLocatorDisplacement());
 
         this.mLocationRequest.setInterval(Preferences.getLocatorIntervalMillis());
 		this.mLocationRequest.setFastestInterval(10000);
@@ -215,16 +211,16 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
         if(Preferences.getLocatorAccuracyForeground() == 0) {
-            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_HIGH_ACCURACY");
+            Timber.v("setupForegroundLocationRequest PRIORITY_HIGH_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 1) {
-            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
+            Timber.v("setupForegroundLocationRequest PRIORITY_BALANCED_POWER_ACCURACY");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         } else if (Preferences.getLocatorAccuracyForeground() == 2) {
-            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_LOW_POWER");
+            Timber.v("setupForegroundLocationRequest PRIORITY_LOW_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         } else {
-            Log.v(TAG, "setupForegroundLocationRequest PRIORITY_NO_POWER");
+            Timber.v("setupForegroundLocationRequest PRIORITY_NO_POWER");
             this.mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
         }
         this.mLocationRequest.setInterval(TimeUnit.SECONDS.toMillis(10));
@@ -242,11 +238,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                 @Override
                 public void onResult(@NonNull Status status) {
                     if (status.isSuccess()) {
-                        Log.v(TAG, "removeLocationUpdates successful");
+                        Timber.v("removeLocationUpdates successfull");
                     } else if (status.hasResolution()) {
-                        Log.v(TAG, "removeLocationUpdates failed. HasResolution");
+                        Timber.v("removeLocationUpdates failed. HasResolution");
                     } else {
-                        Log.v(TAG, "removeLocationUpdates failed. " + status.getStatusMessage());
+                        Timber.v("removeLocationUpdates failed. status:%s", status.getStatusMessage());
                     }
                 }
             });
@@ -271,7 +267,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     private void requestLocationUpdatesAsync() {
 
         if (!isReady() || !hasConnectedGoogleApiClient()) {
-            Log.e(TAG, "requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
+            Timber.e("requestLocationUpdates but not connected to play services. Updates will be requested again once connected");
             return;
         }
 
@@ -291,11 +287,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                 @Override
                 public void onResult(@NonNull Status status) {
                     if (status.isSuccess()) {
-                        Log.v(TAG, "requestLocationUpdates successful");
+                        Timber.v("requestLocationUpdates successful");
                     } else if (status.hasResolution()) {
-                        Log.v(TAG, "requestLocationUpdates failed. HasResolution");
+                        Timber.v("requestLocationUpdates failed. HasResolution");
                     } else {
-                        Log.v(TAG, "requestLocationUpdates failed. " + status.getStatusMessage());
+                        Timber.v("requestLocationUpdates failed. " + status.getStatusMessage());
                     }
                 }
             });
@@ -309,17 +305,17 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
 	@Override
-	public void onStartCommand(Intent intent, int flags, int startId) {
+	public void onStartCommand(Intent intent) {
         if(intent == null)
             return;
 
-        Log.v(TAG, "onStartCommand " + intent.getAction());
+        Timber.v("action:%s", intent.getAction());
         if (ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL.equals(intent.getAction())) {
             reportLocationManually();
-        } else if (intent.getAction().equals(ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION)) {
+        } else if (ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION.equals(intent.getAction())) {
             onFenceTransition(intent);
         } else {
-            Log.e(TAG, "Received unknown intent action: " + intent.getAction());
+            Timber.e("received unknown intent action");
         }
 
 
@@ -332,7 +328,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.v(TAG, "onLocationChanged");
+        Timber.v("onLocationChanged");
 
         if(!ServiceProxy.isInForeground()) {
             StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
@@ -359,6 +355,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
 	private void publishTransitionMessage(Waypoint w, Location triggeringLocation, int transition) {
+
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(MessageTransition.TRIGGER_CIRCULAR);
@@ -397,7 +394,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
         Location l = getLastKnownLocation();
 		if (l == null) {
-            Log.e(TAG, "reportLocation called without a known location");
+            Timber.e("reportLocation called without a known location");
 			return;
 		}
 
@@ -436,6 +433,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     @SuppressWarnings("unused")
     @Subscribe
     public void onEvent(Events.ModeChanged e) {
+        Timber.v("mode changed requesting new geofences");
         removeGeofencesByWaypoint(loadWaypointsForModeId(e.getOldModeId()));
         requestGeofences();
     }
@@ -443,10 +441,10 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     @SuppressWarnings("unused")
     @Subscribe
     public void onEvent(Events.PermissionGranted e) {
-        Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
+        Timber.v("Events.PermissionGranted: " + e.getPermission() );
         if(!hasLocationPermission && e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
             hasLocationPermission = true;
-            Log.v(TAG, "requesting geofences and location updates");
+            Timber.v("requesting geofences and location updates");
             requestGeofences();
             requestLocationUpdates();
         }
@@ -456,7 +454,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
     private void handleWaypoint(Waypoint w, boolean update, boolean remove) {
-        Log.v(TAG, "handleWaypoint u:" +update + " r:"+remove);
+        Timber.v("handleWaypoint u:" +update + " r:"+remove);
         if(update && remove)
             throw new IllegalArgumentException("update and remove cannot be true at the same time");
 
@@ -478,27 +476,27 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		if (!isReady())
 			return;
 
-		List<Geofence> fences = new ArrayList<>();
+        List<Geofence> fences = new ArrayList<>();
 		for (Waypoint w : loadWaypointsForCurrentModeWithValidGeofence()) {
 
-            Log.v(TAG, "requestGeofences - " + w.getDescription());
+            Timber.v("desc:%s", w.getDescription());
 			// if id is null, waypoint is not added yet
 			if (w.getGeofenceId() == null) {
 				w.setGeofenceId(UUID.randomUUID().toString());
 				this.waypointDao.update(w);
-                Log.v(TAG, "new fence found without UUID");
+                Timber.v("new fence found without UUID");
 
 			}
 
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
 					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(30))
+                    .setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(15))
                     .setNotificationResponsiveness((int)TimeUnit.SECONDS.toMillis(30))
 					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Log.v(TAG, "adding geofence for waypoint " + w.getDescription() + " mode: " + w.getModeId() );
+            Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId() );
 			fences.add(geofence);
 		}
 
@@ -514,11 +512,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                 @Override
                 public void onResult(@NonNull Status status) {
                     if (status.isSuccess()) {
-                        Log.v(TAG, "Geofence registration successfull");
+                        Timber.v("Geofence registration successfull");
                     } else if (status.hasResolution()) {
-                        Log.v(TAG, "Geofence registration failed. HasResolution");
+                        Timber.v("Geofence registration failed. HasResolution");
                     } else {
-                        Log.v(TAG, "Geofence registration failed. " + status.getStatusMessage());
+                        Timber.v("Geofence registration failed. " + status.getStatusMessage());
                     }
                 }
             });
@@ -531,7 +529,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     private void handleSecurityException(@Nullable  SecurityException e) {
         if(e != null)
-            Log.e(TAG, e.getMessage());
+            Timber.e(e.getMessage());
         hasLocationPermission = false;
         ServiceProxy.getServiceNotification().notifyMissingPermissions();
     }
@@ -539,7 +537,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     private GeofencingRequest getGeofencingRequest(List<Geofence> fences) {
         GeofencingRequest.Builder  builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER); //trigger transition when geofence is setup and device is already in it
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL); //trigger transition when geofence is setup and device is already in it
         builder.addGeofences(fences);
         return builder.build();
     }
@@ -578,11 +576,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             @Override
             public void onResult(@NonNull Status status) {
                 if (status.isSuccess()) {
-                    Log.v(TAG, "Geofence removal successfull");
+                    Timber.v("Geofence removal successfull");
                 } else if (status.hasResolution()) {
-                    Log.v(TAG, "Geofence removal failed. HasResolution");
+                    Timber.v("Geofence removal failed. HasResolution");
                 } else {
-                    Log.v(TAG, "Geofence removal failed. " + status.getStatusMessage());
+                    Timber.v("Geofence removal failed. " + status.getStatusMessage());
                 }
             }
         });
