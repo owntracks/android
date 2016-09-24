@@ -168,6 +168,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         setDrawer(binding.toolbar);
 
         this.mMapLocationSource = new MapLocationSource();
+        binding.mapView.onCreate(savedInstanceState);
 
         App.postOnMainHandlerDelayed(new Runnable() {
             @Override
@@ -186,7 +187,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
             }
         });
-
         setBottomSheetHidden();
     }
 
@@ -199,6 +199,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void onPause(){
         super.onPause();
+        binding.mapView.onPause();
         // Save current repo state so we ca apply updates to contacts on resume
         repoRevision = viewModel.getContactsRevision();
     }
@@ -221,18 +222,38 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void onResume() {
         super.onResume();
+        binding.mapView.onResume();
+
         queueActionMapUpdate();
         handleIntentExtras(getIntent());
 
     }
+
+    @Override
+    public void onDestroy() {
+        binding.mapView.onDestroy();
+        super.onDestroy();
+    }
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        binding.mapView.onSaveInstanceState(bundle);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        binding.mapView.onLowMemory();
+    }
+
     public void initMapDelayed() {
         Timber.v("trace start %s", System.currentTimeMillis());
 
-        FragmentManager fm = getSupportFragmentManager();
-        SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
-        fm.beginTransaction().replace(R.id.mapContainer, supportMapFragment).commit();
+        //FragmentManager fm = getSupportFragmentManager();
+        //SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
+        //fm.beginTransaction().replace(R.id.mapContainer, supportMapFragment).commit();
 
-        supportMapFragment.getMapAsync(this);
+        binding.mapView.getMapAsync(this);
         Timber.v("trace end %s", System.currentTimeMillis());
 
     }
