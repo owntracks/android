@@ -1,24 +1,13 @@
 package org.owntracks.android.support;
 
+import org.owntracks.android.messages.MessageBase;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
-        import android.util.Log;
-
-        import org.owntracks.android.messages.MessageBase;
-
-        import java.util.concurrent.BlockingQueue;
-        import java.util.concurrent.ThreadPoolExecutor;
-        import java.util.concurrent.TimeUnit;
-        import java.util.concurrent.locks.Condition;
-        import java.util.concurrent.locks.ReentrantLock;
-
-/**
- * A light wrapper around the {@link ThreadPoolExecutor}. It allows for you to pause execution and
- * resume execution when ready. It is very handy for games that need to pause.
- *
- * @author Matthew A. Johnston (warmwaffles)
- */
 public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
-    private static final String TAG = "ThreadPoolExecutor";
     private boolean isPaused;
     private final ReentrantLock lock;
     private final Condition condition;
@@ -40,12 +29,10 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     public void execute(Runnable command) {
-        Log.v(TAG, "queued() " + command+ " executor: " + this);
         super.execute(command);
     }
 
     protected void afterExecute(Runnable r, Throwable t) {
-        Log.v(TAG, "afterRun() " + r+ " executor: " + this);
         super.afterExecute(r, t);
     }
     /**
@@ -55,14 +42,12 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
      */
     @Override
     protected void beforeExecute(Thread thread, Runnable runnable)  {
-        Log.v(TAG, "beforeRun() " + runnable + " executor: " + this);
 
         super.beforeExecute(thread, runnable);
         lock.lock();
         try {
             while (isPaused) condition.await();
         } catch (InterruptedException ie) {
-            Log.v(TAG, "InterruptedException " + runnable + " executor: " + this);
             if(runnable instanceof CanceableRunnable)
                 ((CanceableRunnable)runnable).cancelOnRun();
             thread.interrupt();
@@ -83,13 +68,9 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
      * Pause the execution
      */
     public void pause() {
-        Log.v(TAG, "pause() isPaused:" +isPaused + " executor: " + this) ;
 
         if(isPaused) {
-            Log.v(TAG, "already paused" + " executor: " + this);
             return;
-        } else {
-            Log.v(TAG, "pausing" + " executor: " + this);
         }
 
         lock.lock();
@@ -98,7 +79,6 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
         } finally {
             lock.unlock();
         }
-        Log.v(TAG, "paused" + " executor: " + this);
 
     }
 
@@ -106,7 +86,6 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
      * Resume pool execution
      */
     public void resume() {
-        Log.v(TAG, "resume" + " executor: " + this);
         if(!isPaused)
             return;
 
@@ -120,13 +99,10 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     public void queue(MessageBase message) {
-        Log.v(TAG, "queue message");
-
         this.execute(message);
     }
 
     public void requeue(MessageBase message) {
-        Log.v(TAG, "requeueing message");
         this.queue(message);
     }
 

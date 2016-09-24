@@ -661,14 +661,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
         @Override
         public void onStart() {
             super.onStart();
-            Log.v(TAG, "onStart registerSticky");
             App.getEventBus().register(this);
         }
 
         @Override
         public void onStop() {
-            Log.v(TAG, "onStop unregister");
-
             App.getEventBus().unregister(this);
             super.onStop();
         }
