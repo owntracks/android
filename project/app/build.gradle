@@ -5,11 +5,11 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 2
-def versionBuild = 3
+def versionBuild = 5
 ext.daggerVersion = '2.6'
-ext.playLibVersion = '9.4.0'
+ext.playLibVersion = '9.6.1'
 ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '24.2.0'
+ext.supportLibVersion = '24.2.1'
 
 
 android {
@@ -58,7 +58,7 @@ android {
     }
 
 
-    packagingOptions {
+        packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -78,9 +78,6 @@ repositories {
 }
 
 dependencies {
-
-    compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
-
     // Support libraries
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
@@ -92,49 +89,33 @@ dependencies {
     compile "com.google.android.gms:play-services-maps:${playLibVersion}"
     compile "com.google.android.gms:play-services-location:${playLibVersion}"
     compile "com.google.android.gms:play-services-places:${playLibVersion}"
-    //compile "com.google.android.gms:play-services-base:${playLibVersion}"
-
 
     // Utility libraries
+    apt 'com.google.guava:guava:19.0' // needed by Dagger
+    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    compile "com.google.dagger:dagger:${daggerVersion}"
     compile 'org.greenrobot:eventbus:3.0.0'
     apt 'org.greenrobot:eventbus-annotation-processor:3.0.1'
-
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20160821.041725-20'
-
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
-
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
     compile 'com.jakewharton.timber:timber:4.1.2'
-
+    compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
 
     // Widget libraries
     compile 'com.github.rengwuxian:MaterialEditText:2.1.4'
-    compile('com.mikepenz:fastadapter:1.1.2@aar') {
-        transitive = true
-    }
-    compile('com.mikepenz:materialdrawer:5.6.0@aar') {
-        transitive = true
-    }
-
-    compile 'com.mikepenz:materialize:0.8.8@aar'
-    compile 'com.mikepenz:iconics-core:2.5.11@aar'
-    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
-        transitive = true
-    }
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') {
-        transitive = true
-    }
     compile 'com.joanzapata.android:android-iconify:1.0.10'
     compile 'com.obsez.android.lib.filechooser:filechooser:1.1.2'
-
-    apt 'com.google.guava:guava:19.0' // needed by Dagger
-    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
-    compile "com.google.dagger:dagger:${daggerVersion}"
-
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') { transitive = true }
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') { transitive = true }
+    compile('com.mikepenz:fastadapter:1.1.2@aar') { transitive = true }
+    compile('com.mikepenz:materialdrawer:5.6.0@aar') { transitive = true }
+    compile 'com.mikepenz:materialize:0.8.8@aar'
+    compile 'com.mikepenz:iconics-core:2.5.11@aar'
 }
 apt {
     arguments {
