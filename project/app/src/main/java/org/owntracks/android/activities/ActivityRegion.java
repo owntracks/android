@@ -29,12 +29,11 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StaticHandlerInterface;
-import org.owntracks.android.support.Toasts;
+import org.owntracks.android.support.widgets.Toasts;
 
 
 
-public class ActivityRegion extends ActivityBase implements StaticHandlerInterface {
+public class ActivityRegion extends ActivityBase  {
     private static final String TAG = "ActivityRegion";
 
     private static final int REQUEST_PLACE_PICKER = 19283;
@@ -308,11 +307,6 @@ public class ActivityRegion extends ActivityBase implements StaticHandlerInterfa
     @Override
     public void onPause() {
         super.onPause();
-
-    }
-
-    @Override
-    public void handleHandlerMessage(Message msg) {
 
     }
 }

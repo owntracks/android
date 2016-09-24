@@ -1,4 +1,4 @@
-package org.owntracks.android.support;
+package org.owntracks.android.support.widgets;
 // Based on https://github.com/amulyakhare/TextDrawable with some fixes
 
 import android.graphics.*;

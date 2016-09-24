@@ -1,4 +1,4 @@
-package org.owntracks.android.support;
+package org.owntracks.android.support.widgets;
 
 import android.databinding.BindingConversion;
 

@@ -31,7 +31,7 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Toasts;
+import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
 
 import java.text.SimpleDateFormat;
