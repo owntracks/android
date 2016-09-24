@@ -351,7 +351,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		thread1.start();
 	}
 
-	void handleStart(boolean force) {
+	private void handleStart(boolean force) {
 
 
 		Log.v(TAG, "handleStart: force:" + force);
@@ -560,7 +560,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		subscribToInitialTopics();
 	}
 
-	public void subscribToInitialTopics() {
+	private void subscribToInitialTopics() {
 		List<String> topics = new ArrayList<>();
 		String subTopicBase = Preferences.getSubTopic();
 
@@ -705,18 +705,18 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
         }
 	}
 
-	public boolean isConnected() {
+	private boolean isConnected() {
 		return this.mqttClient != null && this.mqttClient.isConnected(  );
 	}
 
-	public boolean isConnecting() {
+	private boolean isConnecting() {
 		return (this.mqttClient != null)
 				&& (state == EndpointState.CONNECTING);
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.v(TAG, "disconnecting and draining message queue");
+		Timber.v("disconnecting and draining message queue");
 		disconnect(false);
 		//TODO, clear queue
 		unregisterReceiver();
@@ -753,7 +753,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	}
 
 
-	public void clearQueues() {
+	private void clearQueues() {
 		initPausedPubPool();
 		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, 0);
     }
@@ -768,7 +768,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
     // Custom blocking MqttClient that allows to specify a MqttPingSender
     private static final class CustomMqttClient extends MqttAsyncClient {
-        public CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence, MqttPingSender pingSender) throws MqttException {
+        CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence, MqttPingSender pingSender) throws MqttException {
             super(serverURI, clientId, persistence, pingSender);// Have to call do the AsyncClient init twice as there is no other way to setup a client with a ping sender (thanks Paho)
         }
     }
