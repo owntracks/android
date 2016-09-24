@@ -4,11 +4,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.Menu;
@@ -22,11 +20,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityWelcome;
@@ -34,14 +33,10 @@ import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.util.WeakHashMap;
@@ -53,14 +48,8 @@ import timber.log.Timber;
 
 public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private static final long ZOOM_LEVEL_WOLRD = 1;
-    private static final long ZOOM_LEVEL_CONTINENT = 5;
-    private static final long ZOOM_LEVEL_CITY = 10;
     private static final long ZOOM_LEVEL_STREET = 15;
-    private static final long ZOOM_LEVEL_BUILDING = 20;
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
-
-
 
     @Inject
     protected Provider<Navigator> navigator;
@@ -376,13 +365,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         for (Object c : viewModel.getContacts()) {
             doUpdateMarkerSingle(FusedContact.class.cast(c));
         }
-        repoRevision = viewModel.getContactsRevision();;
+        repoRevision = viewModel.getContactsRevision();
 
     }
 
     private void doUpdateMarkerSingle(@NonNull FusedContact contact) {
-        Timber.v("updating single id:%s", contact.getId());
-
         if (!contact.hasLocation() || mMap == null)
             return;
 
@@ -426,7 +413,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         LocationSource.OnLocationChangedListener mListener;
         GeocodableLocation mLocation;
 
-        public MapLocationSource() {
+        MapLocationSource() {
             super();
             App.getEventBus().register(this);
         }
@@ -453,18 +440,15 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             onLocationSourceUpdated();
         }
 
-        public boolean isAvailable() {
-            return mLocation != null;
-        }
-
         public GeocodableLocation getLocation() {
             return mLocation;
         }
-        public LatLng getLatLng() {
+
+        LatLng getLatLng() {
             return mLocation.getLatLng();
         }
 
-    };
+    }
 
     // BOTTOM SHEET CALLBACKS
     @Override
@@ -527,12 +511,9 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     private void showPopupMenu(View v) {
-
-
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
         popupMenu.show();
     }
-
 }
