@@ -153,8 +153,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         message.setOutgoing();
 
         if(endpoint == null) {
-            Timber.e("no endpoint");
-            return;
+            Timber.e("no endpoint, creating on demand");
+            endpoint = instantiateEndpoint(Preferences.getModeId());
         }
 
         if(!endpoint.isReady()) {
