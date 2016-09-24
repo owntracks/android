@@ -116,6 +116,7 @@ public class Preferences {
         attachAllActivePreferenceChangeListeners();
 
         if(!init) {
+            Timber.v("broadcasting mode change event");
             App.getEventBus().post(new Events.ModeChanged(oldModeId,modeId));
         }
     }

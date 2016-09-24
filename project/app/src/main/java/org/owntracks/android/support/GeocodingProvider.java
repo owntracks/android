@@ -21,7 +21,6 @@ import java.util.Timer;
 import timber.log.Timber;
 
 public class GeocodingProvider {
-    private static final String TAG = "GeocodingProvider";
     private static final Double RUN_FIRST = 1d;
     private static final Double RUN_SECOND = 2d;
     private static Geocoder geocoder;
@@ -125,7 +124,7 @@ public class GeocodingProvider {
             run = params[2];
 
             if(!Geocoder.isPresent()) {
-                Log.e(TAG, "geocoder is not present");
+                Timber.e("geocoder is not present");
                 return null;
             }
 
