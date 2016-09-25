@@ -117,18 +117,14 @@ public class ActivityNavigator extends BaseNavigator {
                             return false;
                         }
 
-                        // Intent i = new Intent(activity, targetclass);
-                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        // activity.startActivity(i);
-                        //activity.overridePendingTransition (R.anim.push_up_in,R.anim.hold);
-
                         startActivity(targetclass);
+
                         return false; // return false to enable withCloseOnClick
                     }
                 }).withSelectedItem(activity.getClass().hashCode())
-                .withCloseOnClick(true)
-                .withDelayDrawerClickEvent(350)
-                .withDelayOnDrawerClose(0)
+                //.withCloseOnClick(true)
+               // .withDelayDrawerClickEvent(350)
+                //.withDelayOnDrawerClose(0)
                 .build();
     }
 }
