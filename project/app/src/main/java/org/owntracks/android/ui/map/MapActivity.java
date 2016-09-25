@@ -159,13 +159,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         this.mMapLocationSource = new MapLocationSource();
         binding.mapView.onCreate(savedInstanceState);
 
-        App.postOnMainHandlerDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initMapDelayed();
-            }
-        }, 500);
-
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         binding.contactPeek.contactRow.setOnClickListener(this);
         binding.contactPeek.contactRow.setOnLongClickListener(this);
@@ -213,6 +206,9 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         super.onResume();
         binding.mapView.onResume();
 
+        if(mMap == null)
+            initMapDelayed();
+
         queueActionMapUpdate();
         handleIntentExtras(getIntent());
 
@@ -236,15 +232,21 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     public void initMapDelayed() {
+        FLAG_STATE_MAP_READY = false;
+        App.postOnMainHandlerDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initMap();
+            }
+        }, 500);
+
         Timber.v("trace start %s", System.currentTimeMillis());
-
-        //FragmentManager fm = getSupportFragmentManager();
-        //SupportMapFragment supportMapFragment =  SupportMapFragment.newInstance();
-        //fm.beginTransaction().replace(R.id.mapContainer, supportMapFragment).commit();
-
-        binding.mapView.getMapAsync(this);
         Timber.v("trace end %s", System.currentTimeMillis());
+    }
 
+    private void initMap() {
+        FLAG_STATE_MAP_READY = false;
+        binding.mapView.getMapAsync(this);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
