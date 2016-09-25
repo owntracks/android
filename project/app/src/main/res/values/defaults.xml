@@ -18,6 +18,7 @@
     <integer name="valKeepalivePublic">120</integer>
     <integer name="valPubQosPublic">0</integer>
     <integer name="valIgnoreStaleLocations">0</integer>
+    <integer name="valIgnoreInaccurateLocations">0</integer>
 
 
     <bool name="valInfoPublic" >true</bool>

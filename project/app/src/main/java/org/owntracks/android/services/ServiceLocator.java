@@ -354,7 +354,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         disableLocationUpdates();
 	}
 
-	private void publishTransitionMessage(Waypoint w, Location triggeringLocation, int transition) {
+	private void publishTransitionMessage(@NonNull Waypoint w, @NonNull Location triggeringLocation, int transition) {
+        if(ignoreLowAccuracy(triggeringLocation))
+            return;
 
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
@@ -369,6 +371,11 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
         ServiceProxy.getServiceMessage().sendMessage(message);
 	}
+
+    private boolean ignoreLowAccuracy(@NonNull Location l) {
+        int threshold = Preferences.getIgnoreInaccurateLocations();
+        return threshold > 0 && l.getAccuracy() > threshold;
+    }
 
 	private void publishWaypointMessage(Waypoint w) {
         MessageWaypoint message = MessageWaypoint.fromDaoObject(w);
@@ -397,6 +404,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             Timber.e("reportLocation called without a known location");
 			return;
 		}
+
+        if(ignoreLowAccuracy(l))
+            return;
 
 		MessageLocation message = new MessageLocation();
         message.setLat(l.getLatitude());

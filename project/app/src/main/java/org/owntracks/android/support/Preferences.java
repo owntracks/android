@@ -446,10 +446,23 @@ public class Preferences {
         return getInt(Keys.IGNORE_STALE_LOCATIONS, R.integer.valIgnoreStaleLocations);
     }
 
-    @Export(key =Keys.IGNORE_STALE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    @Import(key =Keys.IGNORE_STALE_LOCATIONS )
     public static void setIgnoreSTaleLocations(int days) {
         setInt(Keys.IGNORE_STALE_LOCATIONS, days, false);
     }
+
+    @Export(key =Keys.IGNORE_INACCURATE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true, exportModeMqttPublic = true)
+    public static int getIgnoreInaccurateLocations() {
+        return getInt(Keys.IGNORE_INACCURATE_LOCATIONS, R.integer.valIgnoreInaccurateLocations);
+    }
+
+    @Import(key =Keys.IGNORE_INACCURATE_LOCATIONS )
+    public static void setIgnoreInaccurateLocations(int meters) {
+        setInt(Keys.IGNORE_INACCURATE_LOCATIONS, meters, true);
+    }
+
+
+
 
     // Not used on public, as many people might use the same device type
     public static String getDeviceIdDefault() {
@@ -1000,10 +1013,7 @@ public class Preferences {
         for(Method m : methods) {
             m.setAccessible(true);
 
-            Timber.v("method for config key: " + m.getAnnotation(Export.class).key());
-            Timber.v("calling method: " + m.getName());
-            Timber.v("return type: " + m.getReturnType());
-            ;
+            Timber.v("method for config key: %s, name:%s, type:%s", m.getAnnotation(Export.class).key(), m.getName(), m.getReturnType());
 
             try {
                 //If the underlying method is static, then the specified obj argument is ignored. It may be null.
@@ -1031,6 +1041,8 @@ public class Preferences {
         public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String HOST                             = "host";
+        public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
+        public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
         public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
         public static final String INFO                             = "info";
         public static final String KEEPALIVE                        = "keepalive";
@@ -1071,8 +1083,6 @@ public class Preferences {
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
 
 
-        // DEBUG AND TESTING
-        public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
