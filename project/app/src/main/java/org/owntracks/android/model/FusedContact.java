@@ -15,11 +15,14 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
+
+import timber.log.Timber;
 
 public class FusedContact extends BaseObservable {
     private static final String TAG = "FusedContact";
@@ -50,7 +53,8 @@ public class FusedContact extends BaseObservable {
         if(this.messageLocation != null && this.messageLocation.getTst() == messageLocation.getTst())
             return false;
 
-
+        if(BuildConfig.DEBUG)
+            Timber.v("update contact:%s, tst:%s", id, messageLocation.getTst());
 
         this.messageLocation = messageLocation;
         this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
@@ -75,6 +79,7 @@ public class FusedContact extends BaseObservable {
 
     public void notifyMessageLocationPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
+        this.notifyPropertyChanged(BR.messageLocation);
         this.notifyPropertyChanged(BR.fusedLocationDate);
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
 
