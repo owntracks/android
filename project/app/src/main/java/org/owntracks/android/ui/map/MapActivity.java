@@ -64,9 +64,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     private static boolean FLAG_STATE_MAP_READY = false;
     private static boolean FLAG_STATE_LOCATION_READY = false;
 
-    private static boolean FLAG_DATA_UPDATED_DEVICE = false;
-    private static boolean FLAG_DATA_UPDATED_CONTACT_ACTIVE = false;
-    private static boolean FLAG_DATA_UPDATED_CONTACT_ALL = false;
+    private static boolean FLAG_REFRESH_DEVICE = false;
+    private static boolean FLAG_REFRESH_CONTACT_ACTIVE = false;
+    private static boolean FLAG_REFRESH_CONTACT_ALL = false;
+    private static boolean FLAG_REFRESH_ALL = false;
 
     private static final int FLAG_ACTION_MODE_FREE = 0;
     private static final int FLAG_ACTION_MODE_DEVICE = 1;
@@ -77,13 +78,13 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     // EVENT ENGINE ACTIONS
     private void queueActionModeDevice() {
         FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
-        FLAG_DATA_UPDATED_DEVICE = true;  // misuse data update flag to center if ready
+        FLAG_REFRESH_DEVICE = true;  // misuse data update flag to center if ready
         executePendingActions();
     }
 
     private void queueActionModeContact(boolean center) {
         FLAG_ACTION_MODE = FLAG_ACTION_MODE_CONTACT;
-        FLAG_DATA_UPDATED_CONTACT_ACTIVE = center;
+        FLAG_REFRESH_CONTACT_ACTIVE = center;
         executePendingActions();
     }
 
@@ -94,7 +95,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
 
     private void queueActionMapUpdate() {
-        FLAG_DATA_UPDATED_CONTACT_ALL = true;
+        FLAG_REFRESH_ALL = true;
         executePendingActions();
     }
 
@@ -105,17 +106,26 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         }
 
         // MAP NEEDS UPDATE. HANDLE BEFORE VIEW UPDATES
-        if(FLAG_DATA_UPDATED_CONTACT_ALL) {
-            FLAG_DATA_UPDATED_CONTACT_ALL = false;
+        if(FLAG_REFRESH_CONTACT_ALL) {
+            FLAG_REFRESH_CONTACT_ALL = false;
             doUpdateMarkerAll();
         }
         // DEVICE OR ACTIVE CONTACT UPDATED. UPDATE VIEW
-        if(FLAG_STATE_LOCATION_READY && FLAG_DATA_UPDATED_DEVICE && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
-            FLAG_DATA_UPDATED_DEVICE = false;
+        if(FLAG_STATE_LOCATION_READY && FLAG_REFRESH_DEVICE && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
+            FLAG_REFRESH_DEVICE = false;
             doCenterDevice();
-        } else if (FLAG_DATA_UPDATED_CONTACT_ACTIVE && (FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT)) {
-            FLAG_DATA_UPDATED_CONTACT_ACTIVE = false;
+        } else if (FLAG_REFRESH_CONTACT_ACTIVE && (FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT)) {
+            FLAG_REFRESH_CONTACT_ACTIVE = false;
             doCenterContact();
+        } else if(FLAG_REFRESH_ALL) {
+            FLAG_REFRESH_ALL = false;
+
+            doUpdateMarkerAll();
+            if(FLAG_STATE_LOCATION_READY && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
+                doCenterDevice();
+            } else if(FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT) {
+                doCenterContact();
+            }
         }
 
 
@@ -127,20 +137,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     // EVENT ENGINE STATE CALLBACKS
     private void onLocationSourceUpdated() {
         FLAG_STATE_LOCATION_READY = true;
-        FLAG_DATA_UPDATED_DEVICE = true;
+        FLAG_REFRESH_DEVICE = true;
         executePendingActions();
         enableLocationMenus();
     }
 
     private void onStateMapReady() {
         FLAG_STATE_MAP_READY = true;
-        FLAG_DATA_UPDATED_CONTACT_ALL = true;
+        FLAG_REFRESH_CONTACT_ALL = true;
         executePendingActions();
     }
 
 
     private void onActiveContactUpdated() {
-        FLAG_DATA_UPDATED_CONTACT_ACTIVE = true;
+        FLAG_REFRESH_CONTACT_ACTIVE = true;
         executePendingActions();
     }
 
