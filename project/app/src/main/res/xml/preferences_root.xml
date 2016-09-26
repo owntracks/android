@@ -84,7 +84,7 @@
             <Preference
                 android:key="mikepenz-materialdrawer"
                 android:title="Mikepenz"
-                android:summary="MaterialDrawer" />
+                android:summary="MaterialDrawer, Materialize" />
             <Preference
                 android:key="rengwuxian-materialedittext"
                 android:title="Rengwuxian"
@@ -93,7 +93,26 @@
                 android:key="afollestad-materialdialogs"
                 android:title="Afollestad"
                 android:summary="Material-Dialogs" />
-
+            <Preference
+                android:key="afollestad-materialdialogs"
+                android:title="Google"
+                android:summary="Dagger2" />
+            <Preference
+                android:key="zxing"
+                android:title="Zebra Crossing"
+                android:summary="Zxing Scanner" />
+            <Preference
+                android:key="jackson"
+                android:title="Fasterxml"
+                android:summary="Jackson" />
+            <Preference
+                android:key="okhttp"
+                android:title="Squareup"
+                android:summary="Okhttp3" />
+            <Preference
+                android:key="timber"
+                android:title="Jacke Wharton"
+                android:summary="Timber" />
         </PreferenceScreen>
 
         <Preference
