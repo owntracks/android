@@ -105,8 +105,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     @Override
     public void update(@NonNull String id, @NonNull MessageLocation m) {
         FusedContact c = getByIdLazy(id);
-        if(c.getMessageLocation() != m)
-            c.setMessageLocation(m);
+        c.setMessageLocation(m);
         App.getEventBus().post(c);
         revision++;
     }
