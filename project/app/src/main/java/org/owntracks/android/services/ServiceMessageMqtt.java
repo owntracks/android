@@ -217,7 +217,8 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 				m.setQos(message.getQos());
 				service.onMessageReceived(m);
 			} catch (Exception e) {
-				Timber.e("payload:%s ", new String(message.getPayload()));
+				Timber.e(e, "payload:%s ", new String(message.getPayload()));
+
 			}
 
 		}
@@ -927,7 +928,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
     class ReconnectHandler {
 		private static final String TAG = "ReconnectHandler";
-		private static final int BACKOFF_INTERVAL_MAX = 6;
+		private static final int BACKOFF_INTERVAL_MAX = 5;
 		private int backoff = 0;
 
 		private final Context context;
@@ -959,7 +960,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			if(BuildConfig.DEBUG)
 				 delayInMilliseconds = TimeUnit.SECONDS.toMillis(10);
 			else
-				delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.MINUTES.toMillis(30);
+				delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
 
 			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
 
