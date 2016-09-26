@@ -438,7 +438,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     public static class ModeFragment extends ScreenFragment {
         public static final int ID = 2;
         private static ModeFragment modeInstance;
-        private ImageView img;
+        private TextView modeDesc;
 
         public static ModeFragment getInstance() {
             if(modeInstance == null)
@@ -453,8 +453,29 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_welcome_mode, container, false);
+            modeDesc = (TextView)v.findViewById(R.id.fragment_welcome_mode_description);
+
             rg = (RadioGroup)v.findViewById(R.id.radioMode);
-            img = (ImageView)v.findViewById(R.id.img);
+            rg.clearCheck();
+
+            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                    switch (rg.getCheckedRadioButtonId()) {
+                        case R.id.radioModeHttpPrivate:
+                        case R.id.radioModeMqttPrivate:
+                            modeDesc.setText(R.string.mqtt_private_description);
+                            break;
+                        case R.id.radioModeMqttPublic:
+                            modeDesc.setText(R.string.mqtt_public_description);
+                            break;
+
+                    }
+                }
+            });
+            rg.check(R.id.radioModeMqttPublic);
+
             return v;
         }
 

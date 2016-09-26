@@ -21,7 +21,6 @@
         android:src="@drawable/ic_cloud_queue_white_48dp"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
-
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/icon_description_cloud"/>
 
@@ -52,39 +51,27 @@
         android:gravity="top|center_horizontal"
         android:minHeight="@dimen/welcome_content_min_height"
         android:layout_below="@+id/screen_heading"
-        android:layout_alignLeft="@+id/screen_heading"
-        android:layout_alignStart="@+id/screen_heading" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@android:color/transparent"
+
+        android:id="@+id/view"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="48dp"
-
-        android:id="@+id/view" />
+        android:layout_alignParentStart="true" />
 
     <RadioGroup
         android:id="@+id/radioMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/view"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
-
-        <android.support.v7.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:gravity="center_horizontal"
-            android:textSize="16sp"
-
-            android:text="@string/mqtt_public_description" />
+        android:layout_above="@+id/fragment_welcome_mode_description"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        >
 
         <android.support.v7.widget.AppCompatRadioButton
             android:textColor="#ffffff"
@@ -93,49 +80,48 @@
             android:layout_height="wrap_content"
             android:text="@string/mode_mqtt_public_label"
             app:buttonTint="@color/md_white_1000"
-            android:checked="true"
-            android:layout_gravity="center_horizontal"
-            android:textSize="16sp"
-
-            android:layout_marginBottom="16dp" />
-
-        <android.support.v7.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:gravity="center_horizontal"
-            android:textSize="16sp"
-
-            android:text="@string/mqtt_private_description"
-             />
+            android:textSize="16sp" />
 
         <android.support.v7.widget.AppCompatRadioButton
-
-            android:id="@+id/radioModeMqttPrivate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            app:buttonTint="@color/md_white_1000"
-            android:textSize="16sp"
-
-            android:text="@string/mode_mqtt_private_label"
-            android:checked="false"
-            android:layout_gravity="center_horizontal" />
-
-        <android.support.v7.widget.AppCompatRadioButton
-
             android:id="@+id/radioModeHttpPrivate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#ffffff"
             app:buttonTint="@color/md_white_1000"
             android:textSize="16sp"
-
             android:text="@string/mode_http_private_label"
-            android:checked="false"
-            android:layout_gravity="center_horizontal" />
+             />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radioModeMqttPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            app:buttonTint="@color/md_white_1000"
+            android:textSize="16sp"
+            android:text="@string/mode_mqtt_private_label"
+         />
 
 
     </RadioGroup>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+
+        android:id="@+id/fragment_welcome_mode_description"
+        android:layout_width="359dp"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
+        android:layout_above="@+id/view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="visible"
+        android:text="@string/mqtt_public_description"
+        android:layout_marginBottom="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

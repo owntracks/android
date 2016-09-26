@@ -15,7 +15,7 @@
     <string name="preferencesClientCrtPath">Client certificate</string>
     <string name="preferencesClientCrtPassword">Client certificate password</string>
 
-    <string name="preferencesLicenses">"Thanks"</string>
+    <string name="preferencesLicenses">"Libraries"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationEvents">Events </string>
@@ -179,8 +179,6 @@
     <string name="preferencesKeyParameters" translatable="false">parameters</string>
     <string name="transitionEntering">entering</string>
     <string name="transitionLeaving">leaving</string>
-
-
     <string name="INITIAL">"Initializing</string>
     <string name="IDLE">Idle</string>
     <string name="CONNECTING">Connecting</string>
@@ -201,7 +199,7 @@
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
-    <string name="mode_description">Owntracks can run in one of several modes. Select the mode that best suites your needs</string>
+    <string name="mode_description">Owntracks can run in one of several modes. Select the mode that best suits your needs.</string>
     <string name="mqtt_public_description">Try out Owntracks and share your location anonymously with other users</string>
     <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
@@ -213,5 +211,6 @@
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
     <string name="title_activity_import">Configuration import</string>
+    <string name="geocorderResolving">resolving</string>
 
 </resources>
