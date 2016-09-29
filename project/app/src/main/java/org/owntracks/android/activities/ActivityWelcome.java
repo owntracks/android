@@ -2,6 +2,7 @@ package org.owntracks.android.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,15 +25,16 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.support.unfree.GoogleApiAvailabilityResponder;
 import org.owntracks.android.support.widgets.PausableViewPager;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.map.MapActivity;
-import org.owntracks.android.support.unfree.GoogleApiAvailability;
-import org.owntracks.android.support.unfree.GoogleApiAvailabilityResponder;
 
 import java.util.ArrayList;
 
@@ -112,11 +114,12 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         c.startActivity(intent);
     }
     private static boolean checkSetup() {
-        return Preferences.getSetupCompleted();
+       return Preferences.getSetupCompleted();
     }
 
     private static boolean checkPlayServices() {
-        return  GoogleApiAvailability.checkPlayServices(App.getContext(), true);
+        return  org.owntracks.android.support.unfree.GoogleApiAvailability.checkPlayServicesWithOverride();
+        //return  GoogleApiAvailability.checkPlayServices(App.getContext(), true);
     }
 
     private static boolean checkPermissions() {
@@ -583,18 +586,26 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    //public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener, GoogleApiAvailabilityResponder {
     public static class PlayFragment extends ScreenFragment implements DialogInterface.OnCancelListener, GoogleApiAvailabilityResponder {
+
         public static final int ID = 3;
         private static PlayFragment instance;
         private Button button;
         private TextView message;
         private ImageView img;
-
+        private static GoogleApiAvailability googleAPI;
         public static PlayFragment getInstance() {
             if(instance == null)
                 instance =  new PlayFragment();
 
             return instance;
+        }
+
+
+        public PlayFragment() {
+            super();
+            googleAPI = GoogleApiAvailability.getInstance();
         }
 
         @Override
@@ -616,7 +627,18 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
         public void onResume() {
             super.onResume();
 
-            GoogleApiAvailability.checkPlayServices(this);
+            //GoogleApiAvailability.checkPlayServices(this);
+            final GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+            final int resultCode = googleAPI.isGooglePlayServicesAvailable(getActivity());
+            if(resultCode == ConnectionResult.SUCCESS) {
+                onPlayServicesAvailable();
+            } else {
+                if (googleAPI.isUserResolvableError(resultCode)) {
+                    onPlayServicesUnavailableRecoverable(resultCode);
+                } else {
+                    onPlayServicesUnavailableNotRecoverable(resultCode);
+                }
+            }
         }
 
         @Override
@@ -650,14 +672,33 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
         @Override
         public void onPlayServicesUnavailableRecoverable(final int resultCode) {
-            Timber.v("onPlayServicesUnavailableRecoverable()");
+           // Timber.v("onPlayServicesUnavailableRecoverable()");
+           // message.setText(getString(R.string.play_services_not_available_recoverable));
+           // button.setVisibility(View.VISIBLE);
+           // button.setText(R.string.welcomeFixIssue);
+           // GoogleApiAvailability.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY, this);
+//
+           // img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
+//
+           // ActivityWelcome.class.cast(getActivity()).disablePagerNext();
+
             message.setText(getString(R.string.play_services_not_available_recoverable));
             button.setVisibility(View.VISIBLE);
             button.setText(R.string.welcomeFixIssue);
-            GoogleApiAvailability.provisionRecoveryButton(button, getActivity(), resultCode, RECOVER_PLAY, this);
-
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    googleAPI.getErrorDialog(getActivity(), resultCode, RECOVER_PLAY).show();
+                    PendingIntent p = googleAPI.getErrorResolutionPendingIntent(getActivity(), resultCode, RECOVER_PLAY);
+                    try {
+                        if(p != null)
+                            p.send();
+                        } catch (PendingIntent.CanceledException e) {
+                            e.printStackTrace();
+                        }
+                }
+            });
             img.setImageResource(R.drawable.ic_assignment_late_white_48dp);
-
             ActivityWelcome.class.cast(getActivity()).disablePagerNext();
         }
 

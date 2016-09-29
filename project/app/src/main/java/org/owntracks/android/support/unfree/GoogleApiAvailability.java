@@ -9,6 +9,9 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.common.ConnectionResult;
+
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.support.Preferences;
@@ -109,6 +112,10 @@ public class GoogleApiAvailability {
                 getInstance().tryErrorResolution(activity, errorCode, requestCode);
             }
         });
+    }
+
+    public static boolean checkPlayServicesWithOverride() {
+        return  com.google.android.gms.common.GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS || Preferences.getPlayOverride();
     }
 
     public static boolean checkPlayServices(Context context) {
