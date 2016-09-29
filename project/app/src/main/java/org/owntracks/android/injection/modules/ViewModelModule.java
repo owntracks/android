@@ -4,6 +4,8 @@ import org.owntracks.android.ui.contacts.ContactsMvvm;
 import org.owntracks.android.ui.contacts.ContactsViewModel;
 import org.owntracks.android.ui.map.MapMvvm;
 import org.owntracks.android.ui.map.MapViewModel;
+import org.owntracks.android.ui.status.StatusMvvm;
+import org.owntracks.android.ui.status.StatusViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -30,4 +32,8 @@ public abstract class ViewModelModule {
 
     @Binds
     abstract ContactsMvvm.ViewModel bindContactsViewModel(ContactsViewModel contactsViewModel);
+
+    @Binds
+    abstract StatusMvvm.ViewModel bindStatusViewModel(StatusViewModel statusViewModel);
+
 }
