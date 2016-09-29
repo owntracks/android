@@ -16,9 +16,15 @@
 #   public *;
 #}
 
+# Skip obfuscation
+-dontobfuscate
+
 # PAHO (https://github.com/eclipse/paho.mqtt.android/issues/79)
 -keepattributes InnerClasses
 -keepattributes EnclosingMethod
+-keepattributes EnclosingMethod
+-keep class org.eclipse.paho.client.mqttv3.* { *; }
+-keep class org.eclipse.paho.client.mqttv3.*$* { *; }
 
 # GREENDAO
 -keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
@@ -30,7 +36,7 @@
 
 # EVENTBUS
 -keepattributes *Annotation*
--keepclassmembers class ** {
+-keepclassmembers,includedescriptorclasses class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;
 }
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
@@ -45,37 +51,24 @@
 -keepnames class com.fasterxml.jackson.** { *; }
  -dontwarn com.fasterxml.jackson.databind.**
  -keep class org.codehaus.** { *; }
- -keepclassmembers public final enum org.codehaus.jackson.annotate.JsonAutoDetect$Visibility {
- public static final org.codehaus.jackson.annotate.JsonAutoDetect$Visibility *; }
--keep public class your.class.** {
+
+-keep public class org.owntracks.android.messages.** {
   public void set*(***);
   public *** get*();
+  public boolean is*();
+}
+-keep class com.fasterxml.jackson.databind.ObjectWriter {
+    public ** writeValueAsString(**);
+}
+
+-keep class com.fasterxml.jackson.databind.ObjectMapper {
+    public <methods>;
+    protected <methods>;
 }
 
 # OKHTTP
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
-# RxJava:
-# rxjava
--keep class rx.schedulers.Schedulers {
-    public static <methods>;
-}
--keep class rx.schedulers.ImmediateScheduler {
-    public <methods>;
-}
--keep class rx.schedulers.TestScheduler {
-    public <methods>;
-}
--keep class rx.schedulers.Schedulers {
-    public static ** test();
-}
--keepclassmembers class rx.internal.util.* {
-    long producerIndex;
-    long consumerIndex;
-}
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
-    long producerNode;
-    long consumerNode;
-}
--dontwarn rx.internal.util.unsafe.**
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
