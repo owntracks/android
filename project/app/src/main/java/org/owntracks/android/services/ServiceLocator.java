@@ -14,7 +14,9 @@ import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ProxyableService;
@@ -72,7 +74,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         this.waypointDao = Dao.getWaypointDao();
         this.googleApiClient = new GoogleApiClient.Builder(this.context).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
-        if (ServiceApplication.checkPlayServices() && !hasConnectedGoogleApiClient()) {
+        if (ServiceProxy.checkPlayServices() && !hasConnectedGoogleApiClient()) {
             this.googleApiClient.connect();
         }
 
@@ -634,4 +636,16 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         if(!hasLocationPermission)
             handleSecurityException(null);
     }
+    public boolean publishWaypointsMessage() {
+        MessageWaypoints m = new MessageWaypoints();
+        MessageWaypointCollection waypoints = Preferences.waypointsToJSON();
+        if(waypoints == null)
+            return false;
+
+        m.setWaypoints(waypoints);
+
+        ServiceProxy.getServiceMessage().sendMessage(m);
+        return true;
+    }
+
 }

@@ -18,10 +18,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+
 import org.owntracks.android.App;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.receiver.ReceiverProxy;
+import org.owntracks.android.support.unfree.GoogleApiAvailability;
 
 import timber.log.Timber;
 
@@ -29,18 +32,15 @@ public class ServiceProxy extends Service {
 	private static final String TAG = "ServiceProxy";
 
     public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
-
-
-    public static final int SERVICE_APP = 0;
-	public static final int SERVICE_LOCATOR = 1;
-	public static final int SERVICE_NOTIFICATION = 2;
-	public static final int SERVICE_BEACON = 3;
-	public static final int SERVICE_MESSAGE = 4;
+	public static final int SERVICE_LOCATOR = 0;
+	public static final int SERVICE_NOTIFICATION = 1;
+	public static final int SERVICE_BEACON = 2;
+	public static final int SERVICE_MESSAGE = 3;
 
 
 	public static final String KEY_SERVICE_ID = "srvID";
 	private static ServiceProxy instance;
-	private static final ProxyableService[] services = new ProxyableService[5];
+	private static final ProxyableService[] services = new ProxyableService[4];
 	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
@@ -84,9 +84,8 @@ public class ServiceProxy extends Service {
 			@Override
 			public void run() {
 				Timber.d("loading services");
-				loadService(SERVICE_MESSAGE);
-				loadService(SERVICE_APP);
 				loadService(SERVICE_NOTIFICATION);
+				loadService(SERVICE_MESSAGE);
 				loadService(SERVICE_LOCATOR);
 				loadService(SERVICE_BEACON);
 				setBgInitialized();
@@ -175,9 +174,6 @@ public class ServiceProxy extends Service {
 
 		Timber.v("lazyloading:%s", id);
         switch (id) {
-            case SERVICE_APP:
-                p = new ServiceApplication();
-                break;
 			case SERVICE_LOCATOR:
                 p = new ServiceLocator();
                 break;
@@ -204,10 +200,6 @@ public class ServiceProxy extends Service {
 		return p;
 	}
 
-	public static ServiceApplication getServiceApplication() {
-		return (ServiceApplication) loadService(SERVICE_APP);
-	}
-
 	public static ServiceLocator getServiceLocator() {
 		return (ServiceLocator) loadService(SERVICE_LOCATOR);
 	}
@@ -221,7 +213,6 @@ public class ServiceProxy extends Service {
 	public static ServiceMessage getServiceMessage() {
 		return (ServiceMessage) loadService(SERVICE_MESSAGE);
 	}
-
 
 	public static ProxyableService getServiceForIntent(Intent i) {
 		if ((i != null) && (i.getIntExtra(KEY_SERVICE_ID, -1) != -1))
@@ -405,5 +396,8 @@ public class ServiceProxy extends Service {
 		}
 	}
 
-
+	protected static boolean checkPlayServices() {
+		//return GoogleApiAvailability.checkPlayServices(App.getContext());
+		return  org.owntracks.android.support.unfree.GoogleApiAvailability.checkPlayServicesWithOverride();
+	}
 }
