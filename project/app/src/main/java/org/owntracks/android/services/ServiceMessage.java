@@ -16,8 +16,10 @@ import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
+import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.widgets.Toasts;
@@ -254,7 +256,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
                 ServiceProxy.getServiceLocator().reportLocationResponse();
                 break;
             case MessageCmd.ACTION_WAYPOINTS:
-                ServiceProxy.getServiceApplication().publishWaypointsMessage();
+                ServiceProxy.getServiceLocator().publishWaypointsMessage();
                 break;
             case MessageCmd.ACTION_SET_WAYPOINTS:
                 Preferences.importWaypointsFromJson(message.getWaypoints());
