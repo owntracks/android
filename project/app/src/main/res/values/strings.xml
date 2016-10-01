@@ -212,5 +212,6 @@
     <string name="icon_description_done">Done</string>
     <string name="title_activity_import">Configuration import</string>
     <string name="geocorderResolving">resolving</string>
+    <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
 
 </resources>
