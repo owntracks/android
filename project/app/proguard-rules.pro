@@ -53,10 +53,9 @@
  -keep class org.codehaus.** { *; }
 
 -keep public class org.owntracks.android.messages.** {
-  public void set*(***);
-  public *** get*();
-  public boolean is*();
-}
+ *;
+ }
+
 -keep class com.fasterxml.jackson.databind.ObjectWriter {
     public ** writeValueAsString(**);
 }
