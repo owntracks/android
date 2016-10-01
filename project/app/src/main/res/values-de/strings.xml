@@ -145,6 +145,7 @@
     <string name="ERROR_DATADISABLED">Datenverbindung nicht verfügbar</string>
     <string name="ERROR_CONFIGURATION">Konfiguration unvollständig</string>
     <string name="errorPreferencesImportFailed">Import fehlgeschlagen</string>
+    <string name="errorPreferencesImportFailedParseException">Konfiguration fehlerhaft</string>
     <string name="welcome_play_description">Owntracks benötigt die Google Play-Dienste</string>
     <string name="play_services_not_available_general">Google Play-Dienste sind nicht verfügbar</string>
     <string name="icon_description_warning">Warnung</string>
