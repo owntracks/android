@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.widget.PopupMenu;
@@ -61,69 +60,69 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     private MapLocationSource mMapLocationSource;
 
 
-    private static boolean FLAG_STATE_MAP_READY = false;
-    private static boolean FLAG_STATE_LOCATION_READY = false;
-
-    private static boolean FLAG_REFRESH_DEVICE = false;
-    private static boolean FLAG_REFRESH_CONTACT_ACTIVE = false;
-    private static boolean FLAG_REFRESH_CONTACT_ALL = false;
-    private static boolean FLAG_REFRESH_ALL = false;
+    private boolean flagStateMapReady = false;
+    private boolean flagStateLocationReady = false;
 
     private static final int FLAG_ACTION_MODE_FREE = 0;
     private static final int FLAG_ACTION_MODE_DEVICE = 1;
     private static final int FLAG_ACTION_MODE_CONTACT = 2;
-    private static int FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
+
+    private boolean flagRefreshDevice = false;
+    private boolean flagRefreshContactActive = false;
+    private boolean flagRefreshContactAll = false;
+    private boolean flagRefreshAll = false;
+    private int mode = FLAG_ACTION_MODE_DEVICE;
     private Menu mMenu;
 
     // EVENT ENGINE ACTIONS
     private void queueActionModeDevice() {
-        FLAG_ACTION_MODE = FLAG_ACTION_MODE_DEVICE;
-        FLAG_REFRESH_DEVICE = true;  // misuse data update flag to center if ready
+        mode = FLAG_ACTION_MODE_DEVICE;
+        flagRefreshDevice = true;  // misuse data update flag to center if ready
         executePendingActions();
     }
 
     private void queueActionModeContact(boolean center) {
-        FLAG_ACTION_MODE = FLAG_ACTION_MODE_CONTACT;
-        FLAG_REFRESH_CONTACT_ACTIVE = center;
+        mode = FLAG_ACTION_MODE_CONTACT;
+        flagRefreshContactActive = center;
         executePendingActions();
     }
 
     private void queueActionModeFree() {
-        FLAG_ACTION_MODE = FLAG_ACTION_MODE_FREE;
+        mode = FLAG_ACTION_MODE_FREE;
         executePendingActions();
     }
 
 
     private void queueActionMapUpdate() {
-        FLAG_REFRESH_ALL = true;
+        flagRefreshAll = true;
         executePendingActions();
     }
 
 
     private void executePendingActions() {
-        if(!FLAG_STATE_MAP_READY) {
+        if(!flagStateMapReady) {
             return;
         }
 
         // MAP NEEDS UPDATE. HANDLE BEFORE VIEW UPDATES
-        if(FLAG_REFRESH_CONTACT_ALL) {
-            FLAG_REFRESH_CONTACT_ALL = false;
+        if(flagRefreshContactAll) {
+            flagRefreshContactAll = false;
             doUpdateMarkerAll();
         }
         // DEVICE OR ACTIVE CONTACT UPDATED. UPDATE VIEW
-        if(FLAG_STATE_LOCATION_READY && FLAG_REFRESH_DEVICE && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
-            FLAG_REFRESH_DEVICE = false;
+        if(flagStateLocationReady && flagRefreshDevice && mode == FLAG_ACTION_MODE_DEVICE) {
+            flagRefreshDevice = false;
             doCenterDevice();
-        } else if (FLAG_REFRESH_CONTACT_ACTIVE && (FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT)) {
-            FLAG_REFRESH_CONTACT_ACTIVE = false;
+        } else if (flagRefreshContactActive && (mode == FLAG_ACTION_MODE_CONTACT)) {
+            flagRefreshContactActive = false;
             doCenterContact();
-        } else if(FLAG_REFRESH_ALL) {
-            FLAG_REFRESH_ALL = false;
+        } else if(flagRefreshAll) {
+            flagRefreshAll = false;
 
             doUpdateMarkerAll();
-            if(FLAG_STATE_LOCATION_READY && FLAG_ACTION_MODE == FLAG_ACTION_MODE_DEVICE) {
+            if(flagStateLocationReady && mode == FLAG_ACTION_MODE_DEVICE) {
                 doCenterDevice();
-            } else if(FLAG_ACTION_MODE == FLAG_ACTION_MODE_CONTACT) {
+            } else if(mode == FLAG_ACTION_MODE_CONTACT) {
                 doCenterContact();
             }
         }
@@ -136,21 +135,21 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     // EVENT ENGINE STATE CALLBACKS
     private void onLocationSourceUpdated() {
-        FLAG_STATE_LOCATION_READY = true;
-        FLAG_REFRESH_DEVICE = true;
+        flagStateLocationReady = true;
+        flagRefreshDevice = true;
         executePendingActions();
         enableLocationMenus();
     }
 
     private void onStateMapReady() {
-        FLAG_STATE_MAP_READY = true;
-        FLAG_REFRESH_CONTACT_ALL = true;
+        flagStateMapReady = true;
+        flagRefreshContactAll = true;
         executePendingActions();
     }
 
 
     private void onActiveContactUpdated() {
-        FLAG_REFRESH_CONTACT_ACTIVE = true;
+        flagRefreshContactActive = true;
         executePendingActions();
     }
 
@@ -242,7 +241,9 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     public void initMapDelayed() {
-        FLAG_STATE_MAP_READY = false;
+        flagStateMapReady = false;
+        flagStateLocationReady = false;
+
         App.postOnMainHandlerDelayed(new Runnable() {
             @Override
             public void run() {
@@ -255,7 +256,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     private void initMap() {
-        FLAG_STATE_MAP_READY = false;
+        flagStateMapReady = false;
         binding.mapView.getMapAsync(this);
     }
 
@@ -263,7 +264,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_map, menu);
         this.mMenu = menu;
-        if(!FLAG_STATE_LOCATION_READY)
+        if(!flagStateLocationReady)
             disableLocationMenus();
         return true;
     }
@@ -308,7 +309,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
-        this.mMap.setLocationSource(mMapLocationSource);
+        this.mMap.setLocationSource(getMapLocationSource());
         this.mMap.setMyLocationEnabled(true);
         this.mMap.getUiSettings().setMyLocationButtonEnabled(false);
         this.mMap.setOnMapClickListener(this);
@@ -344,7 +345,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     // MAP INTERACTION
     private void doCenterDevice() {
         doUpdateCamera(mMapLocationSource.getLatLng(), ZOOM_LEVEL_STREET);
-
     }
 
     private void doCenterContact() {
@@ -381,8 +381,8 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     }
 
-    private void doUpdateMarkerSingle(@NonNull FusedContact contact) {
-        if (!contact.hasLocation() || mMap == null)
+    private void doUpdateMarkerSingle(@Nullable FusedContact contact) {
+        if (contact == null || !contact.hasLocation() || mMap == null)
             return;
 
         Marker m = mMarkers.get(contact.getId());
@@ -418,6 +418,13 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             default:
                 return false;
         }
+    }
+
+    public LocationSource getMapLocationSource() {
+        if(mMapLocationSource == null)
+            mMapLocationSource = new MapLocationSource();
+
+        return mMapLocationSource;
     }
 
 
@@ -511,7 +518,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     @Override
     public void clearMarker() {
-        if(FLAG_STATE_MAP_READY)
+        if(flagStateMapReady)
             mMap.clear();
         mMarkers.clear();
     }

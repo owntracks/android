@@ -39,17 +39,10 @@ import timber.log.Timber;
 
 @PerActivity
 public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View> {
-
-    private static final int MODE_CENTER_DEVICE = 1;
-    private static final int MODE_CENTER_CONTACT = 1;
-
     private final Context ctx;
     private final ContactsRepo contactsRepo;
-
     private FusedContact activeContact;
 
-    int mode = MODE_CENTER_DEVICE;
-    private boolean mapReady = false;
 
     @Inject
     public MapViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
@@ -92,9 +85,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         return contactsRepo.getRevision();
     }
 
-
-    private void setContact(FusedContact c) {
-    }
 
     @Override
     public void restore(@NonNull String contactId) {
@@ -147,7 +137,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void onMenuCenterDeviceClicked() {
-        mode = MODE_CENTER_DEVICE;
         getView().setModeDevice();
     }
 
