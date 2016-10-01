@@ -3,6 +3,7 @@ package org.owntracks.android.support;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,8 +22,11 @@ public class Parser {
 
     public static void initialize(Context c) {
         defaultMapper = new ObjectMapper();
+        defaultMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         arrayCompatMapper = new ObjectMapper();
         arrayCompatMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        arrayCompatMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static String toJsonPlain(@NonNull MessageBase message) throws IOException {
@@ -55,10 +59,13 @@ public class Parser {
     }
 
     private static MessageBase decrypt(MessageBase m) throws IOException, EncryptionException {
+        Timber.v("trying decrypt for message: %s", m);
         if(m instanceof MessageEncrypted) {
             if(!EncryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
             return defaultMapper.readValue(EncryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
+        } else {
+            Timber.v("message not encrypted");
         }
         return m;
     }

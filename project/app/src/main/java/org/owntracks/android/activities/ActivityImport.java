@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Menu;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -31,6 +34,7 @@ import timber.log.Timber;
 public class  ActivityImport extends ActivityBase {
     private static final String TAG = "ActivityImport";
     public static final int REQUEST_CODE = 1;
+    public static final String FLAG_IN_APP = "INAPP";
 
     private TextView input;
     private MessageConfiguration configJSON = null;
@@ -42,22 +46,39 @@ public class  ActivityImport extends ActivityBase {
         setContentView(R.layout.activity_import);
 
         setSupportToolbar();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         input = (TextView) findViewById(R.id.input);
+        handleIntent(getIntent());
+    }
 
-        // Look for Import Preference File Intent
-        final Intent intent = getIntent();
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setHasBack(false);
+        handleIntent(intent);
+
+    }
+
+    private void setHasBack(boolean hasBackArrow) {
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(hasBackArrow);
+    }
+
+
+    private void handleIntent(@Nullable Intent intent) {
+        if(intent == null)
+            return;
+
+        setHasBack(intent.getBooleanExtra(FLAG_IN_APP, false));
+
+
         final String action = intent.getAction();
 
 
-        if(Intent.ACTION_VIEW.equals(action)) {
-
+        if (Intent.ACTION_VIEW.equals(action)) {
             Uri uri = intent.getData();
-
             if (uri != null) {
                 extractPreferences(uri);
-
             }
         } else {
             Intent pickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -71,7 +92,6 @@ public class  ActivityImport extends ActivityBase {
             }
 
         }
-
     }
 
     @Override
@@ -151,16 +171,16 @@ public class  ActivityImport extends ActivityBase {
 
     private void extractPreferences(Uri uri){
 
-        try{
+        try {
             BufferedReader r;
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
                 // Note: left here to avoid breaking compatibility.  May be removed
                 // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
                 Timber.v("using file:/ uri");
-                r  = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
+                r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
             } else {
                 Timber.v("using content:/ uri");
-                InputStream stream =  getContentResolver().openInputStream(uri);
+                InputStream stream = getContentResolver().openInputStream(uri);
                 r = new BufferedReader(new InputStreamReader(stream));
             }
 
@@ -173,21 +193,25 @@ public class  ActivityImport extends ActivityBase {
                 }
             } catch (OutOfMemoryError e) {
                 throw new Error("Unable to load content into memory");
-            } catch (Exception e ) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
             Log.v(TAG, "file content: " + total);
 
-            configJSON= (MessageConfiguration) Parser.fromJson(total.toString().getBytes());
-            if(configJSON == null) {
+            configJSON = (MessageConfiguration) Parser.fromJson(total.toString().getBytes());
+            if (configJSON == null) {
                 throw new Error("Unable to parse content");
             }
 
-
-
-            input.setText(formatString(Parser.toJson(configJSON)));
+            String plain = Parser.toJsonPlain(configJSON);
+            Timber.v("toJsonPlain: %s", plain);
+            input.setText(formatString(plain));
             tintMenu();
+        } catch (JsonParseException e) {
+            Timber.e(e, "parse exception ");
+            Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
+            finish();
         }catch(Exception e){
             Timber.e(e, "import exception ");
             finish();

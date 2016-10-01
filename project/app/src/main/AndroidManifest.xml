@@ -69,9 +69,6 @@
             android:label="@string/title_activity_preferences"
             android:parentActivityName=".ui.map.MapActivity" />
 
-        android:configChanges="orientation"
-            android:label="@string/preferencesServer"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ActivityPreferencesConnection"
             android:configChanges="orientation"
@@ -89,6 +86,7 @@
         <activity
             android:name=".activities.ActivityImport"
             android:configChanges="orientation"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_import">
 
             <!-- Support two dots in file name: -->
