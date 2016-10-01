@@ -340,7 +340,6 @@ public class Preferences {
         if(j == null)
             return;
 
-        Timber.v("importing " + j.size()+" waypoints");
         WaypointDao dao = Dao.getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
@@ -348,9 +347,6 @@ public class Preferences {
             Waypoint w = m.toDaoObject();
 
             for(Waypoint e : deviceWaypoints) {
-                Timber.v("existing waypoint tst: " + TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()));
-                Timber.v("new waypoint tst     : " + TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
-
                 // remove exisiting waypoint before importing new one
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
                     Timber.v("removing existing waypoint with same tst before adding it");
