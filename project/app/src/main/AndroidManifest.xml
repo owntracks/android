@@ -86,7 +86,7 @@
         <activity
             android:name=".activities.ActivityImport"
             android:configChanges="orientation"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:label="@string/title_activity_import">
 
             <!-- Support two dots in file name: -->

@@ -19,6 +19,12 @@
 # Skip obfuscation
 -dontobfuscate
 
+
+-keep public class org.owntracks.android.** {
+  public protected private *;
+}
+
+
 # PAHO (https://github.com/eclipse/paho.mqtt.android/issues/79)
 -keepattributes InnerClasses
 -keepattributes EnclosingMethod
