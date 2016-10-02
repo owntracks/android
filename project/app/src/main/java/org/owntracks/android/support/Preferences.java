@@ -17,6 +17,7 @@ import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -294,6 +295,7 @@ public class Preferences {
 
 
 
+    @SuppressLint("CommitPrefEdits")
     public static void importFromMessage(MessageConfiguration m) {
 
         HashMap<String, Method> methods = getImportMethods();
@@ -315,15 +317,18 @@ public class Preferences {
                     Timber.v("clearing value for key %s", key);
                     clearKey(key);
                 } else
+                    Timber.v("method: %s", methods.get(key).getName());
                    methods.get(key).invoke(null, m.get(key));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
+        activeSharedPreferences.edit().commit();
         if(m.hasWaypoints()) {
             importWaypointsFromJson(m.getWaypoints());
         }
+
+
     }
 
     public static MessageWaypointCollection waypointsToJSON() {
@@ -385,7 +390,7 @@ public class Preferences {
         setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
     }
 
-    @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    @Export(key =Keys.CLEAN_SESSION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getCleanSession() {
         return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
     }
@@ -670,7 +675,7 @@ public class Preferences {
             setString(Keys.USERNAME, value);
     }
 
-
+    @Import(key =Keys.PUB_EXTENDED_DATA)
     private static void setPubLocationExtendedData(boolean aBoolean) {
         setBoolean(Keys.PUB_EXTENDED_DATA, aBoolean);
     }
@@ -743,7 +748,7 @@ public class Preferences {
         setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
 
     }
-    @Import(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD)
+    @Import(key =Keys.PUB_RETAIN)
     private static void setPubRetain(boolean aBoolean) {
         setBoolean(Keys.PUB_RETAIN, aBoolean, false);
 
@@ -897,6 +902,12 @@ public class Preferences {
     public static boolean getBeaconRangingEnabled() {
         return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
     }
+
+    @Import(key =Keys.BEACON_RANGING)
+    public static void setBeaconRangingEnabled(boolean val) {
+        setBoolean(Keys.BEACON_RANGING, val);
+    }
+
 
     // Enable cards
     public static boolean getInfo() {

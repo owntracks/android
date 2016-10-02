@@ -59,13 +59,10 @@ public class Parser {
     }
 
     private static MessageBase decrypt(MessageBase m) throws IOException, EncryptionException {
-        Timber.v("trying decrypt for message: %s", m);
         if(m instanceof MessageEncrypted) {
             if(!EncryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
             return defaultMapper.readValue(EncryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
-        } else {
-            Timber.v("message not encrypted");
         }
         return m;
     }
@@ -73,7 +70,6 @@ public class Parser {
 
     private static String encrypt(@NonNull String input) throws IOException, EncryptionException {
         if(EncryptionProvider.isPayloadEncryptionEnabled()) {
-            Timber.v("encrypting outgoing message with payload:%s", input);
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(EncryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsString(m);
