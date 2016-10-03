@@ -304,6 +304,7 @@ public class Preferences {
             setMode((Integer) m.get(Keys.MODE_ID));
             m.removeKey(Keys.MODE_ID);
         }
+
         // Don't show setup if a config has been imported
         setSetupCompleted();
 
@@ -323,6 +324,7 @@ public class Preferences {
                 e.printStackTrace();
             }
         }
+
         activeSharedPreferences.edit().commit();
         if(m.hasWaypoints()) {
             importWaypointsFromJson(m.getWaypoints());
