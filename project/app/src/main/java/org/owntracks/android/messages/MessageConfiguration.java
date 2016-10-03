@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.Preferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,12 @@ public class MessageConfiguration extends MessageBase{
         Timber.v("import key:%s, value:%s", key, value);
 
         map.put(key, value);
+    }
+
+    // TID would not be included in map for import otherwise
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public void setTid(String tid) {
+        set(Preferences.Keys.TRACKER_ID, tid);
     }
 
     @JsonIgnore
