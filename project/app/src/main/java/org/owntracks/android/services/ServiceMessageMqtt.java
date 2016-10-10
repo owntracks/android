@@ -643,7 +643,8 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
             return;
         }
 
-		pingHandler.stop();
+		if(pingHandler != null)
+			pingHandler.stop();
 
 		try {
 			if (isConnected()) {
