@@ -8,6 +8,7 @@ import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceMessage;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class Events {
@@ -231,22 +232,35 @@ public class Events {
 	}
 
 	public static class EndpointStateChanged extends E {
-			private final ServiceMessage.EndpointState state;
-			private final Object extra;
+		private final ServiceMessage.EndpointState state;
+		private Exception exception = null;
+		private String message = null;
 
-			public EndpointStateChanged(ServiceMessage.EndpointState state, @Nullable  Object extra) {
-				super();
-				this.state = state;
-				this.extra = extra;
-			}
+		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state) {
+			super();
+			this.state = state;
+		}
 
-			public ServiceMessage.EndpointState getState() {
+		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  Exception exception) {
+			super();
+			this.state = state;
+			this.exception = exception;
+		}
+		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  String message) {
+			super();
+			this.state = state;
+			this.message = message;
+		}
+
+		public ServiceMessage.EndpointState getState() {
 				return this.state;
 			}
-
-			@Nullable  public Object getExtra() {
-				return this.extra;
+		@Nullable  public Exception getException() {
+				return this.exception;
 			}
+		@Nullable  public String getMessage() {
+			return this.message;
+		}
 
     }
 
@@ -260,4 +274,8 @@ public class Events {
         }
     }
 
+	public static class AppStarted extends E {
+	}
+	public static class ServiceStarted extends E {
+	}
 }
