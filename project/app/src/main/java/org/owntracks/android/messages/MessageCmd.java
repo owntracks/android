@@ -21,12 +21,14 @@ public class MessageCmd extends MessageBase{
 
     public static final String ACTION_REPORT_LOCATION = "reportLocation";
     public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
+    public static final String ACTION_SET_CONFIGURATION = "setConfiguration";
     public static final String ACTION_SET_WAYPOINTS_KEY_WAYPOINTS = "waypoints";
 
     public static final String ACTION_WAYPOINTS = "waypoints";
 
     private MessageWaypointCollection waypoints;
     private Map<String,Object> map = new HashMap<>();
+    private MessageConfiguration configuration;
 
     @JsonAnyGetter
     public Map<String,Object> any() {
@@ -64,11 +66,17 @@ public class MessageCmd extends MessageBase{
         this.waypoints = m;
     }
 
+    public void setConfiguration(MessageConfiguration m) {
+        this.configuration = m;
+    }
+
     public MessageWaypointCollection getWaypoints() {
         return waypoints;
     }
 
-
+    public MessageConfiguration getConfiguration() {
+        return configuration;
+    }
 
     public void setAction(String action) {
         this.action = action;
