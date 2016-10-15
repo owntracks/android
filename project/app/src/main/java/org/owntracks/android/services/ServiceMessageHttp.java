@@ -28,7 +28,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
-import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.StatelessMessageEndpoint;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
@@ -120,10 +119,10 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         URL endpoint;
         try {
             endpoint = new URL(Preferences.getUrl());
-            service.onEndpointStateChanged(EndpointState.IDLE, null);
+            service.onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            service.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION, null);
+            service.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
             return;
         }
 
@@ -147,13 +146,6 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
     @Override
     public void probe() {
         Timber.d("endpointUrl:%s, httpClient:%s", this.endpointUrl, this.mHttpClient);
-    }
-
-
-    private static void setLastState(String message) {
-        StatisticsProvider.setString(StatisticsProvider.SERVICE_MESSAGE_BACKEND_LAST_STATUS, message);
-        StatisticsProvider.setTime(StatisticsProvider.SERVICE_MESSAGE_BACKEND_LAST_STATUS_TST);
-
     }
 
 
@@ -192,27 +184,23 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
             // If the device is not in idle mode but no network is available, send the message via GCM Network Manager.  The message is automatically send when a connection is available.
 
             if(idleMode) {
-                setLastState("TX1:queued/1");
                 Timber.v("messageId:%s, strategy:indirect, reason:idle", message.getMessageId());
                 prepareAndPostIndirect(wireMessage, message);
 
             } else if (networkAvailable && message.getOutgoingTTL() > 0 && Preferences.getHttpSchedulerAllowDirectStrategy()){
-                setLastState("TX1:queued/2");
                 Timber.v("messageId:%s, strategy:direct", message.getMessageId());
                 prepareAndPostDirect(wireMessage, message);
 
 
             } else {
-                setLastState("TX1:queued/3");
                 Timber.v("messageId:%s, strategy:indirect, reason:network_fail/ttl_fail/no_override", message.getMessageId());
                 prepareAndPostIndirect(wireMessage, message);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            setLastState("TX1: "+ e.getClass().getSimpleName());
-
             service.onMessageDeliveryFailed(message.getMessageId());
+
         }
     }
 
@@ -258,7 +246,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
                      Timber.v("code: %s, streaming response to parser", r.code() );
 
                      MessageBase[] result = Parser.fromJson(r.body().byteStream());
-                     setLastState("TX:"+r.code() + ", RX:" + result.length);
+                     ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.IDLE, "Response "+r.code() + ", " + result.length);
 
                      for (MessageBase aResult : result) {
                         onMessageReceived(aResult);
@@ -266,12 +254,11 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
                 //Non JSON return value
                 } catch (IOException e) {
-                    setLastState("TX2:"+r.code() + ", RX:JsonParseException");
+                     ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "HTTP " +r.code() + ", JsonParseException");
                     Timber.e("error:JsonParseException responseCode:%s", r.code());
                 } catch (Parser.EncryptionException e) {
-                     setLastState("TX2:"+r.code() + ", RX:EncryptionException");
+                     ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "Response: "+r.code() + ", EncryptionException");
                      Timber.e("error:EncryptionException");
-
                  }
                  return onMessageDelivered(c, messageId);
             } else {
@@ -280,8 +267,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
         } catch (IOException e) {
             e.printStackTrace();
-            setLastState("TX2:IOException");
-
+            ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, e);
             return onMessageDeliveryFailed(c, messageId);
         }
     }

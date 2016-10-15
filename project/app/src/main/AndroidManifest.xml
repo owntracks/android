@@ -186,8 +186,9 @@
         </receiver>
 
         <activity
-            android:name=".activities.ActivityStatus"
+            android:name=".ui.status.StatusActivity"
             android:label="@string/title_activity_status"
+            android:exported="true"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.map.MapActivity">
             <meta-data

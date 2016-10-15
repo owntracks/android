@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
@@ -18,14 +19,17 @@ import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.ProxyableService;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -51,7 +55,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     private static final String TAG = "ServiceLocator";
 
     public static final String RECEIVER_ACTION_GEOFENCE_TRANSITION = "org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION";
+    public static final String RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP = "org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP";
     public static final String RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL = "org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL";
+
 
     private GoogleApiClient googleApiClient;
     private ServiceProxy context;
@@ -109,7 +115,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     @Override
     public void onConnected(Bundle arg0) {
         Timber.v("GoogleApiClient is now connected");
-        StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_PLAY_CONNECTED);
 
         this.ready = true;
         App.postOnBackgroundHandler(new Runnable() {
@@ -144,6 +149,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 		return this.lastKnownLocation;
 	}
 
+    @SuppressWarnings("MissingPermission")
     private void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Timber.v("");
@@ -156,7 +162,8 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             int transition = event.getGeofenceTransition();
             for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
-                Waypoint w = this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
+                Waypoint w =  this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
+
 
                 if (w != null) {
                     Timber.v("waypoint triggered:%s transition:%s", w.getDescription(),transition);
@@ -164,10 +171,34 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                     this.waypointDao.update(w);
                     App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                     publishTransitionMessage(w, event.getTriggeringLocation(), transition);
+                    if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
+                        Timber.v("starting location lookup");
+                        LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
+                        Criteria criteria = new Criteria();
+                        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                        Bundle b = new Bundle();
+                        b.putInt("event", transition);
+                        b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
+
+                        PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
+
+                        mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
+                    }
                 }
             }
         }
 	}
+
+
+    private void onEnsuredFenceTransition(Intent intent) {
+        //Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+        Location location = intent.getParcelableExtra("com.google.android.location.LOCATION");
+
+        Waypoint w =  this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(intent.getStringExtra("geofenceId"))).limit(1).unique();
+
+        Timber.v("waypoint location: %s %s %s %s %s %s", w.getDescription(), w.getLocation().getLatitude(), w.getLocation().getLongitude(), w.getLocation().getAccuracy(), w.getLocation().getProvider(), intent.getIntExtra("event", 0) );
+        Timber.v("assisted location: %s %s %s %s", location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getProvider());
+    }
 
 	private boolean shouldPublishLocation() {
         if(!Preferences.getPub())
@@ -316,6 +347,8 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
             reportLocationManually();
         } else if (ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION.equals(intent.getAction())) {
             onFenceTransition(intent);
+        } else if (ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP.equals(intent.getAction())) {
+            //onEnsuredFenceTransition(intent);
         } else {
             Timber.e("received unknown intent action");
         }
@@ -332,9 +365,6 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     public void onLocationChanged(Location location) {
         Timber.v("onLocationChanged");
 
-        if(!ServiceProxy.isInForeground()) {
-            StatisticsProvider.setTime(StatisticsProvider.SERVICE_LOCATOR_BACKGROUND_LOCATION_LAST_CHANGE);
-        }
         lastKnownLocation = location;
 
         App.getEventBus().postSticky(new Events.CurrentLocationUpdated(lastKnownLocation));

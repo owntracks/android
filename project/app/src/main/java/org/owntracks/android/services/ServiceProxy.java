@@ -17,14 +17,10 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.google.android.gms.common.ConnectionResult;
-
 import org.owntracks.android.App;
-import org.owntracks.android.support.StatisticsProvider;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.receiver.ReceiverProxy;
-import org.owntracks.android.support.unfree.GoogleApiAvailability;
 
 import timber.log.Timber;
 
@@ -101,7 +97,7 @@ public class ServiceProxy extends Service {
 		};
 
 		App.postOnBackgroundHandler(runnable);
-		StatisticsProvider.setTime(StatisticsProvider.SERVICE_PROXY_START);
+		App.getEventBus().post(new Events.ServiceStarted());
 
 	}
 

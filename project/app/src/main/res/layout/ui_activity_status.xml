@@ -3,12 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="org.owntracks.android.App"/>
+        <import type="android.view.View"/>
         <variable name="vm" type="org.owntracks.android.ui.status.StatusViewModel" />
     </data>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/frame">
+
 
 
     <android.support.design.widget.AppBarLayout
@@ -26,13 +30,12 @@
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView
-
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <LinearLayout
             android:orientation="vertical"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/activity_horizontal_margin"
@@ -44,7 +47,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.endpointState}"
+                android:text="@{vm.endpointState, default=Connected}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 
@@ -58,7 +61,24 @@
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
 
+            <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.endpointMessage ?? @string/na, default=@string/na}"
+                android:ellipsize="none"
+                style="@style/ListItemPrimary" />
 
+            <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Endpoint state message"
+                android:ellipsize="end"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary" />
             <TextView
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
@@ -102,7 +122,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{App.formatDate(vm.locationServiceUpdateDate)}"
+                android:text="@{App.formatDate(vm.locationUpdated)}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 
@@ -126,7 +146,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@{App.formatDate(vm.appStarted)}"
                 android:ellipsize="none"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary" />
@@ -147,7 +167,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/na"
+                android:text="@{App.formatDate(vm.serviceStarted)}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 
@@ -163,6 +183,5 @@
                 style="@style/ListItemSecondary" />
         </LinearLayout>
     </ScrollView>
-    </FrameLayout>
-
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

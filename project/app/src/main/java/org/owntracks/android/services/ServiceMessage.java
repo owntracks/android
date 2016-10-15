@@ -21,7 +21,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
@@ -76,6 +75,10 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             }
             return (name());
         }
+
+        public boolean isErrorState() {
+            return this == ERROR || this == ERROR_DATADISABLED || this == ERROR_CONFIGURATION;
+        }
     }
 
 
@@ -84,7 +87,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void onCreate(ServiceProxy c) {
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        onEndpointStateChanged(EndpointState.INITIAL, null);
+        onEndpointStateChanged(EndpointState.INITIAL);
         endpoint = instantiateEndpoint(Preferences.getModeId());
     }
 
@@ -172,7 +175,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
 
-        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
         if(m == null) {
             Log.e(TAG, "onMessageDelivered()- messageId:"+messageId + ", error: called for unqueued message");
         } else {
@@ -185,7 +187,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     private void onMessageQueued(MessageBase m) {
         outgoingQueue.put(m.getMessageId(), m);
-        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
 
         Log.v(TAG, "onMessageQueued()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
         if(m instanceof MessageLocation && MessageLocation.REPORT_TYPE_USER.equals(MessageLocation.class.cast(m).getT()))
@@ -196,7 +197,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
-        StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, outgoingQueue.size());
 
         if(m == null) {
             Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
@@ -217,7 +217,15 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         incomingMessageProcessorExecutor.execute(message);
     }
 
-    public void onEndpointStateChanged(EndpointState newState, @Nullable  Exception e) {
+    public void onEndpointStateChanged(EndpointState newState) {
+        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState));
+    }
+
+    public void onEndpointStateChanged(EndpointState newState,  String message) {
+        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState, message));
+    }
+
+    public void onEndpointStateChanged(EndpointState newState, Exception e) {
         Timber.v("new state:%s",newState);
         App.getEventBus().postSticky(new Events.EndpointStateChanged(newState, e));
     }
