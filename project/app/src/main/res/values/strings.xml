@@ -215,5 +215,6 @@
     <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
     <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
+    <string name="errorPreferencesImportFailedMemory">Your device ran out of memory</string>
 
 </resources>

@@ -216,12 +216,15 @@ public class  ActivityImport extends ActivityBase {
             Timber.e(e, "import exception ");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
-
+        } catch(OutOfMemoryError e){
+            Timber.e(e, "import exception ");
+            finish();
+            Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private static String formatString(String text){
+    private static String formatString(String text) throws OutOfMemoryError{
 
         StringBuilder json = new StringBuilder();
         String indentString = "";
