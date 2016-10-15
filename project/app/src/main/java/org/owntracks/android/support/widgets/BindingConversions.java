@@ -1,6 +1,12 @@
 package org.owntracks.android.support.widgets;
 
+import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
+import android.databinding.adapters.TextViewBindingAdapter;
+import android.widget.TextView;
+
+import org.owntracks.android.R;
+import org.owntracks.android.services.ServiceMessage;
 
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
@@ -45,6 +51,12 @@ public class BindingConversions {
     @BindingConversion
     public static String convertToString(String s) {
         return  s != null ? s : EMPTY_STRING;
+    }
+
+
+    @BindingAdapter({"android:text"})
+    public static void setText(TextView view, ServiceMessage.EndpointState state) {
+        view.setText(state != null ? state.getLabel(view.getContext()) : view.getContext().getString(R.string.na));
     }
 
 }

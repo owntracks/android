@@ -21,8 +21,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.StatisticsProvider;
-import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
 import android.app.Application;
@@ -52,7 +50,6 @@ public class App extends Application  {
     private static Handler mainHandler;
     private static Handler backgroundHandler;
 
-    //private static HashMap<String, FusedContact> fusedContacts;
     private static Activity currentActivity;
     private static boolean inForeground;
     private static int runningActivities = 0;
@@ -96,7 +93,6 @@ public class App extends Application  {
         checkFirstStart();
 
 
-        StatisticsProvider.initialize(App.getInstance());
         Preferences.initialize(App.getInstance());
         Parser.initialize(App.getInstance());
         ContactImageProvider.initialize(App.getInstance());
@@ -105,7 +101,7 @@ public class App extends Application  {
         EncryptionProvider.initialize();
         getEventBus().register(this);
         startService(new Intent(this, ServiceProxy.class));
-
+        getEventBus().post(new Events.AppStarted());
     }
 
     public static App getInstance() { return sInstance; }

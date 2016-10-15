@@ -44,7 +44,6 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.PausableThreadPoolExecutor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
-import org.owntracks.android.support.StatisticsProvider;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
@@ -93,7 +92,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		}
 
 		message.setOutgoingProcessor(this);
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, pubPool.getQueueLength());
 
 		this.pubPool.queue(message);
 		return true;
@@ -196,6 +194,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		@Override
 		public void connectionLost(Throwable cause) {
 			Timber.e(cause, "");
+			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 			pubPool.pause();
 			//pingHandler.stop(); Ping handler is automatically stopped by mqttClient
 			reconnectHandler.schedule();
@@ -756,7 +755,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	private void clearQueues() {
 		initPausedPubPool();
-		StatisticsProvider.setInt(StatisticsProvider.SERVICE_MESSAGE_QUEUE_LENGTH, 0);
     }
 
 
