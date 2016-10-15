@@ -228,8 +228,10 @@ public class ActivityPreferences extends ActivityBase {
             screen.addPreference(locator);
             addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND,  R.string.preferencesLocatorAccuracyForeground, R.string.preferencesLocatorAccuracyForegroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
             addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND, R.string.preferencesLocatorAccuracyBackground, R.string.preferencesLocatorAccuracyBackgroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
-            addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_DISPLACEMENT, R.string.preferencesLocatorDisplacement, R.string.preferencesLocatorDisplacementSummary, R.integer.valLocatorDisplacement);
-            addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.string.preferencesLocatorIntervalSummary, R.integer.valLocatorInterval);
+            addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_DISPLACEMENT, R.string.preferencesLocatorDisplacement, R.integer.valLocatorDisplacement).withPreferencesSummary(R.string.preferencesLocatorDisplacementSummary);
+                    addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary);
+
+            addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsSummary);
 
             PreferenceCategory encryption = getCategory(R.string.preferencesCategoryAdvancedEncryption);
             screen.addPreference(encryption);
@@ -318,8 +320,8 @@ public class ActivityPreferences extends ActivityBase {
             EditStringPreference p = new EditStringPreference(getActivity());
             p.setKey(key);
             p.setTitle(titleRes);
+            p.setDialogTitle(titleRes);
             p.setSummary(summaryRes);
-
             p.setPersistent(false);
             p.setText(getEditStringPreferenceTextValueWithHintSupport(key));
             p.setHint(Preferences.getStringDefaultValue(defaultValueResPrivate, defaultValueResPublic));
@@ -333,28 +335,22 @@ public class ActivityPreferences extends ActivityBase {
 
 
 
-        private boolean addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @IntegerRes int defaultValueAllModes) {
-            return addEditIntegerPreference(parent, key, titleRes, summaryRes, defaultValueAllModes, defaultValueAllModes);
+        private EditIntegerPreference addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @IntegerRes int defaultValueAllModes) {
+            return addEditIntegerPreference(parent, key,  titleRes, defaultValueAllModes, defaultValueAllModes);
         }
 
-        private boolean addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @IntegerRes int defaultValueResPrivate, @IntegerRes int defaultValueResPublic) {
-            // Skip if no default value exists for current mode. Can be used to exclude preferences in some modes
-            if((Preferences.isModeMqttPrivate() && defaultValueResPrivate == 0) || (Preferences.isModeMqttPublic() && defaultValueResPublic == 0)) {
-                return false;
-            }
-
+        private EditIntegerPreference addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @IntegerRes int defaultValueResPrivate, @IntegerRes int defaultValueResPublic) {
             EditIntegerPreference p = new EditIntegerPreference(getActivity());
             p.setKey(key);
+            p.setDialogTitle(titleRes);
             p.setTitle(titleRes);
-            p.setSummary(summaryRes);
-
             p.setPersistent(false);
             p.setText(getEditIntegerPreferenceTextValueWithHintSupport(key));
             p.setHint(Integer.toString(Preferences.getIntegerDefaultValue(defaultValueResPrivate, defaultValueResPublic)));
             p.setPersistent(true);
 
             parent.addPreference(p);
-            return true;
+            return p;
         }
 
         private String getEditStringPreferenceTextValueWithHintSupport(String key) {
@@ -385,6 +381,7 @@ public class ActivityPreferences extends ActivityBase {
             ListIntegerPreference p = new ListIntegerPreference(parent.getContext());
             p.setKey(key);
             p.setTitle(titleRes);
+            p.setDialogTitle(titleRes);
             p.setSummary(summaryRes);
             p.setEntries(entriesRes);
             p.setEntryValues(entryValuesRes);

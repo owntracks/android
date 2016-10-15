@@ -2,6 +2,7 @@ package org.owntracks.android.support.widgets;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 
 import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;
@@ -30,5 +31,14 @@ public class EditStringPreference extends MaterialEditTextPreference {
         if(!shouldPersist())
             return;
         super.setText(text);
+    }
+
+    public EditStringPreference withPreferencesSummary(@StringRes int res) {
+        setSummary(res);
+        return this;
+    }
+    public EditStringPreference withDialogMessage(@StringRes int res) {
+        setDialogMessage(res);
+        return this;
     }
 }

@@ -213,5 +213,7 @@
     <string name="title_activity_import">Configuration import</string>
     <string name="geocorderResolving">resolving</string>
     <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
+    <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
+    <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
 
 </resources>

@@ -16,10 +16,10 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityBase;
 import org.owntracks.android.activities.ActivityPreferences;
-import org.owntracks.android.activities.ActivityStatus;
 import org.owntracks.android.activities.ActivityRegions;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.ui.status.StatusActivity;
 
 @Deprecated
 public class DrawerProvider {
@@ -87,7 +87,7 @@ public class DrawerProvider {
 
 
                 ).addStickyDrawerItems(
-                        secondaryDrawerItemForClass(activity, ActivityStatus.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
+                        secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
                         secondaryDrawerItemForClass(activity, ActivityPreferences.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
