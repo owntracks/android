@@ -269,6 +269,9 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             case MessageCmd.ACTION_SET_WAYPOINTS:
                 Preferences.importWaypointsFromJson(message.getWaypoints());
                 break;
+            case MessageCmd.ACTION_SET_CONFIGURATION:
+                Preferences.importFromMessage(message.getConfiguration());
+                break;
         }
     }
 
@@ -276,13 +279,5 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void processIncomingMessage(MessageTransition message) {
         ServiceProxy.getServiceNotification().processMessage(message);
     }
-
-    public void processIncomingMessage(MessageConfiguration message) {
-        if(!Preferences.getRemoteConfiguration())
-            return;
-
-        Preferences.importFromMessage(message);
-    }
-
 
 }
