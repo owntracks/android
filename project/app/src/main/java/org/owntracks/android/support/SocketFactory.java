@@ -22,6 +22,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.CertificateException;
 
+import timber.log.Timber;
+
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     private javax.net.ssl.SSLSocketFactory factory;
 
@@ -101,11 +103,13 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
             for (; aliasesCA.hasMoreElements(); ) {
                 String o = aliasesCA.nextElement();
-                Log.v(this.toString(), "Alias: " + o);
+                Timber.v("Alias: %s", o);
             }
         } else {
-            Log.v(this.toString(), "CA sideload: false, using system keystore");
-            tmf.init((KeyStore) null);
+            Timber.v("CA sideload: false, using system keystore");
+            KeyStore keyStore = KeyStore.getInstance("AndroidCAStore");
+            keyStore.load(null);
+            tmf.init(keyStore);
         }
 
         if (options.hasClientP12Crt()) {
