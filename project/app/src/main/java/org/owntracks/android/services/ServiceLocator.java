@@ -171,19 +171,19 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                     this.waypointDao.update(w);
                     App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                     publishTransitionMessage(w, event.getTriggeringLocation(), transition);
-                    if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
-                        Timber.v("starting location lookup");
-                        LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
-                        Criteria criteria = new Criteria();
-                        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                        Bundle b = new Bundle();
-                        b.putInt("event", transition);
-                        b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
-
-                        PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
-
-                        mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
-                    }
+                    //if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
+                    //    Timber.v("starting location lookup");
+                    //    LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
+                    //    Criteria criteria = new Criteria();
+                    //    criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                    //    Bundle b = new Bundle();
+                    //    b.putInt("event", transition);
+                    //    b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
+//
+                    //    PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
+//
+                    //    mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
+                    //}
                 }
             }
         }
@@ -429,7 +429,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 	}
 
 	private void reportLocation(String trigger) {
-
+        Timber.v("trigger:%s", trigger);
 
         Location l = getLastKnownLocation();
 		if (l == null) {
