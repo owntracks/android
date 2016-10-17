@@ -30,6 +30,7 @@ public class MessageLocation extends MessageBase  {
     private String geocoder;
     private WeakReference<FusedContact> _contact;
     private LatLng point;
+    private boolean wifi;
 
 
     @JsonProperty("lat")
@@ -146,4 +147,13 @@ public class MessageLocation extends MessageBase  {
         return Preferences.getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(Preferences.getIgnoreStaleLocations() );
     }
 
+    @JsonIgnore
+    public void setWifi(boolean wifi) {
+        this.wifi = wifi;
+    }
+
+    @JsonProperty("_wifi")
+    public boolean getWifi() {
+        return wifi;
+    }
 }

@@ -32,7 +32,11 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.databinding.ObservableMap;
+import android.databinding.tool.reflection.Callable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -41,6 +45,8 @@ import android.provider.Settings.Secure;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
+
+import static android.net.ConnectivityManager.TYPE_WIFI;
 
 public class App extends Application  {
     private static App sInstance;
@@ -60,6 +66,10 @@ public class App extends Application  {
 
     private static AppComponent sAppComponent = null;
 
+    public static boolean getWifi() {
+        NetworkInfo activeNetwork = ((ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+    }
 
     @Override
 	public void onCreate() {
