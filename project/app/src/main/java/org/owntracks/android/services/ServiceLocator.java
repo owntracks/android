@@ -447,9 +447,10 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(Preferences.getTrackerId(true));
-        if(Preferences.getPubLocationExtendedData())
+        if(Preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
-
+            message.setWifi(App.getWifi());
+        }
 		ServiceProxy.getServiceMessage().sendMessage(message);
 
 	}
