@@ -8,14 +8,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
@@ -36,8 +38,6 @@ import org.owntracks.android.support.interfaces.ProxyableService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
@@ -46,10 +46,11 @@ public class ServiceNotification implements ProxyableService {
     public static final String INTENT_ACTION_CANCEL_EVENT_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION";
     public static final String INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION = "org.owntracks.android.intent.INTENT_ACTION_CANCEL_MESSAGE_NOTIFICATION"; //unused for now
     private static final String TAG ="ServiceNotification" ;
+    private static final String GROUP_KEY_EVENTS = "events";
 
     private ServiceProxy context;
     private Preferences.OnPreferenceChangedListener preferencesChangedListener;
-    private NotificationManager notificationManager;
+    private NotificationManagerCompat notificationManager;
     private SimpleDateFormat dateFormater;
 
     // Ongoing notification
@@ -59,9 +60,12 @@ public class ServiceNotification implements ProxyableService {
     private ServiceMessage.EndpointState notificationOngoingLastStateCache = ServiceMessage.EndpointState.INITIAL;
 
     // Event notification
-    private static final int NOTIFICATION_ID_EVENTS = 2;
+    private static final int NOTIFICATION_ID_EVENTS_GROUP = 2;
+    private int notificationIdEvents = 3;
     private NotificationCompat.Builder notificationBuilderEvents;
-    private LinkedList<Spannable> notificationListEvents;
+    private NotificationCompat.Builder notificationBuilderEventsGroup;
+
+    private Notification notificationEventsSummary;
 
     // Permission notification
     private NotificationCompat.Builder notificationBuilderPermission;
@@ -72,10 +76,8 @@ public class ServiceNotification implements ProxyableService {
     @Override
     public void onCreate(ServiceProxy c) {
         this.context = c;
-        this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        this.notificationListEvents = new LinkedList<>();
 
-
+        this.notificationManager = NotificationManagerCompat.from(context);
         this.dateFormater = new SimpleDateFormat("HH:mm", context.getResources().getConfiguration().locale);
 
         //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -112,7 +114,7 @@ public class ServiceNotification implements ProxyableService {
         if(!Preferences.getNotification())
             this.context.stopForeground(true);
 
-        notificationManager.cancel(NOTIFICATION_ID_EVENTS);
+        notificationManager.cancel(NOTIFICATION_ID_EVENTS_GROUP);
 
     }
 
@@ -155,6 +157,12 @@ public class ServiceNotification implements ProxyableService {
 
         notificationBuilderOngoing.addAction(R.drawable.ic_report_notification, this.context.getString(R.string.publish), ServiceProxy.getPendingIntentForService(this.context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null, PendingIntent.FLAG_CANCEL_CURRENT));
 
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
+            notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+        notificationBuilderOngoing.setOngoing(true);
 
     }
 
@@ -164,6 +172,7 @@ public class ServiceNotification implements ProxyableService {
             return;
 
         notificationBuilderEvents = new NotificationCompat.Builder(context);
+        notificationBuilderEventsGroup = new NotificationCompat.Builder(context);
 
         Intent resultIntent = new Intent(this.context, ActivityWelcome.class);
         resultIntent.setAction("android.intent.action.MAIN");
@@ -175,8 +184,17 @@ public class ServiceNotification implements ProxyableService {
         notificationBuilderEvents.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
         notificationBuilderEvents.setSmallIcon(R.drawable.ic_notification);
         notificationBuilderEvents.setAutoCancel(true);
-        notificationBuilderEvents.setShowWhen(false);
-        notificationBuilderEvents.setGroup(NOTIFICATION_ID_EVENTS + "");
+        notificationBuilderEvents.setShowWhen(true);
+        notificationBuilderEvents.setGroup(NOTIFICATION_ID_EVENTS_GROUP + "");
+
+
+        notificationBuilderEventsGroup.setContentIntent(resultPendingIntent);
+        notificationBuilderEventsGroup.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
+        notificationBuilderEventsGroup.setSmallIcon(R.drawable.ic_notification);
+        notificationBuilderEventsGroup.setAutoCancel(true);
+        notificationBuilderEventsGroup.setShowWhen(true);
+        notificationBuilderEventsGroup.setGroup(NOTIFICATION_ID_EVENTS_GROUP + "");
+        notificationBuilderEventsGroup.setGroupSummary(true);
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
@@ -184,7 +202,14 @@ public class ServiceNotification implements ProxyableService {
             notificationBuilderEvents.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
 
+            notificationBuilderEventsGroup.setColor(ContextCompat.getColor(context, R.color.primary));
+            notificationBuilderEventsGroup.setPriority(Notification.PRIORITY_MIN);
+            notificationBuilderEventsGroup.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilderEventsGroup.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
+
+
+
     }
     public void  updateNotificationOngoing() {
         Timber.v("enabled:%s, state:%s", Preferences.getNotification(), notificationOngoingLastStateCache.getLabel(context));
@@ -202,29 +227,24 @@ public class ServiceNotification implements ProxyableService {
         }
 
 
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
-            notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
-        }
 
         if(Preferences.getNotificationHigherPriority())
             notificationBuilderOngoing.setPriority(Notification.PRIORITY_DEFAULT);
         else
             notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
 
-        notificationBuilderOngoing.setOngoing(true);
         notificationBuilderOngoing.setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
         this.context.startForeground(NOTIFICATION_ID_ONGOING, notificationBuilderOngoing.build());
     }
 
 
     public void addNotificationEvents(MessageTransition message) {
-
+        // Prepare data
         FusedContact c = App.getFusedContact(message.getContactKey());
 
         String name;
-        String dateStr = dateFormater.format(new Date());
+        long when = message.getTst()*1000;
+        String dateStr = dateFormater.format(new Date(when));
         String transition =  context.getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving);
         String location = message.getDesc();
 
@@ -242,54 +262,66 @@ public class ServiceNotification implements ProxyableService {
             }
         }
 
-        Spannable notification = new SpannableString(dateStr + ": " + name + " " + transition + " " + location);
-        notification.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, dateStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        notificationListEvents.push(notification);
-    }
-
-    private void clearNotificationTransitions() {
-        this.notificationListEvents.clear();
-        notificationManager.cancel(NOTIFICATION_ID_EVENTS);
-
-    }
+        // Add single notification
+        notificationBuilderEvents.setContentTitle(name);
+        notificationBuilderEvents.setContentText(transition + " " + location);
+        notificationBuilderEvents.setWhen(when);
+        notificationBuilderEvents.setShowWhen(true);
+        notificationManager.notify(++notificationIdEvents, notificationBuilderEvents.build());
 
 
-    public void updateNotificationEvents() {
-        if(!Preferences.getNotification() || !Preferences.getNotificationEvents() || this.notificationListEvents.size() == 0)
-            return;
+        // Add group notification
+        android.support.v4.app.NotificationCompat.InboxStyle style  = new android.support.v4.app.NotificationCompat.InboxStyle();
 
-
-        InboxStyle style  = new InboxStyle();
-
-
-        ListIterator<Spannable> iter = this.notificationListEvents.listIterator();
-        while(iter.hasNext()){
-            style.addLine(iter.next());
+        // Append new notification to existing
+        if(notificationEventsSummary != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            CharSequence cs[] = (CharSequence[]) notificationEventsSummary.extras.get(Notification.EXTRA_TEXT_LINES);
+            for (CharSequence line : cs != null ? cs : new CharSequence[0]) {
+                style.addLine(line);
+            }
         }
 
+        Spannable newLine = new SpannableString(name + " " + transition + " " + location);
+        newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, dateStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        style.addLine(newLine);
         String title = context.getString(R.string.events);
         style.setBigContentTitle(title);
 
-        notificationBuilderEvents.setStyle(style);
-        notificationBuilderEvents.setContentText(this.notificationListEvents.getFirst());
-        notificationBuilderEvents.setContentTitle(title);
-        notificationBuilderEvents.setNumber(this.notificationListEvents.size());
+        notificationBuilderEventsGroup.setStyle(style);
+        notificationBuilderEventsGroup.setContentTitle(title);
+        notificationBuilderEventsGroup.setWhen(when);
 
-        notificationManager.notify(NOTIFICATION_ID_EVENTS, notificationBuilderEvents.build());
+
+
+        notificationEventsSummary = notificationBuilderEventsGroup.build();
+        notificationManager.notify(NOTIFICATION_ID_EVENTS_GROUP, notificationEventsSummary);
+
+
+    }
+
+    private void clearNotificationEvents() {
+        notificationManager.cancel(NOTIFICATION_ID_EVENTS_GROUP);
+        notificationIdEvents = NOTIFICATION_ID_EVENTS_GROUP+1;
+    }
+
+
+    private void updateNotificationEvents() {
+        if(!Preferences.getNotification() || !Preferences.getNotificationEvents())
+            clearNotificationEvents();
     }
 
 
     @Override
     public void onDestroy() {
-        clearNotificationTransitions();
+        clearNotifications();
         Preferences.unregisterOnPreferenceChangedListener(this.preferencesChangedListener);
     }
 
     @Override
     public void onStartCommand(Intent intent) {
         if (ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION.equals(intent.getAction())) {
-            clearNotificationTransitions();
+            clearNotificationEvents();
         }
     }
 
@@ -305,10 +337,6 @@ public class ServiceNotification implements ProxyableService {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
-        updateNotificationOngoing(e.getNewModeId());
-    }
-
-    private void updateNotificationOngoing(int newModeId) {
         updateNotificationOngoing();
     }
 
@@ -353,7 +381,6 @@ public class ServiceNotification implements ProxyableService {
             return;
 
         addNotificationEvents(message);
-        updateNotificationEvents();
 
     }
     public void notifyMissingPermissions() {
