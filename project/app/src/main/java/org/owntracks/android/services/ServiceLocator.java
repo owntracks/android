@@ -30,6 +30,8 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -449,10 +451,20 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setTid(Preferences.getTrackerId(true));
         if(Preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
-            message.setWifi(App.getWifi());
+
+            NetworkInfo activeNetwork = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+            if(activeNetwork != null) {
+
+                if(!activeNetwork.isConnected()) {
+                    message.setConn(MessageLocation.CONN_TYPE_OFFLINE);
+                } else if(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI ) {
+                    message.setConn(MessageLocation.CONN_TYPE_WIFI);
+                } else if(activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    message.setConn(MessageLocation.CONN_TYPE_MOBILE);
+                }
+            }
         }
 		ServiceProxy.getServiceMessage().sendMessage(message);
-
 	}
 
     @SuppressWarnings("unused")

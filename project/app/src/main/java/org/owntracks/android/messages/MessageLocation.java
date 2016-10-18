@@ -21,6 +21,10 @@ import timber.log.Timber;
 public class MessageLocation extends MessageBase  {
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
+    public static final String CONN_TYPE_OFFLINE = "o";
+    public static final String CONN_TYPE_WIFI = "w";
+    public static final String CONN_TYPE_MOBILE = "m";
+
     private String t;
     private int batt;
     private int acc;
@@ -30,7 +34,7 @@ public class MessageLocation extends MessageBase  {
     private String geocoder;
     private WeakReference<FusedContact> _contact;
     private LatLng point;
-    private boolean wifi;
+    private String conn;
 
 
     @JsonProperty("lat")
@@ -147,13 +151,12 @@ public class MessageLocation extends MessageBase  {
         return Preferences.getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(Preferences.getIgnoreStaleLocations() );
     }
 
-    @JsonIgnore
-    public void setWifi(boolean wifi) {
-        this.wifi = wifi;
+    public void setConn(String conn) {
+        this.conn = conn;
     }
 
-    @JsonProperty("_wifi")
-    public boolean getWifi() {
-        return wifi;
+    public String getConn() {
+        return this.conn;
     }
+
 }
