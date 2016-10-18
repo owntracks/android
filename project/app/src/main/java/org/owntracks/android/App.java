@@ -66,10 +66,6 @@ public class App extends Application  {
 
     private static AppComponent sAppComponent = null;
 
-    public static boolean getWifi() {
-        NetworkInfo activeNetwork = ((ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-    }
 
     @Override
 	public void onCreate() {
@@ -111,7 +107,7 @@ public class App extends Application  {
         EncryptionProvider.initialize();
         getEventBus().register(this);
         startService(new Intent(this, ServiceProxy.class));
-        getEventBus().post(new Events.AppStarted());
+        getEventBus().postSticky(new Events.AppStarted());
     }
 
     public static App getInstance() { return sInstance; }

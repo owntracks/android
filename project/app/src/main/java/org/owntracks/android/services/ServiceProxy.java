@@ -97,7 +97,7 @@ public class ServiceProxy extends Service {
 		};
 
 		App.postOnBackgroundHandler(runnable);
-		App.getEventBus().post(new Events.ServiceStarted());
+		App.getEventBus().postSticky(new Events.ServiceStarted());
 
 	}
 
