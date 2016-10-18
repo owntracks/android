@@ -172,4 +172,6 @@
     <string name="title_activity_import">Konfigurations import</string>
     <string name="menuCurrentLoction">Aktuelle position</string>
     <string name="geocorderResolving">lade</string>
+    <string name="preferencesIgnoreInaccurateLocations">Ungenaue Positionen</string>
+    <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
 </resources>
