@@ -45,7 +45,6 @@ public class FusedContact extends BaseObservable {
     }
 
     public FusedContact(@Nullable String id) {
-        Log.v(TAG, "new contact allocated for id: " + id);
         this.id = id != null ? id : "NOID";
     }
 
