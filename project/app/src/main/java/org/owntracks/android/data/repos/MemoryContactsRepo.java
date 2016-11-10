@@ -60,7 +60,6 @@ public class MemoryContactsRepo implements ContactsRepo {
                 mList.add(contact);
             }
         });
-        Timber.v("new contact added:%s", id);
         revision++;
     }
 
