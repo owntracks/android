@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map;
 
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -405,10 +406,14 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             case R.id.menu_navigate:
                 FusedContact c = viewModel.getContact();
                 if(c != null && c.hasLocation()) {
-                    LatLng l = c.getLatLng();
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    try {
+                        LatLng l = c.getLatLng();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
                 }
