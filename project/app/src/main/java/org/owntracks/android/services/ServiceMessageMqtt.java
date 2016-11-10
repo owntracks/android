@@ -193,7 +193,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		@Override
 		public void connectionLost(Throwable cause) {
-			Timber.e(cause, "");
+			Timber.e(cause, "doze:%s", PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE)).isDeviceIdleMode());
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 			pubPool.pause();
 			//pingHandler.stop(); Ping handler is automatically stopped by mqttClient
@@ -434,6 +434,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			Log.v(TAG, "init() mode: " + Preferences.getModeId());
 			Log.v(TAG, "init() client id: " + cid);
 			Log.v(TAG, "init() connect string: " + connectString);
+
+			if(pingHandler != null)
+				pingHandler.stop();
 
             this.pingHandler = new PingHandler(context);
 			this.mqttClient = new CustomMqttClient(connectString, cid, persistenceStore, pingHandler);
@@ -818,10 +821,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
         static final String TAG = "PingHandler";
 
         private ClientComms comms;
-        private Context context;
 		private WakeLock wakelock;
 
-		private boolean releaseWakeLock() {
+		private synchronized boolean releaseWakeLock() {
 			if(wakelock != null && wakelock.isHeld()){
 				Log.d(TAG, "Release lock ok(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
 
@@ -832,19 +834,27 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			return false;
 		}
 
-        public void ping(Intent intent) {
-			Log.v(TAG, "sending");
-
+		private synchronized void initWakeLock() {
 			if (wakelock == null) {
 				wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_PING);
 			}
+		}
 
+		private synchronized void acquireWakelock() {
 			if(!wakelock.isHeld())
 				wakelock.acquire();
+		}
+
+        public void ping(Intent intent) {
+			Log.v(TAG, "sending");
+
+			initWakeLock();
+
+			acquireWakelock();
 
 			if(comms == null) {
 				Log.v(TAG, "comms is null, running doStart()");
-				PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
+				PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
 				try {
 					p.send();
 				} catch (PendingIntent.CanceledException ignored) {
@@ -882,7 +892,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
             if (c == null) {
                 throw new IllegalArgumentException( "Neither service nor client can be null.");
             }
-            this.context = c;
         }
 
         @Override
@@ -903,6 +912,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
             Log.v(TAG, "stop " + this);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
             alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, ServiceMessageMqtt.RECEIVER_ACTION_PING, null));
+			releaseWakeLock();
         }
 
 		// Schedules a BroadcastIntent that will trigger a ping message when received.
@@ -956,12 +966,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			hasStarted = true;
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
 			long delayInMilliseconds;
-			if(BuildConfig.DEBUG)
-				 delayInMilliseconds = TimeUnit.SECONDS.toMillis(10);
-			else
-				delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
+			delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
 
-			Log.v(TAG, "scheduling reconnect handler delay:"+delayInMilliseconds);
+			Timber.v("scheduling reconnect delay:%s", delayInMilliseconds);
 
 			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
 			if (Build.VERSION.SDK_INT >= 19) {
