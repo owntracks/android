@@ -4,6 +4,9 @@ import android.databinding.Bindable;
 import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+
+import java.util.Date;
+
 public interface StatusMvvm {
 
     interface View extends MvvmView {
@@ -14,9 +17,9 @@ public interface StatusMvvm {
         String getEndpointMessage();
         int getEndpointQueue();
         boolean getPermissionLocation();
-        long getLocationUpdated();
-        long getAppStarted();
-        long getServiceStarted();
+        Date getLocationUpdated();
+        Date getAppStarted();
+        Date getServiceStarted();
 
     }
 }

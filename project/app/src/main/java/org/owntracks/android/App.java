@@ -42,6 +42,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
@@ -163,12 +165,11 @@ public class App extends Application  {
         backgroundHandler.post(r);
     }
 
-
     public static String formatDate(long tstSeconds) {
         return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
     }
 
-	public static String formatDate(Date d) {
+	public static String formatDate(@NonNull Date d) {
         if(DateUtils.isToday(d.getTime())) {
             return dateFormaterToday.format(d);
         } else {
