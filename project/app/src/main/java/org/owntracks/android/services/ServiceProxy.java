@@ -33,7 +33,6 @@ public class ServiceProxy extends Service {
 	public static final int SERVICE_BEACON = 2;
 	public static final int SERVICE_MESSAGE = 3;
 
-
 	public static final String KEY_SERVICE_ID = "srvID";
 	private static ServiceProxy instance;
 	private static final ProxyableService[] services = new ProxyableService[4];
@@ -107,8 +106,7 @@ public class ServiceProxy extends Service {
 
 	@Override
 	public void onDestroy() {
-		Timber.v("");
-		for ( int i = 1; i <= 4; i ++ ) {
+		for ( int i = 0; i <= services.length; i ++ ) {
 			App.getEventBus().unregister(services[i]);
 			services[i].onDestroy();
 			services[i]=null;
