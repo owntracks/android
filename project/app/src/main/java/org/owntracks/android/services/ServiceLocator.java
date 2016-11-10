@@ -34,6 +34,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -451,6 +452,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setTid(Preferences.getTrackerId(true));
         if(Preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
+            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                message.setDoze(PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE)).isDeviceIdleMode());
+            }
 
             NetworkInfo activeNetwork = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
             if(activeNetwork != null) {
@@ -463,7 +467,10 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                     message.setConn(MessageLocation.CONN_TYPE_MOBILE);
                 }
             }
+
+
         }
+
 		ServiceProxy.getServiceMessage().sendMessage(message);
 	}
 
