@@ -196,17 +196,15 @@ public class ServiceNotification implements ProxyableService {
         notificationBuilderEventsGroup.setGroup(NOTIFICATION_ID_EVENTS_GROUP + "");
         notificationBuilderEventsGroup.setGroupSummary(true);
 
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
-            notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
-            notificationBuilderEvents.setPriority(Notification.PRIORITY_MIN);
-            notificationBuilderEvents.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
+        notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
+        notificationBuilderEvents.setPriority(Notification.PRIORITY_MIN);
+        notificationBuilderEvents.setCategory(Notification.CATEGORY_SERVICE);
+        notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
 
-            notificationBuilderEventsGroup.setColor(ContextCompat.getColor(context, R.color.primary));
-            notificationBuilderEventsGroup.setPriority(Notification.PRIORITY_MIN);
-            notificationBuilderEventsGroup.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderEventsGroup.setVisibility(Notification.VISIBILITY_PUBLIC);
-        }
+        notificationBuilderEventsGroup.setColor(ContextCompat.getColor(context, R.color.primary));
+        notificationBuilderEventsGroup.setPriority(Notification.PRIORITY_MIN);
+        notificationBuilderEventsGroup.setCategory(Notification.CATEGORY_SERVICE);
+        notificationBuilderEventsGroup.setVisibility(Notification.VISIBILITY_PUBLIC);
 
 
 
@@ -239,6 +237,9 @@ public class ServiceNotification implements ProxyableService {
 
 
     public void addNotificationEvents(MessageTransition message) {
+        if (!Preferences.getNotificationEvents())
+            return;
+
         // Prepare data
         FusedContact c = App.getFusedContact(message.getContactKey());
 
@@ -262,6 +263,8 @@ public class ServiceNotification implements ProxyableService {
             }
         }
 
+        if(notificationBuilderEvents == null || notificationBuilderEventsGroup == null)
+            setupNotificationEvents();
 
         // Add single notification
         notificationBuilderEvents.setContentTitle(name);
