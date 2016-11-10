@@ -26,9 +26,9 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     String endpointMessage;
 
     Context context;
-    private long appStarted;
-    private long serviceStarted;
-    private long locationUpdated;
+    private Date appStarted;
+    private Date serviceStarted;
+    private Date locationUpdated;
     private boolean locationPermission;
 
     @Inject
@@ -66,19 +66,19 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public long getServiceStarted() {
+    public Date getServiceStarted() {
         return serviceStarted;
     }
 
     @Override
     @Bindable
-    public long getAppStarted() {
+    public Date getAppStarted() {
         return appStarted;
     }
 
     @Override
     @Bindable
-    public long getLocationUpdated() {
+    public Date getLocationUpdated() {
         return locationUpdated;
     }
 
@@ -102,19 +102,19 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Subscribe(sticky = true)
     public void onEvent(Events.AppStarted e) {
-        this.appStarted = e.getDate().getTime();
+        this.appStarted = e.getDate();
         notifyPropertyChanged(BR.appStarted);
     }
 
     @Subscribe(sticky = true)
     public void onEvent(Events.ServiceStarted e) {
-        this.serviceStarted = e.getDate().getTime();
+        this.serviceStarted = e.getDate();
         notifyPropertyChanged(BR.serviceStarted);
     }
 
     @Subscribe(sticky = true)
     public void onEvent(Events.CurrentLocationUpdated e) {
-        this.locationUpdated = e.getDate().getTime();
+        this.locationUpdated = e.getDate();
         notifyPropertyChanged(BR.locationUpdated);
     }
 }

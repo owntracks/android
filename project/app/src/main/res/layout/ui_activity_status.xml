@@ -105,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.permissionLocation)}"
                 android:ellipsize="none"
+                android:visibility="gone"
                 style="@style/ListItemPrimary" />
 
             <TextView
@@ -114,6 +115,7 @@
                 android:layout_height="wrap_content"
                 android:text="Location service permission"
                 android:ellipsize="end"
+                android:visibility="gone"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
 
@@ -122,7 +124,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{App.formatDate(vm.locationUpdated)}"
+                android:text="@{vm.locationUpdated != null ? App.formatDate(vm.locationUpdated) : @string/na}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 
@@ -146,7 +148,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{App.formatDate(vm.appStarted)}"
+                android:text="@{vm.appStarted != null ? App.formatDate(vm.appStarted)  : @string/na}"
                 android:ellipsize="none"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary" />
@@ -167,7 +169,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{App.formatDate(vm.serviceStarted)}"
+                android:text="@{vm.serviceStarted != null ? App.formatDate(vm.serviceStarted) : @string/na}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 

@@ -174,4 +174,5 @@
     <string name="geocorderResolving">lade</string>
     <string name="preferencesIgnoreInaccurateLocations">Ungenaue Positionen</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
+    <string name="noNavigationApp">keine passende App installiert</string>
 </resources>
