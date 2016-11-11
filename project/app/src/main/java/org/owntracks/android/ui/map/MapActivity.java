@@ -180,6 +180,19 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             }
         });
         setBottomSheetHidden();
+
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
+        CoordinatorLayout.LayoutParams params =
+            (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+        AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
+        behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
+            @Override
+            public boolean canDrag(AppBarLayout appBarLayout) {
+                return false;
+            }
+        });
+        params.setBehavior(behavior);
+        
     }
 
     @Override
