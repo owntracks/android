@@ -5,21 +5,21 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 5
-def versionBuild = 1
+def versionBuild = 3
 ext.daggerVersion = '2.6'
-ext.playLibVersion = '9.8.0'
+ext.playLibVersion = '10.0.1'
 ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '25.0.0'
+ext.supportLibVersion = '25.0.1'
 
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
@@ -92,20 +92,21 @@ dependencies {
     compile "com.google.dagger:dagger:${daggerVersion}"
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
-    compile 'org.greenrobot:greendao:3.0.1'
-    compile 'org.altbeacon:android-beacon-library:2.7.1@aar'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161018.042216-52'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
+    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'org.altbeacon:android-beacon-library:2.9.1@aar'
+
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161114.052252-83'
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.8'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'
     compile 'com.jakewharton.timber:timber:4.1.2'
     compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
-    compile 'com.afollestad.material-dialogs:commons:0.9.0.2'
-    compile('com.mikepenz:materialdrawer:5.6.0@aar') { transitive = true }
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
+    compile('com.mikepenz:materialdrawer:5.8.0@aar') { transitive = true }
     compile 'com.mikepenz:materialize:0.8.8@aar'
 
     // Preprocessors
