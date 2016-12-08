@@ -16,9 +16,9 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageCmd extends MessageBase{
+    static final String TYPE = "cmd";
     private static final String BASETOPIC_SUFFIX = "/cmd";
     private String action;
-
     public static final String ACTION_REPORT_LOCATION = "reportLocation";
     public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
     public static final String ACTION_SET_CONFIGURATION = "setConfiguration";

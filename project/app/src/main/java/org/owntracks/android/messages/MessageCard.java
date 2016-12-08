@@ -12,6 +12,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageCard extends MessageBase{
+    static final String TYPE = "card";
     private static final String BASETOPIC_SUFFIX = "/info";
     private String name;
     private String face;

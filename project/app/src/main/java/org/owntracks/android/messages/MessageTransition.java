@@ -12,6 +12,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageTransition extends MessageBase{
+    public static final String TYPE = "transition";
     public static final String BASETOPIC_SUFFIX = "/event";
     public static final String EVENT_ENTER = "enter";
     public static final String EVENT_LEAVE = "leave";

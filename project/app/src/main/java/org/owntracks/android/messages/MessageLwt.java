@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageEvent extends MessageBase{
-    static final String TYPE = "event";
-    private static final String BASETOPIC_SUFFIX = "/event";
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
+public class MessageLwt extends MessageBase {
+    public static final String TYPE = "lwt";
+
+    public String getBaseTopicSuffix() {  return null; }
+
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);

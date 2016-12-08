@@ -3,10 +3,7 @@ package org.owntracks.android.messages;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
@@ -20,8 +17,8 @@ import java.util.Set;
 import timber.log.Timber;
 
 public class MessageConfiguration extends MessageBase{
+    static final String TYPE = "configuration";
     private static final String BASETOPIC_SUFFIX = "/cmd";
-
     private Map<String,Object> map = new HashMap<>();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
