@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,7 +21,6 @@ import com.mikepenz.materialdrawer.Drawer;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.greenrobot.greendao.query.Query;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Preferences;
@@ -30,7 +30,6 @@ import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.widgets.DividerItemDecoration;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
@@ -73,7 +72,8 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         listView = (org.owntracks.android.support.widgets.RecyclerView) findViewById(R.id.listView);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(listAdapter);
-        listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        listView.addItemDecoration(new DividerItemDecoration(listView.getContext(), layoutManager.getOrientation()));
+
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setEmptyView(findViewById(R.id.placeholder));
         listView.setHasFixedSize(false);
