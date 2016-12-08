@@ -3,7 +3,6 @@ package org.owntracks.android.support;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,10 +12,7 @@ import org.owntracks.android.messages.MessageEncrypted;
 import java.io.IOException;
 import java.io.InputStream;
 
-import timber.log.Timber;
-
 public class Parser {
-    private static final String TAG = "Parser";
     private static ObjectMapper defaultMapper;
     private static ObjectMapper arrayCompatMapper;
 
@@ -49,6 +45,9 @@ public class Parser {
 
     private static MessageBase[] decrypt(MessageBase[] a) throws IOException, EncryptionException {
         // Recorder compatiblity, encrypted messages with data array
+        if(a == null)
+            throw new IOException("null array");
+
         if (a.length == 1 && a[0] instanceof MessageEncrypted) {
             if (!EncryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
