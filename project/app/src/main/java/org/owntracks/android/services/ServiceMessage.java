@@ -3,7 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -12,14 +12,11 @@ import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
-import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
@@ -88,12 +85,16 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         onEndpointStateChanged(EndpointState.INITIAL);
-        endpoint = instantiateEndpoint(Preferences.getModeId());
+        try {
+            endpoint = instantiateEndpoint(Preferences.getModeId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
 
-    private ServiceMessageEndpoint instantiateEndpoint(int mode) {
+    private @NonNull ServiceMessageEndpoint instantiateEndpoint(int mode) throws Exception{
         Timber.v("mode:%s", mode);
         if(endpoint != null) {
             Timber.v("destroying endpoint");
@@ -114,7 +115,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
         if(p == null) {
             Timber.e("unable to instantiate endpoint for mode:%s", mode);
-            return null;
+            throw new Exception("endpoint instantiation faield");
         }
 
         p.onCreate(context);
@@ -143,7 +144,11 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Subscribe
     public void onEvent(Events.ModeChanged event) {
-        endpoint = instantiateEndpoint(Preferences.getModeId());
+        try {
+            endpoint = instantiateEndpoint(Preferences.getModeId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
@@ -152,26 +157,31 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         Timber.v("endpoint:%s, message:%s",endpoint, message);
 
         message.setOutgoing();
+        try {
 
-        if(endpoint == null) {
-            Timber.e("no endpoint, creating on demand");
-            endpoint = instantiateEndpoint(Preferences.getModeId());
+            if(endpoint == null) {
+                Timber.e("no endpoint, creating on demand");
+                endpoint = instantiateEndpoint(Preferences.getModeId());
+            }
+
+            if(!endpoint.isReady()) {
+                Timber.e("endpoint is not ready: %s", endpoint);
+                endpoint.probe();
+                return;
+            }
+
+            if(endpoint.sendMessage(message)) {
+                this.onMessageQueued(message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if(!endpoint.isReady()) {
-            Timber.e("endpoint is not ready: %s", endpoint);
-            endpoint.probe();
-            return;
-        }
-
-        if(endpoint.sendMessage(message)) {
-            this.onMessageQueued(message);
-        }
     }
 
 
 
-    public void onMessageDelivered(Long messageId) {
+     void onMessageDelivered(Long messageId) {
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
 

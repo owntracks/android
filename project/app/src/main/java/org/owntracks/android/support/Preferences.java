@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -282,7 +281,7 @@ public class Preferences {
 
     public static boolean canConnect() {
         if(isModeMqttPrivate()) {
-            return !getHost().trim().equals("") && !getUsername().trim().equals("")  && ((getAuth() &&  !getPassword().trim().equals("")) || !getAuth());
+            return !getHost().trim().equals("") && !getUsername().trim().equals("")  && (!getAuth() || !getPassword().trim().equals(""));
         } else if(isModeMqttPublic()) {
             return true;
         }
@@ -1109,11 +1108,11 @@ public class Preferences {
     }
 
     public static List<Method> getExportMethods() {
-        final List<Method> methods = new ArrayList<Method>();
+        final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
             // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
-            final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(klass.getDeclaredMethods()));
+            final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
                     Export annotInstance = method.getAnnotation(Export.class);
@@ -1133,7 +1132,7 @@ public class Preferences {
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
             // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
-            final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(klass.getDeclaredMethods()));
+            final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Import.class) ) {
                     methods.put(method.getAnnotation(Import.class).key(), method);

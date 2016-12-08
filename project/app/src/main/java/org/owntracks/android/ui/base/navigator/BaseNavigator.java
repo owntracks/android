@@ -8,13 +8,9 @@ import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-
-import org.owntracks.android.R;
-import org.owntracks.android.ui.base.BaseActivity;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -71,7 +67,7 @@ public abstract class BaseNavigator implements Navigator {
     }
 
     @Override
-    public final void replaceFragment(@IdRes int containerId, Fragment fragment, Bundle args) {
+    public final void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
         replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, null, args, false, null);
     }
 
@@ -81,7 +77,7 @@ public abstract class BaseNavigator implements Navigator {
     }
 
     @Override
-    public final void replaceFragmentAndAddToBackStack(@IdRes int containerId, Fragment fragment, Bundle args, String backstackTag) {
+    public final void replaceFragmentAndAddToBackStack(@IdRes int containerId, @NonNull Fragment fragment, Bundle args, String backstackTag) {
         replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, null, args, true, backstackTag);
     }
 

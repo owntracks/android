@@ -12,7 +12,6 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 
 import javax.inject.Inject;
-import timber.log.Timber;
 
 @PerApplication
 public class MemoryContactsRepo implements ContactsRepo {

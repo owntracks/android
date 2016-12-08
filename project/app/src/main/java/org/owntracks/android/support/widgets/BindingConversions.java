@@ -2,7 +2,6 @@ package org.owntracks.android.support.widgets;
 
 import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
-import android.databinding.adapters.TextViewBindingAdapter;
 import android.widget.TextView;
 
 import org.owntracks.android.R;

@@ -731,47 +731,4 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
             return inflater.inflate(R.layout.fragment_welcome_done, container, false);
         }
     }
-
-
-    public class CrossfadePageTransformer implements ViewPager.PageTransformer {
-
-        @Override
-        public void transformPage(View page, float position) {
-            int pageWidth = page.getWidth();
-
-            View backgroundView = page.findViewById(R.id.welcome_fragment);
-            View text_head = page.findViewById(R.id.screen_heading);
-            View text_content = page.findViewById(R.id.screen_desc);
-
-            if (0 <= position && position < 1) {
-                ViewHelper.setTranslationX(page, pageWidth * -position);
-            }
-            if (-1 < position && position < 0) {
-                ViewHelper.setTranslationX(page, pageWidth * -position);
-            }
-
-            if (position <= -1.0f || position >= 1.0f) {
-
-            } else if (position == 0.0f) {
-            } else {
-                if (backgroundView != null) {
-                    ViewHelper.setAlpha(backgroundView, 1.0f - Math.abs(position));
-
-                }
-
-                if (text_head != null) {
-                    ViewHelper.setTranslationX(text_head, pageWidth * position);
-                    ViewHelper.setAlpha(text_head, 1.0f - Math.abs(position));
-                }
-
-                if (text_content != null) {
-                    ViewHelper.setTranslationX(text_content, pageWidth * position);
-                    ViewHelper.setAlpha(text_content, 1.0f - Math.abs(position));
-                }
-            }
-        }
-    }
-
-
-
 }

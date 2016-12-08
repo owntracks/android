@@ -2,7 +2,6 @@ package org.owntracks.android.support.widgets;
 
 import android.content.Context;
 
-import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 
 import org.owntracks.android.support.Preferences;

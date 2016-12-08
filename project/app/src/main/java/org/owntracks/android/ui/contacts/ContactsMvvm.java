@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.contacts;
 
 import android.databinding.ObservableList;
-import android.databinding.ObservableMap;
 
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;

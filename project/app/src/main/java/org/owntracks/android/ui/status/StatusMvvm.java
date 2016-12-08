@@ -1,5 +1,4 @@
 package org.owntracks.android.ui.status;
-import android.databinding.Bindable;
 
 import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.ui.base.view.MvvmView;

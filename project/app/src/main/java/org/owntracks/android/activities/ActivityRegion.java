@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Message;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;

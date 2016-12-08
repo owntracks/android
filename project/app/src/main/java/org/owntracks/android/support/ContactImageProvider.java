@@ -64,7 +64,7 @@ public class ContactImageProvider {
         WeakReference<Marker> target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
-            target = new WeakReference<Marker>(marker);
+            target = new WeakReference<>(marker);
         }
 
         @Override

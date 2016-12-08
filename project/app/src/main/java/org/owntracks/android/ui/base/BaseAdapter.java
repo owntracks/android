@@ -41,6 +41,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
             this.itemViewArg = arg;
         }
 
+        @NonNull
         public BaseAdapterItemView getItemViewArg() {
             return itemViewArg;
         }
