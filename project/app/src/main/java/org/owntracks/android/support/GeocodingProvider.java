@@ -4,8 +4,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
-import android.support.annotation.CallSuper;
-import android.util.Log;
 import android.widget.TextView;
 
 import org.owntracks.android.App;
@@ -16,7 +14,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
 
 import timber.log.Timber;
 
@@ -134,22 +131,23 @@ public class GeocodingProvider {
                 if ((addresses != null) && (addresses.size() > 0)) {
                     StringBuilder g = new StringBuilder();
                     Address a = addresses.get(0);
-                    String th = a.getThoroughfare();
-                    String sth = a.getSubThoroughfare();
-                    String lcy = a.getLocality();
-                    String co = a.getCountryCode();
-                    String ad0 = addresses.get(0).getAddressLine(0);
-                    if (ad0 != null && th != null && sth != null && lcy !=null && co != null && ad0.equalsIgnoreCase(lcy))
-                    {
-                        g.append(th).append(" ").append(sth).append(", ").append(lcy).append(", ").append(co);
-                        return g.toString();
-                    }
-                    if (addresses.get(0).getAddressLine(0) != null)
-                        g.append(addresses.get(0).getAddressLine(0)).append(", ");
-                    if (addresses.get(0).getLocality() != null)
-                        g.append(addresses.get(0).getLocality());
-                    else if (addresses.get(0).getCountryName() != null)
-                        g.append(addresses.get(0).getCountryName());
+
+                    //String th = a.getThoroughfare();
+                    //String sth = a.getSubThoroughfare();
+                    //String lcy = a.getLocality();
+                    //String co = a.getCountryCode();
+                    //String ad0 = a.getAddressLine(0);
+                    //if (ad0 != null && th != null && sth != null && lcy !=null && co != null && ad0.equalsIgnoreCase(lcy))
+                    //{
+                    //    g.append(th).append(" ").append(sth).append(", ").append(lcy).append(", ").append(co);
+                    //    return g.toString();
+                    //}
+                    if (a.getAddressLine(0) != null)
+                        g.append(a.getAddressLine(0)).append(", ");
+                    if (a.getLocality() != null)
+                        g.append(a.getLocality());
+                    else if (a.getCountryName() != null)
+                        g.append(a.getCountryName());
                     return g.toString();
                 } else {
                     return "not available";

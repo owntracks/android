@@ -47,7 +47,6 @@ public class ActivityExport extends ActivityBase {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            final Activity a = getActivity();
 
             addPreferencesFromResource(R.xml.export);
 

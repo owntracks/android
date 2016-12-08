@@ -145,7 +145,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
     @Override
     public void probe() {
-        Timber.d("endpointUrl:%s, httpClient:%s", this.endpointUrl, this.mHttpClient);
+        Timber.d("endpointUrl:%s, httpClient:%s", this.endpointUrl, mHttpClient);
     }
 
 

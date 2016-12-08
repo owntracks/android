@@ -16,7 +16,6 @@ public class EncryptionProvider {
 
     private static SecretBox b;
     private static Random r;
-    private static byte[] key;
     private static boolean enabled;
 
     public static boolean isPayloadEncryptionEnabled() {
@@ -31,7 +30,7 @@ public class EncryptionProvider {
             return;
 
 
-        key = new byte[crypto_secretbox_KEYBYTES];
+        byte[] key = new byte[crypto_secretbox_KEYBYTES];
         System.arraycopy(encryptionKey.getBytes(), 0, key, 0, encryptionKey.length());
         b = new SecretBox(key);
         r = new Random();

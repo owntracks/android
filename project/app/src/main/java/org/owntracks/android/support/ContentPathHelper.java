@@ -1,14 +1,8 @@
 package org.owntracks.android.support;
 
-import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 
 // Credit goes to Paul Burke and his library aFileChooser (https://github.com/iPaulPro/aFileChooser)

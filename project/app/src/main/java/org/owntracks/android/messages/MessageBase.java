@@ -9,24 +9,24 @@ import org.owntracks.android.support.PausableThreadPoolExecutor;
 import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=MessageLocation.class, name="location"),
-        @JsonSubTypes.Type(value=MessageTransition.class, name="transition"),
-        @JsonSubTypes.Type(value=MessageEvent.class, name="event"),
-        @JsonSubTypes.Type(value=MessageCard.class, name="card"),
-        @JsonSubTypes.Type(value=MessageCmd.class, name="cmd"),
-        @JsonSubTypes.Type(value=MessageConfiguration.class, name="configuration"),
-        @JsonSubTypes.Type(value=MessageEncrypted.class, name="encrypted"),
-        @JsonSubTypes.Type(value=MessageWaypoint.class, name="waypoint"),
-        @JsonSubTypes.Type(value=MessageWaypoints.class, name="waypoints")
-})
+        @JsonSubTypes.Type(value=MessageLocation.class, name=MessageLocation.TYPE),
+        @JsonSubTypes.Type(value=MessageTransition.class, name=MessageTransition.TYPE),
+        @JsonSubTypes.Type(value=MessageEvent.class, name=MessageEvent.TYPE),
+        @JsonSubTypes.Type(value=MessageCard.class, name=MessageCard.TYPE),
+        @JsonSubTypes.Type(value=MessageCmd.class, name=MessageCmd.TYPE),
+        @JsonSubTypes.Type(value=MessageConfiguration.class, name=MessageConfiguration.TYPE),
+        @JsonSubTypes.Type(value=MessageEncrypted.class, name=MessageEncrypted.TYPE),
+        @JsonSubTypes.Type(value=MessageWaypoint.class, name=MessageWaypoint.TYPE),
+        @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
+        @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE)
 
+})
 public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
         protected static final String TAG = "MessageBase";
 

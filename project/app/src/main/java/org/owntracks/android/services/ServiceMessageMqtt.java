@@ -31,7 +31,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
@@ -867,7 +866,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			}
 
 
-			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
+			comms.checkForActivity(new IMqttActionListener() {
 
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {

@@ -5,8 +5,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.Menu;
@@ -181,13 +184,12 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         });
         setBottomSheetHidden();
 
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
-        CoordinatorLayout.LayoutParams params =
-            (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+        AppBarLayout appBarLayout = binding.appBarLayout;
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
         behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
             @Override
-            public boolean canDrag(AppBarLayout appBarLayout) {
+            public boolean canDrag(@NonNull AppBarLayout appBarLayout) {
                 return false;
             }
         });

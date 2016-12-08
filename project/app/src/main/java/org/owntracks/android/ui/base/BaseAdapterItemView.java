@@ -75,8 +75,7 @@ public final class BaseAdapterItemView {
 
         BaseAdapterItemView itemView = (BaseAdapterItemView) o;
 
-        if (bindingVariable != itemView.bindingVariable) return false;
-        return layoutRes == itemView.layoutRes;
+        return bindingVariable == itemView.bindingVariable && layoutRes == itemView.layoutRes;
     }
 
     @Override

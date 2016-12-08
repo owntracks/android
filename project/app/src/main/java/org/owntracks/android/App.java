@@ -2,6 +2,7 @@ package org.owntracks.android;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -31,24 +32,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.databinding.ObservableMap;
-import android.databinding.tool.reflection.Callable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
-
-import static android.net.ConnectivityManager.TYPE_WIFI;
 
 public class App extends Application  {
     private static App sInstance;
@@ -89,8 +82,8 @@ public class App extends Application  {
 
 
 
-        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", getResources().getConfiguration().locale);
-        dateFormaterToday = new SimpleDateFormat("HH:mm:ss", getResources().getConfiguration().locale);
+        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        dateFormaterToday = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
         HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
         mServiceHandlerThread.start();
