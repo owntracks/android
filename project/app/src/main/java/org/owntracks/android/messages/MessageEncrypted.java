@@ -9,6 +9,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageEncrypted extends MessageBase{
+    static final String TYPE = "encrypted";
     public String getData() {
         return data;
     }

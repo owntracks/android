@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageWaypoint extends MessageBase{
+    static final String TYPE = "waypoint";
     public static final String BASETOPIC_SUFFIX = "/event";
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
