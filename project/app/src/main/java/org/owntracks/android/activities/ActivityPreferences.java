@@ -81,7 +81,6 @@ public class ActivityPreferences extends ActivityBase {
         private static Preference version;
         private static Preference repo;
         private static Preference twitter;
-        private static Preference community;
         private Preference export;
 
         static String ver;
@@ -114,7 +113,6 @@ public class ActivityPreferences extends ActivityBase {
 
             repo = findPreference("repo");
             twitter = findPreference("twitter");
-            community = findPreference("community");
             documentation = findPreference("documentation");
             version = findPreference("versionReadOnly");
 
@@ -158,15 +156,6 @@ public class ActivityPreferences extends ActivityBase {
                 }
             });
 
-            community.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(getString(R.string.valCommunityUrl)));
-                    a.startActivity(intent);
-                    return false;
-                }
-            });
             documentation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -178,10 +167,6 @@ public class ActivityPreferences extends ActivityBase {
             });
 
             setServerPreferenceSummary(this);
-
-
-
-
 
             Preference.OnPreferenceClickListener connectionListener = new Preference.OnPreferenceClickListener() {
 

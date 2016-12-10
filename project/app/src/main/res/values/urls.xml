@@ -2,6 +2,5 @@
 <resources>
     <string name="valRepoUrl" translatable="false">https://github.com/owntracks</string>
     <string name="valTwitterUrl" translatable="false">https://twitter.com/owntracks</string>
-    <string name="valCommunityUrl" translatable="false">https://community.owntracks.org</string>
     <string name="valDocumentationUrl" translatable="false">http://owntracks.org/booklet</string>
 </resources>
