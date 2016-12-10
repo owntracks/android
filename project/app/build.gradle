@@ -5,7 +5,7 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 5
-def versionBuild = 3
+def versionBuild = 4
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '10.0.1'
 ext.okHttpVersion = '3.4.1'
@@ -95,7 +95,7 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.0'
     compile 'org.altbeacon:android-beacon-library:2.9.1@aar'
 
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161114.052252-83'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161018.042216-52'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.8'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'

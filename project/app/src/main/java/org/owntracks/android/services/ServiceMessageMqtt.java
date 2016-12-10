@@ -866,8 +866,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			}
 
 
-			comms.checkForActivity(new IMqttActionListener() {
-
+			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					Log.d(TAG, "Success. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
