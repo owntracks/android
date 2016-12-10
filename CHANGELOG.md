@@ -1,5 +1,10 @@
 OwnTracks Android App Release Notes
 ===================================
+## OwnTracks 1.1.6
+>Release date: 2016-12-10
+[NEW] Removed links to Community
+[FIX] Reverted MQTT library version
+
 ## OwnTracks 0.7.1
 >Release date: 2016-05-18 for alpha testers
 * [NEW] Last published location in notification is now supported in HTTP mode
