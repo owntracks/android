@@ -13,6 +13,10 @@ import org.greenrobot.greendao.annotation.*;
 @Entity
 public class Waypoint {
 
+    public static final int Type_Unknown = 0;
+    public static final int Type_IBeacon_Event_Enter = 10;
+    public static final int Type_IBeacon_Event_Leave = 11;
+
     @Id
     private Long id;
 

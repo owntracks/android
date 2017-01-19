@@ -14,7 +14,7 @@ ext.supportLibVersion = '25.0.1'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.1"
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "org.owntracks.android"
@@ -93,9 +93,9 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.2.0'
-    compile 'org.altbeacon:android-beacon-library:2.9.1@aar'
+    compile 'org.altbeacon:android-beacon-library:2.9.2@aar'
 
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161018.042216-52'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.8'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'

@@ -2,7 +2,9 @@ package org.owntracks.android.ui.waypoints;
 
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 
 import java.util.Date;
@@ -69,6 +72,7 @@ public class AdapterWaypoints extends AdapterCursorLoader {
 
         if(geofence || beaconUUID) {
             long lastTriggered = cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName));
+            boolean isIBeaconTriggered = cursor.getInt(cursor.getColumnIndex(WaypointDao.Properties.Type.columnName)) == Waypoint.Type_IBeacon_Event_Enter;
 
             if (geofence && !beaconUUID) {
                 ((ItemViewHolder) viewHolder).mText.setText(labelGeofence);
@@ -81,9 +85,14 @@ public class AdapterWaypoints extends AdapterCursorLoader {
             if(lastTriggered != 0) {
                 ((ItemViewHolder) viewHolder).mMeta.setText(App.formatDate(new Date(cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName)))));
                 ((ItemViewHolder) viewHolder).mMeta.setVisibility(View.VISIBLE);
-
             } else {
                 ((ItemViewHolder) viewHolder).mMeta.setVisibility(View.GONE);
+            }
+
+            if(isIBeaconTriggered) {
+                ((ItemViewHolder) viewHolder).mTitle.setTextColor(Color.RED);
+                ((ItemViewHolder) viewHolder).mText.setTextColor(Color.RED);
+                ((ItemViewHolder) viewHolder).mMeta.setTextColor(Color.RED);
             }
 
         } else {
