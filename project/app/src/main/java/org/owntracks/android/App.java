@@ -239,16 +239,16 @@ public class App extends Application  {
 
                 if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON))
                 {
-                    if( myKM.inKeyguardRestrictedInputMode())
-                    {
+                  //  if( myKM.inKeyguardRestrictedInputMode())
+                    //{
                         if(App.isInForeground())
                             App.onEnterBackground();
-                    } else
-                    {
+                   /* } else
+                   // {
                         if(App.isInForeground())
                             App.onEnterBackground();
 
-                    }
+                    }*/
                 }
             }
         };
