@@ -17,6 +17,7 @@
     <bool name="valWsPublic">false</bool>
     <integer name="valKeepalivePublic">120</integer>
     <integer name="valPubQosPublic">0</integer>
+    <integer name="valSubQosPublic">2</integer>
     <integer name="valIgnoreStaleLocations">0</integer>
     <integer name="valIgnoreInaccurateLocations">0</integer>
 
@@ -32,6 +33,7 @@
     <integer name="valPort">8883</integer>
 
     <integer name="valPubQos">1</integer>
+    <integer name="valSubQos">2</integer>
     <integer name="valKeepalive">3600</integer>
     <integer name="valLocatorDisplacement">500</integer>
     <integer name="valLocatorInterval">900</integer>
