@@ -146,6 +146,7 @@ public class Preferences {
         }
     }
 
+
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -760,6 +761,11 @@ public class Preferences {
     }
 
 
+    @Import(key =Keys.SUB_QOS)
+    private static void setSubQos(int anInt) {
+        setInt(Keys.SUB_QOS, anInt > 2 ? 2 : anInt, false);
+    }
+
 
     @Import(key =Keys.PASSWORD)
     public static void setPassword(String password) {
@@ -846,6 +852,12 @@ public class Preferences {
     public static int getPubQos() {
         return getInt(Keys.PUB_QOS, R.integer.valPubQos, R.integer.valPubQosPublic, true);
     }
+
+    @Export(key =Keys.SUB_QOS, exportModeMqttPrivate =true)
+    public static int getSubQos() {
+        return getInt(Keys.SUB_QOS, R.integer.valSubQos, R.integer.valSubQosPublic, true);
+    }
+
     @Export(key =Keys.PUB_RETAIN, exportModeMqttPrivate =true)
     public static boolean getPubRetain() {
         return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain, R.bool.valPubRetainPublic, true);
@@ -1075,6 +1087,7 @@ public class Preferences {
         public static final String REMOTE_CONFIGURATION             = "remoteConfiguration";
         public static final String SUB                              = "sub";
         public static final String SUB_TOPIC                        = "subTopic";
+        public static final String SUB_QOS                          = "subQos";
         public static final String TLS                              = "tls";
         public static final String TLS_CA_CRT                       = "tlsCaCrt";
         public static final String TLS_CLIENT_CRT                   = "tlsClientCrt";
