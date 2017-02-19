@@ -67,6 +67,7 @@
         <activity
             android:name=".activities.ActivityPreferences"
             android:label="@string/title_activity_preferences"
+            android:hardwareAccelerated="true"
             android:parentActivityName=".ui.map.MapActivity" />
 
         <activity
