@@ -192,12 +192,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		@Override
 		public void connectionLost(Throwable cause) {
-			Timber.e(cause, "doze:%s", PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE)).isDeviceIdleMode());
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 			pubPool.pause();
-			//pingHandler.stop(); Ping handler is automatically stopped by mqttClient
 			reconnectHandler.schedule();
-
 		}
 
 		@Override
@@ -206,7 +203,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			try {
 				MessageBase m = Parser.fromJson(message.getPayload());
 				if(!m.isValidMessage()) {
-					Timber.e("message failed validation: %s", message.getPayload());
+					Timber.e("message failed validation");
 					return;
 				}
 
@@ -228,6 +225,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	private void publishMessage(MessageBase message) {
 
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
+
 		try {
 			MqttMessage m = new MqttMessage();
 			m.setPayload(Parser.toJson(message).getBytes());
@@ -236,30 +234,34 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 
 			if(this.mqttClient == null) {
-				Log.e(TAG, "forcing null of mqttclient");
+				Timber.e("null mqttClient");
 				this.pubPool.pause();
 				this.pubPool.requeue(message);
 				return;
 			}
-			Log.v(TAG, "publishing message " + message + " to topic " + message.getTopic() );
+
+			if(!this.mqttClient.isConnected()) {
+				Timber.e("not connected");
+				this.pubPool.pause();
+				this.pubPool.requeue(message);
+				this.reconnectHandler.schedule();
+				changeState(EndpointState.DISCONNECTED);
+				return;
+			}
+
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(message.getTopic(), m);
 			pubToken.setActionCallback(iCallbackPublish);
 			pubToken.setUserContext(message);
 
 			if(this.mqttClient.getPendingDeliveryTokens().length >= MAX_INFLIGHT_MESSAGES) {
-				Log.v(TAG, "pausing pubPool due to back preassure. Outstanding tokens: " + this.mqttClient.getPendingDeliveryTokens().length);
+				Timber.v("pausing pubPool due to back pressure. Outstanding tokens: %s", this.mqttClient.getPendingDeliveryTokens().length);
 				this.pubPool.pause();
 			}
 		} catch (MqttException e) {
-			Log.e(TAG, "processIncomingMessage: MqttException. " + e.getCause() + " " + e.getReasonCode() + " " + e.getMessage());
-			e.printStackTrace();
-		} catch (Parser.EncryptionException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.e(TAG, "processIncomingMessage: JsonProcessingException");
-			e.printStackTrace();
+			Timber.e(e, "MqttException %s %s %s ", e.getCause(), e.getReasonCode(), e.getMessage());
+		} catch (Exception e) {
+			Timber.e(e, "Exception");
 		}
-
 	}
 
 
@@ -417,11 +419,10 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		try {
 			String prefix = "tcp";
-
 			if (Preferences.getTls()) {
-				if (Preferences.getWs())
+				if (Preferences.getWs()) {
 					prefix = "wss";
-				else
+				} else
 					prefix = "ssl";
 			} else {
 				if (Preferences.getWs())
@@ -614,7 +615,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	private int[] getSubTopicsQos(String[] topics) {
 		int[] qos = new int[topics.length];
-		Arrays.fill(qos, 2);
+		Arrays.fill(qos, Preferences.getSubQos());
 		return qos;
 	}
 
