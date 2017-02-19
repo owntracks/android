@@ -4,12 +4,12 @@ apply plugin: 'org.greenrobot.greendao'
 
 def versionMajor = 1
 def versionMinor = 1
-def versionPatch = 6
+def versionPatch = 7
 def versionBuild = 1
 ext.daggerVersion = '2.6'
-ext.playLibVersion = '10.0.1'
+ext.playLibVersion = '10.2.0'
 ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '25.0.1'
+ext.supportLibVersion = '25.1.1'
 
 
 android {
@@ -93,9 +93,9 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.2.0'
-    compile 'org.altbeacon:android-beacon-library:2.9.1@aar'
+    compile 'org.altbeacon:android-beacon-library:2.9.2@aar'
 
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20161018.042216-52'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20170210.121107-84'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.8'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'
