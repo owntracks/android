@@ -5,10 +5,11 @@ def versionMajor = 1
 def versionMinor = 1
 def versionPatch = 7
 def versionBuild = 1
+ext.pahoVersion = "1.1.1-20170320.110310-88"
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '10.2.0'
-ext.okHttpVersion = '3.4.1'
-ext.supportLibVersion = '25.2.0'
+ext.okHttpVersion = '3.6.0'
+ext.supportLibVersion = '25.3.0'
 
 
 android {
@@ -101,17 +102,17 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.0'
     compile 'org.altbeacon:android-beacon-library:2.9.2@aar'
 
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1-20170210.121107-84'
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.8'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'
+    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.7'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
     compile 'com.jakewharton.timber:timber:4.1.2'
     compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.1'
-    compile 'com.afollestad.material-dialogs:commons:0.9.4.1'
+    compile 'com.afollestad.material-dialogs:core:0.9.4.2'
+    compile 'com.afollestad.material-dialogs:commons:0.9.4.2'
     compile('com.mikepenz:materialdrawer:5.8.2@aar') { transitive = true }
     compile "com.mikepenz:materialize:1.0.1@aar"
 

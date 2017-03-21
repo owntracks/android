@@ -18,6 +18,7 @@ import com.google.android.gms.gcm.Task;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
@@ -242,8 +243,9 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
              //We got a response, treat as delivered successful
              if(r != null ) {
                  Timber.v("got HTTP response");
+
                  try {
-                     Timber.v("code: %s, streaming response to parser", r.code() );
+                     //Timber.v("code: %s, streaming response to parser", r.body().string() );
 
                      MessageBase[] result = Parser.fromJson(r.body().byteStream());
                      ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.IDLE, "Response "+r.code() + ", " + result.length);
@@ -256,7 +258,8 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
                 } catch (IOException e) {
                      ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "HTTP " +r.code() + ", JsonParseException");
                     Timber.e("error:JsonParseException responseCode:%s", r.code());
-                } catch (Parser.EncryptionException e) {
+e.printStackTrace();                } catch (Parser.EncryptionException e) {
+
                      ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "Response: "+r.code() + ", EncryptionException");
                      Timber.e("error:EncryptionException");
                  }
@@ -366,6 +369,9 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
     public void processOutgoingMessage(MessageWaypoints message) {
         postMessage(message);
     }
+
+    @Override
+    public void processOutgoingMessage(MessageClear message) { /*not supported */}
 
     @Override
     public void onSetService(ServiceMessage service) {

@@ -29,7 +29,6 @@ public class FusedContact extends BaseObservable {
     private final String id;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
-
     private Integer imageProvider = 0;
 
     @Bindable
@@ -167,4 +166,13 @@ public class FusedContact extends BaseObservable {
         return new LatLng(this.messageLocation.getLatitude(), this.messageLocation.getLongitude());
     }
 
+    private boolean deleted;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

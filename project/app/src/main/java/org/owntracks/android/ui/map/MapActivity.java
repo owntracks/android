@@ -36,9 +36,11 @@ import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceLocator;
+import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
@@ -157,6 +159,17 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         executePendingActions();
     }
 
+    private void onActiveContactRemoved() {
+        flagRefreshContactAll = true;
+        executePendingActions();
+    }
+
+    private void onContactRemoved() {
+        flagRefreshContactAll = true;
+        executePendingActions();
+    }
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
@@ -194,7 +207,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             }
         });
         params.setBehavior(behavior);
-        
+
     }
 
     @Override
@@ -434,6 +447,16 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
                 }
 
                 return true;
+            case R.id.menu_clear:
+                Bundle b = new Bundle();
+                b.putString(ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC, viewModel.getContact().getId());
+                PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_MESSAGE, ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT, b);
+                try {
+                    p.send();
+                } catch (PendingIntent.CanceledException e) {
+                    e.printStackTrace();
+                }
+                return true;
 
             default:
                 return false;
@@ -553,6 +576,8 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
+        if(Preferences.getModeId() == App.MODE_ID_HTTP_PRIVATE)
+            popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }
 }

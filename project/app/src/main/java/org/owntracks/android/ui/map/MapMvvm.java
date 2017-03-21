@@ -35,5 +35,7 @@ public interface MapMvvm {
         void onMenuCenterDeviceClicked();
 
         void restore(String contactId);
+
+        void removeContact(FusedContact contact);
     }
 }

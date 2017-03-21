@@ -13,6 +13,8 @@ import org.owntracks.android.model.FusedContact;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 @PerApplication
 public class MemoryContactsRepo implements ContactsRepo {
     private static final int LOAD_FACTOR = 20;
@@ -78,6 +80,7 @@ public class MemoryContactsRepo implements ContactsRepo {
 
     @Override
     public synchronized void remove(String id) {
+        Timber.v("removing contact: %s", id);
         final FusedContact c = mMap.remove(id);
         if(c != null) {
             App.postOnMainHandler(new Runnable() {
@@ -86,10 +89,14 @@ public class MemoryContactsRepo implements ContactsRepo {
                     mList.remove(c);
                 }
             });
+            c.setDeleted(true);
+            App.getEventBus().post(c);
 
+            majorRevision-=MAJOR_STEP;
+            revision = 0;
         }
-        majorRevision-=MAJOR_STEP;
-        revision = 0;
+
+
     }
 
     @Override

@@ -27,11 +27,14 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+import org.eclipse.paho.client.mqttv3.internal.MessageCatalog;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.messages.MessageCard;
+import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
@@ -65,6 +68,9 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	private static final String TAG = "ServiceMessageMqtt";
 	private static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     private static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
+	public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
+	public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
+
 	private static final int MAX_INFLIGHT_MESSAGES = 10;
 
 
@@ -149,6 +155,13 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		publishMessage(message);
 	}
 
+	@Override
+	public void processOutgoingMessage(MessageClear message) {
+		MqttMessage m = new MqttMessage();
+		m.setRetained(true);
+		publishMessage(m, message);
+	}
+
 
 	private IMqttActionListener iCallbackPublish = new IMqttActionListener() {
 
@@ -199,38 +212,50 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		@Override
 		public void messageArrived(String topic, MqttMessage message) throws Exception {
+			if(message.getPayload().length > 0) {
+				try {
+					MessageBase m = Parser.fromJson(message.getPayload());
+					if (!m.isValidMessage()) {
+						Timber.e("message failed validation");
+						return;
+					}
 
-			try {
-				MessageBase m = Parser.fromJson(message.getPayload());
-				if(!m.isValidMessage()) {
-					Timber.e("message failed validation");
-					return;
+					m.setTopic(getBaseTopic(m, topic));
+					m.setRetained(message.isRetained());
+					m.setQos(message.getQos());
+					service.onMessageReceived(m);
+				} catch (Exception e) {
+					Timber.e(e, "payload:%s ", new String(message.getPayload()));
+
 				}
+			} else {
+				MessageClear m = new MessageClear();
+				m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
+				Timber.v("clear message received: %s", m.getTopic());
 
-				m.setTopic(getBaseTopic(m, topic));
-				m.setRetained(message.isRetained());
-				m.setQos(message.getQos());
 				service.onMessageReceived(m);
-			} catch (Exception e) {
-				Timber.e(e, "payload:%s ", new String(message.getPayload()));
-
 			}
-
 		}
 
 	};
 
-
-
 	private void publishMessage(MessageBase message) {
+		MqttMessage m = new MqttMessage();
+		try {
+			m.setPayload(Parser.toJson(message).getBytes());
+			m.setQos(message.getQos());
+			m.setRetained(message.getRetained());
+			publishMessage(m, message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void publishMessage(MqttMessage m, MessageBase message) {
 
 		Log.v(TAG, "publishMessage: " + message + ", q size: " + pubPool.getQueue().size());
 
 		try {
-			MqttMessage m = new MqttMessage();
-			m.setPayload(Parser.toJson(message).getBytes());
-			m.setQos(message.getQos());
-			m.setRetained(message.getRetained());
 
 
 			if(this.mqttClient == null) {
@@ -263,6 +288,8 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			Timber.e(e, "Exception");
 		}
 	}
+
+
 
 
 
@@ -325,7 +352,19 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 				pingHandler.ping(intent);
 			else
 				doStart();
+		} else if (ServiceMessageMqtt.RECEIVER_ACTION_CLEAR_CONTACT.equals(intent.getAction())) {
+			String topic = intent.getExtras().getString(ServiceMessageMqtt.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC);
+			Timber.v("topic to clear %s", topic);
+			MessageClear mBase = new MessageClear();
+			mBase.setTopic(topic);
+			sendMessage(mBase);
+			MessageClear mInfo = new MessageClear();
+			mInfo.setTopic(topic+MessageCard.BASETOPIC_SUFFIX);
+			sendMessage(mInfo);
+
 		}
+
+
 	}
 
 	private void doStart() {
