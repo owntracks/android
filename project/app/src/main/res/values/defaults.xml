@@ -1,37 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="valModeId">0</integer>
-
-
-
     <string name="valPubTopicPublic" formatted="false" translatable="false">public/%s/%s</string>
     <string name="valSubTopicPublic" translatable="false">public/+/+</string>
     <string name="valUsernamePublic" translatable="false">user</string>
     <string name="valHostPublic" translatable="false">public-mqtt.owntracks.org</string>
-    <integer name="valPortPublic">8889</integer>
-    <bool name="valCleanSessionPublic">true</bool>
-    <bool name="valAuthPublic">false</bool>
-    <bool name="valTlsPublic">true</bool>
-    <bool name="valRemoteConfigurationPublic">false</bool>
-    <bool name="valPubRetainPublic">false</bool>
-    <bool name="valWsPublic">false</bool>
-    <integer name="valKeepalivePublic">120</integer>
-    <integer name="valPubQosPublic">0</integer>
-    <integer name="valSubQosPublic">2</integer>
-    <integer name="valIgnoreStaleLocations">0</integer>
-    <integer name="valIgnoreInaccurateLocations">0</integer>
-
-
-    <bool name="valInfoPublic" >true</bool>
-    <bool name="valSub" >true</bool>
-    <bool name="valSubPublic" >true</bool>
-
-
+    <string name="valBeaconLayout" translatable="false">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%s/%s</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
 
     <integer name="valPort">8883</integer>
-
     <integer name="valPubQos">1</integer>
     <integer name="valSubQos">2</integer>
     <integer name="valKeepalive">3600</integer>
@@ -39,11 +16,16 @@
     <integer name="valLocatorInterval">900</integer>
     <integer name="valLocatorAccuracyBackground">1</integer>
     <integer name="valLocatorAccuracyForeground">0</integer>
-
     <integer name="valBeaconBackgroundScanPeriod">30</integer>
     <integer name="valBeaconForegroundScanPeriod">0</integer>
     <integer name="valBeaconMode">0</integer>
-
+    <integer name="valPortPublic">8889</integer>
+    <integer name="valKeepalivePublic">120</integer>
+    <integer name="valPubQosPublic">0</integer>
+    <integer name="valSubQosPublic">2</integer>
+    <integer name="valIgnoreStaleLocations">0</integer>
+    <integer name="valIgnoreInaccurateLocations">0</integer>
+    <integer name="valModeId">0</integer>
 
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
@@ -52,7 +34,9 @@
     <bool name="valNotificationHigherPriority">false</bool>
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationEvents">true</bool>
-
+    <bool name="valInfoPublic" >true</bool>
+    <bool name="valSub" >true</bool>
+    <bool name="valSubPublic" >true</bool>
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
     <bool name="valPlayOverride">false</bool>
@@ -63,6 +47,12 @@
     <bool name="valTls">true</bool>
     <bool name="valWs">false</bool>
     <bool name="valInfo" >true</bool>
+    <bool name="valCleanSessionPublic">true</bool>
+    <bool name="valAuthPublic">false</bool>
+    <bool name="valTlsPublic">true</bool>
+    <bool name="valRemoteConfigurationPublic">false</bool>
+    <bool name="valPubRetainPublic">false</bool>
+    <bool name="valWsPublic">false</bool>
 
     <string-array name="modeIds" translatable="false">
         <item>3</item>
@@ -84,5 +74,4 @@
     </string-array>
 
     <string name="valEmpty" translatable="false">""</string>
-
 </resources>

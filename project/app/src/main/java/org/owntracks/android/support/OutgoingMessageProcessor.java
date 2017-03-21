@@ -2,6 +2,7 @@ package org.owntracks.android.support;
 
 
 import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageEvent;
 import org.owntracks.android.messages.MessageLocation;
@@ -17,6 +18,5 @@ public interface OutgoingMessageProcessor {
     void processOutgoingMessage(MessageTransition message);
     void processOutgoingMessage(MessageWaypoint message);
     void processOutgoingMessage(MessageWaypoints message);
-
-
+    void processOutgoingMessage(MessageClear message);
 }

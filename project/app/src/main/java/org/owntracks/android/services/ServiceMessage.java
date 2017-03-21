@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -11,6 +12,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
+import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
@@ -32,6 +34,8 @@ import timber.log.Timber;
 
 public class ServiceMessage implements ProxyableService, IncomingMessageProcessor {
     private static final String TAG = "ServiceMessage";
+    public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
+    public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
 
     private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
@@ -133,8 +137,9 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Override
     public void onStartCommand(Intent intent) {
-        if(endpoint != null)
+        if (endpoint != null)
             endpoint.onStartCommand(intent);
+
     }
 
     @Subscribe
@@ -250,6 +255,11 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         Timber.v("type:unknown, key:%s", message.getContactKey());
     }
 
+    @Override
+    public void processIncomingMessage(MessageClear message) {
+        App.getContactsRepo().remove(message.getContactKey());
+    }
+
 
     @Override
     public void processIncomingMessage(MessageLocation message) {
@@ -266,6 +276,11 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void processIncomingMessage(MessageCmd message) {
         if(!Preferences.getRemoteCommand()) {
             Timber.e("remote commands are disabled");
+            return;
+        }
+
+        if(!Preferences.getPubTopicCommands().equals(message.getTopic())) {
+            Timber.e("cmd message received on wrong topic");
             return;
         }
 

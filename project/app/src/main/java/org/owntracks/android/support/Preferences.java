@@ -895,9 +895,15 @@ public class Preferences {
     }
 
     @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static String getCustomBeaconLayout() {
-        return getString(Keys.BEACON_LAYOUT, R.string.valEmpty);
+    public static String getBeaconLayout() {
+        return getString(Keys.BEACON_LAYOUT, R.string.valBeaconLayout);
     }
+
+    @Import(key =Keys.BEACON_LAYOUT)
+    public static void setBeaconLayout(String beaconLayout) {
+        setString(Keys.BEACON_LAYOUT, beaconLayout);
+    }
+
 
     @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public static int getBeaconMode() {

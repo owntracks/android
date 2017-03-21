@@ -217,5 +217,6 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
     <string name="errorPreferencesImportFailedMemory">Your device ran out of memory</string>
     <string name="noNavigationApp">no suitable app installed</string>
+    <string name="menuClear">Clear</string>
 
 </resources>

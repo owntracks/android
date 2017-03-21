@@ -84,13 +84,16 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
             Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
         }
 
-
-        BeaconManager.setAndroidLScanningDisabled(beaconMode == BEACON_MODE_LEGACY_SCANNING);
         beaconManager = BeaconManager.getInstanceForApplication(context);
-        beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
-        beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
-        beaconManager.setBackgroundScanPeriod(TimeUnit.SECONDS.toMillis(30));
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));        // TODO: make configurable
+
+        // Use legacy scanning if desired
+        // See https://altbeacon.github.io/android-beacon-library/battery_manager.html for details
+        if(beaconMode == BEACON_MODE_LEGACY_SCANNING) {
+            BeaconManager.setAndroidLScanningDisabled(true);
+            beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
+            beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
+        }
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Preferences.getBeaconLayout()));
         beaconManager.bind(this);
     }
     
