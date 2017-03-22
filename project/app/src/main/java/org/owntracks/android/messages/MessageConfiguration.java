@@ -16,6 +16,9 @@ import java.util.Set;
 
 import timber.log.Timber;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageConfiguration extends MessageBase{
     static final String TYPE = "configuration";
     private static final String BASETOPIC_SUFFIX = "/cmd";

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
+
 @JsonSubTypes({
         @JsonSubTypes.Type(value=MessageLocation.class, name=MessageLocation.TYPE),
         @JsonSubTypes.Type(value=MessageTransition.class, name=MessageTransition.TYPE),
@@ -24,8 +25,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageEncrypted.class, name=MessageEncrypted.TYPE),
         @JsonSubTypes.Type(value=MessageWaypoint.class, name=MessageWaypoint.TYPE),
         @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
-        @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE)
-
+        @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
 public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
         protected static final String TAG = "MessageBase";
