@@ -11,6 +11,9 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageWaypoint extends MessageBase{

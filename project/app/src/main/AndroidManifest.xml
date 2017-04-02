@@ -42,7 +42,9 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Owntracks">
+        android:hardwareAccelerated="true"
+        android:theme="@style/Theme.Owntracks"
+        >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
