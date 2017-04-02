@@ -205,6 +205,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		@Override
 		public void connectionLost(Throwable cause) {
+			Timber.e(cause, "connectoin error");
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 			pubPool.pause();
 			reconnectHandler.schedule();
