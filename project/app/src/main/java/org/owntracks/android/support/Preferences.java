@@ -790,7 +790,8 @@ public class Preferences {
 
     @Import(key =Keys.WS)
     public static void setWs(boolean wsEnable) {
-        setBoolean(Keys.WS, wsEnable, false);
+        //Disabled for https://github.com/owntracks/android/issues/448
+        //setBoolean(Keys.WS, wsEnable, false);
     }
 
     public static void setTlsCaCrt(String name) {
@@ -814,7 +815,9 @@ public class Preferences {
     }
     @Export(key =Keys.WS, exportModeMqttPrivate =true)
     public static boolean getWs() {
-        return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
+        //Disabled for https://github.com/owntracks/android/issues/448
+        //return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
+        return false;
     }
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)

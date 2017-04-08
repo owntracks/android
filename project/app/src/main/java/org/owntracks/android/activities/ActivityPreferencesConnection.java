@@ -182,7 +182,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                                     port.setText(Preferences.getPortWithHintSupport());
                                     port.setFloatingLabelAlwaysShown(true);
-
                                     ws.setChecked(wsVal);
                                     ws.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
