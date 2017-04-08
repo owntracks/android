@@ -93,11 +93,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Override
-    public void removeContact(FusedContact contact) {
-
-    }
-
-    @Override
     public void onMarkerClick(@NonNull String contactId) {
         activateContact(contactId, false);
     }
@@ -151,8 +146,15 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
         if(c != activeContact )
             getView().contactUpdate(c);
-        else
+        else if(!c.isDeleted())
             getView().contactUpdateActive();
+        else {
+            if(c == activeContact) {
+                clearContact();
+                getView().setModeFree();
+            }
+            getView().contactRemove(c);
+        }
 
     }
 

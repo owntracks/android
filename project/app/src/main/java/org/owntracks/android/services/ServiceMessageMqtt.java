@@ -508,6 +508,8 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 				lastConnectionOptions.setUserName(Preferences.getUsername());
 			}
 
+			lastConnectionOptions.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
+
 			if (Preferences.getTls()) {
 				String tlsCaCrt = Preferences.getTlsCaCrtName();
 				String tlsClientCrt = Preferences.getTlsClientCrtName();

@@ -158,10 +158,6 @@ public class FusedContact extends BaseObservable {
         return id;
     }
 
-    private static float convertDpToPixel(float dp) {
-        return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
-    }
-
     public LatLng getLatLng() {
         return new LatLng(this.messageLocation.getLatitude(), this.messageLocation.getLongitude());
     }
@@ -172,7 +168,7 @@ public class FusedContact extends BaseObservable {
         return deleted;
     }
 
-    public void setDeleted(boolean deleted) {
+    public void  setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 }

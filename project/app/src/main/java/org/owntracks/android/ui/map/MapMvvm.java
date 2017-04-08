@@ -17,10 +17,13 @@ public interface MapMvvm {
 
         void contactUpdate(FusedContact contact);
         void contactUpdateActive();
+        void contactRemove(FusedContact c);
 
         void setModeContact(boolean center);
         void setModeDevice();
+        void setModeFree();
         void clearMarker();
+
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
@@ -35,7 +38,5 @@ public interface MapMvvm {
         void onMenuCenterDeviceClicked();
 
         void restore(String contactId);
-
-        void removeContact(FusedContact contact);
     }
 }
