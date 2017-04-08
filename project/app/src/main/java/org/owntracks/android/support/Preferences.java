@@ -655,12 +655,23 @@ public class Preferences {
         return getIntWithHintSupport(Keys.PORT);
     }
 
+    @Import(key =Keys.MQTT_PROTOCOL_LEVEL)
+    public static void setMqttProtocolLevel(int value) {
+        if(value != 0 && value != 3 && value != 4)
+            return;
+
+        setInt(Keys.MQTT_PROTOCOL_LEVEL, value, false);
+    }
+
+    @Export(key =Keys.MQTT_PROTOCOL_LEVEL, exportModeMqttPrivate =true)
+    public static int getMqttProtocolLevel() {
+        return getInt(Keys.MQTT_PROTOCOL_LEVEL, R.integer.valMqttProtocolLevel, R.integer.valMqttProtocolLevelPublic, true);
+    }
 
     @Import(key =Keys.KEEPALIVE)
     public static void setKeepalive(int value) {
         setInt(Keys.KEEPALIVE, value, false);
     }
-
 
     public static String getKeepaliveWithHintSupport() {
         return getIntWithHintSupport(Keys.KEEPALIVE);
@@ -1080,6 +1091,7 @@ public class Preferences {
         public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
         public static final String LOCATOR_INTERVAL                 = "locatorInterval";
         public static final String MODE_ID                          = "mode";
+        public static final String MQTT_PROTOCOL_LEVEL              = "mqttProtocolLevel";
         public static final String NOTIFICATION                     = "notification";
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
