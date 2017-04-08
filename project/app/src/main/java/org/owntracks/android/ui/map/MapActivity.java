@@ -94,6 +94,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     private void queueActionModeFree() {
+        Timber.v("queing free mode");
         mode = FLAG_ACTION_MODE_FREE;
         executePendingActions();
     }
@@ -106,6 +107,14 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
 
     private void executePendingActions() {
+        Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
+        Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
+        Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
+        Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
+        Timber.v("flag int mode: %s",mode);
+
+
+
         if(!flagStateMapReady) {
             return;
         }
@@ -385,7 +394,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     long repoRevision = -1;
-    private void doUpdateMarkerAll() {
+    private void  doUpdateMarkerAll() {
         Timber.v("repoRevision:%s", repoRevision);
         long newRepoRevision = viewModel.getContactsRevision();
 
@@ -555,8 +564,21 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     }
 
     @Override
+    public void contactRemove(FusedContact c) {
+        doUpdateMarkerAll();
+        //if(mode==FLAG_ACTION_MODE_FREE && c==viewModel.getContact())
+        //    queueActionModeFree();
+
+    }
+
+    @Override
     public void setModeDevice() {
         queueActionModeDevice();
+    }
+
+    @Override
+    public void setModeFree() {
+        queueActionModeFree();
     }
 
     @Override
