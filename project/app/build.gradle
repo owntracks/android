@@ -9,7 +9,7 @@ ext.pahoVersion = "1.1.1"
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '10.2.1'
 ext.okHttpVersion = '3.6.0'
-ext.supportLibVersion = '25.3.1'
+ext.supportLibVersion = '25.3.0'
 
 
 android {
