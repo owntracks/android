@@ -240,8 +240,7 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         try {
              Response r = mHttpClient.newCall(request.build()).execute();
 
-             //We got a response, treat as delivered successful
-             if(r != null ) {
+             if((r != null) && (r.isSuccessful())) {
                  Timber.v("got HTTP response");
 
                  try {
