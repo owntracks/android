@@ -19,13 +19,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -239,26 +236,9 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                 public void onShow(DialogInterface dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
-                                    final ImageView scanButton = (ImageView) d.findViewById(R.id.scanButton);
 
                                     url.setText(Preferences.getUrl());
                                     url.setFloatingLabelAlwaysShown(true);
-
-                                    scanButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            barcodeCallback = new BarcodeScanListener() {
-                                                public void onBarcodeScanResult(String input) {
-                                                    Log.v(TAG, "Receiving barcode url");
-                                                    url.setText(input);
-                                                }
-                                            };
-                                            IntentIntegrator integrator = new IntentIntegrator(FragmentPreferences.this);
-                                            integrator.initiateScan();
-
-                                        }
-                                    });
-
 
                                 }
                             })
@@ -790,17 +770,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            if (requestCode == IntentIntegrator.REQUEST_CODE) {
-                try {
-                    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-                    if (barcodeCallback != null) {
-                        barcodeCallback.onBarcodeScanResult(result.getContents());
-                    }
-                    barcodeCallback = null;
-                } catch (Exception e) {
-                    Log.e(TAG, "Error calling barcode scanner onBarcodeScanResult: " + e);
-                }
-            }
             super.onActivityResult(requestCode, resultCode, data);
         }
 
