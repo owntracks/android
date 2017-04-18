@@ -9,7 +9,7 @@ ext.pahoVersion = "1.1.1"
 ext.daggerVersion = '2.6'
 ext.playLibVersion = '10.2.1'
 ext.okHttpVersion = '3.6.0'
-ext.supportLibVersion = '25.3.0'
+ext.supportLibVersion = '25.3.1'
 
 
 android {
@@ -98,7 +98,6 @@ dependencies {
     // Utility libraries
     compile "com.google.dagger:dagger:${daggerVersion}"
     compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'com.google.zxing:android-integration:3.2.1' // Code scanning
     compile 'org.greenrobot:greendao:3.2.0'
     compile 'org.altbeacon:android-beacon-library:2.9.2@aar'
 

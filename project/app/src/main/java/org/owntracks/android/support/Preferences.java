@@ -1078,7 +1078,7 @@ public class Preferences {
         public static final String BEACON_RANGING                   = "ranging";
         public static final String BEACON_MODE                      = "beaconMode";
         public static final String CLEAN_SESSION                    = "cleanSession";
-        public static final String CLIENT_ID                        = "clientId";
+            public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String HOST                             = "host";
         public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";

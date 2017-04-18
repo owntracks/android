@@ -281,6 +281,8 @@ public class ServiceNotification implements ProxyableService {
             for (CharSequence line : cs != null ? cs : new CharSequence[0]) {
                 style.addLine(line);
             }
+            
+            notificationBuilderEventsGroup.setNumber(cs.length+1);
         }
 
         Spannable newLine = new SpannableString(name + " " + transition + " " + location);
