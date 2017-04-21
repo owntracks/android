@@ -52,7 +52,7 @@ public class ActivityExport extends ActivityBase {
 
             findPreference("exportToFile").setOnPreferenceClickListener(exportToFile);
             findPreference("exportWaypointsToEndpoint").setOnPreferenceClickListener(exportWaypointsToEndpoint);
-            findPreference("import").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            findPreference("load").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
 

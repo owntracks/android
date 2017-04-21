@@ -313,7 +313,7 @@ public class Preferences {
             try {
                 Object value = m.get(key);
 
-                Timber.v("import for key %s:%s", key, value);
+                Timber.v("load for key %s:%s", key, value);
                 if(value==null) {
                     Timber.v("clearing value for key %s", key);
                     clearKey(key);
