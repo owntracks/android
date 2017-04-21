@@ -3,6 +3,7 @@ package org.owntracks.android.injection.components;
 import org.owntracks.android.injection.modules.ActivityModule;
 import org.owntracks.android.injection.modules.ViewModelModule;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.ui.configuration.ConfigurationActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.status.StatusActivity;
@@ -28,4 +29,5 @@ public interface ActivityComponent {
     void inject(MapActivity activity);
     void inject(ContactsActivity activity);
     void inject(StatusActivity activity);
+    void inject(ConfigurationActivity activity);
 }

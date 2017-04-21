@@ -26,6 +26,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.widgets.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.ToolbarPreference;
+import org.owntracks.android.ui.configuration.ConfigurationActivity;
 
 import timber.log.Timber;
 
@@ -85,6 +86,7 @@ public class ActivityPreferences extends ActivityBase {
 
         static String ver;
         private Preference documentation;
+        private Preference configuration;
 
 
         @Override
@@ -115,7 +117,7 @@ public class ActivityPreferences extends ActivityBase {
             twitter = findPreference("twitter");
             documentation = findPreference("documentation");
             version = findPreference("versionReadOnly");
-
+            configuration = findPreference("configuration");
 
 
             try {
@@ -127,6 +129,18 @@ public class ActivityPreferences extends ActivityBase {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(getActivity(), ActivityExport.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
+                    getActivity().startActivity(intent);
+
+                    return true;
+                }
+            });
+
+            configuration.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity(), ConfigurationActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
                     getActivity().startActivity(intent);

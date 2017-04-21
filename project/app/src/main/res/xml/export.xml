@@ -17,5 +17,9 @@
         android:title="@string/preferencesImportFile"
         android:summary="@string/preferencesImportFileSummary">
     </Preference>
-
+    <Preference
+        android:key="importUrl"
+        android:title="Import "
+        android:summary="Import configuration from URL">
+    </Preference>
 </PreferenceScreen>

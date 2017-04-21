@@ -119,6 +119,7 @@ dependencies {
     annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.0.1'
     annotationProcessor  'com.google.guava:guava:19.0' // needed by Dagger
     annotationProcessor  "com.google.dagger:dagger-compiler:${daggerVersion}"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
 
 //apt {

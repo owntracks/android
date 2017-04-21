@@ -50,12 +50,12 @@ public class MessageConfiguration extends MessageBase{
     public void set(String key, Object value) {
         if(value instanceof String && "".equals(value))
             return;
-        Timber.v("import key:%s, value:%s", key, value);
+        Timber.v("load key:%s, value:%s", key, value);
 
         map.put(key, value);
     }
 
-    // TID would not be included in map for import otherwise
+    // TID would not be included in map for load otherwise
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public void setTid(String tid) {
         set(Preferences.Keys.TRACKER_ID, tid);

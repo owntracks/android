@@ -28,6 +28,11 @@
         android:title="@string/preferencesExport">
     </Preference>
 
+    <Preference
+        android:key="configuration"
+        android:title="@string/configurationManagement">
+    </Preference>
+
     <PreferenceScreen
         android:key="informationScreen"
         android:title="@string/preferencesInfo" >

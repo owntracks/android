@@ -146,7 +146,7 @@ public class  ActivityImport extends ActivityBase {
         Log.v(TAG, "Importing configuration. Brace for impact.");
         Preferences.importFromMessage(configJSON);
 
-       // importPreferenceResultDialog("Success", "Preferences import successful.\nIt is recommended to restart the app.");
+       // importPreferenceResultDialog("Success", "Preferences load successful.\nIt is recommended to restart the app.");
         Snackbar s = Snackbar.make(findViewById(R.id.frame), R.string.snackbarImportCompleted, Snackbar.LENGTH_LONG);
         TextView textView = (TextView) s.getView().findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.WHITE   );
@@ -213,11 +213,11 @@ public class  ActivityImport extends ActivityBase {
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
             finish();
         }catch(Exception e){
-            Timber.e(e, "import exception ");
+            Timber.e(e, "load exception ");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
         } catch(OutOfMemoryError e){
-            Timber.e(e, "import exception ");
+            Timber.e(e, "load exception ");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
         }
