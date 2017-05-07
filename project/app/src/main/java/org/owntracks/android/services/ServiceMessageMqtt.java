@@ -221,7 +221,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 						return;
 					}
 
-					m.setTopic(getBaseTopic(m, topic));
+					m.setTopic(topic);
 					m.setRetained(message.isRetained());
 					m.setQos(message.getQos());
 					service.onMessageReceived(m);
@@ -784,14 +784,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 
 
-	private String getBaseTopic(MessageBase message, String topic){
-
-		if (message.getBaseTopicSuffix() != null && topic.endsWith(message.getBaseTopicSuffix())) {
-			return topic.substring(0, (topic.length() - message.getBaseTopicSuffix().length()));
-		} else {
-			return topic;
-		}
-	}
 
 	@Subscribe
 	public void onEvent(Events.Dummy e) {

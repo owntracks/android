@@ -1,4 +1,4 @@
-package org.owntracks.android.activities;
+package org.owntracks.android.ui.load;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,8 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -20,34 +22,41 @@ import android.widget.Toast;
 import com.fasterxml.jackson.core.JsonParseException;
 
 import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityImport;
+import org.owntracks.android.databinding.UiActivityConfigurationBinding;
+import org.owntracks.android.databinding.UiActivityLoadBinding;
 import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.base.BaseActivity;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Timer;
 
 import timber.log.Timber;
 
-public class  ActivityImport extends ActivityBase {
-    private static final String TAG = "ActivityImport";
+public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
     public static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
-
-    private TextView input;
-    private MessageConfiguration configJSON = null;
     private MenuItem saveButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_import);
+        activityComponent().inject(this);
+        setAndBindContentView(R.layout.ui_activity_load, savedInstanceState);
 
-        setSupportToolbar();
+        setHasEventBus(false);
+        setSupportToolbar(binding.toolbar);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        input = (TextView) findViewById(R.id.input);
         handleIntent(getIntent());
     }
 
@@ -56,24 +65,52 @@ public class  ActivityImport extends ActivityBase {
         super.onNewIntent(intent);
         setHasBack(false);
         handleIntent(intent);
-
+    }
+    private void tintMenu() {
+        if(saveButton != null) {
+            saveButton.setEnabled(viewModel.getConfigurationPretty() != null);
+            saveButton.setVisible(viewModel.getConfigurationPretty() != null);
+        }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save:
+                viewModel.saveConfiguration();
+                return true;
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
     private void setHasBack(boolean hasBackArrow) {
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(hasBackArrow);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_load, menu);
+
+        saveButton = menu.findItem(R.id.save);
+        tintMenu();
+        return true;
+    }
 
     private void handleIntent(@Nullable Intent intent) {
         if(intent == null)
             return;
 
+
         setHasBack(intent.getBooleanExtra(FLAG_IN_APP, false));
+        Timber.v("inApp %s", intent.getBooleanExtra(FLAG_IN_APP, false));
 
 
         final String action = intent.getAction();
-
 
         if (Intent.ACTION_VIEW.equals(action)) {
             Uri uri = intent.getData();
@@ -86,6 +123,7 @@ public class  ActivityImport extends ActivityBase {
             pickerIntent.setType("*/*");
 
             try {
+                Timber.v("loading picker");
                 startActivityForResult(Intent.createChooser(pickerIntent, "Select a file"), ActivityImport.REQUEST_CODE);
             } catch (android.content.ActivityNotFoundException ex) {
                 // Potentially direct the user to the Market with a Dialog
@@ -94,10 +132,11 @@ public class  ActivityImport extends ActivityBase {
         }
     }
 
+    // Return path from file picker
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
-        Log.v(TAG, "onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
+        Timber.v("RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
             case ActivityImport.REQUEST_CODE: {
                 if(resultCode == RESULT_OK) {
@@ -110,63 +149,6 @@ public class  ActivityImport extends ActivityBase {
                 break;
             }
         }
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_export, menu);
-
-        saveButton = menu.findItem(R.id.save);
-        tintMenu();
-        return true;
-    }
-
-    private void tintMenu() {
-        if(saveButton != null) {
-            saveButton.setEnabled(configJSON != null);
-            saveButton.getIcon().setAlpha(configJSON != null ? 255 : 130);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save:
-                importAction();
-                return true;
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-    private void importAction() {
-        Log.v(TAG, "Importing configuration. Brace for impact.");
-        Preferences.importFromMessage(configJSON);
-
-        // importPreferenceResultDialog("Success", "Preferences load successful.\nIt is recommended to restart the app.");
-        Snackbar s = Snackbar.make(findViewById(R.id.frame), R.string.snackbarImportCompleted, Snackbar.LENGTH_LONG);
-        TextView textView = (TextView) s.getView().findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.WHITE);
-
-        s.setAction("Restart", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.e(TAG, "restarting app");
-                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-                PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0, i, 0);
-                AlarmManager manager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-                manager.set(AlarmManager.RTC, System.currentTimeMillis() + 1, intent);
-                System.exit(2);
-
-            }
-        });
-        s.show();
-
-
     }
 
     private void extractPreferences(Uri uri){
@@ -197,16 +179,7 @@ public class  ActivityImport extends ActivityBase {
                 e.printStackTrace();
             }
 
-            Log.v(TAG, "file content: " + total);
-
-            configJSON = (MessageConfiguration) Parser.fromJson(total.toString().getBytes());
-            if (configJSON == null) {
-                throw new Error("Unable to parse content");
-            }
-
-            String plain = Parser.toJsonPlain(configJSON);
-            Timber.v("toJsonPlain: %s", plain);
-            input.setText(formatString(plain));
+            viewModel.setConfiguration(total.toString());
             tintMenu();
         } catch (JsonParseException e) {
             Timber.e(e, "parse exception ");
@@ -224,36 +197,8 @@ public class  ActivityImport extends ActivityBase {
 
     }
 
-    private static String formatString(String text) throws OutOfMemoryError{
+    @Override
+    public void displayErrorPreferencesLoadFailed() {
 
-        StringBuilder json = new StringBuilder();
-        String indentString = "";
-
-        for (int i = 0; i < text.length(); i++) {
-            char letter = text.charAt(i);
-            switch (letter) {
-                case '{':
-                case '[':
-                    json.append("\n").append(indentString).append(letter).append("\n");
-                    indentString = indentString + "\t";
-                    json.append(indentString);
-                    break;
-                case '}':
-                case ']':
-                    indentString = indentString.replaceFirst("\t", "");
-                    json.append("\n").append(indentString).append(letter);
-                    break;
-                case ',':
-                    json.append(letter).append("\n").append(indentString);
-                    break;
-
-                default:
-                    json.append(letter);
-                    break;
-            }
-        }
-
-        return json.toString();
     }
-
 }

@@ -99,7 +99,7 @@
 
 
         <activity
-            android:name=".activities.ActivityImport"
+            android:name=".ui.load.LoadActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:label="@string/title_activity_import">

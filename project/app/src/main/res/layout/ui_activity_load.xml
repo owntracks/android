@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="vm" type="org.owntracks.android.ui.configuration.ConfigurationViewModel" />
+        <variable name="vm" type="org.owntracks.android.ui.load.LoadViewModel" />
     </data>
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="fill_parent"
@@ -32,8 +32,8 @@
                 android:id="@+id/effectiveConfiguration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"
-                android:text="@{vm.effectiveConfiguration, default=Configuration}"
+                android:layout_margin="@dimen/default_spacing"
+                android:text="@{vm.configurationPretty, default=Configuration}"
                 />
 
         </ScrollView>

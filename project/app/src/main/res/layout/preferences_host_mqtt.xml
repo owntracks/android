@@ -42,7 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:id="@+id/tlsWrapper"
-        android:visibility="gone"
         >
 
         <TextView

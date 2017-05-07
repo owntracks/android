@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        android:id="@+id/inputKey"
+        android:inputType="textUri|textNoSuggestions"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="Key"
+        android:hint="Key"
+         />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:met_baseColor="@color/textPrimary"
+        app:met_primaryColor="@color/accent"
+        android:id="@+id/inputValue"
+        android:inputType="textUri|textNoSuggestions"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="Key"
+        android:hint="Value"
+        />
+
+</LinearLayout>

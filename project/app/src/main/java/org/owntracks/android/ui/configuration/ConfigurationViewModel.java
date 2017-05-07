@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -34,42 +35,12 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
 
     private void updateEffectiveConfiguration() {
         try {
-            setEffectiveConfiguration(formatString(Parser.toJsonPlain(Preferences.exportToMessage())));
+            MessageConfiguration m = Preferences.exportToMessage();
+            m.setWaypoints(null);
+            setEffectiveConfiguration(Parser.toJsonPlainPretty(m));
         } catch (IOException e) {
-            getView().displayLoadError();
+            getView().displayErrorPreferencesLoadFailed();
         }
-    }
-
-    private static String formatString(String text) throws OutOfMemoryError{
-
-        StringBuilder v = new StringBuilder();
-        String indentString = "";
-
-        for (int i = 0; i < text.length(); i++) {
-            char letter = text.charAt(i);
-            switch (letter) {
-                case '{':
-                case '[':
-                    v.append("\n").append(indentString).append(letter).append("\n");
-                    indentString = indentString + "\t";
-                    v.append(indentString);
-                    break;
-                case '}':
-                case ']':
-                    indentString = indentString.replaceFirst("\t", "");
-                    v.append("\n").append(indentString).append(letter);
-                    break;
-                case ',':
-                    v.append(letter).append("\n").append(indentString);
-                    break;
-
-                default:
-                    v.append(letter);
-                    break;
-            }
-        }
-
-        return v.toString();
     }
 
     @Bindable
@@ -80,5 +51,50 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
     @Bindable
     public void setEffectiveConfiguration(String effectiveConfiguration) {
         this.effectiveConfiguration = effectiveConfiguration;
+    }
+
+    @Override
+    public void onExportConfigurationToFileClicked() {
+        String exportStr;
+        try {
+            exportStr = Parser.toJsonPlain(Preferences.exportToMessage());
+        } catch (IOException e) {
+            getView().displayErrorExportFailed();
+            return;
+        }
+
+        if(getView().exportConfigurationToFile(exportStr)) {
+            getView().displaySuccessConfigurationExportToFile();
+        }
+    }
+
+    @Override
+    public void onExportWaypointsToEndpointClicked() {
+
+    }
+
+    @Override
+    public void onImportConfigurationFromFileClicked() {
+
+    }
+
+    @Override
+    public void onImportConfigurationValueClicked() {
+        getView().showImportConfigurationValueView();
+    }
+
+    @Override
+    public void onImportConfigurationSingleValueClicked() {
+        getView().showImportConfigurationValueView();
+    }
+
+    @Override
+    public void onPreferencesValueForKeySetSuccessful() {
+        updateEffectiveConfiguration();
+    }
+
+    @Override
+    public void onPreferencesValueForKeySetFailed() {
+
     }
 }

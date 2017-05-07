@@ -4,7 +4,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -294,8 +296,21 @@ public class Preferences {
 
 
 
-
     @SuppressLint("CommitPrefEdits")
+    public static void importKeyValue(String key, String value) throws InvocationTargetException, IllegalAccessException {
+        Timber.v("setting %s, for key %s", key, value);
+        HashMap<String, Method> methods = getImportMethods();
+        methods.get(key).invoke(null, value);
+
+        Method m = methods.get(key);
+        Type t = m.getGenericParameterTypes()[0];
+        
+
+    }
+
+
+
+        @SuppressLint("CommitPrefEdits")
     public static void importFromMessage(MessageConfiguration m) {
 
         HashMap<String, Method> methods = getImportMethods();
@@ -377,7 +392,7 @@ public class Preferences {
         return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
 
-    @Import(key =Keys.REMOTE_CONFIGURATION)
+    @Import(key =Keys.REMOTE_CONFIGURATION )
     public static void setRemoteConfiguration(boolean aBoolean) {
         setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean, false);
     }
@@ -801,8 +816,7 @@ public class Preferences {
 
     @Import(key =Keys.WS)
     public static void setWs(boolean wsEnable) {
-        //Disabled for https://github.com/owntracks/android/issues/448
-        //setBoolean(Keys.WS, wsEnable, false);
+        setBoolean(Keys.WS, wsEnable, false);
     }
 
     public static void setTlsCaCrt(String name) {
@@ -826,9 +840,7 @@ public class Preferences {
     }
     @Export(key =Keys.WS, exportModeMqttPrivate =true)
     public static boolean getWs() {
-        //Disabled for https://github.com/owntracks/android/issues/448
-        //return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
-        return false;
+        return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
     }
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
@@ -1140,6 +1152,7 @@ public class Preferences {
     public @interface Import {
         String key();
     }
+
 
     public static List<Method> getExportMethods() {
         final List<Method> methods = new ArrayList<>();
