@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageEncrypted;
@@ -19,11 +21,17 @@ public class Parser {
     public static void initialize(Context c) {
         defaultMapper = new ObjectMapper();
         defaultMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        defaultMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
         arrayCompatMapper = new ObjectMapper();
         arrayCompatMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         arrayCompatMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
+    public static String toJsonPlainPretty(@NonNull MessageBase message) throws IOException {
+        return defaultMapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
+    }
+
 
     public static String toJsonPlain(@NonNull MessageBase message) throws IOException {
         return defaultMapper.writeValueAsString(message);

@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
+import org.owntracks.android.R;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
@@ -55,6 +56,7 @@ import javax.inject.Provider;
  * view model. */
 public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends AppCompatActivity {
 
+    public static final String FLAG_DISABLES_ANIMATION = "disablesAnimation";
     protected B binding;
     @Inject protected V viewModel;
     @Inject protected EventBus eventBus;
@@ -63,6 +65,8 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     private ActivityComponent mActivityComponent;
 
     protected boolean hasEventBus = true;
+    private boolean disablesAnimation = false;
+
     private Toolbar toolbar;
 
     protected void setHasEventBus(boolean enable) {
@@ -111,10 +115,30 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     }
 
     @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        if(getIntent() != null && getIntent().getExtras() !=  null)
+            disablesAnimation = getIntent().getExtras().getBoolean(FLAG_DISABLES_ANIMATION);
+
+    }
+
+    @Override
     @CallSuper
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if(viewModel != null) { viewModel.saveInstanceState(outState); }
+    }
+
+
+    @Override
+    public void onStart() {
+        if(disablesAnimation)
+            overridePendingTransition(0, 0);
+        else if(App.isInForeground())
+            overridePendingTransition(R.anim.push_up_in, R.anim.none);
+
+
+        super.onStart();
     }
 
     @Override
@@ -141,10 +165,17 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
         if(eventBus.isRegistered(viewModel))
             eventBus.unregister(viewModel);
+
+        if(disablesAnimation)
+            overridePendingTransition(0, 0);
+        else
+            overridePendingTransition(R.anim.push_up_in, R.anim.none);
     }
 
     protected Bundle getExtrasBundle(Intent intent) {
         return intent.getBundleExtra(Navigator.EXTRA_ARGS);
     }
+
+
 
 }

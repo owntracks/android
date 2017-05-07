@@ -31,7 +31,7 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         protected static final String TAG = "MessageBase";
 
         @JsonIgnore
-        private String _mqtt_topic;
+        protected String _mqtt_topic;
 
         @JsonIgnore
         public long getMessageId() {
@@ -102,8 +102,8 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         }
 
         @JsonIgnore
-        public void setTopic(String _topic) {
-                this._mqtt_topic = _topic;
+        public void setTopic(String topic) {
+                this._mqtt_topic = getBaseTopic(topic);
         }
 
         @Override
@@ -189,4 +189,16 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         public void setTid(String tid) {
                 this.tid = tid;
         }
+
+        @JsonIgnore
+        protected String getBaseTopic(String topic){
+
+                if (this.getBaseTopicSuffix() != null && topic.endsWith(this.getBaseTopicSuffix())) {
+                        return topic.substring(0, (topic.length() - this.getBaseTopicSuffix().length()));
+                } else {
+                        return topic;
+                }
+        }
+
+
 }

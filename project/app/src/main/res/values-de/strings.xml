@@ -176,4 +176,6 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
     <string name="noNavigationApp">keine passende App installiert</string>
     <string name="menuClear">Entfernen</string>
+    <string name="configurationManagement">Konfigurationsverwaltung</string>
+
 </resources>

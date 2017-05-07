@@ -279,6 +279,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             return;
         }
 
+
         if(!Preferences.getPubTopicCommands().equals(message.getTopic())) {
             Timber.e("cmd message received on wrong topic");
             return;
