@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -71,7 +73,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
                 return true;
 
             case R.id.importConfigurationSingleValue:
-                viewModel.onImportConfigurationSingleValueClicked();
+                showImportConfigurationValueView();
                 return true;
             default:
                 return false;
@@ -118,19 +120,33 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
         Toast.makeText(this, R.string.preferencesExportSuccess, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void showImportConfigurationValueView() {
+    public void displayPreferencesValueForKeySetFailedKey() {
+        Toast.makeText(this, R.string.preferencesValueForKeySetFailedKey, Toast.LENGTH_SHORT).show();
+    }
+    public void displayPreferencesValueForKeySetFailedValue() {
+        Toast.makeText(this, R.string.preferencesValueForKeySetFailedValue, Toast.LENGTH_SHORT).show();
+    }
+
+
+
+
+    private void showImportConfigurationValueView() {
         MaterialDialog d = new MaterialDialog.Builder(this)
                 .customView(R.layout.ui_activity_configuration_single_value, true)
-                .title("Single value")
+                .title("Editor")
                 .positiveText(R.string.accept)
                 .negativeText(R.string.cancel)
-                .callback(new MaterialDialog.ButtonCallback() {
+                .autoDismiss(false)
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        MaterialDialog d = MaterialDialog.class.cast(dialog);
-                        final MaterialAutoCompleteTextView inputKey = (MaterialAutoCompleteTextView) d.findViewById(R.id.inputKey);
-                        final MaterialEditText inputValue = (MaterialEditText) d.findViewById(R.id.inputValue);
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        final MaterialAutoCompleteTextView inputKey = (MaterialAutoCompleteTextView) dialog.findViewById(R.id.inputKey);
+                        final MaterialEditText inputValue = (MaterialEditText) dialog.findViewById(R.id.inputValue);
 
                         String key = inputKey.getText().toString();
                         String value = inputValue.getText().toString();
@@ -138,14 +154,14 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
                         try {
                             Preferences.importKeyValue(key, value);
                             viewModel.onPreferencesValueForKeySetSuccessful();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                            viewModel.onPreferencesValueForKeySetFailed();
-
+                            dialog.dismiss();
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
-                            viewModel.onPreferencesValueForKeySetFailed();
+                            displayPreferencesValueForKeySetFailedKey();
 
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                            displayPreferencesValueForKeySetFailedValue();
                         }
 
                     }
