@@ -10,23 +10,13 @@ public interface ConfigurationMvvm {
         boolean exportConfigurationToFile(String exportStr);
 
         void displaySuccessConfigurationExportToFile();
-
-        void showImportConfigurationValueView();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void onExportConfigurationToFileClicked();
-
         void onExportWaypointsToEndpointClicked();
-
-        void onImportConfigurationFromFileClicked();
-
-        void onImportConfigurationValueClicked();
-
-        void onImportConfigurationSingleValueClicked();
 
         void onPreferencesValueForKeySetSuccessful();
 
-        void onPreferencesValueForKeySetFailed();
     }
 }

@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -298,20 +299,35 @@ public class Preferences {
 
 
     @SuppressLint("CommitPrefEdits")
-    public static void importKeyValue(String key, String value) throws InvocationTargetException, IllegalAccessException {
+    public static void importKeyValue(String key, String value) throws IllegalAccessException, IllegalArgumentException {
         Timber.v("setting %s, for key %s", value, key);
         HashMap<String, Method> methods = getImportMethods();
 
         Method m = methods.get(key);
-        Type t = m.getGenericParameterTypes()[0];
-        Timber.v("type of parameter: %s %s", t, t.getClass());
-        methods.get(key).invoke(null, convert(t, value));
+        if(m == null)
+            throw new IllegalAccessException();
+
+        try {
+            Type t = m.getGenericParameterTypes()[0];
+            Timber.v("type of parameter: %s %s", t, t.getClass());
+            methods.get(key).invoke(null, convert(t, value));
+        } catch (InvocationTargetException e) {
+            throw new IllegalAccessException();
+        }
 
     }
 
-    public static Object convert( Type t, String value ) {
-        if( Boolean.TYPE == t ) return Boolean.parseBoolean( value );
-        if(  Integer.TYPE == t ) return Integer.parseInt( value );
+    private static Object convert( Type t, String value ) throws IllegalArgumentException{
+        if( Boolean.TYPE == t ) {
+            if(!"true".equals(value)&& !"false".equals(value) )
+                throw new IllegalArgumentException();
+            return Boolean.parseBoolean(value);
+        }
+        try {
+            if (Integer.TYPE == t) return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException();
+        }
         return value;
     }
 
@@ -1070,8 +1086,6 @@ public class Preferences {
         MessageConfiguration cfg = new MessageConfiguration();
         for(Method m : methods) {
             m.setAccessible(true);
-
-            Timber.v("method for config key: %s, name:%s, type:%s", m.getAnnotation(Export.class).key(), m.getName(), m.getReturnType());
 
             try {
                 //If the underlying method is static, then the specified obj argument is ignored. It may be null.

@@ -74,7 +74,7 @@
     <string name="radius">Radius</string>
     <string name="addWaypoint">Add waypoint</string>
     <string name="export">Export</string>
-    <string name="exportConfiguration">Export preferences</string>
+    <string name="exportConfiguration">Export</string>
     <string name="preferencesExport">Export</string>
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
@@ -88,7 +88,7 @@
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
-    <string name="importConfig">Import</string>
+    <string name="importConfig">Edit</string>
     <string name="importWarning">The following preference values will be imported:</string>
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Security</string>
@@ -219,6 +219,9 @@
     <string name="noNavigationApp">no suitable app installed</string>
     <string name="menuClear">Clear</string>
     <string name="configurationManagement">Configuration management</string>
-    <string name="importValue">Import value</string>
+    <string name="importValue">Editor</string>
+    <string name="preferencesValueForKeySetFailedKey">Invalid key specified</string>
+    <string name="preferencesValueForKeySetFailedValue">Invalid value specified</string>
+    <string name="preferencesEditorDescription">Set a single value for the specified key. Some changes might require an restart of the app.</string>
 
 </resources>

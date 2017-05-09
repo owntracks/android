@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -70,31 +71,12 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
 
     @Override
     public void onExportWaypointsToEndpointClicked() {
-
-    }
-
-    @Override
-    public void onImportConfigurationFromFileClicked() {
-
-    }
-
-    @Override
-    public void onImportConfigurationValueClicked() {
-        getView().showImportConfigurationValueView();
-    }
-
-    @Override
-    public void onImportConfigurationSingleValueClicked() {
-        getView().showImportConfigurationValueView();
+        //TODO
     }
 
     @Override
     public void onPreferencesValueForKeySetSuccessful() {
         updateEffectiveConfiguration();
-    }
-
-    @Override
-    public void onPreferencesValueForKeySetFailed() {
-
+        notifyPropertyChanged(BR.effectiveConfiguration);
     }
 }
