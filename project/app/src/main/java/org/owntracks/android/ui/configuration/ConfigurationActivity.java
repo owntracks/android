@@ -27,8 +27,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import timber.log.Timber;
-
 public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationBinding, ConfigurationMvvm.ViewModel> implements ConfigurationMvvm.View {
 
     @Override
@@ -76,7 +74,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
     private void showEditorView() {
         MaterialDialog d = new MaterialDialog.Builder(this)
                 .customView(R.layout.ui_activity_configuration_single_value, true)
-                .title("Editor")
+                .title(R.string.preferencesEditor)
                 .positiveText(R.string.accept)
                 .negativeText(R.string.cancel)
                 .autoDismiss(false)
@@ -154,9 +152,9 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
     }
 
     public void displayPreferencesValueForKeySetFailedKey() {
-        Toast.makeText(this, R.string.preferencesValueForKeySetFailedKey, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.preferencesEditorKeyError, Toast.LENGTH_SHORT).show();
     }
     public void displayPreferencesValueForKeySetFailedValue() {
-        Toast.makeText(this, R.string.preferencesValueForKeySetFailedValue, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.preferencesEditorValueError, Toast.LENGTH_SHORT).show();
     }
 }

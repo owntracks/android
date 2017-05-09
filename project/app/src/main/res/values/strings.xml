@@ -88,7 +88,7 @@
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
-    <string name="importConfig">Edit</string>
+    <string name="importConfig">Import</string>
     <string name="importWarning">The following preference values will be imported:</string>
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Security</string>
@@ -219,10 +219,12 @@
     <string name="noNavigationApp">no suitable app installed</string>
     <string name="menuClear">Clear</string>
     <string name="configurationManagement">Configuration management</string>
-    <string name="importValue">Editor</string>
-    <string name="preferencesValueForKeySetFailedKey">Invalid key specified</string>
-    <string name="preferencesValueForKeySetFailedValue">Invalid value specified</string>
+    <string name="preferencesEditor">Editor</string>
+    <string name="preferencesEditorKeyError">Invalid key specified</string>
+    <string name="preferencesEditorValueError">Invalid value specified</string>
     <string name="preferencesEditorDescription">Set a single value for the specified key. Some changes might require an restart of the app.</string>
     <string name="preferencesLoadFailed">Unable to load effective configuration</string>
+    <string name="preferencesEditorKey">Key</string>
+    <string name="preferencesEditorValue">Value</string>
 
 </resources>

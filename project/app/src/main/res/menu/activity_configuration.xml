@@ -18,7 +18,7 @@
         android:id="@+id/importConfigurationSingleValue"
         android:orderInCategory="1"
         app:showAsAction="never"
-        android:title="@string/importValue">
+        android:title="@string/preferencesEditor">
     </item>
 
 </menu>

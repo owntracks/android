@@ -55,7 +55,7 @@
     <string name="radius">Radius</string>
     <string name="addWaypoint">Region hinzufügen</string>
     <string name="export">Export</string>
-    <string name="exportConfiguration">Einstellungen exportieren</string>
+    <string name="exportConfiguration">Exportieren</string>
     <string name="preferencesExport">Export</string>
     <string name="contactLocationUnknown">Kein Standort verfügbar</string>
     <string name="menuContactNavigate">Navigieren</string>
@@ -177,5 +177,12 @@
     <string name="noNavigationApp">keine passende App installiert</string>
     <string name="menuClear">Entfernen</string>
     <string name="configurationManagement">Konfigurationsverwaltung</string>
+    <string name="preferencesEditor">Editor</string>
+    <string name="preferencesEditorKeyError">Ungültiger Schlüssel</string>
+    <string name="preferencesEditorValueError">Ungültiger Wert</string>
+    <string name="preferencesEditorDescription">Erlaubt die Anpassung einzelner Einstellungen. Einige Änderungen können einen Neustart der App erfordern.</string>
+    <string name="preferencesLoadFailed">Die effektive Konfiguration konnte nicht geladen werden</string>
+    <string name="preferencesEditorKey">Schlüssel</string>
+    <string name="preferencesEditorValue">Wert</string>
 
 </resources>
