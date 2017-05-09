@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 
@@ -176,6 +177,21 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
             case R.id.add:
                 Intent detailIntent = new Intent(this, ActivityRegion.class);
                 startActivity(detailIntent);
+                return true;
+            case R.id.exportWaypointsService:
+                //Dirty hack here
+                ServiceProxy.runOrBind(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
+                            Toast.makeText(getApplicationContext(), R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
