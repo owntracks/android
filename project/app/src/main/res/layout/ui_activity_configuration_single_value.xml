@@ -19,9 +19,9 @@
         android:id="@+id/inputKey"
         android:inputType="textUri|textNoSuggestions"
         app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="Key"
+        app:met_floatingLabelText="@string/preferencesEditorKey"
         android:completionThreshold="1"
-        android:hint="Key"
+        android:hint="@string/preferencesEditorKey"
          />
 
     <com.rengwuxian.materialedittext.MaterialEditText
@@ -32,9 +32,8 @@
         android:id="@+id/inputValue"
         android:inputType="textUri|textNoSuggestions"
         app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="Value"
-
-        android:hint="Value"
+        app:met_floatingLabelText="@string/preferencesEditorValue"
+        android:hint="@string/preferencesEditorValue"
         />
 
 </LinearLayout>
