@@ -123,15 +123,15 @@ public class ActivityExport extends ActivityBase {
         public boolean onPreferenceClick(Preference preference) {
 
             ServiceProxy.runOrBind(context, new Runnable() {
-                @Override
-                public void run() {
-                    if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
-                        Toast.makeText(context, R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void run() {
+                            if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
+                                Toast.makeText(context, R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
 
-                    } else {
-                        Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
 
-                    }
+                            }
                 }
             });
             return false;

@@ -9,12 +9,6 @@
         android:title="@string/exportConfiguration">
     </item>
     <item
-        android:id="@+id/exportWaypointsService"
-        android:orderInCategory="1"
-        app:showAsAction="never"
-        android:title="@string/exportWaypointsToEndpoint">
-    </item>
-    <item
         android:id="@+id/importConfigurationFile"
         android:orderInCategory="1"
         app:showAsAction="never"

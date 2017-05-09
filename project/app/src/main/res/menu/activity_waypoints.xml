@@ -9,4 +9,11 @@
         app:showAsAction="always"
         android:title="@string/addWaypoint">
     </item>
+    <item
+        android:id="@+id/exportWaypointsService"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="@string/exportWaypointsToEndpoint">
+    </item>
+
 </menu>

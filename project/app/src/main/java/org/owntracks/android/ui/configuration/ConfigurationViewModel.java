@@ -25,8 +25,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
     String effectiveConfiguration;
 
     @Inject
-    public ConfigurationViewModel(@AppContext Context context) {
-
+    public ConfigurationViewModel() {
     }
 
     public void attachView(@NonNull ConfigurationMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -40,7 +39,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
             m.setWaypoints(null);
             setEffectiveConfiguration(Parser.toJsonPlainPretty(m));
         } catch (IOException e) {
-            getView().displayErrorPreferencesLoadFailed();
+            getView().displayLoadFailed();
         }
     }
 
@@ -60,19 +59,16 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
         try {
             exportStr = Parser.toJsonPlain(Preferences.exportToMessage());
         } catch (IOException e) {
-            getView().displayErrorExportFailed();
+            getView().displayExportToFileFailed();
             return;
         }
 
+        // Actual export handled by view because it requires a contexts
         if(getView().exportConfigurationToFile(exportStr)) {
-            getView().displaySuccessConfigurationExportToFile();
+            getView().displayExportToFileSuccessful();
         }
     }
 
-    @Override
-    public void onExportWaypointsToEndpointClicked() {
-        //TODO
-    }
 
     @Override
     public void onPreferencesValueForKeySetSuccessful() {
