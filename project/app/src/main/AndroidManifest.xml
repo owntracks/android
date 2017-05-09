@@ -77,15 +77,6 @@
             android:configChanges="orientation"
             android:label="@string/preferencesServer"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.ActivityExport"
-            android:configChanges="orientation"
-            android:label="@string/export"
-            android:parentActivityName=".activities.ActivityPreferences">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.ActivityPreferences" />
-        </activity>
 
         <activity
             android:name=".ui.configuration.ConfigurationActivity"
@@ -102,7 +93,7 @@
             android:name=".ui.load.LoadActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
-            android:label="@string/title_activity_import">
+            android:label="@string/title_activity_load">
 
             <!-- Support two dots in file name: -->
             <intent-filter>

@@ -1,43 +1,24 @@
 package org.owntracks.android.ui.load;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityImport;
-import org.owntracks.android.databinding.UiActivityConfigurationBinding;
 import org.owntracks.android.databinding.UiActivityLoadBinding;
-import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Timer;
 
 import timber.log.Timber;
 
@@ -48,7 +29,6 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
         setAndBindContentView(R.layout.ui_activity_load, savedInstanceState);
@@ -124,7 +104,7 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
 
             try {
                 Timber.v("loading picker");
-                startActivityForResult(Intent.createChooser(pickerIntent, "Select a file"), ActivityImport.REQUEST_CODE);
+                startActivityForResult(Intent.createChooser(pickerIntent, "Select a file"), LoadActivity.REQUEST_CODE);
             } catch (android.content.ActivityNotFoundException ex) {
                 // Potentially direct the user to the Market with a Dialog
             }
@@ -138,7 +118,7 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
         super.onActivityResult(requestCode, resultCode, resultIntent);
         Timber.v("RequestCode: " + requestCode + " resultCode: " + resultCode);
         switch(requestCode) {
-            case ActivityImport.REQUEST_CODE: {
+            case LoadActivity.REQUEST_CODE: {
                 if(resultCode == RESULT_OK) {
                     extractPreferences(resultIntent.getData());
                 } else {

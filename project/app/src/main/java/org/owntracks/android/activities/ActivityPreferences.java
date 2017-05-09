@@ -82,7 +82,6 @@ public class ActivityPreferences extends ActivityBase {
         private static Preference version;
         private static Preference repo;
         private static Preference twitter;
-        private Preference export;
 
         static String ver;
         private Preference documentation;
@@ -111,8 +110,6 @@ public class ActivityPreferences extends ActivityBase {
             PreferenceScreen root = (PreferenceScreen) findPreference("root");
             populatePreferencesScreen(root);
 
-            export = findPreference("export");
-
             repo = findPreference("repo");
             twitter = findPreference("twitter");
             documentation = findPreference("documentation");
@@ -124,18 +121,6 @@ public class ActivityPreferences extends ActivityBase {
                 ver = pm.getPackageInfo(a.getPackageName(), 0).versionName + " (" + pm.getPackageInfo(a.getPackageName(), 0).versionCode+")";
             } catch (PackageManager.NameNotFoundException e) { ver = a.getString(R.string.na);}
             version.setSummary(ver);
-
-            export.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), ActivityExport.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
-                    getActivity().startActivity(intent);
-
-                    return true;
-                }
-            });
 
             configuration.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
