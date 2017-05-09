@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -298,16 +299,21 @@ public class Preferences {
 
     @SuppressLint("CommitPrefEdits")
     public static void importKeyValue(String key, String value) throws InvocationTargetException, IllegalAccessException {
-        Timber.v("setting %s, for key %s", key, value);
+        Timber.v("setting %s, for key %s", value, key);
         HashMap<String, Method> methods = getImportMethods();
-        methods.get(key).invoke(null, value);
 
         Method m = methods.get(key);
         Type t = m.getGenericParameterTypes()[0];
-        
+        Timber.v("type of parameter: %s %s", t, t.getClass());
+        methods.get(key).invoke(null, convert(t, value));
 
     }
 
+    public static Object convert( Type t, String value ) {
+        if( Boolean.TYPE == t ) return Boolean.parseBoolean( value );
+        if(  Integer.TYPE == t ) return Integer.parseInt( value );
+        return value;
+    }
 
 
         @SuppressLint("CommitPrefEdits")
@@ -1090,7 +1096,7 @@ public class Preferences {
         public static final String BEACON_RANGING                   = "ranging";
         public static final String BEACON_MODE                      = "beaconMode";
         public static final String CLEAN_SESSION                    = "cleanSession";
-            public static final String CLIENT_ID                        = "clientId";
+        public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String HOST                             = "host";
         public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
@@ -1154,6 +1160,8 @@ public class Preferences {
     }
 
 
+
+
     public static List<Method> getExportMethods() {
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
@@ -1172,6 +1180,10 @@ public class Preferences {
             klass = klass.getSuperclass();
         }
         return methods;
+    }
+
+    public static List<String> getImportKeys() {
+        return new ArrayList<>(getImportMethods().keySet());
     }
 
     public static HashMap<String, Method> getImportMethods() {
