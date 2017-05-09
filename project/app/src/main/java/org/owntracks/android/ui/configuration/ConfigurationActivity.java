@@ -9,11 +9,14 @@ import android.support.v4.content.FileProvider;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
@@ -117,7 +120,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
 
     @Override
     public void showImportConfigurationValueView() {
-        new MaterialDialog.Builder(this)
+        MaterialDialog d = new MaterialDialog.Builder(this)
                 .customView(R.layout.ui_activity_configuration_single_value, true)
                 .title("Single value")
                 .positiveText(R.string.accept)
@@ -126,7 +129,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         MaterialDialog d = MaterialDialog.class.cast(dialog);
-                        final MaterialEditText inputKey = (MaterialEditText) d.findViewById(R.id.inputKey);
+                        final MaterialAutoCompleteTextView inputKey = (MaterialAutoCompleteTextView) d.findViewById(R.id.inputKey);
                         final MaterialEditText inputValue = (MaterialEditText) d.findViewById(R.id.inputValue);
 
                         String key = inputKey.getText().toString();
@@ -146,9 +149,9 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
                         }
 
                     }
-                })
-
-                .show();
+                }).show();
+        MaterialAutoCompleteTextView view = (MaterialAutoCompleteTextView) d.getCustomView().findViewById(R.id.inputKey);
+        view.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, Preferences.getImportKeys()));
     }
 
     public void onPreferencesImported() {
