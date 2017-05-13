@@ -37,6 +37,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
         try {
             MessageConfiguration m = Preferences.exportToMessage();
             m.setWaypoints(null);
+            m.set(Preferences.Keys.PASSWORD, "********");
             setEffectiveConfiguration(Parser.toJsonPlainPretty(m));
         } catch (IOException e) {
             getView().displayLoadFailed();
