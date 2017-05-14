@@ -36,7 +36,6 @@ public class MessageLocation extends MessageBase  {
     private WeakReference<FusedContact> _contact;
     private LatLng point;
     private String conn;
-    private boolean doze;
 
 
     @JsonProperty("lat")
@@ -161,10 +160,4 @@ public class MessageLocation extends MessageBase  {
         return this.conn;
     }
 
-    public void setDoze(boolean doze) {
-        this.doze = doze;
-    }
-    public boolean getDoze() {
-        return this.doze;
-    }
 }

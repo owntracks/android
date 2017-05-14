@@ -198,7 +198,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             binding.mapView.onCreate(savedInstanceState);
         } catch (Exception e) {
             Timber.e("not showing map due to issue https://issuetracker.google.com/issues/35827842");
-            flagStateMapReady = false; 
+            flagStateMapReady = false;
         }
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         binding.contactPeek.contactRow.setOnClickListener(this);

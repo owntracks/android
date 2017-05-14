@@ -563,7 +563,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(Preferences.getPubTopicBase(true), lwt.toString().getBytes(), 0, false);
+            m.setWill(Preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
         } catch(JSONException ignored) {}
 
 	}
@@ -621,7 +621,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 				topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
 
 			if (!Preferences.isModeMqttPublic())
-				topics.add(Preferences.getPubTopicBase(true) + Preferences.getPubTopicCommandsPart());
+				topics.add(Preferences.getPubTopicBase() + Preferences.getPubTopicCommandsPart());
 
 			if (!Preferences.isModeMqttPublic()) {
 				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());

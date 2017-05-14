@@ -540,11 +540,11 @@ public class Preferences {
     }
 
     public static String getPubTopicLocations() {
-        return getPubTopicBase(true);
+        return getPubTopicBase();
     }
 
     public static String getPubTopicWaypoints() {
-        return getPubTopicBase(true) +getPubTopicWaypointsPart();
+        return getPubTopicBase() +getPubTopicWaypointsPart();
     }
 
     public static String getPubTopicWaypointsPart() {
@@ -552,7 +552,7 @@ public class Preferences {
     }
 
     public static String getPubTopicEvents() {
-        return getPubTopicBase(true) + getPubTopicEventsPart();
+        return getPubTopicBase() + getPubTopicEventsPart();
     }
 
     public static String getPubTopicEventsPart() {
@@ -562,44 +562,20 @@ public class Preferences {
         return "/info";
     }
     public static String getPubTopicCommands() {
-        return getPubTopicBase(true) +getPubTopicCommandsPart();
+        return getPubTopicBase() +getPubTopicCommandsPart();
     }
     public static String getPubTopicCommandsPart() {
         return "/cmd";
     }
 
 
-    public static String getPubTopicBaseDefault() {
-        String formatString;
-        String username;
-        String deviceId = getDeviceId(true); // will use App.SESSION_UUID on public
-
-
-
-        if(isModeMqttPublic()) {
-            username = "user";
-            formatString = getStringRessource(R.string.valPubTopicPublic);
-        } else {
-            username = getUsername();
-            formatString = getStringRessource(R.string.valPubTopic);
-        }
-
-        return String.format(formatString, username, deviceId);
-    }
-
     @Export(key =Keys.PUB_TOPIC_BASE, exportModeMqttPrivate =true)
-    public static String getPubTopicBase() {
-        return getPubTopicBase(false);
+    public static String getPubTopicBaseFormatString() {
+        return getString(Keys.PUB_TOPIC_BASE, R.string.valPubTopic, R.string.valPubTopicPublic, R.string.valEmpty, true, false);
     }
-    public static String getPubTopicBase(boolean fallbackToDefault) {
-        if(!isModeMqttPrivate()) {
-            return getPubTopicBaseDefault();
-        }
-        String topic = getString(Keys.PUB_TOPIC_BASE, R.string.valEmpty);
-        if (topic.equals("") && fallbackToDefault)
-            topic = getPubTopicBaseDefault();
 
-        return topic;
+    public static String getPubTopicBase() {
+        return getPubTopicBaseFormatString().replace("%u", getUsername()).replace("%d", getDeviceId());
     }
 
     @Export(key =Keys.SUB_TOPIC, exportModeMqttPrivate =true)

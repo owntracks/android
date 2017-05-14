@@ -448,9 +448,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setTid(Preferences.getTrackerId(true));
         if(Preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
-            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                message.setDoze(PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE)).isDeviceIdleMode());
-            }
+
 
             NetworkInfo activeNetwork = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
             if(activeNetwork != null) {
