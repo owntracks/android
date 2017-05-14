@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="valPubTopicPublic" formatted="false" translatable="false">public/%s/%s</string>
+    <string name="valPubTopicPublic" formatted="false" translatable="false">public/user/%d</string>
     <string name="valSubTopicPublic" translatable="false">public/+/+</string>
     <string name="valUsernamePublic" translatable="false">user</string>
     <string name="valHostPublic" translatable="false">public-mqtt.owntracks.org</string>
     <string name="valBeaconLayout" translatable="false">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
-    <string name="valPubTopic" formatted="false" translatable="false">owntracks/%s/%s</string>
+    <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
     <integer name="valMqttProtocolLevelPublic" translatable="false">3</integer>
 
