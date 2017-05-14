@@ -192,8 +192,14 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         setDrawer(binding.toolbar);
 
         this.mMapLocationSource = new MapLocationSource();
-        binding.mapView.onCreate(savedInstanceState);
 
+        // Workaround for Google Maps crash on Android 6
+        try {
+            binding.mapView.onCreate(savedInstanceState);
+        } catch (Exception e) {
+            Timber.e("not showing map due to issue https://issuetracker.google.com/issues/35827842");
+            flagStateMapReady = false; 
+        }
         this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
         binding.contactPeek.contactRow.setOnClickListener(this);
         binding.contactPeek.contactRow.setOnLongClickListener(this);
