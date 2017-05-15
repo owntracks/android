@@ -1,8 +1,11 @@
 package org.owntracks.android.services;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -298,6 +301,16 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
             case MessageCmd.ACTION_SET_CONFIGURATION:
                 Preferences.importFromMessage(message.getConfiguration());
                 break;
+            case MessageCmd.ACTION_RECONNECT:
+                ServiceProxy.getServiceMessage().reconnect();
+            case MessageCmd.ACTION_RESTART:
+                Intent mStartActivity = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                int mPendingIntentId = 223344;
+                PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                System.exit(0);
         }
     }
 
