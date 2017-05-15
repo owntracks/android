@@ -20,6 +20,7 @@ import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.ConnectionListener;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
 import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
@@ -50,6 +51,26 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void disconnect() {
         if(endpoint instanceof StatefulServiceMessageEndpoint)
             StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
+    }
+
+    /**
+     * Registers a connection listener. The same listener can only be added once, if executed multiple times on the same listener, nothing happens
+     * @param listener to be added
+     * @throws  NullPointerException Thrown if listener is null
+     */
+    public void register(final ConnectionListener listener) {
+        if(endpoint instanceof StatefulServiceMessageEndpoint)
+            StatefulServiceMessageEndpoint.class.cast(endpoint).register(listener);
+    }
+
+    /**
+     * Unregisters a listener. If the listener is not registered, nothing happens
+     * @param listener to be unregistered
+     * @throws  NullPointerException Thrown if listener is null
+     */
+    public void unregister(final ConnectionListener listener) {
+        if(endpoint instanceof StatefulServiceMessageEndpoint)
+            StatefulServiceMessageEndpoint.class.cast(endpoint).unregister(listener);
     }
 
     public ServiceProxy getContext() {

@@ -28,6 +28,7 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.ConnectionListener;
 import org.owntracks.android.support.widgets.Toasts;
 
 
@@ -43,6 +44,39 @@ public class ActivityRegion extends ActivityBase  {
 
     private MenuItem saveButton;
     private ActivityRegionBinding binding;
+
+
+    /**
+     * Connection state listener for displaying status toast messages
+     */
+    private final ConnectionListener connectionListener = new ConnectionListener() {
+
+        private final Activity activity = ActivityRegion.this;
+
+        private void toast(final int resId, final int duration) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, resId, duration).show();
+                }
+            });
+        }
+
+        @Override
+        public void onConnected() {
+            toast(R.string.connection_established, Toast.LENGTH_SHORT);
+        }
+
+        @Override
+        public void onClosed() {
+
+        }
+
+        @Override
+        public void onError(final Throwable t) {
+            toast(R.string.connection_error, Toast.LENGTH_LONG);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +113,8 @@ public class ActivityRegion extends ActivityBase  {
         binding.setItem(this.waypoint);
         binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
         setupListenerAndRequiredFields();
+
+        ServiceProxy.getServiceMessage().register(connectionListener);
     }
 
     private void setupListenerAndRequiredFields() {
@@ -299,13 +335,20 @@ public class ActivityRegion extends ActivityBase  {
     }
 
     @Override
+    public void onPause() {
+        ServiceProxy.getServiceMessage().unregister(connectionListener);
+        super.onPause();
+    }
+
+    @Override
     public void onResume() {
+        ServiceProxy.getServiceMessage().register(connectionListener);
         super.onResume();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
+    protected void onStop() {
+        ServiceProxy.getServiceMessage().unregister(connectionListener);
+        super.onStop();
     }
 }
