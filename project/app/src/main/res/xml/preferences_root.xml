@@ -24,11 +24,6 @@
     </PreferenceScreen>
 
     <Preference
-        android:key="export"
-        android:title="@string/preferencesExport">
-    </Preference>
-
-    <Preference
         android:key="configuration"
         android:title="@string/configurationManagement">
     </Preference>
