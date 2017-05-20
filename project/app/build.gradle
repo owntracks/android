@@ -7,9 +7,9 @@ def versionPatch = 3
 def versionBuild = 1
 ext.pahoVersion = "1.1.0"
 ext.daggerVersion = '2.6'
-ext.playLibVersion = '10.2.1'
-ext.okHttpVersion = '3.6.0'
-ext.supportLibVersion = '25.3.0'
+ext.playLibVersion = '10.2.6'
+ext.okHttpVersion = '3.8.0'
+ext.supportLibVersion = '25.3.1'
 
 
 android {
@@ -110,9 +110,9 @@ dependencies {
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.2'
-    compile 'com.afollestad.material-dialogs:commons:0.9.4.2'
-    compile('com.mikepenz:materialdrawer:5.8.2@aar') { transitive = true }
+    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
+    compile 'com.afollestad.material-dialogs:commons:0.9.4.5'
+    compile('com.mikepenz:materialdrawer:5.9.1@aar') { transitive = true }
     compile "com.mikepenz:materialize:1.0.1@aar"
 
     // Preprocessors
