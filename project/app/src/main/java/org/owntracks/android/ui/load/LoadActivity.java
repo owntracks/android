@@ -148,15 +148,9 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
 
             StringBuilder total = new StringBuilder();
 
-            try {
-                String content;
-                while ((content = r.readLine()) != null) {
-                    total.append(content);
-                }
-            } catch (OutOfMemoryError e) {
-                throw new Error("Unable to load content into memory");
-            } catch (Exception e) {
-                e.printStackTrace();
+            String content;
+            while ((content = r.readLine()) != null) {
+                total.append(content);
             }
 
             viewModel.setConfiguration(total.toString());
@@ -165,15 +159,15 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
             Timber.e(e, "parse exception ");
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
             finish();
-        }catch(Exception e){
-            Timber.e(e, "load exception ");
-            finish();
-            Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
         } catch(OutOfMemoryError e){
-            Timber.e(e, "load exception ");
+            Timber.e(e, "load exception oom");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
-        }
+        } catch(Exception e) {
+            Timber.e(e, "load exception");
+            finish();
+            Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
+        } 
 
     }
 
