@@ -257,12 +257,19 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void onResume() {
         super.onResume();
-        binding.mapView.onResume();
 
-        if(mMap == null)
-            initMapDelayed();
+        try {
+            binding.mapView.onResume();
 
-        queueActionMapUpdate();
+            if (mMap == null)
+                initMapDelayed();
+
+            queueActionMapUpdate();
+
+        } catch (Exception e) {
+            Timber.e("not showing map due to crash in Google Maps library");
+            flagStateMapReady = false;
+        }
         handleIntentExtras(getIntent());
 
     }
