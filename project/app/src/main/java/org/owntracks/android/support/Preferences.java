@@ -33,6 +33,7 @@ import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.messages.MessageWaypoints;
 
 import timber.log.Timber;
 
@@ -380,7 +381,7 @@ public class Preferences {
     }
 
 
-    public static void importWaypointsFromJson(@Nullable List<MessageWaypoint> j) {
+    public static void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
         if(j == null)
             return;
 
