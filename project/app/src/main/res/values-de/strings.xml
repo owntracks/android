@@ -117,8 +117,6 @@
     <string name="preferencesImportFileSummary">Konfiguration aus Datei importieren</string>
     <string name="preferencesExportToFile">Konfiguration exportieren</string>
     <string name="preferencesExportToFileSummary">Konfiguration in Datei exportieren</string>
-    <string name="exportWaypointsToEndpoint">Regionen exportieren</string>
-    <string name="exportWaypointsToEndpointSummary">Regionen an Server exportieren</string>
     <string name="preferencesExportFailed">Einstellungs-Export fehlgeschlagen</string>
     <string name="preferencesExportSuccess">Export erfolgreich</string>
     <string name="geofenceAndBeaconInactive">Geofence und Beacon inaktiv</string>
@@ -184,5 +182,7 @@
     <string name="preferencesLoadFailed">Die effektive Konfiguration konnte nicht geladen werden</string>
     <string name="preferencesEditorKey">Schlüssel</string>
     <string name="preferencesEditorValue">Wert</string>
+    <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
+
 
 </resources>
