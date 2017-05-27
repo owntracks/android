@@ -1,5 +1,8 @@
 package org.owntracks.android.messages;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,13 +10,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,11 +26,10 @@ public class MessageCmd extends MessageBase{
     public static final String ACTION_REPORT_LOCATION = "reportLocation";
     public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
     public static final String ACTION_SET_CONFIGURATION = "setConfiguration";
-    public static final String ACTION_SET_WAYPOINTS_KEY_WAYPOINTS = "waypoints";
 
     public static final String ACTION_WAYPOINTS = "waypoints";
 
-    private MessageWaypointCollection waypoints;
+    private MessageWaypoints waypoints;
     private Map<String,Object> map = new HashMap<>();
     private MessageConfiguration configuration;
 
@@ -47,6 +47,7 @@ public class MessageCmd extends MessageBase{
     }
 
     @JsonIgnore
+    @Nullable
     public Object get(String key) {
         return map.get(key);
     }
@@ -58,14 +59,15 @@ public class MessageCmd extends MessageBase{
 
 
     @Override
+    @NonNull
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
-
+    @Nullable
     public String getAction() {
         return action;
     }
 
-    public void setWaypoints(MessageWaypointCollection m) {
+    public void setWaypoints(MessageWaypoints m) {
         this.waypoints = m;
     }
 
@@ -73,10 +75,12 @@ public class MessageCmd extends MessageBase{
         this.configuration = m;
     }
 
-    public MessageWaypointCollection getWaypoints() {
+    @Nullable
+    public MessageWaypoints getWaypoints() {
         return waypoints;
     }
 
+    @Nullable
     public MessageConfiguration getConfiguration() {
         return configuration;
     }
