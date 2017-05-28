@@ -1,6 +1,5 @@
 package org.owntracks.android.services;
 
-import android.app.Service;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,31 +10,34 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
-import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import timber.log.Timber;
 
-public class ServiceMessageDispatcher extends GcmTaskService {
-    public static final String BUNDLE_KEY_MESSAGE_MODE = "SEND_MESSAGE_KEY_MODE";
+public class Dispatcher extends GcmTaskService {
+    static Dispatcher instance;
+    public static final String BUNDLE_KEY_ACTION = "DISPATCHER_ACTION";
 
-    public static final String BUNDLE_KEY_MESSAGE_PAYLOAD = "SEND_MESSAGE_KEY_PAYLOAD";
-    public static final String BUNDLE_KEY_MESSAGE_TARGET = "SEND_MESSAGE_KEY_TARGET";
-    public static final String BUNDLE_KEY_MESSAGE_ID = "SEND_MESSAGE_KEY_ID";
+    public static final String BUNDLE_KEY_MESSAGE_MODE = "SEND_MESSAGE_KEY_MODE";
 
     public static final String TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
     public static final String TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT";
 
+    public static Dispatcher getInstance() {
+        if(instance == null)
+            instance = new Dispatcher();
+        return instance;
+    }
+
     @Override
     public int onRunTask(TaskParams taskParams) {
         Bundle extras = taskParams.getExtras();
-        switch (taskParams.getTag()) {
+        switch (extras.getString(BUNDLE_KEY_ACTION)) {
             case TASK_SEND_MESSAGE_HTTP:
                 return sendMessageHttp(extras);
             case TASK_SEND_MESSAGE_MQTT:
@@ -47,7 +49,7 @@ public class ServiceMessageDispatcher extends GcmTaskService {
     }
 
     private int sendMessageMqtt(Bundle extras) {
-        return ServiceMessageMqttGCM.
+        return ServiceEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
     }
 
     private int sendMessageHttp(Bundle extras) {
@@ -56,23 +58,19 @@ public class ServiceMessageDispatcher extends GcmTaskService {
     }
 
 
-    public void scheduleMessage(MessageBase message)  {
-        Bundle b = BundleFactory.getBundleCreator().getBundle(message);
-        if(b == null) {
-            Timber.e("no bundle returned for message %s", message.getMessageId());
-            return;
-        }
+    public void scheduleMessage(Bundle b)  {
 
         Task task = new OneoffTask.Builder()
-                .setService(ServiceMessageDispatcher.class)
+                .setService(Dispatcher.class)
                 .setExecutionWindow(0, 30)
-                .setTag(b.getString(BUNDLE_KEY_MESSAGE_MODE))
+                .setTag(Long.toString("todo")
                 .setUpdateCurrent(false)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setRequiresCharging(false)
                 .setExtras(b)
                 .build();
 
+        Timber.v("scheduling task %s", task.getTag());
         GcmNetworkManager.getInstance(this).schedule(task);
     }
 
@@ -173,8 +171,9 @@ public class ServiceMessageDispatcher extends GcmTaskService {
         @Override
         @Nullable
         public Bundle getBundle(MessageBase message) {
-            Bundle b = new Bundle();
+            Bundle b = message.toBundle();
             b.putString(BUNDLE_KEY_MESSAGE_MODE, TASK_SEND_MESSAGE_MQTT);
+
             return b;
         }
     }

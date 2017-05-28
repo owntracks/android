@@ -1,5 +1,6 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
-public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
+public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable{
         protected static final String TAG = "MessageBase";
 
         @JsonIgnore
@@ -204,4 +205,5 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         }
 
 
+    public abstract Bundle toBundle();
 }

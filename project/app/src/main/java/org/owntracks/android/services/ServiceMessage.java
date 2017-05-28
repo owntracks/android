@@ -21,6 +21,9 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.OutgoingMessageProcessorHttp;
+import org.owntracks.android.support.OutgoingMessageProcessorMqtt;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
@@ -41,6 +44,8 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
+    private ThreadPoolExecutor outgoingMessageProcessorExecutor;
+    private OutgoingMessageProcessor outgoingMessageProcessor;
 
     private ServiceProxy context;
 
@@ -90,15 +95,29 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void onCreate(ServiceProxy c) {
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        this.outgoingMessageProcessor = instantiateOutgoingMessageProcessor(Preferences.getModeId());
+
         onEndpointStateChanged(EndpointState.INITIAL);
-        try {
-            endpoint = instantiateEndpoint(Preferences.getModeId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
+    private @NonNull OutgoingMessageProcessor instantiateOutgoingMessageProcessor(int mode){
+        Timber.v("mode:%s", mode);
+        if(outgoingMessageProcessorExecutor != null) {
+            outgoingMessageProcessorExecutor.purge();
+        }
 
+        Timber.v("instantiating new outgoingMessageProcessorExecutor");
+        switch (mode) {
+            case App.MODE_ID_HTTP_PRIVATE:
+                return new OutgoingMessageProcessorHttp();
+            case App.MODE_ID_MQTT_PRIVATE:
+            case App.MODE_ID_MQTT_PUBLIC:
+            default:
+                return new OutgoingMessageProcessorMqtt();
+
+        }
+    }
 
     private @NonNull ServiceMessageEndpoint instantiateEndpoint(int mode) throws Exception{
         Timber.v("mode:%s", mode);
@@ -161,30 +180,36 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
     void sendMessage(MessageBase message) {
-        Timber.v("endpoint:%s, message:%s",endpoint, message);
-
-        message.setOutgoing();
-        try {
-
-            if(endpoint == null) {
-                Timber.e("no endpoint, creating on demand");
-                endpoint = instantiateEndpoint(Preferences.getModeId());
-            }
-
-            if(!endpoint.isReady()) {
-                Timber.e("endpoint is not ready: %s", endpoint);
-                endpoint.probe();
-                return;
-            }
-
-            if(endpoint.sendMessage(message)) {
-                this.onMessageQueued(message);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Timber.v("executing message on outgoingMessageProcessor");
+        message.setOutgoingProcessor(outgoingMessageProcessor);
+        this.outgoingMessageProcessorExecutor.execute(message);
 
     }
+//    void sendMessage(MessageBase message) {
+//        Timber.v("endpoint:%s, message:%s",endpoint, message);
+//
+//        message.setOutgoing();
+//        try {
+//
+//            if(endpoint == null) {
+//                Timber.e("no endpoint, creating on demand");
+//                endpoint = instantiateEndpoint(Preferences.getModeId());
+//            }
+//
+//            if(!endpoint.isReady()) {
+//                Timber.e("endpoint is not ready: %s", endpoint);
+//                endpoint.probe();
+//                return;
+//            }
+//
+//            if(endpoint.sendMessage(message)) {
+//                this.onMessageQueued(message);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
 
 
@@ -309,5 +334,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public void processIncomingMessage(MessageTransition message) {
         ServiceProxy.getServiceNotification().processMessage(message);
     }
+
 
 }

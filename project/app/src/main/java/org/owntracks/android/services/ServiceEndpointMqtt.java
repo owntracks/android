@@ -42,6 +42,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -51,10 +52,13 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class ServiceDispatcherMqtt {
+public class ServiceEndpointMqtt {
 	private static final String TAG = "ServiceMessageMqtt";
-	public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
-	public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
+
+	public static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
+	public static final String MQTT_BUNDLE_KEY_MESSAGE_TOPIC = "MQTT_BUNDLE_KEY_MESSAGE_TOPIC";
+	public static final String MQTT_BUNDLE_KEY_MESSAGE_RETAINED = "MQTT_BUNDLE_KEY_MESSAGE_RETAINED";
+	public static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
 
 	private MqttAsyncClient mqttClient;
 	private Object error;
@@ -63,18 +67,43 @@ public class ServiceDispatcherMqtt {
 	private String lastConnectionId;
 	private static EndpointState state;
 
-	public static void sendMessage(Bundle b) {
-		getInstance().handle(b);
+	boolean sendMessage(Bundle b) {
+		if(!isConnected() && !connect())
+			return false;
+
+		try {
+			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
+			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
+			return true;
+		} catch (MqttException e) {
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 
-	private void handle(Bundle b) {
-
+	private MqttMessage mqttMessageFromBundle(Bundle b) {
+		MqttMessage  m = new MqttMessage();
+		m.setPayload(b.getString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD).getBytes());
+		m.setQos(b.getInt(MQTT_BUNDLE_KEY_MESSAGE_QOS));
+		m.setRetained(b.getBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED));
+		return m;
 	}
 
-	private static ServiceDispatcherMqtt instance;
-	public static ServiceDispatcherMqtt getInstance() {
+	public static Bundle mqttMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+		Bundle b = new Bundle();
+		b.putString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
+		b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
+		b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
+		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
+		return b;
+	}
+
+
+	private static ServiceEndpointMqtt instance;
+	public static ServiceEndpointMqtt getInstance() {
 		if(instance == null)
-			instance = new ServiceDispatcherMqtt();
+			instance = new ServiceEndpointMqtt();
 		return instance;
 	}
 
@@ -449,306 +478,17 @@ public class ServiceDispatcherMqtt {
 		return state;
 	}
 
-	@Override
-	public boolean isReady() {
-		return this.service != null && this.mqttClient != null;
-	}
-
-
-	public Exception getError() {
-        return error;
-    }
-
-
-
 
 	@Subscribe
 	public void onEvent(Events.Dummy e) {
 	}
 
 
-	private void clearQueues() {
-		initPausedPubPool();
-    }
 
 
 	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {
-        clearQueues();
+//        clearQueues();
     }
-
-
-
-    // Custom blocking MqttClient that allows to specify a MqttPingSender
-    private static final class CustomMqttClient extends MqttAsyncClient {
-        CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence, MqttPingSender pingSender) throws MqttException {
-            super(serverURI, clientId, persistence, pingSender);// Have to call do the AsyncClient init twice as there is no other way to setup a client with a ping sender (thanks Paho)
-        }
-    }
-
-	@TargetApi(Build.VERSION_CODES.M)
-	private void onDeviceIdleChanged() {
-		if(powerManager.isDeviceIdleMode()) {
-			Timber.v("idleMode: enabled");
-		} else {
-			Timber.v("idleMode: disabled");
-
-		}
-	}
-
-	private void unregisterReceiver() {
-		if(idleReceiver != null && receiverRegisterd)
-			context.unregisterReceiver(idleReceiver);
-	}
-
-
-	private void registerReceiver() {
-		IntentFilter filter = new IntentFilter();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			filter.addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
-
-			idleReceiver = new BroadcastReceiver() {
-				@Override
-				public void onReceive(Context context, Intent intent) {
-					onDeviceIdleChanged();
-				}
-			};
-			context.registerReceiver(idleReceiver, filter);
-			receiverRegisterd = true;
-		}
-
-	}
-
-
-	@Override
-	public void probe() {
-		Timber.d("mqttClient:%s, mqttClient.isConnected:%s, state:%s, reconnectHandlerEngaged:%s, pubPool.isRunning:%s", mqttClient!=null, mqttClient != null && mqttClient.isConnected(), getState(), reconnectHandler.hasStarted, pubPool.isRunning());
-
-		if(error != null)
-			Timber.e(error, "hasError");
-	}
-
-	class PingHandler implements MqttPingSender {
-        static final String TAG = "PingHandler";
-
-        private ClientComms comms;
-		private WakeLock wakelock;
-
-		private synchronized boolean releaseWakeLock() {
-			if(wakelock != null && wakelock.isHeld()){
-				Log.d(TAG, "Release lock ok(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
-
-				wakelock.release();
-				return true;
-			}
-			Log.d(TAG, "Release lock underlock or null (" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
-			return false;
-		}
-
-		private synchronized void initWakeLock() {
-			if (wakelock == null) {
-				wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ServiceProxy.WAKELOCK_TAG_BROKER_PING);
-			}
-		}
-
-		private synchronized void acquireWakelock() {
-			if(!wakelock.isHeld())
-				wakelock.acquire();
-		}
-
-        public void ping(Intent intent) {
-			Log.v(TAG, "sending");
-
-			initWakeLock();
-
-			acquireWakelock();
-
-			if(comms == null) {
-				Log.v(TAG, "comms is null, running doStart()");
-				PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
-				try {
-					p.send();
-				} catch (PendingIntent.CanceledException ignored) {
-
-				} finally {
-					Log.v(TAG, "releaseWakeLock 1");
-					releaseWakeLock();
-				}
-				return;
-			}
-
-
-			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
-				@Override
-				public void onSuccess(IMqttToken asyncActionToken) {
-					Log.d(TAG, "Success. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
-					Log.v(TAG, "releaseWakeLock 2 onSuccess");
-
-					releaseWakeLock();
-				}
-
-				@Override
-				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-					Log.d(TAG, "Failure. Release lock(" + ServiceProxy.WAKELOCK_TAG_BROKER_PING + "):" + System.currentTimeMillis());
-					Log.v(TAG, "releaseWakeLock 3 onFailure");
-
-					releaseWakeLock();
-				}
-			});
-
-		}
-
-        public PingHandler(Context c) {
-            if (c == null) {
-                throw new IllegalArgumentException( "Neither service nor client can be null.");
-            }
-        }
-
-        @Override
-        public void init(ClientComms comms) {
-            Log.v(TAG, "init " + this);
-			this.comms = comms;
-        }
-
-        @Override
-        public void start() {
-            Log.v(TAG, "start " + this);
-			if(comms != null)
-	            schedule(comms.getKeepAlive());
-        }
-
-        @Override
-        public void stop() {
-            Log.v(TAG, "stop " + this);
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, ServiceDispatcherMqtt.RECEIVER_ACTION_PING, null));
-			releaseWakeLock();
-        }
-
-		// Schedules a BroadcastIntent that will trigger a ping message when received.
-		// It will be received by ServiceMessageMqtt.onStartCommand which recreates the service in case it has been stopped
-		// onStartCommand will then deliver the intent to the ping(...) method if the service was alive or it will trigger a new connection attempt
-        @Override
-        public void schedule(long delayInMilliseconds) {
-
-			long targetTstMs = System.currentTimeMillis() + delayInMilliseconds;
-			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_MESSAGE, ServiceDispatcherMqtt.RECEIVER_ACTION_PING, null);
-			if (Build.VERSION.SDK_INT >= 19) {
-				alarmManager.setExact(AlarmManager.RTC_WAKEUP, targetTstMs, p);
-			} else {
-				alarmManager.set(AlarmManager.RTC_WAKEUP, targetTstMs, p);
-			}
-
-			Log.v(TAG, "scheduled ping at tst " + (targetTstMs) +" (current: " + System.currentTimeMillis() +" /"+ delayInMilliseconds+ ")");
-
-        }
-    }
-
-    class ReconnectHandler {
-		private static final String TAG = "ReconnectHandler";
-		private static final int BACKOFF_INTERVAL_MAX = 5;
-		private int backoff = 0;
-
-		private final Context context;
-        private boolean hasStarted;
-
-
-        public ReconnectHandler(Context context) {
-            this.context = context;
-        }
-
-
-
-
-        public void stop() {
-            Log.v(TAG, "stopping reconnect handler");
-			backoff = 0;
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-            alarmManager.cancel(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null));
-
-            if (hasStarted) {
-                hasStarted = false;
-            }
-        }
-
-        public void schedule() {
-			hasStarted = true;
-			AlarmManager alarmManager = (AlarmManager) context.getSystemService(ServiceProxy.ALARM_SERVICE);
-			long delayInMilliseconds;
-			delayInMilliseconds =  (long)Math.pow(2, backoff) * TimeUnit.SECONDS.toMillis(30);
-
-			Timber.v("scheduling reconnect delay:%s", delayInMilliseconds);
-
-			PendingIntent p = ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_MESSAGE, RECEIVER_ACTION_RECONNECT, null);
-			if (Build.VERSION.SDK_INT >= 19) {
-				alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
-			} else {
-				alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, p);
-			}
-
-			if(backoff <= BACKOFF_INTERVAL_MAX)
-				backoff++;
-		}
-
-	}
-
-    private static final class CustomMemoryPersistence implements MqttClientPersistence {
-        private static Hashtable data;
-
-        public CustomMemoryPersistence(){
-
-        }
-
-        @Override
-        public void open(String s, String s2) throws MqttPersistenceException {
-            if(data == null) {
-                data = new Hashtable();
-            }
-        }
-
-		@SuppressWarnings("unused")
-        private Integer getSize(){
-            return data.size();
-        }
-
-        @Override
-        public void close() throws MqttPersistenceException {
-
-        }
-
-        @Override
-        public void put(String key, MqttPersistable persistable) throws MqttPersistenceException {
-            data.put(key, persistable);
-        }
-
-        @Override
-        public MqttPersistable get(String key) throws MqttPersistenceException {
-            return (MqttPersistable)data.get(key);
-        }
-
-        @Override
-        public void remove(String key) throws MqttPersistenceException {
-            data.remove(key);
-        }
-
-        @Override
-        public Enumeration keys() throws MqttPersistenceException {
-            return data.keys();
-        }
-
-        @Override
-        public void clear() throws MqttPersistenceException {
-            data.clear();
-        }
-
-        @Override
-        public boolean containsKey(String key) throws MqttPersistenceException {
-            return data.containsKey(key);
-        }
-
-
-
-	}
 }
 
