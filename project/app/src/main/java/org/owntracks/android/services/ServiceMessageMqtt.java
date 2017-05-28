@@ -772,10 +772,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		return state;
 	}
 
-	@Override
-	public boolean isReady() {
-		return this.service != null && this.mqttClient != null;
-	}
 
 
 	public Exception getError() {
@@ -840,15 +836,6 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			receiverRegisterd = true;
 		}
 
-	}
-
-
-	@Override
-	public void probe() {
-		Timber.d("mqttClient:%s, mqttClient.isConnected:%s, state:%s, reconnectHandlerEngaged:%s, pubPool.isRunning:%s", mqttClient!=null, mqttClient != null && mqttClient.isConnected(), getState(), reconnectHandler.hasStarted, pubPool.isRunning());
-
-		if(error != null)
-			Timber.e(error, "hasError");
 	}
 
 	class PingHandler implements MqttPingSender {

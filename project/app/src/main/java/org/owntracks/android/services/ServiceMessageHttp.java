@@ -55,12 +55,17 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMessageProcessor {
+public class ServiceMessageHttp  {
     // Headers according to https://github.com/owntracks/recorder#http-mode
     private static final String HEADER_USERNAME = "X-Limit-U";
     private static final String HEADER_DEVICE = "X-Limit-D";
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
+    private static final String HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD = "HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD";
+    private static final String HTTP_BUNDLE_KEY_USERINFO = "HTTP_BUNDLE_KEY_USERINFO";
+    private static final String HTTP_BUNDLE_KEY_URL = "HTTP_BUNDLE_KEY_URL";
+    private static final String HTTP_BUNDLE_KEY_MESSAGE_ID = "HTTP_BUNDLE_KEY_MESSAGE_ID";
+
     private static String headerUsername;
     private static String headerDevice;
 
@@ -77,11 +82,42 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
 
     public void onCreate(ServiceProxy c) {
         Timber.v("loaded HTTP endoint");
-        this.context = c;
-        this.mOutgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        powerManager = PowerManager.class.cast(context.getSystemService(Context.POWER_SERVICE));
-        connectivityManager =  ConnectivityManager.class.cast(context.getSystemService(Context.CONNECTIVITY_SERVICE));
 
+    }
+
+    private static ServiceMessageHttp instance;
+    private static ServiceMessageHttp getInstance() {
+        if(instance == null) {
+            instance = new ServiceMessageHttp();
+        }
+        return instance;
+    }
+
+    public ServiceMessageHttp() {
+        Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
+            @Override
+            public void onAttachAfterModeChanged() {
+
+            }
+
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if(Preferences.Keys.URL.equals(key))
+                    loadEndpointUrl();
+                if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
+                    loadHTTPClient();
+                if(Preferences.Keys.USERNAME.equals(key))
+                    headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
+                if(Preferences.Keys.DEVICE_ID.equals(key))
+                    headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
+
+
+
+            }
+        });
+
+        loadEndpointUrl();
+        loadHTTPClient();
     }
 
     private void loadHTTPClient() {
@@ -140,17 +176,6 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
     }
 
     @Override
-    public boolean isReady() {
-        return mHttpClient != null;
-    }
-
-    @Override
-    public void probe() {
-        Timber.d("endpointUrl:%s, httpClient:%s", this.endpointUrl, mHttpClient);
-    }
-
-
-    @Override
     public void onDestroy() {
         //TODO: unregister preferences change listener
     }
@@ -205,6 +230,36 @@ public class ServiceMessageHttp implements StatelessMessageEndpoint, OutgoingMes
         }
     }
 
+    boolean sendMessage(Bundle b) {
+        String body = b.getString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD);
+        String url = b.getString(HTTP_BUNDLE_KEY_URL);
+        String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
+        long messageId = b.getLong(HTTP_BUNDLE_KEY_MESSAGE_ID);
+
+        Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
+
+        if(body == null || url == null)
+            return false;
+
+        Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
+
+        if(userInfo != null) {
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
+        } else if(Preferences.getAuth()) {
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((Preferences.getUsername()+":"+Preferences.getPassword()).getBytes(), Base64.NO_WRAP));
+
+        }
+
+        if(headerUsername != null) {
+            request.header(HEADER_USERNAME, headerUsername);
+        }
+        if(headerDevice != null) {
+            request.header(HEADER_DEVICE, headerDevice);
+        }
+
+    }
+
+    @Deprecated
     public static int postMessage(final String body, @Nullable final String url, @Nullable final String userInfo, final Context c, final Long messageId) {
         Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
 
@@ -311,6 +366,7 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
         return true;
     }
 
+    @Deprecated
     private boolean prepareAndPostIndirect(String wireMessage, @NonNull MessageBase message) {
         Timber.v("messageId:%s", message.getMessageId());
         Bundle b = new Bundle();
@@ -334,78 +390,15 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
         return true;
     }
 
-    @Override
-    public void processOutgoingMessage(MessageBase message) {
-        postMessage(message);
+
+    public static Bundle httpMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+        Bundle b = new Bundle();
+        b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
+        b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
+        b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
+        b.putLong(HTTP_BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
+
+        return b;
     }
 
-    @Override
-    public void processOutgoingMessage(MessageCmd message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageEvent message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageLocation message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageTransition message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageWaypoint message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageWaypoints message) {
-        postMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageClear message) { /*not supported */}
-
-    @Override
-    public void onSetService(ServiceMessage service) {
-        this.service = service;
-
-        Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
-            @Override
-            public void onAttachAfterModeChanged() {
-
-            }
-
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(Preferences.Keys.URL.equals(key))
-                    loadEndpointUrl();
-                if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
-                    loadHTTPClient();
-                if(Preferences.Keys.USERNAME.equals(key))
-                    headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
-                if(Preferences.Keys.DEVICE_ID.equals(key))
-                    headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
-
-
-
-            }
-        });
-
-        loadEndpointUrl();
-        loadHTTPClient();
-    }
-
-    @Override
-    public boolean sendMessage(MessageBase message) {
-        message.setOutgoingProcessor(this);
-        this.mOutgoingMessageProcessorExecutor.execute(message);
-        return true;
-    }
 }

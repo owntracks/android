@@ -170,7 +170,7 @@
         </service>
 
 
-        <service android:name=".services.ServiceMessageDispatcher"
+        <service android:name=".services.Dispatcher"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>

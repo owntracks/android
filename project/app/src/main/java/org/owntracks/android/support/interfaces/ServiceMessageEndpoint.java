@@ -6,7 +6,5 @@ import org.owntracks.android.services.ServiceMessage;
 public interface ServiceMessageEndpoint extends ProxyableService {
         void onSetService(ServiceMessage service);
         boolean sendMessage(MessageBase message);
-        boolean isReady();
 
-        void probe();
 }
