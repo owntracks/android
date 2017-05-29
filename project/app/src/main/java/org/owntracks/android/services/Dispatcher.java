@@ -10,6 +10,7 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
+import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
@@ -22,8 +23,7 @@ import timber.log.Timber;
 public class Dispatcher extends GcmTaskService {
     static Dispatcher instance;
     public static final String BUNDLE_KEY_ACTION = "DISPATCHER_ACTION";
-
-    public static final String BUNDLE_KEY_MESSAGE_MODE = "SEND_MESSAGE_KEY_MODE";
+    public static final String BUNDLE_KEY_MESSAGE_ID = "MESSAGE_ID";
 
     public static final String TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
     public static final String TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT";
@@ -37,144 +37,48 @@ public class Dispatcher extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         Bundle extras = taskParams.getExtras();
+        if(extras.getString(BUNDLE_KEY_ACTION) == null) {
+            Timber.e("BUNDLE_KEY_ACTION is not set");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+
+        Timber.v("BUNDLE_KEY_ACTION: %s", extras.getString(BUNDLE_KEY_ACTION));
+
         switch (extras.getString(BUNDLE_KEY_ACTION)) {
             case TASK_SEND_MESSAGE_HTTP:
-                return sendMessageHttp(extras);
+                return ServiceMessageHttp.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
             case TASK_SEND_MESSAGE_MQTT:
-                return sendMessageMqtt(extras);
+                return ServiceEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
             default:
                 return GcmNetworkManager.RESULT_FAILURE;
         }
 
     }
 
-    private int sendMessageMqtt(Bundle extras) {
-        return ServiceEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
-    }
-
-    private int sendMessageHttp(Bundle extras) {
-        //TODO: Refactor keys
-        return ServiceMessageHttp.postMessage(extras.getString(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY), extras.getString(ServiceMessageHttpGcm.BUNDLE_KEY_URL), extras.getString(ServiceMessageHttpGcm.BUNDLE_KEY_USERINFO), this, extras.getLong(ServiceMessageHttpGcm.BUNDLE_KEY_MESSAGE_ID));
-    }
-
-
     public void scheduleMessage(Bundle b)  {
+        if(b.get(BUNDLE_KEY_MESSAGE_ID) == null) {
+            Timber.e("Bundle without BUNDLE_KEY_MESSAGE_ID");
+            return;
+        }
+        if(b.get(BUNDLE_KEY_ACTION) == null) {
+            Timber.e("Bundle without BUNDLE_KEY_ACTION");
+            return;
+        }
+
+
 
         Task task = new OneoffTask.Builder()
                 .setService(Dispatcher.class)
                 .setExecutionWindow(0, 30)
-                .setTag(Long.toString("todo")
+                .setTag(Long.toString(b.getLong(BUNDLE_KEY_MESSAGE_ID)))
                 .setUpdateCurrent(false)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setRequiresCharging(false)
                 .setExtras(b)
                 .build();
 
-        Timber.v("scheduling task %s", task.getTag());
-        GcmNetworkManager.getInstance(this).schedule(task);
-    }
+        Timber.v("scheduling task %s /", task.getTag());
 
-    private static class BundleFactory implements org.owntracks.android.support.Preferences.OnPreferenceChangedListener {
-
-        private BundleCreator creator;
-        private static BundleFactory instance;
-
-        static BundleFactory getInstance() {
-            if(instance == null) {
-                instance = new BundleFactory();
-                Preferences.registerOnPreferenceChangedListener(instance);
-            }
-            return instance;
-        }
-
-        static BundleCreator getBundleCreator() {
-            if(getInstance().creator == null) {
-                if(Preferences.isModeHttpPrivate())
-                    getInstance().creator = new HttpBundleCreator();
-                else
-                    getInstance().creator = new MqttBundleCreator();
-            }
-            return getInstance().creator;
-        }
-
-        @Override
-        public void onAttachAfterModeChanged() {
-            creator = null;
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
-        }
-    }
-
-
-    private interface BundleCreator {
-        @Nullable Bundle getBundle(MessageBase message);
-    }
-
-    public static void onEndpointStateChanged(ServiceMessage.EndpointState state) {
-
-    }
-
-    private static class HttpBundleCreator implements BundleCreator {
-
-        private String endpointUserInfo;
-        private String endpointUrl;
-
-        HttpBundleCreator() {
-            loadEndpointUrl();
-        }
-
-        private void loadEndpointUrl() {
-            URL endpoint;
-            try {
-                endpoint = new URL(Preferences.getUrl());
-                onEndpointStateChanged(ServiceMessage.EndpointState.IDLE);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                onEndpointStateChanged(ServiceMessage.EndpointState.ERROR_CONFIGURATION);
-                return;
-            }
-
-            this.endpointUserInfo = endpoint.getUserInfo();
-
-            if (this.endpointUserInfo != null && this.endpointUserInfo.length() > 0) {
-                this.endpointUrl = endpoint.toString().replace(endpointUserInfo+"@", "");
-            } else {
-                this.endpointUrl = endpoint.toString();
-            }
-            Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
-        }
-
-        @Override
-        @Nullable
-        public Bundle getBundle(MessageBase message) {
-            Bundle b = new Bundle();
-            try {
-                b.putString(BUNDLE_KEY_MESSAGE_MODE, TASK_SEND_MESSAGE_HTTP);
-                b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_USERINFO, this.endpointUserInfo);
-                b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_URL, this.endpointUrl);
-                b.putLong(ServiceMessageHttpGcm.BUNDLE_KEY_MESSAGE_ID, message.getMessageId());
-                b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY, Parser.toJson(message));
-            } catch (Exception e) {
-                onEndpointStateChanged(ServiceMessage.EndpointState.ERROR);
-                e.printStackTrace();
-                b = null;
-            }
-
-            return b;
-        }
-    }
-    private static class MqttBundleCreator implements BundleCreator {
-
-        @Override
-        @Nullable
-        public Bundle getBundle(MessageBase message) {
-            Bundle b = message.toBundle();
-            b.putString(BUNDLE_KEY_MESSAGE_MODE, TASK_SEND_MESSAGE_MQTT);
-
-            return b;
-        }
+        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
     }
 }

@@ -9,6 +9,7 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
+import org.owntracks.android.services.ServiceMessage;
 
 public interface OutgoingMessageProcessor {
     void processOutgoingMessage(MessageBase message);
@@ -19,4 +20,7 @@ public interface OutgoingMessageProcessor {
     void processOutgoingMessage(MessageWaypoint message);
     void processOutgoingMessage(MessageWaypoints message);
     void processOutgoingMessage(MessageClear message);
+
+    void onAssociate(ServiceMessage service);
+    void onDestroy();
 }

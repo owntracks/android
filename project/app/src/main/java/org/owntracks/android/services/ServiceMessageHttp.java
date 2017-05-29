@@ -55,7 +55,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class ServiceMessageHttp  {
+public class ServiceMessageHttp implements OutgoingMessageProcessor {
     // Headers according to https://github.com/owntracks/recorder#http-mode
     private static final String HEADER_USERNAME = "X-Limit-U";
     private static final String HEADER_DEVICE = "X-Limit-D";
@@ -86,7 +86,7 @@ public class ServiceMessageHttp  {
     }
 
     private static ServiceMessageHttp instance;
-    private static ServiceMessageHttp getInstance() {
+    public static ServiceMessageHttp getInstance() {
         if(instance == null) {
             instance = new ServiceMessageHttp();
         }
@@ -175,59 +175,9 @@ public class ServiceMessageHttp  {
 
     }
 
-    @Override
-    public void onDestroy() {
-        //TODO: unregister preferences change listener
-    }
-
-    @Override
-    public void onStartCommand(Intent intent) {
-
-    }
-
     @Subscribe
     public void onEvent(Events.Dummy event) {
 
-    }
-
-    private void postMessage(MessageBase message) {
-
-        try {
-
-            String wireMessage = Parser.toJson(message);
-
-            Timber.d("outgoing message:%s", wireMessage);
-            boolean idleMode =  false;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                idleMode = powerManager.isDeviceIdleMode();
-            }
-
-            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
-            boolean networkAvailable = netInfo != null && netInfo.isConnected();
-
-            // If the device is in idle mode (Doze), send the message via GCM Network Manager. The message is automatically send during a maintenance period
-            // If the device is not in idle mode and network is available, send the message directly. If we already tried to send it directly before (TTL == 0), send it via GCM network manager
-            // If the device is not in idle mode but no network is available, send the message via GCM Network Manager.  The message is automatically send when a connection is available.
-
-            if(idleMode) {
-                Timber.v("messageId:%s, strategy:indirect, reason:idle", message.getMessageId());
-                prepareAndPostIndirect(wireMessage, message);
-
-            } else if (networkAvailable && message.getOutgoingTTL() > 0 && Preferences.getHttpSchedulerAllowDirectStrategy()){
-                Timber.v("messageId:%s, strategy:direct", message.getMessageId());
-                prepareAndPostDirect(wireMessage, message);
-
-
-            } else {
-                Timber.v("messageId:%s, strategy:indirect, reason:network_fail/ttl_fail/no_override", message.getMessageId());
-                prepareAndPostIndirect(wireMessage, message);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            service.onMessageDeliveryFailed(message.getMessageId());
-
-        }
     }
 
     boolean sendMessage(Bundle b) {
@@ -257,6 +207,42 @@ public class ServiceMessageHttp  {
             request.header(HEADER_DEVICE, headerDevice);
         }
 
+
+        try {
+            Response r = mHttpClient.newCall(request.build()).execute();
+
+            if((r != null) && (r.isSuccessful())) {
+                Timber.v("got HTTP response");
+
+                try {
+                    //Timber.v("code: %s, streaming response to parser", r.body().string() );
+
+                    MessageBase[] result = Parser.fromJson(r.body().byteStream());
+                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.IDLE, "Response "+r.code() + ", " + result.length);
+
+                    for (MessageBase aResult : result) {
+                        onMessageReceived(aResult);
+                    }
+
+                    //Non JSON return value
+                } catch (IOException e) {
+                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "HTTP " +r.code() + ", JsonParseException");
+                    Timber.e("error:JsonParseException responseCode:%s", r.code());
+                    e.printStackTrace();                } catch (Parser.EncryptionException e) {
+
+                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "Response: "+r.code() + ", EncryptionException");
+                    Timber.e("error:EncryptionException");
+                }
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, e);
+            return false;
+        }
     }
 
     @Deprecated
@@ -319,13 +305,13 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
                  }
                  return onMessageDelivered(c, messageId);
             } else {
-                return onMessageDeliveryFailed(c, messageId);
+                return onMessageDeliveryFailed(messageId);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, e);
-            return onMessageDeliveryFailed(c, messageId);
+            return onMessageDeliveryFailed(messageId);
         }
     }
 
@@ -340,19 +326,12 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
-    private static int onMessageDeliveryFailed(@NonNull Context c, Long messageId) {
+    private static int onMessageDeliveryFailed(Long messageId) {
         if(messageId == null || messageId == 0) {
             Timber.e("messageId:null");
-            return GcmNetworkManager.RESULT_FAILURE;
         }
 
-        //GCM Network Manager will automatically retry sending if the message
-        if(c instanceof ServiceMessageHttpGcm) {
-            return GcmNetworkManager.RESULT_RESCHEDULE;
-        } else {
-            ServiceProxy.getServiceMessage().onMessageDeliveryFailed(messageId);
-            return GcmNetworkManager.RESULT_FAILURE;
-        }
+        return GcmNetworkManager.RESULT_FAILURE;
     }
 
     private static void onMessageReceived(@NonNull MessageBase message) {
@@ -360,45 +339,76 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
     }
 
 
-    private boolean prepareAndPostDirect(String wireMessage, @NonNull MessageBase message) {
-        Timber.v("messageId:%s", message.getMessageId());
-        postMessage(wireMessage, this.endpointUrl, this.endpointUserInfo, context, message.getMessageId());
-        return true;
-    }
 
-    @Deprecated
-    private boolean prepareAndPostIndirect(String wireMessage, @NonNull MessageBase message) {
-        Timber.v("messageId:%s", message.getMessageId());
-        Bundle b = new Bundle();
-
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_USERINFO, this.endpointUserInfo);
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_URL, this.endpointUrl);
-        b.putLong(ServiceMessageHttpGcm.BUNDLE_KEY_MESSAGE_ID, message.getMessageId());
-        b.putString(ServiceMessageHttpGcm.BUNDLE_KEY_REQUEST_BODY, wireMessage);
-
-        Task task = new OneoffTask.Builder()
-                .setService(ServiceMessageHttpGcm.class)
-                .setTag("owntracks_mid_"+message.getMessageId())
-                .setExecutionWindow(0, 5)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setExtras(b)
-                .setUpdateCurrent(false)
-                .setPersisted(false)
-                .setRequiresCharging(false)
-                .build();
-        GcmNetworkManager.getInstance(context).schedule(task);
-        return true;
-    }
-
-
-    public static Bundle httpMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+    Bundle httpMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
         Bundle b = new Bundle();
         b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
         b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
         b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
-        b.putLong(HTTP_BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
-
+        b.putLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
         return b;
     }
 
+
+    @Override
+    public void processOutgoingMessage(MessageBase message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageCmd message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageEvent message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageLocation message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageTransition message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageWaypoint message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageWaypoints message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void processOutgoingMessage(MessageClear message) {
+        scheduleMessage(message);
+    }
+
+    @Override
+    public void onAssociate(ServiceMessage service) {
+        this.service = service;
+    }
+
+    @Override
+    public void onDestroy() {
+
+    }
+
+    private void scheduleMessage(MessageBase m) {
+        try {
+            Bundle b = httpMessageToBundle(m);
+            b.putString(Dispatcher.BUNDLE_KEY_ACTION, Dispatcher.TASK_SEND_MESSAGE_MQTT);
+            Dispatcher.getInstance().scheduleMessage(b);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Parser.EncryptionException e) {
+            e.printStackTrace();
+        }
+    }
 }

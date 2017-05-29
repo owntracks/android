@@ -162,6 +162,11 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 		publishMessage(m, message);
 	}
 
+	@Override
+	public void onAssociate(ServiceMessage service) {
+
+	}
+
 
 	private IMqttActionListener iCallbackPublish = new IMqttActionListener() {
 

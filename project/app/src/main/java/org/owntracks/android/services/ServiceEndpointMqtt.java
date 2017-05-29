@@ -35,8 +35,15 @@ import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
+import org.owntracks.android.messages.MessageCmd;
+import org.owntracks.android.messages.MessageEvent;
+import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.messages.MessageTransition;
+import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.ServiceMessage.EndpointState;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
@@ -52,13 +59,13 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class ServiceEndpointMqtt {
+public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	private static final String TAG = "ServiceMessageMqtt";
 
-	public static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
-	public static final String MQTT_BUNDLE_KEY_MESSAGE_TOPIC = "MQTT_BUNDLE_KEY_MESSAGE_TOPIC";
-	public static final String MQTT_BUNDLE_KEY_MESSAGE_RETAINED = "MQTT_BUNDLE_KEY_MESSAGE_RETAINED";
-	public static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
+	private static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
+	private static final String MQTT_BUNDLE_KEY_MESSAGE_TOPIC = "MQTT_BUNDLE_KEY_MESSAGE_TOPIC";
+	private static final String MQTT_BUNDLE_KEY_MESSAGE_RETAINED = "MQTT_BUNDLE_KEY_MESSAGE_RETAINED";
+	private static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
 
 	private MqttAsyncClient mqttClient;
 	private Object error;
@@ -90,12 +97,13 @@ public class ServiceEndpointMqtt {
 		return m;
 	}
 
-	public static Bundle mqttMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+	private Bundle mqttMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
 		Bundle b = new Bundle();
 		b.putString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
 		b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
 		b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
 		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
+		b.putLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
 		return b;
 	}
 
@@ -490,5 +498,82 @@ public class ServiceEndpointMqtt {
 	public void onEvent(Events.BrokerChanged e) {
 //        clearQueues();
     }
+
+
+
+	public void processOutgoingMessage(MessageBase message) {
+		message.setTopic(Preferences.getPubTopicBase());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageCmd message) {
+		message.setTopic(Preferences.getPubTopicCommands());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageEvent message) {
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageLocation message) {
+		message.setTopic(Preferences.getPubTopicLocations());
+		message.setQos(Preferences.getPubQosLocations());
+		message.setRetained(Preferences.getPubRetainLocations());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageTransition message) {
+		message.setTopic(Preferences.getPubTopicEvents());
+		message.setQos(Preferences.getPubQosEvents());
+		message.setRetained(Preferences.getPubRetainEvents());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageWaypoint message) {
+		message.setTopic(Preferences.getPubTopicWaypoints());
+		message.setQos(Preferences.getPubQosWaypoints());
+		message.setRetained(Preferences.getPubRetainWaypoints());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageWaypoints message) {
+		message.setTopic(Preferences.getPubTopicWaypoints());
+		message.setQos(Preferences.getPubQosWaypoints());
+		message.setRetained(Preferences.getPubRetainWaypoints());
+		scheduleMessage(message);
+	}
+
+	@Override
+	public void processOutgoingMessage(MessageClear message) {
+		//TODO
+	}
+
+	@Override
+	public void onAssociate(ServiceMessage service) {
+
+	}
+
+	@Override
+	public void onDestroy() {
+		disconnect(false);
+	}
+
+	private void scheduleMessage(MessageBase m) {
+		try {
+			Bundle b = mqttMessageToBundle(m);
+			b.putString(Dispatcher.BUNDLE_KEY_ACTION, Dispatcher.TASK_SEND_MESSAGE_MQTT);
+			Dispatcher.getInstance().scheduleMessage(b);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Parser.EncryptionException e) {
+			e.printStackTrace();
+		}
+	}
 }
 

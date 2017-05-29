@@ -205,5 +205,4 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         }
 
 
-    public abstract Bundle toBundle();
 }
