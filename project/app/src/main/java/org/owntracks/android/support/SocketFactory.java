@@ -13,7 +13,11 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -22,6 +26,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.CertificateException;
 
+import timber.log.BuildConfig;
 import timber.log.Timber;
 
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
@@ -91,20 +96,29 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             caKeyStore.load(null, null);
 
             CertificateFactory caCF = CertificateFactory.getInstance("X.509");
-            java.security.cert.Certificate ca;
-                ca = caCF.generateCertificate(options.getCaCrtInputStream());
-                caKeyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
-                tmf.init(caKeyStore);
+            X509Certificate ca = (X509Certificate) caCF.generateCertificate(options.getCaCrtInputStream());
 
 
+            caKeyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
+            tmf.init(caKeyStore);
 
-            Log.v(this.toString(), "CA Keystore content: ");
-            Enumeration<String> aliasesCA = caKeyStore.aliases();
+            if(BuildConfig.DEBUG) {
+                Timber.d("Certificate Owner: " + ca.getSubjectDN().toString());
+                Timber.d("Certificate Issuer: " + ca.getIssuerDN().toString());
+                Timber.d("Certificate Serial Number: " + ca.getSerialNumber().toString());
+                Timber.d("Certificate Algorithm: " + ca.getSigAlgName());
+                Timber.d("Certificate Version: " + ca.getVersion());
+                Timber.d("Certificate OID: " + ca.getSigAlgOID());
+                Enumeration<String> aliasesCA = caKeyStore.aliases();
+                for (; aliasesCA.hasMoreElements(); ) {
+                    String o = aliasesCA.nextElement();
+                    Timber.v("Alias: %s isKeyEntry:%s isCertificateEntry:%s", o, caKeyStore.isKeyEntry(o), caKeyStore.isCertificateEntry(o));
 
-            for (; aliasesCA.hasMoreElements(); ) {
-                String o = aliasesCA.nextElement();
-                Timber.v("Alias: %s", o);
+                }
             }
+
+
+
         } else {
             Timber.v("CA sideload: false, using system keystore");
             KeyStore keyStore = KeyStore.getInstance("AndroidCAStore");
@@ -124,7 +138,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             Enumeration<String> aliasesClientCert = clientKeyStore.aliases();
             for (; aliasesClientCert.hasMoreElements(); ) {
                 String o = aliasesClientCert.nextElement();
-                Log.v(this.toString(), "Alias: " + o);
+                Timber.v("Alias: %s", o);
             }
         } else {
             Log.v(this.toString(), "Client .p12 sideload: false, using null client cert");
