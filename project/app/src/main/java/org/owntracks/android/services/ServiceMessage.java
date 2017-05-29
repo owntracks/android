@@ -1,10 +1,8 @@
 package org.owntracks.android.services;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -17,18 +15,13 @@ import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
-import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessorHttp;
-import org.owntracks.android.support.OutgoingMessageProcessorMqtt;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.support.interfaces.ProxyableService;
-import org.owntracks.android.support.interfaces.ServiceMessageEndpoint;
-import org.owntracks.android.support.interfaces.StatefulServiceMessageEndpoint;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -42,7 +35,6 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
     public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
 
-    private static ServiceMessageEndpoint endpoint;
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
     private ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private OutgoingMessageProcessor outgoingMessageProcessor;
@@ -50,13 +42,15 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
     private ServiceProxy context;
 
     public void reconnect() {
-        if(endpoint instanceof StatefulServiceMessageEndpoint)
-            StatefulServiceMessageEndpoint.class.cast(endpoint).reconnect();
+        // TODO: move to dispatcher
+        //if(endpoint instanceof StatefulServiceMessageEndpoint)
+        //    StatefulServiceMessageEndpoint.class.cast(endpoint).reconnect();
     }
 
     public void disconnect() {
-        if(endpoint instanceof StatefulServiceMessageEndpoint)
-            StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
+        //TODO: move to dispather
+        //if(endpoint instanceof StatefulServiceMessageEndpoint)
+        //    StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
     }
 
     public ServiceProxy getContext() {
@@ -96,70 +90,46 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
         this.context = c;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        this.outgoingMessageProcessor = instantiateOutgoingMessageProcessor(Preferences.getModeId());
+        this.loadOutgoingMessageProcessor(Preferences.getModeId());
 
         onEndpointStateChanged(EndpointState.INITIAL);
     }
 
-    private @NonNull OutgoingMessageProcessor instantiateOutgoingMessageProcessor(int mode){
+    private void loadOutgoingMessageProcessor(int mode){
         Timber.v("mode:%s", mode);
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
 
-        Timber.v("instantiating new outgoingMessageProcessorExecutor");
+        if(outgoingMessageProcessor != null) {
+            outgoingMessageProcessor.onDestroy();
+        }
+
+
+            Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (mode) {
             case App.MODE_ID_HTTP_PRIVATE:
-                return new OutgoingMessageProcessorHttp();
+                this.outgoingMessageProcessor = new ServiceMessageHttp();
             case App.MODE_ID_MQTT_PRIVATE:
             case App.MODE_ID_MQTT_PUBLIC:
             default:
-                return new OutgoingMessageProcessorMqtt();
+                this.outgoingMessageProcessor = new ServiceEndpointMqtt();
 
         }
+        this.outgoingMessageProcessor.onAssociate(this);
     }
 
-    private @NonNull ServiceMessageEndpoint instantiateEndpoint(int mode) throws Exception{
-        Timber.v("mode:%s", mode);
-        if(endpoint != null) {
-            Timber.v("destroying endpoint");
-            endpoint.onDestroy();
-        }
 
-        Timber.v("instantiating new endpoint");
-        ServiceMessageEndpoint p = null;
-        switch (mode) {
-            case App.MODE_ID_HTTP_PRIVATE:
-                p = new ServiceMessageHttp();
-                break;
-            case App.MODE_ID_MQTT_PRIVATE:
-            case App.MODE_ID_MQTT_PUBLIC:
-                p = new ServiceMessageMqtt();
-                break;
-        }
-
-        if(p == null) {
-            Timber.e("unable to instantiate endpoint for mode:%s", mode);
-            throw new Exception("endpoint instantiation faield");
-        }
-
-        p.onCreate(context);
-        p.onSetService(this);
-        App.getEventBus().register(p);
-        return p;
-    }
 
     @Override
     public void onDestroy() {
         Timber.d("onDestroy");
-        if(endpoint != null)
-            endpoint.onDestroy();
+        if(outgoingMessageProcessor != null)
+            outgoingMessageProcessor.onDestroy();
     }
 
     @Override
     public void onStartCommand(Intent intent) {
-        if (endpoint != null)
-            endpoint.onStartCommand(intent);
 
     }
 
@@ -170,11 +140,7 @@ public class ServiceMessage implements ProxyableService, IncomingMessageProcesso
 
     @Subscribe
     public void onEvent(Events.ModeChanged event) {
-        try {
-            endpoint = instantiateEndpoint(Preferences.getModeId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        loadOutgoingMessageProcessor(Preferences.getModeId());
     }
 
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
