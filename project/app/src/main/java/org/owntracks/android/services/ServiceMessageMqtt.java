@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
+public class ServiceMessageMqtt extends ServiceMessageProvider implements OutgoingMessageProcessor, RejectedExecutionHandler, StatefulServiceMessageEndpoint {
 	private static final String TAG = "ServiceMessageMqtt";
 	private static final String RECEIVER_ACTION_RECONNECT = "org.owntracks.android.RECEIVER_ACTION_RECONNECT";
     private static final String RECEIVER_ACTION_PING = "org.owntracks.android.RECEIVER_ACTION_PING";
@@ -93,6 +93,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 	public boolean sendMessage(MessageBase message) {
 		if(state == ServiceMessage.EndpointState.ERROR_CONFIGURATION) {
 			Timber.e("dropping outgoing message due to incomplete configuration");
+			connectionListener.onError(new IllegalStateException("Incomplete configuration"));
 			return false;
 		}
 
@@ -248,6 +249,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 			m.setRetained(message.getRetained());
 			publishMessage(m, message);
 		} catch (Exception e) {
+			connectionListener.onError(new IllegalStateException("Incomplete configuration"));
 			e.printStackTrace();
 		}
 	}
@@ -498,6 +500,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 		error = null; // clear previous error on connect
 		if(!init()) {
+			connectionListener.onError(new IllegalStateException("Configuration error"));
             return false;
         }
 
@@ -520,6 +523,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 					try {
 						socketFactoryOptions.withCaInputStream(context.openFileInput(tlsCaCrt));
 					} catch (FileNotFoundException e) {
+						connectionListener.onError(new RuntimeException("Tls configuration error - Ca File not found"));
 						e.printStackTrace();
 					}
 				}
@@ -528,6 +532,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 					try {
 						socketFactoryOptions.withClientP12InputStream(context.openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
 					} catch (FileNotFoundException e1) {
+						connectionListener.onError(new RuntimeException("Tls configuration error - Client Crt File not found"));
 						e1.printStackTrace();
 					}
 				}
@@ -734,6 +739,17 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 
 	private void changeState(EndpointState newState, Exception e) {
 		state = newState;
+		if(newState == EndpointState.CONNECTED) {
+			connectionListener.onConnected();
+		} else if(newState == EndpointState.DISCONNECTED || newState == EndpointState.DISCONNECTED_USERDISCONNECT) {
+			connectionListener.onClosed();
+		} else if(newState == EndpointState.ERROR_CONFIGURATION) {
+			connectionListener.onError(new IllegalStateException("Configuration error", e));
+		} else if(newState == EndpointState.ERROR_DATADISABLED) {
+			connectionListener.onError(new IllegalStateException("Data connection disabled", e));
+		} else if(newState == EndpointState.ERROR) {
+			connectionListener.onError(new IOException(e.getLocalizedMessage(), e));
+		}
 		if(service != null)
 			service.onEndpointStateChanged(newState, e);
 	}

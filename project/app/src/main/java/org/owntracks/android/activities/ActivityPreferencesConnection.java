@@ -21,10 +21,12 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -34,6 +36,7 @@ import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContentPathHelper;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.ConnectionListener;
 import org.owntracks.android.support.widgets.Toasts;
 
 import java.io.FileOutputStream;
@@ -152,6 +155,49 @@ public class ActivityPreferencesConnection extends ActivityBase {
         private String tlsClientCrtName;
 
         private BarcodeScanListener barcodeCallback;
+
+        /**
+         * Connection state listener for displaying status toast messages
+         */
+        private final ConnectionListener connectionListener = new ConnectionListener() {
+
+            private void toast(final int resId, final int duration) {
+                final String str = getString(resId);
+                toast(str, duration);
+            }
+            private void toast(final CharSequence msg, final int duration) {
+                final Activity activity = getActivity();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity, msg, duration).show();
+                    }
+                });
+            }
+
+        @Override
+        public void onConnected() {
+            toast(R.string.connection_established, Toast.LENGTH_SHORT);
+        }
+
+        @Override
+        public void onClosed() {
+
+        }
+
+        @Override
+        public void onError(final Throwable t) {
+            String msg = getString(R.string.connection_error);
+            if( MqttException.class.isInstance(t)) {
+                /* This could be added, when MqttException returns a localised error message
+                 * final MqttException e = (MqttException)t;
+                 * msg += ": " + e.getMessage();
+                */
+            } else
+                msg += ":\n" + t.getLocalizedMessage();
+            toast(msg, Toast.LENGTH_LONG);
+        }
+    };
 
         private interface BarcodeScanListener {
             void onBarcodeScanResult(String url);
@@ -637,11 +683,13 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public void onStart() {
             super.onStart();
             App.getEventBus().register(this);
+            ServiceProxy.getServiceMessage().register(connectionListener);
         }
 
         @Override
         public void onStop() {
             App.getEventBus().unregister(this);
+            ServiceProxy.getServiceMessage().unregister(connectionListener);
             super.onStop();
         }
 
@@ -650,7 +698,17 @@ public class ActivityPreferencesConnection extends ActivityBase {
             super.onDestroy();
         }
 
+        @Override
+        public void onPause() {
+            ServiceProxy.getServiceMessage().unregister(connectionListener);
+            super.onPause();
+        }
 
+        @Override
+        public void onResume() {
+            ServiceProxy.getServiceMessage().register(connectionListener);
+            super.onResume();
+        }
 
         @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
         public void onEvent(Events.EndpointStateChanged e) {
@@ -689,10 +747,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
             switch (item.getItemId()) {
                 case R.id.connect:
 
-                    Runnable r = new Runnable() {
+                    final Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
+                            ServiceProxy.getServiceMessage().register(connectionListener);
                             ServiceProxy.getServiceMessage().reconnect();
                         }
                     };
