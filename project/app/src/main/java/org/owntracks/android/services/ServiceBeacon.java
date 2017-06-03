@@ -135,6 +135,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
         ServiceProxy.getServiceMessage().sendMessage(m);
+        ServiceProxy.getServiceLocator().reportLocationBeacon();
 
         w.setLastTriggered(System.currentTimeMillis());
         this.waypointDao.update(w);
