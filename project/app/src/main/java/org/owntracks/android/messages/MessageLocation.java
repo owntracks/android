@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.android.gms.maps.model.LatLng;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -23,8 +22,6 @@ public class MessageLocation extends MessageBase  {
     static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
-    public static final String REPORT_TYPE_BEACON= "b";
-    public static final String REPORT_TYPE_CIRCULAR= "c";
     public static final String CONN_TYPE_OFFLINE = "o";
     public static final String CONN_TYPE_WIFI = "w";
     public static final String CONN_TYPE_MOBILE = "m";
@@ -39,9 +36,7 @@ public class MessageLocation extends MessageBase  {
     private WeakReference<FusedContact> _contact;
     private LatLng point;
     private String conn;
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonProperty("_cp")
-    private boolean cp = false;
+
 
     @JsonProperty("lat")
     public double getLatitude() {
@@ -57,6 +52,8 @@ public class MessageLocation extends MessageBase  {
     public double getAltitude() {
         return 0;
     }
+
+
 
     public String getT() {
         return t;
@@ -163,11 +160,4 @@ public class MessageLocation extends MessageBase  {
         return this.conn;
     }
 
-    public boolean getCp() {
-        return cp;
-    }
-
-    public void setCp(boolean cp) {
-        this.cp = cp;
-    }
 }
