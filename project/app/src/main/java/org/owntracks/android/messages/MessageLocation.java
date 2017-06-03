@@ -39,6 +39,19 @@ public class MessageLocation extends MessageBase  {
     private LatLng point;
     private String conn;
 
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonProperty("_cp")
+    private boolean cp = false;
+
+    public boolean getCp() {
+        return cp;
+    }
+
+    public void setCp(boolean cp) {
+        this.cp = cp;
+    }
+
     @JsonProperty("lat")
     public double getLatitude() {
         return lat;

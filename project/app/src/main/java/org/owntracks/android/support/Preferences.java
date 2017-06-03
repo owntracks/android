@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -152,6 +153,7 @@ public class Preferences {
     }
 
 
+
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -281,10 +283,6 @@ public class Preferences {
         return activeSharedPreferences;
     }
 
-    public static String getAndroidId() {
-        return App.getAndroidId();
-    }
-
     public static boolean canConnect() {
         if(isModeMqttPrivate()) {
             return !getHost().trim().equals("") && !getUsername().trim().equals("")  && (!getAuth() || !getPassword().trim().equals(""));
@@ -293,8 +291,6 @@ public class Preferences {
         }
         return false;
     }
-
-
 
 
 
@@ -405,6 +401,16 @@ public class Preferences {
         }
     }
 
+    @Import(key = Keys.CP)
+    public static void setCp(boolean cp) {
+        setBoolean(Keys.CP, cp, false);
+    }
+
+    @Export(key = Keys.CP, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
+    public static boolean getCp() {
+        return getBoolean(Keys.CP, R.bool.valCp);
+    }
+
     @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public static boolean getRemoteConfiguration() {
         return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
@@ -513,21 +519,17 @@ public class Preferences {
 
     @Export(key =Keys.CLIENT_ID, exportModeMqttPrivate =true)
     public static String getClientId() {
-        return getClientId(false);
-    }
-    public static String getClientId(boolean fallbackToDefault) {
         if(isModeMqttPublic())
             return MqttAsyncClient.generateClientId();
 
         String clientId = getString(Keys.CLIENT_ID, R.string.valEmpty);
-        if ("".equals(clientId) && fallbackToDefault)
+        if ("".equals(clientId))
             clientId = getClientIdDefault();
         return clientId;
     }
 
-    public static String getClientIdDefault() {
-        String clientID=getUsername()+"/"+getDeviceId(true);
-        return clientID.replaceAll("[^a-zA-Z0-9/]+", "").toLowerCase();
+    private static String getClientIdDefault() {
+        return (getUsername()+ getDeviceId()).replaceAll("\\W", "").toLowerCase();
     }
 
     @Import(key =Keys.CLIENT_ID)
@@ -611,7 +613,7 @@ public class Preferences {
     }
 
     public static String getTrackerIdDefault(){
-        String deviceId = getDeviceId(true);
+        String deviceId = getDeviceId();
         if(deviceId!=null && deviceId.length() >= 2)
             return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured deviceId.
         else
@@ -708,7 +710,7 @@ public class Preferences {
     }
 
     @Import(key =Keys.PUB)
-    private static void setPub(boolean aBoolean) {
+    public static void setPub(boolean aBoolean) {
         setBoolean(Keys.PUB, aBoolean);
     }
 
@@ -1088,6 +1090,7 @@ public class Preferences {
         public static final String BEACON_MODE                      = "beaconMode";
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
+        public static final String CP                               = "cp";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String HOST                             = "host";
         public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
