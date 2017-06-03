@@ -7,16 +7,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
+import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityPreferences;
 import org.owntracks.android.activities.ActivityRegions;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
@@ -68,7 +77,6 @@ public class ActivityNavigator extends BaseNavigator {
                 .withIconTintingEnabled(true)
                 .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
                 .withTag(targetActivityClass)
-                .withTextColorRes(R.color.md_black_1000)
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
@@ -81,10 +89,48 @@ public class ActivityNavigator extends BaseNavigator {
                 .withIconTintingEnabled(true)
                 .withTag(targetActivityClass)
                 .withSelectable(false)
-                .withTextColorRes(R.color.md_black_1000)
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
+
+    private SecondarySwitchDrawerItem switchDrawerItemPub() {
+        OnCheckedChangeListener l = new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                Preferences.setPub(isChecked);
+            }
+        };
+        return new SecondarySwitchDrawerItem()
+                .withName(R.string.drawerSwitchReporting)
+                .withSelectable(false)
+                .withCheckable(false)
+                .withChecked(Preferences.getPub())
+                .withOnCheckedChangeListener(l)
+                .withIcon(R.drawable.ic_report)
+                .withIconTintingEnabled(true)
+                .withIconColorRes(COLOR_ICON_SECONDARY);
+    }
+
+    private SecondarySwitchDrawerItem switchDrawerItemCopy() {
+        OnCheckedChangeListener l = new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                Preferences.setCp(isChecked);
+            }
+        };
+        return new SecondarySwitchDrawerItem()
+                .withName(R.string.drawerSwitchCopy)
+                .withSelectable(false)
+                .withCheckable(false)
+                .withChecked(Preferences.getCp())
+                .withOnCheckedChangeListener(l)
+                .withIconTintingEnabled(true)
+                .withIcon(R.drawable.ic_layers_black_24dp)
+                .withIconColorRes(COLOR_ICON_SECONDARY);
+
+    }
+
+
 
     public Drawer attachDrawer(@NonNull Toolbar toolbar) {
 
@@ -100,6 +146,8 @@ public class ActivityNavigator extends BaseNavigator {
 
 
                 ).addStickyDrawerItems(
+                        switchDrawerItemPub(),
+                        switchDrawerItemCopy(),
                         secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
                         secondaryDrawerItemForClass(activity, ActivityPreferences.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -107,6 +155,9 @@ public class ActivityNavigator extends BaseNavigator {
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem == null)
                             return false;
+
+                        if(drawerItem instanceof SecondarySwitchDrawerItem)
+                            return true;
 
                         Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
 

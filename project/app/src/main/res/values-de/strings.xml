@@ -183,6 +183,8 @@
     <string name="preferencesEditorKey">Schlüssel</string>
     <string name="preferencesEditorValue">Wert</string>
     <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
+    <string name="drawerSwitchReporting">Veröffentlichen</string>
+    <string name="drawerSwitchCopy">Kopieren</string>
 
 
 </resources>
