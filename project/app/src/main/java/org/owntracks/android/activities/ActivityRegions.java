@@ -18,20 +18,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.mikepenz.materialdrawer.Drawer;
-
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.waypoints.AdapterCursorLoader;
 import org.owntracks.android.ui.waypoints.AdapterWaypoints;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
 import org.owntracks.android.support.widgets.Toasts;
@@ -45,7 +43,6 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     private org.owntracks.android.support.widgets.RecyclerView listView;
     private final int LOADER_ID = 1;
     private AdapterWaypoints listAdapter;
-    private Drawer drawer;
     private boolean actionMode;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +60,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        drawer = DrawerProvider.buildDrawer(this, toolbar);
+        new ActivityNavigator(this).attachDrawer(toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
