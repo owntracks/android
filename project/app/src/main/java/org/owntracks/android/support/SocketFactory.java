@@ -97,24 +97,21 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
             CertificateFactory caCF = CertificateFactory.getInstance("X.509");
             X509Certificate ca = (X509Certificate) caCF.generateCertificate(options.getCaCrtInputStream());
-
-
-            caKeyStore.setCertificateEntry("owntracks-custom-tls-root", ca);
+            String alias = ca.getSubjectX500Principal().getName();
+            // Set propper alias name
+            caKeyStore.setCertificateEntry(alias, ca);
             tmf.init(caKeyStore);
 
-            if(BuildConfig.DEBUG) {
-                Timber.d("Certificate Owner: " + ca.getSubjectDN().toString());
-                Timber.d("Certificate Issuer: " + ca.getIssuerDN().toString());
-                Timber.d("Certificate Serial Number: " + ca.getSerialNumber().toString());
-                Timber.d("Certificate Algorithm: " + ca.getSigAlgName());
-                Timber.d("Certificate Version: " + ca.getVersion());
-                Timber.d("Certificate OID: " + ca.getSigAlgOID());
-                Enumeration<String> aliasesCA = caKeyStore.aliases();
-                for (; aliasesCA.hasMoreElements(); ) {
-                    String o = aliasesCA.nextElement();
-                    Timber.v("Alias: %s isKeyEntry:%s isCertificateEntry:%s", o, caKeyStore.isKeyEntry(o), caKeyStore.isCertificateEntry(o));
-
-                }
+            Timber.v("Certificate Owner: %s", ca.getSubjectDN().toString());
+            Timber.v("Certificate Issuer: %s", ca.getIssuerDN().toString());
+            Timber.v("Certificate Serial Number: %s", ca.getSerialNumber().toString());
+            Timber.v("Certificate Algorithm: %s", ca.getSigAlgName());
+            Timber.v("Certificate Version: %s", ca.getVersion());
+            Timber.v("Certificate OID: %s", ca.getSigAlgOID());
+            Enumeration<String> aliasesCA = caKeyStore.aliases();
+            for (; aliasesCA.hasMoreElements(); ) {
+                String o = aliasesCA.nextElement();
+                Timber.v("Alias: %s isKeyEntry:%s isCertificateEntry:%s", o, caKeyStore.isKeyEntry(o), caKeyStore.isCertificateEntry(o));
             }
 
 
