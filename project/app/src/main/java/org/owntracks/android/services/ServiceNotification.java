@@ -55,7 +55,7 @@ public class ServiceNotification implements ProxyableService {
     private static final int NOTIFICATION_ID_ONGOING = 1;
     private NotificationCompat.Builder notificationBuilderOngoing;
     private MessageLocation notificationOngoingLastLocationCache;
-    private ServiceMessage.EndpointState notificationOngoingLastStateCache = ServiceMessage.EndpointState.INITIAL;
+    private MessageProcessor.EndpointState notificationOngoingLastStateCache = MessageProcessor.EndpointState.INITIAL;
 
     // Event notification
     private static final int NOTIFICATION_ID_EVENTS_GROUP = 2;
@@ -343,15 +343,14 @@ public class ServiceNotification implements ProxyableService {
         updateNotificationOngoing();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onEventMainThread(Events.EndpointStateChanged e) {
-        if (App.isInForeground()) {
-            // Prevent double toasts when no connection can be established
-            if(notificationOngoingLastStateCache == ServiceMessage.EndpointState.ERROR && e.getState() != ServiceMessage.EndpointState.DISCONNECTED)
-                Toasts.showEndpointStateChange(e.getState());
-
-
-        }
+        Timber.v("EndpointStateChanged %s", e.getState().getLabel(context));
+        //if (App.isInForeground()) {
+        //    // Prevent double toasts when no connection can be established
+        //    if(notificationOngoingLastStateCache == MessageProcessor.EndpointState.ERROR && e.getState() != MessageProcessor.EndpointState.DISCONNECTED)
+        //        Toasts.showEndpointStateChange(e.getState());
+        //}
         notificationOngoingLastStateCache = e.getState();
         updateNotificationOngoing();
     }
