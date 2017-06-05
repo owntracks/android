@@ -37,15 +37,13 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private OutgoingMessageProcessor outgoingMessageProcessor;
 
     public void reconnect() {
-        // TODO: move to scheduler
         if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
             StatefulServiceMessageProcessor.class.cast(outgoingMessageProcessor).reconnect();
     }
 
     public void disconnect() {
-        //TODO: move to dispather
-        //if(endpoint instanceof StatefulServiceMessageProcessor)
-        //    StatefulServiceMessageProcessor.class.cast(endpoint).disconnect();
+        if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
+            StatefulServiceMessageProcessor.class.cast(outgoingMessageProcessor).disconnect();
     }
 
     public void onEnterForeground() {
