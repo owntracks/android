@@ -304,7 +304,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
     private void scheduleMessage(MessageBase m) {
         try {
             Bundle b = httpMessageToBundle(m);
-            b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.TASK_SEND_MESSAGE_MQTT);
+            b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.TASK_SEND_MESSAGE_HTTP);
             if(App.isInForeground())
                 sendMessage(b);
             else
