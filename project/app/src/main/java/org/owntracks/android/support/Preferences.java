@@ -695,7 +695,10 @@ public class Preferences {
 
     @Export(key =Keys.KEEPALIVE, exportModeMqttPrivate =true)
     public static int getKeepalive() {
-        return getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
+        int keepalive = getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
+        if(keepalive < 30)
+            keepalive = 30;
+        return keepalive;
     }
 
     @Import(key =Keys.USERNAME)
