@@ -127,6 +127,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		@Override
 		public void connectComplete(boolean reconnect, String serverURI) {
 			Timber.v("%s, serverUri:%s", reconnect, serverURI);
+			onConnect();
 		}
 
 		@Override
@@ -170,40 +171,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	};
 
 
-	private void handleStart() {
-		Log.v(TAG, "handleStart");
-        if(!Preferences.canConnect()) {
-			changeState(EndpointState.ERROR_CONFIGURATION);
-			return;
-        }
-
-		if (isConnecting()) {
-			Log.d(TAG, "handleStart: isConnecting:true");
-			return;
-		}
-
-		// Check if there is a data connection. If not, try again in some time.
-		if (!isOnline()) {
-			Log.e(TAG, "handleStart: isOnline:false");
-			changeState(EndpointState.ERROR_DATADISABLED);
-			return;
-		}
-
-		if (isDisconnected()) {
-				Log.v(TAG, "handleStart: isDisconnected:true");
-				changeState(EndpointState.DISCONNECTED);
-
-				if (connect())
-					onConnect();
-		} else {
-			Log.d(TAG, "handleStart: isDisconnected() == false");
-		}
-	}
-
-	private boolean isDisconnected() {
-		return this.mqttClient == null || !this.mqttClient.isConnected();
-	}
-
 	private boolean initClient() {
 		Timber.v("initing");
 		if (this.mqttClient != null) {
@@ -242,6 +209,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private boolean connect() {
+
 		if(isConnected()) {
 			Timber.v("already connected");
 			return true;
@@ -249,6 +217,17 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		if(isConnecting()) {
 			Timber.v("already connecting");
+			return false;
+		}
+
+		if(!Preferences.canConnect()) {
+			changeState(EndpointState.ERROR_CONFIGURATION);
+			return false;
+		}
+
+		// Check if there is a data connection.
+		if (!isOnline()) {
+			changeState(EndpointState.ERROR_DATADISABLED);
 			return false;
 		}
 
@@ -345,27 +324,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			Log.v(TAG, "lastConnectionId changed to: " + lastConnectionId);
 		}
 
-		// Establish observer to monitor wifi and radio connectivity
-		if (cleanSession)
-			onCleanSessionConnect();
-		else
-			onUncleanSessionConnect();
-
-		onSessionConnect();
-	}
-
-
-	private void onCleanSessionConnect() {
-	}
-
-	private void onUncleanSessionConnect() {
-	}
-
-	private void onSessionConnect() {
-		subscribToInitialTopics();
-	}
-
-	private void subscribToInitialTopics() {
 		List<String> topics = new ArrayList<>();
 		String subTopicBase = Preferences.getSubTopic();
 
@@ -391,8 +349,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 
 		subscribe(topics.toArray(new String[topics.size()]));
-
 	}
+
 
 
     private void subscribe(String[] topics) {
@@ -405,9 +363,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
         }
 		try {
 			int qos[] = getSubTopicsQos(topics);
-
 			this.mqttClient.subscribe(topics, qos);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -467,7 +423,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	public void reconnect() {
 		disconnect(false);
-		handleStart();
+		connect();
 	}
 
 	@Override
@@ -536,15 +492,10 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	public void onEvent(Events.Dummy e) {
 	}
 
-
-
-
 	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {
 //        clearQueues();
     }
-
-
 
 	public void processOutgoingMessage(MessageBase message) {
 		message.setTopic(Preferences.getPubTopicBase());
