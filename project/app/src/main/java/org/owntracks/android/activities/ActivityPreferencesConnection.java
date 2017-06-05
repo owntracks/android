@@ -29,7 +29,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContentPathHelper;
 import org.owntracks.android.support.Events;
@@ -147,7 +147,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         private static Menu mMenu;
         private MenuInflater mInflater;
-        ServiceMessage.EndpointState cachedState = null;
+        MessageProcessor.EndpointState cachedState = null;
         private String tlsCaCrtName;
         private String tlsClientCrtName;
 
@@ -688,12 +688,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.connect:
-
                     Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceMessage().reconnect();
+                            App.getMessageProcessor().reconnect();
                         }
                     };
                     new Thread(r).start();
@@ -704,7 +703,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
                         @Override
                         public void run() {
-                            ServiceProxy.getServiceMessage().disconnect();
+                            App.getMessageProcessor().disconnect();
 
                         }
                     };
@@ -715,7 +714,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             }
         }
 
-        public static void updateDisconnectButton(ServiceMessage.EndpointState state) {
+        public static void updateDisconnectButton(MessageProcessor.EndpointState state) {
             if (mMenu == null || state == null)
                 return;
 
@@ -724,8 +723,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
             if (disconnectButton == null)
                 return;
 
-            disconnectButton.setEnabled(state == ServiceMessage.EndpointState.CONNECTED);
-            disconnectButton.getIcon().setAlpha(state == ServiceMessage.EndpointState.CONNECTED ? 255 : 130);
+            disconnectButton.setEnabled(state == MessageProcessor.EndpointState.CONNECTED);
+            disconnectButton.getIcon().setAlpha(state == MessageProcessor.EndpointState.CONNECTED ? 255 : 130);
         }
 
         public static void updateConnectButton() {
