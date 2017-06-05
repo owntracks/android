@@ -157,8 +157,8 @@ public class ServiceNotification implements ProxyableService {
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             notificationBuilderOngoing.setColor(context.getResources().getColor(R.color.primary, context.getTheme()));
-            notificationBuilderOngoing.setCategory(Notification.CATEGORY_SERVICE);
-            notificationBuilderOngoing.setVisibility(Notification.VISIBILITY_PUBLIC);
+            notificationBuilderOngoing.setCategory(NotificationCompat.CATEGORY_SERVICE);
+            notificationBuilderOngoing.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
         notificationBuilderOngoing.setOngoing(true);
 
@@ -195,14 +195,14 @@ public class ServiceNotification implements ProxyableService {
         notificationBuilderEventsGroup.setGroupSummary(true);
 
         notificationBuilderEvents.setColor(ContextCompat.getColor(context, R.color.primary));
-        notificationBuilderEvents.setPriority(Notification.PRIORITY_MIN);
-        notificationBuilderEvents.setCategory(Notification.CATEGORY_SERVICE);
-        notificationBuilderEvents.setVisibility(Notification.VISIBILITY_PUBLIC);
+        notificationBuilderEvents.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        notificationBuilderEvents.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        notificationBuilderEvents.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         notificationBuilderEventsGroup.setColor(ContextCompat.getColor(context, R.color.primary));
-        notificationBuilderEventsGroup.setPriority(Notification.PRIORITY_MIN);
-        notificationBuilderEventsGroup.setCategory(Notification.CATEGORY_SERVICE);
-        notificationBuilderEventsGroup.setVisibility(Notification.VISIBILITY_PUBLIC);
+        notificationBuilderEventsGroup.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        notificationBuilderEventsGroup.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        notificationBuilderEventsGroup.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
 
 
@@ -225,9 +225,9 @@ public class ServiceNotification implements ProxyableService {
 
 
         if(Preferences.getNotificationHigherPriority())
-            notificationBuilderOngoing.setPriority(Notification.PRIORITY_DEFAULT);
+            notificationBuilderOngoing.setPriority(NotificationCompat.PRIORITY_DEFAULT);
         else
-            notificationBuilderOngoing.setPriority(Notification.PRIORITY_MIN);
+            notificationBuilderOngoing.setPriority(NotificationCompat.PRIORITY_MIN);
 
         notificationBuilderOngoing.setSmallIcon(R.drawable.ic_notification).setContentText(subtitle);
         this.context.startForeground(NOTIFICATION_ID_ONGOING, notificationBuilderOngoing.build());
@@ -277,7 +277,7 @@ public class ServiceNotification implements ProxyableService {
 
         // Append new notification to existing
         if(notificationEventsSummary != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            CharSequence cs[] = (CharSequence[]) notificationEventsSummary.extras.get(Notification.EXTRA_TEXT_LINES);
+            CharSequence cs[] = (CharSequence[]) notificationEventsSummary.extras.get(NotificationCompat.EXTRA_TEXT_LINES);
             for (CharSequence line : cs != null ? cs : new CharSequence[0]) {
                 style.addLine(line);
             }
@@ -407,9 +407,9 @@ public class ServiceNotification implements ProxyableService {
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             notificationBuilderPermission.setColor(ContextCompat.getColor(context, R.color.primary));
-            notificationBuilderPermission.setPriority(Notification.PRIORITY_DEFAULT);
-            notificationBuilderPermission.setCategory(Notification.CATEGORY_ERROR);
-            notificationBuilderPermission.setVisibility(Notification.VISIBILITY_PUBLIC);
+            notificationBuilderPermission.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            notificationBuilderPermission.setCategory(NotificationCompat.CATEGORY_ERROR);
+            notificationBuilderPermission.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
 
 
