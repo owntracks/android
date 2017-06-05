@@ -27,6 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttPingSender;
+import org.eclipse.paho.client.mqttv3.MqttToken;
 import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -74,13 +75,18 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	private String lastConnectionId;
 	private static EndpointState state;
 
-	boolean sendMessage(Bundle b) {
-		if(!isConnected() && !connect())
+	synchronized boolean sendMessage(Bundle b) {
+		Timber.v("message id:%s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
+		if(!isConnected() && !connect()) {
+			Timber.e("not connected and connect failed");
 			return false;
+		}
 
 		try {
+			Timber.v("client is connected, sending message sync: %s", Dispatcher.BUNDLE_KEY_MESSAGE_ID);
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
+			Timber.v("message send: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
 			return true;
 		} catch (MqttException e) {
 			e.printStackTrace();
@@ -199,11 +205,14 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	private boolean init() {
+		Timber.v("initing");
 		if (this.mqttClient != null) {
+			Timber.e("no mqttClient instance");
 			return true;
 		}
 
 		try {
+
 			String prefix = "tcp";
 			if (Preferences.getTls()) {
 				if (Preferences.getWs()) {
@@ -215,17 +224,17 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 					prefix = "ws";
 			}
 
-			String cid = Preferences.getClientId(true);
+			String cid = Preferences.getClientId();
             String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
 			Log.v(TAG, "init() mode: " + Preferences.getModeId());
 			Log.v(TAG, "init() client id: " + cid);
 			Log.v(TAG, "init() connect string: " + connectString);
 
-			this.mqttClient = new MqttAsyncClient(connectString, cid);
+			this.mqttClient = new MqttAsyncClient(connectString, cid, new MqttClientMemoryPersistence());
 			this.mqttClient.setCallback(iCallbackClient);
-			Timber.v("clientInstance:%s", this.mqttClient);
 		} catch (Exception e) {
 			// something went wrong!
+			Timber.e(e, "init failed");
 			this.mqttClient = null;
 			changeState(e);
             return false;
@@ -234,6 +243,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	private boolean connect() {
+		Timber.v("conecting on thread %s",  Thread.currentThread().getId());
         changeState(EndpointState.CONNECTING);
 
 		error = null; // clear previous error on connect
@@ -242,6 +252,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
         }
 
 		try {
+			Timber.v("setting up connect options");
 			 connectOptions = new MqttConnectOptions();
 			if (Preferences.getAuth()) {
 				connectOptions.setPassword(Preferences.getPassword().toCharArray());
@@ -284,6 +295,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 			cleanSession = Preferences.getCleanSession();
 			connectOptions.setCleanSession(cleanSession);
 
+			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
 			changeState(EndpointState.CONNECTED);
 
@@ -475,7 +487,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	private boolean isConnected() {
-		return this.mqttClient != null && this.mqttClient.isConnected(  );
+		return this.mqttClient != null && this.mqttClient.isConnected();
 	}
 
 	private boolean isConnecting() {
@@ -573,6 +585,62 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 			e.printStackTrace();
 		} catch (Parser.EncryptionException e) {
 			e.printStackTrace();
+		}
+	}
+
+
+	private static final class MqttClientMemoryPersistence implements MqttClientPersistence {
+		private static Hashtable data;
+
+		public MqttClientMemoryPersistence(){
+
+		}
+
+		@Override
+		public void open(String s, String s2) throws MqttPersistenceException {
+			if(data == null) {
+				data = new Hashtable();
+			}
+		}
+
+		@SuppressWarnings("unused")
+		private Integer getSize(){
+			return data.size();
+		}
+
+		@Override
+		public void close() throws MqttPersistenceException {
+
+		}
+
+		@Override
+		public void put(String key, MqttPersistable persistable) throws MqttPersistenceException {
+			data.put(key, persistable);
+		}
+
+		@Override
+		public MqttPersistable get(String key) throws MqttPersistenceException {
+			return (MqttPersistable)data.get(key);
+		}
+
+		@Override
+		public void remove(String key) throws MqttPersistenceException {
+			data.remove(key);
+		}
+
+		@Override
+		public Enumeration keys() throws MqttPersistenceException {
+			return data.keys();
+		}
+
+		@Override
+		public void clear() throws MqttPersistenceException {
+			data.clear();
+		}
+
+		@Override
+		public boolean containsKey(String key) throws MqttPersistenceException {
+			return data.containsKey(key);
 		}
 	}
 }
