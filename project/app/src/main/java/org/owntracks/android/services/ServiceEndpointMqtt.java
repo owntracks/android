@@ -83,16 +83,15 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		}
 
 		try {
-			Timber.v("client is connected, sending message sync: %s", Dispatcher.BUNDLE_KEY_MESSAGE_ID);
+			Timber.v("client is connected, sending message sync: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
-			Timber.v("message send: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
+			Timber.v("message sent: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
 			return true;
 		} catch (MqttException e) {
 			e.printStackTrace();
 			return false;
 		}
-
 	}
 
 	private MqttMessage mqttMessageFromBundle(Bundle b) {
@@ -243,7 +242,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	private boolean connect() {
-		Timber.v("conecting on thread %s",  Thread.currentThread().getId());
+		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
         changeState(EndpointState.CONNECTING);
 
 		error = null; // clear previous error on connect
@@ -580,7 +579,10 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		try {
 			Bundle b = mqttMessageToBundle(m);
 			b.putString(Dispatcher.BUNDLE_KEY_ACTION, Dispatcher.TASK_SEND_MESSAGE_MQTT);
-			Dispatcher.getInstance().scheduleMessage(b);
+			if(App.isInForeground())
+				sendMessage(b);
+			else
+				App.getDispatcher().scheduleMessage(b);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Parser.EncryptionException e) {

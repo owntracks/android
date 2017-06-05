@@ -21,30 +21,24 @@ import java.net.URL;
 import timber.log.Timber;
 
 public class Dispatcher extends GcmTaskService {
-    static Dispatcher instance;
     public static final String BUNDLE_KEY_ACTION = "DISPATCHER_ACTION";
     public static final String BUNDLE_KEY_MESSAGE_ID = "MESSAGE_ID";
 
     public static final String TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
     public static final String TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT";
 
-    public static Dispatcher getInstance() {
-        if(instance == null)
-            instance = new Dispatcher();
-        return instance;
-    }
-
     @Override
     public int onRunTask(TaskParams taskParams) {
         Bundle extras = taskParams.getExtras();
-        if(extras.getString(BUNDLE_KEY_ACTION) == null) {
+        String action = extras.getString(BUNDLE_KEY_ACTION);
+        if(action == null) {
             Timber.e("BUNDLE_KEY_ACTION is not set");
             return GcmNetworkManager.RESULT_FAILURE;
         }
 
         Timber.v("BUNDLE_KEY_ACTION: %s", extras.getString(BUNDLE_KEY_ACTION));
 
-        switch (extras.getString(BUNDLE_KEY_ACTION)) {
+        switch (action) {
             case TASK_SEND_MESSAGE_HTTP:
                 return ServiceMessageHttp.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
             case TASK_SEND_MESSAGE_MQTT:

@@ -15,6 +15,7 @@ import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.Dispatcher;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
@@ -114,6 +115,11 @@ public class App extends Application  {
     public static EventBus getEventBus() {
         return sAppComponent.eventBus();
     }
+
+    public static Dispatcher getDispatcher() {
+        return sAppComponent.dispatcher();
+    }
+
 
     public static ContactsRepo getContactsRepo() {
         return sAppComponent.contactsRepo();
