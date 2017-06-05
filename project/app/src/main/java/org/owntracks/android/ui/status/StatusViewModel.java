@@ -11,7 +11,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
@@ -22,7 +22,7 @@ import javax.inject.Inject;
 
 @PerActivity
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
-    ServiceMessage.EndpointState endpointState;
+    MessageProcessor.EndpointState endpointState;
     String endpointMessage;
 
     Context context;
@@ -42,7 +42,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public ServiceMessage.EndpointState getEndpointState() {
+    public MessageProcessor.EndpointState getEndpointState() {
         return endpointState;
     }
 
