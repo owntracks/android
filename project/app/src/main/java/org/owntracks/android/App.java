@@ -93,18 +93,20 @@ public class App extends Application  {
         mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
-
-
-        Preferences.initialize(App.getInstance());
-        Parser.initialize(App.getInstance());
-        ContactImageProvider.initialize(App.getInstance());
-        GeocodingProvider.initialize(App.getInstance());
-        Dao.initialize(App.getInstance());
         getEventBus().register(this);
-        getMessageProcessor().initialize();
-        EncryptionProvider.initialize();
-        startService(new Intent(this, ServiceProxy.class));
         getEventBus().postSticky(new Events.AppStarted());
+
+        Preferences.initialize(this);
+        Parser.initialize(this);
+
+        ContactImageProvider.initialize(this);
+        GeocodingProvider.initialize(this);
+        EncryptionProvider.initialize();
+        Dao.initialize(this);
+
+        getMessageProcessor().initialize();
+        startService(new Intent(this, ServiceProxy.class));
+
     }
 
     public static App getInstance() { return sInstance; }
