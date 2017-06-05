@@ -5,7 +5,7 @@ import android.databinding.BindingConversion;
 import android.widget.TextView;
 
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
@@ -54,7 +54,7 @@ public class BindingConversions {
 
 
     @BindingAdapter({"android:text"})
-    public static void setText(TextView view, ServiceMessage.EndpointState state) {
+    public static void setText(TextView view, MessageProcessor.EndpointState state) {
         view.setText(state != null ? state.getLabel(view.getContext()) : view.getContext().getString(R.string.na));
     }
 

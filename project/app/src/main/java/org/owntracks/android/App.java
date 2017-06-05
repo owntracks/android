@@ -15,7 +15,8 @@ import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.Dispatcher;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
@@ -66,7 +67,6 @@ public class App extends Application  {
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Timber.d("trace / App onCreate start %s", System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
@@ -100,8 +100,9 @@ public class App extends Application  {
         ContactImageProvider.initialize(App.getInstance());
         GeocodingProvider.initialize(App.getInstance());
         Dao.initialize(App.getInstance());
-        EncryptionProvider.initialize();
         getEventBus().register(this);
+        getMessageProcessor().initialize();
+        EncryptionProvider.initialize();
         startService(new Intent(this, ServiceProxy.class));
         getEventBus().postSticky(new Events.AppStarted());
     }
@@ -116,14 +117,18 @@ public class App extends Application  {
         return sAppComponent.eventBus();
     }
 
-    public static Dispatcher getDispatcher() {
-        return sAppComponent.dispatcher();
+    public static Scheduler getDispatcher() {
+        return sAppComponent.scheduler();
     }
-
 
     public static ContactsRepo getContactsRepo() {
         return sAppComponent.contactsRepo();
     }
+
+    public static MessageProcessor getMessageProcessor() {
+        return sAppComponent.messageProcessor();
+    }
+
 
     public static void enableForegroundBackgroundDetection() {
         sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
@@ -193,6 +198,7 @@ public class App extends Application  {
 
     private static void onEnterForeground() {
         inForeground = true;
+        getMessageProcessor().onEnterForeground();
         ServiceProxy.onEnterForeground();
     }
 
