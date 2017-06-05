@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.status;
 
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
@@ -12,7 +12,7 @@ public interface StatusMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        ServiceMessage.EndpointState getEndpointState();
+        MessageProcessor.EndpointState getEndpointState();
         String getEndpointMessage();
         int getEndpointQueue();
         boolean getPermissionLocation();

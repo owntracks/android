@@ -4,7 +4,7 @@ import android.widget.Toast;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 
 public class Toasts {
     public static void showCurrentLocationNotAvailable(){
@@ -27,7 +27,7 @@ public class Toasts {
 
 
     private static Toast stateChangeToast;
-    public static void showEndpointStateChange(ServiceMessage.EndpointState state) {
+    public static void showEndpointStateChange(MessageProcessor.EndpointState state) {
         if(stateChangeToast != null)
             stateChangeToast.cancel();
 

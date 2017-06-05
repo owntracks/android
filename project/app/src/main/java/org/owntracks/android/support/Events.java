@@ -5,7 +5,7 @@ import java.util.Date;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -232,27 +232,27 @@ public class Events {
 	}
 
 	public static class EndpointStateChanged extends E {
-		private final ServiceMessage.EndpointState state;
+		private final MessageProcessor.EndpointState state;
 		private Exception exception = null;
 		private String message = null;
 
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state) {
+		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state) {
 			super();
 			this.state = state;
 		}
 
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  Exception exception) {
+		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state, @Nullable  Exception exception) {
 			super();
 			this.state = state;
 			this.exception = exception;
 		}
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  String message) {
+		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state, @Nullable  String message) {
 			super();
 			this.state = state;
 			this.message = message;
 		}
 
-		public ServiceMessage.EndpointState getState() {
+		public MessageProcessor.EndpointState getState() {
 				return this.state;
 			}
 		@Nullable  public Exception getException() {
