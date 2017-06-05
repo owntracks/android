@@ -7,7 +7,8 @@ import android.content.res.Resources;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.services.Dispatcher;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.Scheduler;
 
 import dagger.Module;
 import dagger.Provides;
@@ -55,7 +56,14 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    Dispatcher provideDispatcher() {
-        return new Dispatcher();
+    Scheduler provideScheduler() {
+        return new Scheduler();
     }
+
+    @Provides
+    @PerApplication
+    MessageProcessor provideMessageProcessor() {
+        return new MessageProcessor();
+    }
+
 }

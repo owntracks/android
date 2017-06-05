@@ -31,11 +31,10 @@ public class ServiceProxy extends Service {
 	public static final int SERVICE_LOCATOR = 0;
 	public static final int SERVICE_NOTIFICATION = 1;
 	public static final int SERVICE_BEACON = 2;
-	public static final int SERVICE_MESSAGE = 3;
 
 	public static final String KEY_SERVICE_ID = "srvID";
 	private static ServiceProxy instance;
-	private static final ProxyableService[] services = new ProxyableService[4];
+	private static final ProxyableService[] services = new ProxyableService[3];
 	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
 	private static ServiceProxyConnection connection;
 	private static boolean bound = false;
@@ -80,7 +79,6 @@ public class ServiceProxy extends Service {
 			public void run() {
 				Timber.d("loading services");
 				loadService(SERVICE_NOTIFICATION);
-				loadService(SERVICE_MESSAGE);
 				loadService(SERVICE_LOCATOR);
 				loadService(SERVICE_BEACON);
 				setBgInitialized();
@@ -177,9 +175,6 @@ public class ServiceProxy extends Service {
 			case SERVICE_NOTIFICATION:
 				p = new ServiceNotification();
 				break;
-			case SERVICE_MESSAGE:
-				p = new ServiceMessage();
-				break;
 		}
 
 		if(p == null)
@@ -204,8 +199,12 @@ public class ServiceProxy extends Service {
 	public static ServiceNotification getServiceNotification() {
 		return (ServiceNotification) loadService(SERVICE_NOTIFICATION);
 	}
-	public static ServiceMessage getServiceMessage() {
-		return (ServiceMessage) loadService(SERVICE_MESSAGE);
+
+
+	@Deprecated
+	public static MessageProcessor getServiceMessage() {
+		// Left in for compatiblity reasons. Use App.getMessageProcessor() directly instead.
+		return App.getMessageProcessor();
 	}
 
 	public static ProxyableService getServiceForIntent(Intent i) {
