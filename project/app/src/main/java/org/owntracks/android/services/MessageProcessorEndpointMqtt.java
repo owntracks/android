@@ -1,23 +1,12 @@
 package org.owntracks.android.services;
 
-import android.annotation.TargetApi;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
@@ -26,9 +15,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.MqttPingSender;
-import org.eclipse.paho.client.mqttv3.MqttToken;
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +28,7 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.services.ServiceMessage.EndpointState;
+import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Parser;
@@ -60,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
+public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor {
 	private static final String TAG = "ServiceMessageMqtt";
 
 	private static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
@@ -68,27 +54,43 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	private static final String MQTT_BUNDLE_KEY_MESSAGE_RETAINED = "MQTT_BUNDLE_KEY_MESSAGE_RETAINED";
 	private static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
 
-	private MqttAsyncClient mqttClient;
+	private CustomMqttClient mqttClient;
 	private Object error;
 	private MqttConnectOptions connectOptions;
 	private boolean cleanSession;
 	private String lastConnectionId;
 	private static EndpointState state;
 
+	public MessageProcessorEndpointMqtt() {
+	}
+
+	synchronized boolean sendPing() {
+		// Connects if not connected or sends a ping message if aleady connected
+		if(checkConnection() && mqttClient!=null) {
+			mqttClient.ping();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	synchronized boolean sendMessage(Bundle b) {
-		Timber.v("message id:%s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
-		if(!isConnected() && !connect()) {
+		long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
+		Timber.v("message id:%s", messageId);
+		if(!connect()) {
 			Timber.e("not connected and connect failed");
 			return false;
 		}
 
 		try {
-			Timber.v("client is connected, sending message sync: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
+			Timber.v("client is connected, sending message sync: %s", messageId);
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
-			Timber.v("message sent: %s", b.getLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID));
+			App.getMessageProcessor().onMessageDelivered(messageId);
+			Timber.v("message sent: %s", b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID));
 			return true;
 		} catch (MqttException e) {
+			App.getMessageProcessor().onMessageDeliveryFailed(messageId);
 			e.printStackTrace();
 			return false;
 		}
@@ -108,15 +110,15 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
 		b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
 		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
-		b.putLong(Dispatcher.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
+		b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
 		return b;
 	}
 
 
-	private static ServiceEndpointMqtt instance;
-	public static ServiceEndpointMqtt getInstance() {
+	private static MessageProcessorEndpointMqtt instance;
+	public static MessageProcessorEndpointMqtt getInstance() {
 		if(instance == null)
-			instance = new ServiceEndpointMqtt();
+			instance = new MessageProcessorEndpointMqtt();
 		return instance;
 	}
 
@@ -135,7 +137,6 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		public void connectionLost(Throwable cause) {
 			Timber.e(cause, "connectionLost error");
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
-			// TODO: schedule reconnect through dispatcher
 		}
 
 		@Override
@@ -152,7 +153,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 					m.setRetained(message.isRetained());
 					m.setQos(message.getQos());
 					//TODO: send to repo
-					//service.onMessageReceived(m);
+					App.getMessageProcessor().onMessageReceived(m);
 				} catch (Exception e) {
 					Timber.e(e, "payload:%s ", new String(message.getPayload()));
 
@@ -161,8 +162,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 				MessageClear m = new MessageClear();
 				m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
 				Timber.v("clear message received: %s", m.getTopic());
-				//TODO: send to repo
-				//service.onMessageReceived(m);
+				App.getMessageProcessor().onMessageReceived(m);
 			}
 		}
 
@@ -203,10 +203,10 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		return this.mqttClient == null || !this.mqttClient.isConnected();
 	}
 
-	private boolean init() {
+	private boolean initClient() {
 		Timber.v("initing");
 		if (this.mqttClient != null) {
-			Timber.e("no mqttClient instance");
+			Timber.d("client is already initialized");
 			return true;
 		}
 
@@ -225,14 +225,13 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 
 			String cid = Preferences.getClientId();
             String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
-			Log.v(TAG, "init() mode: " + Preferences.getModeId());
-			Log.v(TAG, "init() client id: " + cid);
-			Log.v(TAG, "init() connect string: " + connectString);
+			Timber.v("mode: " + Preferences.getModeId());
+			Timber.v("client id: " + cid);
+			Timber.v("connect string: " + connectString);
 
-			this.mqttClient = new MqttAsyncClient(connectString, cid, new MqttClientMemoryPersistence());
+			this.mqttClient = new CustomMqttClient(connectString, cid, new MqttClientMemoryPersistence());
 			this.mqttClient.setCallback(iCallbackClient);
 		} catch (Exception e) {
-			// something went wrong!
 			Timber.e(e, "init failed");
 			this.mqttClient = null;
 			changeState(e);
@@ -242,11 +241,22 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	private boolean connect() {
-		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
-        changeState(EndpointState.CONNECTING);
+		if(isConnected()) {
+			Timber.v("already connected");
+			return true;
+		}
 
+		if(isConnecting()) {
+			Timber.v("already connecting");
+			return false;
+		}
+
+		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
+
+        changeState(EndpointState.CONNECTING);
 		error = null; // clear previous error on connect
-		if(!init()) {
+
+		if(!initClient()) {
             return false;
         }
 
@@ -296,6 +306,7 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
+			App.getDispatcher().scheduleMqttPing(connectOptions.getKeepAliveInterval());
 			changeState(EndpointState.CONNECTED);
 
 			return true;
@@ -458,6 +469,20 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		handleStart();
 	}
 
+	@Override
+	public void onEnterForeground() {
+		checkConnection();
+	}
+
+	private boolean checkConnection() {
+		if(isConnected()) {
+			return true;
+		} else {
+			connect();
+			return false;
+		}
+	}
+
 	private void changeState(Exception e) {
 		error = e;
 		changeState(EndpointState.ERROR, e);
@@ -469,8 +494,11 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 
 	private void changeState(EndpointState newState, Exception e) {
 		state = newState;
-		//if(service != null)
-		//	service.onEndpointStateChanged(newState, e);
+		getMessageProcessor().onEndpointStateChanged(newState, e);
+	}
+
+	private MessageProcessor getMessageProcessor() {
+		return App.getMessageProcessor();
 	}
 
 	private boolean isOnline() {
@@ -566,19 +594,21 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 	}
 
 	@Override
-	public void onAssociate(ServiceMessage service) {
-
-	}
-
-	@Override
 	public void onDestroy() {
 		disconnect(false);
 	}
 
+	@Override
+	public void onCreateFromProcessor() {
+		connect();
+	}
+
+
+
 	private void scheduleMessage(MessageBase m) {
 		try {
 			Bundle b = mqttMessageToBundle(m);
-			b.putString(Dispatcher.BUNDLE_KEY_ACTION, Dispatcher.TASK_SEND_MESSAGE_MQTT);
+			b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.TASK_SEND_MESSAGE_MQTT);
 			if(App.isInForeground())
 				sendMessage(b);
 			else
@@ -643,6 +673,18 @@ public class ServiceEndpointMqtt implements OutgoingMessageProcessor {
 		@Override
 		public boolean containsKey(String key) throws MqttPersistenceException {
 			return data.containsKey(key);
+		}
+	}
+
+	private static final class CustomMqttClient extends MqttAsyncClient {
+
+		CustomMqttClient(String serverURI, String clientId, MqttClientPersistence persistence) throws MqttException {
+			super(serverURI, clientId, persistence);
+		}
+
+		void ping() {
+			if(comms != null)
+				comms.checkForActivity();
 		}
 	}
 }
