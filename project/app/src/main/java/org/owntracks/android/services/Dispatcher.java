@@ -69,7 +69,7 @@ public class Dispatcher extends GcmTaskService {
 
         Task task = new OneoffTask.Builder()
                 .setService(Dispatcher.class)
-                .setExecutionWindow(0, 30)
+                .setExecutionWindow(0L, App.isInForeground() ? 1L: 60L)
                 .setTag(Long.toString(b.getLong(BUNDLE_KEY_MESSAGE_ID)))
                 .setUpdateCurrent(false)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
