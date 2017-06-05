@@ -1,7 +1,7 @@
 package org.owntracks.android.support.interfaces;
 
 
-public interface StatefulServiceMessageEndpoint extends ServiceMessageEndpoint {
+public interface StatefulServiceMessageProcessor {
     void reconnect();
     void disconnect();
 }

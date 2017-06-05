@@ -34,6 +34,7 @@ import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
+import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor {
+public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, StatefulServiceMessageProcessor {
 	private static final String TAG = "ServiceMessageMqtt";
 
 	private static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
@@ -467,6 +468,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor {
 	public void reconnect() {
 		disconnect(false);
 		handleStart();
+	}
+
+	@Override
+	public void disconnect() {
+		disconnect(true);
 	}
 
 	@Override
