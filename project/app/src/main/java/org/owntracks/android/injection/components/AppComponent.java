@@ -10,6 +10,7 @@ import org.owntracks.android.injection.modules.DataModule;
 import org.owntracks.android.injection.modules.NetModule;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.services.Dispatcher;
 
 import dagger.Component;
 
@@ -34,5 +35,6 @@ public interface AppComponent {
 
     ContactsRepo contactsRepo();
     EventBus eventBus();
+    Dispatcher dispatcher();
 
 }

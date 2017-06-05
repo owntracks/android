@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.services.Dispatcher;
 
 import dagger.Module;
 import dagger.Provides;
@@ -52,4 +53,9 @@ public class AppModule {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
+    @Provides
+    @PerApplication
+    Dispatcher provideDispatcher() {
+        return new Dispatcher();
+    }
 }

@@ -404,7 +404,7 @@ e.printStackTrace();                } catch (Parser.EncryptionException e) {
         try {
             Bundle b = httpMessageToBundle(m);
             b.putString(Dispatcher.BUNDLE_KEY_ACTION, Dispatcher.TASK_SEND_MESSAGE_MQTT);
-            Dispatcher.getInstance().scheduleMessage(b);
+            App.getDispatcher().scheduleMessage(b);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Parser.EncryptionException e) {
