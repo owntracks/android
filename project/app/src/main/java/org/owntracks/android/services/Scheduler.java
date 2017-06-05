@@ -75,15 +75,15 @@ public class Scheduler extends GcmTaskService {
         GcmNetworkManager.getInstance(App.getContext()).schedule(task);
     }
 
-    public void scheduleMqttPing(long keepAliveMs) {
+    public void scheduleMqttPing(long keepAliveSeconds) {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(Scheduler.class)
                 .setTag(TASK_SEND_MQTT_PING)
                 .setExtras(getBundleForAction(TASK_SEND_MQTT_PING))
-                .setPeriod(TimeUnit.MILLISECONDS.toSeconds(keepAliveMs))
+                .setPeriod(keepAliveSeconds)
                 .setUpdateCurrent(true)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setFlex(TimeUnit.MILLISECONDS.toSeconds(keepAliveMs))
+                .setFlex(keepAliveSeconds)
                 .build();
         Timber.v("scheduling task TASK_SEND_MQTT_PING");
         GcmNetworkManager.getInstance(App.getContext()).schedule(task);
