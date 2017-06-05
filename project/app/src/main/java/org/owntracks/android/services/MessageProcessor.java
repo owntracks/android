@@ -18,6 +18,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 import org.owntracks.android.support.widgets.Toasts;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,14 +38,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void reconnect() {
         // TODO: move to scheduler
-        //if(endpoint instanceof StatefulServiceMessageEndpoint)
-        //    StatefulServiceMessageEndpoint.class.cast(endpoint).reconnect();
+        if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
+            StatefulServiceMessageProcessor.class.cast(outgoingMessageProcessor).reconnect();
     }
 
     public void disconnect() {
         //TODO: move to dispather
-        //if(endpoint instanceof StatefulServiceMessageEndpoint)
-        //    StatefulServiceMessageEndpoint.class.cast(endpoint).disconnect();
+        //if(endpoint instanceof StatefulServiceMessageProcessor)
+        //    StatefulServiceMessageProcessor.class.cast(endpoint).disconnect();
     }
 
     public void onEnterForeground() {
