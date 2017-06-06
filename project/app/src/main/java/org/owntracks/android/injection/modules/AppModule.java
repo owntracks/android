@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import org.greenrobot.eventbus.EventBus;
+import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Parser;
 
 import dagger.Module;
@@ -51,21 +53,33 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    EventBus provideEventbus() {
+    static EventBus provideEventbus() {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
 
     @Provides
     @PerApplication
-    Scheduler provideScheduler() {
+    static Scheduler provideScheduler() {
         return new Scheduler();
     }
 
     @Provides
     @PerApplication
-    MessageProcessor provideMessageProcessor() {
-        return new MessageProcessor();
+    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo) {
+        return new MessageProcessor(eventBus, repo);
+    }
+
+    @Provides
+    @PerApplication
+    static Parser provideParser(EncryptionProvider provider) {
+        return new Parser(provider);
+    }
+
+    @Provides
+    @PerApplication
+    static EncryptionProvider provideEncryptionProvider() {
+        return new EncryptionProvider();
     }
 
 }
