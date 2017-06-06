@@ -22,6 +22,8 @@ public class MessageLocation extends MessageBase  {
     static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
+    public static final String REPORT_TYPE_BEACON= "b";
+    public static final String REPORT_TYPE_CIRCULAR= "c";
     public static final String CONN_TYPE_OFFLINE = "o";
     public static final String CONN_TYPE_WIFI = "w";
     public static final String CONN_TYPE_MOBILE = "m";
@@ -37,6 +39,18 @@ public class MessageLocation extends MessageBase  {
     private LatLng point;
     private String conn;
 
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonProperty("_cp")
+    private boolean cp = false;
+
+    public boolean getCp() {
+        return cp;
+    }
+
+    public void setCp(boolean cp) {
+        this.cp = cp;
+    }
 
     @JsonProperty("lat")
     public double getLatitude() {

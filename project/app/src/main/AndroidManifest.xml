@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.owntracks.android">
 
     <uses-feature
@@ -28,7 +29,7 @@
         />
     <!-- Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove"/>
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- To locate the device -->
@@ -44,6 +45,7 @@
         android:label="@string/app_name"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.Owntracks"
+        android:networkSecurityConfig="@xml/network_security_config"
         >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
