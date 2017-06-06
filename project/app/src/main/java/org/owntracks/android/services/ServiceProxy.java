@@ -31,12 +31,11 @@ import timber.log.Timber;
 public class ServiceProxy extends Service {
 	private static final String TAG = "ServiceProxy";
 
-    public static final String WAKELOCK_TAG_BROKER_PING = "org.owntracks.android.wakelock.broker.ping";
 	public static final int SERVICE_LOCATOR = 0;
 	public static final int SERVICE_NOTIFICATION = 1;
 	public static final int SERVICE_BEACON = 2;
-
 	public static final String KEY_SERVICE_ID = "srvID";
+
 	private static ServiceProxy instance;
 	private static final ProxyableService[] services = new ProxyableService[3];
 	private static final LinkedList<Runnable> runQueue = new LinkedList<>();
@@ -44,9 +43,6 @@ public class ServiceProxy extends Service {
 	private static boolean bound = false;
     private static boolean attemptingToBind = false;
 	private static boolean bgInitialized = false;
-
-
-
 
 	protected boolean started;
 	protected ServiceBinder binder;
@@ -62,8 +58,6 @@ public class ServiceProxy extends Service {
 			return bgInitialized;
 		}
 	}
-
-
 
 	@Override
 	public void onCreate() {
@@ -90,7 +84,6 @@ public class ServiceProxy extends Service {
 				App.postOnMainHandler(new Runnable() {
 					@Override
 					public void run() {
-
 						runQueue();
 					}
 				});

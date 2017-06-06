@@ -17,7 +17,6 @@ public interface StatusMvvm {
         int getEndpointQueue();
         boolean getPermissionLocation();
         Date getLocationUpdated();
-        Date getAppStarted();
         Date getServiceStarted();
 
     }

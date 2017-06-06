@@ -477,7 +477,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
 
-		ServiceProxy.getServiceMessage().sendMessage(message);
+		App.getMessageProcessor().sendMessage(message);
 	}
 
     @SuppressWarnings("unused")

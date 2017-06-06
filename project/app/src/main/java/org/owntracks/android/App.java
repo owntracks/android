@@ -7,8 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.components.AppComponent;
@@ -40,7 +38,7 @@ import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
-1
+
 public class App extends Application  {
     public static final int MODE_ID_MQTT_PRIVATE =0;
     public static final int MODE_ID_MQTT_PUBLIC =2;
@@ -82,12 +80,15 @@ public class App extends Application  {
         mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
-        getEventBus().register(this);
-        getEventBus().postSticky(new Events.AppStarted());
+        getPreferences().initialize();
 
-        Preferences.initialize(this);
-        getMessageProcessor().initialize();
-        startService(new Intent(this, ServiceProxy.class));
+        postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                getMessageProcessor().initialize();
+                startService(new Intent(getApplicationContext(), ServiceProxy.class));
+            }
+        });
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
@@ -106,13 +107,12 @@ public class App extends Application  {
         return sAppComponent.scheduler();
     }
 
-    public static ContactsRepo getContactsRepo() {
-        return sAppComponent.contactsRepo();
-    }
+    public static ContactsRepo getContactsRepo() { return sAppComponent.contactsRepo(); }
 
-    public static MessageProcessor getMessageProcessor() {
-        return sAppComponent.messageProcessor();
-    }
+    public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
+
+    public static Preferences getPreferences() { return sAppComponent.preferences(); }
+
 
     public static Dao getDao() {
         return sAppComponent.dao();
@@ -131,11 +131,7 @@ public class App extends Application  {
         return sAppComponent.contactsRepo().getById(topic);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.ModeChanged e) {
-        getContactsRepo().clearAll();
-        getContactImageProvider().invalidateCache();
-    }
+
 
     public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
         mainHandler.postDelayed(r, delayMilis);
@@ -171,10 +167,6 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
-    @Subscribe
-    public void onEvent(Events.BrokerChanged e) {
-        getContactsRepo().clearAll();
-    }
 
     private void onEnterForeground() {
         inForeground = true;

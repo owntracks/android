@@ -64,7 +64,7 @@ public class Preferences {
         return deviceUUID;
     }
 
-    public static void initialize(Context c){
+    public Preferences(Context c){
         Timber.v("preferences initializing");
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
@@ -152,6 +152,9 @@ public class Preferences {
         }
     }
 
+    public void initialize() {
+
+    }
 
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
