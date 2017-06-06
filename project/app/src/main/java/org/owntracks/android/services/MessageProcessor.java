@@ -242,21 +242,38 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return;
         }
 
-        switch (message.getAction()) {
-            case MessageCmd.ACTION_REPORT_LOCATION:
-                ServiceProxy.getServiceLocator().reportLocationResponse();
-                break;
-            case MessageCmd.ACTION_WAYPOINTS:
-                ServiceProxy.getServiceLocator().publishWaypointsMessage();
-                break;
-            case MessageCmd.ACTION_SET_WAYPOINTS:
-                MessageWaypoints w = message.getWaypoints();
-                if(w != null)
-                    Preferences.importWaypointsFromJson(w.getWaypoints());
-                break;
-            case MessageCmd.ACTION_SET_CONFIGURATION:
-                Preferences.importFromMessage(message.getConfiguration());
-                break;
+        String actions = message.getAction();
+        if(actions == null) {
+            Timber.e("no action in cmd message");
+            return;
+        }
+
+        for(String cmd : actions.split(",")) {
+
+            switch (cmd) {
+                case MessageCmd.ACTION_REPORT_LOCATION:
+                    ServiceProxy.getServiceLocator().reportLocationResponse();
+                    break;
+                case MessageCmd.ACTION_WAYPOINTS:
+                    ServiceProxy.getServiceLocator().publishWaypointsMessage();
+                    break;
+                case MessageCmd.ACTION_SET_WAYPOINTS:
+                    MessageWaypoints w = message.getWaypoints();
+                    if (w != null)
+                        Preferences.importWaypointsFromJson(w.getWaypoints());
+                    break;
+                case MessageCmd.ACTION_SET_CONFIGURATION:
+                    Preferences.importFromMessage(message.getConfiguration());
+                    break;
+                case MessageCmd.ACTION_REOCONNECT:
+                    reconnect();
+                    break;
+                case MessageCmd.ACTION_RESTART:
+                    App.restart();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
