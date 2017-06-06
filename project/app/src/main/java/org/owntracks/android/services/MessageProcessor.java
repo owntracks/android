@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.LongSparseArray;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
+import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -31,6 +33,8 @@ import timber.log.Timber;
 public class MessageProcessor implements IncomingMessageProcessor {
     public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
     public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
+    private final EventBus eventBus;
+    private final ContactsRepo contactsRepo;
 
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
     private ThreadPoolExecutor outgoingMessageProcessorExecutor;
@@ -80,7 +84,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
-    public MessageProcessor() {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo) {
+        this.eventBus = eventBus;
+        this.contactsRepo = contactsRepo;
+
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
     }
@@ -142,7 +149,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         } else {
             Timber.e("onMessageDelivered()-  messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
             if(m instanceof MessageLocation) {
-                App.getEventBus().post(m);
+                eventBus.post(m);
             }
         }
     }
@@ -180,16 +187,16 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState));
+        eventBus.postSticky(new Events.EndpointStateChanged(newState));
     }
 
     void onEndpointStateChanged(EndpointState newState, String message) {
-        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState, message));
+        eventBus.postSticky(new Events.EndpointStateChanged(newState, message));
     }
 
     void onEndpointStateChanged(EndpointState newState, Exception e) {
         Timber.v("new state:%s",newState);
-        App.getEventBus().postSticky(new Events.EndpointStateChanged(newState, e));
+        eventBus.postSticky(new Events.EndpointStateChanged(newState, e));
     }
 
 
@@ -204,19 +211,19 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageClear message) {
-        App.getContactsRepo().remove(message.getContactKey());
+        contactsRepo.remove(message.getContactKey());
     }
 
 
     @Override
     public void processIncomingMessage(MessageLocation message) {
-        App.getContactsRepo().update(message.getContactKey(),message);
+        contactsRepo.update(message.getContactKey(),message);
 
     }
 
     @Override
     public void processIncomingMessage(MessageCard message) {
-        App.getContactsRepo().update(message.getContactKey(),message);
+        contactsRepo.update(message.getContactKey(),message);
     }
 
     @Override
