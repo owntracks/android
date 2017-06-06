@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.provider.OpenableColumns;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,8 +32,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.ContentPathHelper;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
@@ -793,8 +793,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
         protected String doInBackground(Uri... params) {
             try {
                 Log.v(TAG, "CopyTask with URI: " + params[0]);
-                //String path = ContentPathHelper.getPath(App.getContext(), params[0]);
-                String filename = ContentPathHelper.uriToFilename(App.getContext(), params[0]);
+                String filename = uriToFilename(App.getContext(), params[0]);
                 Log.v(TAG, "filename for save is: " + filename);
 
                 InputStream inputStream = App.getContext().getContentResolver().openInputStream(params[0]);
@@ -821,6 +820,29 @@ public class ActivityPreferencesConnection extends ActivityBase {
             }
         }
     }
+
+    public static String uriToFilename(Context c, Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = c.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
 
     private static class CaCrtCopyTask extends CopyTask {
         public CaCrtCopyTask(FragmentPreferences fragment) {
