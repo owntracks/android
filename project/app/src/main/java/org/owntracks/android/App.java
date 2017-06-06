@@ -97,11 +97,11 @@ public class App extends Application  {
         getEventBus().postSticky(new Events.AppStarted());
 
         Preferences.initialize(this);
-        Parser.initialize(this);
+        //Handled by Dagger     EncryptionProvider.initialize();
+        //Handled by Dagger     Parser.initialize(this);
 
         ContactImageProvider.initialize(this);
         GeocodingProvider.initialize(this);
-        EncryptionProvider.initialize();
         Dao.initialize(this);
 
         getMessageProcessor().initialize();
@@ -112,6 +112,10 @@ public class App extends Application  {
     public static App getInstance() { return sInstance; }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
+
+    public static Parser getParser() { return sAppComponent.parser(); }
+
+    public static EncryptionProvider getEncryptionProvider() { return sAppComponent.encryptionProvider(); }
 
     public static Resources getRes() { return sInstance.getResources(); }
 

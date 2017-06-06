@@ -219,8 +219,4 @@ public class ContactImageProvider {
     private static float convertDpToPixel(float dp) {
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
     }
-
-
-
-
 }

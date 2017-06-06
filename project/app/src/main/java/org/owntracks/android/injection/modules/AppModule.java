@@ -9,6 +9,7 @@ import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.support.Parser;
 
 import dagger.Module;
 import dagger.Provides;
@@ -53,6 +54,7 @@ public class AppModule {
     EventBus provideEventbus() {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
+
 
     @Provides
     @PerApplication

@@ -18,11 +18,11 @@ public class EncryptionProvider {
     private static Random r;
     private static boolean enabled;
 
-    public static boolean isPayloadEncryptionEnabled() {
+    public boolean isPayloadEncryptionEnabled() {
         return enabled;
     }
 
-    private static void initializeSecretBox() {
+    private void initializeSecretBox() {
         String encryptionKey = Preferences.getEncryptionKey();
         enabled = encryptionKey != null && encryptionKey.length() > 0;
         Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
@@ -37,12 +37,12 @@ public class EncryptionProvider {
         Log.v(TAG, "SecretBox initialized");
     }
 
-    public static void initialize() {
+    public EncryptionProvider() {
         Preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         initializeSecretBox();
     }
 
-    public static String decrypt(String cyphertextb64) {
+    public String decrypt(String cyphertextb64) {
         byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
         byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
@@ -52,7 +52,7 @@ public class EncryptionProvider {
         return new String(b.decrypt(nonce, cyphertext));
     }
 
-    public static String encrypt(String plaintext) {
+    public String encrypt(String plaintext) {
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
         byte[] cyphertext = b.encrypt(nonce, plaintext.getBytes());
         byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
@@ -63,11 +63,10 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private static class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
-        public SecretBoxManager() {
+    private class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
+        SecretBoxManager() {
             Preferences.registerOnPreferenceChangedListener(this);
         }
-
 
         @Override
         public void onAttachAfterModeChanged() {
