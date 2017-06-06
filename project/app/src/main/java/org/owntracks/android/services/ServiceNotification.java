@@ -367,7 +367,7 @@ public class ServiceNotification implements ProxyableService {
     public void onEvent(MessageLocation m) {
         if(m.isOutgoing() && (notificationOngoingLastLocationCache == null || notificationOngoingLastLocationCache.getTst() <=  m.getTst())) {
             this.notificationOngoingLastLocationCache = m;
-            GeocodingProvider.resolve(m, this);
+            App.getGeocodingProvider().resolve(m, this);
         }
     }
 

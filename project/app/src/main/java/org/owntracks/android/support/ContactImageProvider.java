@@ -28,17 +28,16 @@ import org.owntracks.android.support.widgets.TextDrawable;
 import java.lang.ref.WeakReference;
 
 public class ContactImageProvider {
-    private static final String TAG = "ContactImageProvider";
     private static ContactBitmapMemoryCache memoryCache;
     private static BitmapDrawable placeholder;
 
 
-    public static void invalidateCacheLevelCard(String key) {
+    public void invalidateCacheLevelCard(String key) {
         memoryCache.clearLevelCard(key);
     }
 
 
-    private static class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
+    private class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
         final WeakReference<ImageView> target;
 
         public ContactDrawableWorkerTaskForImageView(ImageView imageView) {
@@ -60,7 +59,7 @@ public class ContactImageProvider {
         }
 
     }
-    private static class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
+    private class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
         WeakReference<Marker> target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
@@ -84,17 +83,17 @@ public class ContactImageProvider {
     }
 
 
-    public static void setMarkerAsync(Marker marker, FusedContact contact) {
+    public void setMarkerAsync(Marker marker, FusedContact contact) {
         (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
-    public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
+    public void setImageViewAsync(ImageView imageView, FusedContact contact) {
         imageView.setImageDrawable(placeholder);
         (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
 
-    private static Bitmap getBitmapFromCache(FusedContact contact) {
+    private Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
@@ -126,7 +125,7 @@ public class ContactImageProvider {
         return d;
     }
 
-    public static void initialize(Context c){
+    public ContactImageProvider(Context c){
         memoryCache = new ContactBitmapMemoryCache();
 
         Rect rect = new Rect(0, 0, 1, 1);
@@ -172,10 +171,10 @@ public class ContactImageProvider {
         }
     }
 
-    public static void invalidateCache() {
+    public void invalidateCache() {
         memoryCache.clear();
     }
-    private static Bitmap getRoundedShape(Bitmap bitmap) {
+    private Bitmap getRoundedShape(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
@@ -196,7 +195,7 @@ public class ContactImageProvider {
         return output;
     }
 
-    private static Bitmap drawableToBitmap(Drawable drawable) {
+    private Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable)drawable).getBitmap();
         }
