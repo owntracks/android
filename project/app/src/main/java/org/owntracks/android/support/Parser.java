@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageEncrypted;
 
@@ -16,8 +14,9 @@ import java.io.InputStream;
 public class Parser {
     private static ObjectMapper defaultMapper;
     private static ObjectMapper arrayCompatMapper;
-
-    public Parser() {
+    private EncryptionProvider encryptionProvider;
+    public Parser(EncryptionProvider encryptionProvider) {
+        this.encryptionProvider = encryptionProvider;
         defaultMapper = new ObjectMapper();
         defaultMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         defaultMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
@@ -56,9 +55,9 @@ public class Parser {
             throw new IOException("null array");
 
         if (a.length == 1 && a[0] instanceof MessageEncrypted) {
-            if (!App.getEncryptionProvider().isPayloadEncryptionEnabled())
+            if (!encryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
-            return defaultMapper.readValue(App.getEncryptionProvider().decrypt(((MessageEncrypted) a[0]).getData()), MessageBase[].class);
+            return defaultMapper.readValue(encryptionProvider.decrypt(((MessageEncrypted) a[0]).getData()), MessageBase[].class);
         } else { // single message wrapped in array by mapper or array of messages
             return a;
         }
@@ -66,18 +65,18 @@ public class Parser {
 
     private MessageBase decrypt(MessageBase m) throws IOException, EncryptionException {
         if(m instanceof MessageEncrypted) {
-            if(!App.getEncryptionProvider().isPayloadEncryptionEnabled())
+            if(!encryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
-            return defaultMapper.readValue(App.getEncryptionProvider().decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
+            return defaultMapper.readValue(encryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
         }
         return m;
     }
 
 
     private String encrypt(@NonNull String input) throws IOException, EncryptionException {
-        if(App.getEncryptionProvider().isPayloadEncryptionEnabled()) {
+        if(encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
-            m.setdata(App.getEncryptionProvider().encrypt(input));
+            m.setdata(encryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsString(m);
         }
         return input;
@@ -85,7 +84,7 @@ public class Parser {
 
 
     public static class EncryptionException extends Exception {
-        public EncryptionException(String s) {
+        EncryptionException(String s) {
             super(s);
         }
     }
