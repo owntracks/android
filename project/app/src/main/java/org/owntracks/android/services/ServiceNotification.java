@@ -208,9 +208,11 @@ public class ServiceNotification implements ProxyableService {
 
     }
     public void  updateNotificationOngoing() {
-        Timber.v("enabled:%s, state:%s", Preferences.getNotification(), notificationOngoingLastStateCache.getLabel(context));
         if (!Preferences.getNotification())
             return;
+
+        Timber.v("enabled:%s, state:%s", Preferences.getNotification(), notificationOngoingLastStateCache.getLabel(context));
+
 
         String subtitle = notificationOngoingLastStateCache.getLabel(context);
 
@@ -221,7 +223,6 @@ public class ServiceNotification implements ProxyableService {
         } else {
             notificationBuilderOngoing.setContentTitle(this.context.getString(R.string.app_name));
         }
-
 
 
         if(Preferences.getNotificationHigherPriority())
@@ -346,18 +347,13 @@ public class ServiceNotification implements ProxyableService {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onEventMainThread(Events.EndpointStateChanged e) {
         Timber.v("EndpointStateChanged %s", e.getState().getLabel(context));
-        //if (App.isInForeground()) {
-        //    // Prevent double toasts when no connection can be established
-        //    if(notificationOngoingLastStateCache == MessageProcessor.EndpointState.ERROR && e.getState() != MessageProcessor.EndpointState.DISCONNECTED)
-        //        Toasts.showEndpointStateChange(e.getState());
-        //}
         notificationOngoingLastStateCache = e.getState();
         updateNotificationOngoing();
     }
 
     @Subscribe
     public void onEvent(Events.PermissionGranted e) {
-        Log.v(TAG, "Events.PermissionGranted: " + e.getPermission() );
+        Timber.v("Events.PermissionGranted: %s", e.getPermission() );
         if(e.getPermission().equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
             clearNotificationPermission();
         }
@@ -372,7 +368,6 @@ public class ServiceNotification implements ProxyableService {
     }
 
     public void onMessageLocationGeocoderResult(MessageLocation m) {
-        Timber.v("for location: %s", m.getGeocoder());
         if (m == notificationOngoingLastLocationCache) {
             updateNotificationOngoing();
         }

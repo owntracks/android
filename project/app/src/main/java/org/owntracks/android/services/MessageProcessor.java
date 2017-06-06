@@ -136,8 +136,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
     void sendMessage(MessageBase message) {
         Timber.v("executing message on outgoingMessageProcessor");
         message.setOutgoingProcessor(outgoingMessageProcessor);
-        this.outgoingMessageProcessorExecutor.execute(message);
 
+        this.outgoingMessageProcessorExecutor.execute(message);
+        onMessageQueued(message);
     }
 
      void onMessageDelivered(Long messageId) {
@@ -145,9 +146,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
         outgoingQueue.remove(messageId);
 
         if(m == null) {
-            Timber.e("onMessageDelivered()- messageId:"+messageId + ", error: called for unqueued message");
+            Timber.e("messageId:%s, error: called for unqueued message", messageId);
         } else {
-            Timber.e("onMessageDelivered()-  messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+            Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m instanceof MessageLocation) {
                 eventBus.post(m);
             }
@@ -157,7 +158,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private void onMessageQueued(MessageBase m) {
         outgoingQueue.put(m.getMessageId(), m);
 
-        Timber.e("onMessageQueued()- messageId:" + m.getMessageId()+", queueLength:"+outgoingQueue.size());
+        Timber.v("messageId:%s, queueLength:%s", m.getMessageId(), outgoingQueue.size());
         if(m instanceof MessageLocation && MessageLocation.REPORT_TYPE_USER.equals(MessageLocation.class.cast(m).getT()))
             Toasts.showMessageQueued();
     }
@@ -170,9 +171,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
         if(m == null) {
             Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
         } else {
-            Timber.e("type:base, messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
+            Timber.v("type:base, messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m.getOutgoingTTL() > 0)  {
-                Timber.e("type:base, messageId:%s, action: requeued",m.getMessageId() );
+                Timber.d("type:base, messageId:%s, action: requeued",m.getMessageId() );
                 sendMessage(m);
             } else {
                 Timber.e("type:base, messageId:%s, action: discarded due to expired ttl",m.getMessageId() );
@@ -182,7 +183,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void onMessageReceived(MessageBase message) {
         message.setIncomingProcessor(this);
-        message.setIncoming();
         incomingMessageProcessorExecutor.execute(message);
     }
 

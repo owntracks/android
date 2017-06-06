@@ -56,7 +56,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	private static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
 
 	private CustomMqttClient mqttClient;
-	private Object error;
 	private MqttConnectOptions connectOptions;
 	private boolean cleanSession;
 	private String lastConnectionId;
@@ -234,7 +233,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
 
         changeState(EndpointState.CONNECTING);
-		error = null; // clear previous error on connect
 
 		if(!initClient()) {
             return false;
@@ -446,7 +444,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private void changeState(Exception e) {
-		error = e;
 		changeState(EndpointState.ERROR, e);
 	}
 

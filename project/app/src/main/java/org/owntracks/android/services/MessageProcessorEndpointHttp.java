@@ -59,7 +59,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
     private static OkHttpClient mHttpClient;
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
-    private MessageProcessor service;
 
     private static MessageProcessorEndpointHttp instance;
     public static MessageProcessorEndpointHttp getInstance() {
@@ -137,10 +136,10 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
         URL endpoint;
         try {
             endpoint = new URL(Preferences.getUrl());
-            service.onEndpointStateChanged(EndpointState.IDLE);
+            App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            service.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
+            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
             return;
         }
 
