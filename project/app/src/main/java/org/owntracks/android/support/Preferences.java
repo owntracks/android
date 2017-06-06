@@ -1017,17 +1017,6 @@ public class Preferences {
 
     }
 
-    @Export(key = Keys.PLAY_OVERRIDE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getPlayOverride() {
-        return activeSharedPreferences.getBoolean(Keys.PLAY_OVERRIDE, false);
-    }
-
-    @Import(key = Keys.PLAY_OVERRIDE)
-    public static void setPlayOverride(boolean playOverride) {
-        activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).apply();
-    }
-
-
     // Maybe make this configurable
     // For now it makes things easier to change
     public static int getPubQosEvents() {

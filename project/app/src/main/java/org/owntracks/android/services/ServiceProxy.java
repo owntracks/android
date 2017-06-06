@@ -17,6 +17,10 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 import org.owntracks.android.App;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.interfaces.ProxyableService;
@@ -390,7 +394,6 @@ public class ServiceProxy extends Service {
 	}
 
 	protected static boolean checkPlayServices() {
-		//return GoogleApiAvailability.checkPlayServices(App.getContext());
-		return  org.owntracks.android.support.unfree.GoogleApiAvailability.checkPlayServicesWithOverride();
+		return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
 	}
 }
