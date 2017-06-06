@@ -22,8 +22,9 @@ public class Scheduler extends GcmTaskService {
 
     public static final String TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
     public static final String TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT";
-    private static final String TASK_SEND_MQTT_PING = "TASK_SEND_MQTT_PING" ;
     private static final String TASK_SEND_LOCATION_PING = "TASK_SEND_LOCATION_PING" ;
+    private static final String TASK_MQTT_PING = "TASK_MQTT_PING" ;
+    private static final String TASK_MQTT_RECONNECT = "TASK_MQTT_RECONNECT";
 
     @Override
     public int onRunTask(TaskParams taskParams) {
@@ -39,11 +40,14 @@ public class Scheduler extends GcmTaskService {
 
         switch (action) {
             case TASK_SEND_MESSAGE_HTTP:
-                return MessageProcessorEndpointHttp.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
+                return MessageProcessorEndpointHttp.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
             case TASK_SEND_MESSAGE_MQTT:
-                return MessageProcessorEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
-            case TASK_SEND_MQTT_PING:
+                return MessageProcessorEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
+            case TASK_MQTT_PING:
                 return MessageProcessorEndpointMqtt.getInstance().sendPing() ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
+            case TASK_MQTT_RECONNECT:
+                return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
+
             default:
                 return GcmNetworkManager.RESULT_FAILURE;
         }
@@ -78,15 +82,23 @@ public class Scheduler extends GcmTaskService {
     public void scheduleMqttPing(long keepAliveSeconds) {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(Scheduler.class)
-                .setTag(TASK_SEND_MQTT_PING)
-                .setExtras(getBundleForAction(TASK_SEND_MQTT_PING))
+                .setTag(TASK_MQTT_PING)
+                .setExtras(getBundleForAction(TASK_MQTT_PING))
                 .setPeriod(keepAliveSeconds)
                 .setUpdateCurrent(true)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setFlex(keepAliveSeconds)
                 .build();
-        Timber.v("scheduling task TASK_SEND_MQTT_PING");
+        Timber.v("scheduling task TASK_MQTT_PING");
         GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+    }
+    public void cancelMqttPing() {
+        Timber.v("canceling task TASK_MQTT_PING");
+        GcmNetworkManager.getInstance(App.getContext()).cancelTask(TASK_MQTT_PING, Scheduler.class);
+    }
+
+    public void scheduleLocationPing() {
+        Bundle b = getBundleForAction(TASK_SEND_LOCATION_PING);
     }
 
     @NonNull
@@ -96,7 +108,23 @@ public class Scheduler extends GcmTaskService {
         return b;
     }
 
-    public void scheduleLocationPing() {
-        Bundle b = getBundleForAction(TASK_SEND_LOCATION_PING);
+    public void scheduleMqttReconnect() {
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(Scheduler.class)
+                .setTag(TASK_MQTT_RECONNECT)
+                .setExtras(getBundleForAction(TASK_MQTT_RECONNECT))
+                .setPeriod(TimeUnit.MINUTES.toSeconds(10))
+                .setUpdateCurrent(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setFlex(TimeUnit.MINUTES.toSeconds(10))
+                .build();
+        Timber.v("scheduling task TASK_MQTT_RECONNECT");
+        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+    }
+
+    public void cancelMqttReconnect() {
+        Timber.v("canceling task TASK_MQTT_RECONNECT");
+        GcmNetworkManager.getInstance(App.getContext()).cancelTask(TASK_MQTT_RECONNECT, Scheduler.class);
+
     }
 }
