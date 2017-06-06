@@ -56,10 +56,6 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
 
         @JsonIgnore
         private boolean _mqtt_retained;
-        private volatile boolean cancelOnRun = false;
-        private int direction = DIRECTION_INCOMING;
-        private static final int DIRECTION_INCOMING = 1;
-        private static final int DIRECTION_OUTGOING = 2;
         private String tid;
 
         @JsonIgnore
@@ -110,12 +106,6 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
 
         @Override
         public void run(){
-
-                // If the message is enqueued to a ThreadPoolExecutor, stopping that executor results in the first queued message runnable being run
-                // We check if the running thread is shutting down and don't submit that messagfe to the message handler
-                if(cancelOnRun)
-                        return;
-
                 if(_processorIn != null && _processorIn.get() !=  null)
                         processIncomingMessage(_processorIn.get());
                 if(_processorOut != null && _processorOut.get() !=  null) {
@@ -152,23 +142,13 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
         @JsonIgnore
-        public void setIncoming() {
-                this.direction = DIRECTION_INCOMING;
-        }
-
-        @JsonIgnore
-        public void setOutgoing() {
-                this.direction = DIRECTION_OUTGOING;
-        }
-
-        @JsonIgnore
         public boolean isIncoming() {
-                return this.direction == DIRECTION_INCOMING;
+                return this._processorIn != null;
         }
 
         @JsonIgnore
         public boolean isOutgoing() {
-                return !isIncoming();
+                return this._processorOut != null;
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
