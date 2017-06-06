@@ -2,14 +2,18 @@ package org.owntracks.android.data.repos;
 
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v4.util.SimpleArrayMap;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.Events;
 
 import javax.inject.Inject;
 
@@ -30,6 +34,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     MemoryContactsRepo() {
         mMap = new SimpleArrayMap<>(LOAD_FACTOR);
         mList = new ObservableArrayList<>();
+        App.getEventBus().register(this);
     }
 
     @Override
@@ -65,14 +70,10 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
+    @MainThread
     public synchronized void clearAll() {
         mMap.clear();
-        App.postOnMainHandler(new Runnable() {
-            @Override
-            public void run() {
-                mList.clear();
-            }
-        });
+        mList.clear();
 
         majorRevision-=MAJOR_STEP;
         revision = 0;
@@ -119,4 +120,16 @@ public class MemoryContactsRepo implements ContactsRepo {
     public long getRevision() {
         return majorRevision+revision;
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(Events.ModeChanged e) {
+        clearAll();
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.BrokerChanged e) {
+        clearAll();
+    }
+
 }

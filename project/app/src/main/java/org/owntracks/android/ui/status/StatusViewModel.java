@@ -72,12 +72,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public Date getAppStarted() {
-        return appStarted;
-    }
-
-    @Override
-    @Bindable
     public Date getLocationUpdated() {
         return locationUpdated;
     }
@@ -98,12 +92,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
         if(Manifest.permission.ACCESS_FINE_LOCATION.equals(e.getPermission()))
             this.locationPermission = true;
         notifyPropertyChanged(BR.locationUpdated);
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(Events.AppStarted e) {
-        this.appStarted = e.getDate();
-        notifyPropertyChanged(BR.appStarted);
     }
 
     @Subscribe(sticky = true)

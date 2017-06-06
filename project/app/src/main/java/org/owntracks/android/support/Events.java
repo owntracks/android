@@ -274,8 +274,6 @@ public class Events {
         }
     }
 
-	public static class AppStarted extends E {
-	}
 	public static class ServiceStarted extends E {
 	}
 }

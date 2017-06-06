@@ -16,6 +16,7 @@ import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
 
 import dagger.Component;
 
@@ -46,4 +47,6 @@ public interface AppComponent {
     MessageProcessor messageProcessor();
     ContactImageProvider contactImageProvider();
     GeocodingProvider geocodingProvider();
+    Preferences preferences();
+
 }

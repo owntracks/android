@@ -36,7 +36,6 @@ import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.services.ServiceMessage;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
@@ -107,11 +106,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
 
     private void executePendingActions() {
-        Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
-        Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
-        Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
-        Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
-        Timber.v("flag int mode: %s",mode);
+        //Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
+        //Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
+        //Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
+        //Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
+        //Timber.v("flag int mode: %s",mode);
 
 
 
@@ -301,9 +300,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
                 initMap();
             }
         }, 500);
-
-        Timber.v("trace start %s", System.currentTimeMillis());
-        Timber.v("trace end %s", System.currentTimeMillis());
     }
 
     private void initMap() {
@@ -446,7 +442,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             mMarkers.put(contact.getId(), m);
         }
 
-        ContactImageProvider.setMarkerAsync(m, contact);
+        App.getContactImageProvider().setMarkerAsync(m, contact);
 
     }
 
@@ -470,15 +466,15 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
                 return true;
             case R.id.menu_clear:
-                Bundle b = new Bundle();
-                b.putString(ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC, viewModel.getContact().getId());
-                PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_MESSAGE, ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT, b);
-                try {
-                    p.send();
-                } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
-                return true;
+                //Bundle b = new Bundle();
+                //b.putString(ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC, viewModel.getContact().getId());
+                //PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_MESSAGE, ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT, b);
+                //try {
+                //    p.send();
+                //} catch (PendingIntent.CanceledException e) {
+                //    e.printStackTrace();
+                //}
+                //return true;
 
             default:
                 return false;

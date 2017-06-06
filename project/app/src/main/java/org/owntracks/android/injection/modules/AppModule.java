@@ -15,6 +15,7 @@ import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
 
 import dagger.Module;
 import dagger.Provides;
@@ -93,4 +94,8 @@ public class AppModule {
     @Provides
     @PerApplication
     static ContactImageProvider provideContactImageProvider(@AppContext Context context) { return new ContactImageProvider(context); }
+
+    @Provides
+    @PerApplication
+    static Preferences providePreferences(@AppContext Context context) { return new Preferences(context); }
 }

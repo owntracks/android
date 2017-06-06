@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
@@ -136,6 +138,7 @@ public class ContactImageProvider {
         paint.setColor(color);
         canvas.drawBitmap(image, 0, 0, paint);
         placeholder = new BitmapDrawable(c.getResources(), image);
+        App.getEventBus().register(this);
 
     }
 
@@ -217,5 +220,10 @@ public class ContactImageProvider {
 
     private static float convertDpToPixel(float dp) {
         return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(Events.ModeChanged e) {
+        invalidateCache();
     }
 }
