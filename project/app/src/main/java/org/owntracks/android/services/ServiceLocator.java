@@ -76,7 +76,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         checkLocationPermission();
 
         this.lastPublish = System.currentTimeMillis(); // defer first location report when the service is started;
-        this.waypointDao = Dao.getWaypointDao();
+        this.waypointDao = App.getDao().getWaypointDao();
         this.googleApiClient = new GoogleApiClient.Builder(this.context).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
         if (ServiceProxy.checkPlayServices() && !hasConnectedGoogleApiClient()) {

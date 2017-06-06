@@ -63,7 +63,7 @@ public class ActivityRegion extends ActivityBase  {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        this.dao = Dao.getWaypointDao();
+        this.dao = App.getDao().getWaypointDao();
 
 
         if (hasIntentExtras()) {

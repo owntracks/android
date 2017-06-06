@@ -19,7 +19,6 @@ import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
@@ -102,7 +101,7 @@ public class App extends Application  {
 
         ContactImageProvider.initialize(this);
         GeocodingProvider.initialize(this);
-        Dao.initialize(this);
+        //Handled by Dagger     Dao.initialize(this);
 
         getMessageProcessor().initialize();
         startService(new Intent(this, ServiceProxy.class));
@@ -114,8 +113,6 @@ public class App extends Application  {
     public static AppComponent getAppComponent() { return sAppComponent; }
 
     public static Parser getParser() { return sAppComponent.parser(); }
-
-    public static EncryptionProvider getEncryptionProvider() { return sAppComponent.encryptionProvider(); }
 
     public static Resources getRes() { return sInstance.getResources(); }
 
@@ -135,6 +132,9 @@ public class App extends Application  {
         return sAppComponent.messageProcessor();
     }
 
+    public static Dao getDao() {
+        return sAppComponent.dao();
+    }
 
     public static void enableForegroundBackgroundDetection() {
         sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
