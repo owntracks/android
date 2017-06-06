@@ -1,8 +1,8 @@
 package org.owntracks.android.messages;
 
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 
 import java.lang.ref.WeakReference;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.google.android.gms.maps.model.LatLng;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")

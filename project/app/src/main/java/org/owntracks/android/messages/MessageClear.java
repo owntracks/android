@@ -1,11 +1,10 @@
 package org.owntracks.android.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageClear extends MessageBase {
     @Override

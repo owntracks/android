@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

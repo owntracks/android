@@ -30,7 +30,7 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
