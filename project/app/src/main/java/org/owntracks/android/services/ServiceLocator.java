@@ -170,6 +170,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
                     this.waypointDao.update(w);
                     App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                     publishTransitionMessage(w, event.getTriggeringLocation(), transition);
+                    reportLocationCircular();
                     //if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
                     //    Timber.v("starting location lookup");
                     //    LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
@@ -423,6 +424,14 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         reportLocation(MessageLocation.REPORT_TYPE_RESPONSE); // response to a "reportLocation" request
     }
 
+    void reportLocationBeacon() {
+        reportLocation(MessageLocation.REPORT_TYPE_BEACON); // response to a beacon transition
+    }
+
+    void reportLocationCircular() {
+        reportLocation(MessageLocation.REPORT_TYPE_CIRCULAR); // response to a beacon transition
+    }
+
     private void reportLocation() {
         reportLocation(null); // automatic publish after a location change
 	}
@@ -446,6 +455,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(Preferences.getTrackerId(true));
+        message.setCp(Preferences.getCp());
         if(Preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
 
@@ -464,6 +474,8 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 
         }
+
+
 
 		ServiceProxy.getServiceMessage().sendMessage(message);
 	}

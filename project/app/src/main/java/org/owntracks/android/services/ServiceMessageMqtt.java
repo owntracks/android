@@ -469,7 +469,7 @@ public class ServiceMessageMqtt implements OutgoingMessageProcessor, RejectedExe
 					prefix = "ws";
 			}
 
-			String cid = Preferences.getClientId(true);
+			String cid = Preferences.getClientId();
             String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
 			Log.v(TAG, "init() mode: " + Preferences.getModeId());
 			Log.v(TAG, "init() client id: " + cid);

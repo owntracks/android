@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.altbeacon.beacon.BeaconConsumer;
@@ -18,6 +19,8 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.logging.LogManager;
+import org.altbeacon.beacon.logging.Loggers;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
@@ -26,6 +29,8 @@ import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.ProxyableService;
+
+import timber.log.Timber;
 
 // Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
 //  -> https://github.com/AltBeacon/spec
@@ -66,13 +71,11 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         // Gets additional information about available BLE features
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        int beaconMode = Preferences.getBeaconMode();
-
         if(bluetoothAdapter == null) {
             Log.e(TAG, "Bluetooth is not available");
             return;
         }
-        if(beaconMode == BEACON_MODE_OFF) {
+        if(Preferences.getBeaconMode() == BEACON_MODE_OFF) {
             Log.e(TAG, "Beacon scanning is disabled");
             return;
 
@@ -86,14 +89,15 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
         beaconManager = BeaconManager.getInstanceForApplication(context);
 
-        // Use legacy scanning if desired
-        // See https://altbeacon.github.io/android-beacon-library/battery_manager.html for details
-        if(beaconMode == BEACON_MODE_LEGACY_SCANNING) {
-            BeaconManager.setAndroidLScanningDisabled(true);
-            beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
-            beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
-        }
+
+
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25")); //altbeacon
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Preferences.getBeaconLayout()));
+
+        beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
+        beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
+
         beaconManager.bind(this);
     }
     
@@ -135,6 +139,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
 
         ServiceProxy.getServiceMessage().sendMessage(m);
+        ServiceProxy.getServiceLocator().reportLocationBeacon();
 
         w.setLastTriggered(System.currentTimeMillis());
         this.waypointDao.update(w);
@@ -144,7 +149,20 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     @Override
     public void onBeaconServiceConnect() {
         Log.v(TAG, "onBeaconServiceConnect");
-        beaconManager.setMonitorNotifier(new MonitorNotifier() {
+
+        // Use legacy scanning if desired
+        // See https://altbeacon.github.io/android-beacon-library/battery_manager.html for details
+        if(Preferences.getBeaconMode()  == BEACON_MODE_LEGACY_SCANNING) {
+            BeaconManager.setAndroidLScanningDisabled(true);
+        }
+
+        try {
+            beaconManager.updateScanPeriods();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
                 Log.i(TAG, "didEnterRegion " + region.getUniqueId() + " " + Long.parseLong(region.getUniqueId()));
@@ -169,6 +187,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     }
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointAdded e) {
         addRegion(e.getWaypoint());
     }
@@ -209,7 +228,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         Log.v(TAG, "startMonitoringBeaconsInRegion " + w.getId() + " desc: " + w.getDescription() + " UUID: " + w.getBeaconUUID() + " " + w.getBeaconMajor() + "/" + w.getBeaconMinor());
         try {
             Region r = getRegionFromWaypoint(w);
-
+            Timber.v("region %s UUID:%s major:%s minor:%s", r.getUniqueId(), r.getId1(),r.getId2(), r.getId3());
             Log.v(TAG, r.getUniqueId() + " " + r.getId1() + " " + r.getId2() + " " + r.getId3());
             beaconManager.startMonitoringBeaconsInRegion(r);
         } catch (Exception e) {
@@ -238,12 +257,14 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     }
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointUpdated e) {
         removeRegion(e.getWaypoint());
         addRegion(e.getWaypoint());
     }
 
     @SuppressWarnings("unused")
+    @Subscribe
     public void onEvent(Events.WaypointRemoved e) {
         removeRegion(e.getWaypoint());
     }
@@ -270,14 +291,14 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     }
 
     void onEnterForeground() {
-        if(beaconManager != null) {
+        if(beaconManager != null && beaconManager.isAnyConsumerBound()) {
             Log.v(TAG, "enabling foreground mode");
             beaconManager.setBackgroundMode(false);
         }
     }
 
     void onEnterBackground() {
-        if(beaconManager != null) {
+        if(beaconManager != null && beaconManager.isAnyConsumerBound()) {
             Log.v(TAG, "enabling background mode");
             beaconManager.setBackgroundMode(true);
         }
