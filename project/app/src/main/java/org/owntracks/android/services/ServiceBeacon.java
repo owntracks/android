@@ -22,6 +22,7 @@ import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.logging.LogManager;
 import org.altbeacon.beacon.logging.Loggers;
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.App;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
@@ -52,7 +53,7 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         Log.v(TAG, "onCreate()");
 
         this.context = c;
-        this.waypointDao = Dao.getWaypointDao();
+        this.waypointDao = App.getDao().getWaypointDao();
         this.activeRegions = new HashMap<>();
 
 

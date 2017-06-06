@@ -6,10 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 public  class Dao {
     private static final String NAME = "org.owntracks.android.db";
     private static final String TAG = "Dao";
-    private static org.owntracks.android.db.WaypointDao waypointDao;
-    private static SQLiteDatabase db;
+    private org.owntracks.android.db.WaypointDao waypointDao;
+    private SQLiteDatabase db;
 
-    public static void initialize(Context c) {
+
+    public Dao(Context c) {
+        initialize(c);
+    }
+    private void initialize(Context c) {
         org.owntracks.android.db.DaoMaster.DevOpenHelper helper1 = new org.owntracks.android.db.DaoMaster.DevOpenHelper(c, NAME, null);
         db = helper1.getWritableDatabase();
         org.owntracks.android.db.DaoMaster daoMaster1 = new org.owntracks.android.db.DaoMaster(db);
@@ -19,6 +23,6 @@ public  class Dao {
     }
 
 
-    public static SQLiteDatabase getDb() { return db; }
-    public static org.owntracks.android.db.WaypointDao getWaypointDao() {  return waypointDao; }
+    public SQLiteDatabase getDb() { return db; }
+    public org.owntracks.android.db.WaypointDao getWaypointDao() {  return waypointDao; }
 }

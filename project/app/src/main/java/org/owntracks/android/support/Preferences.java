@@ -370,7 +370,7 @@ public class Preferences {
     public static MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
+        for(Waypoint waypoint : App.getDao().getWaypointDao().loadAll()) {
             messages.add(MessageWaypoint.fromDaoObject(waypoint));
         }
         return messages;
@@ -381,7 +381,7 @@ public class Preferences {
         if(j == null)
             return;
 
-        WaypointDao dao = Dao.getWaypointDao();
+        WaypointDao dao = App.getDao().getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
         for (MessageWaypoint m: j) {

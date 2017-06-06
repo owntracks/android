@@ -90,7 +90,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return Dao.getWaypointDao().queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId())).buildCursor().query();
+                return App.getDao().getWaypointDao().queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId())).buildCursor().query();
             }
         };
     }
@@ -133,8 +133,8 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
     private void remove(long id) {
 
-        Waypoint w = Dao.getWaypointDao().loadByRowId(id);
-        Dao.getWaypointDao().delete(w);
+        Waypoint w = App.getDao().getWaypointDao().loadByRowId(id);
+        App.getDao().getWaypointDao().delete(w);
         App.getEventBus().post(new Events.WaypointRemoved(w));
         Toasts.showWaypointRemovedToast();
         if(mActionMode != null)
