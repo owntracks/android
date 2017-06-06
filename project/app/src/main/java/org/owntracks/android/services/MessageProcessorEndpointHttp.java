@@ -299,7 +299,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
             if(App.isInForeground())
                 sendMessage(b);
             else
-                App.getDispatcher().scheduleMessage(b);
+                App.getScheduler().scheduleMessage(b);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Parser.EncryptionException e) {
