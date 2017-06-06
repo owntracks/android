@@ -137,6 +137,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		@Override
 		public void connectionLost(Throwable cause) {
 			Timber.e(cause, "connectionLost error");
+			App.getScheduler().cancelMqttPing();
+            App.getScheduler().scheduleMqttReconnect();
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 		}
 
@@ -284,7 +286,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
-			App.getDispatcher().scheduleMqttPing(connectOptions.getKeepAliveInterval());
+			App.getScheduler().scheduleMqttPing(connectOptions.getKeepAliveInterval());
 			changeState(EndpointState.CONNECTED);
 
 			return true;
@@ -313,7 +315,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private void onConnect() {
-
+		App.getScheduler().cancelMqttReconnect();
 		// Check if we're connecting to the same broker that we were already connected to
 		String connectionId = getConnectionId();
 		if(lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
@@ -414,6 +416,9 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				changeState(EndpointState.DISCONNECTED_USERDISCONNECT);
 			else
 				changeState(EndpointState.DISCONNECTED);
+			App.getScheduler().cancelMqttPing();
+			App.getScheduler().cancelMqttReconnect();
+
 		}
 	}
 
@@ -434,7 +439,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		checkConnection();
 	}
 
-	private boolean checkConnection() {
+	public boolean checkConnection() {
 		if(isConnected()) {
 			return true;
 		} else {
@@ -566,7 +571,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			if(App.isInForeground())
 				sendMessage(b);
 			else
-				App.getDispatcher().scheduleMessage(b);
+				App.getScheduler().scheduleMessage(b);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Parser.EncryptionException e) {
