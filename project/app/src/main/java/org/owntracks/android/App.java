@@ -103,7 +103,7 @@ public class App extends Application  {
         return sAppComponent.eventBus();
     }
 
-    public static Scheduler getDispatcher() {
+    public static Scheduler getScheduler() {
         return sAppComponent.scheduler();
     }
 
