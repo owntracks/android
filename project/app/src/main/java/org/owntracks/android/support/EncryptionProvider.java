@@ -18,7 +18,7 @@ public class EncryptionProvider {
     private static Random r;
     private static boolean enabled;
 
-    public boolean isPayloadEncryptionEnabled() {
+    boolean isPayloadEncryptionEnabled() {
         return enabled;
     }
 
@@ -42,7 +42,7 @@ public class EncryptionProvider {
         initializeSecretBox();
     }
 
-    public String decrypt(String cyphertextb64) {
+    String decrypt(String cyphertextb64) {
         byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
         byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
@@ -52,7 +52,7 @@ public class EncryptionProvider {
         return new String(b.decrypt(nonce, cyphertext));
     }
 
-    public String encrypt(String plaintext) {
+    String encrypt(String plaintext) {
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
         byte[] cyphertext = b.encrypt(nonce, plaintext.getBytes());
         byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
