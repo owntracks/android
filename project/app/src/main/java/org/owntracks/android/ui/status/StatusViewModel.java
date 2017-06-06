@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
@@ -55,7 +56,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     @Bindable
     public int getEndpointQueue() {
-        return 0;
+        return App.getMessageProcessor().getQueueLenght();
     }
 
     @Override

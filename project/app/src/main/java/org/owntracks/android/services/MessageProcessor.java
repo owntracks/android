@@ -56,6 +56,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
             outgoingMessageProcessor.onEnterForeground();
     }
 
+    public int getQueueLenght() {
+        return outgoingQueue.size();
+    }
 
 
     public enum EndpointState {
