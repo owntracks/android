@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiActivityConfigurationBinding;
 import org.owntracks.android.support.Preferences;
@@ -58,6 +59,8 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
             case R.id.importConfigurationSingleValue:
                 showEditorView();
                 return true;
+            case R.id.restart:
+                App.restart();
             default:
                 return false;
         }
