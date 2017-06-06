@@ -7,10 +7,13 @@ import android.content.res.Resources;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
+import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
+import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 
 import dagger.Module;
@@ -82,4 +85,12 @@ public class AppModule {
         return new EncryptionProvider();
     }
 
+
+    @Provides
+    @PerApplication
+    static GeocodingProvider provideGeocodingProvider(@AppContext Context context) { return new GeocodingProvider(context); }
+
+    @Provides
+    @PerApplication
+    static ContactImageProvider provideContactImageProvider(@AppContext Context context) { return new ContactImageProvider(context); }
 }

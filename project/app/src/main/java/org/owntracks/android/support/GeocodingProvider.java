@@ -22,7 +22,7 @@ public class GeocodingProvider {
     private static final Double RUN_SECOND = 2d;
     private static Geocoder geocoder;
 
-    public static void resolve(MessageLocation m, TextView tv) {
+    public void resolve(MessageLocation m, TextView tv) {
         if(m.hasGeocoder()) {
             tv.setText(m.getGeocoder());
         } else {
@@ -31,7 +31,7 @@ public class GeocodingProvider {
         }
     }
 
-    public static void resolve(MessageLocation m, ServiceNotification s) {
+    public void resolve(MessageLocation m, ServiceNotification s) {
         NotificationLocationResolverTask.run(m, s, RUN_FIRST);
     }
 
@@ -180,10 +180,9 @@ public class GeocodingProvider {
 
     }
 
-    public static void initialize(Context c){
+
+
+    public GeocodingProvider(Context c){
         geocoder = new Geocoder(App.getContext(), Locale.getDefault());
     }
-
-
-
 }

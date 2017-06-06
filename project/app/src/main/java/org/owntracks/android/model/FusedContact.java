@@ -62,7 +62,7 @@ public class FusedContact extends BaseObservable {
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
 
-        ContactImageProvider.invalidateCacheLevelCard(getId());
+        App.getContactImageProvider().invalidateCacheLevelCard(getId());
         notifyMessageCardPropertyChanged();
     }
 
@@ -106,14 +106,14 @@ public class FusedContact extends BaseObservable {
 
     @BindingAdapter({"imageProvider", "contact"})
     public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
-        ContactImageProvider.setImageViewAsync(view, c);
+        App.getContactImageProvider().setImageViewAsync(view, c);
 
     }
 
     @BindingAdapter({"android:text", "messageLocation"})
     public static void displayFusedLocationInViewAsync(TextView view,  FusedContact c, MessageLocation m) {
         if(m != null)
-            GeocodingProvider.resolve(m, view);
+            App.getGeocodingProvider().resolve(m, view);
         else
             view.setText(R.string.na);
     }

@@ -26,39 +26,35 @@ import org.owntracks.android.support.Preferences;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
-import android.provider.Settings.Secure;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
-
+1
 public class App extends Application  {
-    private static App sInstance;
+    public static final int MODE_ID_MQTT_PRIVATE =0;
+    public static final int MODE_ID_MQTT_PUBLIC =2;
+    public static final int MODE_ID_HTTP_PRIVATE = 3;
+
     private static SimpleDateFormat dateFormater;
     private static SimpleDateFormat dateFormaterToday;
 
     private static Handler mainHandler;
     private static Handler backgroundHandler;
 
-    private static Activity currentActivity;
+    private Activity currentActivity;
     private static boolean inForeground;
-    private static int runningActivities = 0;
-
-    public static final int MODE_ID_MQTT_PRIVATE =0;
-    public static final int MODE_ID_MQTT_PUBLIC =2;
-    public static final int MODE_ID_HTTP_PRIVATE = 3;
+    private int runningActivities = 0;
 
     private static AppComponent sAppComponent = null;
 
@@ -71,16 +67,10 @@ public class App extends Application  {
                 @Override
                 protected String createStackElementTag(StackTraceElement element) {
                     return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
-
                 }
             });
         }
-        sInstance = this;
-        sAppComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
-
-
+        sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
 
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         dateFormaterToday = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
@@ -96,25 +86,17 @@ public class App extends Application  {
         getEventBus().postSticky(new Events.AppStarted());
 
         Preferences.initialize(this);
-        //Handled by Dagger     EncryptionProvider.initialize();
-        //Handled by Dagger     Parser.initialize(this);
-
-        ContactImageProvider.initialize(this);
-        GeocodingProvider.initialize(this);
-        //Handled by Dagger     Dao.initialize(this);
-
         getMessageProcessor().initialize();
         startService(new Intent(this, ServiceProxy.class));
-
     }
-
-    public static App getInstance() { return sInstance; }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
 
-    public static Parser getParser() { return sAppComponent.parser(); }
+    public static GeocodingProvider getGeocodingProvider() { return sAppComponent.geocodingProvider(); }
 
-    public static Resources getRes() { return sInstance.getResources(); }
+    public static ContactImageProvider getContactImageProvider() { return sAppComponent.contactImageProvider(); }
+
+    public static Parser getParser() { return sAppComponent.parser(); }
 
     public static EventBus getEventBus() {
         return sAppComponent.eventBus();
@@ -136,27 +118,23 @@ public class App extends Application  {
         return sAppComponent.dao();
     }
 
-    public static void enableForegroundBackgroundDetection() {
-        sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-        sInstance.registerScreenOnReceiver();
+    public void enableForegroundBackgroundDetection() {
+        registerActivityLifecycleCallbacks(new LifecycleCallbacks());
+        registerScreenOnReceiver();
     }
 
-
-
     public static Context getContext() {
-		return sInstance;
+		return sAppComponent.context();
 	}
 
     public static FusedContact getFusedContact(String topic) {
         return sAppComponent.contactsRepo().getById(topic);
     }
 
-
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {
         getContactsRepo().clearAll();
-        ContactImageProvider.invalidateCache();
+        getContactImageProvider().invalidateCache();
     }
 
     public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
@@ -187,10 +165,6 @@ public class App extends Application  {
         }
 	}
 
-	public static String getAndroidId() {
-		return Secure.getString(sInstance.getContentResolver(), Secure.ANDROID_ID);
-	}
-
 	public static int getBatteryLevel() {
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		Intent batteryStatus = getContext().registerReceiver(null, ifilter);
@@ -202,13 +176,13 @@ public class App extends Application  {
         getContactsRepo().clearAll();
     }
 
-    private static void onEnterForeground() {
+    private void onEnterForeground() {
         inForeground = true;
         getMessageProcessor().onEnterForeground();
         ServiceProxy.onEnterForeground();
     }
 
-    private static void onEnterBackground() {
+    private void onEnterBackground() {
         inForeground = false;
         ServiceProxy.onEnterBackground();
     }
@@ -220,18 +194,18 @@ public class App extends Application  {
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background
      */
-    private static final class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private final class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
 
-            App.runningActivities++;
+            runningActivities++;
             currentActivity = activity;
-            if (App.runningActivities == 1) App.onEnterForeground();
+            if (runningActivities == 1) onEnterForeground();
         }
 
         public void onActivityStopped(Activity activity) {
-            App.runningActivities--;
+            runningActivities--;
             if(currentActivity == activity)  currentActivity = null;
-            if (App.runningActivities == 0) App.onEnterBackground();
+            if (runningActivities == 0) onEnterBackground();
         }
 
         public void onActivityResumed(Activity activity) {  }
@@ -252,21 +226,9 @@ public class App extends Application  {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String strAction = intent.getAction();
-
-                KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-
-                if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON))
+                if ((strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON)) && isInForeground())
                 {
-                  //  if( myKM.inKeyguardRestrictedInputMode())
-                    //{
-                        if(App.isInForeground())
-                            App.onEnterBackground();
-                   /* } else
-                   // {
-                        if(App.isInForeground())
-                            App.onEnterBackground();
-
-                    }*/
+                        onEnterBackground();
                 }
             }
         };
@@ -274,7 +236,6 @@ public class App extends Application  {
         getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
 
     }
-
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
@@ -287,8 +248,6 @@ public class App extends Application  {
 
             p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
 
-        } else {
-            Timber.v("Consecutive application launch");
         }
     }
 

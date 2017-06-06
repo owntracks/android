@@ -33,4 +33,5 @@ public abstract class ViewModelModule {
     @Binds
     abstract LoadMvvm.ViewModel bindLoadViewModel(LoadViewModel statusViewModel);
 
+
 }

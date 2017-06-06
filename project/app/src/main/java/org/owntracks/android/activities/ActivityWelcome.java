@@ -91,7 +91,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
 
 
     private void startActivityMain() {
-        App.enableForegroundBackgroundDetection();
+        App.class.cast(getApplication()).enableForegroundBackgroundDetection();
         Intent intent = new Intent(this, MapActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -99,7 +99,7 @@ public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageCha
     }
 
     private void startActivityPreferences() {
-        App.enableForegroundBackgroundDetection();
+        App.class.cast(getApplication()).enableForegroundBackgroundDetection();
         Intent intent = new Intent(this, ActivityPreferences.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
