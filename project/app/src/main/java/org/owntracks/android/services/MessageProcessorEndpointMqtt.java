@@ -107,7 +107,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	private Bundle mqttMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
 		Bundle b = new Bundle();
-		b.putString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
+		b.putString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
 		b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
 		b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
 		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
@@ -145,7 +145,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		public void messageArrived(String topic, MqttMessage message) throws Exception {
 			if(message.getPayload().length > 0) {
 				try {
-					MessageBase m = Parser.fromJson(message.getPayload());
+					MessageBase m = App.getParser().fromJson(message.getPayload());
 					if (!m.isValidMessage()) {
 						Timber.e("message failed validation");
 						return;

@@ -198,7 +198,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
                 try {
                     //Timber.v("code: %s, streaming response to parser", r.body().string() );
 
-                    MessageBase[] result = Parser.fromJson(r.body().byteStream());
+                    MessageBase[] result = App.getParser().fromJson(r.body().byteStream());
                     ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.IDLE, "Response "+r.code() + ", " + result.length);
 
                     for (MessageBase aResult : result) {
@@ -236,7 +236,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
     private Bundle httpMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
         Bundle b = new Bundle();
-        b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, Parser.toJson(m));
+        b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
         b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
         b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
         b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());

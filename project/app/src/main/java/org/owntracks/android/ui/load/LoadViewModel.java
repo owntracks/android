@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.json.JSONException;
+import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.qualifier.AppContext;
@@ -54,8 +55,8 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public void setConfiguration(String json) throws IOException, Parser.EncryptionException {
         Timber.v("%s", json);
-        this.configuration = MessageConfiguration.class.cast(Parser.fromJson(json.getBytes()));
-        this.configurationPretty = Parser.toJsonPlainPretty(this.configuration);
+        this.configuration = MessageConfiguration.class.cast(App.getParser().fromJson(json.getBytes()));
+        this.configurationPretty = App.getParser().toJsonPlainPretty(this.configuration);
         notifyPropertyChanged(BR.configurationPretty);
     }
 

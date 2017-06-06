@@ -2,9 +2,13 @@ package org.owntracks.android.injection.modules;
 
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.MemoryContactsRepo;
+import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.support.EncryptionProvider;
+import org.owntracks.android.support.Parser;
 
 import dagger.Binds;
 import dagger.Module;
+import dagger.Provides;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -24,5 +28,18 @@ public abstract class DataModule {
 
     @Binds
     abstract ContactsRepo bindContactsRepo(MemoryContactsRepo memoryContactsRepo);
+
+    @Provides
+    @PerApplication
+    Parser provideParser() {
+        return new Parser();
+    }
+
+    @Provides
+    @PerApplication
+    EncryptionProvider provideEncryptionProvider() {
+        return new EncryptionProvider();
+    }
+
 
 }

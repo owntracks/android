@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
@@ -38,7 +39,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
             MessageConfiguration m = Preferences.exportToMessage();
             m.setWaypoints(null);
             m.set(Preferences.Keys.PASSWORD, "********");
-            setEffectiveConfiguration(Parser.toJsonPlainPretty(m));
+            setEffectiveConfiguration(App.getParser().toJsonPlainPretty(m));
         } catch (IOException e) {
             getView().displayLoadFailed();
         }
@@ -58,7 +59,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
     public void onExportConfigurationToFileClicked() {
         String exportStr;
         try {
-            exportStr = Parser.toJsonPlain(Preferences.exportToMessage());
+            exportStr = App.getParser().toJsonPlain(Preferences.exportToMessage());
         } catch (IOException e) {
             getView().displayExportToFileFailed();
             return;
