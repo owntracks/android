@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import org.owntracks.android.support.IncomingMessageProcessor;
 import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.PausableThreadPoolExecutor;
 
 import java.lang.ref.WeakReference;
 
@@ -28,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
-public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable{
+public abstract class MessageBase extends BaseObservable implements Runnable {
         protected static final String TAG = "MessageBase";
 
         @JsonIgnore
@@ -126,11 +125,6 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
                 }
         }
 
-        @Override
-        public void cancelOnRun() {
-                this.cancelOnRun = true;
-        }
-
 
         @JsonIgnore
         public void setIncomingProcessor(IncomingMessageProcessor processor) {
@@ -166,7 +160,6 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         @JsonIgnore
         public void setOutgoing() {
                 this.direction = DIRECTION_OUTGOING;
-
         }
 
         @JsonIgnore
