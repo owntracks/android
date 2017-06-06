@@ -1,10 +1,9 @@
 package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 
