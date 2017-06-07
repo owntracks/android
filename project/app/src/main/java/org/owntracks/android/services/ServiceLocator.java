@@ -558,9 +558,9 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
             Geofence geofence = new Geofence.Builder()
 					.setRequestId(w.getGeofenceId())
-					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(15))
-                    .setNotificationResponsiveness((int)TimeUnit.SECONDS.toMillis(30))
+					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    //.setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(15))
+                    .setNotificationResponsiveness((int)TimeUnit.MINUTES.toMillis(2))
 					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
 					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
@@ -605,7 +605,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
     private GeofencingRequest getGeofencingRequest(List<Geofence> fences) {
         GeofencingRequest.Builder  builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL); //trigger transition when geofence is setup and device is already in it
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER); //trigger transition when geofence is setup and device is already in it
         builder.addGeofences(fences);
         return builder.build();
     }
