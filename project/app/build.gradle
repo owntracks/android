@@ -7,7 +7,7 @@ def versionPatch = 4
 def versionBuild = 2
 ext.pahoVersion = "1.1.0"
 ext.daggerVersion = '2.6'
-ext.playLibVersion = '10.2.6'
+ext.playLibVersion = '11.0.0'
 ext.okHttpVersion = '3.8.0'
 ext.supportLibVersion = '25.3.1'
 
