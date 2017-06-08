@@ -227,5 +227,6 @@
     <string name="preferencesEditorValue">Value</string>
     <string name="drawerSwitchReporting">Reporting</string>
     <string name="drawerSwitchCopy">Copy</string>
+    <string name="restart">Restart</string>
 
 </resources>
