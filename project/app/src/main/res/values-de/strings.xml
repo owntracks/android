@@ -185,6 +185,7 @@
     <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
     <string name="drawerSwitchReporting">Veröffentlichen</string>
     <string name="drawerSwitchCopy">Kopieren</string>
+    <string name="restart">Neu starten</string>
 
 
 </resources>

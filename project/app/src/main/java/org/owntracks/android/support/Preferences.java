@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 
 import android.annotation.SuppressLint;
@@ -306,6 +307,12 @@ public class Preferences {
         Method m = methods.get(key);
         if(m == null)
             throw new IllegalAccessException();
+
+
+        if(value == null) {
+            clearKey(key);
+            return;
+        }
 
         try {
             Type t = m.getGenericParameterTypes()[0];
@@ -1058,6 +1065,7 @@ public class Preferences {
     public static MessageConfiguration exportToMessage() {
         List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
+        cfg.set(Keys._VERSION, BuildConfig.VERSION_CODE);
         for(Method m : methods) {
             m.setAccessible(true);
 
@@ -1130,6 +1138,7 @@ public class Preferences {
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIRST_START                     = "firstStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
+        public static final String _VERSION                         = "_build";
 
 
     }
