@@ -471,6 +471,17 @@ public class Preferences {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
+    @Export(key =Keys.PING, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
+    public static int getPing() {
+        return getInt(Keys.PING, R.integer.valPing);
+    }
+
+    @Import(key =Keys.PING)
+    private static void setPing(int anInt) {
+        setInt(Keys.PING, anInt);
+
+    }
+
     @Export(key =Keys.USERNAME, exportModeMqttPrivate =true)
     public static String getUsername() {
         // in public, the username is just used to build the topic public/user/$deviceId
@@ -1112,7 +1123,7 @@ public class Preferences {
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
         public static final String PASSWORD                         = "password";
-        public static final String PLAY_OVERRIDE                    = "playOverride";
+        public static final String PING                             = "ping";
         public static final String PORT                             = "port";
         public static final String PUB                              = "pub";
         public static final String PUB_EXTENDED_DATA                = "pubExtendedData";

@@ -152,41 +152,7 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
     private void onFenceTransition(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Timber.v("");
-        if(event != null){
-            if(event.hasError()) {
-                Timber.e("geofence event has error: %s", event.getErrorCode());
-                return;
-            }
 
-            int transition = event.getGeofenceTransition();
-            for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
-
-                Waypoint w =  this.waypointDao.queryBuilder().where(WaypointDao.Properties.GeofenceId.eq(event.getTriggeringGeofences().get(index).getRequestId())).limit(1).unique();
-
-
-                if (w != null) {
-                    Timber.v("waypoint triggered:%s transition:%s", w.getDescription(),transition);
-                    w.setLastTriggered(System.currentTimeMillis());
-                    this.waypointDao.update(w);
-                    App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
-                    publishTransitionMessage(w, event.getTriggeringLocation(), transition);
-                    reportLocationCircular();
-                    //if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
-                    //    Timber.v("starting location lookup");
-                    //    LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
-                    //    Criteria criteria = new Criteria();
-                    //    criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                    //    Bundle b = new Bundle();
-                    //    b.putInt("event", transition);
-                    //    b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
-//
-                    //    PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
-//
-                    //    mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
-                    //}
-                }
-            }
-        }
 	}
 
 

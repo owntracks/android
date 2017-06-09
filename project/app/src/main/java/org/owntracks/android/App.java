@@ -180,9 +180,7 @@ public class App extends Application  {
         ServiceProxy.onEnterForeground();
 
         Intent mIntent = new Intent(this, LocationService.class);
-        mIntent.putExtra(LocationService.INTENT_EXTRA_BG_STATUS_CHANGE, true);
-        mIntent.putExtra(LocationService.INTENT_EXTRA_BG, false);
-
+        mIntent.setAction(LocationService.INTENT_ACTION_CHANGE_BG);
         startService(mIntent);
     }
 
@@ -191,8 +189,7 @@ public class App extends Application  {
         ServiceProxy.onEnterBackground();
 
         Intent mIntent = new Intent(this, LocationService.class);
-        mIntent.putExtra(LocationService.INTENT_EXTRA_BG_STATUS_CHANGE, true);
-        mIntent.putExtra(LocationService.INTENT_EXTRA_BG, true);
+        mIntent.setAction(LocationService.INTENT_ACTION_CHANGE_BG);
         startService(mIntent);
 
     }
