@@ -43,7 +43,6 @@ public class MessageConfiguration extends MessageBase{
     @JsonAnyGetter
     @JsonPropertyOrder(alphabetic=true)
     public Map<String,Object> any() {
-        Timber.v("getting map. length: %s", map.size());
         return map;
     }
 
@@ -51,8 +50,6 @@ public class MessageConfiguration extends MessageBase{
     public void set(String key, Object value) {
         if(value instanceof String && "".equals(value))
             return;
-        Timber.v("load key:%s, value:%s", key, value);
-
         map.put(key, value);
     }
 

@@ -567,7 +567,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	private void scheduleMessage(MessageBase m) {
 		try {
 			Bundle b = mqttMessageToBundle(m);
-			b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.TASK_SEND_MESSAGE_MQTT);
+			b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_MQTT);
 			if(App.isInForeground())
 				sendMessage(b);
 			else
