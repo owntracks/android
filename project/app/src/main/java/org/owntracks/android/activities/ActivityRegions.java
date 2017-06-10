@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -26,10 +25,8 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.waypoints.AdapterCursorLoader;
 import org.owntracks.android.ui.waypoints.AdapterWaypoints;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.SimpleCursorLoader;
 import org.owntracks.android.support.widgets.Toasts;
@@ -46,13 +43,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     private boolean actionMode;
 
     protected void onCreate(Bundle savedInstanceState) {
-        startService(new Intent(this, ServiceProxy.class));
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                Log.v("ActivityMain", "ServiceProxy bound");
-            }
-        });
+        //startService(new Intent(this, ServiceProxy.class));
 
         super.onCreate(savedInstanceState);
 
@@ -119,14 +110,6 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
     @Override
     public void onDestroy() {
-        ServiceProxy.runOrBind(this, new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.closeServiceConnection();
-
-            }
-        });
         super.onDestroy();
     }
 
@@ -135,7 +118,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         Waypoint w = App.getDao().getWaypointDao().loadByRowId(id);
         App.getDao().getWaypointDao().delete(w);
-        App.getEventBus().post(new Events.WaypointRemoved(w));
+        App.getEventBus().post(w);
         Toasts.showWaypointRemovedToast();
         if(mActionMode != null)
             mActionMode.finish();
@@ -148,7 +131,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.WaypointAdded e) {
+    public void onEventMainThread(Waypoint e) {
         requery();
     }
 
@@ -156,17 +139,6 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     public void onEventMainThread(Events.WaypointTransition e) {
         requery();
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.WaypointRemoved e) {
-        requery();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.WaypointUpdated e) {
-        requery();
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -176,19 +148,20 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
                 startActivity(detailIntent);
                 return true;
             case R.id.exportWaypointsService:
+                //TODO: reimplement
                 //Dirty hack here
-                ServiceProxy.runOrBind(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
-                            Toast.makeText(getApplicationContext(), R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            Toast.makeText(getApplicationContext(), R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                });
+                //ServiceProxy.runOrBind(this, new Runnable() {
+                //    @Override
+                //    public void run() {
+                //        if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
+                //            Toast.makeText(getApplicationContext(), R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
+//
+                //        } else {
+                //            Toast.makeText(getApplicationContext(), R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
+//
+                //        }
+                //    }
+                //});
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
