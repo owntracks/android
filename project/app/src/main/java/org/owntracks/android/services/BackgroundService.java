@@ -1,19 +1,21 @@
 package org.owntracks.android.services;
 
-import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v13.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,10 +35,12 @@ import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.model.GeocodableLocation;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
+import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +52,10 @@ public class BackgroundService extends Service {
     public static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
 
-    private static final int NOTIFICATION_ID_ONGOING = 1923;
+    private static final int NOTIFICATION_ID_ONGOING = 1;
+    private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
+
+    private String NOTIFICATION_GROUP_EVENTS = "events";
 
     public static final String INTENT_ACTION_CHANGE_BG = "BG";
     public static final String INTENT_ACTION_SEND_LOCATION_PING = "LP";
@@ -68,6 +75,8 @@ public class BackgroundService extends Service {
 
 
     private NotificationCompat.Builder activeNotificationBuilder;
+    private NotificationCompat.Builder notificationBuilderEvents;
+    private NotificationManager mNotificationManager;
 
     @Nullable
     @Override
@@ -80,7 +89,7 @@ public class BackgroundService extends Service {
     public void onCreate() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-
+        mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         sendOngoingNotification();
 
@@ -191,11 +200,114 @@ public class BackgroundService extends Service {
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
 
-    private void setupLocationPing() {
-        App.getScheduler().scheduleLocationPing();
+
+    private void sendEventNotification(MessageTransition message) {
+        Timber.v("sending for message %s", message.getMessageId());
+        NotificationCompat.Builder builder = getEventsNotificationBuilder();
+
+        if (builder == null)
+            return;
+
+        Timber.v("have builder %s", message.getMessageId());
+
+        //getNotificationManagerService().notify(remoteNotification.getUserNotificationGroup(), remoteNotification.getUserNotificationId(), builtNotification);
+
+        // Prepare data
+        FusedContact c = App.getFusedContact(message.getContactKey());
+
+        long when = message.getTst()*1000;
+        String transition =  getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving);
+        String location = message.getDesc();
+
+        if (location == null) {
+            location = getString(R.string.aLocation);
+        }
+        String name = message.getTid();
+
+        if(c != null)
+            name = c.getFusedName();
+        else if(name == null){
+            name = message.getContactKey();
+        }
+
+        notificationBuilderEvents.setContentTitle(name);
+        notificationBuilderEvents.setContentText(transition + " " + location);
+        notificationBuilderEvents.setWhen(when);
+        notificationBuilderEvents.setShowWhen(true);
+
+        // Deliver notification
+        Notification n = notificationBuilderEvents.build();
+        mNotificationManager.notify((int)System.currentTimeMillis() / 1000, n);
+
+        sendEventStackNotification(n);
     }
 
 
+
+    private void sendEventStackNotification(Notification remoteNotification) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            ArrayList<StatusBarNotification> groupedNotifications = new ArrayList<>();
+
+            for (StatusBarNotification sbn : mNotificationManager.getActiveNotifications()) {
+                // add any previously sent notifications with a group that matches our RemoteNotification
+                // and exclude any previously sent stack notifications
+                if (sbn.getId() != NOTIFICATION_ID_EVENT_GROUP && sbn.getId() != NOTIFICATION_ID_ONGOING) {
+                    groupedNotifications.add(sbn);
+                }
+            }
+
+            // since we assume the most recent notification was delivered just prior to calling this method,
+            // we check that previous notifications in the group include at least 2 notifications
+            if (groupedNotifications.size() > 1) {
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+                // use convenience methods on our RemoteNotification wrapper to create a title
+                builder.setContentTitle(getString(R.string.events));
+                builder.setContentText(String.format("%d new events", groupedNotifications.size()));
+
+                // for every previously sent notification that met our above requirements,
+                // add a new line containing its title to the inbox style notification extender
+                NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
+                {
+                    for (StatusBarNotification activeSbn : groupedNotifications) {
+                        String stackNotificationLine = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
+                        if (stackNotificationLine != null) {
+                            inbox.addLine(stackNotificationLine);
+                        }
+                    }
+
+                    // the summary text will appear at the bottom of the expanded stack notification
+                    // we just display the same thing from above (don't forget to use string
+                    // resource formats!)
+                    inbox.setSummaryText(String.format("%d new activities", groupedNotifications.size()));
+                }
+                builder.setStyle(inbox);
+
+                builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications
+                builder.setGroupSummary(true);
+
+                // if the user taps the notification, it should disappear after firing its content intent
+                // and we set the priority to high to avoid Doze from delaying our notifications
+                builder.setAutoCancel(true);
+                builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+
+                // create a unique PendingIntent using an integer request code.
+                final int requestCode = (int)System.currentTimeMillis() / 1000;
+                builder.setContentIntent(PendingIntent.getActivity(App.getContext(), requestCode, new Intent(App.getContext(), ActivityWelcome.class), PendingIntent.FLAG_ONE_SHOT));
+
+                Notification stackNotification = builder.build();
+                stackNotification.defaults = Notification.DEFAULT_ALL;
+
+                mNotificationManager.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
+            }
+        }
+    }
+
+
+
+    private void setupLocationPing() {
+        App.getScheduler().scheduleLocationPing();
+    }
 
 
     private void onGeofencingEvent(@Nullable  GeofencingEvent event) {
@@ -221,7 +333,7 @@ public class BackgroundService extends Service {
                     w.setLastTriggered(System.currentTimeMillis());
 
                     App.getDao().getWaypointDao().update(w);
-                    App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
+                    //App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                     publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
                     publishTransitionMessage(w, event.getTriggeringLocation(), transition);
 
@@ -393,10 +505,6 @@ public class BackgroundService extends Service {
         }
     }
 
-    private boolean checkPermissions() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
     @SuppressWarnings("MissingPermission")
     private void setupGeofences() {
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
@@ -454,8 +562,9 @@ public class BackgroundService extends Service {
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageTransition message) {
-        //if(message.isIncoming())
-            //sendEventNotification(message);
+        Timber.v("transition %s", message.isIncoming());
+        if(message.isIncoming())
+            sendEventNotification(message);
     }
 
     @SuppressWarnings("unused")
@@ -478,5 +587,44 @@ public class BackgroundService extends Service {
     public void onEvent(MessageProcessor.EndpointState state) {
         this.lastEndpointState = state;
         sendOngoingNotification();
+    }
+
+    public NotificationCompat.Builder getEventsNotificationBuilder() {
+        if (!Preferences.getNotificationEvents())
+            return null;
+
+        Timber.v("building notification builder");
+
+
+        if(notificationBuilderEvents!=null)
+            return notificationBuilderEvents;
+
+        Timber.v("builder not present, lazy building");
+
+
+        notificationBuilderEvents = new NotificationCompat.Builder(this);
+
+
+        Intent openIntent = new Intent(this, ActivityWelcome.class);
+        openIntent.setAction("android.intent.action.MAIN");
+        openIntent.addCategory("android.intent.category.LAUNCHER");
+        openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent openPendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationBuilderEvents.setContentIntent(openPendingIntent);
+        //notificationBuilderEvents.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
+        notificationBuilderEvents.setSmallIcon(R.drawable.ic_notification);
+        notificationBuilderEvents.setAutoCancel(true);
+        notificationBuilderEvents.setShowWhen(true);
+        notificationBuilderEvents.setGroup(NOTIFICATION_GROUP_EVENTS);
+        notificationBuilderEvents.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        notificationBuilderEvents.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        notificationBuilderEvents.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationBuilderEvents.setColor(getColor(R.color.primary));
+        }
+
+        return notificationBuilderEvents;
     }
 }
