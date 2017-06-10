@@ -12,7 +12,6 @@ import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 
 import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
 import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
@@ -55,8 +54,8 @@ public class Scheduler extends GcmTaskService {
             case PERIODIC_TASK_MQTT_RECONNECT:
                 return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
             case PERIODIC_TASK_SEND_LOCATION_PING:
-                Intent mIntent = new Intent(this, LocationService.class);
-                mIntent.setAction(LocationService.INTENT_ACTION_SEND_LOCATION_PING);
+                Intent mIntent = new Intent(this, BackgroundService.class);
+                mIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
                 startService(mIntent);
 
             default:

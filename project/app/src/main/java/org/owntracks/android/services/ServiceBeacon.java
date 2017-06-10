@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.altbeacon.beacon.BeaconConsumer;
@@ -19,24 +18,21 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
-import org.altbeacon.beacon.logging.LogManager;
-import org.altbeacon.beacon.logging.Loggers;
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.ProxyableService;
 
 import timber.log.Timber;
 
 // Detects Bluetooth LE beacons as defined in the AltBeacon Spec:
 //  -> https://github.com/AltBeacon/spec
 
-public class ServiceBeacon implements ProxyableService, BeaconConsumer {
+@Deprecated
+public class ServiceBeacon implements BeaconConsumer {
     private static final String TAG = "ServiceBeacon";
 
     private Context context;
@@ -48,11 +44,9 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     private static final int BEACON_MODE_LEGACY_SCANNING = 1;
     private static final int BEACON_MODE_OFF = 2;
 
-    @Override
-    public void onCreate(ServiceProxy c) {
+    public void onCreate() {
         Log.v(TAG, "onCreate()");
 
-        this.context = c;
         this.waypointDao = App.getDao().getWaypointDao();
         this.activeRegions = new HashMap<>();
 
@@ -106,14 +100,12 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
     
 
 
-    @Override
     public void onDestroy() {
         if(beaconManager != null && beaconManager.isBound(this))
             beaconManager.unbind(this);
     }
 
 
-    @Override
     public void onStartCommand(Intent intent) {
 
     }
@@ -141,8 +133,9 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         m.setTrigger(MessageTransition.TRIGGER_BEACON);
 
 
-        ServiceProxy.getServiceMessage().sendMessage(m);
-        ServiceProxy.getServiceLocator().reportLocationBeacon();
+        App.getMessageProcessor().sendMessage(m);
+        //TODO: reimplement
+        //ServiceProxy.getServiceLocator().reportLocationBeacon();
 
         w.setLastTriggered(System.currentTimeMillis());
         this.waypointDao.update(w);
@@ -187,12 +180,6 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
         for(Waypoint w : loadWaypointsForModeIdWithValidBeacon()) {
             addRegion(w);
         }
-    }
-
-    @SuppressWarnings("unused")
-    @Subscribe
-    public void onEvent(Events.WaypointAdded e) {
-        addRegion(e.getWaypoint());
     }
 
     private boolean hasBeaconManager() {
@@ -261,16 +248,16 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
     @SuppressWarnings("unused")
     @Subscribe
-    public void onEvent(Events.WaypointUpdated e) {
-        removeRegion(e.getWaypoint());
-        addRegion(e.getWaypoint());
+    public void onEvent(Waypoint e) {
+        removeRegion(e);
+        addRegion(e);
     }
 
-    @SuppressWarnings("unused")
-    @Subscribe
-    public void onEvent(Events.WaypointRemoved e) {
-        removeRegion(e.getWaypoint());
-    }
+    //@SuppressWarnings("unused")
+    //@Subscribe
+    //public void onEvent(Events.WaypointRemoved e) {
+    //    removeRegion(e.getWaypoint());
+    //}
 
     private List<Waypoint> loadWaypointsForModeIdWithValidBeacon() {
         return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId()), WaypointDao.Properties.BeaconUUID.isNotNull()).build().list();

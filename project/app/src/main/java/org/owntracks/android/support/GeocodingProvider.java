@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.services.ServiceNotification;
+import org.owntracks.android.services.BackgroundService;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -31,15 +31,15 @@ public class GeocodingProvider {
         }
     }
 
-    public void resolve(MessageLocation m, ServiceNotification s) {
+    public void resolve(MessageLocation m, BackgroundService s) {
         NotificationLocationResolverTask.run(m, s, RUN_FIRST);
     }
 
     private static class NotificationLocationResolverTask extends MessageLocationResolverTask {
 
-        private final WeakReference<ServiceNotification> service;
+        private final WeakReference<BackgroundService> service;
 
-        static void run(MessageLocation m, ServiceNotification s, double run) {
+        static void run(MessageLocation m, BackgroundService s, double run) {
             (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
         }
 
@@ -47,13 +47,13 @@ public class GeocodingProvider {
         void retry() {
             Timber.v("retrying");
             MessageLocation m = message.get();
-            ServiceNotification s = service.get();
+            BackgroundService s = service.get();
 
             if(m != null && s != null)
                 run(m, s, RUN_SECOND);
         }
 
-        NotificationLocationResolverTask(MessageLocation m, ServiceNotification service) {
+        NotificationLocationResolverTask(MessageLocation m, BackgroundService service) {
             super(m);
             this.service = new WeakReference<>(service);
 
@@ -62,13 +62,11 @@ public class GeocodingProvider {
         @Override
         void onPostExecuteResultAvailable(String result) {
             MessageLocation m = this.message.get();
-            ServiceNotification s = this.service.get();
+            BackgroundService s = this.service.get();
             if(m!=null && s!=null) {
-                s.onMessageLocationGeocoderResult(m);
+                s.onGeocodingProviderResult(m);
             }
         }
-
-
     }
 
     private static class TextViewLocationResolverTask extends MessageLocationResolverTask {

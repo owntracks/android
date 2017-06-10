@@ -21,12 +21,9 @@ import com.google.android.gms.maps.model.LatLng;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityRegionBinding;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 
@@ -47,14 +44,6 @@ public class ActivityRegion extends ActivityBase  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, ServiceProxy.class));
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                Log.v("ActivityRegions", "ServiceProxy bound");
-            }
-        });
-
 
         //setContentView(R.layout.activity_waypoint);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_region);
@@ -117,15 +106,6 @@ public class ActivityRegion extends ActivityBase  {
 
     @Override
     public void onDestroy() {
-       // handler.removeCallbacksAndMessages(null); // disable handler
-        ServiceProxy.runOrBind(this, new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.closeServiceConnection();
-
-            }
-        });
         super.onDestroy();
     }
 
@@ -133,13 +113,13 @@ public class ActivityRegion extends ActivityBase  {
     private void add(Waypoint w) {
         long id = this.dao.insert(w);
         Log.v(TAG, "added waypoint with id: " + id);
-        App.getEventBus().post(new Events.WaypointAdded(w)); // For ServiceLocator update
+        App.getEventBus().post(w); // For ServiceLocator update
         //App.getEventBus().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     private void update(Waypoint w) {
         this.dao.update(w);
-        App.getEventBus().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
+        App.getEventBus().post(w); // For ServiceLocator update
         //App.getEventBus().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
@@ -217,20 +197,21 @@ public class ActivityRegion extends ActivityBase  {
             case PERMISSION_REQUEST_USE_CURRENT:
                 Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION");
                 if (granted) {
-                    ServiceProxy.runOrBind(this, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-                            if(l != null) {
-                                waypoint.setGeofenceLatitude(l.getLatitude());
-                                waypoint.setGeofenceLongitude(l.getLongitude());
-                            } else {
-
-                                Toasts.showCurrentLocationNotAvailable();
-                            }
-                        }
-                    });
+                    //TODO: refactor
+                    //ServiceProxy.runOrBind(this, new Runnable() {
+//
+                    //    @Override
+                    //    public void run() {
+                    //        Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
+                    //        if(l != null) {
+                    //            waypoint.setGeofenceLatitude(l.getLatitude());
+                    //            waypoint.setGeofenceLongitude(l.getLongitude());
+                    //        } else {
+//
+                    //            Toasts.showCurrentLocationNotAvailable();
+                    //        }
+                    //    }
+                    //});
                 } else {
                     Toasts.showLocationPermissionNotAvailable();
                 }

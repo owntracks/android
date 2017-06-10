@@ -171,12 +171,7 @@
         </service>
 
         <service
-            android:name=".services.LocationService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <service
-            android:name=".services.ServiceProxy"
+            android:name=".services.BackgroundService"
             android:enabled="true"
             android:exported="false" />
 
@@ -186,17 +181,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".support.receiver.ReceiverProxy"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_RECONNECT" />
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_PING" />
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_GEOFENCE_TRANSITION" />
-                <action android:name="org.owntracks.android.RECEIVER_ACTION_PUBLISH_LASTKNOWN" />
             </intent-filter>
         </receiver>
 
