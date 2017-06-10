@@ -186,6 +186,7 @@
     <string name="drawerSwitchReporting">Veröffentlichen</string>
     <string name="drawerSwitchCopy">Kopieren</string>
     <string name="restart">Neu starten</string>
+    <string name="notificationEventsTitle" formatted="false">%d neue Ereignisse</string>
 
 
 </resources>
