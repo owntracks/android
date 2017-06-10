@@ -170,6 +170,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true"
+            android:exported="false" />
 
         <service
             android:name=".services.ServiceProxy"

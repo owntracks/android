@@ -97,8 +97,6 @@ public class ServiceNotification implements ProxyableService {
                 }
             }
 
-
-
         };
 
         Preferences.registerOnPreferenceChangedListener(this.preferencesChangedListener);

@@ -28,6 +28,7 @@
     <integer name="valIgnoreInaccurateLocations">0</integer>
     <integer name="valModeId">0</integer>
     <integer name="valMqttProtocolLevel">3</integer>
+    <integer name="valPing">30</integer>
 
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
