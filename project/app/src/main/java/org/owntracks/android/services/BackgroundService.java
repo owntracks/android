@@ -3,6 +3,8 @@ package org.owntracks.android.services;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.NotificationChannel;
+
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -290,6 +292,7 @@ public class BackgroundService extends Service {
                 // and we set the priority to high to avoid Doze from delaying our notifications
                 builder.setAutoCancel(true);
                 builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                builder.setSmallIcon(R.drawable.ic_notification);
 
                 // create a unique PendingIntent using an integer request code.
                 final int requestCode = (int)System.currentTimeMillis() / 1000;
@@ -620,7 +623,6 @@ public class BackgroundService extends Service {
         notificationBuilderEvents.setPriority(NotificationCompat.PRIORITY_DEFAULT);
         notificationBuilderEvents.setCategory(NotificationCompat.CATEGORY_SERVICE);
         notificationBuilderEvents.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             notificationBuilderEvents.setColor(getColor(R.color.primary));
         }
