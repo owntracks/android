@@ -3,7 +3,6 @@ package org.owntracks.android.services;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.NotificationChannel;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -198,7 +197,7 @@ public class BackgroundService extends Service {
 
         builder.setPriority(Preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         builder.setContentText(lastEndpointState.getLabel(App.getContext()));
-
+Timber.v("starting notification foreground");
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
 
@@ -236,17 +235,17 @@ public class BackgroundService extends Service {
         notificationBuilderEvents.setContentText(transition + " " + location);
         notificationBuilderEvents.setWhen(when);
         notificationBuilderEvents.setShowWhen(true);
-
         // Deliver notification
         Notification n = notificationBuilderEvents.build();
+
         mNotificationManager.notify((int)System.currentTimeMillis() / 1000, n);
 
-        sendEventStackNotification(n);
+        sendEventStackNotification();
     }
 
 
 
-    private void sendEventStackNotification(Notification remoteNotification) {
+    private void sendEventStackNotification() {
         if (Build.VERSION.SDK_INT >= 23) {
             ArrayList<StatusBarNotification> groupedNotifications = new ArrayList<>();
 
@@ -261,11 +260,13 @@ public class BackgroundService extends Service {
             // since we assume the most recent notification was delivered just prior to calling this method,
             // we check that previous notifications in the group include at least 2 notifications
             if (groupedNotifications.size() > 1) {
+
+                String title = String.format(getString(R.string.notificationEventsTitle), groupedNotifications.size());
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
                 // use convenience methods on our RemoteNotification wrapper to create a title
                 builder.setContentTitle(getString(R.string.events));
-                builder.setContentText(String.format("%d new events", groupedNotifications.size()));
+                builder.setContentText(title);
 
                 // for every previously sent notification that met our above requirements,
                 // add a new line containing its title to the inbox style notification extender
@@ -278,15 +279,13 @@ public class BackgroundService extends Service {
                         }
                     }
 
-                    // the summary text will appear at the bottom of the expanded stack notification
-                    // we just display the same thing from above (don't forget to use string
-                    // resource formats!)
-                    inbox.setSummaryText(String.format("%d new activities", groupedNotifications.size()));
+                    inbox.setSummaryText(title);
                 }
                 builder.setStyle(inbox);
 
                 builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications
                 builder.setGroupSummary(true);
+                builder.setColor(getColor(R.color.primary));
 
                 // if the user taps the notification, it should disappear after firing its content intent
                 // and we set the priority to high to avoid Doze from delaying our notifications
