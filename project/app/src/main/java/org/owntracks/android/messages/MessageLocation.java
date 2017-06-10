@@ -23,6 +23,9 @@ public class MessageLocation extends MessageBase  {
     public static final String REPORT_TYPE_RESPONSE = "r";
     public static final String REPORT_TYPE_BEACON= "b";
     public static final String REPORT_TYPE_CIRCULAR= "c";
+    public static final String REPORT_TYPE_PING = "p";
+    public static final String REPORT_TYPE_DEFAULT = null;
+
     public static final String CONN_TYPE_OFFLINE = "o";
     public static final String CONN_TYPE_WIFI = "w";
     public static final String CONN_TYPE_MOBILE = "m";

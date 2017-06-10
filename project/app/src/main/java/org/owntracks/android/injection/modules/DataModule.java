@@ -10,6 +10,7 @@ import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
 
 import dagger.Binds;
 import dagger.Module;
@@ -36,8 +37,8 @@ public abstract class DataModule {
 
     @Provides
     @PerApplication
-    static Dao provideDao(@AppContext Context context) {
-        return new Dao(context);
+    static Dao provideDao(@AppContext Context context, Preferences preferences) {
+        return new Dao(context, preferences);
     }
 
 }

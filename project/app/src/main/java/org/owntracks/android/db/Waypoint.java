@@ -190,6 +190,10 @@ public class Waypoint {
         return l;
     }
 
+    private boolean hasValidGeofence() {
+        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
+    }
+
 
     public void setDefaults() {
         this.setShared(false);
