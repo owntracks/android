@@ -198,7 +198,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
                     //Timber.v("code: %s, streaming response to parser", r.body().string() );
 
                     MessageBase[] result = App.getParser().fromJson(r.body().byteStream());
-                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.IDLE, "Response "+r.code() + ", " + result.length);
+                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("Response "+r.code() + ", " + result.length));
 
                     for (MessageBase aResult : result) {
                         getMessageProcessor().onMessageReceived(aResult);
@@ -206,13 +206,13 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
                     //Non JSON return value
                 } catch (IOException e) {
-                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "HTTP " +r.code() + ", JsonParseException");
+                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP " +r.code() + ", JsonParseException"));
                     Timber.e("error:JsonParseException responseCode:%s", r.code());
                     e.printStackTrace();
                     getMessageProcessor().onMessageDeliveryFailed(messageId);
                     return false;
                 } catch (Parser.EncryptionException e) {
-                    ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, "Response: "+r.code() + ", EncryptionException");
+                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response: "+r.code() + ", EncryptionException"));
                     Timber.e("error:EncryptionException");
                     getMessageProcessor().onMessageDeliveryFailed(messageId);
                     return false;
@@ -224,7 +224,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
         } catch (IOException e) {
             e.printStackTrace();
-            ServiceProxy.getServiceMessage().onEndpointStateChanged(EndpointState.ERROR, e);
+            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setError(e));
             return false;
         }
     }
