@@ -14,10 +14,8 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v13.app.ActivityCompat;
+import android.support.v7.app.NotificationCompat;
 
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -30,14 +28,15 @@ import com.google.android.gms.location.LocationServices;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
+import org.owntracks.android.R;
+import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
+import org.owntracks.android.model.GeocodableLocation;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -45,21 +44,30 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class LocationService extends Service {
+public class BackgroundService extends Service {
     public static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
 
+    private static final int NOTIFICATION_ID_ONGOING = 1923;
+
     public static final String INTENT_ACTION_CHANGE_BG = "BG";
-    public static final String INTENT_ACTION_SEND_LOCATION_PING = "L_P";
-    public static final String INTENT_ACTION_SEND_LOCATION_USER = "L_U";
-
-    public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "E_C";
-
+    public static final String INTENT_ACTION_SEND_LOCATION_PING = "LP";
+    public static final String INTENT_ACTION_SEND_LOCATION_USER = "LU";
+    public static final String INTENT_ACTION_SEND_LOCATION_RESPONSE = "LR";
+    public static final String INTENT_ACTION_SEND_WAYPOINTS = "W";
+    public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "EC";
 
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
 
-    protected Location mLastLocation;
+    private Location lastLocation;
+    private MessageLocation lastLocationMessage;
+    private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
+
+
+
+
+    private NotificationCompat.Builder activeNotificationBuilder;
 
     @Nullable
     @Override
@@ -73,13 +81,14 @@ public class LocationService extends Service {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
 
-        requestLocation();
-        requestGeofences();
-        requestLocationScheduled();
-    }
 
-    private void requestLocationScheduled() {
-        App.getScheduler().scheduleLocationPing();
+        sendOngoingNotification();
+
+        setupLocationRequest();
+        setupGeofences();
+        setupLocationPing();
+
+        App.getEventBus().register(this);
     }
 
     @Override
@@ -94,14 +103,12 @@ public class LocationService extends Service {
     }
 
     private void handleIntent(@NonNull Intent intent) {
-
-
         if (LocationResult.hasResult(intent)) {
-           onLocationChanged(intent);
+            onLocationChanged(intent);
         } else if(intent.getAction() != null){
             switch (intent.getAction()) {
                 case INTENT_ACTION_CHANGE_BG:
-                    requestLocation();
+                    setupLocationRequest();
                     return;
                 case INTENT_ACTION_SEND_LOCATION_PING:
                     publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
@@ -112,12 +119,84 @@ public class LocationService extends Service {
                 case INTENT_ACTION_SEND_EVENT_CIRCULAR:
                     onGeofencingEvent(GeofencingEvent.fromIntent(intent));
                     return;
+                case INTENT_ACTION_SEND_LOCATION_RESPONSE:
+                    Timber.e("INTENT_ACTION_SEND_LOCATION_RESPONSE not implemented");
+                    return;
+                case INTENT_ACTION_SEND_WAYPOINTS:
+                    Timber.e("INTENT_ACTION_SEND_WAYPOINTS not implemented");
+                    return;
+
 
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
             }
         }
     }
+
+    @Nullable
+    private NotificationCompat.Builder getOngoingNotificationBuilder() {
+        if (!Preferences.getNotification())
+            return null;
+
+        if(activeNotificationBuilder!=null)
+            return activeNotificationBuilder;
+
+
+        activeNotificationBuilder = new NotificationCompat.Builder(this);
+
+        Intent resultIntent = new Intent(App.getContext(), ActivityWelcome.class);
+        resultIntent.setAction("android.intent.action.MAIN");
+        resultIntent.addCategory("android.intent.category.LAUNCHER");
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        activeNotificationBuilder.setContentIntent(resultPendingIntent);
+        activeNotificationBuilder.setSortKey("a");
+
+
+
+        Intent publishIntent = new Intent();
+        publishIntent.setAction(INTENT_ACTION_SEND_LOCATION_USER);
+        PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        activeNotificationBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent);
+        activeNotificationBuilder.setSmallIcon(R.drawable.ic_notification);
+
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            activeNotificationBuilder.setColor(getColor(R.color.primary));
+            activeNotificationBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
+            activeNotificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        }
+        activeNotificationBuilder.setOngoing(true);
+
+        return activeNotificationBuilder;
+    }
+
+    private void sendOngoingNotification() {
+        NotificationCompat.Builder builder = getOngoingNotificationBuilder();
+
+        if (builder == null)
+            return;
+
+        if (this.lastLocationMessage != null && this.lastLocationMessage.getGeocoder() != null && Preferences.getNotificationLocation()) {
+            builder.setContentTitle(this.lastLocationMessage.getGeocoder());
+            builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTst()));
+        } else {
+            builder.setContentTitle(getString(R.string.app_name));
+        }
+
+        builder.setPriority(Preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        builder.setContentText(lastEndpointState.getLabel(App.getContext()));
+
+        startForeground(NOTIFICATION_ID_ONGOING, builder.build());
+    }
+
+    private void setupLocationPing() {
+        App.getScheduler().scheduleLocationPing();
+    }
+
+
+
 
     private void onGeofencingEvent(@Nullable  GeofencingEvent event) {
 
@@ -172,9 +251,9 @@ public class LocationService extends Service {
         if (location != null) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
-            mLastLocation = location;
+            lastLocation = location;
 
-            App.getEventBus().postSticky(new Events.CurrentLocationUpdated(mLastLocation));
+            App.getEventBus().postSticky(lastLocation);
 
             if (shouldPublishLocation())
                 publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
@@ -190,18 +269,18 @@ public class LocationService extends Service {
     private void publishLocationMessage(@Nullable String trigger) {
         Timber.v("trigger:%s", trigger);
 
-        if(mLastLocation == null) {
+        if(lastLocation == null) {
             Timber.e("no location available");
             return;
         }
 
-        if(ignoreLowAccuracy(mLastLocation))
+        if(ignoreLowAccuracy(lastLocation))
             return;
 
         MessageLocation message = new MessageLocation();
-        message.setLat(mLastLocation.getLatitude());
-        message.setLon(mLastLocation.getLongitude());
-        message.setAcc(Math.round(mLastLocation.getAccuracy()));
+        message.setLat(lastLocation.getLatitude());
+        message.setLon(lastLocation.getLongitude());
+        message.setAcc(Math.round(lastLocation.getAccuracy()));
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(Preferences.getTrackerId(true));
@@ -248,15 +327,15 @@ public class LocationService extends Service {
         if(!Preferences.getPub())
             return false;
 
-        if (!ServiceProxy.isInForeground())
+        if (!App.isInForeground())
             return true;
 
         // Publishes are throttled to 30 seconds when in the foreground to not spam the server
-        return (System.currentTimeMillis() - this.mLastLocation.getTime()) > TimeUnit.SECONDS.toMillis(30);
+        return (System.currentTimeMillis() - this.lastLocation.getTime()) > TimeUnit.SECONDS.toMillis(30);
     }
 
     @SuppressWarnings("MissingPermission")
-    private void requestLocation() {
+    private void setupLocationRequest() {
         Timber.v("updating location request");
         if(mFusedLocationClient == null) {
             Timber.e("mFusedLocationClient not available");
@@ -269,11 +348,11 @@ public class LocationService extends Service {
     }
 
     private PendingIntent getLocationPendingIntent() {
-        Intent locationIntent = new Intent(getApplicationContext(), LocationService.class);
+        Intent locationIntent = new Intent(getApplicationContext(), BackgroundService.class);
         return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
     private PendingIntent getGeofencePendingIntent() {
-        Intent geofeneIntent = new Intent(getApplicationContext(), LocationService.class);
+        Intent geofeneIntent = new Intent(getApplicationContext(), BackgroundService.class);
         geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
         return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
@@ -319,7 +398,7 @@ public class LocationService extends Service {
     }
 
     @SuppressWarnings("MissingPermission")
-    private void requestGeofences() {
+    private void setupGeofences() {
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
         List<Geofence> fences = new LinkedList<>();
@@ -360,30 +439,44 @@ public class LocationService extends Service {
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointAdded e) {
+    public void onEvent(Waypoint e) {
         removeGeofences();
-        requestGeofences();
-    }
-
-    @SuppressWarnings("unused")
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointUpdated e) {
-        removeGeofences();
-        requestGeofences();
-    }
-
-    @SuppressWarnings("unused")
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointRemoved e) {
-        removeGeofences();
-        requestGeofences();
-
+        setupGeofences();
     }
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.ModeChanged e) {
         removeGeofences();
-        requestGeofences();
+        setupGeofences();
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(MessageTransition message) {
+        //if(message.isIncoming())
+            //sendEventNotification(message);
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(MessageLocation m) {
+        if(m.isOutgoing() && (lastLocationMessage == null || lastLocationMessage.getTst() <=  m.getTst())) {
+            this.lastLocationMessage = m;
+            App.getGeocodingProvider().resolve(m, this);
+        }
+    }
+
+    public void onGeocodingProviderResult(MessageLocation m) {
+        if(m == lastLocationMessage) {
+            sendOngoingNotification();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(MessageProcessor.EndpointState state) {
+        this.lastEndpointState = state;
+        sendOngoingNotification();
     }
 }
