@@ -14,12 +14,10 @@ import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.LocationService;
+import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
-import org.owntracks.android.services.ServiceProxy;
 import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
@@ -31,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,7 +86,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 getMessageProcessor().initialize();
-                startService(new Intent(getApplicationContext(), LocationService.class));
+                startService(new Intent(getApplicationContext(), BackgroundService.class));
 
                 //startService(new Intent(getApplicationContext(), ServiceProxy.class));
             }
@@ -176,22 +173,16 @@ public class App extends Application  {
     private void onEnterForeground() {
         inForeground = true;
         getMessageProcessor().onEnterForeground();
-
-        ServiceProxy.onEnterForeground();
-
-        Intent mIntent = new Intent(this, LocationService.class);
-        mIntent.setAction(LocationService.INTENT_ACTION_CHANGE_BG);
+        Intent mIntent = new Intent(this, BackgroundService.class);
+        mIntent.setAction(BackgroundService.INTENT_ACTION_CHANGE_BG);
         startService(mIntent);
     }
 
     private void onEnterBackground() {
         inForeground = false;
-        ServiceProxy.onEnterBackground();
-
-        Intent mIntent = new Intent(this, LocationService.class);
-        mIntent.setAction(LocationService.INTENT_ACTION_CHANGE_BG);
+        Intent mIntent = new Intent(this, BackgroundService.class);
+        mIntent.setAction(BackgroundService.INTENT_ACTION_CHANGE_BG);
         startService(mIntent);
-
     }
 
     public static boolean isInForeground() {
