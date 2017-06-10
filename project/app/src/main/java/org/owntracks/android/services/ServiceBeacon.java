@@ -82,11 +82,13 @@ public class ServiceBeacon implements ProxyableService, BeaconConsumer {
 
         }
 
+        try { // bluetoothAdapter.isMultipleAdvertisementSupported might throw a NullPointerException for some reason
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Log.v(TAG, "bluetoothAdapter.isMultipleAdvertisementSupported: " + bluetoothAdapter.isMultipleAdvertisementSupported());
             Log.v(TAG, "bluetoothAdapter.isOffloadedFilteringSupported: " + bluetoothAdapter.isOffloadedFilteringSupported());
             Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
-        }
+        } } catch(NullPointerException e) {Timber.e("bluetoothAdapter threw a NullPointerException");};
+
 
         beaconManager = BeaconManager.getInstanceForApplication(context);
 
