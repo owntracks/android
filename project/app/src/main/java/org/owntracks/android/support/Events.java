@@ -50,76 +50,6 @@ public class Events {
 
 	}
 
-	public static class WaypointAddedByUser extends E {
-		final Waypoint w;
-
-		public WaypointAddedByUser(Waypoint w) {
-			super();
-			this.w = w;
-		}
-
-		public Waypoint getWaypoint() {
-			return this.w;
-		}
-
-	}
-    public static class WaypointAdded extends E {
-        final Waypoint w;
-
-        public WaypointAdded(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-
-    public static class WaypointUpdated extends E {
-        final Waypoint w;
-
-        public WaypointUpdated(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-    public static class WaypointUpdatedByUser extends E {
-        final Waypoint w;
-
-        public WaypointUpdatedByUser(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-
-	public static class WaypointRemoved extends E {
-		final Waypoint w;
-
-		public WaypointRemoved(Waypoint w) {
-			super();
-			this.w = w;
-		}
-
-		public Waypoint getWaypoint() {
-			return this.w;
-		}
-
-	}
 
 	public static abstract class E {
 		final Date date;
@@ -137,22 +67,6 @@ public class Events {
 	public static class Dummy extends E {
 		public Dummy() {
 		}
-	}
-
-	public static class PublishSuccessful extends E {
-		final Object extra;
-        final boolean wasQueued;
-
-		public PublishSuccessful(Object extra, boolean wasQueued) {
-			super();
-			this.extra = extra;
-            this.wasQueued = wasQueued;
-		}
-
-		public Object getExtra() {
-			return this.extra;
-		}
-        public boolean wasQueued() {return  this.wasQueued;}
 	}
 
 	public static class CurrentLocationUpdated extends E {
@@ -230,39 +144,6 @@ public class Events {
 	public static class BrokerChanged extends E {
 		public BrokerChanged() {}
 	}
-
-	public static class EndpointStateChanged extends E {
-		private final MessageProcessor.EndpointState state;
-		private Exception exception = null;
-		private String message = null;
-
-		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state) {
-			super();
-			this.state = state;
-		}
-
-		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state, @Nullable  Exception exception) {
-			super();
-			this.state = state;
-			this.exception = exception;
-		}
-		public EndpointStateChanged(@NonNull MessageProcessor.EndpointState state, @Nullable  String message) {
-			super();
-			this.state = state;
-			this.message = message;
-		}
-
-		public MessageProcessor.EndpointState getState() {
-				return this.state;
-			}
-		@Nullable  public Exception getException() {
-				return this.exception;
-			}
-		@Nullable  public String getMessage() {
-			return this.message;
-		}
-
-    }
 
     public static class PermissionGranted extends E {
         private final String permission;

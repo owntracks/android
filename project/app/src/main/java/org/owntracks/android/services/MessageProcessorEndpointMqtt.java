@@ -453,12 +453,13 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private void changeState(EndpointState newState) {
-		changeState(newState, null);
+		state = newState;
+		getMessageProcessor().onEndpointStateChanged(newState);
 	}
 
 	private void changeState(EndpointState newState, Exception e) {
 		state = newState;
-		getMessageProcessor().onEndpointStateChanged(newState, e);
+		getMessageProcessor().onEndpointStateChanged(newState.setError(e));
 	}
 
 	private MessageProcessor getMessageProcessor() {

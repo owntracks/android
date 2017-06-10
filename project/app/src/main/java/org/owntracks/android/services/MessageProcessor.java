@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.util.LongSparseArray;
 
@@ -23,6 +24,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 import org.owntracks.android.support.widgets.Toasts;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +41,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
     private ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private OutgoingMessageProcessor outgoingMessageProcessor;
+    private String endpointMessage;
 
     public void reconnect() {
         if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
@@ -73,6 +76,22 @@ public class MessageProcessor implements IncomingMessageProcessor {
         ERROR_DATADISABLED,
         ERROR_CONFIGURATION;
 
+        String message;
+        private Exception error;
+
+        public String getMessage() {
+            return message;
+        }
+
+        public Exception getError() {
+            return error;
+        }
+        public EndpointState setMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+
         public String getLabel(Context context) {
             Resources res = context.getResources();
             int resId = res.getIdentifier(this.name(), "string", context.getPackageName());
@@ -84,6 +103,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         public boolean isErrorState() {
             return this == ERROR || this == ERROR_DATADISABLED || this == ERROR_CONFIGURATION;
+        }
+
+        public EndpointState setError(Exception error) {
+            this.error = error;
+            return this;
         }
     }
 
@@ -190,18 +214,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        eventBus.postSticky(new Events.EndpointStateChanged(newState));
+        eventBus.postSticky(newState);
     }
-
-    void onEndpointStateChanged(EndpointState newState, String message) {
-        eventBus.postSticky(new Events.EndpointStateChanged(newState, message));
-    }
-
-    void onEndpointStateChanged(EndpointState newState, Exception e) {
-        Timber.v("new state:%s",newState);
-        eventBus.postSticky(new Events.EndpointStateChanged(newState, e));
-    }
-
 
     @Override
     public void processIncomingMessage(MessageBase message) {
@@ -252,10 +266,15 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
-                    ServiceProxy.getServiceLocator().reportLocationResponse();
+
+                    Intent reportIntent = new Intent(App.getContext(), BackgroundService.class);
+                    reportIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_RESPONSE);
+                    App.getContext().startService(reportIntent);
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
-                    ServiceProxy.getServiceLocator().publishWaypointsMessage();
+                    Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
+                    waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_WAYPOINTS);
+                    App.getContext().startService(waypointsIntent);
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     MessageWaypoints w = message.getWaypoints();
@@ -279,6 +298,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageTransition message) {
-        ServiceProxy.getServiceNotification().processMessage(message);
+        eventBus.post(message);
+        //ServiceProxy.getServiceNotification().processMessage(message);
     }
 }

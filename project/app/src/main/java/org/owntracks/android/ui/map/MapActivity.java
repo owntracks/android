@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,11 +35,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.Events;
+import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.base.navigator.Navigator;
@@ -329,13 +326,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
 
+            Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
+            waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
+            startService(waypointsIntent);
 
-            PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
-            try {
-                p.send();
-            } catch (PendingIntent.CanceledException e) {
-                e.printStackTrace();
-            }
             return true;
         } else if (itemId == R.id.menu_mylocation) {
             viewModel.onMenuCenterDeviceClicked();
@@ -491,7 +485,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     public class MapLocationSource implements LocationSource {
         LocationSource.OnLocationChangedListener mListener;
-        GeocodableLocation mLocation;
+        Location mLocation;
 
         MapLocationSource() {
             super();
@@ -512,22 +506,16 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         }
 
         @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
-        public void update(Events.CurrentLocationUpdated l) {
-            Timber.v("update to location: %s", l.getLocation().toLatLonString());
-            this.mLocation = l.getLocation();
+        public void update(Location l) {
+            this.mLocation = l;
             if(mListener != null)
                 this.mListener.onLocationChanged(this.mLocation);
             onLocationSourceUpdated();
         }
 
-        public GeocodableLocation getLocation() {
-            return mLocation;
-        }
-
         LatLng getLatLng() {
-            return mLocation.getLatLng();
+            return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
         }
-
     }
 
     // BOTTOM SHEET CALLBACKS
