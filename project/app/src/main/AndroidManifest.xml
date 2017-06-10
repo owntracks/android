@@ -177,6 +177,7 @@
 
             <intent-filter>
                 <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
+                <action android:name="EC" /> <!-- INTENT_ACTION_SEND_EVENT_CIRCULAR -->
             </intent-filter>
         </service>
 
