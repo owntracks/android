@@ -402,12 +402,12 @@ public class Preferences {
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
                     Timber.v("removing existing waypoint with same tst before adding it");
                     dao.delete(e);
-                    App.getEventBus().post(new Events.WaypointRemoved(e));
+                    App.getEventBus().post(w);
                 }
             }
 
             dao.insert(w);
-            App.getEventBus().post(new Events.WaypointAdded(w));
+            App.getEventBus().post(w);
         }
     }
 

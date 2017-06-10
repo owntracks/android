@@ -653,12 +653,9 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
 
         @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-        public void onEvent(Events.EndpointStateChanged e) {
-            Log.v(TAG, "onEventMainThread Events.EndpointStateChanged -> " + e.getState() + " cached " + cachedState);
-
-
-            cachedState = e.getState(); // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
-            updateDisconnectButton(e.getState());
+        public void onEvent(MessageProcessor.EndpointState e) {
+            cachedState = e; // this event might arrive before options menu is ready. In this case onCreateOptionsmenu updates the button from the cachedState
+            updateDisconnectButton(e);
         }
 
 

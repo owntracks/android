@@ -78,10 +78,10 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(Events.EndpointStateChanged e) {
-        this.endpointState = e.getState();
-        if(e.getException() != null)
-            this.endpointMessage = e.getException().toString();
+    public void onEvent(MessageProcessor.EndpointState e) {
+        this.endpointState = e;
+        if(e.getError() != null)
+            this.endpointMessage = e.getError().toString();
         else
             this.endpointMessage = e.getMessage();
         notifyPropertyChanged(BR.endpointState);
