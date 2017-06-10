@@ -26,12 +26,15 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ContactImageProvider {
     private static final String TAG = "ContactImageProvider";
     private static ContactBitmapMemoryCache memoryCache;
     private static BitmapDrawable placeholder;
-
 
     public static void invalidateCacheLevelCard(String key) {
         memoryCache.clearLevelCard(key);
@@ -85,12 +88,12 @@ public class ContactImageProvider {
 
 
     public static void setMarkerAsync(Marker marker, FusedContact contact) {
-        (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
+        (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
     }
 
     public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
         imageView.setImageDrawable(placeholder);
-        (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
+        (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
     }
 
 
