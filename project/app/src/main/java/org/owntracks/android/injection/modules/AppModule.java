@@ -14,7 +14,6 @@ import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.GeocodingProvider;
-import org.owntracks.android.support.NotificationProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 
@@ -109,9 +108,5 @@ public class AppModule {
     @Provides
     @PerApplication
     static Preferences providePreferences(@AppContext Context context) { return new Preferences(context); }
-
-    @Provides
-    @PerApplication
-    static NotificationProvider provideNotificationProvider(@AppContext Context context, Resources resources, Locale locale) { return new NotificationProvider(context, resources, locale); }
 
 }
