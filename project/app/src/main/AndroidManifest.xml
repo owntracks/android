@@ -173,7 +173,12 @@
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".support.receiver.BootCompleteReceiver"
