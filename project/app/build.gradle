@@ -78,9 +78,6 @@ android {
         exclude 'META-INF/LGPL2.1'
     }
 }
-repositories {
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
-}
 
 dependencies {
     // Support libraries
@@ -113,10 +110,10 @@ dependencies {
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
-    compile 'com.afollestad.material-dialogs:commons:0.9.4.5'
-    compile('com.mikepenz:materialdrawer:5.9.1@aar') { transitive = true }
-    compile "com.mikepenz:materialize:1.0.1@aar"
+    compile 'com.afollestad.material-dialogs:core:0.9.4.3'
+    compile 'com.afollestad.material-dialogs:commons:0.9.4.3'
+    compile('com.mikepenz:materialdrawer:5.9.2@aar') { transitive = true }
+    compile "com.mikepenz:materialize:1.0.2@aar"
 
     // Preprocessors
     annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.0.1'
