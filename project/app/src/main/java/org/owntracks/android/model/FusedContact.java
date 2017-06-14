@@ -18,8 +18,6 @@ import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.GeocodingProvider;
 
 import timber.log.Timber;
 

@@ -18,12 +18,13 @@ import org.owntracks.android.R;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.support.DrawerProvider;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 
 /* Copyright 2016 Patrick Löwenstein
@@ -60,7 +61,8 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     protected B binding;
     @Inject protected V viewModel;
     @Inject protected EventBus eventBus;
-    @Inject protected Provider<Navigator> navigator;
+    @Inject protected DrawerProvider drawerProvider;
+    @Inject protected Preferences preferences;
 
     private ActivityComponent mActivityComponent;
 
@@ -111,8 +113,10 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
 
     protected void setDrawer(@NonNull Toolbar toolbar) {
-        navigator.get().attachDrawer(toolbar);
+        drawerProvider.attach(toolbar);
+        drawerProvider.registerPreferencesChangeListener();
     }
+
 
     @Override
     protected void onCreate(Bundle b) {
@@ -149,6 +153,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         binding = null;
         viewModel = null;
         mActivityComponent = null;
+        drawerProvider.unregisterPreferencesChangeListener();
     }
 
 
