@@ -62,6 +62,6 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
 
     public void saveConfiguration() {
-        Preferences.importFromMessage(configuration);
+        App.getPreferences().importFromMessage(configuration);
     }
 }

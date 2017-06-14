@@ -30,12 +30,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.messages.MessageWaypoints;
 
 import timber.log.Timber;
 
@@ -66,7 +64,7 @@ public class Preferences {
     }
 
     public Preferences(Context c){
-        Timber.v("preferences initializing");
+        Timber.v("initializing");
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -182,8 +180,6 @@ public class Preferences {
         if (isModeMqttPublic()) {
             return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
         }
-
-        Timber.v("loading key %s from private debug: %s, is really private %s", key, privateSharedPreferences.getBoolean(key, false), privateSharedPreferences == activeSharedPreferences);
 
         return activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
     }
@@ -341,8 +337,8 @@ public class Preferences {
     }
 
 
-        @SuppressLint("CommitPrefEdits")
-    public static void importFromMessage(MessageConfiguration m) {
+    @SuppressLint("CommitPrefEdits")
+    public void importFromMessage(MessageConfiguration m) {
 
         HashMap<String, Method> methods = getImportMethods();
 
@@ -389,7 +385,7 @@ public class Preferences {
     }
 
 
-    public static void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
+    public void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
         if(j == null)
             return;
 
@@ -429,7 +425,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getRemoteCommand() {
+    public boolean getRemoteCommand() {
         return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
 
@@ -587,7 +583,7 @@ public class Preferences {
     public static String getPubTopicInfoPart() {
         return "/info";
     }
-    public static String getPubTopicCommands() {
+    public String getPubTopicCommands() {
         return getPubTopicBase() +getPubTopicCommandsPart();
     }
     public static String getPubTopicCommandsPart() {
@@ -918,7 +914,6 @@ public class Preferences {
 
     @Export(key =Keys.PUB, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public boolean getPub() {
-        Timber.v("loading pub");
         return getBoolean(Keys.PUB, R.bool.valPub);
     }
 

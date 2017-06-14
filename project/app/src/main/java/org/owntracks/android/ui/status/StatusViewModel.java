@@ -3,6 +3,7 @@ package org.owntracks.android.ui.status;
 import android.Manifest;
 import android.content.Context;
 import android.databinding.Bindable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -29,7 +31,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     Context context;
     private Date appStarted;
     private Date serviceStarted;
-    private Date locationUpdated;
+    private long locationUpdated;
     private boolean locationPermission;
 
     @Inject
@@ -56,7 +58,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     @Bindable
     public int getEndpointQueue() {
-        return App.getMessageProcessor().getQueueLenght();
+        return App.getMessageProcessor().getQueueLength();
     }
 
     @Override
@@ -73,7 +75,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public Date getLocationUpdated() {
+    public long getLocationUpdated() {
         return locationUpdated;
     }
 
@@ -102,8 +104,8 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(Events.CurrentLocationUpdated e) {
-        this.locationUpdated = e.getDate();
+    public void onEvent(Location l) {
+        this.locationUpdated = TimeUnit.MILLISECONDS.toSeconds(l.getTime());
         notifyPropertyChanged(BR.locationUpdated);
     }
 }

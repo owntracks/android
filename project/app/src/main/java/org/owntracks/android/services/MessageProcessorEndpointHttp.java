@@ -139,7 +139,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
+            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
             return;
         }
 

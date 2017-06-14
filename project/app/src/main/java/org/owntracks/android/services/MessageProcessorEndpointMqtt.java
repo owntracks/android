@@ -508,7 +508,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void processOutgoingMessage(MessageCmd message) {
-		message.setTopic(Preferences.getPubTopicCommands());
+		message.setTopic(App.getPreferences().getPubTopicCommands());
 		scheduleMessage(message);
 	}
 
