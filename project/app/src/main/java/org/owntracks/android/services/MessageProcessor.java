@@ -37,6 +37,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
+    private final Preferences preferences;
 
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
     private ThreadPoolExecutor outgoingMessageProcessorExecutor;
@@ -111,7 +112,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences) {
+        this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
 
@@ -121,7 +123,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void initialize() {
         onEndpointStateChanged(EndpointState.INITIAL);
-        this.loadOutgoingMessageProcessor(Preferences.getModeId());
+        this.loadOutgoingMessageProcessor(preferences.getModeId());
     }
 
     private void loadOutgoingMessageProcessor(int mode){
@@ -155,7 +157,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Subscribe
     public void onEvent(Events.ModeChanged event) {
-        loadOutgoingMessageProcessor(Preferences.getModeId());
+        loadOutgoingMessageProcessor(preferences.getModeId());
     }
 
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
@@ -214,7 +216,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        eventBus.postSticky(newState);
+        App.getEventBus().postSticky(newState);
     }
 
     @Override
@@ -245,13 +247,13 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageCmd message) {
-        if(!Preferences.getRemoteCommand()) {
+        if(!preferences.getRemoteCommand()) {
             Timber.e("remote commands are disabled");
             return;
         }
 
 
-        if(!Preferences.getPubTopicCommands().equals(message.getTopic())) {
+        if(!preferences.getPubTopicCommands().equals(message.getTopic())) {
             Timber.e("cmd message received on wrong topic");
             return;
         }
@@ -279,10 +281,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     MessageWaypoints w = message.getWaypoints();
                     if (w != null)
-                        Preferences.importWaypointsFromJson(w.getWaypoints());
+                        preferences.importWaypointsFromJson(w.getWaypoints());
                     break;
                 case MessageCmd.ACTION_SET_CONFIGURATION:
-                    Preferences.importFromMessage(message.getConfiguration());
+                    preferences.importFromMessage(message.getConfiguration());
                     break;
                 case MessageCmd.ACTION_REOCONNECT:
                     reconnect();

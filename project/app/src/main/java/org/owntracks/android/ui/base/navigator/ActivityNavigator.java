@@ -51,8 +51,10 @@ public class ActivityNavigator extends BaseNavigator {
     private static final int COLOR_ICON_SECONDARY_ACTIVE = COLOR_ICON_PRIMARY_ACTIVE;
 
     private final AppCompatActivity activity;
+    private final Preferences preferences;
 
-    public ActivityNavigator(AppCompatActivity activity) {
+    public ActivityNavigator(AppCompatActivity activity, Preferences preferences) {
+        this.preferences = preferences;
         this.activity = activity;
     }
 
@@ -97,14 +99,14 @@ public class ActivityNavigator extends BaseNavigator {
         OnCheckedChangeListener l = new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Preferences.setPub(isChecked);
+                preferences.setPub(isChecked);
             }
         };
         return new SecondarySwitchDrawerItem()
                 .withName(R.string.drawerSwitchReporting)
                 .withSelectable(false)
                 .withCheckable(false)
-                .withChecked(Preferences.getPub())
+                .withChecked(preferences.getPub())
                 .withOnCheckedChangeListener(l)
                 .withIcon(R.drawable.ic_report)
                 .withIconTintingEnabled(true)
@@ -115,14 +117,14 @@ public class ActivityNavigator extends BaseNavigator {
         OnCheckedChangeListener l = new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Preferences.setCp(isChecked);
+                preferences.setCp(isChecked);
             }
         };
         return new SecondarySwitchDrawerItem()
                 .withName(R.string.drawerSwitchCopy)
                 .withSelectable(false)
                 .withCheckable(false)
-                .withChecked(Preferences.getCp())
+                .withChecked(preferences.getCp())
                 .withOnCheckedChangeListener(l)
                 .withIconTintingEnabled(true)
                 .withIcon(R.drawable.ic_layers_black_24dp)

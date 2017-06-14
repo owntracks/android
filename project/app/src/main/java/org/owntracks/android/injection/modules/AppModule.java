@@ -72,8 +72,8 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo) {
-        return new MessageProcessor(eventBus, repo);
+    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences) {
+        return new MessageProcessor(eventBus, repo, preferences);
     }
 
     @SuppressWarnings("deprecation")

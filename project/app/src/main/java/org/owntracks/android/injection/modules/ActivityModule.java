@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
@@ -46,6 +47,6 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
-    Navigator provideNavigator() { return new ActivityNavigator(mActivity); }
+    Navigator provideNavigator(Preferences preferences) { return new ActivityNavigator(mActivity, preferences); }
 
 }

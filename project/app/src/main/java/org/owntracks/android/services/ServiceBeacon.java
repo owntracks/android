@@ -260,7 +260,7 @@ public class ServiceBeacon implements BeaconConsumer {
     //}
 
     private List<Waypoint> loadWaypointsForModeIdWithValidBeacon() {
-        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId()), WaypointDao.Properties.BeaconUUID.isNotNull()).build().list();
+        return this.waypointDao.queryBuilder().where(WaypointDao.Properties.ModeId.eq(App.getPreferences().getModeId()), WaypointDao.Properties.BeaconUUID.isNotNull()).build().list();
     }
 
 
