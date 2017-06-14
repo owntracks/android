@@ -130,12 +130,12 @@ public class Preferences {
 
     private static LinkedList<OnPreferenceChangedListener> activeSharedPreferencesChangeListener;
 
-    public static void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+    public void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
         activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
         activeSharedPreferencesChangeListener.push(listener);
     }
 
-    public static void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+    public void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
         activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
         activeSharedPreferencesChangeListener.remove(listener);
     }
@@ -182,6 +182,8 @@ public class Preferences {
         if (isModeMqttPublic()) {
             return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
         }
+
+        Timber.v("loading key %s from private debug: %s, is really private %s", key, privateSharedPreferences.getBoolean(key, false), privateSharedPreferences == activeSharedPreferences);
 
         return activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
     }
@@ -916,6 +918,7 @@ public class Preferences {
 
     @Export(key =Keys.PUB, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public boolean getPub() {
+        Timber.v("loading pub");
         return getBoolean(Keys.PUB, R.bool.valPub);
     }
 

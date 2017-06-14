@@ -21,8 +21,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.ui.base.navigator.ActivityNavigator;
+import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.ui.waypoints.AdapterCursorLoader;
 import org.owntracks.android.ui.waypoints.AdapterWaypoints;
 import org.owntracks.android.db.Waypoint;
@@ -51,7 +50,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        new ActivityNavigator(this, App.getPreferences()).attachDrawer(toolbar);
+        new DrawerProvider(this, App.getPreferences()).attach(toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);

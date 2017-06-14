@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +19,7 @@ import android.os.Looper;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,8 +76,6 @@ public class BackgroundService extends Service {
     private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
 
 
-
-
     private NotificationCompat.Builder activeNotificationBuilder;
     private NotificationCompat.Builder notificationBuilderEvents;
     private NotificationManager mNotificationManager;
@@ -92,7 +93,7 @@ public class BackgroundService extends Service {
         preferences = App.getPreferences();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         sendOngoingNotification();
 
@@ -107,7 +108,7 @@ public class BackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        if(intent != null) {
+        if (intent != null) {
             handleIntent(intent);
         }
 
@@ -117,7 +118,7 @@ public class BackgroundService extends Service {
     private void handleIntent(@NonNull Intent intent) {
         if (LocationResult.hasResult(intent)) {
             onLocationChanged(intent);
-        } else if(intent.getAction() != null){
+        } else if (intent.getAction() != null) {
             switch (intent.getAction()) {
                 case INTENT_ACTION_CHANGE_BG:
                     setupLocationRequest();
@@ -150,7 +151,7 @@ public class BackgroundService extends Service {
         if (!preferences.getNotification())
             return null;
 
-        if(activeNotificationBuilder!=null)
+        if (activeNotificationBuilder != null)
             return activeNotificationBuilder;
 
 
@@ -163,7 +164,6 @@ public class BackgroundService extends Service {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         activeNotificationBuilder.setContentIntent(resultPendingIntent);
         activeNotificationBuilder.setSortKey("a");
-
 
 
         Intent publishIntent = new Intent();
@@ -199,7 +199,7 @@ public class BackgroundService extends Service {
 
         builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         builder.setContentText(lastEndpointState.getLabel(App.getContext()));
-Timber.v("starting notification foreground");
+        Timber.v("starting notification foreground");
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
 
@@ -218,8 +218,8 @@ Timber.v("starting notification foreground");
         // Prepare data
         FusedContact c = App.getFusedContact(message.getContactKey());
 
-        long when = message.getTst()*1000;
-        String transition =  getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving);
+        long when = message.getTst() * 1000;
+        String transition = getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving);
         String location = message.getDesc();
 
         if (location == null) {
@@ -227,9 +227,9 @@ Timber.v("starting notification foreground");
         }
         String name = message.getTid();
 
-        if(c != null)
+        if (c != null)
             name = c.getFusedName();
-        else if(name == null){
+        else if (name == null) {
             name = message.getContactKey();
         }
 
@@ -240,11 +240,10 @@ Timber.v("starting notification foreground");
         // Deliver notification
         Notification n = notificationBuilderEvents.build();
 
-        mNotificationManager.notify((int)System.currentTimeMillis() / 1000, n);
+        mNotificationManager.notify((int) System.currentTimeMillis() / 1000, n);
 
         sendEventStackNotification();
     }
-
 
 
     private void sendEventStackNotification() {
@@ -268,15 +267,15 @@ Timber.v("starting notification foreground");
 
                 // use convenience methods on our RemoteNotification wrapper to create a title
                 builder.setContentTitle(getString(R.string.events));
-                    builder.setContentText(title);
+                builder.setContentText(title);
 
                 // for every previously sent notification that met our above requirements,
                 // add a new line containing its title to the inbox style notification extender
                 NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
 
                 for (StatusBarNotification activeSbn : groupedNotifications) {
-                    String stackNotificationTitle = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
-                    String stackNotificationText = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TEXT);
+                    String stackNotificationTitle = (String) activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
+                    String stackNotificationText = (String) activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TEXT);
 
                     if (stackNotificationTitle != null && stackNotificationText != null) {
                         inbox.addLine(String.format("%s %s", stackNotificationTitle, stackNotificationText));
@@ -298,7 +297,7 @@ Timber.v("starting notification foreground");
                 builder.setSmallIcon(R.drawable.ic_notification);
 
                 // create a unique PendingIntent using an integer request code.
-                final int requestCode = (int)System.currentTimeMillis() / 1000;
+                final int requestCode = (int) System.currentTimeMillis() / 1000;
                 builder.setContentIntent(PendingIntent.getActivity(App.getContext(), requestCode, new Intent(App.getContext(), ActivityWelcome.class), PendingIntent.FLAG_ONE_SHOT));
 
                 Notification stackNotification = builder.build();
@@ -310,20 +309,19 @@ Timber.v("starting notification foreground");
     }
 
 
-
     private void setupLocationPing() {
         App.getScheduler().scheduleLocationPing();
     }
 
 
-    private void onGeofencingEvent(@Nullable  GeofencingEvent event) {
+    private void onGeofencingEvent(@Nullable GeofencingEvent event) {
 
-        if(event == null) {
+        if (event == null) {
             Timber.e("GeofencingEvent null or hasError");
             return;
         }
 
-        if(event.hasError()) {
+        if (event.hasError()) {
             Timber.e("GeofencingEvent hasError: %s", event.getErrorCode());
             return;
         }
@@ -332,35 +330,34 @@ Timber.v("starting notification foreground");
         int transition = event.getGeofenceTransition();
         for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
 
-                Waypoint w =  App.getDao().loadWaypointForGeofenceId(event.getTriggeringGeofences().get(index).getRequestId());
+            Waypoint w = App.getDao().loadWaypointForGeofenceId(event.getTriggeringGeofences().get(index).getRequestId());
 
-                if (w != null) {
-                    Timber.v("waypoint triggered:%s transition:%s", w.getDescription(),transition);
-                    w.setLastTriggered(System.currentTimeMillis());
+            if (w != null) {
+                Timber.v("waypoint triggered:%s transition:%s", w.getDescription(), transition);
+                w.setLastTriggered(System.currentTimeMillis());
 
-                    App.getDao().getWaypointDao().update(w);
-                    //App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
-                    publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
-                    publishTransitionMessage(w, event.getTriggeringLocation(), transition);
+                App.getDao().getWaypointDao().update(w);
+                //App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
+                publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
+                publishTransitionMessage(w, event.getTriggeringLocation(), transition);
 
-                    //if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
-                    //    Timber.v("starting location lookup");
-                    //    LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
-                    //    Criteria criteria = new Criteria();
-                    //    criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                    //    Bundle b = new Bundle();
-                    //    b.putInt("event", transition);
-                    //    b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
+                //if(transition == Geofence.GEOFENCE_TRANSITION_EXIT || BuildConfig.DEBUG) {
+                //    Timber.v("starting location lookup");
+                //    LocationManager mgr = LocationManager.class.cast(context.getSystemService(Context.LOCATION_SERVICE));
+                //    Criteria criteria = new Criteria();
+                //    criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                //    Bundle b = new Bundle();
+                //    b.putInt("event", transition);
+                //    b.putString("geofenceId", event.getTriggeringGeofences().get(index).getRequestId());
 //
-                    //    PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
+                //    PendingIntent p = ServiceProxy.getBroadcastIntentForService(context, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_GEOFENCE_TRANSITION_LOOKUP, b);
 //
-                    //    mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
-                    //}
-                }
+                //    mgr.requestSingleUpdate(mgr.getBestProvider(criteria, true), p );
+                //}
             }
+        }
 
     }
-
 
 
     private void onLocationChanged(@NonNull Intent intent) {
@@ -386,17 +383,17 @@ Timber.v("starting notification foreground");
     private void publishLocationMessage(@Nullable String trigger) {
         Timber.v("trigger:%s", trigger);
 
-        if(lastLocation == null) {
+        if (lastLocation == null) {
             Timber.e("no location available");
             return;
         }
 
         // Automatic updates are discarded if automatic reporting is disabled
-        if((trigger == MessageLocation.REPORT_TYPE_DEFAULT || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub() ) {
+        if ((trigger == MessageLocation.REPORT_TYPE_DEFAULT || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub()) {
             return;
         }
 
-        if(ignoreLowAccuracy(lastLocation)) {
+        if (ignoreLowAccuracy(lastLocation)) {
             return;
         }
 
@@ -409,17 +406,17 @@ Timber.v("starting notification foreground");
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(preferences.getTrackerId(true));
         message.setCp(preferences.getCp());
-        if(preferences.getPubLocationExtendedData()) {
+        if (preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
 
             NetworkInfo activeNetwork = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-            if(activeNetwork != null) {
+            if (activeNetwork != null) {
 
-                if(!activeNetwork.isConnected()) {
+                if (!activeNetwork.isConnected()) {
                     message.setConn(MessageLocation.CONN_TYPE_OFFLINE);
-                } else if(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI ) {
+                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                     message.setConn(MessageLocation.CONN_TYPE_WIFI);
-                } else if(activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
                     message.setConn(MessageLocation.CONN_TYPE_MOBILE);
                 }
             }
@@ -429,7 +426,7 @@ Timber.v("starting notification foreground");
     }
 
     private void publishTransitionMessage(@NonNull Waypoint w, @NonNull Location triggeringLocation, int transition) {
-        if(ignoreLowAccuracy(triggeringLocation))
+        if (ignoreLowAccuracy(triggeringLocation))
             return;
 
         MessageTransition message = new MessageTransition();
@@ -450,8 +447,13 @@ Timber.v("starting notification foreground");
 
     @SuppressWarnings("MissingPermission")
     private void setupLocationRequest() {
+        if(missingLocationPermission()) {
+            Timber.e("missing location permission");
+            return;
+        }
+
         Timber.v("updating location request");
-        if(mFusedLocationClient == null) {
+        if (mFusedLocationClient == null) {
             Timber.e("mFusedLocationClient not available");
             return;
         }
@@ -465,6 +467,7 @@ Timber.v("starting notification foreground");
         Intent locationIntent = new Intent(getApplicationContext(), BackgroundService.class);
         return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
     private PendingIntent getGeofencePendingIntent() {
         Intent geofeneIntent = new Intent(getApplicationContext(), BackgroundService.class);
         geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
@@ -491,7 +494,6 @@ Timber.v("starting notification foreground");
     }
 
 
-
     private int getLocationRequestPriority(boolean background) {
         switch (background ? preferences.getLocatorAccuracyBackground() : preferences.getLocatorAccuracyForeground()) {
             case 0:
@@ -509,6 +511,11 @@ Timber.v("starting notification foreground");
 
     @SuppressWarnings("MissingPermission")
     private void setupGeofences() {
+        if(missingLocationPermission()) {
+            Timber.e("missing location permission");
+            return;
+        }
+
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
         List<Geofence> fences = new LinkedList<>();
@@ -525,11 +532,11 @@ Timber.v("starting notification foreground");
             Geofence geofence = new Geofence.Builder()
                     .setRequestId(w.getGeofenceId())
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setNotificationResponsiveness((int)TimeUnit.MINUTES.toMillis(2))
+                    .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
                     .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
                     .setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId() );
+            Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId());
             fences.add(geofence);
         }
 
@@ -541,6 +548,10 @@ Timber.v("starting notification foreground");
         GeofencingRequest request = b.addGeofences(fences).build();
         mGeofencingClient.addGeofences(request, getGeofencePendingIntent());
 
+    }
+
+    private boolean missingLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED;
     }
 
     private void removeGeofences() {

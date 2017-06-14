@@ -17,6 +17,7 @@ public class EncryptionProvider {
     private static SecretBox b;
     private static Random r;
     private static boolean enabled;
+    private final Preferences preferences;
 
     boolean isPayloadEncryptionEnabled() {
         return enabled;
@@ -37,8 +38,9 @@ public class EncryptionProvider {
         Log.v(TAG, "SecretBox initialized");
     }
 
-    public EncryptionProvider() {
-        Preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
+    public EncryptionProvider(Preferences preferences) {
+        this.preferences = preferences; 
+        preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         initializeSecretBox();
     }
 
@@ -65,7 +67,7 @@ public class EncryptionProvider {
 
     private class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
         SecretBoxManager() {
-            Preferences.registerOnPreferenceChangedListener(this);
+            preferences.registerOnPreferenceChangedListener(this);
         }
 
         @Override

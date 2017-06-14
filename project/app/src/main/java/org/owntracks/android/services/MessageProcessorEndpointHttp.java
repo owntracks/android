@@ -70,7 +70,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
 
     public MessageProcessorEndpointHttp() {
-        Preferences.registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
+        App.getPreferences().registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
             @Override
             public void onAttachAfterModeChanged() {
 
