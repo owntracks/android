@@ -176,8 +176,8 @@
     <string name="preferencesKeyIdentification" translatable="false">identification</string>
     <string name="preferencesKeySecurity" translatable="false">security</string>
     <string name="preferencesKeyParameters" translatable="false">parameters</string>
-    <string name="transitionEntering">entering</string>
-    <string name="transitionLeaving">leaving</string>
+    <string name="transitionEntering">enters</string>
+    <string name="transitionLeaving">leaves</string>
     <string name="INITIAL">"Initializing</string>
     <string name="IDLE">Idle</string>
     <string name="CONNECTING">Connecting</string>

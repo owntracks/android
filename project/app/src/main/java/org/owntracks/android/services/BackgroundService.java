@@ -10,6 +10,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.NotificationCompat;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -80,6 +85,7 @@ public class BackgroundService extends Service {
     private NotificationCompat.Builder notificationBuilderEvents;
     private NotificationManager mNotificationManager;
     private Preferences preferences;
+    private List<Waypoint> waypoints = new LinkedList<>();
 
     @Nullable
     @Override
@@ -207,8 +213,10 @@ public class BackgroundService extends Service {
     private void sendEventNotification(MessageTransition message) {
         NotificationCompat.Builder builder = getEventsNotificationBuilder();
 
-        if (builder == null)
+        if (builder == null) {
+            Timber.e("no builder returned");
             return;
+        }
 
         FusedContact c = App.getFusedContact(message.getContactKey());
 
@@ -234,6 +242,7 @@ public class BackgroundService extends Service {
         // Deliver notification
         Notification n = notificationBuilderEvents.build();
 
+        Timber.v("sending new transition notification");
         mNotificationManager.notify((int) System.currentTimeMillis() / 1000, n);
 
         sendEventStackNotification();
@@ -242,6 +251,7 @@ public class BackgroundService extends Service {
 
     private void sendEventStackNotification() {
         if (Build.VERSION.SDK_INT >= 23) {
+            Timber.v("SDK_INT >= 23, building stack notification");
             ArrayList<StatusBarNotification> groupedNotifications = new ArrayList<>();
 
             for (StatusBarNotification sbn : mNotificationManager.getActiveNotifications()) {
@@ -251,6 +261,8 @@ public class BackgroundService extends Service {
                     groupedNotifications.add(sbn);
                 }
             }
+
+            Timber.v("have %s groupedNotifications", groupedNotifications.size());
 
             // since we assume the most recent notification was delivered just prior to calling this method,
             // we check that previous notifications in the group include at least 2 notifications
@@ -270,9 +282,13 @@ public class BackgroundService extends Service {
                 for (StatusBarNotification activeSbn : groupedNotifications) {
                     String stackNotificationTitle = (String) activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
                     String stackNotificationText = (String) activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TEXT);
+                    String stackNotificationWhen = App.formatDate(TimeUnit.MILLISECONDS.toSeconds((activeSbn.getNotification().when)));
+
 
                     if (stackNotificationTitle != null && stackNotificationText != null) {
-                        inbox.addLine(String.format("%s %s", stackNotificationTitle, stackNotificationText));
+                        Spannable newLine = new SpannableString(String.format("%s %s %s", stackNotificationWhen, stackNotificationTitle, stackNotificationText));
+                        newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, stackNotificationWhen.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        inbox.addLine(newLine);
                     }
                 }
 
@@ -287,7 +303,7 @@ public class BackgroundService extends Service {
                 // if the user taps the notification, it should disappear after firing its content intent
                 // and we set the priority to high to avoid Doze from delaying our notifications
                 builder.setAutoCancel(true);
-                builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
                 builder.setSmallIcon(R.drawable.ic_notification);
 
                 // create a unique PendingIntent using an integer request code.
@@ -363,6 +379,21 @@ public class BackgroundService extends Service {
             lastLocation = location;
 
             App.getEventBus().postSticky(lastLocation);
+
+            for(Waypoint w : waypoints) {
+                float meters = location.distanceTo(w.getLocation());
+
+                Timber.v("location distance to waypoint %s,%s is %s, currently inside: %s", w.getDescription(), w.getGeofenceRadius(),meters, w.getStatus() == 1);
+                if(meters <=w.getGeofenceRadius() && (w.getStatus() == 0 || w.getStatus() == -1)) {
+                    Timber.v("entered geofence");
+                    w.setStatus(1);
+                    publishTransitionMessage(w, location, Geofence.GEOFENCE_TRANSITION_ENTER);
+                } else if(meters >w.getGeofenceRadius() && w.getStatus() == 1) {
+                    Timber.v("left geofence");
+                    w.setStatus(-1);
+                    publishTransitionMessage(w, location, Geofence.GEOFENCE_TRANSITION_EXIT );
+                }
+            }
 
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
 
@@ -512,8 +543,9 @@ public class BackgroundService extends Service {
 
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
-        List<Geofence> fences = new LinkedList<>();
-        for (Waypoint w : App.getDao().loadWaypointsForCurrentModeWithValidGeofence()) {
+        LinkedList<Geofence> fences = new LinkedList<>();
+        waypoints = App.getDao().loadWaypointsForCurrentModeWithValidGeofence();
+        for (Waypoint w : waypoints ) {
 
             Timber.v("desc:%s", w.getDescription());
             // if id is null, waypoint is not added yet

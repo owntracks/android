@@ -31,6 +31,9 @@ public class Waypoint {
     private Long lastTriggered;
     private int modeId;
     private int type;
+    
+    @Transient
+    private int status = 0;
 
     @Generated(hash = 96494712)
     public Waypoint(Long id, @NotNull String description, double geofenceLatitude, double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId,
@@ -197,5 +200,14 @@ public class Waypoint {
 
     public void setDefaults() {
         this.setShared(false);
+    }
+
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return this.status;
     }
 }
