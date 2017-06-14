@@ -226,7 +226,7 @@ public class ActivityRegion extends ActivityBase  {
 
 
         if (!update) {
-            w.setModeId(Preferences.getModeId());
+            w.setModeId(App.getPreferences().getModeId());
             w.setDate(new java.util.Date());
         }
 

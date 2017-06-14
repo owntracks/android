@@ -78,6 +78,7 @@ public class BackgroundService extends Service {
     private NotificationCompat.Builder activeNotificationBuilder;
     private NotificationCompat.Builder notificationBuilderEvents;
     private NotificationManager mNotificationManager;
+    private Preferences preferences;
 
     @Nullable
     @Override
@@ -88,6 +89,7 @@ public class BackgroundService extends Service {
 
     @Override
     public void onCreate() {
+        preferences = App.getPreferences();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -145,7 +147,7 @@ public class BackgroundService extends Service {
 
     @Nullable
     private NotificationCompat.Builder getOngoingNotificationBuilder() {
-        if (!Preferences.getNotification())
+        if (!preferences.getNotification())
             return null;
 
         if(activeNotificationBuilder!=null)
@@ -188,14 +190,14 @@ public class BackgroundService extends Service {
         if (builder == null)
             return;
 
-        if (this.lastLocationMessage != null && this.lastLocationMessage.getGeocoder() != null && Preferences.getNotificationLocation()) {
+        if (this.lastLocationMessage != null && this.lastLocationMessage.getGeocoder() != null && preferences.getNotificationLocation()) {
             builder.setContentTitle(this.lastLocationMessage.getGeocoder());
             builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTst()));
         } else {
             builder.setContentTitle(getString(R.string.app_name));
         }
 
-        builder.setPriority(Preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         builder.setContentText(lastEndpointState.getLabel(App.getContext()));
 Timber.v("starting notification foreground");
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
@@ -266,21 +268,23 @@ Timber.v("starting notification foreground");
 
                 // use convenience methods on our RemoteNotification wrapper to create a title
                 builder.setContentTitle(getString(R.string.events));
-                builder.setContentText(title);
+                    builder.setContentText(title);
 
                 // for every previously sent notification that met our above requirements,
                 // add a new line containing its title to the inbox style notification extender
                 NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
-                {
-                    for (StatusBarNotification activeSbn : groupedNotifications) {
-                        String stackNotificationLine = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
-                        if (stackNotificationLine != null) {
-                            inbox.addLine(stackNotificationLine);
-                        }
-                    }
 
-                    inbox.setSummaryText(title);
+                for (StatusBarNotification activeSbn : groupedNotifications) {
+                    String stackNotificationTitle = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TITLE);
+                    String stackNotificationText = (String)activeSbn.getNotification().extras.get(NotificationCompat.EXTRA_TEXT);
+
+                    if (stackNotificationTitle != null && stackNotificationText != null) {
+                        inbox.addLine(String.format("%s %s", stackNotificationTitle, stackNotificationText));
+                    }
                 }
+
+                inbox.setSummaryText(title);
+
                 builder.setStyle(inbox);
 
                 builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications
@@ -369,14 +373,13 @@ Timber.v("starting notification foreground");
 
             App.getEventBus().postSticky(lastLocation);
 
-            if (shouldPublishLocation())
-                publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
+            publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
 
         }
     }
 
     private boolean ignoreLowAccuracy(@NonNull Location l) {
-        int threshold = Preferences.getIgnoreInaccurateLocations();
+        int threshold = preferences.getIgnoreInaccurateLocations();
         return threshold > 0 && l.getAccuracy() > threshold;
     }
 
@@ -388,18 +391,25 @@ Timber.v("starting notification foreground");
             return;
         }
 
-        if(ignoreLowAccuracy(lastLocation))
+        // Automatic updates are discarded if automatic reporting is disabled
+        if((trigger == MessageLocation.REPORT_TYPE_DEFAULT || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub() ) {
             return;
+        }
+
+        if(ignoreLowAccuracy(lastLocation)) {
+            return;
+        }
 
         MessageLocation message = new MessageLocation();
         message.setLat(lastLocation.getLatitude());
         message.setLon(lastLocation.getLongitude());
+        message.setAlt(lastLocation.getAltitude());
         message.setAcc(Math.round(lastLocation.getAccuracy()));
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        message.setTid(Preferences.getTrackerId(true));
-        message.setCp(Preferences.getCp());
-        if(Preferences.getPubLocationExtendedData()) {
+        message.setTid(preferences.getTrackerId(true));
+        message.setCp(preferences.getCp());
+        if(preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
 
             NetworkInfo activeNetwork = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
@@ -425,7 +435,7 @@ Timber.v("starting notification foreground");
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(MessageTransition.TRIGGER_CIRCULAR);
-        message.setTid(Preferences.getTrackerId(true));
+        message.setTid(preferences.getTrackerId(true));
         message.setLat(triggeringLocation.getLatitude());
         message.setLon(triggeringLocation.getLongitude());
         message.setAcc(triggeringLocation.getAccuracy());
@@ -437,16 +447,6 @@ Timber.v("starting notification foreground");
 
     }
 
-    private boolean shouldPublishLocation() {
-        if(!Preferences.getPub())
-            return false;
-
-        if (!App.isInForeground())
-            return true;
-
-        // Publishes are throttled to 30 seconds when in the foreground to not spam the server
-        return (System.currentTimeMillis() - this.lastLocation.getTime()) > TimeUnit.SECONDS.toMillis(30);
-    }
 
     @SuppressWarnings("MissingPermission")
     private void setupLocationRequest() {
@@ -474,9 +474,9 @@ Timber.v("starting notification foreground");
 
     private LocationRequest getBackgroundLocationRequest() {
         LocationRequest request = new LocationRequest();
-        request.setInterval(TimeUnit.SECONDS.toMillis(Preferences.getLocatorInterval()));
+        request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
         request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
-        request.setSmallestDisplacement(Preferences.getLocatorDisplacement());
+        request.setSmallestDisplacement(preferences.getLocatorDisplacement());
         request.setPriority(getLocationRequestPriority(true));
         return request;
     }
@@ -493,7 +493,7 @@ Timber.v("starting notification foreground");
 
 
     private int getLocationRequestPriority(boolean background) {
-        switch (background ? Preferences.getLocatorAccuracyBackground() : Preferences.getLocatorAccuracyForeground()) {
+        switch (background ? preferences.getLocatorAccuracyBackground() : preferences.getLocatorAccuracyForeground()) {
             case 0:
                 return LocationRequest.PRIORITY_HIGH_ACCURACY;
             case 1:
@@ -585,14 +585,15 @@ Timber.v("starting notification foreground");
     }
 
     @SuppressWarnings("unused")
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(sticky = true)
     public void onEvent(MessageProcessor.EndpointState state) {
+        Timber.v("endpoint state changed %s", state.getLabel(this));
         this.lastEndpointState = state;
         sendOngoingNotification();
     }
 
     public NotificationCompat.Builder getEventsNotificationBuilder() {
-        if (!Preferences.getNotificationEvents())
+        if (!preferences.getNotificationEvents())
             return null;
 
         Timber.v("building notification builder");

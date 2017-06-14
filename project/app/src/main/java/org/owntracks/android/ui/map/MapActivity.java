@@ -599,7 +599,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-        if(Preferences.getModeId() == App.MODE_ID_HTTP_PRIVATE)
+        if(App.getPreferences().getModeId() == App.MODE_ID_HTTP_PRIVATE)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }

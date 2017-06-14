@@ -51,7 +51,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        new ActivityNavigator(this).attachDrawer(toolbar);
+        new ActivityNavigator(this, App.getPreferences()).attachDrawer(toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -81,7 +81,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         return new SimpleCursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
-                return App.getDao().getWaypointDao().queryBuilder().where(WaypointDao.Properties.ModeId.eq(Preferences.getModeId())).buildCursor().query();
+                return App.getDao().getWaypointDao().queryBuilder().where(WaypointDao.Properties.ModeId.eq(App.getPreferences().getModeId())).buildCursor().query();
             }
         };
     }

@@ -35,12 +35,12 @@ public class MessageLocation extends MessageBase  {
     private int acc;
     private double lat;
     private double lon;
+    private double alt;
     private long tst;
     private String geocoder;
     private WeakReference<FusedContact> _contact;
     private LatLng point;
     private String conn;
-
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty("_cp")
@@ -63,12 +63,6 @@ public class MessageLocation extends MessageBase  {
     public double getLongitude() {
         return lon;
     }
-
-    @JsonIgnore
-    public double getAltitude() {
-        return 0;
-    }
-
 
 
     public String getT() {
@@ -176,4 +170,10 @@ public class MessageLocation extends MessageBase  {
         return this.conn;
     }
 
+    public void setAlt(double alt) {
+        this.alt = alt;
+    }
+    public double getAlt() {
+        return alt;
+    }
 }

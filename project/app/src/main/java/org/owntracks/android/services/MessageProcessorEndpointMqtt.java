@@ -194,7 +194,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 			String cid = Preferences.getClientId();
             String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
-			Timber.v("mode: " + Preferences.getModeId());
+			Timber.v("mode: " + App.getPreferences().getModeId());
 			Timber.v("client id: " + cid);
 			Timber.v("connect string: " + connectString);
 
@@ -213,6 +213,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		if(isConnected()) {
 			Timber.v("already connected");
+			changeState(getState()); // Background service might be restarted and not get the connection state
 			return true;
 		}
 

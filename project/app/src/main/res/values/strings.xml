@@ -228,8 +228,6 @@
     <string name="drawerSwitchReporting">Reporting</string>
     <string name="drawerSwitchCopy">Copy</string>
     <string name="restart">Restart</string>
-    <string name="channel_events_name">events</string>
-    <string name="channel_events_description">Region transition events</string>
     <string name="notificationEventsTitle" formatted="false">%d new events</string>
 
 </resources>

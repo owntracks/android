@@ -94,7 +94,7 @@ public class ActivityPreferences extends ActivityBase {
             final Activity a = getActivity();
             PackageManager pm = a.getPackageManager();
 
-            Timber.v("Prepping preferences: " + Preferences.getModeId());
+            Timber.v("Prepping preferences: " + App.getPreferences().getModeId());
 
             if (Preferences.isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
@@ -417,7 +417,7 @@ public class ActivityPreferences extends ActivityBase {
 
     public static String getModeIdReadable(Context c) {
         String mode;
-        switch (Preferences.getModeId()) {
+        switch (App.getPreferences().getModeId()) {
             case App.MODE_ID_MQTT_PRIVATE:
                 mode = c.getString(R.string.mode_mqtt_private_label);
                 break;

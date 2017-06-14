@@ -280,7 +280,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getModeId() { return modeId; }
+    public int getModeId() { return modeId; }
 
 
     public SharedPreferences getActiveSharedPreferences() {
@@ -412,12 +412,12 @@ public class Preferences {
     }
 
     @Import(key = Keys.CP)
-    public static void setCp(boolean cp) {
+    public void setCp(boolean cp) {
         setBoolean(Keys.CP, cp, false);
     }
 
     @Export(key = Keys.CP, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
-    public static boolean getCp() {
+    public boolean getCp() {
         return getBoolean(Keys.CP, R.bool.valCp);
     }
 
@@ -734,7 +734,7 @@ public class Preferences {
     }
 
     @Import(key =Keys.PUB)
-    public static void setPub(boolean aBoolean) {
+    public void setPub(boolean aBoolean) {
         setBoolean(Keys.PUB, aBoolean);
     }
 
@@ -915,7 +915,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.PUB, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static boolean getPub() {
+    public boolean getPub() {
         return getBoolean(Keys.PUB, R.bool.valPub);
     }
 
@@ -1172,6 +1172,7 @@ public class Preferences {
 
 
     public static List<Method> getExportMethods() {
+        int modeId = App.getPreferences().getModeId();
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -1180,7 +1181,7 @@ public class Preferences {
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
                     Export annotInstance = method.getAnnotation(Export.class);
-                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic() ||getModeId() == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
+                    if(modeId == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || modeId == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic() ||modeId == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
                         methods.add(method);
                     }
                 }

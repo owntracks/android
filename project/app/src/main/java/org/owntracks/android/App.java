@@ -80,7 +80,7 @@ public class App extends Application  {
         mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
-        getPreferences().initialize();
+        App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
 
         postOnBackgroundHandler(new Runnable() {
             @Override

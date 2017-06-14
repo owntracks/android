@@ -39,7 +39,7 @@ public  class Dao {
     }
 
     public List<Waypoint> loadWaypointsForCurrentModeWithValidGeofence() {
-        return loadWaypointsForModeIdWithValidGeofence(Preferences.getModeId());
+        return loadWaypointsForModeIdWithValidGeofence(preferences.getModeId());
     }
 
     public List<Waypoint> loadWaypointsForModeIdWithValidGeofence(int modeId) {

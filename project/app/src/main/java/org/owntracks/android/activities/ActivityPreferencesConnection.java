@@ -593,7 +593,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             setHasOptionsMenu(true);
 
 
-            Log.v(TAG, "Prepping preferences: " + Preferences.getModeId());
+            Log.v(TAG, "Prepping preferences: " + App.getPreferences().getModeId());
 
 
             if (Preferences.isModeMqttPrivate()) {
