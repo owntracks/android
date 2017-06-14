@@ -102,6 +102,7 @@ public class BackgroundService extends Service {
         setupLocationPing();
 
         App.getEventBus().register(this);
+        App.getEventBus().postSticky(new Events.ServiceStarted());
     }
 
     @Override
@@ -199,23 +200,16 @@ public class BackgroundService extends Service {
 
         builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         builder.setContentText(lastEndpointState.getLabel(App.getContext()));
-        Timber.v("starting notification foreground");
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
 
 
     private void sendEventNotification(MessageTransition message) {
-        Timber.v("sending for message %s", message.getMessageId());
         NotificationCompat.Builder builder = getEventsNotificationBuilder();
 
         if (builder == null)
             return;
 
-        Timber.v("have builder %s", message.getMessageId());
-
-        //getNotificationManagerService().notify(remoteNotification.getUserNotificationGroup(), remoteNotification.getUserNotificationId(), builtNotification);
-
-        // Prepare data
         FusedContact c = App.getFusedContact(message.getContactKey());
 
         long when = message.getTst() * 1000;
@@ -337,7 +331,7 @@ public class BackgroundService extends Service {
                 w.setLastTriggered(System.currentTimeMillis());
 
                 App.getDao().getWaypointDao().update(w);
-                //App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
+                App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
                 publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
                 publishTransitionMessage(w, event.getTriggeringLocation(), transition);
 

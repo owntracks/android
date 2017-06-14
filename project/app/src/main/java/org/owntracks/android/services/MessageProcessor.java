@@ -24,7 +24,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 import org.owntracks.android.support.widgets.Toasts;
 
-import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,8 +32,6 @@ import timber.log.Timber;
 
 
 public class MessageProcessor implements IncomingMessageProcessor {
-    public static final String RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC = "RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC" ;
-    public static final String RECEIVER_ACTION_CLEAR_CONTACT = "RECEIVER_ACTION_CLEAR_CONTACT";
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final Preferences preferences;
@@ -42,7 +39,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private ThreadPoolExecutor incomingMessageProcessorExecutor;
     private ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private OutgoingMessageProcessor outgoingMessageProcessor;
-    private String endpointMessage;
+
+    private boolean acceptMessages = false;
 
     public void reconnect() {
         if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
@@ -55,12 +53,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     public void onEnterForeground() {
-        Timber.v("waking up endpoint for foreground transition");
         if(outgoingMessageProcessor != null)
             outgoingMessageProcessor.onEnterForeground();
     }
 
-    public int getQueueLenght() {
+    public int getQueueLength() {
         return outgoingQueue.size();
     }
 
@@ -102,10 +99,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return (name());
         }
 
-        public boolean isErrorState() {
-            return this == ERROR || this == ERROR_DATADISABLED || this == ERROR_CONFIGURATION;
-        }
-
         public EndpointState setError(Exception error) {
             this.error = error;
             return this;
@@ -119,15 +112,15 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        this.eventBus.register(this);
     }
 
     public void initialize() {
         onEndpointStateChanged(EndpointState.INITIAL);
-        this.loadOutgoingMessageProcessor(preferences.getModeId());
+        this.loadOutgoingMessageProcessor();
     }
 
-    private void loadOutgoingMessageProcessor(int mode){
-        Timber.v("mode:%s", mode);
+    private void loadOutgoingMessageProcessor(){
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
@@ -138,9 +131,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
 
             Timber.v("instantiating new outgoingMessageProcessorExecutor");
-        switch (mode) {
+        switch (preferences.getModeId()) {
             case App.MODE_ID_HTTP_PRIVATE:
                 this.outgoingMessageProcessor = MessageProcessorEndpointHttp.getInstance();
+                break;
             case App.MODE_ID_MQTT_PRIVATE:
             case App.MODE_ID_MQTT_PUBLIC:
             default:
@@ -148,21 +142,30 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         }
         this.outgoingMessageProcessor.onCreateFromProcessor();
+        acceptMessages = true;
     }
 
-    @Subscribe
-    public void onEvent(Events.Dummy event) {
-
-    }
-
-    @Subscribe
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe(priority = 10)
     public void onEvent(Events.ModeChanged event) {
-        loadOutgoingMessageProcessor(preferences.getModeId());
+        acceptMessages = false;
+        App.getScheduler().cancelAllTasks();
+        loadOutgoingMessageProcessor();
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe(priority = 10)
+    public void onEvent(Events.BrokerChanged event) {
+        acceptMessages = false;
+        App.getScheduler().cancelAllTasks();
+        loadOutgoingMessageProcessor();
     }
 
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
     void sendMessage(MessageBase message) {
+        if(!acceptMessages) return;
+
         Timber.v("executing message on outgoingMessageProcessor");
         message.setOutgoingProcessor(outgoingMessageProcessor);
 
@@ -192,7 +195,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             Toasts.showMessageQueued();
     }
 
-    public void onMessageDeliveryFailed(Long messageId) {
+    void onMessageDeliveryFailed(Long messageId) {
 
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
@@ -210,7 +213,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
-    public void onMessageReceived(MessageBase message) {
+    void onMessageReceived(MessageBase message) {
         message.setIncomingProcessor(this);
         incomingMessageProcessorExecutor.execute(message);
     }
@@ -301,6 +304,5 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Override
     public void processIncomingMessage(MessageTransition message) {
         eventBus.post(message);
-        //ServiceProxy.getServiceNotification().processMessage(message);
     }
 }
