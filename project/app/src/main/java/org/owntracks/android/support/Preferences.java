@@ -453,21 +453,17 @@ public class Preferences {
 
 
     @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getPubLocationExtendedData() {
+    public boolean getPubLocationExtendedData() {
         return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData, R.bool.valPubExtendedData, false);
     }
 
     @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getLocatorDisplacement() {
+    public int getLocatorDisplacement() {
         return getInt(Keys.LOCATOR_DISPLACEMENT, R.integer.valLocatorDisplacement);
     }
 
-    public static long getLocatorIntervalMillis() {
-        return TimeUnit.SECONDS.toMillis(getLocatorInterval());
-    }
-
     @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getLocatorInterval() {
+    public int getLocatorInterval() {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
@@ -520,7 +516,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.IGNORE_INACCURATE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true, exportModeMqttPublic = true)
-    public static int getIgnoreInaccurateLocations() {
+    public int getIgnoreInaccurateLocations() {
         return getInt(Keys.IGNORE_INACCURATE_LOCATIONS, R.integer.valIgnoreInaccurateLocations);
     }
 
@@ -619,11 +615,11 @@ public class Preferences {
 
 
     @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static String getTrackerId() {
+    public String getTrackerId() {
         return getTrackerId(false);
 
     }
-    public static String getTrackerId(boolean fallback) {
+    public String getTrackerId(boolean fallback) {
 
         String tid = getString(Keys.TRACKER_ID, R.string.valEmpty);
 
@@ -633,7 +629,7 @@ public class Preferences {
             return tid;
     }
 
-    public static String getTrackerIdDefault(){
+    public String getTrackerIdDefault(){
         String deviceId = getDeviceId();
         if(deviceId!=null && deviceId.length() >= 2)
             return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured deviceId.
@@ -879,23 +875,22 @@ public class Preferences {
     }
 
     @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getNotification() {
+    public boolean getNotification() {
         return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
     }
 
     @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getNotificationHigherPriority() {
+    public boolean getNotificationHigherPriority() {
         return getBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, R.bool.valNotificationHigherPriority);
     }
 
 
-
     @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static boolean getNotificationLocation() {
+    public  boolean getNotificationLocation() {
         return getBoolean(Keys.NOTIFICATION_LOCATION, R.bool.valNotificationLocation);
     }
 
-    public static boolean getNotificationEvents() {
+    public boolean getNotificationEvents() {
         return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
     }
 
@@ -926,7 +921,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getLocatorAccuracyForeground() {
+    public int getLocatorAccuracyForeground() {
         return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
@@ -941,7 +936,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getLocatorAccuracyBackground() {
+    public int getLocatorAccuracyBackground() {
         return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
