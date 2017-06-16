@@ -299,8 +299,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
                                     deviceId.setHint(Preferences.getDeviceIdDefault());
                                     deviceId.setText(Preferences.getDeviceId(false));
-                                    trackerId.setText(Preferences.getTrackerId(false));
-                                    trackerId.setHint(Preferences.getTrackerIdDefault());
+                                    trackerId.setText(App.getPreferences().getTrackerId(false));
+                                    trackerId.setHint(App.getPreferences().getTrackerIdDefault());
 
                                     deviceId.addTextChangedListener(new TextWatcher() {
                                         @Override
