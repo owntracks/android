@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -33,13 +32,11 @@ import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
-import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -59,12 +56,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	private CustomMqttClient mqttClient;
 	private MqttConnectOptions connectOptions;
-	private boolean cleanSession;
 	private String lastConnectionId;
 	private static EndpointState state;
-
-	public MessageProcessorEndpointMqtt() {
-	}
 
 	synchronized boolean sendPing() {
 		// Connects if not connected or sends a ping message if aleady connected
@@ -298,8 +291,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
             setWill(connectOptions);
 			connectOptions.setKeepAliveInterval(Preferences.getKeepalive());
 			connectOptions.setConnectionTimeout(30);
-			cleanSession = Preferences.getCleanSession();
-			connectOptions.setCleanSession(cleanSession);
+			connectOptions.setCleanSession(Preferences.getCleanSession());
 
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
@@ -456,7 +448,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		checkConnection();
 	}
 
-	public boolean checkConnection() {
+	boolean checkConnection() {
 		if(isConnected()) {
 			return true;
 		} else {
@@ -508,14 +500,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 
-	@Subscribe
-	public void onEvent(Events.Dummy e) {
-	}
-
+	@SuppressWarnings("UnusedParameters")
 	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {
-//        clearQueues();
-    }
+
+	}
 
 	public void processOutgoingMessage(MessageBase message) {
 		message.setTopic(Preferences.getPubTopicBase());
@@ -595,16 +584,12 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 
 	private static final class MqttClientMemoryPersistence implements MqttClientPersistence {
-		private static Hashtable data;
-
-		public MqttClientMemoryPersistence(){
-
-		}
+		private static Hashtable<String, MqttPersistable> data;
 
 		@Override
 		public void open(String s, String s2) throws MqttPersistenceException {
 			if(data == null) {
-				data = new Hashtable();
+				data = new Hashtable<>();
 			}
 		}
 
@@ -625,7 +610,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		@Override
 		public MqttPersistable get(String key) throws MqttPersistenceException {
-			return (MqttPersistable)data.get(key);
+			return data.get(key);
 		}
 
 		@Override
