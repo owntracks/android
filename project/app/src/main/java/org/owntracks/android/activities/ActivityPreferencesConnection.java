@@ -39,7 +39,7 @@ import org.owntracks.android.support.widgets.Toasts;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-
+@Deprecated
 public class ActivityPreferencesConnection extends ActivityBase {
     private static final String TAG = "ActivityPreferencesCon";
 
@@ -313,7 +313,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                             if (s.length() >= 2)
                                                 trackerId.setHint(s.toString().substring(deviceId.length() - 2));
                                             else
-                                                trackerId.setHint(Preferences.getTrackerIdDefault());
+                                                trackerId.setHint(App.getPreferences().getTrackerIdDefault());
                                         }
 
                                         @Override

@@ -39,6 +39,7 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
+@Deprecated
 public class ActivityWelcome extends ActivityBase implements ViewPager.OnPageChangeListener {
     private static final int PERMISSION_REQUEST_USER_LOCATION = 2;
     private static final int RECOVER_PLAY = 1001;

@@ -31,7 +31,7 @@ import org.owntracks.android.support.SimpleCursorLoader;
 import org.owntracks.android.support.widgets.Toasts;
 
 
-
+@Deprecated
 public class ActivityRegions extends ActivityBase implements LoaderManager.LoaderCallbacks<Cursor>, AdapterCursorLoader.OnViewHolderClickListener<AdapterWaypoints.ItemViewHolder> {
     private static final String TAG = "ActivityRegions";
     private static final String CURSOR_ORDER = String.format("%s ASC", WaypointDao.Properties.Description.columnName );
