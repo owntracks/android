@@ -70,8 +70,8 @@ public class App extends Application  {
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
 
-        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        dateFormaterToday = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
         HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
         mServiceHandlerThread.start();
@@ -86,6 +86,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 getMessageProcessor().initialize();
+
                 startService(new Intent(getApplicationContext(), BackgroundService.class));
 
                 //startService(new Intent(getApplicationContext(), ServiceProxy.class));

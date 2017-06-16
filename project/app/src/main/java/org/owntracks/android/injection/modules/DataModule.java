@@ -7,9 +7,6 @@ import org.owntracks.android.data.repos.MemoryContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.services.Scheduler;
-import org.owntracks.android.support.EncryptionProvider;
-import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 
 import dagger.Binds;

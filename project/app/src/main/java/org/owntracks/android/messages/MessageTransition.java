@@ -20,6 +20,8 @@ public class MessageTransition extends MessageBase{
 
     public static final String TRIGGER_BEACON = "b";
     public static final String TRIGGER_CIRCULAR = "c";
+    public static final String TRIGGER_LOCATION = "l";
+
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @JsonIgnore
@@ -152,4 +154,5 @@ public class MessageTransition extends MessageBase{
     public double getLat() {
         return lat;
     }
+
 }
