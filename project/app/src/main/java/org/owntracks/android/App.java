@@ -86,6 +86,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 getMessageProcessor().initialize();
+
                 startService(new Intent(getApplicationContext(), BackgroundService.class));
 
                 //startService(new Intent(getApplicationContext(), ServiceProxy.class));
