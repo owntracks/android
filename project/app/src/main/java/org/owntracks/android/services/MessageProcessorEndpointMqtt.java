@@ -76,14 +76,12 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	synchronized boolean sendMessage(Bundle b) {
 		long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
-		Timber.v("message id:%s", messageId);
 		if(!connect()) {
 			Timber.e("not connected and connect failed");
 			return false;
 		}
 
 		try {
-			Timber.v("client is connected, sending message sync: %s", messageId);
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
 			App.getMessageProcessor().onMessageDelivered(messageId);
@@ -173,12 +171,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 
 	private boolean initClient() {
-		Timber.v("initing");
 		if (this.mqttClient != null) {
-			Timber.d("client is already initialized");
 			return true;
 		}
 
+		Timber.v("initializing new mqttClient");
 		try {
 
 			String prefix = "tcp";

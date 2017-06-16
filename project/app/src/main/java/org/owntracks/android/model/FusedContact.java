@@ -99,7 +99,7 @@ public class FusedContact extends BaseObservable {
         if(hasCard() && getMessageCard().hasName())
             return getMessageCard().getName();
         else
-            return "Device-"+getTrackerId();
+            return getTrackerId();
     }
 
     @BindingAdapter({"imageProvider", "contact"})
