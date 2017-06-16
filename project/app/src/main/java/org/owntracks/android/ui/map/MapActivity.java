@@ -458,16 +458,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
                 return true;
             case R.id.menu_clear:
-                //Bundle b = new Bundle();
-                //b.putString(ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC, viewModel.getContact().getId());
-                //PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_MESSAGE, ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT, b);
-                //try {
-                //    p.send();
-                //} catch (PendingIntent.CanceledException e) {
-                //    e.printStackTrace();
-                //}
-                //return true;
-
+                viewModel.onClearContactClicked();
             default:
                 return false;
         }

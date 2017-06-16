@@ -35,9 +35,18 @@ public class Parser {
         return defaultMapper.writeValueAsString(message);
     }
 
-    public String toJson(@NonNull MessageBase message) throws IOException, EncryptionException {
-        return encrypt(toJsonPlain(message));
+    public byte[] toJsonPlainBytes(@NonNull MessageBase message) throws IOException {
+        return defaultMapper.writeValueAsBytes(message);
     }
+
+    public String toJson(@NonNull MessageBase message) throws IOException, EncryptionException {
+        return encryptString(toJsonPlain(message));
+    }
+
+    public byte[] toJsonBytes(@NonNull MessageBase message) throws IOException, EncryptionException {
+        return encryptBytes(toJsonPlainBytes(message));
+    }
+
 
     // Accepts {plain} as byte array
     public MessageBase fromJson(@NonNull byte[] input) throws IOException, EncryptionException {
@@ -73,7 +82,7 @@ public class Parser {
     }
 
 
-    private String encrypt(@NonNull String input) throws IOException, EncryptionException {
+    private String encryptString(@NonNull String input) throws IOException, EncryptionException {
         if(encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(encryptionProvider.encrypt(input));
@@ -81,6 +90,16 @@ public class Parser {
         }
         return input;
     }
+
+    private byte[] encryptBytes(@NonNull byte[] input) throws IOException, EncryptionException {
+        if(encryptionProvider.isPayloadEncryptionEnabled()) {
+            MessageEncrypted m = new MessageEncrypted();
+            m.setdata(encryptionProvider.encrypt(input));
+            return defaultMapper.writeValueAsBytes(m);
+        }
+        return input;
+    }
+
 
 
     public static class EncryptionException extends Exception {

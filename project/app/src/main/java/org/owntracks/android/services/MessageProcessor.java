@@ -163,7 +163,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
-    void sendMessage(MessageBase message) {
+    public void sendMessage(MessageBase message) {
         if(!acceptMessages) return;
 
         Timber.v("executing message on outgoingMessageProcessor");

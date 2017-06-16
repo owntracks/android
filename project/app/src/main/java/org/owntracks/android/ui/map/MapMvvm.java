@@ -36,7 +36,9 @@ public interface MapMvvm {
         void onBottomSheetLongClick();
         void onBottomSheetClick();
         void onMenuCenterDeviceClicked();
+        void onClearContactClicked();
 
         void restore(String contactId);
+
     }
 }
