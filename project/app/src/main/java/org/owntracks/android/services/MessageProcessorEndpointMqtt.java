@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -94,23 +96,43 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	private MqttMessage mqttMessageFromBundle(Bundle b) {
 		MqttMessage  m = new MqttMessage();
-		m.setPayload(b.getString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD).getBytes());
+		m.setPayload(b.getByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD));
 		m.setQos(b.getInt(MQTT_BUNDLE_KEY_MESSAGE_QOS));
 		m.setRetained(b.getBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED));
 		return m;
 	}
 
-	private Bundle mqttMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+	@NonNull
+	private Bundle mqttMessageToBundle(MessageBase m)  {
 		Bundle b = new Bundle();
-		b.putString(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
-		b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
-		b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
-		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
 		b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
+		b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_MQTT);
+
+		try {
+			// Message properties
+			b.putByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJsonBytes(m));
+			b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
+			b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
+			b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
+		} catch (Exception e) {
+			// Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
+			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped" ,m.getMessageId());
+			return b;
+		}
 		return b;
 	}
+
+	@NonNull
+	private Bundle mqttMessageToBundle(@NonNull MessageClear m) {
+		Bundle b = mqttMessageToBundle(MessageBase.class.cast(m));
+		b.putByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, new byte[0]);
+		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, true);
+		return b;
+	}
+
 
 
 	private static MessageProcessorEndpointMqtt instance;
@@ -142,31 +164,28 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		@Override
 		public void messageArrived(String topic, MqttMessage message) throws Exception {
-			if(message.getPayload().length > 0) {
-				try {
-					MessageBase m = App.getParser().fromJson(message.getPayload());
-					if (!m.isValidMessage()) {
-						Timber.e("message failed validation");
-						return;
-					}
-
-					m.setTopic(topic);
-					m.setRetained(message.isRetained());
-					m.setQos(message.getQos());
-					//TODO: send to repo
-					App.getMessageProcessor().onMessageReceived(m);
-				} catch (Exception e) {
-					Timber.e(e, "payload:%s ", new String(message.getPayload()));
-
+			try {
+				MessageBase m = App.getParser().fromJson(message.getPayload());
+				if (!m.isValidMessage()) {
+					Timber.e("message failed validation");
+					return;
 				}
-			} else {
-				MessageClear m = new MessageClear();
-				m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
-				Timber.v("clear message received: %s", m.getTopic());
+
+				m.setTopic(topic);
+				m.setRetained(message.isRetained());
+				m.setQos(message.getQos());
 				App.getMessageProcessor().onMessageReceived(m);
+			} catch (Exception e) {
+				if (message.getPayload().length == 0) {
+					Timber.v("clear message received: %s", topic);
+					MessageClear m = new MessageClear();
+					m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
+					App.getMessageProcessor().onMessageReceived(m);
+				} else {
+					Timber.e(e, "payload:%s ", new String(message.getPayload()));
+				}
 			}
 		}
-
 	};
 
 
@@ -500,18 +519,18 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	public void processOutgoingMessage(MessageBase message) {
 		message.setTopic(Preferences.getPubTopicBase());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageCmd message) {
 		message.setTopic(App.getPreferences().getPubTopicCommands());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageEvent message) {
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -519,7 +538,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(Preferences.getPubTopicLocations());
 		message.setQos(Preferences.getPubQosLocations());
 		message.setRetained(Preferences.getPubRetainLocations());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -527,7 +546,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(Preferences.getPubTopicEvents());
 		message.setQos(Preferences.getPubQosEvents());
 		message.setRetained(Preferences.getPubRetainEvents());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -535,7 +554,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(Preferences.getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -543,12 +562,16 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(Preferences.getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
-		scheduleMessage(message);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageClear message) {
-		//TODO
+		message.setRetained(true);
+		scheduleMessage(mqttMessageToBundle(message));
+
+		message.setTopic(message.getTopic()+MessageCard.BASETOPIC_SUFFIX);
+		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -563,19 +586,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 
 
-	private void scheduleMessage(MessageBase m) {
-		try {
-			Bundle b = mqttMessageToBundle(m);
-			b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_MQTT);
+	private void scheduleMessage(Bundle b) {
 			if(App.isInForeground())
 				sendMessage(b);
 			else
 				App.getScheduler().scheduleMessage(b);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Parser.EncryptionException e) {
-			e.printStackTrace();
-		}
 	}
 
 

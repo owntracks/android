@@ -2,6 +2,7 @@ package org.owntracks.android.support;
 
 
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -54,9 +55,13 @@ public class EncryptionProvider {
         return new String(b.decrypt(nonce, cyphertext));
     }
 
-    String encrypt(String plaintext) {
+    String encrypt(@NonNull String plaintext) {
+        return encrypt(plaintext.getBytes());
+    }
+
+    public String encrypt(@NonNull byte[] plaintext) {
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
-        byte[] cyphertext = b.encrypt(nonce, plaintext.getBytes());
+        byte[] cyphertext = b.encrypt(nonce, plaintext);
         byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
 
         System.arraycopy(nonce, 0, out, 0, crypto_secretbox_NONCEBYTES);

@@ -57,8 +57,9 @@ public class Scheduler extends GcmTaskService {
                 Intent mIntent = new Intent(this, BackgroundService.class);
                 mIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
                 startService(mIntent);
-
+                return GcmNetworkManager.RESULT_SUCCESS;
             default:
+                Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
                 return GcmNetworkManager.RESULT_FAILURE;
         }
 

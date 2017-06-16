@@ -128,7 +128,7 @@ public class ServiceBeacon implements BeaconConsumer {
         m.setDesc(w.getDescription());
         m.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         m.setEvent(transition);
-        m.setTid(Preferences.getTrackerId(true));
+        m.setTid(App.getPreferences().getTrackerId(true));
         m.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
         m.setTrigger(MessageTransition.TRIGGER_BEACON);
 

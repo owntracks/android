@@ -8,10 +8,12 @@ import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -138,6 +140,13 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onMenuCenterDeviceClicked() {
         getView().setModeDevice();
+    }
+
+    @Override
+    public void onClearContactClicked() {
+        MessageClear m = new MessageClear();
+        m.setTopic(activeContact.getId());
+        App.getMessageProcessor().sendMessage(m);
     }
 
 
