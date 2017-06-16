@@ -28,7 +28,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 
 
-
+@Deprecated
 public class ActivityRegion extends ActivityBase  {
     private static final String TAG = "ActivityRegion";
 

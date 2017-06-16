@@ -30,6 +30,7 @@ import org.owntracks.android.ui.configuration.ConfigurationActivity;
 
 import timber.log.Timber;
 
+@Deprecated
 public class ActivityPreferences extends ActivityBase {
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
