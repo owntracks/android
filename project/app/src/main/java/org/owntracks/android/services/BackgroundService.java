@@ -62,7 +62,6 @@ public class BackgroundService extends Service {
     private static int notificationEventsID = 3;
 
     private String NOTIFICATION_GROUP_EVENTS = "events";
-    private String NOTIFICATION_TAG_EVENTS_STACK = "events_stack";
 
     public static final String INTENT_ACTION_CHANGE_BG = "BG";
     public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "C";
@@ -396,7 +395,7 @@ public class BackgroundService extends Service {
         }
 
         // Automatic updates are discarded if automatic reporting is disabled
-        if ((trigger == MessageLocation.REPORT_TYPE_DEFAULT || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub()) {
+        if ((trigger == null || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub()) {
             return;
         }
 
