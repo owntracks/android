@@ -313,18 +313,21 @@ public class BackgroundService extends Service {
     private void onWaypointTransition(@NonNull Waypoint w, @NonNull Location l, int transition, @NonNull String trigger) {
         Timber.v("%s transition:%s, trigger:%s", w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
+        if(ignoreLowAccuracy(l)) {
+            Timber.d("ignoring transition: low accuracy ");
+            return;
+        }
+
         // Don't send transition if the region is already triggered
         // If the region status is unknown, send transition only if the device is inside
         if ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))
         {
-            Timber.d("ignoring duplicate transition event");
+            Timber.d("ignoring transition: duplicate");
             w.setLastTransition(transition);
             return;
         }
 
-
         w.setLastTransition(transition);
-
         w.setLastTriggered(System.currentTimeMillis());
         App.getDao().getWaypointDao().update(w);
 
@@ -430,9 +433,6 @@ public class BackgroundService extends Service {
     }
 
     private void publishTransitionMessage(@NonNull Waypoint w, @NonNull Location triggeringLocation, int transition, String trigger) {
-        if (ignoreLowAccuracy(triggeringLocation))
-            return;
-
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(trigger);
