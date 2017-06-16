@@ -92,10 +92,9 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static EncryptionProvider provideEncryptionProvider() {
-        return new EncryptionProvider();
+    static EncryptionProvider provideEncryptionProvider(Preferences preferences) {
+        return new EncryptionProvider(preferences);
     }
-
 
     @Provides
     @PerApplication

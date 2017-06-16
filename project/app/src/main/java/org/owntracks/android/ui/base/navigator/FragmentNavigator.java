@@ -39,8 +39,4 @@ public class FragmentNavigator extends BaseNavigator {
         return fragment.getChildFragmentManager();
     }
 
-    @Override
-    public Drawer attachDrawer(@NonNull Toolbar toolbar) {
-        throw new UnsupportedOperationException("Fragments cannot attach to a drawer");
-    }
 }

@@ -12,6 +12,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class Events {
+    public static abstract class E {
+        final Date date;
+        public E() {
+            this.date = new Date();
+        }
+        public Date getDate() {
+            return this.date;
+        }
+    }
+
+    public static class Dummy extends E {
+        public Dummy() {
+        }
+    }
 
     public static class ModeChanged extends E {
         final int newModeId;
@@ -48,96 +62,6 @@ public class Events {
 			return this.transition;
 		}
 
-	}
-
-
-	public static abstract class E {
-		final Date date;
-
-		public E() {
-			this.date = new Date();
-		}
-
-		public Date getDate() {
-			return this.date;
-		}
-
-	}
-
-	public static class Dummy extends E {
-		public Dummy() {
-		}
-	}
-
-	public static class CurrentLocationUpdated extends E {
-		final GeocodableLocation l;
-
-		public CurrentLocationUpdated(Location l) {
-			super();
-			this.l = new GeocodableLocation(l);
-		}
-
-		public CurrentLocationUpdated(GeocodableLocation l) {
-			this.l = l;
-		}
-
-		public GeocodableLocation getLocation() {
-			return this.l;
-		}
-
-	}
-
-	public static class ContactAdded extends E {
-        final FusedContact contact;
-
-		public ContactAdded(FusedContact f) {
-			super();
-			this.contact = f;
-		}
-
-		public FusedContact getContact() {
-			return this.contact;
-		}
-
-	}
-
-    public static class FusedContactAdded extends E {
-        final FusedContact contact;
-
-        public FusedContactAdded(FusedContact f) {
-            super();
-            this.contact = f;
-        }
-
-        public FusedContact getContact() {
-            return this.contact;
-        }
-    }
-
-    public static class FusedContactUpdated extends E {
-        final FusedContact contact;
-
-        public FusedContactUpdated(FusedContact f) {
-            super();
-            this.contact = f;
-        }
-
-        public FusedContact getContact() {
-            return this.contact;
-        }
-    }
-
-    public static class ContactUpdated extends E {
-		private final FusedContact c;
-
-		public ContactUpdated(FusedContact c) {
-			super();
-			this.c = c;
-		}
-
-		public FusedContact getContact() {
-			return this.c;
-		}
 	}
 
 

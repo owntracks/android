@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.map;
 
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.location.Location;
@@ -36,14 +35,9 @@ import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.util.WeakHashMap;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 import timber.log.Timber;
 
@@ -51,9 +45,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
     private static final long ZOOM_LEVEL_STREET = 15;
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
-
-    @Inject
-    protected Provider<Navigator> navigator;
 
     WeakHashMap<String, Marker> mMarkers = new WeakHashMap <>();
 
@@ -179,7 +170,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        ActivityWelcome.runChecks(this);
+        if(ActivityWelcome.runChecks(this)) {
+            finish();
+            return;
+        }
 
         activityComponent().inject(this);
         setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
@@ -245,7 +239,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
         Bundle b = getExtrasBundle(intent);
         if(b != null) {
-            Timber.v("intent has extras from navigator");
+            Timber.v("intent has extras from drawerProvider");
             String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
             if(contactId != null) {
                 viewModel.restore(contactId);
