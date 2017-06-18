@@ -86,7 +86,12 @@ public class Waypoint {
     }
 
     public void setGeofenceLatitude(double geofenceLatitude) {
-        this.geofenceLatitude = geofenceLatitude;
+        if(geofenceLatitude > 90)
+            this.geofenceLatitude = 90;
+        if(geofenceLatitude < -90)
+            this.geofenceLatitude = -90;
+        else
+            this.geofenceLatitude = geofenceLatitude;
     }
 
     public double getGeofenceLongitude() {
@@ -94,7 +99,12 @@ public class Waypoint {
     }
 
     public void setGeofenceLongitude(double geofenceLongitude) {
-        this.geofenceLongitude = geofenceLongitude;
+        if(geofenceLongitude > 180 )
+            this.geofenceLongitude = 180 ;
+        if(geofenceLongitude < -180 )
+            this.geofenceLongitude = -180 ;
+        else
+            this.geofenceLongitude = geofenceLongitude;
     }
 
     public Integer getGeofenceRadius() {
