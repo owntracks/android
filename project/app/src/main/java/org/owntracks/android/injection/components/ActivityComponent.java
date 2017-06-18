@@ -1,13 +1,19 @@
 package org.owntracks.android.injection.components;
 
+import android.content.Context;
+import android.support.v4.app.FragmentManager;
+
 import org.owntracks.android.injection.modules.ActivityModule;
 import org.owntracks.android.injection.modules.ViewModelModule;
+import org.owntracks.android.injection.qualifier.ActivityContext;
+import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.configuration.ConfigurationActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.load.LoadActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.status.StatusActivity;
+import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import dagger.Component;
 
@@ -27,10 +33,13 @@ import dagger.Component;
 @PerActivity
 @Component(dependencies = AppComponent.class, modules = {ActivityModule.class, ViewModelModule.class})
 public interface ActivityComponent {
+    @ActivityContext Context activityContext();
+    @ActivityFragmentManager FragmentManager activityFragmentManager();
+
     void inject(MapActivity activity);
     void inject(ContactsActivity activity);
     void inject(StatusActivity activity);
     void inject(ConfigurationActivity activity);
     void inject(LoadActivity activity);
-
+    void inject(WelcomeActivity activity);
 }
