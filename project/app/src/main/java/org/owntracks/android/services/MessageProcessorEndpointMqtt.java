@@ -231,7 +231,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			return false;
 		}
 
-		if(!Preferences.canConnect()) {
+		if(!App.getPreferences().canConnect()) {
 			changeState(EndpointState.ERROR_CONFIGURATION);
 			return false;
 		}
@@ -253,7 +253,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		try {
 			Timber.v("setting up connect options");
 			 connectOptions = new MqttConnectOptions();
-			if (Preferences.getAuth()) {
+			if (App.getPreferences().getAuth()) {
 				connectOptions.setPassword(Preferences.getPassword().toCharArray());
 				connectOptions.setUserName(Preferences.getUsername());
 			}
