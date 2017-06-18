@@ -5,9 +5,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
+import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.DrawerProvider;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
@@ -43,6 +45,7 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
+    @ActivityFragmentManager
     FragmentManager provideFragmentManager() { return mActivity.getSupportFragmentManager(); }
 
     @Provides
@@ -52,4 +55,9 @@ public class ActivityModule {
     @Provides
     @PerActivity
     Navigator provideNavigator() { return new ActivityNavigator(mActivity); }
+
+    @Provides
+    @PerActivity
+    RequirementsChecker provideRequirementsChecker(Preferences preferences) {return new RequirementsChecker(preferences); }
+
 }

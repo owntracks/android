@@ -11,6 +11,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.databinding.UiActivityMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
@@ -170,16 +170,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        if(ActivityWelcome.runChecks(this)) {
-            finish();
-            return;
-        }
-
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
 
-        setSupportToolbar(binding.toolbar);
-        setDrawer(binding.toolbar);
+        assertRequirements();
+        bindAndAttachContentView(R.layout.ui_activity_map, savedInstanceState);
+        setSupportToolbarWithDrawer(this.binding.toolbar);
 
         this.mMapLocationSource = new MapLocationSource();
 
@@ -190,10 +185,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             Timber.e("not showing map due to issue https://issuetracker.google.com/issues/35827842");
             flagStateMapReady = false;
         }
-        this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
-        binding.contactPeek.contactRow.setOnClickListener(this);
-        binding.contactPeek.contactRow.setOnLongClickListener(this);
-        binding.moreButton.setOnClickListener(new View.OnClickListener() {
+        this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);
+        this.binding.contactPeek.contactRow.setOnClickListener(this);
+        this.binding.contactPeek.contactRow.setOnLongClickListener(this);
+        this.binding.moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupMenu(v);
@@ -202,7 +197,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         });
         setBottomSheetHidden();
 
-        AppBarLayout appBarLayout = binding.appBarLayout;
+        AppBarLayout appBarLayout = this.binding.appBarLayout;
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
         behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
@@ -237,7 +232,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     private void handleIntentExtras(Intent intent) {
         Timber.v("handleIntentExtras");
 
-        Bundle b = getExtrasBundle(intent);
+        Bundle b = navigator.getExtrasBundle(intent);
         if(b != null) {
             Timber.v("intent has extras from drawerProvider");
             String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
@@ -308,16 +303,22 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         this.mMenu = menu;
         if(!flagStateLocationReady)
             disableLocationMenus();
+        else
+            enableLocationMenus();
         return true;
     }
 
     private void disableLocationMenus() {
-        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
-        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
+        if(this.mMenu != null) {
+            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
+            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
+        }
     }
     private void enableLocationMenus() {
-        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
-        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
+        if(this.mMenu != null) {
+            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
+            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
+        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -470,7 +471,6 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
         return mMapLocationSource;
     }
-
 
     public class MapLocationSource implements LocationSource {
         LocationSource.OnLocationChangedListener mListener;
