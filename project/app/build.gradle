@@ -4,7 +4,7 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 4
+def versionBuild = 9
 ext.pahoVersion = "1.1.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '11.0.1'
@@ -86,12 +86,14 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile "com.android.support:customtabs:${supportLibVersion}"
 
     // Play Services libraries
     compile "com.google.android.gms:play-services-gcm:${playLibVersion}"
     compile "com.google.android.gms:play-services-maps:${playLibVersion}"
     compile "com.google.android.gms:play-services-location:${playLibVersion}"
     compile "com.google.android.gms:play-services-places:${playLibVersion}"
+
 
     // Utility libraries
     compile "com.google.dagger:dagger:${daggerVersion}"
@@ -103,6 +105,8 @@ dependencies {
 
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.7'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
     compile 'com.jakewharton.timber:timber:4.5.1'
