@@ -7,6 +7,8 @@ import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageClear extends MessageBase {
+    static final String TYPE = "clear";
+
     @Override
     protected void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
@@ -22,4 +24,5 @@ public class MessageClear extends MessageBase {
     public String getBaseTopicSuffix() {
         return null;
     }
+
 }
