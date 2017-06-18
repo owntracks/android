@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Base64;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
@@ -38,9 +40,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
 
-public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
+public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, Preferences.OnPreferenceChangedListener {
     // Headers according to https://github.com/owntracks/recorder#http-mode
     private static final String HEADER_USERNAME = "X-Limit-U";
     private static final String HEADER_DEVICE = "X-Limit-D";
@@ -49,7 +52,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
     private static final String HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD = "HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD";
     private static final String HTTP_BUNDLE_KEY_USERINFO = "HTTP_BUNDLE_KEY_USERINFO";
     private static final String HTTP_BUNDLE_KEY_URL = "HTTP_BUNDLE_KEY_URL";
-    private static final String HTTP_BUNDLE_KEY_MESSAGE_ID = "HTTP_BUNDLE_KEY_MESSAGE_ID";
 
     private static String headerUsername;
     private static String headerDevice;
@@ -69,32 +71,12 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
     }
 
 
-    public MessageProcessorEndpointHttp() {
-        App.getPreferences().registerOnPreferenceChangedListener(new Preferences.OnPreferenceChangedListener() {
-            @Override
-            public void onAttachAfterModeChanged() {
-
-            }
-
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(Preferences.Keys.URL.equals(key))
-                    loadEndpointUrl();
-                if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
-                    loadHTTPClient();
-                if(Preferences.Keys.USERNAME.equals(key))
-                    headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
-                if(Preferences.Keys.DEVICE_ID.equals(key))
-                    headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
-
-
-
-            }
-        });
-
+    private MessageProcessorEndpointHttp() {
+        App.getPreferences().registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
         loadHTTPClient();
     }
+
     @Override
     public void onCreateFromProcessor() {
 
@@ -123,7 +105,14 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
         try {
             SocketFactory f = new SocketFactory(socketFactoryOptions);
-            mHttpClient = new OkHttpClient.Builder().sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]).build();
+
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel( HttpLoggingInterceptor.Level.BODY);
+
+            mHttpClient = new OkHttpClient.Builder().sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]).addInterceptor(logging).build();
+
+
+
         } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | IOException | UnrecoverableKeyException | CertificateException e) {
             e.printStackTrace();
         }
@@ -138,7 +127,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
             endpoint = new URL(Preferences.getUrl());
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
             return;
         }
@@ -155,6 +143,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
     }
 
+    @SuppressWarnings("UnusedParameters")
     @Subscribe
     public void onEvent(Events.Dummy event) {
 
@@ -164,7 +153,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
         String body = b.getString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD);
         String url = b.getString(HTTP_BUNDLE_KEY_URL);
         String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
-        long messageId = b.getLong(HTTP_BUNDLE_KEY_MESSAGE_ID);
+        long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 
         Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
 
@@ -172,12 +161,11 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
             return false;
 
         Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
-
+        //request.addHeader("Accept-Encoding", "gzip");
         if(userInfo != null) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
-        } else if(Preferences.getAuth()) {
+        } else if(App.getPreferences().getAuth()) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((Preferences.getUsername()+":"+Preferences.getPassword()).getBytes(), Base64.NO_WRAP));
-
         }
 
         if(headerUsername != null) {
@@ -187,58 +175,62 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
             request.header(HEADER_DEVICE, headerDevice);
         }
 
-
         try {
+            //Send request
             Response r = mHttpClient.newCall(request.build()).execute();
 
+            // Handle delivered message
             if((r != null) && (r.isSuccessful())) {
-                Timber.v("got HTTP response");
+                getMessageProcessor().onMessageDelivered(messageId);
 
-                try {
-                    //Timber.v("code: %s, streaming response to parser", r.body().string() );
+                // Handle response
+                if(r.body() != null ) {
+                    try {
 
-                    MessageBase[] result = App.getParser().fromJson(r.body().byteStream());
-                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("Response "+r.code() + ", " + result.length));
+                        MessageBase[] result = App.getParser().fromJson(r.body().byteStream());
+                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
 
-                    for (MessageBase aResult : result) {
-                        getMessageProcessor().onMessageReceived(aResult);
+                        for (MessageBase aResult : result) {
+                            getMessageProcessor().onMessageReceived(aResult);
+                        }
+                    } catch (JsonProcessingException e ) {
+                        Timber.e("error:JsonParseException responseCode:%s", r.code());
+                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("HTTP " +r.code() + ", JsonParseException"));
+                    } catch (Parser.EncryptionException e) {
+                        Timber.e("error:JsonParseException responseCode:%s", r.code());
+                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
-
-                    //Non JSON return value
-                } catch (IOException e) {
-                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP " +r.code() + ", JsonParseException"));
-                    Timber.e("error:JsonParseException responseCode:%s", r.code());
-                    e.printStackTrace();
-                    getMessageProcessor().onMessageDeliveryFailed(messageId);
-                    return false;
-                } catch (Parser.EncryptionException e) {
-                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response: "+r.code() + ", EncryptionException"));
-                    Timber.e("error:EncryptionException");
-                    getMessageProcessor().onMessageDeliveryFailed(messageId);
-                    return false;
                 }
-                return true;
             } else {
+                getMessageProcessor().onMessageDeliveryFailed(messageId);
                 return false;
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Timber.e("error:IOException. Delivery failed ");
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setError(e));
+            getMessageProcessor().onMessageDeliveryFailed(messageId);
             return false;
         }
+
+        return true;
     }
 
     private static MessageProcessor getMessageProcessor() {
         return App.getMessageProcessor();
     }
 
-    private Bundle httpMessageToBundle(MessageBase m) throws IOException, Parser.EncryptionException {
+    private Bundle httpMessageToBundle(MessageBase m)  {
         Bundle b = new Bundle();
-        b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
-        b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
-        b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
         b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
+
+        try {
+            b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
+            b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
+            b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return b;
     }
 
@@ -259,6 +251,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
     @Override
     public void processOutgoingMessage(MessageLocation message) {
+
+        message.setTopic(Preferences.getPubTopicBase());
         scheduleMessage(message);
     }
 
@@ -284,6 +278,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
 
     @Override
     public void onDestroy() {
+        App.getPreferences().unregisterOnPreferenceChangedListener(this);
 
     }
 
@@ -293,17 +288,28 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor {
     }
 
     private void scheduleMessage(MessageBase m) {
-        try {
             Bundle b = httpMessageToBundle(m);
             b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_HTTP);
             if(App.isInForeground())
                 sendMessage(b);
             else
                 App.getScheduler().scheduleMessage(b);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Parser.EncryptionException e) {
-            e.printStackTrace();
-        }
+    }
+
+    @Override
+    public void onAttachAfterModeChanged() {
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(Preferences.Keys.URL.equals(key))
+            loadEndpointUrl();
+        else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
+            loadHTTPClient();
+        else if(Preferences.Keys.USERNAME.equals(key))
+            headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
+        else if(Preferences.Keys.DEVICE_ID.equals(key))
+            headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 }
