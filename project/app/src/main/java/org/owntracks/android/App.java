@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.components.AppComponent;
@@ -21,6 +20,7 @@ import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
 import android.app.Application;
@@ -191,7 +191,7 @@ public class App extends Application  {
     }
 
     public static void restart() {
-        Intent intent = new Intent(getContext(), ActivityWelcome.class);
+        Intent intent = new Intent(getContext(), MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
