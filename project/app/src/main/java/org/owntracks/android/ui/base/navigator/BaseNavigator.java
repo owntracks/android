@@ -52,11 +52,20 @@ public abstract class BaseNavigator implements Navigator {
 
     @Override
     public final void startActivity(@NonNull Class<? extends Activity> activityClass, Bundle args) {
+        startActivity(activityClass, args, 0);
+    }
+
+
+    @Override
+    public void startActivity(@NonNull Class<? extends Activity> activityClass, Bundle args, int flags) {
         Activity activity = getActivity();
         Intent intent = new Intent(activity, activityClass);
+        intent.setFlags(flags);
         if(args != null) { intent.putExtra(EXTRA_ARGS, args); }
         activity.startActivity(intent);
+
     }
+
 
     @Override
     public final void startActivity(@NonNull Class<? extends Activity> activityClass, Parcelable args) {
@@ -116,4 +125,9 @@ public abstract class BaseNavigator implements Navigator {
             fm.executePendingTransactions();
         }
     }
+
+    public Bundle getExtrasBundle(Intent intent) {
+        return intent.hasExtra(Navigator.EXTRA_ARGS) ? intent.getBundleExtra(Navigator.EXTRA_ARGS) : new Bundle();
+    }
+
 }
