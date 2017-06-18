@@ -89,9 +89,14 @@ public class ActivityRegion extends ActivityBase  {
 
         boolean enabled;
         try {
+
+            float lat = Float.parseFloat(binding.latitude.getText().toString());
+            float lon = Float.parseFloat(binding.longitude.getText().toString());
+
             enabled = (binding.description.getText().toString().length() > 0)
                     && (binding.latitude.getText().toString().length() > 0)
-                    && (binding.longitude.getText().toString().length() > 0);
+                    && (binding.longitude.getText().toString().length() > 0)
+                    && ((lat <= 90) && (lat >= -90)) && ((lon <= 180) && (lon >= -180));
 
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input
