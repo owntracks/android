@@ -168,22 +168,24 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         Timber.v("executing message on outgoingMessageProcessor");
         message.setOutgoingProcessor(outgoingMessageProcessor);
+        onMessageQueued(message);
 
         this.outgoingMessageProcessorExecutor.execute(message);
-        onMessageQueued(message);
     }
 
      void onMessageDelivered(Long messageId) {
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
 
-        if(m == null) {
-            Timber.e("messageId:%s, error: called for unqueued message", messageId);
-        } else {
+        if(m != null) {
             Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m instanceof MessageLocation) {
+                onMessageReceived(m);
                 eventBus.post(m);
             }
+
+        } else {
+            Timber.e("messageId:%s, error: called for unqueued message", messageId);
         }
     }
 
@@ -191,8 +193,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
         outgoingQueue.put(m.getMessageId(), m);
 
         Timber.v("messageId:%s, queueLength:%s", m.getMessageId(), outgoingQueue.size());
-        if(m instanceof MessageLocation && MessageLocation.REPORT_TYPE_USER.equals(MessageLocation.class.cast(m).getT()))
-            Toasts.showMessageQueued();
     }
 
     void onMessageDeliveryFailed(Long messageId) {
@@ -214,6 +214,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onMessageReceived(MessageBase message) {
+        Timber.v("messageId:%s", message.getMessageId());
         message.setIncomingProcessor(this);
         incomingMessageProcessorExecutor.execute(message);
     }
