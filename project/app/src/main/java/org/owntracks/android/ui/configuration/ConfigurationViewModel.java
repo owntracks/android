@@ -36,7 +36,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
 
     private void updateEffectiveConfiguration() {
         try {
-            MessageConfiguration m = Preferences.exportToMessage();
+            MessageConfiguration m = App.getPreferences().exportToMessage();
             m.setWaypoints(null);
             m.set(Preferences.Keys.PASSWORD, "********");
             setEffectiveConfiguration(App.getParser().toJsonPlainPretty(m));
@@ -59,7 +59,7 @@ public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.
     public void onExportConfigurationToFileClicked() {
         String exportStr;
         try {
-            exportStr = App.getParser().toJsonPlain(Preferences.exportToMessage());
+            exportStr = App.getParser().toJsonPlain(App.getPreferences().exportToMessage());
         } catch (IOException e) {
             getView().displayExportToFileFailed();
             return;
