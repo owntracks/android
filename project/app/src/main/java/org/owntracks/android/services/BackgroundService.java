@@ -37,13 +37,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityWelcome;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -165,7 +165,7 @@ public class BackgroundService extends Service {
 
         activeNotificationBuilder = new NotificationCompat.Builder(this);
 
-        Intent resultIntent = new Intent(App.getContext(), ActivityWelcome.class);
+        Intent resultIntent = new Intent(App.getContext(), MapActivity.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -288,7 +288,7 @@ public class BackgroundService extends Service {
                 }
 
                 builder.setStyle(inbox);
-                builder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(App.getContext(), ActivityWelcome.class), PendingIntent.FLAG_ONE_SHOT));
+                builder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(App.getContext(), MapActivity.class), PendingIntent.FLAG_ONE_SHOT));
                 builder.setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
 
                 Notification stackNotification = builder.build();
@@ -533,15 +533,19 @@ public class BackgroundService extends Service {
                 Timber.v("new fence found without UUID");
             }
 
-            Geofence geofence = new Geofence.Builder()
-                    .setRequestId(w.getGeofenceId())
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                    .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE).build();
+            try {
+                Geofence geofence = new Geofence.Builder()
+                        .setRequestId(w.getGeofenceId())
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
+                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId());
-            fences.add(geofence);
+                Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId());
+                fences.add(geofence);
+            } catch (Exception e) {
+                Timber.e("invalid geofence for waypoint %s", w.getDescription());
+            }
         }
 
         if (fences.isEmpty()) {
@@ -623,7 +627,7 @@ public class BackgroundService extends Service {
         notificationBuilderEvents = new NotificationCompat.Builder(this);
 
 
-        Intent openIntent = new Intent(this, ActivityWelcome.class);
+        Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.setAction("android.intent.action.MAIN");
         openIntent.addCategory("android.intent.category.LAUNCHER");
         openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
