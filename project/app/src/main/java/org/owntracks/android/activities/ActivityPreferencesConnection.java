@@ -35,6 +35,7 @@ import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
+import org.owntracks.android.ui.status.StatusActivity;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -94,6 +95,9 @@ public class ActivityPreferencesConnection extends ActivityBase {
         switch (item.getItemId()) {
             case android.R.id.home:     // If the user hits the toolbar back arrow, go back to ActivityMain, no matter where he came from (same as hitting back)
                 handleBack();
+                return true;
+            case R.id.status:
+                startActivity(new Intent(this, StatusActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -349,7 +353,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 }
             };
 
-            authenticationVal = Preferences.getAuth();
+            authenticationVal = App.getPreferences().getAuth();
             identificationPreference = findPreference(getString(R.string.preferencesKeyIdentification));
             identificationPreference.setOnPreferenceClickListener(identificationClickListener);
 
@@ -625,7 +629,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             mode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Preferences.setMode(Integer.parseInt((String) newValue));
+                    App.getPreferences().setMode(Integer.parseInt((String) newValue));
                     ActivityPreferencesConnection.modeSwitch = true; // signal that ConnectionPreferences should be shown again after fragment is restored
                     getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("preferences")).add(R.id.content_frame, new FragmentPreferences(), "preferences").commit();
                     return false; // Don't save, setMode already did
@@ -661,7 +665,6 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            Log.v(TAG, "onCreateOptionsMenu");
             if (menu != null) {
                 mMenu = menu;
                 mInflater = inflater;
@@ -672,13 +675,13 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
 
             mMenu.clear();
-           if(Preferences.isModeHttpPrivate())
-               return;
-
-            mInflater.inflate(R.menu.preferences_connection_mqtt, mMenu);
-
-            updateDisconnectButton(cachedState);
-            updateConnectButton();
+           if(Preferences.isModeHttpPrivate()) {
+               mInflater.inflate(R.menu.preferences_connection_http, mMenu);
+           } else {
+               mInflater.inflate(R.menu.preferences_connection_mqtt, mMenu);
+               updateDisconnectButton(cachedState);
+               updateConnectButton();
+           }
         }
 
         @Override
@@ -735,7 +738,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             if (connectButton == null)
                 return;
 
-            boolean canConnect = Preferences.canConnect();
+            boolean canConnect = App.getPreferences().canConnect();
 
             connectButton.setEnabled(canConnect);
             connectButton.getIcon().setAlpha(canConnect ? 255 : 130);
