@@ -76,7 +76,7 @@ public class Preferences {
     }
 
 
-    public static void initMode(int active) {
+    void initMode(int active) {
         // Check for valid mode IDs and fallback to Private if an invalid mode is set
         if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC || active == App.MODE_ID_HTTP_PRIVATE) {
             setMode(active, true);
@@ -85,10 +85,10 @@ public class Preferences {
         }
     }
 
-    public static void setMode(int active) {
+    public void setMode(int active) {
         setMode(active, false);
     }
-    private static void setMode(int active, boolean init){
+    public void setMode(int active, boolean init){
         Timber.v("setMode: " + active);
 
         if(!init && modeId == active)
@@ -285,7 +285,7 @@ public class Preferences {
         return activeSharedPreferences;
     }
 
-    public static boolean canConnect() {
+    public boolean canConnect() {
         if(isModeMqttPrivate()) {
             return !getHost().trim().equals("") && !getUsername().trim().equals("")  && (!getAuth() || !getPassword().trim().equals(""));
         } else if(isModeMqttPublic()) {
@@ -476,14 +476,14 @@ public class Preferences {
 
     }
 
-    @Export(key =Keys.USERNAME, exportModeMqttPrivate =true)
+    @Export(key =Keys.USERNAME, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public static String getUsername() {
         // in public, the username is just used to build the topic public/user/$deviceId
         return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, R.string.valEmpty, true, false);
     }
 
     @Export(key =Keys.AUTH, exportModeMqttPrivate =true)
-    public static boolean getAuth() {
+    public  boolean getAuth() {
         return getBoolean(Keys.AUTH, R.bool.valAuth, R.bool.valAuthPublic, true);
 
     }
@@ -848,7 +848,7 @@ public class Preferences {
     public static String getHost() {
         return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, R.string.valEmpty, true, false);
     }
-    @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true)
+    @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public static String getPassword() {
         return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, false);
     }
@@ -1021,7 +1021,7 @@ public class Preferences {
 
 
 
-    public static boolean getSetupCompleted() {
+    public boolean getSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
         return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
@@ -1066,16 +1066,15 @@ public class Preferences {
     }
 
 
-    public static MessageConfiguration exportToMessage() {
+    public MessageConfiguration exportToMessage() {
         List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
         cfg.set(Keys._VERSION, BuildConfig.VERSION_CODE);
         for(Method m : methods) {
             m.setAccessible(true);
-
+            Timber.v("key %s", m.getAnnotation(Export.class).key());
             try {
-                //If the underlying method is static, then the specified obj argument is ignored. It may be null.
-                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null));
+                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(this));
             } catch (Exception e) {
                 e.printStackTrace();
             }
