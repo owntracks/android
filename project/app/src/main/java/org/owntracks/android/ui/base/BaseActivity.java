@@ -20,9 +20,11 @@ import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import javax.inject.Inject;
 
@@ -46,7 +48,7 @@ import javax.inject.Inject;
  * view model is injected and the binding is created when the content view is set.
  * Each subclass therefore has to call the following code in onCreate():
  *    ()activityComponent.inject(this);
- *    setAndBindContentView(R.layout.my_activity_layout, savedInstanceState);
+ *    bindAndAttachContentView(R.layout.my_activity_layout, savedInstanceState);
  *
  * After calling these methods, the binding and the view model is initialized.
  * saveInstanceState() and restoreInstanceState() methods of the view model
@@ -57,30 +59,30 @@ import javax.inject.Inject;
  * view model. */
 public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends AppCompatActivity {
 
-    public static final String FLAG_DISABLES_ANIMATION = "disablesAnimation";
     protected B binding;
     @Inject protected V viewModel;
     @Inject protected EventBus eventBus;
     @Inject protected DrawerProvider drawerProvider;
     @Inject protected Preferences preferences;
+    @Inject protected RequirementsChecker requirementsChecker;
+    @Inject protected Navigator navigator;
 
     private ActivityComponent mActivityComponent;
 
-    protected boolean hasEventBus = true;
+    private boolean hasEventBus = true;
     private boolean disablesAnimation = false;
 
-    private Toolbar toolbar;
-
     protected void setHasEventBus(boolean enable) {
-        hasEventBus = enable;
+        this.hasEventBus = enable;
     }
 
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
-    protected final void setAndBindContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
+    protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)"); }
         binding = DataBindingUtil.setContentView(this, layoutResId);
         binding.setVariable(BR.vm, viewModel);
+
         //noinspection unchecked
         viewModel.attachView((MvvmView) this, savedInstanceState);
     }
@@ -111,6 +113,11 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
     }
 
+    protected void setSupportToolbarWithDrawer(@NonNull Toolbar toolbar) {
+        setSupportToolbar(toolbar, true, true);
+        setDrawer(toolbar);
+    }
+
 
     protected void setDrawer(@NonNull Toolbar toolbar) {
         drawerProvider.attach(toolbar);
@@ -121,9 +128,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        if(getIntent() != null && getIntent().getExtras() !=  null)
-            disablesAnimation = getIntent().getExtras().getBoolean(FLAG_DISABLES_ANIMATION);
-
+        disablesAnimation = (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NO_ANIMATION) != 0;
     }
 
     @Override
@@ -177,10 +182,12 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
     }
 
-    protected Bundle getExtrasBundle(Intent intent) {
-        return intent.getBundleExtra(Navigator.EXTRA_ARGS);
+    protected boolean assertRequirements() {
+        if(requirementsChecker.assertRequirements(this)) {
+            navigator.startActivity(WelcomeActivity.class);
+            finish();
+            return true;
+        }
+        return false;
     }
-
-
-
 }

@@ -21,7 +21,7 @@ public class ContactsActivity extends BaseActivity<UiActivityContactsBinding, Co
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_contacts, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_activity_contacts, savedInstanceState);
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar);
