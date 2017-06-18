@@ -14,7 +14,7 @@ public class StatusActivity extends BaseActivity<UiActivityStatusBinding, Status
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_status, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_activity_status, savedInstanceState);
         setSupportToolbar(binding.toolbar);
         setDrawer(binding.toolbar);
     }

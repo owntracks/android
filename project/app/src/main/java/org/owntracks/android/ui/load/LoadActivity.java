@@ -31,7 +31,7 @@ public class LoadActivity extends BaseActivity<UiActivityLoadBinding, LoadMvvm.V
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_load, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_activity_load, savedInstanceState);
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar);

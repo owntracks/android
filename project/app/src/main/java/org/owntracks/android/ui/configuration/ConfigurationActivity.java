@@ -34,7 +34,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_configuration, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_activity_configuration, savedInstanceState);
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar);
@@ -67,11 +67,9 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
     }
 
     private void showImportConfigurationFilePickerView() {
-        Intent intent = new Intent(this, LoadActivity.class);
-        intent.putExtra(LoadActivity.FLAG_IN_APP, true);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(BaseActivity.FLAG_DISABLES_ANIMATION, true);
-        startActivity(intent);
+        Bundle b = new Bundle();
+        b.putBoolean(LoadActivity.FLAG_IN_APP, true);
+        navigator.startActivity(LoadActivity.class, b);
     }
 
     private void showEditorView() {
