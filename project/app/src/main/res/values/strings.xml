@@ -229,5 +229,8 @@
     <string name="drawerSwitchCopy">Copy</string>
     <string name="restart">Restart</string>
     <string name="notificationEventsTitle" formatted="false">%d new events</string>
+    <string name="ui_fragment_welcome_version_title">Restrictions</string>
+    <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner</string>
+    <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
 
 </resources>
