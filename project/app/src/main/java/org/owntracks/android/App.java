@@ -81,7 +81,7 @@ public class App extends Application  {
 
         checkFirstStart();
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
-
+        enableForegroundBackgroundDetection();
         postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
@@ -172,6 +172,7 @@ public class App extends Application  {
 
 
     private void onEnterForeground() {
+        Timber.v("entering foreground");
         inForeground = true;
         getMessageProcessor().onEnterForeground();
         Intent mIntent = new Intent(this, BackgroundService.class);
@@ -180,6 +181,8 @@ public class App extends Application  {
     }
 
     private void onEnterBackground() {
+        Timber.v("entering background");
+
         inForeground = false;
         Intent mIntent = new Intent(this, BackgroundService.class);
         mIntent.setAction(BackgroundService.INTENT_ACTION_CHANGE_BG);
@@ -232,6 +235,7 @@ public class App extends Application  {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String strAction = intent.getAction();
+                Timber.v("screenOnOffReceiver intent received");
                 if ((strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON)) && isInForeground())
                 {
                         onEnterBackground();
@@ -239,7 +243,7 @@ public class App extends Application  {
             }
         };
 
-        getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
+        registerReceiver(screenOnOffReceiver, theFilter);
 
     }
 

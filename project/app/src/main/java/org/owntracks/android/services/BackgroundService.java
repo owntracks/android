@@ -63,6 +63,7 @@ public class BackgroundService extends Service {
 
     private String NOTIFICATION_GROUP_EVENTS = "events";
 
+    // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
     public static final String INTENT_ACTION_CHANGE_BG = "BG";
     public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "C";
     public static final String INTENT_ACTION_SEND_LOCATION_PING = "LP";
@@ -125,6 +126,8 @@ public class BackgroundService extends Service {
         if (LocationResult.hasResult(intent)) {
             onLocationChanged(intent);
         } else if (intent.getAction() != null) {
+            Timber.v("intent received with action:%s", intent.getAction());
+
             switch (intent.getAction()) {
                 case INTENT_ACTION_CHANGE_BG:
                     setupLocationRequest();
@@ -491,12 +494,14 @@ public class BackgroundService extends Service {
         request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(10)));
         request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
         request.setSmallestDisplacement(50);
-        request.setPriority(getLocationRequestPriority(true));
+        request.setPriority(getLocationRequestPriority(false));
         return request;
     }
 
 
     private int getLocationRequestPriority(boolean background) {
+        Timber.v("request background:%s, acc:%s ", background, preferences.getLocatorAccuracyBackground());
+
         switch (background ? preferences.getLocatorAccuracyBackground() : preferences.getLocatorAccuracyForeground()) {
             case 0:
                 return LocationRequest.PRIORITY_HIGH_ACCURACY;
