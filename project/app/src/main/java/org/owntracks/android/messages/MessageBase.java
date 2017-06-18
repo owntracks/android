@@ -9,6 +9,7 @@ import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
 public abstract class MessageBase extends BaseObservable implements Runnable {
-        protected static final String TAG = "MessageBase";
+        static final String TYPE = "base";
 
         @JsonIgnore
         protected String _mqtt_topic;
@@ -117,11 +118,13 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
 
         @JsonIgnore
         public void setIncomingProcessor(IncomingMessageProcessor processor) {
+                this._processorOut = null;
                 this._processorIn = new WeakReference<>(processor);
         }
 
         @JsonIgnore
         public void setOutgoingProcessor(OutgoingMessageProcessor processor) {
+                this._processorIn = null;
                 this._processorOut = new WeakReference<>(processor);
         }
 
@@ -175,6 +178,5 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
                         return topic;
                 }
         }
-
 
 }

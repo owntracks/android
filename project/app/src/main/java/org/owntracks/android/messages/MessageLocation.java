@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageLocation extends MessageBase  {
-    static final String TYPE = "location";
+    public static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
     public static final String REPORT_TYPE_BEACON= "b";
@@ -176,4 +176,5 @@ public class MessageLocation extends MessageBase  {
     public double getAlt() {
         return alt;
     }
+
 }
