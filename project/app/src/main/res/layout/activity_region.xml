@@ -82,7 +82,7 @@
                     android:id="@+id/latitude"
                     android:inputType="numberDecimal|numberSigned"
                     android:text="@{item.geofenceLatitude}"
-                    app:met_helperText=""/>
+                    app:met_helperText="-90...+90"/>
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginLeft="@dimen/default_spacing_half"
@@ -97,7 +97,7 @@
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
                     app:met_iconLeft="@drawable/ic_location"
-                    app:met_helperText=""/>
+                    app:met_helperText="-180...180"/>
 
 
                 <com.rengwuxian.materialedittext.MaterialEditText
