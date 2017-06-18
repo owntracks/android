@@ -42,8 +42,6 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
     private boolean actionMode;
 
     protected void onCreate(Bundle savedInstanceState) {
-        //startService(new Intent(this, ServiceProxy.class));
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_regions);
