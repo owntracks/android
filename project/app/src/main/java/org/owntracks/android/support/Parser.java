@@ -47,6 +47,10 @@ public class Parser {
         return encryptBytes(toJsonPlainBytes(message));
     }
 
+    public MessageBase fromJson(@NonNull String input) throws IOException, EncryptionException {
+        return decrypt(defaultMapper.readValue(input, MessageBase.class));
+    }
+
 
     // Accepts {plain} as byte array
     public MessageBase fromJson(@NonNull byte[] input) throws IOException, EncryptionException {
