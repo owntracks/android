@@ -4,7 +4,8 @@
     xmlns:bind="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View" />
-        <variable name="vm" type="org.owntracks.android.ui.welcome.WelcomeViewModel" />
+        <variable name="vm" type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel" />
+        <variable name="fragmentVm" type="org.owntracks.android.ui.welcome.WelcomeFragmentMvvm.ViewModel" />
 
     </data>
 
@@ -44,7 +45,7 @@
                 android:src="@drawable/ic_done_white_24dp"
                 android:textSize="18sp"
                 android:background="?selectableItemBackgroundBorderless"
-                android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.GONE}"
+                android:visibility="gone"
                 android:contentDescription="Next" />
 
             <ImageButton
@@ -58,7 +59,7 @@
                 android:layout_alignParentRight="true"
                 android:background="?selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
-                android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.GONE}"
+                android:visibility="@{fragmentVm.nextEnabled ? View.VISIBLE : View.GONE}"
                 android:onClick="@{() -> vm.onNextClicked()}"
 
                 android:contentDescription="Next" />

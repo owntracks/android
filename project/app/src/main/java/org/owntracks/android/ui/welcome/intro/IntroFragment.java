@@ -14,7 +14,7 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
-public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
+public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, IntroFragmentMvvm.ViewModel> implements IntroFragmentMvvm.View {
     public static final int ID = 1;
 
     private static IntroFragment instance;
@@ -24,10 +24,14 @@ public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, N
         return instance;
     }
 
+    public IntroFragment() {
+        super();
+        fragmentComponent().inject(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentComponent().inject(this);
     }
 
     @Nullable
@@ -35,13 +39,9 @@ public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, N
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_intro, savedInstanceState);
     }
-    @Override
-    public void onNextClicked() {
-
-    }
 
     @Override
-    public boolean canProceed() {
-        return true;
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return viewModel;
     }
 }

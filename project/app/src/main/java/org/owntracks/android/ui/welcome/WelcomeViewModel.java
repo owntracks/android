@@ -40,27 +40,10 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     @Override
     public void onAdapterPageSelected(int position) {
         getView().setPagerIndicator(position);
-        notifyPropertyChanged(BR.doneEnabled);
-        notifyPropertyChanged(BR.nextEnabled);
-
     }
 
     @Override
     public void onNextClicked() {
         getView().showNextFragment();
     }
-
-
-    @Bindable
-    @Override
-    public boolean getDoneEnabled() {
-        return false;
-    }
-
-    @Bindable
-    @Override
-    public boolean getNextEnabled() {
-        return getView().getCurrentFragmentNextEnabled();
-    }
-
 }

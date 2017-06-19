@@ -38,6 +38,7 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     public void setPermissionGranted(boolean granted) {
         this.permissionGranted = granted;
         Timber.v("granted");
+        setIsNextEnabled(true);
         notifyPropertyChanged(BR.nextEnabled);
         notifyChange();
     }
@@ -52,4 +53,16 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     public void onNextClicked() {
 
     }
+
+    @Override
+    @Bindable
+    public boolean isNextEnabled() {
+        return permissionGranted;
+    }
+
+    @Bindable
+    public boolean setNextEnabled(boolean enabled) {
+        return permissionGranted;
+    }
+
 }

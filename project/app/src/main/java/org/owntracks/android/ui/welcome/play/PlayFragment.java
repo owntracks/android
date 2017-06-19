@@ -17,7 +17,7 @@ import org.owntracks.android.ui.welcome.mode.ModeFragment;
 
 import timber.log.Timber;
 
-public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
+public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     public static final int ID = 2;
 
     private static PlayFragment instance;
@@ -27,10 +27,14 @@ public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, NoO
         return instance;
     }
 
+    public PlayFragment() {
+        super();
+        fragmentComponent().inject(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentComponent().inject(this);
     }
 
     @Nullable
@@ -39,13 +43,9 @@ public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, NoO
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_play, savedInstanceState);
     }
 
-    @Override
-    public void onNextClicked() {
-
-    }
 
     @Override
-    public boolean canProceed() {
-        return false;
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return viewModel;
     }
 }
