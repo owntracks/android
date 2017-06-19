@@ -72,5 +72,11 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
         }
     }
 
+    @Override
+    @Bindable
+    public boolean isNextEnabled() {
+        return true;
+    }
+
 
 }

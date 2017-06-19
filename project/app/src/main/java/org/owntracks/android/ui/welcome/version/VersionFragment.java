@@ -23,7 +23,7 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 import timber.log.Timber;
 
-public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
+public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBinding, VersionFragmentMvvm.ViewModel> implements VersionFragmentMvvm.View, View.OnClickListener {
     public static final int ID = 5;
 
     private static VersionFragment instance;
@@ -31,6 +31,11 @@ public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBindin
         if(instance == null)
             instance = new VersionFragment();
         return instance;
+    }
+
+    public VersionFragment() {
+        super();
+        fragmentComponent().inject(this);
     }
 
     public static final String CUSTOM_TAB_PACKAGE_NAME = "com.android.chrome";
@@ -58,14 +63,11 @@ public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBindin
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentComponent().inject(this);
-        boolean ok = CustomTabsClient.bindCustomTabsService(getActivity(), CUSTOM_TAB_PACKAGE_NAME, connection);
-
+        CustomTabsClient.bindCustomTabsService(getActivity(), CUSTOM_TAB_PACKAGE_NAME, connection);
     }
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
     }
 
@@ -76,15 +78,6 @@ public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBindin
         binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this);
         return v;
 
-    }
-    @Override
-    public void onNextClicked() {
-
-    }
-
-    @Override
-    public boolean canProceed() {
-        return true;
     }
 
     @Override
@@ -100,5 +93,10 @@ public class VersionFragment extends BaseFragment<UiFragmentWelcomeVersionBindin
         CustomTabsIntent customTabsIntent = builder.build();
 
         customTabsIntent.launchUrl(getActivity(), Uri.parse(getString(R.string.valDocumentationUrlAndroid)));
+    }
+
+    @Override
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return viewModel;
     }
 }

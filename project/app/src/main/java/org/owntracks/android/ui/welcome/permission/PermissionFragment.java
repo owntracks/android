@@ -32,11 +32,14 @@ public class PermissionFragment extends BaseFragment<UiFragmentWelcomeFinishBind
         return instance;
     }
 
+    public PermissionFragment() {
+        super();
+        fragmentComponent().inject(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentComponent().inject(this);
-
         viewModel.setPermissionGranted(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
@@ -46,14 +49,10 @@ public class PermissionFragment extends BaseFragment<UiFragmentWelcomeFinishBind
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_permissions, savedInstanceState);
     }
 
-    @Override
-    public void onNextClicked() {
-
-    }
 
     @Override
-    public boolean canProceed() {
-        return viewModel.getPermissionGranted();
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return null;
     }
 
     public void requestPermission() {

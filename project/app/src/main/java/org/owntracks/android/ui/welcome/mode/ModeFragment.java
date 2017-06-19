@@ -29,6 +29,12 @@ public class ModeFragment extends BaseFragment<UiFragmentWelcomeModeBinding, Mod
         return instance;
     }
 
+
+    public ModeFragment() {
+        super();
+        fragmentComponent().inject(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,18 +43,11 @@ public class ModeFragment extends BaseFragment<UiFragmentWelcomeModeBinding, Mod
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this); }
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_mode, savedInstanceState);
     }
 
     @Override
-    public void onNextClicked() {
-        Timber.v("vm %s", viewModel.getCheckedButton());
-        viewModel.onNextClicked();
-    }
-
-    @Override
-    public boolean canProceed() {
-        return true;
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return viewModel;
     }
 }

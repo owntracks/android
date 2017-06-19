@@ -13,8 +13,9 @@ import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
+import org.owntracks.android.ui.welcome.play.PlayFragmentMvvm;
 
-public class FinishFragment extends BaseFragment<UiFragmentWelcomeFinishBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
+public class FinishFragment extends BaseFragment<UiFragmentWelcomeFinishBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     public static final int ID = 6;
 
     private static FinishFragment instance;
@@ -35,13 +36,9 @@ public class FinishFragment extends BaseFragment<UiFragmentWelcomeFinishBinding,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_finish, savedInstanceState);
     }
-    @Override
-    public void onNextClicked() {
-
-    }
 
     @Override
-    public boolean canProceed() {
-        return true;
+    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+        return viewModel;
     }
 }
