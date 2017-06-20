@@ -10,12 +10,8 @@ import android.view.ViewGroup;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiFragmentWelcomePlayBinding;
 import org.owntracks.android.ui.base.BaseFragment;
-import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
-import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragment;
-
-import timber.log.Timber;
+import org.owntracks.android.ui.welcome.WelcomeMvvm;
+import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
 
 public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     public static final int ID = 2;
@@ -27,11 +23,6 @@ public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, Pla
         return instance;
     }
 
-    public PlayFragment() {
-        super();
-        fragmentComponent().inject(this);
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,12 +31,18 @@ public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, Pla
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(viewModel == null) { fragmentComponent().inject(this); }
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_play, savedInstanceState);
     }
 
 
     @Override
-    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+    public PlayFragmentMvvm.ViewModel getViewModel() {
         return viewModel;
     }
+    @Override
+    public void setActivityViewModel() {
+        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
+    }
+
 }

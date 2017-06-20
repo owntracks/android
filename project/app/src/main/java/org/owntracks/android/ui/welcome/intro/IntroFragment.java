@@ -10,9 +10,8 @@ import android.view.ViewGroup;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiFragmentWelcomeIntroBinding;
 import org.owntracks.android.ui.base.BaseFragment;
-import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
-import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
+import org.owntracks.android.ui.welcome.WelcomeMvvm;
+import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
 
 public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, IntroFragmentMvvm.ViewModel> implements IntroFragmentMvvm.View {
     public static final int ID = 1;
@@ -24,11 +23,6 @@ public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, I
         return instance;
     }
 
-    public IntroFragment() {
-        super();
-        fragmentComponent().inject(this);
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +31,17 @@ public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, I
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(viewModel == null) { fragmentComponent().inject(this); }
         return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_intro, savedInstanceState);
     }
 
     @Override
-    public WelcomeFragmentMvvm.ViewModel getViewModel() {
+    public IntroFragmentMvvm.ViewModel getViewModel() {
         return viewModel;
+    }
+
+    @Override
+    public void setActivityViewModel() {
+        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
     }
 }

@@ -1,14 +1,11 @@
 package org.owntracks.android.ui.welcome.permission;
 
 import android.databinding.Bindable;
-import android.view.View;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.android.databinding.library.baseAdapters.BR;
-
-import org.owntracks.android.App;
-import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerFragment;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
@@ -22,27 +19,17 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     private boolean permissionGranted = false;
 
     @Inject
-    public PermissionFragmentViewModel() {
+    PermissionFragmentViewModel() {
 
     }
 
 
     @Override
-    @Bindable
-    public boolean getPermissionGranted() {
-        return permissionGranted;
+    public void attachView(@NonNull PermissionFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
+        super.attachView(view, savedInstanceState);
+        getView().setActivityViewModel();
+        getView().checkPermission();
     }
-
-    @Override
-    @Bindable
-    public void setPermissionGranted(boolean granted) {
-        this.permissionGranted = granted;
-        Timber.v("granted");
-        setIsNextEnabled(true);
-        notifyPropertyChanged(BR.nextEnabled);
-        notifyChange();
-    }
-
 
     @Override
     public void onFixClicked() {
@@ -61,8 +48,10 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     }
 
     @Bindable
-    public boolean setNextEnabled(boolean enabled) {
-        return permissionGranted;
+    public void setNextEnabled(boolean enabled) {
+        Timber.v("set %s", enabled);
+        this.permissionGranted = enabled;
+        notifyChange();
     }
 
 }

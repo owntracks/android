@@ -13,6 +13,8 @@ import org.owntracks.android.ui.status.StatusViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 import org.owntracks.android.ui.welcome.WelcomeViewModel;
+import org.owntracks.android.ui.welcome.finish.FinishFragmentMvvm;
+import org.owntracks.android.ui.welcome.finish.FinishFragmentViewModel;
 import org.owntracks.android.ui.welcome.intro.IntroFragmentMvvm;
 import org.owntracks.android.ui.welcome.intro.IntroFragmentViewModel;
 import org.owntracks.android.ui.welcome.mode.ModeFragment;
@@ -63,8 +65,9 @@ public abstract class ViewModelModule {
     @Binds
     abstract PlayFragmentMvvm.ViewModel bindWelcomePlayFragmentViewModel(PlayFragmentViewModel viewModel);
 
+    @Binds
+    abstract FinishFragmentMvvm.ViewModel bindWelcomeFinishFragmentViewModel(FinishFragmentViewModel viewModel);
 
     @Binds
     abstract VersionFragmentMvvm.ViewModel bindWelcomeVersionFragmentViewModel(VersionFragmentViewModel viewModel);
-
 }

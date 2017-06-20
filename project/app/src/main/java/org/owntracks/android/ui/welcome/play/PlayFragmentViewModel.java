@@ -1,6 +1,9 @@
 package org.owntracks.android.ui.welcome.play;
 
 import android.databinding.Bindable;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.android.databinding.library.baseAdapters.BR;
 
@@ -22,6 +25,12 @@ public class PlayFragmentViewModel extends BaseViewModel<PlayFragmentMvvm.View> 
     }
 
     @Override
+    public void attachView(@NonNull PlayFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
+        super.attachView(view, savedInstanceState);
+        getView().setActivityViewModel();
+    }
+
+    @Override
     public void onNextClicked() {
 
     }
@@ -30,5 +39,10 @@ public class PlayFragmentViewModel extends BaseViewModel<PlayFragmentMvvm.View> 
     @Bindable
     public boolean isNextEnabled() {
         return true;
+    }
+
+    @Override
+    public void setNextEnabled(boolean enabled) {
+
     }
 }

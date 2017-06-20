@@ -28,6 +28,8 @@ import timber.log.Timber;
 
 @PerActivity
 public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements WelcomeMvvm.ViewModel<WelcomeMvvm.View> {
+    private WelcomeFragmentMvvm.ViewModel fragmentViewModel;
+
 
     @Inject
     public WelcomeViewModel() {
@@ -45,5 +47,18 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     @Override
     public void onNextClicked() {
         getView().showNextFragment();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public WelcomeFragmentMvvm.ViewModel getFragmentViewModel() {
+        return fragmentViewModel;
+    }
+
+    @Override
+    public void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel) {
+        this.fragmentViewModel = fragmentViewModel;
+        notifyChange();
+        notifyPropertyChanged(BR.vm);
     }
 }

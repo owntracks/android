@@ -1026,7 +1026,7 @@ public class Preferences {
         return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
 
-    public static void setSetupCompleted() {
+    public void setSetupCompleted() {
         sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).apply();
 
     }

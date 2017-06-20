@@ -54,7 +54,7 @@
             android:layout_above="@+id/view"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:visibility="@{vm.permissionGranted ? View.VISIBLE : View.GONE}"
+            android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.GONE}"
             android:layout_marginBottom="48dp"/>
 
         <Button
@@ -63,7 +63,7 @@
             android:text="@string/welcomeFixIssue"
             android:id="@+id/button"
             android:layout_above="@+id/view"
-            android:visibility="@{vm.permissionGranted ? View.GONE : View.VISIBLE}"
+            android:visibility="@{vm.nextEnabled ? View.GONE : View.VISIBLE}"
             android:onClick="@{() -> vm.onFixClicked()}"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="48dp"/>
