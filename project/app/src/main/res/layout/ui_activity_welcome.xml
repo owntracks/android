@@ -5,7 +5,6 @@
     <data>
         <import type="android.view.View" />
         <variable name="vm" type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel" />
-        <variable name="fragmentVm" type="org.owntracks.android.ui.welcome.WelcomeFragmentMvvm.ViewModel" />
 
     </data>
 
@@ -33,7 +32,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_centerInParent="true">
-
             </LinearLayout>
 
             <ImageButton
@@ -59,7 +57,7 @@
                 android:layout_alignParentRight="true"
                 android:background="?selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
-                android:visibility="@{fragmentVm.nextEnabled ? View.VISIBLE : View.GONE}"
+                android:visibility="@{vm.fragmentViewModel.nextEnabled ? View.VISIBLE : View.GONE}"
                 android:onClick="@{() -> vm.onNextClicked()}"
 
                 android:contentDescription="Next" />

@@ -22,6 +22,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
+import org.owntracks.android.ui.welcome.intro.IntroFragmentMvvm;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +43,11 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
     @Inject
     public ModeFragmentViewModel(Preferences preferences) {
         this.preferences = preferences; 
+    }
+
+    public void attachView(@NonNull ModeFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
+        super.attachView(view, savedInstanceState);
+        getView().setActivityViewModel();
     }
 
     @Override
@@ -70,12 +76,18 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
                 preferences.setMode(App.MODE_ID_MQTT_PUBLIC, true);
                 break;
         }
+        preferences.setSetupCompleted();
     }
 
     @Override
     @Bindable
     public boolean isNextEnabled() {
         return true;
+    }
+
+    @Override
+    public void setNextEnabled(boolean enabled) {
+
     }
 
 

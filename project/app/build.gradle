@@ -86,7 +86,6 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile "com.android.support:customtabs:${supportLibVersion}"
 
     // Play Services libraries
     compile "com.google.android.gms:play-services-gcm:${playLibVersion}"

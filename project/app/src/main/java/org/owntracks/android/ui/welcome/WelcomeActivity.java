@@ -8,8 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.android.databinding.library.baseAdapters.BR;
-
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiActivityWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -43,10 +41,11 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
 
         if(!requirementsChecker.isInitialSetupCheckPassed()) {
             viewPagerAdapter.addItemId(IntroFragment.ID);
-            viewPagerAdapter.addItemId(ModeFragment.ID);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 viewPagerAdapter.addItemId(VersionFragment.ID);
+
+            viewPagerAdapter.addItemId(ModeFragment.ID);
         }
 
         if(!requirementsChecker.isPlayCheckPassed()) {
@@ -66,7 +65,10 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
         Timber.v("pager setup with %s fragments", viewPagerAdapter.getCount());
         buildPagerIndicator();
         setPagerIndicator(0);
-        binding.setFragmentVm(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
+        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
+
+
+        //binding.setFragmentVm(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
 
 
     }
@@ -109,17 +111,18 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
     }
 
     @Override
+    public void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel) {
+        this.viewModel.setFragmentViewModel(fragmentViewModel);
+    }
+
+    @Override
     public void showNextFragment() {
         WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel().onNextClicked();
         binding.viewPager.forward();
-        binding.setFragmentVm(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
-        binding.notifyPropertyChanged(BR.fragmentVm);
-        binding.notifyPropertyChanged(BR.nextEnabled);
-        binding.notifyChange();
-
+        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
     }
 
-    private WelcomeFragmentMvvm.View getCurrentFragment() {
+    public WelcomeFragmentMvvm.View getCurrentFragment() {
         return viewPagerAdapter.getFragment(binding.viewPager.getCurrentItem());
     }
 
