@@ -2,6 +2,7 @@ package org.owntracks.android.support.widgets;
 
 import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
+import android.view.View;
 import android.widget.TextView;
 
 import org.owntracks.android.R;
@@ -57,5 +58,16 @@ public class BindingConversions {
     public static void setText(TextView view, MessageProcessor.EndpointState state) {
         view.setText(state != null ? state.getLabel(view.getContext()) : view.getContext().getString(R.string.na));
     }
+
+    @BindingAdapter("android:visibility")
+    public static void setVisibility(View view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @BindingConversion
+    public static int convertBooleanToVisibility(boolean visible) {
+        return visible ? View.VISIBLE : View.GONE;
+    }
+
 
 }
