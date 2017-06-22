@@ -81,7 +81,7 @@ public class ServiceBeacon implements BeaconConsumer {
             Log.v(TAG, "bluetoothAdapter.isMultipleAdvertisementSupported: " + bluetoothAdapter.isMultipleAdvertisementSupported());
             Log.v(TAG, "bluetoothAdapter.isOffloadedFilteringSupported: " + bluetoothAdapter.isOffloadedFilteringSupported());
             Log.v(TAG, "bluetoothAdapter.isOffloadedScanBatchingSupported: " + bluetoothAdapter.isOffloadedScanBatchingSupported());
-        } } catch(NullPointerException e) {Timber.e("bluetoothAdapter threw a NullPointerException");};
+        } } catch(NullPointerException e) {Timber.e("bluetoothAdapter threw a NullPointerException");}
 
 
         beaconManager = BeaconManager.getInstanceForApplication(context);

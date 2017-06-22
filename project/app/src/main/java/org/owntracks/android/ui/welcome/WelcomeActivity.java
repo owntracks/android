@@ -39,20 +39,20 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
     private void setupPagerAdapter() {
         requirementsChecker.assertRequirements(this);
 
-        if(!requirementsChecker.isInitialSetupCheckPassed()) {
+        if (!requirementsChecker.isInitialSetupCheckPassed()) {
             viewPagerAdapter.addItemId(IntroFragment.ID);
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 viewPagerAdapter.addItemId(VersionFragment.ID);
 
             viewPagerAdapter.addItemId(ModeFragment.ID);
         }
 
-        if(!requirementsChecker.isPlayCheckPassed()) {
+        if (!requirementsChecker.isPlayCheckPassed()) {
             viewPagerAdapter.addItemId(PlayFragment.ID);
         }
 
-        if(!requirementsChecker.isPermissionCheckPassed()) {
+        if (!requirementsChecker.isPermissionCheckPassed()) {
             viewPagerAdapter.addItemId(PermissionFragment.ID);
         }
 
@@ -73,15 +73,6 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
 
     }
 
-    @Override
-    public void onBackPressed() {
-        if (binding.viewPager.getCurrentItem() == 0) {
-            finish();
-        } else {
-            binding.viewPager.setCurrentItem(binding.viewPager.getCurrentItem() - 1);
-        }
-    }
-
     private void buildPagerIndicator() {
         float scale = getResources().getDisplayMetrics().density;
         int padding = (int) (5 * scale + 0.5f);
@@ -95,6 +86,17 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
             binding.circles.addView(circle);
         }
 
+    }
+
+    public WelcomeFragmentMvvm.View getCurrentFragment() {
+        return viewPagerAdapter.getFragment(binding.viewPager.getCurrentItem());
+    }
+
+    @Override
+    public void showNextFragment() {
+        WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel().onNextClicked();
+        binding.viewPager.forward();
+        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
     }
 
     public void setPagerIndicator(int index) {
@@ -116,18 +118,17 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
     }
 
     @Override
-    public void showNextFragment() {
-        WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel().onNextClicked();
-        binding.viewPager.forward();
-        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
-    }
-
-    public WelcomeFragmentMvvm.View getCurrentFragment() {
-        return viewPagerAdapter.getFragment(binding.viewPager.getCurrentItem());
+    public void onBackPressed() {
+        if (binding.viewPager.getCurrentItem() == 0) {
+            finish();
+        } else {
+            binding.viewPager.setCurrentItem(binding.viewPager.getCurrentItem() - 1);
+        }
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
 
     @Override
     public void onPageSelected(int position) {
@@ -135,5 +136,6 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {}
+    public void onPageScrollStateChanged(int state) {
+    }
 }

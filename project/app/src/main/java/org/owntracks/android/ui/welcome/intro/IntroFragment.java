@@ -11,7 +11,6 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiFragmentWelcomeIntroBinding;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
 
 public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, IntroFragmentMvvm.ViewModel> implements IntroFragmentMvvm.View {
     public static final int ID = 1;
