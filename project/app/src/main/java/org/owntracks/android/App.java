@@ -30,11 +30,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
@@ -86,10 +88,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 getMessageProcessor().initialize();
-
-                startService(new Intent(getApplicationContext(), BackgroundService.class));
-
-                //startService(new Intent(getApplicationContext(), ServiceProxy.class));
+                startBackgroundServiceCompat(getApplicationContext(), BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
             }
         });
     }
@@ -175,18 +174,12 @@ public class App extends Application  {
         Timber.v("entering foreground");
         inForeground = true;
         getMessageProcessor().onEnterForeground();
-        Intent mIntent = new Intent(this, BackgroundService.class);
-        mIntent.setAction(BackgroundService.INTENT_ACTION_CHANGE_BG);
-        startService(mIntent);
     }
 
     private void onEnterBackground() {
         Timber.v("entering background");
-
         inForeground = false;
-        Intent mIntent = new Intent(this, BackgroundService.class);
-        mIntent.setAction(BackgroundService.INTENT_ACTION_CHANGE_BG);
-        startService(mIntent);
+        startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_CHANGE_BG);
     }
 
     public static boolean isInForeground() {
@@ -198,6 +191,15 @@ public class App extends Application  {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
+    }
+
+    public static void startBackgroundServiceCompat(@NonNull Context c, @Nullable String action) {
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+            //TODO: use NotificationManager.startServiceInForeground() on API >= O
+            c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+        } else {
+            c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+        }
     }
 
     /*

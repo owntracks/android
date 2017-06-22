@@ -11,7 +11,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -325,9 +324,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
 
-            Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
-            waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
-            startService(waypointsIntent);
+            App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
 
             return true;
         } else if (itemId == R.id.menu_mylocation) {
