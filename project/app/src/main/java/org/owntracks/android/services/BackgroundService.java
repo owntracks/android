@@ -683,6 +683,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if(bluetoothAdapter == null || preferences.getBeaconMode() == BEACON_MODE_OFF) {
+            Timber.e("bluetooth not available or BEACON_MODE_OFF"); 
             return;
         }
 
@@ -697,7 +698,9 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25")); //altbeacon
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(preferences.getBeaconLayout())); // custom
+        try {
+            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(preferences.getBeaconLayout())); // custom
+        } catch (BeaconParser.BeaconLayoutException ignored) {}
         beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
         beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
         beaconManager.bind(this);
