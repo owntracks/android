@@ -616,6 +616,14 @@ public class BackgroundService extends Service {
         sendOngoingNotification();
     }
 
+    @SuppressWarnings("unused")
+    public void onEvent(Events.PermissionGranted event) {
+        setupGeofences();
+        setupLocationRequest();
+    }
+
+
+
     public NotificationCompat.Builder getEventsNotificationBuilder() {
         if (!preferences.getNotificationEvents())
             return null;

@@ -10,7 +10,7 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 public interface PermissionFragmentMvvm {
     interface View extends WelcomeFragmentMvvm.View {
-        void requestPermission();
+        void requestFix();
         Activity getActivity();
         void checkPermission();
 

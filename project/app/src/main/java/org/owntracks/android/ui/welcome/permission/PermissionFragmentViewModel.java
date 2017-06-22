@@ -28,12 +28,12 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     public void attachView(@NonNull PermissionFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
         getView().setActivityViewModel();
-        getView().checkPermission();
+        //getView().checkPermission();
     }
 
     @Override
     public void onFixClicked() {
-        getView().requestPermission();
+        getView().requestFix();
     }
 
     @Override
