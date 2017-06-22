@@ -60,6 +60,16 @@
             android:layout_alignLeft="@+id/screen_heading"
             android:layout_alignStart="@+id/screen_heading" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/view"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
 
     </RelativeLayout>
 </layout>

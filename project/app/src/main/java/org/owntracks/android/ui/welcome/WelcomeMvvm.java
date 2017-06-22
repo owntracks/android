@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.welcome;
 
+import android.databinding.Bindable;
 import android.os.Bundle;
 
 import org.owntracks.android.ui.base.view.MvvmView;
@@ -17,6 +18,7 @@ public interface WelcomeMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
+        @Bindable boolean isDoneEnabled();
         void onAdapterPageSelected(int position);
         void onNextClicked();
 

@@ -20,6 +20,8 @@ import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.ui.welcome.finish.FinishFragment;
+import org.owntracks.android.ui.welcome.finish.FinishFragmentViewModel;
 
 import javax.inject.Inject;
 
@@ -40,6 +42,14 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     }
 
     @Override
+    public boolean isDoneEnabled() {
+        if(fragmentViewModel != null) {
+            Timber.v("class :%s", fragmentViewModel.getClass());
+        }
+        return fragmentViewModel != null && fragmentViewModel.getClass() == FinishFragmentViewModel.class;
+    }
+
+    @Override
     public void onAdapterPageSelected(int position) {
         getView().setPagerIndicator(position);
     }
@@ -56,9 +66,11 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     }
 
     @Override
+    @Bindable
     public void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel) {
         this.fragmentViewModel = fragmentViewModel;
         notifyChange();
         notifyPropertyChanged(BR.vm);
+        notifyPropertyChanged(BR.doneEnabled);
     }
 }

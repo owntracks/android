@@ -14,12 +14,13 @@ public interface WelcomeFragmentMvvm  {
 
     interface View extends MvvmView {
         ViewModel getViewModel();
-        void setActivityViewModel();
-    }
+        void setActivityViewModel();}
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void onNextClicked();
         @Bindable boolean isNextEnabled();
         @Bindable void setNextEnabled(boolean enabled);
+
+
     }
 }
