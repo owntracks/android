@@ -203,15 +203,9 @@ public class Waypoint {
         return l;
     }
 
-    private boolean hasValidGeofence() {
-        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
-    }
-
-
     public void setDefaults() {
         this.setShared(false);
     }
-
 
     public void setLastTransition(int status) {
         this.lastTransition = status;
@@ -223,5 +217,13 @@ public class Waypoint {
 
     public boolean isUnknown() {
         return this.lastTransition == 0;
+    }
+
+    public boolean hasBeacon() {
+        return getBeaconUUID() != null;
+    }
+
+    public boolean hasGeofence() {
+        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
     }
 }

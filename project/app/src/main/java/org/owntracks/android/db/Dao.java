@@ -49,4 +49,8 @@ public  class Dao {
     public Waypoint loadWaypointForGeofenceId(String geofenceId) {
         return this.waypointDao.queryBuilder().where(org.owntracks.android.db.WaypointDao.Properties.GeofenceId.eq(geofenceId)).limit(1).unique();
     }
+
+    public Waypoint loadWaypointForId(String l) {
+        return this.waypointDao.load(Long.parseLong(l));
+    }
 }

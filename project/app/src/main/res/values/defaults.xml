@@ -4,7 +4,7 @@
     <string name="valSubTopicPublic" translatable="false">public/+/+</string>
     <string name="valUsernamePublic" translatable="false">user</string>
     <string name="valHostPublic" translatable="false">public-mqtt.owntracks.org</string>
-    <string name="valBeaconLayout" translatable="false">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
+    <string name="valBeaconLayout" translatable="false"></string>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
     <integer name="valMqttProtocolLevelPublic" translatable="false">3</integer>
