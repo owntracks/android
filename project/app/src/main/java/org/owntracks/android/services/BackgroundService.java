@@ -683,7 +683,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if(bluetoothAdapter == null || preferences.getBeaconMode() == BEACON_MODE_OFF) {
-            Timber.e("bluetooth not available or BEACON_MODE_OFF"); 
+            Timber.e("bluetooth not available or BEACON_MODE_OFF");
             return;
         }
 
@@ -758,14 +758,14 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     @Override
     public void didEnterRegion(Region region) {
         Waypoint w = App.getDao().loadWaypointForId(region.getUniqueId());
-        publishTransitionMessage(w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_ENTER, MessageTransition.TRIGGER_BEACON);
+        onWaypointTransition (w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_ENTER, MessageTransition.TRIGGER_BEACON);
 
     }
 
     @Override
     public void didExitRegion(Region region) {
         Waypoint w = App.getDao().loadWaypointForId(region.getUniqueId());
-        publishTransitionMessage(w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_BEACON);
+        onWaypointTransition(w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_BEACON);
     }
 
     @Override

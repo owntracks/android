@@ -199,7 +199,7 @@ public class Waypoint {
         Location l= new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
         l.setLongitude(getGeofenceLongitude());
-        l.setAccuracy(getGeofenceRadius() != null ? getGeofenceRadius() : 0);
+        l.setAccuracy(0);
         return l;
     }
 
