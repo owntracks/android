@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,10 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiFragmentWelcomeFinishBinding;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
@@ -51,19 +54,20 @@ public class PermissionFragment extends BaseFragment<UiFragmentWelcomeFinishBind
         return viewModel;
     }
 
-    public void requestPermission() {
+    public void requestFix() {
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
     }
 
     @Override
     public void checkPermission() {
-        this.viewModel.setNextEnabled(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity()) == ConnectionResult.SUCCESS);
+        this.viewModel.setNextEnabled(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             viewModel.setNextEnabled(true);
+            App.getEventBus().post(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
     }
 
