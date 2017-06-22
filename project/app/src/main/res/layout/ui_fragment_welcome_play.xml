@@ -2,7 +2,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="org.owntracks.android.App"/>
+        <variable name="vm" type="org.owntracks.android.ui.welcome.play.PlayFragmentMvvm.ViewModel" />
+        <import type="android.view.View" />
     </data>
     <RelativeLayout
 
@@ -77,7 +78,7 @@
             android:textSize="16sp"
             android:text="@string/play_services_not_available_general"
             android:id="@+id/message"
-            android:visibility="visible"
+            android:visibility="@{vm.nextEnabled}"
             android:layout_above="@+id/recover"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -91,7 +92,8 @@
             android:text="@string/welcomeFixIssue"
             android:id="@+id/recover"
             android:layout_above="@+id/view"
-            android:visibility="gone"
+            android:visibility="@{vm.fixAvailable}"
+            android:onClick="@{() -> vm.onFixClicked()}"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="48dp"/>
 
