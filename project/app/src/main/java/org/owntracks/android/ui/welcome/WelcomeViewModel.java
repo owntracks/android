@@ -59,6 +59,11 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
         getView().showNextFragment();
     }
 
+    @Override
+    public void onDoneClicked() {
+        navigator.get().startActivity(MapActivity.class);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public WelcomeFragmentMvvm.ViewModel getFragmentViewModel() {

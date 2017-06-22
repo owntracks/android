@@ -21,6 +21,7 @@ public interface WelcomeMvvm {
         @Bindable boolean isDoneEnabled();
         void onAdapterPageSelected(int position);
         void onNextClicked();
+        void onDoneClicked();
 
         WelcomeFragmentMvvm.ViewModel<WelcomeFragmentMvvm.View> getFragmentViewModel();
         void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel);
