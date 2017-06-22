@@ -22,7 +22,6 @@ public class IntroFragmentViewModel extends BaseViewModel<IntroFragmentMvvm.View
 
     public void attachView(@NonNull IntroFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        getView().setActivityViewModel();
     }
 
     @Override

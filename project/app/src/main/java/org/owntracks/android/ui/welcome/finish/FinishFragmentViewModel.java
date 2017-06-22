@@ -18,7 +18,6 @@ public class FinishFragmentViewModel extends BaseViewModel<FinishFragmentMvvm.Vi
 
     public void attachView(@NonNull FinishFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        getView().setActivityViewModel();
     }
 
     @Override
