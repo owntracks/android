@@ -22,8 +22,6 @@ import org.owntracks.android.messages.MessageLocation;
 import timber.log.Timber;
 
 public class FusedContact extends BaseObservable {
-    private static final String TAG = "FusedContact";
-
     private final String id;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
