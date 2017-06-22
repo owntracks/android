@@ -47,7 +47,6 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
 
     public void attachView(@NonNull ModeFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        getView().setActivityViewModel();
     }
 
     @Override

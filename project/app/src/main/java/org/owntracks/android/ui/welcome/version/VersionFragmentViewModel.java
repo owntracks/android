@@ -24,7 +24,6 @@ public class VersionFragmentViewModel extends BaseViewModel<VersionFragmentMvvm.
     @Override
     public void attachView(@NonNull VersionFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        getView().setActivityViewModel();
     }
 
 
