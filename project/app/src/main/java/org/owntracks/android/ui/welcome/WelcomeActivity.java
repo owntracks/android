@@ -57,8 +57,6 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
         }
 
         viewPagerAdapter.addItemId(FinishFragment.ID);
-
-
         binding.viewPager.setAdapter(viewPagerAdapter);
         binding.viewPager.addOnPageChangeListener(this);
 
@@ -123,6 +121,8 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
             finish();
         } else {
             binding.viewPager.setCurrentItem(binding.viewPager.getCurrentItem() - 1);
+            viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
+
         }
     }
 

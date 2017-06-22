@@ -43,8 +43,8 @@
                 android:src="@drawable/ic_done_white_24dp"
                 android:textSize="18sp"
                 android:background="?selectableItemBackgroundBorderless"
-                android:visibility="gone"
-                android:contentDescription="Next" />
+                android:visibility="@{vm.doneEnabled}"
+                android:contentDescription="Done" />
 
             <ImageButton
                 android:id="@+id/btn_next"
