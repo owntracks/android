@@ -21,7 +21,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.DrawerProvider;
+import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.ui.waypoints.AdapterCursorLoader;
 import org.owntracks.android.ui.waypoints.AdapterWaypoints;
 import org.owntracks.android.db.Waypoint;
@@ -145,25 +147,18 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
                 startActivity(detailIntent);
                 return true;
             case R.id.exportWaypointsService:
-                //TODO: reimplement
-                //Dirty hack here
-                //ServiceProxy.runOrBind(this, new Runnable() {
-                //    @Override
-                //    public void run() {
-                //        if(ServiceProxy.getServiceLocator().publishWaypointsMessage()) {
-                //            Toast.makeText(getApplicationContext(), R.string.preferencesExportQueued, Toast.LENGTH_SHORT).show();
-//
-                //        } else {
-                //            Toast.makeText(getApplicationContext(), R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show();
-//
-                //        }
-                //    }
-                //});
+                MessageWaypoints m = new MessageWaypoints();
+                MessageWaypointCollection waypoints = App.getPreferences().waypointsToJSON();
+                if(waypoints == null)
+                    return false;
+                m.setWaypoints(waypoints);
+
+                App.getMessageProcessor().sendMessage(m);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
 
