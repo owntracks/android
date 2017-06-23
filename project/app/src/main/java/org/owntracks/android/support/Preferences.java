@@ -375,7 +375,7 @@ public class Preferences {
 
     }
 
-    public static MessageWaypointCollection waypointsToJSON() {
+    public MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
         for(Waypoint waypoint : App.getDao().getWaypointDao().loadAll()) {

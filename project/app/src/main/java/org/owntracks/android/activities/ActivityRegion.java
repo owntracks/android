@@ -195,37 +195,6 @@ public class ActivityRegion extends ActivityBase  {
 
     }
 
-
-
-    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
-        switch (action) {
-            case PERMISSION_REQUEST_USE_CURRENT:
-                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION");
-                if (granted) {
-                    //TODO: refactor
-                    //ServiceProxy.runOrBind(this, new Runnable() {
-//
-                    //    @Override
-                    //    public void run() {
-                    //        Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-                    //        if(l != null) {
-                    //            waypoint.setGeofenceLatitude(l.getLatitude());
-                    //            waypoint.setGeofenceLongitude(l.getLongitude());
-                    //        } else {
-//
-                    //            Toasts.showCurrentLocationNotAvailable();
-                    //        }
-                    //    }
-                    //});
-                } else {
-                    Toasts.showLocationPermissionNotAvailable();
-                }
-
-        }
-    }
-
-
-
     private void save() {
        Waypoint w = this.waypoint;
 
