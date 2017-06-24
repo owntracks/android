@@ -41,8 +41,6 @@
     <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet/</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
     <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
-    <string name="preferencesCommunity">Community</string>
-    <string name="preferencesCommunitySummary" translatable="false">community.owntracks.org</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
 
@@ -60,8 +58,6 @@
     <string name="preferencesPubExtendedData">Extended data</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
-    <string name="preferencesPlayOverrideSummary">Do not use Google Play Services. Needs restart. Warning: unsupported mode! Some features will be not available.</string>
-    <string name="preferencesPlayOverride">Override Google Play Services</string>
     <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
@@ -73,23 +69,18 @@
     <string name="longitude">Longitude</string>
     <string name="radius">Radius</string>
     <string name="addWaypoint">Add waypoint</string>
-    <string name="export">Export</string>
     <string name="exportConfiguration">Export</string>
-    <string name="preferencesExport">Export</string>
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuCurrentLoction">Current location</string>
 
-    <string name="contactDetailsLocation">Location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsReportedTime">Reported</string>
     <string name="contactDetailsTopic">Identifier</string>
-    <string name="contactDetailsName">Name</string>
     <string name="waypointListPlaceholder">No waypoints defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
     <string name="importConfig">Import</string>
-    <string name="importWarning">The following preference values will be imported:</string>
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Security</string>
     <string name="accept">Accept</string>
@@ -98,12 +89,8 @@
     <string name="preferencesKeepalive" translatable="false">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
-    <string name="snackbarConnected">Connected</string>
-    <string name="snackbarDisconnected">Disconnected</string>
-    <string name="snackbarDisconnectedError">Disconnected with error</string>
 
 
-    <string name="ssid" translatable="false">SSID</string>
     <string-array name="locatorAccuracy_readable">
         <item>High power</item>
         <item>Balanced power</item>
@@ -115,18 +102,11 @@
     <string name="mode_mqtt_private_label">Private MQTT</string>
     <string name="mode_mqtt_public_label">Public MQTT</string>
 
-    <string name="refresh">Refresh</string>
-    <string name="connectivityDisconnectedConfigIncomplete">Connection not configured</string>
-
-    <string name="snackbarImportCompleted">Preferences imported</string>
-    <string name="snackbarConfigIncomplete">Configuration incomplete</string>
     <string name="aLocation">a region</string>
     <string name="events">Events</string>
-    <string name="notificationMessageTitle">Messages</string>
     <string name="beaconUUID" translatable="false">Beacon UUID</string>
     <string name="beaconMajor" translatable="false">Beacon major</string>
     <string name="beaconMinor" translatable="false">Beacon minor</string>
-    <string name="locationPermissionNotAvailable">Location access denied</string>
     <string name="title_activity_regions">Regions</string>
     <string name="title_activity_region">Region</string>
     <string name="title_activity_map">Map</string>
@@ -144,31 +124,21 @@
     <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
     <string name="waypointRemoved">Region removed</string>
 
-    <string name="preferencesImportFile">Import configuration</string>
-    <string name="preferencesImportFileSummary">Import configuration from file</string>
-    <string name="preferencesExportToFile">Export configuration</string>
-    <string name="preferencesExportToFileSummary">Export configuration to file</string>
     <string name="exportWaypointsToEndpoint">Publish Waypoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successful</string>
     <string name="geofenceAndBeaconInactive">Geofence and beacon disabled</string>
     <string name="geofenceAndBeaconActive">Geofence and beacon enabled</string>
     <string name="beaconActive">Beacon enabled</string>
-    <string name="preferencesExportQueued">Export queued</string>
 
 
     <string name="welcomeFixIssue">Fix</string>
-    <string name="welcomeFixQuit">Quit</string>
     <string name="play_services_now_available">Google Play Services are now available</string>
 
     <string name="play_services_not_available_recoverable">Google Play Services are not enabled or not installed</string>
     <string name="play_services_not_available_not_recoverable">Google Play Services are not available for your device</string>
     <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">Private HTTP</string>
-    <string name="messageQueued">message queued</string>
-
-
-    <string name="connectivityDisconnectedDataDisabled">"Disconnected: Data disabled"</string>
 
 
     <string name="preferencesKeyModeId" translatable="false">mode</string>
@@ -178,23 +148,11 @@
     <string name="preferencesKeyParameters" translatable="false">parameters</string>
     <string name="transitionEntering">enters</string>
     <string name="transitionLeaving">leaves</string>
-    <string name="INITIAL">"Initializing</string>
-    <string name="IDLE">Idle</string>
-    <string name="CONNECTING">Connecting</string>
-    <string name="CONNECTED">Connected</string>
-    <string name="DISCONNECTING">Disconnecting</string>
-    <string name="DISCONNECTED">Disconnected</string>
-    <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
-    <string name="ERROR">Error</string>
-    <string name="ERROR_DATADISABLED">Data connection not available</string>
-    <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
     <string name="welcome_play_heading">Google Play Services</string>
     <string name="welcome_play_description">Owntracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
     <string name="play_services_not_available_general">Google Play Services are not available</string>
-    <string name="play_override_continue">Yes, continue at own risk</string>
-    <string name="play_override_question">It seems, Google Play Services cannot be used on your device. If you continue, this app is operating in unsupported mode. Certain features may not be available.</string>
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
@@ -210,7 +168,6 @@
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
     <string name="title_activity_load">Configuration import</string>
-    <string name="geocorderResolving">resolving</string>
     <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
     <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
@@ -228,7 +185,7 @@
     <string name="drawerSwitchReporting">Reporting</string>
     <string name="drawerSwitchCopy">Copy</string>
     <string name="restart">Restart</string>
-    <string name="notificationEventsTitle" formatted="false">%d new events</string>
+    <string name="notificationEventsTitle" formatted="false">%1$d new events</string>
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
     <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner</string>
     <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
