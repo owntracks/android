@@ -8,14 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiFragmentWelcomeFinishBinding;
+import org.owntracks.android.databinding.UiWelcomeFinishBinding;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
-import org.owntracks.android.ui.welcome.intro.IntroFragmentMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
-import org.owntracks.android.ui.welcome.play.PlayFragmentMvvm;
 
-public class FinishFragment extends BaseFragment<UiFragmentWelcomeFinishBinding, FinishFragmentMvvm.ViewModel> implements FinishFragmentMvvm.View {
+public class FinishFragment extends BaseFragment<UiWelcomeFinishBinding, FinishFragmentMvvm.ViewModel> implements FinishFragmentMvvm.View {
     public static final int ID = 6;
 
     private static FinishFragment instance;
@@ -29,7 +26,7 @@ public class FinishFragment extends BaseFragment<UiFragmentWelcomeFinishBinding,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { fragmentComponent().inject(this); }
-        return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_finish, savedInstanceState);
+        return setAndBindContentView(inflater, container, R.layout.ui_welcome_finish, savedInstanceState);
     }
 
     @Override

@@ -8,11 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiFragmentWelcomeIntroBinding;
+import org.owntracks.android.databinding.UiWelcomeIntroBinding;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, IntroFragmentMvvm.ViewModel> implements IntroFragmentMvvm.View {
+public class IntroFragment extends BaseFragment<UiWelcomeIntroBinding, IntroFragmentMvvm.ViewModel> implements IntroFragmentMvvm.View {
     public static final int ID = 1;
 
     private static IntroFragment instance;
@@ -22,16 +22,12 @@ public class IntroFragment extends BaseFragment<UiFragmentWelcomeIntroBinding, I
         return instance;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { fragmentComponent().inject(this); }
-        return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_intro, savedInstanceState);
+        return setAndBindContentView(inflater, container, R.layout.ui_welcome_intro, savedInstanceState);
     }
 
     @Override

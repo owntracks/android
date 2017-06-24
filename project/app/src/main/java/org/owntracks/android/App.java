@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
@@ -109,8 +108,6 @@ public class App extends Application  {
         return sAppComponent.scheduler();
     }
 
-    public static ContactsRepo getContactsRepo() { return sAppComponent.contactsRepo(); }
-
     public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
 
     public static Preferences getPreferences() { return sAppComponent.preferences(); }
@@ -120,7 +117,7 @@ public class App extends Application  {
         return sAppComponent.dao();
     }
 
-    public void enableForegroundBackgroundDetection() {
+    private void enableForegroundBackgroundDetection() {
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         registerScreenOnReceiver();
     }
@@ -147,7 +144,7 @@ public class App extends Application  {
         backgroundHandler.postDelayed(r, delayMilis);
     }
 
-    public static void postOnBackgroundHandler(Runnable r) {
+    private static void postOnBackgroundHandler(Runnable r) {
         backgroundHandler.post(r);
     }
 

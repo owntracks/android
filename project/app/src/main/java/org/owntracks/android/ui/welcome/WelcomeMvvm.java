@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.welcome;
 
 import android.databinding.Bindable;
-import android.os.Bundle;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;

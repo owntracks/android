@@ -6,7 +6,6 @@ import android.util.Base64;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageClear;
@@ -16,7 +15,6 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
@@ -140,12 +138,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         }
         Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
 
-
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe
-    public void onEvent(Events.Dummy event) {
 
     }
 

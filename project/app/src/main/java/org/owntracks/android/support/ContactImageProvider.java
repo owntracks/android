@@ -62,7 +62,7 @@ public class ContactImageProvider {
 
     }
     private class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
-        WeakReference<Marker> target;
+        final WeakReference<Marker> target;
 
         public ContactDrawableWorkerTaskForMarker(Marker marker) {
             target = new WeakReference<>(marker);
@@ -143,38 +143,37 @@ public class ContactImageProvider {
     }
 
     private static class ContactBitmapMemoryCache {
-        private ArrayMap<String, Bitmap> cacheLevelCard;
-        private ArrayMap<String, Bitmap> cacheLevelTid;
+        private final ArrayMap<String, Bitmap> cacheLevelCard;
+        private final ArrayMap<String, Bitmap> cacheLevelTid;
 
-        public ContactBitmapMemoryCache() {
+        ContactBitmapMemoryCache() {
             cacheLevelCard = new ArrayMap<>();
             cacheLevelTid = new ArrayMap<>();
         }
 
-        public synchronized void putLevelCard(String key, Bitmap value) {
+        synchronized void putLevelCard(String key, Bitmap value) {
             cacheLevelCard.put(key, value);
             cacheLevelTid.remove(key);
         }
-        public synchronized void putLevelTid(String key, Bitmap value) {
+        synchronized void putLevelTid(String key, Bitmap value) {
             cacheLevelTid.put(key, value);
         }
-        public synchronized Bitmap getLevelCard(String key) {
+        synchronized Bitmap getLevelCard(String key) {
             return cacheLevelCard.get(key);
         }
-        public synchronized Bitmap getLevelTid(String key) {
+        synchronized Bitmap getLevelTid(String key) {
             return cacheLevelTid.get(key);
         }
         public synchronized void clear() {
             cacheLevelCard.clear();
             cacheLevelTid.clear();
         }
-        public synchronized void clearLevelCard(String key) {
+        synchronized void clearLevelCard(String key) {
             cacheLevelCard.remove(key);
-
         }
     }
 
-    public void invalidateCache() {
+    private void invalidateCache() {
         memoryCache.clear();
     }
     private Bitmap getRoundedShape(Bitmap bitmap) {

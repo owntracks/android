@@ -28,7 +28,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     MessageProcessor.EndpointState endpointState;
     String endpointMessage;
 
-    Context context;
+    final Context context;
     private Date appStarted;
     private Date serviceStarted;
     private long locationUpdated;

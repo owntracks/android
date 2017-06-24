@@ -4,7 +4,6 @@ import android.content.Context;
 import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -41,15 +40,13 @@ import timber.log.Timber;
 
 @PerActivity
 public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View> {
-    private final Context ctx;
     private final ContactsRepo contactsRepo;
     private FusedContact activeContact;
 
 
     @Inject
-    public MapViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
+    public MapViewModel(ContactsRepo contactsRepo) {
         Timber.v("onCreate");
-        this.ctx = context.getApplicationContext();
         this.contactsRepo = contactsRepo;
     }
 
@@ -59,16 +56,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void restoreInstanceState(@NonNull Bundle savedInstanceState) {
-    }
-
-    @Override
-    public void detachView() {
-        super.detachView();
-    }
-
-    public void attachView(@NonNull MapMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
-
     }
 
     @Override

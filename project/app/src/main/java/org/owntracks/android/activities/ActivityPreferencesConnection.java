@@ -32,7 +32,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.ui.status.StatusActivity;

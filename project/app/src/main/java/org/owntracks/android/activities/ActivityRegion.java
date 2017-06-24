@@ -3,7 +3,6 @@ package org.owntracks.android.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,7 +24,6 @@ import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.widgets.Toasts;
 
 
 @Deprecated
@@ -208,9 +206,7 @@ public class ActivityRegion extends ActivityBase  {
         try {
             w.setGeofenceLatitude(Double.parseDouble(binding.latitude.getText().toString()));
             w.setGeofenceLongitude(Double.parseDouble(binding.longitude.getText().toString()));
-        } catch (NumberFormatException e) {
-
-        }
+        } catch (NumberFormatException ignored) { }
 
         try {
             w.setGeofenceRadius(Integer.parseInt(binding.radius.getText().toString()));

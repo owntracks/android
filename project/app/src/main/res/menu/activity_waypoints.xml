@@ -6,7 +6,7 @@
         android:id="@+id/add"
         android:icon="@drawable/ic_add"
         android:orderInCategory="97"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/addWaypoint">
     </item>
     <item

@@ -135,7 +135,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		return instance;
 	}
 
-	private MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
+	private final MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
 		@Override
 		public void connectComplete(boolean reconnect, String serverURI) {
 			Timber.v("%s, serverUri:%s", reconnect, serverURI);
@@ -503,7 +503,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	@SuppressWarnings("UnusedParameters")
 	@Subscribe
 	public void onEvent(Events.BrokerChanged e) {
-
+		reconnect();
 	}
 
 	public void processOutgoingMessage(MessageBase message) {

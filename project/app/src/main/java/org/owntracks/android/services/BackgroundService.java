@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 import timber.log.Timber;
 
 public class BackgroundService extends Service implements BeaconConsumer, RangeNotifier, MonitorNotifier {
-    public static final int INTENT_REQUEST_CODE_LOCATION = 1263;
+    private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
@@ -71,7 +71,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
     private static int notificationEventsID = 3;
 
-    private String NOTIFICATION_GROUP_EVENTS = "events";
+    private final String NOTIFICATION_GROUP_EVENTS = "events";
 
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
     public static final String INTENT_ACTION_CHANGE_BG = "BG";
@@ -99,7 +99,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private NotificationManagerCompat mNotificationManager;
     private Preferences preferences;
     private List<Waypoint> waypoints = new LinkedList<>();
-    private LinkedList<Spannable> activeNotifications = new LinkedList<>();
+    private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private BeaconManager beaconManager;
 
     @Nullable
@@ -290,7 +290,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
             if (activeNotifications.size() > 1) {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                String summary = String.format(getString(R.string.notificationEventsTitle), activeNotifications.size());
+                String summary = getString(R.string.notificationEventsTitle, activeNotifications.size());
                 builder.setContentTitle(getString(R.string.events));
                 builder.setContentText(summary);
                 builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications
@@ -338,10 +338,11 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
             return;
         }
 
+
         // Don't send transition if the region is already triggered
         // If the region status is unknown, send transition only if the device is inside
-        if ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))
-        {
+
+        if (preferences.getFuseRegionDetection() && ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
             Timber.d("ignoring transition: duplicate");
             w.setLastTransition(transition);
             return;
