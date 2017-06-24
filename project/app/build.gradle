@@ -77,6 +77,15 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
+
+    lintOptions {
+        baseline file("../../as/lint-baseline.xml")
+        checkAllWarnings true
+        warningsAsErrors true
+        abortOnError true
+
+    }
+
 }
 
 dependencies {
