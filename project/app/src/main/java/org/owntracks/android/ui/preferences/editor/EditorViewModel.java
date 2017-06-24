@@ -1,6 +1,5 @@
-package org.owntracks.android.ui.configuration;
+package org.owntracks.android.ui.preferences.editor;
 
-import android.content.Context;
 import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,10 +7,8 @@ import android.support.annotation.Nullable;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
@@ -21,15 +18,15 @@ import javax.inject.Inject;
 
 
 @PerActivity
-public class ConfigurationViewModel extends BaseViewModel<org.owntracks.android.ui.configuration.ConfigurationMvvm.View> implements org.owntracks.android.ui.configuration.ConfigurationMvvm.ViewModel<org.owntracks.android.ui.configuration.ConfigurationMvvm.View> {
+public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements EditorMvvm.ViewModel<EditorMvvm.View> {
     @Bindable
     String effectiveConfiguration;
 
     @Inject
-    public ConfigurationViewModel() {
+    public EditorViewModel() {
     }
 
-    public void attachView(@NonNull ConfigurationMvvm.View view, @Nullable Bundle savedInstanceState) {
+    public void attachView(@NonNull EditorMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
         updateEffectiveConfiguration();
     }

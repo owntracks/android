@@ -26,7 +26,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.widgets.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.ToolbarPreference;
-import org.owntracks.android.ui.configuration.ConfigurationActivity;
+import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
 import timber.log.Timber;
 
@@ -126,7 +126,7 @@ public class ActivityPreferences extends ActivityBase {
             configuration.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), ConfigurationActivity.class);
+                    Intent intent = new Intent(getActivity(), EditorActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
                     getActivity().startActivity(intent);

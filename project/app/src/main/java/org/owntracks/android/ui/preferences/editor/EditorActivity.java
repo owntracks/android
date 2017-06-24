@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.configuration;
+package org.owntracks.android.ui.preferences.editor;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -19,22 +19,22 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiActivityConfigurationBinding;
+import org.owntracks.android.databinding.UiPreferencesEditorBinding;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.load.LoadActivity;
+import org.owntracks.android.ui.preferences.load.LoadActivity;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationBinding, ConfigurationMvvm.ViewModel> implements ConfigurationMvvm.View {
+public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        bindAndAttachContentView(R.layout.ui_activity_configuration, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState);
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar);
@@ -74,7 +74,7 @@ public class ConfigurationActivity extends BaseActivity<UiActivityConfigurationB
 
     private void showEditorView() {
         MaterialDialog d = new MaterialDialog.Builder(this)
-                .customView(R.layout.ui_activity_configuration_single_value, true)
+                .customView(R.layout.ui_preferences_editor_dialog, true)
                 .title(R.string.preferencesEditor)
                 .positiveText(R.string.accept)
                 .negativeText(R.string.cancel)
