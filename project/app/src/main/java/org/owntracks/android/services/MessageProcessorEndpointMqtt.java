@@ -201,7 +201,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 					prefix = "ws";
 			}
 
-			String cid = Preferences.getClientId();
+			String cid = App.getPreferences().getClientId();
             String connectString = prefix + "://" + App.getPreferences().getHost() + ":" + App.getPreferences().getPort();
 			Timber.v("mode: " + App.getPreferences().getModeId());
 			Timber.v("client id: " + cid);
@@ -314,7 +314,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(Preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
+            m.setWill(App.getPreferences().getPubTopicBase(), lwt.toString().getBytes(), 0, false);
         } catch(JSONException ignored) {}
 
 	}
@@ -347,7 +347,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
 
 			if (!Preferences.isModeMqttPublic())
-				topics.add(Preferences.getPubTopicBase() + Preferences.getPubTopicCommandsPart());
+				topics.add(App.getPreferences().getPubTopicBase() + Preferences.getPubTopicCommandsPart());
 
 			if (!Preferences.isModeMqttPublic()) {
 				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
@@ -507,7 +507,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	public void processOutgoingMessage(MessageBase message) {
-		message.setTopic(Preferences.getPubTopicBase());
+		message.setTopic(App.getPreferences().getPubTopicBase());
 		scheduleMessage(mqttMessageToBundle(message));
 	}
 
@@ -524,15 +524,15 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void processOutgoingMessage(MessageLocation message) {
-		message.setTopic(Preferences.getPubTopicLocations());
-		message.setQos(Preferences.getPubQosLocations());
-		message.setRetained(Preferences.getPubRetainLocations());
+		message.setTopic(App.getPreferences().getPubTopicLocations());
+		message.setQos(App.getPreferences().getPubQosLocations());
+		message.setRetained(App.getPreferences().getPubRetainLocations());
 		scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageTransition message) {
-		message.setTopic(Preferences.getPubTopicEvents());
+		message.setTopic(App.getPreferences().getPubTopicEvents());
 		message.setQos(Preferences.getPubQosEvents());
 		message.setRetained(Preferences.getPubRetainEvents());
 		scheduleMessage(mqttMessageToBundle(message));
@@ -540,7 +540,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void processOutgoingMessage(MessageWaypoint message) {
-		message.setTopic(Preferences.getPubTopicWaypoints());
+		message.setTopic(App.getPreferences().getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
 		scheduleMessage(mqttMessageToBundle(message));
@@ -548,9 +548,9 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void processOutgoingMessage(MessageWaypoints message) {
-		message.setTopic(Preferences.getPubTopicWaypoints());
-		message.setQos(Preferences.getPubQosWaypoints());
-		message.setRetained(Preferences.getPubRetainWaypoints());
+		message.setTopic(App.getPreferences().getPubTopicWaypoints());
+		message.setQos(App.getPreferences().getPubQosWaypoints());
+		message.setRetained(App.getPreferences().getPubRetainWaypoints());
 		scheduleMessage(mqttMessageToBundle(message));
 	}
 

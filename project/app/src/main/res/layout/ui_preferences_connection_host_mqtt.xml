@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="vm"
-            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel"/>
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel" />
     </data>
 
     <LinearLayout
         android:id="@+id/content_frame"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
         <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/host"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:met_baseColor="@color/textPrimary"
-            app:met_primaryColor="@color/accent"
-			android:text="@={vm.hostText}"
-            android:id="@+id/host"
+            android:hint="@string/preferencesHost"
             android:inputType="textVisiblePassword|textNoSuggestions"
+            android:text="@={vm.hostText}"
+            app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesHost"
-            android:hint="@string/preferencesHost"
-            />
+            app:met_primaryColor="@color/accent" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
 
+            android:id="@+id/port"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:met_baseColor="@color/textPrimary"
-            app:met_primaryColor="@color/accent"
-            android:id="@+id/port"
-            android:inputType="number|textNoSuggestions"
-            android:maxLength="5"
             android:digits="0123456789"
             android:hint="@integer/valPort"
+            android:inputType="number|textNoSuggestions"
+            android:maxLength="5"
             android:text="@={vm.portText}"
+            app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/preferencesPort"
             app:met_floatingLabelAlwaysShown="true"
+            app:met_floatingLabelText="@string/preferencesPort"
+            app:met_primaryColor="@color/accent"
 
             />
 
         <RelativeLayout
-            android:orientation="vertical"
+            android:id="@+id/tlsWrapper"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:id="@+id/tlsWrapper"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/preferencesWebsocket"
-                android:textSize="18sp"
-                />
+                android:textSize="18sp" />
 
             <Switch
                 android:id="@+id/ws"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:checked="@={vm.ws}"
-                android:layout_alignParentEnd="true"/>
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="@={vm.ws}" />
         </RelativeLayout>
 
     </LinearLayout>

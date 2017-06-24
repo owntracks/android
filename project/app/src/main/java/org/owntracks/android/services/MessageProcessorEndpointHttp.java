@@ -244,7 +244,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     @Override
     public void processOutgoingMessage(MessageLocation message) {
 
-        message.setTopic(Preferences.getPubTopicBase());
+        message.setTopic(App.getPreferences().getPubTopicBase());
         scheduleMessage(message);
     }
 

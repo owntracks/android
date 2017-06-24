@@ -13,6 +13,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionHostHttpBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionHostMqttBinding;
+import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionModeBinding;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -79,7 +80,15 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Override
     public void showIdentificationDialog() {
-        Timber.e("NOT IMPLEMENTED");
+        UiPreferencesConnectionIdentificationBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_identification,  null, false);
+        dialogBinding.setVm(viewModel.getIdentificationDialogViewModel());
+        new MaterialDialog.Builder(this)
+                .customView(dialogBinding.getRoot(), true)
+                .title(R.string.preferencesIdentification)
+                .positiveText(R.string.accept)
+                .negativeText(R.string.cancel)
+                .onPositive(dialogBinding.getVm())
+                .show();
     }
 
     @Override

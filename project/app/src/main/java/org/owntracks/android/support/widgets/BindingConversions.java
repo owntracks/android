@@ -5,6 +5,8 @@ import android.databinding.BindingConversion;
 import android.view.View;
 import android.widget.TextView;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
+
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
@@ -58,6 +60,11 @@ public class BindingConversions {
     @BindingAdapter({"android:text"})
     public static void setText(TextView view, MessageProcessor.EndpointState state) {
         view.setText(state != null ? state.getLabel(view.getContext()) : view.getContext().getString(R.string.na));
+    }
+
+    @BindingAdapter("app:met_helperText")
+    public static void setVisibility(MaterialEditText view, String text) {
+        view.setHelperText(text);
     }
 
     @BindingAdapter("android:visibility")

@@ -70,6 +70,7 @@
                         android:layout_weight="1">
 
                         <TextView
+                            style="@style/ListItemPrimary"
                             android:id="@+id/title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -79,6 +80,7 @@
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         <TextView
+                            style="@style/ListItemSecondary"
                             android:id="@+id/mode_current"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
