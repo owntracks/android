@@ -470,11 +470,15 @@ public class Preferences {
     }
 
     @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true)
-    public static String getDeviceId() {
+    public String getDeviceId() {
         return getDeviceId(true);
     }
 
-    public static String getDeviceId(boolean fallbackToDefault) {
+    public String getDeviceIdWithHintSupport() {
+        return getDeviceId(false);
+    }
+
+    public String getDeviceId(boolean fallbackToDefault) {
         if(Preferences.isModeMqttPublic())
             return getDeviceUUID();
 
@@ -508,13 +512,13 @@ public class Preferences {
 
 
     // Not used on public, as many people might use the same device type
-    public static String getDeviceIdDefault() {
+    public String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
         return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
 
     @Export(key =Keys.CLIENT_ID, exportModeMqttPrivate =true)
-    public static String getClientId() {
+    public String getClientId() {
         if(isModeMqttPublic())
             return MqttAsyncClient.generateClientId();
 
@@ -524,7 +528,7 @@ public class Preferences {
         return clientId;
     }
 
-    private static String getClientIdDefault() {
+    private String getClientIdDefault() {
         return (getUsername()+ getDeviceId()).replaceAll("\\W", "").toLowerCase();
     }
 
@@ -538,11 +542,11 @@ public class Preferences {
         setString(Keys.PUB_TOPIC_BASE, deviceTopic, false);
     }
 
-    public static String getPubTopicLocations() {
+    public String getPubTopicLocations() {
         return getPubTopicBase();
     }
 
-    public static String getPubTopicWaypoints() {
+    public String getPubTopicWaypoints() {
         return getPubTopicBase() +getPubTopicWaypointsPart();
     }
 
@@ -550,7 +554,7 @@ public class Preferences {
         return "/waypoint";
     }
 
-    public static String getPubTopicEvents() {
+    public String getPubTopicEvents() {
         return getPubTopicBase() + getPubTopicEventsPart();
     }
 
@@ -573,7 +577,7 @@ public class Preferences {
         return getString(Keys.PUB_TOPIC_BASE, R.string.valPubTopic, R.string.valPubTopicPublic, R.string.valEmpty, true, false);
     }
 
-    public static String getPubTopicBase() {
+    public String getPubTopicBase() {
         return getPubTopicBaseFormatString().replace("%u", getUsername()).replace("%d", getDeviceId());
     }
 
@@ -596,8 +600,8 @@ public class Preferences {
     @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
     public String getTrackerId() {
         return getTrackerId(false);
-
     }
+
     public String getTrackerId(boolean fallback) {
 
         String tid = getString(Keys.TRACKER_ID, R.string.valEmpty);

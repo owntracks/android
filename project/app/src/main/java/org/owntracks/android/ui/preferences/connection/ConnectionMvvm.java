@@ -2,10 +2,12 @@ package org.owntracks.android.ui.preferences.connection;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBinding;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionIdentificationViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel;
 
 
@@ -34,5 +36,6 @@ public interface ConnectionMvvm {
 
         ConnectionModeDialogViewModel getModeDialogViewModel();
 
+        ConnectionIdentificationViewModel getIdentificationDialogViewModel();
     }
 }

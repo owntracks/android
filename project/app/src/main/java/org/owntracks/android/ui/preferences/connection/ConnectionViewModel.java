@@ -15,6 +15,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionIdentificationViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel;
 
 import javax.inject.Inject;
@@ -90,11 +91,16 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     @Override
     public ConnectionHostMqttDialogViewModel getHostDialogViewModelMqtt() {
-        return null;
+        return new ConnectionHostMqttDialogViewModel(preferences);
     }
 
     @Override
     public ConnectionHostHttpDialogViewModel getHostDialogViewModelHttp() {
         return new ConnectionHostHttpDialogViewModel(preferences);
+    }
+
+    @Override
+    public ConnectionIdentificationViewModel getIdentificationDialogViewModel() {
+        return new ConnectionIdentificationViewModel(preferences);
     }
 }
