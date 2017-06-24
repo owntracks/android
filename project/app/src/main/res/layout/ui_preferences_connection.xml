@@ -1,245 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto">
-	<data>
-		<import type="android.view.View"/>
-		<variable
-			name="vm"
-			type="org.owntracks.android.ui.preferences.connection.ConnectionMvvm.ViewModel"/>
-	</data>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="org.owntracks.android.App" />
+        <import type="org.owntracks.android.support.widgets.BindingConversions" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.ConnectionMvvm.ViewModel" />
+    </data>
 
 
-	<android.support.design.widget.CoordinatorLayout
-		android:id="@+id/frame"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/frame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
 
-		<android.support.design.widget.AppBarLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:elevation="4dp"
-			android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-			<android.support.v7.widget.Toolbar
-				android:id="@+id/toolbar"
-				android:layout_width="match_parent"
-				android:layout_height="?attr/actionBarSize"
-				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-		</android.support.design.widget.AppBarLayout>
+        </android.support.design.widget.AppBarLayout>
 
-		<ScrollView
-			android:id="@+id/scrollView"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentStart="true"
-			android:layout_alignParentTop="true"
-			app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-			<LinearLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-				<LinearLayout
-					android:id="@+id/mode"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?android:attr/selectableItemBackground"
-					android:baselineAligned="false"
-					android:gravity="center_vertical"
-					android:minHeight="?android:attr/listPreferredItemHeight"
-					android:onClick="@{() -> vm.onModeClick()}"
-					android:paddingRight="?android:attr/scrollbarSize">
+                <LinearLayout
+                    android:id="@+id/mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:onClick="@{() -> vm.onModeClick()}"
+                    android:paddingRight="?android:attr/scrollbarSize">
 
-					<RelativeLayout
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="6dip"
-						android:layout_marginLeft="15dip"
-						android:layout_marginRight="6dip"
-						android:layout_marginTop="6dip"
-						android:layout_weight="1">
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginLeft="15dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_weight="1">
 
-						<TextView
-							android:id="@+id/title"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:ellipsize="marquee"
-							android:fadingEdge="horizontal"
-							android:text="Mode"
-							android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:text="Mode"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-						<TextView
-							android:id="@+id/mode_current"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_below="@id/title"
-							android:maxLines="4"
-							android:text="HTTP"
-							android:textAppearance="?android:attr/textAppearanceSmall"
-							android:textColor="?android:attr/textColorSecondary"/>
-					</RelativeLayout>
-				</LinearLayout>
+                        <TextView
+                            android:id="@+id/mode_current"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/title"
+                            android:maxLines="4"
+                            android:text="@{BindingConversions.convertModeIdToLabelResId(vm.modeId)}"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="?android:attr/textColorSecondary" />
+                    </RelativeLayout>
+                </LinearLayout>
 
-				<ImageView
-					android:layout_width="fill_parent"
-					android:layout_height="1dp"
-					android:background="@android:drawable/divider_horizontal_bright"
-					android:contentDescription="divider"
-					android:scaleType="matrix"
-					android:src="@android:drawable/divider_horizontal_bright"/>
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/divider_horizontal_bright"
+                    android:contentDescription="divider"
+                    android:scaleType="matrix"
+                    android:src="@android:drawable/divider_horizontal_bright" />
 
-				<LinearLayout
-					android:id="@+id/host"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?android:attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:minHeight="?android:attr/listPreferredItemHeight"
-					android:onClick="@{() -> vm.onHostClick()}"
-					android:paddingRight="?android:attr/scrollbarSize">
+                <LinearLayout
+                    android:id="@+id/host"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:onClick="@{() -> vm.onHostClick()}"
+                    android:paddingRight="?android:attr/scrollbarSize">
 
-					<RelativeLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="6dip"
-						android:layout_marginLeft="15dip"
-						android:layout_marginRight="6dip"
-						android:layout_marginTop="6dip"
-						android:layout_weight="1">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginLeft="15dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_weight="1">
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:ellipsize="marquee"
-							android:fadingEdge="horizontal"
-							android:text="Host"
-							android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:text="Host"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-					</RelativeLayout>
-				</LinearLayout>
+                    </RelativeLayout>
+                </LinearLayout>
 
-				<ImageView
-					android:layout_width="fill_parent"
-					android:layout_height="1dp"
-					android:background="@android:drawable/divider_horizontal_bright"
-					android:contentDescription="divider"
-					android:scaleType="matrix"
-					android:src="@android:drawable/divider_horizontal_bright"/>
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/divider_horizontal_bright"
+                    android:contentDescription="divider"
+                    android:scaleType="matrix"
+                    android:src="@android:drawable/divider_horizontal_bright" />
 
-				<LinearLayout
-					android:id="@+id/identification"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?android:attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:minHeight="?android:attr/listPreferredItemHeight"
-					android:onClick="@{() -> vm.onIdentificationClick()}"
-					android:paddingRight="?android:attr/scrollbarSize">
+                <LinearLayout
+                    android:id="@+id/identification"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:onClick="@{() -> vm.onIdentificationClick()}"
+                    android:paddingRight="?android:attr/scrollbarSize">
 
-					<RelativeLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="6dip"
-						android:layout_marginLeft="15dip"
-						android:layout_marginRight="6dip"
-						android:layout_marginTop="6dip"
-						android:layout_weight="1">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginLeft="15dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_weight="1">
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:ellipsize="marquee"
-							android:fadingEdge="horizontal"
-							android:text="Identification"
-							android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:text="Identification"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-					</RelativeLayout>
-				</LinearLayout>
-				<ImageView
-					android:layout_width="fill_parent"
-					android:layout_height="1dp"
-					android:background="@android:drawable/divider_horizontal_bright"
-					android:contentDescription="divider"
-					android:scaleType="matrix"
-					android:src="@android:drawable/divider_horizontal_bright"
-					android:visibility="@{vm.modeMqtt}"/>
+                    </RelativeLayout>
+                </LinearLayout>
 
-				<LinearLayout
-					android:id="@+id/security"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?android:attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:minHeight="?android:attr/listPreferredItemHeight"
-					android:onClick="@{() -> vm.onSecurityClick()}"
-					android:paddingRight="?android:attr/scrollbarSize"
-					android:visibility="@{vm.modeMqtt}">
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/divider_horizontal_bright"
+                    android:contentDescription="divider"
+                    android:scaleType="matrix"
+                    android:src="@android:drawable/divider_horizontal_bright"
+                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}" />
 
-					<RelativeLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="6dip"
-						android:layout_marginLeft="15dip"
-						android:layout_marginRight="6dip"
-						android:layout_marginTop="6dip"
-						android:layout_weight="1">
+                <LinearLayout
+                    android:id="@+id/security"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:onClick="@{() -> vm.onSecurityClick()}"
+                    android:paddingRight="?android:attr/scrollbarSize"
+                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}">
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:ellipsize="marquee"
-							android:fadingEdge="horizontal"
-							android:text="Security"
-							android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginLeft="15dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_weight="1">
 
-					</RelativeLayout>
-				</LinearLayout>
-				<ImageView
-					android:layout_width="fill_parent"
-					android:layout_height="1dp"
-					android:background="@android:drawable/divider_horizontal_bright"
-					android:contentDescription="divider"
-					android:scaleType="matrix"
-					android:src="@android:drawable/divider_horizontal_bright"
-					android:visibility="@{vm.modeMqtt}"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:text="Security"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-				<LinearLayout
-					android:id="@+id/parameters"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?android:attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:minHeight="?android:attr/listPreferredItemHeight"
-					android:onClick="@{() -> vm.onParametersClick()}"
-					android:paddingRight="?android:attr/scrollbarSize"
-					android:visibility="@{vm.modeMqtt}">
+                    </RelativeLayout>
+                </LinearLayout>
 
-					<RelativeLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="6dip"
-						android:layout_marginLeft="15dip"
-						android:layout_marginRight="6dip"
-						android:layout_marginTop="6dip"
-						android:layout_weight="1">
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/divider_horizontal_bright"
+                    android:contentDescription="divider"
+                    android:scaleType="matrix"
+                    android:src="@android:drawable/divider_horizontal_bright"
+                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}" />
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:ellipsize="marquee"
-							android:fadingEdge="horizontal"
-							android:text="Parameters"
-							android:textAppearance="?android:attr/textAppearanceMedium"/>
+                <LinearLayout
+                    android:id="@+id/parameters"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:onClick="@{() -> vm.onParametersClick()}"
+                    android:paddingRight="?android:attr/scrollbarSize"
+                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}">
 
-					</RelativeLayout>
-				</LinearLayout>
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginLeft="15dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_weight="1">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:text="Parameters"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-			</LinearLayout>
-		</ScrollView>
-	</android.support.design.widget.CoordinatorLayout>
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

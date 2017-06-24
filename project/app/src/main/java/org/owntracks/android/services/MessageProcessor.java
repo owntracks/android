@@ -37,6 +37,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
+    private final Events.QueueChanged queueEvent = new Events.QueueChanged();
     private OutgoingMessageProcessor outgoingMessageProcessor;
 
     private boolean acceptMessages = false;
@@ -176,12 +177,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
 
+
         if(m != null) {
             Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m instanceof MessageLocation) {
                 onMessageReceived(m);
                 eventBus.post(m);
             }
+            eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 
         } else {
             Timber.e("messageId:%s, error: called for unqueued message", messageId);
@@ -190,7 +193,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     private void onMessageQueued(MessageBase m) {
         outgoingQueue.put(m.getMessageId(), m);
-
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
         Timber.v("messageId:%s, queueLength:%s", m.getMessageId(), outgoingQueue.size());
     }
 
@@ -202,6 +205,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         if(m == null) {
             Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
         } else {
+            eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
             Timber.v("type:base, messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m.getOutgoingTTL() > 0)  {
                 Timber.d("type:base, messageId:%s, action: requeued",m.getMessageId() );

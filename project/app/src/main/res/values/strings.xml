@@ -189,5 +189,14 @@
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
     <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner</string>
     <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
-
+    <string name="INITIAL">"Initializing</string>
+    <string name="IDLE">Idle</string>
+    <string name="CONNECTING">Connecting</string>
+    <string name="CONNECTED">Connected</string>
+    <string name="DISCONNECTING">Disconnecting</string>
+    <string name="DISCONNECTED">Disconnected</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
+    <string name="ERROR">Error</string>
+    <string name="ERROR_DATADISABLED">Data connection not available</string>
+    <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
 </resources>

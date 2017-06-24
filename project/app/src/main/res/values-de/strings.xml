@@ -151,4 +151,14 @@
     <string name="ui_fragment_welcome_version_title">Einschränkungen</string>
     <string name="ui_fragment_welcome_version_description">Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar</string>
     <string name="ui_fragment_welcome_version_learn_more">Mehr erfahren</string>
+    <string name="INITIAL">Initialisieren</string>
+    <string name="IDLE">Aktiv</string>
+    <string name="CONNECTING">Verbinden</string>
+    <string name="CONNECTED">Verbunden</string>
+    <string name="DISCONNECTING">Trennen</string>
+    <string name="DISCONNECTED">Getrennt</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Getrennt</string>
+    <string name="ERROR">Fehler</string>
+    <string name="ERROR_DATADISABLED">Datenverbindung nicht verfügbar</string>
+    <string name="ERROR_CONFIGURATION">Konfiguration unvollständig</string>
 </resources>

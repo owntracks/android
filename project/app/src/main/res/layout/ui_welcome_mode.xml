@@ -67,10 +67,7 @@
             android:layout_above="@+id/fragment_welcome_mode_description"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="8dp"
-            android:checkedButton="@={vm.checkedButton}"
-
-
-            >
+            android:checkedButton="@={vm.checkedButton}" >
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:textColor="#ffffff"

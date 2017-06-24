@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel" />
+    </data>
+
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:checkedButton="@={vm.mode}">
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radioModeMqttPublic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_mqtt_public_label" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radioModeHttpPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_http_private_label" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radioModeMqttPrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_mqtt_private_label" />
+    </RadioGroup>
+</layout>
