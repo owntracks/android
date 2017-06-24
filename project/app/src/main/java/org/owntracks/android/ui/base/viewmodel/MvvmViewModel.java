@@ -4,6 +4,8 @@ import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import org.owntracks.android.ui.base.view.MvvmView;
 
 /* Copyright 2016 Patrick Löwenstein
@@ -25,5 +27,4 @@ public interface MvvmViewModel<V extends MvvmView> extends Observable {
 
     void saveInstanceState(@NonNull Bundle outState);
     void restoreInstanceState(@NonNull Bundle savedInstanceState);
-
 }

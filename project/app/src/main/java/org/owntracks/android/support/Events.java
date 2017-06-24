@@ -68,4 +68,20 @@ public class Events {
 
 	public static class ServiceStarted extends E {
 	}
+
+    public static class QueueChanged extends E {
+        int length;
+
+        public QueueChanged() {
+        }
+        public QueueChanged withNewLength(int length) {
+            this.length = length;
+            return this;
+        }
+        public int getNewLength() {
+            return length;
+        }
+
+    }
+
 }

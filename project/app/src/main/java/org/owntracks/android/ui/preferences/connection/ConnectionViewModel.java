@@ -1,35 +1,33 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import android.Manifest;
 import android.content.Context;
 import android.databinding.Bindable;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
 
 @PerActivity
 public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View> {
 
-    final Context context;
-    final Preferences preferences;
-    private boolean mqtt;
+    private final Context context;
+    private final Preferences preferences;
+
+    private int modeId;
 
     @Inject
     public ConnectionViewModel(@AppContext Context context, Preferences preferences) {
@@ -39,7 +37,25 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     public void attachView(@NonNull ConnectionMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        setModeMqtt(!preferences.isModeHttpPrivate());
+        setModeId(preferences.getModeId());
+    }
+
+    @Override
+    public void setModeId(int newModeId) {
+        this.modeId = newModeId;
+    }
+
+    @Bindable
+    @Override
+    public int getModeId() {
+        return modeId;
+    }
+
+    @Subscribe
+    public void onEvent(Events.ModeChanged e) {
+        Timber.v("mode changed %s", e.getNewModeId());
+        setModeId(e.getNewModeId());
+        notifyChange();
     }
 
     @Override
@@ -68,12 +84,17 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
     }
 
     @Override
-    public boolean isModeMqtt() {
-        return mqtt;
+    public ConnectionModeDialogViewModel getModeDialogViewModel() {
+        return new ConnectionModeDialogViewModel(preferences);
     }
 
     @Override
-    public void setModeMqtt(boolean b) {
-        this.mqtt = b; 
+    public ConnectionHostMqttDialogViewModel getHostDialogViewModelMqtt() {
+        return null;
+    }
+
+    @Override
+    public ConnectionHostHttpDialogViewModel getHostDialogViewModelHttp() {
+        return new ConnectionHostHttpDialogViewModel(preferences);
     }
 }

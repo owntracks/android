@@ -5,7 +5,7 @@
         <import type="android.view.View"/>
         <variable
             name="vm"
-            type="org.owntracks.android.ui.preferences.connection.ConnectionActivity.ConnectionBinding"/>
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel"/>
     </data>
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             app:met_baseColor="@color/textPrimary"
             app:met_primaryColor="@color/accent"
-			android:text="@={vm.host}"
+			android:text="@={vm.hostText}"
             android:id="@+id/host"
             android:inputType="textVisiblePassword|textNoSuggestions"
             app:met_floatingLabel="highlight"
@@ -39,6 +39,7 @@
             android:maxLength="5"
             android:digits="0123456789"
             android:hint="@integer/valPort"
+            android:text="@={vm.portText}"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesPort"
             app:met_floatingLabelAlwaysShown="true"
@@ -67,6 +68,7 @@
                 android:layout_gravity="end"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
+                android:checked="@={vm.ws}"
                 android:layout_alignParentEnd="true"/>
         </RelativeLayout>
 

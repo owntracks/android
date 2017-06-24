@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 
 @PerActivity
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
@@ -33,6 +35,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     private Date serviceStarted;
     private long locationUpdated;
     private boolean locationPermission;
+    private int queueLength;
 
     @Inject
     public StatusViewModel(@AppContext Context context) {
@@ -58,7 +61,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     @Bindable
     public int getEndpointQueue() {
-        return App.getMessageProcessor().getQueueLength();
+        return queueLength;
     }
 
     @Override
@@ -91,13 +94,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(Events.PermissionGranted e) {
-        if(Manifest.permission.ACCESS_FINE_LOCATION.equals(e.getPermission()))
-            this.locationPermission = true;
-        notifyPropertyChanged(BR.locationUpdated);
-    }
-
-    @Subscribe(sticky = true)
     public void onEvent(Events.ServiceStarted e) {
         this.serviceStarted = e.getDate();
         notifyPropertyChanged(BR.serviceStarted);
@@ -108,4 +104,12 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
         this.locationUpdated = TimeUnit.MILLISECONDS.toSeconds(l.getTime());
         notifyPropertyChanged(BR.locationUpdated);
     }
+
+    @Subscribe(sticky = true)
+    public void onEvent(Events.QueueChanged e) {
+        Timber.e("queue changed %s", e.getNewLength());
+        this.queueLength = e.getNewLength();
+        notifyPropertyChanged(BR.endpointQueue);
+    }
+
 }

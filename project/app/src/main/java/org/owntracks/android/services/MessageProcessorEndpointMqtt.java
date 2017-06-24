@@ -192,17 +192,17 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 			String prefix = "tcp";
 			if (Preferences.getTls()) {
-				if (Preferences.getWs()) {
+				if (App.getPreferences().getWs()) {
 					prefix = "wss";
 				} else
 					prefix = "ssl";
 			} else {
-				if (Preferences.getWs())
+				if (App.getPreferences().getWs())
 					prefix = "ws";
 			}
 
 			String cid = Preferences.getClientId();
-            String connectString = prefix + "://" + Preferences.getHost() + ":" + Preferences.getPort();
+            String connectString = prefix + "://" + App.getPreferences().getHost() + ":" + App.getPreferences().getPort();
 			Timber.v("mode: " + App.getPreferences().getModeId());
 			Timber.v("client id: " + cid);
 			Timber.v("connect string: " + connectString);

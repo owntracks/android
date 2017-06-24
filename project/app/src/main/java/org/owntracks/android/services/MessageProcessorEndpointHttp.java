@@ -122,7 +122,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     private void loadEndpointUrl() {
         URL endpoint;
         try {
-            endpoint = new URL(Preferences.getUrl());
+            endpoint = new URL(App.getPreferences().getUrl());
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));

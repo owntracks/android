@@ -617,16 +617,16 @@ public class Preferences {
     }
 
     @Import(key =Keys.HOST)
-    public static void setHost(String value) {
+    public void setHost(String value) {
             setString(Keys.HOST, value, false);
     }
 
-    public static void setPortDefault(int value) {
+    public void setPortDefault() {
         clearKey(Keys.PORT);
     }
 
     @Import(key =Keys.PORT)
-    public static void setPort(int value) {
+    public void setPort(int value) {
             setInt(Keys.PORT, value, false);
    }
 
@@ -663,7 +663,7 @@ public class Preferences {
         }
     }
 
-    public static String getPortWithHintSupport() {
+    public String getPortWithHintSupport() {
         return getIntWithHintSupport(Keys.PORT);
     }
 
@@ -815,7 +815,7 @@ public class Preferences {
     }
 
     @Import(key =Keys.WS)
-    public static void setWs(boolean wsEnable) {
+    public void setWs(boolean wsEnable) {
         setBoolean(Keys.WS, wsEnable, false);
     }
 
@@ -826,7 +826,7 @@ public class Preferences {
         setString(Keys.TLS_CLIENT_CRT, name, false);
     }
     @Export(key =Keys.HOST, exportModeMqttPrivate =true)
-    public static String getHost() {
+    public String getHost() {
         return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, R.string.valEmpty, true, false);
     }
     @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
@@ -839,7 +839,7 @@ public class Preferences {
         return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
     }
     @Export(key =Keys.WS, exportModeMqttPrivate =true)
-    public static boolean getWs() {
+    public boolean getWs() {
         return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
     }
 
@@ -984,12 +984,12 @@ public class Preferences {
 
 
     @Import(key =Keys.URL)
-    public static void setUrl(String url) {
+    public void setUrl(String url) {
         setString(Keys.URL, url);
     }
 
     @Export(key = Keys.URL, exportModeHttpPrivate = true)
-    public static String getUrl() {
+    public String getUrl() {
         return getString(Keys.URL, R.string.valEmpty);
     }
     public static void setTlsClientCrtPassword(String password) {

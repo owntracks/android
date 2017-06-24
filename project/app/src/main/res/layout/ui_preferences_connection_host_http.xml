@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel"/>
+    </data>
+
+    <LinearLayout
+        android:id="@+id/content_frame"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@={vm.urlText}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_primaryColor="@color/accent"
+            android:id="@+id/url"
+            android:inputType="textUri|textNoSuggestions"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="@string/preferencesUrl"
+            android:hint="@string/preferencesUrl"
+         />
+
+    </LinearLayout>
+</layout>

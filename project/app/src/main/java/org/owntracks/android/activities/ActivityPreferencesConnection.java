@@ -177,10 +177,10 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
                                     final Switch ws = (Switch)d.findViewById(R.id.ws);
 
-                                    host.setText(Preferences.getHost());
+                                    host.setText(App.getPreferences().getHost());
                                     host.setFloatingLabelAlwaysShown(true);
 
-                                    port.setText(Preferences.getPortWithHintSupport());
+                                    port.setText(App.getPreferences().getPortWithHintSupport());
                                     port.setFloatingLabelAlwaysShown(true);
                                     ws.setChecked(wsVal);
                                     ws.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -201,14 +201,14 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText port = (MaterialEditText) d.findViewById(R.id.port);
 
 
-                                    Preferences.setHost(host.getText().toString());
+                                    App.getPreferences().setHost(host.getText().toString());
                                     try {
-                                        Preferences.setPort(Integer.parseInt(port.getText().toString()));
+                                        App.getPreferences().setPort(Integer.parseInt(port.getText().toString()));
                                     } catch (NumberFormatException e) {
-                                        Preferences.clearKey(Preferences.Keys.PORT);
+                                        App.getPreferences().clearKey(Preferences.Keys.PORT);
                                     }
 
-                                    Preferences.setWs(wsVal);
+                                    App.getPreferences().setWs(wsVal);
                                 }
                             })
 
@@ -221,7 +221,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
             hostPreference = findPreference(getString(R.string.preferencesKeyHost));
             hostPreference.setOnPreferenceClickListener(hostClickListener);
-            wsVal = Preferences.getWs();
+            wsVal = App.getPreferences().getWs();
 
         }
 
@@ -240,7 +240,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
 
-                                    url.setText(Preferences.getUrl());
+                                    url.setText(App.getPreferences().getUrl());
                                     url.setFloatingLabelAlwaysShown(true);
 
                                 }
@@ -253,7 +253,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText url = (MaterialEditText) d.findViewById(R.id.url);
 
 
-                                    Preferences.setUrl(url.getText().toString());
+                                    App.getPreferences().setUrl(url.getText().toString());
                                 }
                             })
 
@@ -297,11 +297,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     });
 
                                     authentication.setChecked(authenticationVal);
-                                    username.setText(Preferences.getUsername());
-                                    password.setText(Preferences.getPassword());
+                                    username.setText(App.getPreferences().getUsername());
+                                    password.setText(App.getPreferences().getPassword());
                                     password.setVisibility(authenticationVal ? View.VISIBLE : View.GONE);
-                                    deviceId.setHint(Preferences.getDeviceIdDefault());
-                                    deviceId.setText(Preferences.getDeviceId(false));
+                                    deviceId.setHint(App.getPreferences().getDeviceIdDefault());
+                                    deviceId.setText(App.getPreferences().getDeviceId(false));
                                     trackerId.setText(App.getPreferences().getTrackerId(false));
                                     trackerId.setHint(App.getPreferences().getTrackerIdDefault());
 
@@ -336,11 +336,11 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText deviceId = (MaterialEditText) d.findViewById(R.id.deviceId);
                                     final MaterialEditText trackerId = (MaterialEditText) d.findViewById(R.id.trackerId);
 
-                                    Preferences.setAuth(authenticationVal);
-                                    Preferences.setUsername(username.getText().toString());
-                                    Preferences.setPassword(password.getText().toString());
-                                    Preferences.setDeviceId(deviceId.getText().toString());
-                                    Preferences.setTrackerId(trackerId.getText().toString());
+                                    App.getPreferences().setAuth(authenticationVal);
+                                    App.getPreferences().setUsername(username.getText().toString());
+                                    App.getPreferences().setPassword(password.getText().toString());
+                                    App.getPreferences().setDeviceId(deviceId.getText().toString());
+                                    App.getPreferences().setTrackerId(trackerId.getText().toString());
 
                                     updateConnectButton();
                                 }
@@ -375,8 +375,8 @@ public class ActivityPreferencesConnection extends ActivityBase {
                             .showListener(new DialogInterface.OnShowListener() {
                                 @Override
                                 public void onShow(DialogInterface dialog) {
-                                    tlsCaCrtName = Preferences.getTlsCaCrtName();
-                                    tlsClientCrtName = Preferences.getTlsClientCrtName();
+                                    tlsCaCrtName = App.getPreferences().getTlsCaCrtName();
+                                    tlsClientCrtName = App.getPreferences().getTlsClientCrtName();
 
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     Switch tls = (Switch) d.findViewById(R.id.tls);
@@ -386,7 +386,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     final MaterialEditText tlsClientCrtPasswordView = (MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword);
 
 
-                                    d.findViewById(R.id.tlsWrapper).setVisibility(Preferences.isModeHttpPrivate() ? View.GONE : View.VISIBLE);
+                                    d.findViewById(R.id.tlsWrapper).setVisibility(App.getPreferences().isModeHttpPrivate() ? View.GONE : View.VISIBLE);
                                     tls.setChecked(tlsVal);
                                     tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                         @Override
@@ -496,7 +496,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     });
 
                                     tlsClientCrtPasswordView.setVisibility(tlsVal && !"".equals(tlsClientCrtNameView.getText().toString()) ? View.VISIBLE : View.GONE);
-                                    tlsClientCrtPasswordView.setText(Preferences.getTlsClientCrtPassword());
+                                    tlsClientCrtPasswordView.setText(App.getPreferences().getTlsClientCrtPassword());
 
 
 
@@ -508,13 +508,13 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                 public void onPositive(MaterialDialog dialog) {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
 
-                                    Preferences.setTls(tlsVal);
-                                    Preferences.setTlsCaCrt(tlsCaCrtName);
-                                    Preferences.setTlsClientCrt(tlsClientCrtName);
+                                    App.getPreferences().setTls(tlsVal);
+                                    App.getPreferences().setTlsCaCrt(tlsCaCrtName);
+                                    App.getPreferences().setTlsClientCrt(tlsClientCrtName);
 
                                     Log.v(TAG, "" + tlsCaCrtName + " " + tlsClientCrtName);
 
-                                    Preferences.setTlsClientCrtPassword(((MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword)).getText().toString());
+                                    App.getPreferences().setTlsClientCrtPassword(((MaterialEditText) d.findViewById(R.id.tlsClientCrtPassword)).getText().toString());
                                     updateConnectButton();
                                     securityDialog = null;
                                 }
@@ -524,7 +524,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                     return true;
                 }
             };
-            tlsVal = Preferences.getTls();
+            tlsVal = App.getPreferences().getTls();
             securityPreference = findPreference(getString(R.string.preferencesKeySecurity));
             securityPreference.setOnPreferenceClickListener(securityListener);
 
@@ -555,7 +555,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                         }
                                     });
 
-                                    keepalive.setText(Preferences.getKeepaliveWithHintSupport());
+                                    keepalive.setText(App.getPreferences().getKeepaliveWithHintSupport());
 
                                 }
                             })
@@ -566,12 +566,12 @@ public class ActivityPreferencesConnection extends ActivityBase {
                                     MaterialDialog d = MaterialDialog.class.cast(dialog);
                                     final MaterialEditText keepalive = (MaterialEditText) d.findViewById(R.id.keepalive);
 
-                                    Preferences.setCleanSession(cleansessionVal);
+                                    App.getPreferences().setCleanSession(cleansessionVal);
                                     try {
-                                        Preferences.setKeepalive(Integer.parseInt(keepalive.getText().toString()));
+                                        App.getPreferences().setKeepalive(Integer.parseInt(keepalive.getText().toString()));
 
                                     } catch (NumberFormatException e) {
-                                        Preferences.clearKey(Preferences.Keys.KEEPALIVE);
+                                        App.getPreferences().clearKey(Preferences.Keys.KEEPALIVE);
                                     }
 
                                     updateConnectButton();
@@ -584,7 +584,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 }
             };
 
-            cleansessionVal = Preferences.getCleanSession();
+            cleansessionVal = App.getPreferences().getCleanSession();
             optionsPreference = findPreference(getString(R.string.preferencesKeyParameters));
             optionsPreference.setOnPreferenceClickListener(optionsClickListener);
         }
@@ -599,7 +599,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
             Log.v(TAG, "Prepping preferences: " + App.getPreferences().getModeId());
 
 
-            if (Preferences.isModeMqttPrivate()) {
+            if (App.getPreferences().isModeMqttPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PRIVATE);
                 addPreferencesFromResource(R.xml.preferences_private_connection);
 
@@ -609,10 +609,10 @@ public class ActivityPreferencesConnection extends ActivityBase {
                 loadOptionsPreferences(a);
                 loadIdentificationPreferences(a);
 
-            } else if (Preferences.isModeMqttPublic()) {
+            } else if (App.getPreferences().isModeMqttPublic()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_PUBLIC);
                 addPreferencesFromResource(R.xml.preferences_public_connection);
-            } else if(Preferences.isModeHttpPrivate()) {
+            } else if(App.getPreferences().isModeHttpPrivate()) {
                 this.getPreferenceManager().setSharedPreferencesName(Preferences.FILENAME_HTTP);
                 addPreferencesFromResource(R.xml.preferences_http_connection);
                 loadHostPreferencesHttp(a);
@@ -674,7 +674,7 @@ public class ActivityPreferencesConnection extends ActivityBase {
 
 
             mMenu.clear();
-           if(Preferences.isModeHttpPrivate()) {
+           if(App.getPreferences().isModeHttpPrivate()) {
                mInflater.inflate(R.menu.preferences_connection_http, mMenu);
            } else {
                mInflater.inflate(R.menu.preferences_connection_mqtt, mMenu);
