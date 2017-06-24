@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary"
+        >
+
+        <org.owntracks.android.support.widgets.PausableViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            >
+
+            <LinearLayout
+                android:id="@+id/circles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/done"
+                android:layout_width="80dp"
+                android:layout_height="48dp"
+                android:layout_alignParentRight="true"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="Done"
+                android:gravity="center"
+                android:onClick="@{() -> vm.onDoneClicked()}"
+                android:src="@drawable/ic_done_white_24dp"
+                android:textSize="18sp"
+                android:visibility="@{vm.doneEnabled}"/>
+
+            <ImageButton
+                android:id="@+id/btn_next"
+                android:layout_width="80dp"
+                android:layout_height="48dp"
+                android:layout_alignParentRight="true"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="Next"
+                android:gravity="center"
+                android:onClick="@{() -> vm.onNextClicked()}"
+                android:paddingBottom="12dp"
+                android:paddingTop="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
+                android:visibility="@{vm.fragmentViewModel.nextEnabled ? View.VISIBLE : View.GONE}"/>
+        </RelativeLayout>
+    </RelativeLayout>
+</layout>

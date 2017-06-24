@@ -9,4 +9,9 @@
     <!--Welcome sliding page  -->
     <dimen name="welcome_content_min_height">96dp</dimen>
 
+
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="activity_settings_margin">24dp</dimen>
+
 </resources>
