@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiActivityWelcomeBinding;
+import org.owntracks.android.databinding.UiWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 
-public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, WelcomeMvvm.ViewModel> implements WelcomeMvvm.View, ViewPager.OnPageChangeListener {
+public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.ViewModel> implements WelcomeMvvm.View, ViewPager.OnPageChangeListener {
     @Inject
     WelcomeAdapter viewPagerAdapter;
 
@@ -31,7 +31,7 @@ public class WelcomeActivity extends BaseActivity<UiActivityWelcomeBinding, Welc
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        bindAndAttachContentView(R.layout.ui_activity_welcome, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
         setupPagerAdapter();
     }

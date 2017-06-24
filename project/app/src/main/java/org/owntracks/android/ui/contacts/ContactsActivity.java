@@ -7,21 +7,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiActivityContactsBinding;
+import org.owntracks.android.databinding.UiContactsBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import timber.log.Timber;
 
 
-public class ContactsActivity extends BaseActivity<UiActivityContactsBinding, ContactsMvvm.ViewModel> implements ContactsMvvm.View, org.owntracks.android.ui.contacts.ContactsAdapter.ClickListener {
+public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMvvm.ViewModel> implements ContactsMvvm.View, org.owntracks.android.ui.contacts.ContactsAdapter.ClickListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
-        bindAndAttachContentView(R.layout.ui_activity_contacts, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_contacts, savedInstanceState);
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar);

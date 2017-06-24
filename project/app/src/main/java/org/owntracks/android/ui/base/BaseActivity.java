@@ -102,14 +102,17 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         setSupportToolbar(toolbar, true, true);
     }
 
-    void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
+    protected void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
         setSupportActionBar(toolbar);
-        if(showTitle)
-          getSupportActionBar().setTitle(getTitle());
-        getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(showHome);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
+        if(getSupportActionBar() != null) {
+            if (showTitle)
+                getSupportActionBar().setTitle(getTitle());
+
+            getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
+            getSupportActionBar().setDisplayShowHomeEnabled(showHome);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
+        }
 
     }
 

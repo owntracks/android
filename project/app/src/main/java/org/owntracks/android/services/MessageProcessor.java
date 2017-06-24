@@ -22,7 +22,6 @@ import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
-import org.owntracks.android.support.widgets.Toasts;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,8 +35,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final ContactsRepo contactsRepo;
     private final Preferences preferences;
 
-    private ThreadPoolExecutor incomingMessageProcessorExecutor;
-    private ThreadPoolExecutor outgoingMessageProcessorExecutor;
+    private final ThreadPoolExecutor incomingMessageProcessorExecutor;
+    private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private OutgoingMessageProcessor outgoingMessageProcessor;
 
     private boolean acceptMessages = false;
@@ -161,7 +160,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         loadOutgoingMessageProcessor();
     }
 
-    private LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
+    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
     public void sendMessage(MessageBase message) {
         if(!acceptMessages) return;

@@ -1,8 +1,5 @@
 package org.owntracks.android.ui.welcome;
 
-import android.content.res.Resources;
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -25,13 +22,11 @@ import timber.log.Timber;
 @PerActivity
 public class WelcomeAdapter extends FragmentStatePagerAdapter {
 
-    private Resources res;
-    private ArrayList<Integer> ids = new ArrayList<>();
+    private final ArrayList<Integer> ids = new ArrayList<>();
 
     @Inject
-    public WelcomeAdapter(@ActivityFragmentManager FragmentManager fm, Resources res) {
+    public WelcomeAdapter(@ActivityFragmentManager FragmentManager fm) {
         super(fm);
-        this.res = res;
     }
 
     public void addItemId(int id) {

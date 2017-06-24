@@ -1,7 +1,5 @@
 package org.owntracks.android.ui.welcome.mode;
 
-import android.widget.RadioGroup;
-
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 

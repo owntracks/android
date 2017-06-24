@@ -11,22 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiFragmentWelcomeFinishBinding;
+import org.owntracks.android.databinding.UiWelcomePermissionsBinding;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
 
-public class PermissionFragment extends BaseFragment<UiFragmentWelcomeFinishBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
+public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
     public static final int ID = 3;
 
     private static PermissionFragment instance;
-    private int PERMISSIONS_REQUEST_CODE = 1;
+    private final int PERMISSIONS_REQUEST_CODE = 1;
 
     public static Fragment getInstance() {
         if(instance == null)
@@ -35,17 +31,11 @@ public class PermissionFragment extends BaseFragment<UiFragmentWelcomeFinishBind
         return instance;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { fragmentComponent().inject(this); }
-        return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_permissions, savedInstanceState);
+        return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState);
     }
 
 

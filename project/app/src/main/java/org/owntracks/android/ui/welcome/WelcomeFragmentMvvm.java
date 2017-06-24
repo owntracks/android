@@ -1,13 +1,9 @@
 package org.owntracks.android.ui.welcome;
 
 import android.databinding.Bindable;
-import android.support.v7.app.AppCompatActivity;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-import org.owntracks.android.ui.welcome.intro.IntroFragmentMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
-import org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm;
 
 public interface WelcomeFragmentMvvm  {
 

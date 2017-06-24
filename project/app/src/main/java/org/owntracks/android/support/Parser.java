@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class Parser {
     private static ObjectMapper defaultMapper;
     private static ObjectMapper arrayCompatMapper;
-    private EncryptionProvider encryptionProvider;
+    private final EncryptionProvider encryptionProvider;
     public Parser(EncryptionProvider encryptionProvider) {
         this.encryptionProvider = encryptionProvider;
         defaultMapper = new ObjectMapper();
@@ -86,7 +86,7 @@ public class Parser {
     }
 
 
-    private String encryptString(@NonNull String input) throws IOException, EncryptionException {
+    private String encryptString(@NonNull String input) throws IOException {
         if(encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(encryptionProvider.encrypt(input));
@@ -95,7 +95,7 @@ public class Parser {
         return input;
     }
 
-    private byte[] encryptBytes(@NonNull byte[] input) throws IOException, EncryptionException {
+    private byte[] encryptBytes(@NonNull byte[] input) throws IOException {
         if(encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(encryptionProvider.encrypt(input));

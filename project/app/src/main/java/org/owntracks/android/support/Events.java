@@ -3,13 +3,6 @@ package org.owntracks.android.support;
 import java.util.Date;
 
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.MessageProcessor;
-
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 public class Events {
     public static abstract class E {
@@ -19,11 +12,6 @@ public class Events {
         }
         public Date getDate() {
             return this.date;
-        }
-    }
-
-    public static class Dummy extends E {
-        public Dummy() {
         }
     }
 
@@ -46,7 +34,7 @@ public class Events {
 
 	public static class WaypointTransition extends E {
 		final Waypoint w;
-		int transition;
+		final int transition;
 
 		public WaypointTransition(Waypoint w, int transition) {
 			super();
@@ -63,7 +51,6 @@ public class Events {
 		}
 
 	}
-
 
 	public static class BrokerChanged extends E {
 		public BrokerChanged() {}

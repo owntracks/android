@@ -8,9 +8,6 @@ import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
-
-import com.mikepenz.materialdrawer.Drawer;
 
 /* Copyright 2016 Patrick Löwenstein
  *

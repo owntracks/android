@@ -9,7 +9,6 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.services.MessageProcessor;
 
 public interface OutgoingMessageProcessor {
     void processOutgoingMessage(MessageBase message);

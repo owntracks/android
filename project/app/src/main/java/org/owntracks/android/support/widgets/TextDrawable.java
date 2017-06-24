@@ -18,7 +18,6 @@ public class TextDrawable extends ShapeDrawable {
     private final Paint borderPaint;
     private static final float SHADE_FACTOR = 0.9f;
     private final String text;
-    private final int color;
     private final RectShape shape;
     private final int height;
     private final int width;
@@ -29,6 +28,7 @@ public class TextDrawable extends ShapeDrawable {
 
     private TextDrawable(Builder builder) {
         super(builder.shape);
+        int color;
 
         // shape properties
         shape = builder.shape;

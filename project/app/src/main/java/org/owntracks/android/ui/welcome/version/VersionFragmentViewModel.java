@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm;
-import org.owntracks.android.ui.welcome.play.PlayFragmentMvvm;
 
 import javax.inject.Inject;
 

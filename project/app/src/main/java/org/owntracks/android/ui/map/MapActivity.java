@@ -31,7 +31,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiActivityMapBinding;
+import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -40,12 +40,12 @@ import java.util.WeakHashMap;
 
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
+public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
 
     private static final long ZOOM_LEVEL_STREET = 15;
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
 
-    WeakHashMap<String, Marker> mMarkers = new WeakHashMap <>();
+    final WeakHashMap<String, Marker> mMarkers = new WeakHashMap <>();
 
     private GoogleMap mMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
@@ -172,8 +172,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         activityComponent().inject(this);
 
         assertRequirements();
-        bindAndAttachContentView(R.layout.ui_activity_map, savedInstanceState);
-        setSupportToolbarWithDrawer(this.binding.toolbar);
+        bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
+
+        setSupportToolbar(this.binding.toolbar, false, true);
+        setDrawer(this.binding.toolbar);
 
         this.mMapLocationSource = new MapLocationSource();
 

@@ -9,7 +9,6 @@ import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -41,7 +40,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
         @JsonIgnore
-        private Long _messageId = System.currentTimeMillis();
+        private final Long _messageId = System.currentTimeMillis();
 
         @JsonIgnore
         private int _outgoingTTL = 2;

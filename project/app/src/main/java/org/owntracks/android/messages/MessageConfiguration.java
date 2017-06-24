@@ -14,15 +14,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import timber.log.Timber;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageConfiguration extends MessageBase{
     static final String TYPE = "configuration";
     private static final String BASETOPIC_SUFFIX = "/cmd";
-    private Map<String,Object> map = new TreeMap<>();
+    private final Map<String,Object> map = new TreeMap<>();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MessageWaypointCollection waypoints;

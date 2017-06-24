@@ -8,8 +8,6 @@ import android.support.v4.content.ContextCompat;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import org.owntracks.android.App;
-
 import timber.log.Timber;
 
 public class RequirementsChecker {

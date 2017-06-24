@@ -5,13 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.android.databinding.library.baseAdapters.BR;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm;
 
 import javax.inject.Inject;
 

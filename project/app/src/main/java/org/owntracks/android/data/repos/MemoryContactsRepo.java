@@ -24,8 +24,8 @@ public class MemoryContactsRepo implements ContactsRepo {
     private static final int LOAD_FACTOR = 20;
     private static final long MAJOR_STEP = 1000000;
 
-    private SimpleArrayMap<String, FusedContact> mMap;
-    private ObservableList<FusedContact> mList;
+    private final SimpleArrayMap<String, FusedContact> mMap;
+    private final ObservableList<FusedContact> mList;
 
     private long majorRevision = 0;
     private long revision = 0;

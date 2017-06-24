@@ -13,17 +13,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiFragmentWelcomePlayBinding;
+import org.owntracks.android.databinding.UiWelcomePlayBinding;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
 
-import timber.log.Timber;
-
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-
-public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
+public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     public static final int ID = 2;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1;
 
@@ -33,17 +27,11 @@ public class PlayFragment extends BaseFragment<UiFragmentWelcomePlayBinding, Pla
             instance = new PlayFragment();
         return instance;
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { fragmentComponent().inject(this); }
-        return setAndBindContentView(inflater, container, R.layout.ui_fragment_welcome_play, savedInstanceState);
+        return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState);
     }
 
     @Override

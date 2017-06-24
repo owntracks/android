@@ -4,15 +4,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.IllegalFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -151,26 +148,10 @@ public class Preferences {
         }
     }
 
-    public void initialize() {
-
-    }
-
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
-
-
-
-
-
-
-
-
-
-    //public static String getContactKey(int resId) {
-    //    return App.getContext().getString(resId);
-    //}
 
     public static boolean getBoolean(String key,  int defId) {
         return getBoolean(key, defId, defId, false);
@@ -989,7 +970,7 @@ public class Preferences {
 
 
 
-    @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeMqttPrivate =false, exportModeMqttPublic = false, exportModeHttpPrivate =true)
+    @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeHttpPrivate =true)
     public static boolean getHttpSchedulerAllowDirectStrategy() {
         return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valTrue);
     }
@@ -1086,6 +1067,20 @@ public class Preferences {
         return cfg;
     }
 
+    @Export(key =Keys.FUSED_REGION_DETECTION, exportModeMqttPrivate = true, exportModeHttpPrivate =true)
+    public boolean getFuseRegionDetection() {
+        return getBoolean(Keys.FUSED_REGION_DETECTION, R.bool.valTrue);
+    }
+
+    @Import(key =Keys.FUSED_REGION_DETECTION)
+    public void setFusedRegionDetection(boolean aBoolean) {
+        setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean, false);
+    }
+
+
+
+
+
     public static class Keys {
         public static final String AUTH                             = "auth";
         public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
@@ -1098,6 +1093,7 @@ public class Preferences {
         public static final String CLIENT_ID                        = "clientId";
         public static final String CP                               = "cp";
         public static final String DEVICE_ID                        = "deviceId";
+        public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
         public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";

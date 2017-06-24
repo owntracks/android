@@ -31,7 +31,7 @@ public class MessageCmd extends MessageBase{
     public static final String ACTION_WAYPOINTS = "waypoints";
 
     private MessageWaypoints waypoints;
-    private Map<String,Object> map = new HashMap<>();
+    private final Map<String,Object> map = new HashMap<>();
     private MessageConfiguration configuration;
 
     @JsonAnyGetter

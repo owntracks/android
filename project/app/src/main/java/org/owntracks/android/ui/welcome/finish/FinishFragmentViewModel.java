@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.welcome.intro.IntroFragmentMvvm;
 
 import javax.inject.Inject;
 
