@@ -4,7 +4,7 @@
     <string name="valSubTopicPublic" translatable="false">public/+/+</string>
     <string name="valUsernamePublic" translatable="false">user</string>
     <string name="valHostPublic" translatable="false">public-mqtt.owntracks.org</string>
-    <string name="valBeaconLayout" translatable="false"></string>
+    <string name="valBeaconLayout" translatable="false">""</string>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
     <integer name="valMqttProtocolLevelPublic" translatable="false">3</integer>
@@ -43,7 +43,6 @@
     <bool name="valSubPublic" >true</bool>
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
-    <bool name="valPlayOverride">false</bool>
     <bool name="valAuth">true</bool>
     <bool name="valRemoteCommand">true</bool>
     <bool name="valRemoteConfiguration">true</bool>
