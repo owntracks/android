@@ -26,6 +26,8 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.widgets.ListIntegerPreference;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.ToolbarPreference;
+import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.preferences.connection.ConnectionActivity;
 import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
 import timber.log.Timber;
@@ -35,24 +37,25 @@ public class ActivityPreferences extends ActivityBase {
     private static final int REQUEST_CODE_CONNECTION = 1310 ;
 
 
-    // Return from ActivityPreferencesConnection to see if we need to reload the preferences because a mode change occured
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
-        super.onActivityResult(requestCode, resultCode, resultIntent);
-        Timber.v("onActivityResult: RequestCode: " + requestCode + " resultCode: " + resultCode);
-        switch(requestCode) {
-            case (REQUEST_CODE_CONNECTION) : {
-                Timber.v("onActivityResult with REQUEST_CODE_CONNECTION");
-                if(resultIntent != null && resultIntent.getBooleanExtra(ActivityPreferencesConnection.KEY_MODE_CHANGED, false)) {
-                    Timber.v("recreating ActivityPreferences due to mode change");
-                 //   this.recreate();
-                 //   this.overridePendingTransition(0, 0);
-                    loadFragment();
-                }
 
-                break;
-            }
-        }
+    public void onResume() {
+        super.onResume();
+        if(!App.getEventBus().isRegistered(this))
+            App.getEventBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        if(App.getEventBus().isRegistered(this))
+            App.getEventBus().unregister(this);
+        super.onPause();
+    }
+
+
+    @Subscribe
+    public void onEvent(Events.ModeChanged event) {
+        Timber.v("recreating ActivityPreferences due to mode change");
+        loadFragment();
     }
 
 
@@ -172,11 +175,9 @@ public class ActivityPreferences extends ActivityBase {
 
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Timber.v("startActivityForResult ActivityPreferencesConnection");
-                    Intent intent = new Intent(getActivity(), ActivityPreferencesConnection.class);
+                    Timber.v("startActivityForResult Co");
+                    Intent intent = new Intent(getActivity(), ConnectionActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    intent.putExtra(ActivityBase.DISABLES_ANIMATION, true);
-
                     getActivity().startActivityForResult(intent, REQUEST_CODE_CONNECTION);
 
                     return true;
