@@ -1,4 +1,6 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
+import android.content.Intent;
+
 import org.owntracks.android.support.Preferences;
 import timber.log.Timber;
 
@@ -12,6 +14,11 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
 
     public ConnectionHostMqttDialogViewModel(Preferences preferences) {
         super(preferences);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
     }
 
     @Override

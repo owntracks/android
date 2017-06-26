@@ -24,6 +24,6 @@
         android:title="@string/preferencesSecurity" />
     <Preference
         android:key="@string/preferencesKeyParameters"
-        android:title="@string/preferencesOptions"/>
+        android:title="@string/preferencesParameters"/>
 
 </PreferenceScreen>

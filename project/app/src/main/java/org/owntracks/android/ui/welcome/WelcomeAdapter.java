@@ -37,6 +37,8 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter {
         return ids.get(ids.size()-1);
     }
 
+
+
     public WelcomeFragmentMvvm.View getFragment(int position) {
         return WelcomeFragmentMvvm.View.class.cast(getItem(position));
     }

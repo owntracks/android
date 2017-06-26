@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.support.annotation.NonNull;
 
@@ -8,7 +9,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.owntracks.android.support.Preferences;
 
-abstract class BaseDialogViewModel extends BaseObservable implements MaterialDialog.SingleButtonCallback{
+public abstract class BaseDialogViewModel extends BaseObservable implements MaterialDialog.SingleButtonCallback{
     protected Preferences preferences;
     BaseDialogViewModel(Preferences preferences) {
         this.preferences = preferences;
@@ -22,7 +23,7 @@ abstract class BaseDialogViewModel extends BaseObservable implements MaterialDia
         }
     }
 
-
+    public abstract void onActivityResult(int requestCode, int resultCode, Intent data);
     abstract void load();
     abstract void save();
 }

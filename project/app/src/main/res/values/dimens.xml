@@ -14,4 +14,12 @@
 
     <dimen name="activity_settings_margin">24dp</dimen>
 
+    <dimen name="listitem_textsize">16sp</dimen>
+    <dimen name="listitem_height">48dp</dimen>
+    <dimen name="listitem_control_margin">6dp</dimen>
+    <dimen name="listitem_margin_left">24dp</dimen>
+    <dimen name="listitem_vertical_margin">12dp</dimen>
+    <dimen name="listitem_vertical_margin_choice">8dp</dimen>
+
+
 </resources>

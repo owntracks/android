@@ -36,14 +36,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:digits="0123456789"
-            android:hint="@integer/valPort"
+            android:hint="@string/preferencesPort"
             android:inputType="number|textNoSuggestions"
             android:maxLength="5"
             android:text="@={vm.portText}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
-            app:met_floatingLabelAlwaysShown="true"
-            app:met_floatingLabelText="@string/preferencesPort"
             app:met_primaryColor="@color/accent"
 
             />

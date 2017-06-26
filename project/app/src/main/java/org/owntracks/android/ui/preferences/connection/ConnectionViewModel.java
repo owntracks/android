@@ -1,14 +1,11 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import android.content.Context;
 import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.owntracks.android.BR;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -17,6 +14,8 @@ import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttp
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionIdentificationViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel;
 
 import javax.inject.Inject;
 
@@ -25,14 +24,12 @@ import timber.log.Timber;
 @PerActivity
 public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View> {
 
-    private final Context context;
     private final Preferences preferences;
-
     private int modeId;
 
+
     @Inject
-    public ConnectionViewModel(@AppContext Context context, Preferences preferences) {
-        this.context = context;
+    ConnectionViewModel(Preferences preferences) {
         this.preferences = preferences;
     }
 
@@ -103,4 +100,15 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
     public ConnectionIdentificationViewModel getIdentificationDialogViewModel() {
         return new ConnectionIdentificationViewModel(preferences);
     }
+
+    @Override
+    public ConnectionSecurityViewModel getConnectionSecurityViewModel() {
+        return new ConnectionSecurityViewModel(preferences, navigator.get());
+    }
+
+    @Override
+    public ConnectionParametersViewModel getConnectionParametersViewModel() {
+        return new ConnectionParametersViewModel(preferences);
+    }
+
 }

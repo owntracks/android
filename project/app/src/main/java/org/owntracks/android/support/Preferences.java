@@ -148,7 +148,6 @@ public class Preferences {
         }
     }
 
-
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -622,15 +621,24 @@ public class Preferences {
 
     @Import(key =Keys.HOST)
     public void setHost(String value) {
-            setString(Keys.HOST, value, false);
+        setString(Keys.HOST, value, false);
+        App.getEventBus().post(new Events.EndpointChanged());
     }
 
     public void setPortDefault() {
         clearKey(Keys.PORT);
     }
+    public void setKeepaliveDefault() {
+        clearKey(Keys.KEEPALIVE);
+    }
+
+
 
     @Import(key =Keys.PORT)
     public void setPort(int value) {
+        if(value < 1 || value > 65535)
+            setPortDefault();
+        else
             setInt(Keys.PORT, value, false);
    }
 
@@ -685,8 +693,12 @@ public class Preferences {
     }
 
     @Import(key =Keys.KEEPALIVE)
-    public static void setKeepalive(int value) {
-        setInt(Keys.KEEPALIVE, value, false);
+    public void setKeepalive(int value)
+    {
+        if(value < 1)
+            setKeepaliveDefault();
+        else
+            setInt(Keys.KEEPALIVE, value, false);
     }
 
     public static String getKeepaliveWithHintSupport() {

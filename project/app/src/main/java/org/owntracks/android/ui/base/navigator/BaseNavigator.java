@@ -130,4 +130,9 @@ public abstract class BaseNavigator implements Navigator {
         return intent.hasExtra(Navigator.EXTRA_ARGS) ? intent.getBundleExtra(Navigator.EXTRA_ARGS) : new Bundle();
     }
 
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        getActivity().startActivityForResult(intent, requestCode);
+    }
+
 }

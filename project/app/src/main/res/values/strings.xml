@@ -85,7 +85,7 @@
     <string name="preferencesSecurity">Security</string>
     <string name="accept">Accept</string>
     <string name="preferencesIdentification">Identification</string>
-    <string name="preferencesOptions">Parameters</string>
+    <string name="preferencesParameters">Parameters</string>
     <string name="preferencesKeepalive" translatable="false">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>

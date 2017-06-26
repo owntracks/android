@@ -66,7 +66,7 @@
     <string name="preferencesSecurity">Sicherheit</string>
     <string name="accept">Übernehmen</string>
     <string name="preferencesIdentification">Identifikation</string>
-    <string name="preferencesOptions">Parameter</string>
+    <string name="preferencesParameters">Parameter</string>
     <string name="seconds">Sekunden</string>
     <string name="preferencesProfileId">Modus</string>
     <string-array name="locatorAccuracy_readable">

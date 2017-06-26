@@ -328,7 +328,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		// Check if we're connecting to the same broker that we were already connected to
 		String connectionId = getConnectionId();
 		if(lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
-			App.getEventBus().post(new Events.BrokerChanged());
+			App.getEventBus().post(new Events.EndpointChanged());
 			lastConnectionId = connectionId;
 			Log.v(TAG, "lastConnectionId changed to: " + lastConnectionId);
 		}
@@ -502,7 +502,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@SuppressWarnings("UnusedParameters")
 	@Subscribe
-	public void onEvent(Events.BrokerChanged e) {
+	public void onEvent(Events.EndpointChanged e) {
 		reconnect();
 	}
 
