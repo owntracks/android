@@ -63,8 +63,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         Timber.v("pager setup with %s fragments", viewPagerAdapter.getCount());
         buildPagerIndicator();
         setPagerIndicator(0);
-        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
-
 
         //binding.setFragmentVm(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
 

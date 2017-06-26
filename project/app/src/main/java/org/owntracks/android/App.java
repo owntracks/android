@@ -70,11 +70,10 @@ public class App extends Application  {
             });
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
-
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-        HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
+        HandlerThread mServiceHandlerThread = new HandlerThread("backgroundHandlerThread");
         mServiceHandlerThread.start();
 
         backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
@@ -83,13 +82,7 @@ public class App extends Application  {
         checkFirstStart();
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
-        postOnBackgroundHandler(new Runnable() {
-            @Override
-            public void run() {
-                getMessageProcessor().initialize();
-                startBackgroundServiceCompat(getApplicationContext(), BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
-            }
-        });
+        getMessageProcessor().initialize();
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }

@@ -52,8 +52,8 @@ public class Events {
 
 	}
 
-	public static class BrokerChanged extends E {
-		public BrokerChanged() {}
+	public static class EndpointChanged extends E {
+		public EndpointChanged() {}
 	}
 
     public static class PermissionGranted extends E {

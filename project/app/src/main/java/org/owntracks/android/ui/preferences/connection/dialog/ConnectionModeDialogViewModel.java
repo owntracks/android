@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.RadioGroup;
 
@@ -16,6 +17,11 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
 
     public ConnectionModeDialogViewModel(Preferences preferences) {
         super(preferences);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
     }
 
     @Override

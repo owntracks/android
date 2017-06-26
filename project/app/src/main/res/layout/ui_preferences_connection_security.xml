@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/tlsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/tls"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/tls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:checked="@{vm.tls}"
+                android:layout_gravity="end" />
+        </RelativeLayout>
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/tlsCaCrt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:hint="@string/preferencesCaCrtPath"
+            android:inputType="textVisiblePassword"
+            android:text="@{vm.tlsCaCrtName}"
+            android:onClick="@{(view) ->  vm.onTlsCaCrtNameClick(view)}"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelAlwaysShown="false"
+            app:met_floatingLabelText="@string/preferencesCaCrtPath"
+            app:met_primaryColor="@color/accent"  />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/tlsClientCrt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:hint="@string/preferencesClientCrtPath"
+            android:inputType="textVisiblePassword"
+            android:onClick="@{(view) ->  vm.onTlsClientCrtNameClick(view)}"
+            android:text="@{vm.tlsClientCrtName}"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelAlwaysShown="false"
+            app:met_floatingLabelText="@string/preferencesClientCrtPath"
+            app:met_primaryColor="@color/accent" />
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/tlsClientCrtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/preferencesClientCrtPassword"
+            android:inputType="textPassword"
+            android:text="@={vm.tlsClientCrtPassword}"
+            android:visibility="@{vm.tlsClientCrtName != null}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/accent"
+            app:met_singleLineEllipsis="true" />
+
+    </LinearLayout>
+</layout>

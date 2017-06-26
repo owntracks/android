@@ -62,8 +62,11 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     @Bindable
     public void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel) {
         this.fragmentViewModel = fragmentViewModel;
-        notifyChange();
         notifyPropertyChanged(BR.vm);
         notifyPropertyChanged(BR.doneEnabled);
+        notifyPropertyChanged(BR.nextEnabled);
+        notifyChange();
+
+        Timber.v("enabled: %s", this.fragmentViewModel.isNextEnabled());
     }
 }

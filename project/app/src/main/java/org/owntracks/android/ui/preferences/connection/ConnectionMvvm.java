@@ -1,14 +1,21 @@
 package org.owntracks.android.ui.preferences.connection;
 
+import android.view.MenuItem;
+
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBinding;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionIdentificationViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel;
 
 
 public interface ConnectionMvvm {
@@ -33,9 +40,9 @@ public interface ConnectionMvvm {
 
         ConnectionHostMqttDialogViewModel getHostDialogViewModelMqtt();
         ConnectionHostHttpDialogViewModel getHostDialogViewModelHttp();
-
         ConnectionModeDialogViewModel getModeDialogViewModel();
-
         ConnectionIdentificationViewModel getIdentificationDialogViewModel();
+        ConnectionSecurityViewModel getConnectionSecurityViewModel();
+        ConnectionParametersViewModel getConnectionParametersViewModel();
     }
 }

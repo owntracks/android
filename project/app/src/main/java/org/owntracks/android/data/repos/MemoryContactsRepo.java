@@ -128,7 +128,7 @@ public class MemoryContactsRepo implements ContactsRepo {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(Events.BrokerChanged e) {
+    public void onEvent(Events.EndpointChanged e) {
         clearAll();
     }
 

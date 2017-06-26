@@ -155,7 +155,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @SuppressWarnings("UnusedParameters")
     @Subscribe(priority = 10)
-    public void onEvent(Events.BrokerChanged event) {
+    public void onEvent(Events.EndpointChanged event) {
         acceptMessages = false;
         App.getScheduler().cancelAllTasks();
         loadOutgoingMessageProcessor();
