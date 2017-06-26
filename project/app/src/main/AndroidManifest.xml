@@ -76,12 +76,6 @@
             android:parentActivityName=".ui.map.MapActivity" />
 
         <activity
-            android:name=".activities.ActivityPreferencesConnection"
-            android:configChanges="orientation"
-            android:label="@string/preferencesServer"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name=".ui.preferences.editor.EditorActivity"
             android:configChanges="orientation"
             android:label="@string/configurationManagement"
@@ -228,12 +222,8 @@
         <activity
             android:name=".ui.preferences.connection.ConnectionActivity"
             android:clearTaskOnLaunch="true"
-            android:label="DEBUG"
+            android:label="@string/preferencesServer"
             android:launchMode="singleTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
 
         </activity>
 

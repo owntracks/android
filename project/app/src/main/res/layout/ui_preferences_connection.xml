@@ -39,15 +39,14 @@
             android:id="@+id/scrollView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
 
                 <LinearLayout
                     android:id="@+id/mode"
@@ -55,6 +54,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:baselineAligned="false"
+                    android:elevation="6dp"
                     android:gravity="center_vertical"
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onModeClick()}"
@@ -70,8 +70,8 @@
                         android:layout_weight="1">
 
                         <TextView
-                            style="@style/ListItemPrimary"
                             android:id="@+id/title"
+                            style="@style/ListItemPrimary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
@@ -80,8 +80,8 @@
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         <TextView
-                            style="@style/ListItemSecondary"
                             android:id="@+id/mode_current"
+                            style="@style/ListItemSecondary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/title"
@@ -120,6 +120,7 @@
                         android:layout_weight="1">
 
                         <TextView
+                            android:id="@+id/hostTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
