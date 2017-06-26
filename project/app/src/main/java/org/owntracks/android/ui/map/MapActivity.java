@@ -209,6 +209,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         });
         params.setBehavior(behavior);
 
+        App.startBackgroundServiceCompat(getApplicationContext(), null);
     }
 
     @Override
