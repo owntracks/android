@@ -183,13 +183,20 @@ public class App extends Application  {
         Runtime.getRuntime().exit(0);
     }
 
-    public static void startBackgroundServiceCompat(@NonNull Context c, @Nullable String action) {
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-            //TODO: use NotificationManager.startServiceInForeground() on API >= O
-            c.startService((new Intent(c, BackgroundService.class)).setAction(action));
-        } else {
-            c.startService((new Intent(c, BackgroundService.class)).setAction(action));
-        }
+    public static void startBackgroundServiceCompat(final @NonNull Context c, final @Nullable String action) {
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                    //TODO: use NotificationManager.startServiceInForeground() on API >= O
+                    c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+                } else {
+                    c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+                }
+
+            }
+        };
+        postOnBackgroundHandlerDelayed(r, 1000);
     }
 
     /*
