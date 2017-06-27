@@ -56,20 +56,9 @@
 			android:id="@+id/ui_fragment_welcome_version_button_learn_more"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_above="@+id/view"
 			android:layout_alignParentBottom="true"
 			android:layout_centerHorizontal="true"
-			android:layout_marginBottom="48dp"
-			android:text="@string/ui_fragment_welcome_version_learn_more"
-			android:visibility="visible"/>
+			android:text="@string/ui_fragment_welcome_version_learn_more"/>
 
-		<View
-			android:id="@+id/view"
-			android:layout_width="match_parent"
-			android:layout_height="48dp"
-			android:layout_alignParentBottom="true"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentStart="true"
-			android:background="@android:color/transparent"/>
 	</RelativeLayout>
 </layout>
