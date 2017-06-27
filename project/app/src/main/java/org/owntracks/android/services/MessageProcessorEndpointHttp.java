@@ -270,6 +270,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     @Override
     public void onDestroy() {
+        App.getScheduler().cancelHttpTasks();
         App.getPreferences().unregisterOnPreferenceChangedListener(this);
 
     }

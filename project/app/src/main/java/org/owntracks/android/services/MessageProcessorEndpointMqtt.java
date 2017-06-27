@@ -566,6 +566,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	@Override
 	public void onDestroy() {
 		disconnect(false);
+		App.getScheduler().cancelMqttTasks();;
 	}
 
 	@Override
