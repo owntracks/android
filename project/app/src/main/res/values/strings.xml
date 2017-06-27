@@ -77,7 +77,7 @@
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsReportedTime">Reported</string>
     <string name="contactDetailsTopic">Identifier</string>
-    <string name="waypointListPlaceholder">No waypoints defined yet</string>
+    <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
     <string name="importConfig">Import</string>
