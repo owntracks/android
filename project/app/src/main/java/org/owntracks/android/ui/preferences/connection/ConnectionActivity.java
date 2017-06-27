@@ -33,8 +33,6 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel> implements ConnectionMvvm.View {
     private BaseDialogViewModel activeDialogViewModel ;
-    private Menu mMenu;
-    private MenuInflater mInflater;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,24 +141,19 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         activeDialogViewModel.onActivityResult(requestCode, resultCode, data);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        if (menu != null) {
-            mMenu = menu;
-            MenuItem connect = mMenu.findItem(R.id.connect);
-            if(connect != null) {
-                connect.getIcon().setAlpha(255);
-            }
+    public void recreateOptionsMenu() {
+        invalidateOptionsMenu();
+    }
 
-        } else if (mMenu == null) {
-            return false;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (menu != null) {
+            menu.clear();
         }
 
-        mMenu.clear();
         if(viewModel.getModeId() == App.MODE_ID_HTTP_PRIVATE) {
-            inflater.inflate(R.menu.preferences_connection_http, mMenu);
+            getMenuInflater().inflate(R.menu.preferences_connection_http, menu);
         } else {
-            inflater.inflate(R.menu.preferences_connection_mqtt, mMenu);
+            getMenuInflater().inflate(R.menu.preferences_connection_mqtt, menu);
         }
         return true;
     }
