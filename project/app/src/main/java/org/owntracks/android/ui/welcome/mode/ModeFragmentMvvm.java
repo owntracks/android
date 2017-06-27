@@ -11,5 +11,6 @@ public interface ModeFragmentMvvm {
     interface ViewModel<V extends MvvmView> extends WelcomeFragmentMvvm.ViewModel<V> {
         int getCheckedButton();
         void setCheckedButton(int buttonId);
+        void onNextClicked();
     }
 }

@@ -31,17 +31,16 @@ public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding
         return instance;
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public PermissionFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
-        return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState);
     }
 
 
+    @Nullable
     @Override
-    public PermissionFragmentMvvm.ViewModel getViewModel() {
-        return viewModel;
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(viewModel == null) { fragmentComponent().inject(this);};
+        return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState);
     }
 
     public void requestFix() {
@@ -49,21 +48,26 @@ public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding
     }
 
     @Override
-    public void checkPermission() {
-        this.viewModel.setNextEnabled(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            viewModel.setNextEnabled(true);
             App.getEventBus().post(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
+        checkPermission();
+    }
+
+    public void checkPermission() {
+        viewModel.setPermissionGranted(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(viewModel.isPermissionGranted());
+
     }
 
     @Override
-    public void setActivityViewModel() {
-        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
+    public void onNextClicked() {
+
     }
 
+    @Override
+    public boolean isNextEnabled() {
+        return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
 }

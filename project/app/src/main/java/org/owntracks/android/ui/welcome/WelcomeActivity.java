@@ -62,11 +62,29 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
 
         Timber.v("pager setup with %s fragments", viewPagerAdapter.getCount());
         buildPagerIndicator();
-        setPagerIndicator(0);
+        showFragment(0);
 
-        //binding.setFragmentVm(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
+    }
+    @Override
+    public void showNextFragment() {
+        int currentItem =  binding.viewPager.getCurrentItem();
+        viewPagerAdapter.getFragment(currentItem).onNextClicked();
+        showFragment(currentItem+1);
+    }
 
+    public void showPreviousFragment() {
+        showFragment(binding.viewPager.getCurrentItem()-1);
 
+    }
+
+    public void showFragment(int id) {
+        binding.viewPager.setCurrentItem(id);
+        if(id == FinishFragment.ID) {
+            viewModel.setNextEnabled(false);
+            viewModel.setDoneEnabled(true);
+        } else {
+            viewModel.setNextEnabled(viewPagerAdapter.getFragment(id).isNextEnabled());
+        }
     }
 
     private void buildPagerIndicator() {
@@ -81,18 +99,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
             circle.setPadding(padding, 0, padding, 0);
             binding.circles.addView(circle);
         }
-
-    }
-
-    public WelcomeFragmentMvvm.View getCurrentFragment() {
-        return viewPagerAdapter.getFragment(binding.viewPager.getCurrentItem());
-    }
-
-    @Override
-    public void showNextFragment() {
-        WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel().onNextClicked();
-        binding.viewPager.forward();
-        viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
+        setPagerIndicator(0);
     }
 
     public void setPagerIndicator(int index) {
@@ -109,8 +116,13 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     }
 
     @Override
-    public void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel) {
-        this.viewModel.setFragmentViewModel(fragmentViewModel);
+    public void setNextEnabled(boolean enabled) {
+        viewModel.setNextEnabled(enabled);
+    }
+
+    @Override
+    public void setDoneEnabled(boolean enabled) {
+        viewModel.setDoneEnabled(enabled);
     }
 
     @Override
@@ -118,9 +130,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         if (binding.viewPager.getCurrentItem() == 0) {
             finish();
         } else {
-            binding.viewPager.setCurrentItem(binding.viewPager.getCurrentItem() - 1);
-            viewModel.setFragmentViewModel(WelcomeFragmentMvvm.View.class.cast(getCurrentFragment()).getViewModel());
-
+            showPreviousFragment();
         }
     }
 

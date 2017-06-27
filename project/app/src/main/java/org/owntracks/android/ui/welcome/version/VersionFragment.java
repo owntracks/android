@@ -12,9 +12,11 @@ import android.view.ViewGroup;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeVersionBinding;
 import org.owntracks.android.ui.base.BaseFragment;
+import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
+import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, VersionFragmentMvvm.ViewModel> implements VersionFragmentMvvm.View, View.OnClickListener {
+public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
     public static final int ID = 5;
 
     private static VersionFragment instance;
@@ -24,11 +26,15 @@ public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, Versi
         return instance;
     }
 
+    public VersionFragment() {
+        if(viewModel == null) { fragmentComponent().inject(this); }
+    }
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this); }
+        if(viewModel == null) { fragmentComponent().inject(this);};
         View v = setAndBindContentView(inflater, container, R.layout.ui_welcome_version, savedInstanceState);
         binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this);
         return v;
@@ -43,11 +49,12 @@ public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, Versi
     }
 
     @Override
-    public VersionFragmentMvvm.ViewModel getViewModel() {
-        return viewModel;
+    public void onNextClicked() {
+
     }
+
     @Override
-    public void setActivityViewModel() {
-        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
+    public boolean isNextEnabled() {
+        return true;
     }
 }

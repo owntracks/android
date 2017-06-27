@@ -62,7 +62,7 @@
                 android:paddingTop="12dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
-                android:visibility="@{vm.fragmentViewModel.nextEnabled ? View.VISIBLE : View.GONE}"/>
+                android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.GONE}"/>
         </RelativeLayout>
     </RelativeLayout>
 </layout>

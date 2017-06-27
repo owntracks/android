@@ -15,19 +15,17 @@ import timber.log.Timber;
 
 @PerFragment
 public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmentMvvm.View> implements PermissionFragmentMvvm.ViewModel<PermissionFragmentMvvm.View> {
-
-    private boolean permissionGranted = false;
+    boolean permissionGranted;
 
     @Inject
     PermissionFragmentViewModel() {
 
     }
 
-
     @Override
     public void attachView(@NonNull PermissionFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        getView().setActivityViewModel();
+        getView().checkPermission();
     }
 
     @Override
@@ -35,22 +33,12 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
         getView().requestFix();
     }
 
-    @Override
-    public void onNextClicked() {
-
-    }
-
-    @Override
-    @Bindable
-    public boolean isNextEnabled() {
+    public boolean isPermissionGranted() {
         return permissionGranted;
     }
 
-    @Bindable
-    public void setNextEnabled(boolean enabled) {
-        Timber.v("set %s", enabled);
-        this.permissionGranted = enabled;
+    public void setPermissionGranted(boolean permissionGranted) {
+        this.permissionGranted = permissionGranted;
         notifyChange();
     }
-
 }
