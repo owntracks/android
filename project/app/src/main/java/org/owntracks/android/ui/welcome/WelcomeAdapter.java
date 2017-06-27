@@ -34,9 +34,12 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter {
     }
 
     public int getLastItemId() {
-        return ids.get(ids.size()-1);
+        return ids.get(getLastItemPosition());
     }
 
+    public int getLastItemPosition() {
+        return ids.size()-1;
+    }
 
 
     public WelcomeFragmentMvvm.View getFragment(int position) {

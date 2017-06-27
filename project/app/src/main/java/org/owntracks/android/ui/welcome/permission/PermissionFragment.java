@@ -50,7 +50,7 @@ public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            App.getEventBus().post(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
+            App.getEventBus().postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
         checkPermission();
     }
@@ -68,6 +68,6 @@ public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding
 
     @Override
     public boolean isNextEnabled() {
-        return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }
