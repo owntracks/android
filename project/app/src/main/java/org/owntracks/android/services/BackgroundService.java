@@ -34,6 +34,8 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -62,7 +64,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class BackgroundService extends Service implements BeaconConsumer, RangeNotifier, MonitorNotifier {
+public class BackgroundService extends Service implements BeaconConsumer, RangeNotifier, MonitorNotifier, OnCompleteListener<Location> {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -387,7 +389,13 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private void onLocationChanged(@NonNull Intent intent) {
         LocationResult locationResult = LocationResult.extractResult(intent);
         Location location = locationResult.getLastLocation();
-        if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
+        if(location != null) {
+            onLocationChanged(location);
+        }
+    }
+
+    private void onLocationChanged(@NonNull Location location) {
+        if (((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
             lastLocation = location;
@@ -635,7 +643,12 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     }
 
     @SuppressWarnings("unused")
+    @Subscribe(sticky = true)
     public void onEvent(Events.PermissionGranted event) {
+        try {
+            Timber.v("location permission granted. Getting last location.");
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(this);
+        } catch (SecurityException ignored) {}
         setupGeofences();
         setupBeacons();
         setupLocationRequest();
@@ -772,5 +785,12 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     @Override
     public void didDetermineStateForRegion(int i, Region region) {
         Timber.v("state determined for %s", region.getUniqueId());
+    }
+
+    @Override
+    public void onComplete(@NonNull Task<Location> task) {
+        Location l = task.getResult();
+        if(l != null)
+            onLocationChanged(l);
     }
 }

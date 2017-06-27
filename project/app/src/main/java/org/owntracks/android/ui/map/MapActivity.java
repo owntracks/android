@@ -93,11 +93,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
 
     private void executePendingActions() {
-        //Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
-        //Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
-        //Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
-        //Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
-        //Timber.v("flag int mode: %s",mode);
+        Timber.v("flag flagStateLocationReady: %s",flagStateLocationReady);
+        Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
+        Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
+        Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
+        Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
+        Timber.v("flag int mode: %s",mode);
 
 
 
@@ -135,7 +136,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
 
     // EVENT ENGINE STATE CALLBACKS
-    private void onLocationSourceUpdated() {
+    public void onLocationSourceUpdated() {
+        Timber.v("onLocationSourceUpdated");
+
         flagStateLocationReady = true;
         flagRefreshDevice = true;
         executePendingActions();
@@ -262,7 +265,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             flagStateMapReady = false;
         }
         handleIntentExtras(getIntent());
-
+        executePendingActions();
     }
 
     @Override
@@ -284,7 +287,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     public void initMapDelayed() {
         flagStateMapReady = false;
-        flagStateLocationReady = false;
+        //flagStateLocationReady = false;
 
         App.postOnMainHandlerDelayed(new Runnable() {
             @Override
@@ -483,6 +486,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
         @Override
         public void activate(OnLocationChangedListener onLocationChangedListener) {
+            Timber.v("location source activated");
             mListener = onLocationChangedListener;
             if(mLocation != null)
                 this.mListener.onLocationChanged(mLocation);
@@ -494,8 +498,10 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             App.getEventBus().unregister(this);
         }
 
-        @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
+        @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
         public void update(Location l) {
+            Timber.v("location source updated");
+
             this.mLocation = l;
             if(mListener != null)
                 this.mListener.onLocationChanged(this.mLocation);
