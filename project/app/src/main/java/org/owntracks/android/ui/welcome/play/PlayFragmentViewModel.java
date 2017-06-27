@@ -27,27 +27,8 @@ public class PlayFragmentViewModel extends BaseViewModel<PlayFragmentMvvm.View> 
     @Override
     public void attachView(@NonNull PlayFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        Timber.v("attaching view");
-        getView().checkAvailability();
     }
 
-    @Override
-    public void onNextClicked() {
-
-    }
-
-    @Override
-    @Bindable
-    public boolean isNextEnabled() {
-        return playServicesAvailable;
-    }
-
-    @Bindable
-    public void setNextEnabled(boolean enabled) {
-        Timber.v("set %s", enabled);
-        this.playServicesAvailable = enabled;
-        notifyChange();
-    }
 
     @Override
     public void onFixClicked() {

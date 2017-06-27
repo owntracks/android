@@ -22,20 +22,24 @@ public class ModeFragment extends BaseFragment<UiWelcomeModeBinding, ModeFragmen
         return instance;
     }
 
+    public ModeFragment() {
+        if(viewModel == null) { fragmentComponent().inject(this); }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this); }
+        if(viewModel == null) { fragmentComponent().inject(this);};
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_mode, savedInstanceState);
     }
 
     @Override
-    public ModeFragmentMvvm.ViewModel getViewModel() {
-        return viewModel;
-    }
-    @Override
-    public void setActivityViewModel() {
-        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
+    public void onNextClicked() {
+        viewModel.onNextClicked();
     }
 
+    @Override
+    public boolean isNextEnabled() {
+        return true;
+    }
 }

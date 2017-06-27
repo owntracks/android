@@ -27,22 +27,16 @@ public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmen
             instance = new PlayFragment();
         return instance;
     }
+
+    public PlayFragment() {
+        if(viewModel == null) { fragmentComponent().inject(this); }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this); }
+        if(viewModel == null) { fragmentComponent().inject(this);};
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState);
-    }
-
-    @Override
-    public PlayFragmentMvvm.ViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setActivityViewModel() {
-        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
-
     }
 
     @Override
@@ -51,7 +45,6 @@ public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmen
             checkAvailability();
         }
     }
-
 
     @Override
     public void requestFix() {
@@ -72,22 +65,34 @@ public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmen
     }
 
 
-    @Override
     public void checkAvailability() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(getActivity());
         if (result == ConnectionResult.SUCCESS) {
-            viewModel.setNextEnabled(true);
+            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(true);
             viewModel.setFixAvailable(false);
+            binding.message.setVisibility(View.VISIBLE);
             binding.message.setText(getString(R.string.play_services_now_available));
         } else if(googleAPI.isUserResolvableError(result)){
-            viewModel.setNextEnabled(false);
+            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
             viewModel.setFixAvailable(true);
+            binding.message.setVisibility(View.VISIBLE);
             binding.message.setText(getString(R.string.play_services_not_available_recoverable));
         } else {
-            viewModel.setNextEnabled(false);
+            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
             viewModel.setFixAvailable(false);
+            binding.message.setVisibility(View.VISIBLE);
             binding.message.setText(getString(R.string.play_services_not_available_not_recoverable));
         }
+    }
+
+    @Override
+    public void onNextClicked() {
+
+    }
+
+    @Override
+    public boolean isNextEnabled() {
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity()) == ConnectionResult.SUCCESS;
     }
 }

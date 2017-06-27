@@ -8,21 +8,24 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 public interface WelcomeMvvm {
 
     interface View extends MvvmView {
-        WelcomeFragmentMvvm.View getCurrentFragment();
         void showNextFragment();
         void setPagerIndicator(int position);
 
-        // Called from Fragments to set
-        void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel viewModel);
+        // Called from Fragments to set button states
+        void setNextEnabled(boolean enabled);
+        void setDoneEnabled(boolean enabled);
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         @Bindable boolean isDoneEnabled();
+        @Bindable boolean isNextEnabled();
+
         void onAdapterPageSelected(int position);
+
         void onNextClicked();
         void onDoneClicked();
 
-        WelcomeFragmentMvvm.ViewModel<WelcomeFragmentMvvm.View> getFragmentViewModel();
-        void setFragmentViewModel(WelcomeFragmentMvvm.ViewModel fragmentViewModel);
+        void setNextEnabled(boolean enabled);
+        void setDoneEnabled(boolean enabled);
     }
 }

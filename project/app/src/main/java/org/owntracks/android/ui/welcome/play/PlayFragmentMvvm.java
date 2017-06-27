@@ -8,7 +8,6 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 public interface PlayFragmentMvvm {
     interface View extends WelcomeFragmentMvvm.View {
-        void checkAvailability();
         void requestFix();
     }
 
@@ -17,6 +16,5 @@ public interface PlayFragmentMvvm {
 
         @Bindable boolean isFixAvailable();
         @Bindable void setFixAvailable(boolean enabled);
-
     }
 }

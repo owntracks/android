@@ -59,14 +59,6 @@
             android:layout_below="@+id/screen_heading"
             android:layout_alignLeft="@+id/screen_heading"
             android:layout_alignStart="@+id/screen_heading" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:id="@+id/view"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
 
 
         <android.support.v7.widget.AppCompatTextView
@@ -77,7 +69,7 @@
             android:textSize="16sp"
             android:text="@string/play_services_not_available_general"
             android:id="@+id/message"
-            android:visibility="@{vm.nextEnabled}"
+            android:visibility="gone"
             android:layout_above="@+id/recover"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -95,6 +87,15 @@
             android:onClick="@{() -> vm.onFixClicked()}"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="48dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/view"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 </layout>

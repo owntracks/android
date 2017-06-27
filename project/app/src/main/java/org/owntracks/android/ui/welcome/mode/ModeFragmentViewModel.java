@@ -59,17 +59,4 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
         }
         preferences.setSetupCompleted();
     }
-
-    @Override
-    @Bindable
-    public boolean isNextEnabled() {
-        return true;
-    }
-
-    @Override
-    public void setNextEnabled(boolean enabled) {
-
-    }
-
-
 }

@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeFinishBinding;
 import org.owntracks.android.ui.base.BaseFragment;
+import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
+import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-public class FinishFragment extends BaseFragment<UiWelcomeFinishBinding, FinishFragmentMvvm.ViewModel> implements FinishFragmentMvvm.View {
+public class FinishFragment extends BaseFragment<UiWelcomeFinishBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
     public static final int ID = 6;
 
     private static FinishFragment instance;
@@ -22,20 +24,26 @@ public class FinishFragment extends BaseFragment<UiWelcomeFinishBinding, FinishF
         return instance;
     }
 
+    public FinishFragment() {
+        if(viewModel == null) { fragmentComponent().inject(this); }
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this); }
+        if(viewModel == null) { fragmentComponent().inject(this);};
+
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_finish, savedInstanceState);
     }
 
+
     @Override
-    public FinishFragmentMvvm.ViewModel getViewModel() {
-        return viewModel;
+    public void onNextClicked() {
     }
 
     @Override
-    public void setActivityViewModel() {
-        WelcomeMvvm.View.class.cast(getActivity()).setFragmentViewModel(viewModel);
+    public boolean isNextEnabled() {
+        return false;
     }
 }
