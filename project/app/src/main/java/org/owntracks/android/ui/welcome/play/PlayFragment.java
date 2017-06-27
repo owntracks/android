@@ -25,6 +25,7 @@ public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmen
     public static Fragment getInstance() {
         if(instance == null)
             instance = new PlayFragment();
+
         return instance;
     }
 

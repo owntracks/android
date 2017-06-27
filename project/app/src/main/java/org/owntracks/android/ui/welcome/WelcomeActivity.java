@@ -65,41 +65,12 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         showFragment(0);
 
     }
+
     @Override
     public void showNextFragment() {
-        int currentItem =  binding.viewPager.getCurrentItem();
+        int currentItem = binding.viewPager.getCurrentItem();
         viewPagerAdapter.getFragment(currentItem).onNextClicked();
-        showFragment(currentItem+1);
-    }
-
-    public void showPreviousFragment() {
-        showFragment(binding.viewPager.getCurrentItem()-1);
-
-    }
-
-    public void showFragment(int id) {
-        binding.viewPager.setCurrentItem(id);
-        if(id == FinishFragment.ID) {
-            viewModel.setNextEnabled(false);
-            viewModel.setDoneEnabled(true);
-        } else {
-            viewModel.setNextEnabled(viewPagerAdapter.getFragment(id).isNextEnabled());
-        }
-    }
-
-    private void buildPagerIndicator() {
-        float scale = getResources().getDisplayMetrics().density;
-        int padding = (int) (5 * scale + 0.5f);
-
-        for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
-            ImageView circle = new ImageView(this);
-            circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fiber_manual_record_white_18dp));
-            circle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            circle.setAdjustViewBounds(true);
-            circle.setPadding(padding, 0, padding, 0);
-            binding.circles.addView(circle);
-        }
-        setPagerIndicator(0);
+        showFragment(currentItem + 1);
     }
 
     public void setPagerIndicator(int index) {
@@ -123,6 +94,31 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     public void setDoneEnabled(boolean enabled) {
         viewModel.setDoneEnabled(enabled);
+    }
+
+    public void showPreviousFragment() {
+        showFragment(binding.viewPager.getCurrentItem() - 1);
+    }
+
+    public void showFragment(int position) {
+        binding.viewPager.setCurrentItem(position);
+        viewModel.setNextEnabled(viewPagerAdapter.getFragment(position).isNextEnabled());
+        viewModel.setDoneEnabled(position == viewPagerAdapter.getLastItemPosition());
+    }
+
+    private void buildPagerIndicator() {
+        float scale = getResources().getDisplayMetrics().density;
+        int padding = (int) (5 * scale + 0.5f);
+
+        for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
+            ImageView circle = new ImageView(this);
+            circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fiber_manual_record_white_18dp));
+            circle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            circle.setAdjustViewBounds(true);
+            circle.setPadding(padding, 0, padding, 0);
+            binding.circles.addView(circle);
+        }
+        setPagerIndicator(0);
     }
 
     @Override

@@ -14,7 +14,6 @@ import org.owntracks.android.databinding.UiWelcomeVersionBinding;
 import org.owntracks.android.ui.base.BaseFragment;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
-import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
 public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
     public static final int ID = 5;
@@ -23,6 +22,7 @@ public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, NoOpV
     public static Fragment getInstance() {
         if(instance == null)
             instance = new VersionFragment();
+
         return instance;
     }
 

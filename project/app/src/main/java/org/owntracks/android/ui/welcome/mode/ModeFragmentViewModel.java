@@ -9,6 +9,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
@@ -29,6 +30,17 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
 
     public void attachView(@NonNull ModeFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
+        switch (preferences.getModeId()) {
+            case App.MODE_ID_HTTP_PRIVATE:
+                setCheckedButton(R.id.radioModeHttpPrivate);
+                break;
+            case App.MODE_ID_MQTT_PRIVATE:
+                setCheckedButton(R.id.radioModeMqttPrivate);
+                break;
+            case App.MODE_ID_MQTT_PUBLIC:
+                setCheckedButton(R.id.radioModeMqttPublic);
+                break;
+        }
     }
 
     @Override

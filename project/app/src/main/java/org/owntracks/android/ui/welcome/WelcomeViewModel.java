@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.welcome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,7 +38,7 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
 
     @Override
     public void onDoneClicked() {
-        navigator.get().startActivity(MapActivity.class);
+        navigator.get().startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
     @Override
