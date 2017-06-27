@@ -65,18 +65,16 @@ public class Scheduler extends GcmTaskService {
 
     }
 
-    public void cancelAllTasks() {
-        Timber.v("canceling all tasks");
-
-        //Don't cancel PERIODIC_TASK_SEND_LOCATION_PING
-        //GcmNetworkManager.getInstance(App.getContext()).cancelAllTasks(Scheduler.class);
-
+    public void cancelHttpTasks() {
         GcmNetworkManager.getInstance(App.getContext()).cancelTask(ONEOFF_TASK_SEND_MESSAGE_HTTP, Scheduler.class);
+    }
+
+    public void cancelMqttTasks() {
         GcmNetworkManager.getInstance(App.getContext()).cancelTask(ONEOFF_TASK_SEND_MESSAGE_MQTT, Scheduler.class);
         GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_PING, Scheduler.class);
         GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_RECONNECT, Scheduler.class);
-
     }
+
 
     public void scheduleMessage(Bundle b)  {
         if(b.get(BUNDLE_KEY_MESSAGE_ID) == null) {
@@ -161,6 +159,6 @@ public class Scheduler extends GcmTaskService {
     public void cancelMqttReconnect() {
         Timber.v("canceling task PERIODIC_TASK_MQTT_RECONNECT");
         GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_RECONNECT, Scheduler.class);
-
     }
+
 }

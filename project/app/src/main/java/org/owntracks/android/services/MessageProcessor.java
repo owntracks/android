@@ -121,6 +121,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor(){
+
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
@@ -129,8 +130,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
             outgoingMessageProcessor.onDestroy();
         }
 
+        outgoingQueue.clear();
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 
-            Timber.v("instantiating new outgoingMessageProcessorExecutor");
+        Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (preferences.getModeId()) {
             case App.MODE_ID_HTTP_PRIVATE:
                 this.outgoingMessageProcessor = MessageProcessorEndpointHttp.getInstance();
@@ -144,12 +147,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
         this.outgoingMessageProcessor.onCreateFromProcessor();
         acceptMessages = true;
     }
-
     @SuppressWarnings("UnusedParameters")
     @Subscribe(priority = 10)
     public void onEvent(Events.ModeChanged event) {
         acceptMessages = false;
-        App.getScheduler().cancelAllTasks();
         loadOutgoingMessageProcessor();
     }
 
@@ -157,7 +158,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Subscribe(priority = 10)
     public void onEvent(Events.EndpointChanged event) {
         acceptMessages = false;
-        App.getScheduler().cancelAllTasks();
         loadOutgoingMessageProcessor();
     }
 
