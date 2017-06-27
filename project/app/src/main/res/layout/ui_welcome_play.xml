@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:tools="http://schemas.android.com/tools"
+	xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable name="vm" type="org.owntracks.android.ui.welcome.play.PlayFragmentMvvm.ViewModel" />
         <import type="android.view.View" />
@@ -44,7 +45,7 @@
             />
 
 
-        <TextView
+		<TextView
             android:id="@+id/screen_desc"
             android:text="@string/welcome_play_description"
             android:paddingLeft="24dp"
@@ -61,41 +62,30 @@
             android:layout_alignStart="@+id/screen_heading" />
 
 
-        <android.support.v7.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:gravity="center_horizontal"
-            android:textSize="16sp"
-            android:text="@string/play_services_not_available_general"
-            android:id="@+id/message"
-            android:visibility="gone"
-            android:layout_above="@+id/recover"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:layout_marginBottom="24dp"/>
-
-        <Button
+		<TextView
+			android:id="@+id/message"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_above="@+id/recover"
+			android:layout_alignParentBottom="true"
+			android:layout_marginBottom="24dp"
+			android:gravity="center_horizontal"
+			android:paddingLeft="24dp"
+			android:paddingRight="24dp"
+			android:text="@string/play_services_not_available_general"
+			android:textColor="#ffffff"
+			android:textSize="16sp"
+			android:visibility="gone"
+			tools:text="test"/>
+		<Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/welcomeFixIssue"
             android:id="@+id/recover"
-            android:layout_above="@+id/view"
             android:visibility="@{vm.fixAvailable}"
             android:onClick="@{() -> vm.onFixClicked()}"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="48dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:id="@+id/view"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_centerHorizontal="true"/>
 
     </RelativeLayout>
 </layout>
