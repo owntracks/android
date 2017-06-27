@@ -53,6 +53,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
     public void onEvent(Events.ModeChanged e) {
         Timber.v("mode changed %s", e.getNewModeId());
         setModeId(e.getNewModeId());
+        getView().recreateOptionsMenu();
         notifyChange();
     }
 

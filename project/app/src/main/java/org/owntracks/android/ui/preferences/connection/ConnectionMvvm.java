@@ -26,7 +26,9 @@ public interface ConnectionMvvm {
         void showIdentificationDialog();
         void showSecurityDialog();
         void showParametersDialog();
-    }
+        void recreateOptionsMenu();
+
+        }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void onModeClick();
