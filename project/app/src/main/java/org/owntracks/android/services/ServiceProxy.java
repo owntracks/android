@@ -106,7 +106,10 @@ public class ServiceProxy extends Service {
 
 	@Override
 	public void onDestroy() {
-		for ( int i = 0; i <= services.length; i ++ ) {
+
+
+
+		for ( int i = 0; i < services.length; i ++ ) {
 			App.getEventBus().unregister(services[i]);
 			services[i].onDestroy();
 			services[i]=null;
