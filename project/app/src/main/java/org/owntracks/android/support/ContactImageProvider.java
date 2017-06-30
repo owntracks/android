@@ -28,6 +28,7 @@ import org.owntracks.android.support.widgets.TextDrawable;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -88,14 +89,17 @@ public class ContactImageProvider {
 
 
     public static void setMarkerAsync(Marker marker, FusedContact contact) {
-        (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
+        try {
+            (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
+        } catch (RejectedExecutionException ignored) {}
     }
 
     public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
         imageView.setImageDrawable(placeholder);
-        (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
+        try {
+            (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, contact);
+        } catch (RejectedExecutionException ignored) {}
     }
-
 
     private static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
