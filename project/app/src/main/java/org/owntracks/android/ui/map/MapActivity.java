@@ -234,7 +234,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void onPause(){
         super.onPause();
-        binding.mapView.onPause();
+        try {
+            binding.mapView.onPause();
+        } catch (Exception e) {
+            flagStateMapReady = false;
+        }
         // Save current repo state so we ca apply updates to contacts on resume
         repoRevision = viewModel.getContactsRevision();
     }
