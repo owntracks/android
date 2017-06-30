@@ -46,6 +46,9 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         setHasBack(false);
         handleIntent(intent);
     }
+
+
+
     private void tintMenu() {
         if(saveButton != null) {
             saveButton.setEnabled(viewModel.getConfigurationPretty() != null);
@@ -82,8 +85,10 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     }
 
     private void handleIntent(@Nullable Intent intent) {
-        if(intent == null)
+        if(intent == null) {
+            Timber.e("no intent provided");
             return;
+        }
 
 
         setHasBack(intent.getBooleanExtra(FLAG_IN_APP, false));
@@ -94,6 +99,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
         if (Intent.ACTION_VIEW.equals(action)) {
             Uri uri = intent.getData();
+            Timber.v("uri: %s", uri);
             if (uri != null) {
                 extractPreferences(uri);
             }
