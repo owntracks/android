@@ -556,16 +556,20 @@ public class ServiceLocator implements ProxyableService, GoogleApiClient.Connect
 
 			}
 
-            Geofence geofence = new Geofence.Builder()
-					.setRequestId(w.getGeofenceId())
-					.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setLoiteringDelay((int)TimeUnit.SECONDS.toMillis(15))
-                    .setNotificationResponsiveness((int)TimeUnit.SECONDS.toMillis(30))
-					.setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-					.setExpirationDuration(Geofence.NEVER_EXPIRE).build();
+			try {
+                Geofence geofence = new Geofence.Builder()
+                        .setRequestId(w.getGeofenceId())
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setLoiteringDelay((int) TimeUnit.SECONDS.toMillis(15))
+                        .setNotificationResponsiveness((int) TimeUnit.SECONDS.toMillis(30))
+                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build();
 
-            Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId() );
-			fences.add(geofence);
+                Timber.v("adding geofence for waypoint %s, mode:%s", w.getDescription(), w.getModeId());
+                fences.add(geofence);
+            } catch (IllegalArgumentException ignored) {
+                Timber.e("invalid geofence");
+            }
 		}
 
 		if (fences.isEmpty()) {
