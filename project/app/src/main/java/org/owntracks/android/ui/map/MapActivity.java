@@ -225,7 +225,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void onPause(){
         super.onPause();
         try {
-            binding.mapView.onPause();
+            if(flagStateMapReady)
+                binding.mapView.onPause();
         } catch (Exception e) {
             flagStateMapReady = false;
         }
@@ -253,7 +254,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onResume();
 
         try {
-            binding.mapView.onResume();
+            if(flagStateMapReady)
+                binding.mapView.onResume();
 
             if (mMap == null)
                 initMapDelayed();
@@ -270,19 +272,29 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     public void onDestroy() {
-        binding.mapView.onDestroy();
+        try {
+            if(flagStateMapReady)
+                binding.mapView.onDestroy();
+        } catch (Exception ignored){flagStateMapReady = false;}
         super.onDestroy();
     }
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        binding.mapView.onSaveInstanceState(bundle);
+        try {
+            if (flagStateMapReady)
+                binding.mapView.onSaveInstanceState(bundle);
+        } catch (Exception ignored){flagStateMapReady = false;}
+
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        binding.mapView.onLowMemory();
+        try {
+            if (flagStateMapReady)
+                binding.mapView.onLowMemory();
+        } catch (Exception ignored){flagStateMapReady = false;}
     }
 
     public void initMapDelayed() {
@@ -299,7 +311,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     private void initMap() {
         flagStateMapReady = false;
-        binding.mapView.getMapAsync(this);
+        try {
+            binding.mapView.getMapAsync(this);
+        } catch (Exception ignored) { }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
