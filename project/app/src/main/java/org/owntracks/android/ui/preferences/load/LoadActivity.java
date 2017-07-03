@@ -4,13 +4,18 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.mikepenz.materialize.color.Material;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesLoadBinding;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -34,8 +39,10 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         bindAndAttachContentView(R.layout.ui_preferences_load, savedInstanceState);
 
         setHasEventBus(false);
-        setSupportToolbar(binding.toolbar);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        setSupportToolbar(binding.toolbar, true, getIntent() != null && getIntent().getBooleanExtra(FLAG_IN_APP, false));
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.title_activity_load);
+        }
 
         handleIntent(getIntent());
     }
@@ -161,7 +168,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             }
 
             viewModel.setConfiguration(total.toString());
-            tintMenu();
         } catch (JsonParseException e) {
             Timber.e(e, "parse exception ");
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
@@ -178,4 +184,28 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
     }
 
+    @Override
+    public void showFinishDialog() {
+        new MaterialDialog.Builder(this)
+                .title("Import successful")
+                .content("It is recommended to restart the app to apply all imported values")
+                .positiveText("Restart")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        App.restart();
+                    }
+                }).build().show();
+    }
+
+    @Override
+    public void showSaveButton() {
+        tintMenu();
+    }
 }

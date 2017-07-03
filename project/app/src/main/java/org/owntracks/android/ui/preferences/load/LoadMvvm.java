@@ -8,6 +8,8 @@ import java.io.IOException;
 public interface LoadMvvm {
 
     interface View extends MvvmView {
+        void showFinishDialog();
+        void showSaveButton();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
