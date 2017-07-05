@@ -32,6 +32,7 @@ public class GeocodingProvider {
     }
 
     public static void resolve(MessageLocation m, ServiceNotification s) {
+        Timber.v("loading for service %s", m.getTopic());
         NotificationLocationResolverTask.run(m, s, RUN_FIRST);
     }
 
@@ -40,7 +41,7 @@ public class GeocodingProvider {
         private final WeakReference<ServiceNotification> service;
 
         static void run(MessageLocation m, ServiceNotification s, double run) {
-            (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+            (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
         }
 
         @Override
@@ -76,7 +77,7 @@ public class GeocodingProvider {
         private final WeakReference<TextView> textView;
 
         static void run(MessageLocation m, TextView tv, double run) {
-            (new TextViewLocationResolverTask(m, tv)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+            (new TextViewLocationResolverTask(m, tv)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
         }
 
         @Override
@@ -183,7 +184,4 @@ public class GeocodingProvider {
     public static void initialize(Context c){
         geocoder = new Geocoder(App.getContext(), Locale.getDefault());
     }
-
-
-
 }
