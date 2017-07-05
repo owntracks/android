@@ -278,8 +278,11 @@ public class ServiceNotification implements ProxyableService {
         // Append new notification to existing
         if(notificationEventsSummary != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             CharSequence cs[] = (CharSequence[]) notificationEventsSummary.extras.get(NotificationCompat.EXTRA_TEXT_LINES);
-            for (CharSequence line : cs != null ? cs : new CharSequence[0]) {
-                style.addLine(line);
+            if(cs == null)
+                cs = new CharSequence[0];
+
+            for (int i = 0; i < cs.length && i < 19; i++) {
+                style.addLine(cs[i]);
             }
             
             notificationBuilderEventsGroup.setNumber(cs.length+1);
