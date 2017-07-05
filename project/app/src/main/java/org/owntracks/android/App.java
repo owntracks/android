@@ -170,10 +170,6 @@ public class App extends Application  {
         }
 	}
 
-	public static String getAndroidId() {
-		return Secure.getString(sInstance.getContentResolver(), Secure.ANDROID_ID);
-	}
-
 	public static int getBatteryLevel() {
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		Intent batteryStatus = getContext().registerReceiver(null, ifilter);
