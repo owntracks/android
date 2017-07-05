@@ -107,6 +107,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
 
     private void executePendingActions() {
+        Timber.v("flag flagStateMapReady: %s",flagStateMapReady);
         Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
         Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
         Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
@@ -235,7 +236,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public void onPause(){
         super.onPause();
         try {
-            if(flagStateMapReady)
+            if(binding.mapView != null)
                 binding.mapView.onPause();
         } catch (Exception e) {
             flagStateMapReady = false;
@@ -264,7 +265,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         super.onResume();
 
         try {
-            if(flagStateMapReady)
+            if(binding.mapView != null)
                 binding.mapView.onResume();
 
             if (mMap == null)
@@ -283,7 +284,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     @Override
     public void onDestroy() {
         try {
-            if(flagStateMapReady)
+            if(binding.mapView != null)
                 binding.mapView.onDestroy();
         } catch (Exception ignored){flagStateMapReady = false;}
         super.onDestroy();
@@ -292,7 +293,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         try {
-            if (flagStateMapReady)
+            if (binding.mapView != null)
                 binding.mapView.onSaveInstanceState(bundle);
         } catch (Exception ignored){flagStateMapReady = false;}
 
@@ -302,7 +303,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
     public void onLowMemory() {
         super.onLowMemory();
         try {
-            if (flagStateMapReady)
+            if (binding.mapView != null)
                 binding.mapView.onLowMemory();
         } catch (Exception ignored){flagStateMapReady = false;}
     }
