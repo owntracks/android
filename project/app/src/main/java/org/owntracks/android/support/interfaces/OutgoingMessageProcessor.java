@@ -23,4 +23,6 @@ public interface OutgoingMessageProcessor {
     void onCreateFromProcessor();
     void onDestroy();
     void onEnterForeground();
+
+    boolean isConfigurationComplete();
 }

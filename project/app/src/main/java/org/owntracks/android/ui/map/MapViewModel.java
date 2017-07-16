@@ -100,6 +100,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     private void activateContact(@NonNull String contactId, boolean center) {
         activeContact = contactsRepo.getById(contactId);
+        if(activeContact == null) {
+            Timber.e("contact %s could not be loaded from repo", contactId);
+            getView().setModeDevice();
+            return;
+        }
+
         Timber.v("contactId:%s, obj:%s ", contactId, activeContact);
 
         notifyPropertyChanged(BR.contact);
