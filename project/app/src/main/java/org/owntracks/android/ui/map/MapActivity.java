@@ -286,6 +286,10 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleIntentExtras(intent);
+        try {
+            if (binding.mapView != null)
+                binding.mapView.onLowMemory();
+        } catch (Exception ignored){flagStateMapReady = false;}
     }
 
     public void initMapDelayed() {
@@ -302,7 +306,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     private void initMap() {
         flagStateMapReady = false;
-        binding.mapView.getMapAsync(this);
+        try {
+            binding.mapView.getMapAsync(this);
+        } catch (Exception ignored) { }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
