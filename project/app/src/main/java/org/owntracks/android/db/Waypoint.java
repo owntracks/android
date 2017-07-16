@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.*;
 // KEEP INCLUDES - put your custom includes here
     import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 // KEEP INCLUDES END
 /**
  * Entity mapped to table "WAYPOINT".
@@ -108,6 +109,7 @@ public class Waypoint {
             this.geofenceLongitude = geofenceLongitude;
     }
 
+    @Nullable
     public Integer getGeofenceRadius() {
         return geofenceRadius;
     }
@@ -140,6 +142,7 @@ public class Waypoint {
         this.beaconUUID = beaconUUID;
     }
 
+    @Nullable
     public Integer getBeaconMajor() {
         return beaconMajor;
     }
@@ -148,6 +151,7 @@ public class Waypoint {
         this.beaconMajor = beaconMajor;
     }
 
+    @Nullable
     public Integer getBeaconMinor() {
         return beaconMinor;
     }
@@ -172,6 +176,7 @@ public class Waypoint {
         this.date = date;
     }
 
+    @Nullable
     public Long getLastTriggered() {
         return lastTriggered;
     }
