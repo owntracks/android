@@ -12,6 +12,7 @@ import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.io.IOException;
@@ -23,13 +24,14 @@ import timber.log.Timber;
 
 @PerActivity
 public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadMvvm.ViewModel<LoadMvvm.View> {
+    private final Preferences preferences;
     @Bindable
     private String configurationPretty;
     private MessageConfiguration configuration;
 
     @Inject
-    public LoadViewModel(@AppContext Context context) {
-
+    public LoadViewModel(@AppContext Context context, Preferences preferences) {
+        this.preferences = preferences;
     }
 
     public void attachView(@NonNull LoadMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -50,6 +52,6 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
 
     public void saveConfiguration() {
-        App.getPreferences().importFromMessage(configuration);
+        preferences.importFromMessage(configuration);
     }
 }
