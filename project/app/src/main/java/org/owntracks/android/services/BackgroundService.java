@@ -427,7 +427,10 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
 
             for (Waypoint w : waypoints) {
-                onWaypointTransition(w, location, location.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+                if(w.hasGeofence()) {
+                    //noinspection ConstantConditions
+                    onWaypointTransition(w, location, location.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+                }
             }
 
         }
@@ -587,6 +590,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
                 w.setLastTransition(0); // Reset in-memory status
 
                 try {
+                    //noinspection ConstantConditions
                     geofences.add(new Geofence.Builder()
                             .setRequestId(w.getId().toString())
                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
