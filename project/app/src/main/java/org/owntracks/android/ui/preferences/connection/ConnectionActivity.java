@@ -163,7 +163,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.connect:
-                if(preferences.canConnect()) {
+                if(App.getMessageProcessor().isEndpointConfigurationComplete()) {
                     Runnable r = new Runnable() {
 
                         @Override

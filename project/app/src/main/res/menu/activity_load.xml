@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/save"
+        android:icon="@drawable/ic_done"
+        android:title="@string/save"
         android:orderInCategory="97"
-        app:showAsAction="always"
-        android:title="@string/save">
-    </item>
+        app:showAsAction="ifRoom"/>
 
 </menu>

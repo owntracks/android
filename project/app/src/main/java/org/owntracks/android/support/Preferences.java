@@ -267,16 +267,6 @@ public class Preferences {
         return activeSharedPreferences;
     }
 
-    public boolean canConnect() {
-        if(isModeMqttPrivate()) {
-            return !getHost().trim().equals("") && !getUsername().trim().equals("")  && (!getAuth() || !getPassword().trim().equals(""));
-        } else if(isModeMqttPublic()) {
-            return true;
-        }
-        return false;
-    }
-
-
 
 
     @SuppressLint("CommitPrefEdits")
@@ -344,9 +334,9 @@ public class Preferences {
                     clearKey(key);
                 } else {
                     Timber.v("method: %s", methods.get(key).getName());
-                    methods.get(key).invoke(null, m.get(key));
+                    methods.get(key).invoke(this, m.get(key));
                 }
-            } catch (Exception e) {
+                } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -989,22 +979,6 @@ public class Preferences {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
 
-
-
-
-    @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeHttpPrivate =true)
-    public static boolean getHttpSchedulerAllowDirectStrategy() {
-        return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valTrue);
-    }
-
-    @Import(key =Keys.HTTP_SCHEDULER_DIRECT)
-    public static void setHttpSchedulerAllowDirectStrategy(boolean aBoolean) {
-        setBoolean(Keys.HTTP_SCHEDULER_DIRECT, aBoolean, false);
-    }
-
-
-
-
     @Import(key =Keys.URL)
     public void setUrl(String url) {
         setString(Keys.URL, url);
@@ -1117,7 +1091,6 @@ public class Preferences {
         public static final String DEVICE_ID                        = "deviceId";
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
-        public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
         public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
         public static final String INFO                             = "info";

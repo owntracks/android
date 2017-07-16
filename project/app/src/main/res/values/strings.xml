@@ -167,7 +167,7 @@
     <string name="enjoy_description">Enjoy Owntracks</string>
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
-    <string name="title_activity_load">Configuration import</string>
+    <string name="title_activity_load">Import</string>
     <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
     <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>

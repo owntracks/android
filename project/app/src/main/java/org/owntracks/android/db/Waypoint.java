@@ -6,6 +6,7 @@ import org.greenrobot.greendao.annotation.*;
 
 // KEEP INCLUDES - put your custom includes here
     import android.location.Location;
+import android.support.annotation.NonNull;
 // KEEP INCLUDES END
 /**
  * Entity mapped to table "WAYPOINT".
@@ -195,6 +196,7 @@ public class Waypoint {
         this.type = type;
     }
 
+    @NonNull
     public Location getLocation() {
         Location l= new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
