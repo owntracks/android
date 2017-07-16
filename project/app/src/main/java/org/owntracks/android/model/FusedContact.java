@@ -39,7 +39,7 @@ public class FusedContact extends BaseObservable {
     }
 
     public FusedContact(@Nullable String id) {
-        this.id = id != null ? id : "NOID";
+        this.id = (id != null && !id.isEmpty()) ? id : "NOID";
     }
 
     public boolean setMessageLocation(MessageLocation messageLocation) {

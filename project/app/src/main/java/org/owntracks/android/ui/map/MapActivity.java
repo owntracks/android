@@ -121,8 +121,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 doCenterContact();
             }
         }
-
-
     }
 
     // EVENT ENGINE STATE CALLBACKS
@@ -596,6 +594,4 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
         }
     }
-
-
 }

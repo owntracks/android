@@ -305,4 +305,9 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         else if(Preferences.Keys.DEVICE_ID.equals(key))
             headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
+
+    @Override
+    public boolean isConfigurationComplete() {
+        return this.endpointUrl != null;
+    }
 }

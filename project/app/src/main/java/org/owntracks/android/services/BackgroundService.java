@@ -58,6 +58,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -100,9 +101,11 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private NotificationCompat.Builder notificationBuilderEvents;
     private NotificationManagerCompat mNotificationManager;
     private Preferences preferences;
-    private List<Waypoint> waypoints = new LinkedList<>();
+    private List<Waypoint> waypoints = Collections.emptyList();
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private BeaconManager beaconManager;
+    private int lastQueueLength = 0;
+    private Notification stackNotification;
 
     @Nullable
     @Override
@@ -163,6 +166,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
                     return;
                 case INTENT_ACTION_SEND_LOCATION_RESPONSE:
                     Timber.e("INTENT_ACTION_SEND_LOCATION_RESPONSE not implemented");
+                    publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
                     return;
                 case INTENT_ACTION_SEND_WAYPOINTS:
                     Timber.e("INTENT_ACTION_SEND_WAYPOINTS not implemented");
@@ -221,9 +225,12 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         if (builder == null)
             return;
 
-        if (this.lastLocationMessage != null && this.lastLocationMessage.getGeocoder() != null && preferences.getNotificationLocation()) {
+        Timber.v("updating notification %s %s", this.lastLocationMessage != null, preferences.getNotificationLocation());
+
+        if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
             builder.setContentTitle(this.lastLocationMessage.getGeocoder());
             builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTst()));
+            builder.setNumber(lastQueueLength);
         } else {
             builder.setContentTitle(getString(R.string.app_name));
         }
@@ -306,15 +313,30 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
                 // add a new line containing its title to the inbox style notification extender
                 NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
                 inbox.setSummaryText(summary);
-                for (Spannable activeSbn : activeNotifications) {
-                    inbox.addLine(activeSbn);
+
+
+                // Append new notification to existing
+                CharSequence cs[] = null;
+
+                if(stackNotification != null) {
+                    cs = (CharSequence[]) stackNotification.extras.get(NotificationCompat.EXTRA_TEXT_LINES);
                 }
 
+                if(cs == null) {
+                    cs = new CharSequence[0];
+                }
+
+                for (int i = 0; i < cs.length && i < 19; i++) {
+                    inbox.addLine(cs[i]);
+                }
+                inbox.addLine(newLine);
+
+                builder.setNumber(cs.length+1);
                 builder.setStyle(inbox);
                 builder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(App.getContext(), MapActivity.class), PendingIntent.FLAG_ONE_SHOT));
                 builder.setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
 
-                Notification stackNotification = builder.build();
+                stackNotification = builder.build();
                 mNotificationManager.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
             }
         }
@@ -354,8 +376,12 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         w.setLastTriggered(System.currentTimeMillis());
         App.getDao().getWaypointDao().update(w);
 
-        if(!trigger.equals(MessageTransition.TRIGGER_LOCATION))
+        if(trigger.equals(MessageTransition.TRIGGER_LOCATION)) {
             publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
+        } else if(trigger.equals(MessageTransition.TRIGGER_BEACON)) {
+            publishLocationMessage(MessageLocation.REPORT_TYPE_BEACON);
+        }
+
         publishTransitionMessage(w, l, transition, trigger);
 
         App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
@@ -388,28 +414,25 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
     private void onLocationChanged(@NonNull Intent intent) {
         LocationResult locationResult = LocationResult.extractResult(intent);
-        Location location = locationResult.getLastLocation();
-        if(location != null) {
-            onLocationChanged(location);
-        }
+        onLocationChanged(locationResult.getLastLocation());
     }
 
-    private void onLocationChanged(@NonNull Location location) {
-        if (((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
+    private void onLocationChanged(@Nullable Location location) {
+        if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
             lastLocation = location;
 
             App.getEventBus().postSticky(lastLocation);
-
-            for(Waypoint w : waypoints) {
-                onWaypointTransition(w, location, location.distanceTo(w.getLocation()) <=w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
-            }
-
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
+
+            for (Waypoint w : waypoints) {
+                onWaypointTransition(w, location, location.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+            }
 
         }
     }
+
 
     private boolean ignoreLowAccuracy(@NonNull Location l) {
         int threshold = preferences.getIgnoreInaccurateLocations();
@@ -622,8 +645,10 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation m) {
-        if(m.isOutgoing() && (lastLocationMessage == null || lastLocationMessage.getTst() <=  m.getTst())) {
+        Timber.v("MessageLocation received %s, %s, outgoing: %s ", m, lastLocationMessage, m.isOutgoing());
+        if(m.isDelivered() && (lastLocationMessage == null || lastLocationMessage.getTst() <=  m.getTst())) {
             this.lastLocationMessage = m;
+            sendOngoingNotification();
             App.getGeocodingProvider().resolve(m, this);
         }
     }
@@ -644,14 +669,25 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
+    public void onEvent(Events.QueueChanged e) {
+        this.lastQueueLength = e.getNewLength();
+        sendOngoingNotification();
+    }
+
+
+    @SuppressWarnings("unused")
+    @Subscribe(sticky = true)
     public void onEvent(Events.PermissionGranted event) {
-        try {
-            Timber.v("location permission granted. Getting last location.");
-            mFusedLocationClient.getLastLocation().addOnCompleteListener(this);
-        } catch (SecurityException ignored) {}
+        Timber.v("location permission granted");
         setupGeofences();
         setupBeacons();
         setupLocationRequest();
+
+        try {
+            Timber.v("Getting last location");
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(this);
+        } catch (SecurityException ignored) {}
+
     }
 
 
@@ -789,8 +825,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
     @Override
     public void onComplete(@NonNull Task<Location> task) {
-        Location l = task.getResult();
-        if(l != null)
-            onLocationChanged(l);
+        onLocationChanged(task.getResult());
     }
 }

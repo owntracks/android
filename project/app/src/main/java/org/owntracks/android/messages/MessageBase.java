@@ -33,6 +33,8 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         protected String _mqtt_topic;
         @JsonIgnore
         protected String _mqtt_topic_base;
+        @JsonIgnore
+        private boolean delivered;
 
         @JsonIgnore
         public long getMessageId() {
@@ -178,4 +180,13 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
                 }
         }
 
+        @JsonIgnore
+        public void setDelivered(boolean delivered) {
+                this.delivered = delivered;
+        }
+
+        @JsonIgnore
+        public boolean isDelivered() {
+                return delivered;
+        }
 }

@@ -40,7 +40,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
     private OutgoingMessageProcessor outgoingMessageProcessor;
 
-    private boolean acceptMessages = false;
+    private boolean acceptMessages =  false;
 
     public void reconnect() {
         if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
@@ -59,6 +59,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public int getQueueLength() {
         return outgoingQueue.size();
+    }
+
+    public boolean isEndpointConfigurationComplete() {
+        return this.outgoingMessageProcessor != null && this.outgoingMessageProcessor.isConfigurationComplete();
     }
 
 
@@ -164,7 +168,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
 
     public void sendMessage(MessageBase message) {
-        if(!acceptMessages) return;
+        if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) return;
 
         Timber.v("executing message on outgoingMessageProcessor");
         message.setOutgoingProcessor(outgoingMessageProcessor);
@@ -179,6 +183,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
 
         if(m != null) {
+            // message will be treated as incoming message.
+            // Set the delivered flag to distinguish it from messages received fro the broker.
+            m.setDelivered(true);
             Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m instanceof MessageLocation) {
                 onMessageReceived(m);
