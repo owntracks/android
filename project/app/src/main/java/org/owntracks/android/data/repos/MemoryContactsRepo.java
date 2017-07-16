@@ -59,6 +59,7 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     private synchronized void put(String id, final FusedContact contact) {
+        Timber.v("new contact allocated id:%s, tid:%s", id, contact.getTrackerId());
         mMap.put(id, contact);
         App.postOnMainHandler(new Runnable() {
             @Override

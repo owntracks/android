@@ -48,10 +48,12 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         this.configuration = MessageConfiguration.class.cast(App.getParser().fromJson(json.getBytes()));
         this.configurationPretty = App.getParser().toJsonPlainPretty(this.configuration);
         notifyPropertyChanged(BR.configurationPretty);
+        getView().showSaveButton();
     }
 
 
     public void saveConfiguration() {
         preferences.importFromMessage(configuration);
+        getView().showFinishDialog();
     }
 }

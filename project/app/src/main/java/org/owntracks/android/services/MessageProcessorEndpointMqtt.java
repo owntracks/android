@@ -231,10 +231,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			return false;
 		}
 
-		if(!App.getPreferences().canConnect()) {
+		if(!isConfigurationComplete()) {
 			changeState(EndpointState.ERROR_CONFIGURATION);
 			return false;
 		}
+
 
 		// Check if there is a data connection.
 		if (!isOnline()) {
@@ -446,6 +447,16 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	@Override
 	public void onEnterForeground() {
 		checkConnection();
+	}
+
+	@Override
+	public boolean isConfigurationComplete() {
+		if (App.getPreferences().isModeMqttPrivate()) {
+			return !App.getPreferences().getHost().trim().equals("") && !App.getPreferences().getUsername().trim().equals("") && (!App.getPreferences().getAuth() || !App.getPreferences().getPassword().trim().equals(""));
+		} else if (App.getPreferences().isModeMqttPublic()) {
+			return true;
+		}
+		return false;
 	}
 
 	boolean checkConnection() {
