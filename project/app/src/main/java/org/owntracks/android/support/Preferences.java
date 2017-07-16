@@ -88,8 +88,10 @@ public class Preferences {
     public void setMode(int active, boolean init){
         Timber.v("setMode: " + active);
 
-        if(!init && modeId == active)
+        if(!init && modeId == active) {
+            Timber.v("mode is already set to requested mode");
             return;
+        }
 
         Timber.v("setting mode to: " + active);
 
@@ -319,10 +321,11 @@ public class Preferences {
 
     @SuppressLint("CommitPrefEdits")
     public void importFromMessage(MessageConfiguration m) {
-
+        Timber.v("importing %s keys ", m.getKeys().size());
         HashMap<String, Method> methods = getImportMethods();
 
         if(m.containsKey(Keys.MODE_ID)) {
+            Timber.v("setting mode to %s", m.get(Keys.MODE_ID));
             setMode((Integer) m.get(Keys.MODE_ID));
             m.removeKey(Keys.MODE_ID);
         }
@@ -339,13 +342,16 @@ public class Preferences {
                 if(value==null) {
                     Timber.v("clearing value for key %s", key);
                     clearKey(key);
-                } else
+                } else {
                     Timber.v("method: %s", methods.get(key).getName());
-                   methods.get(key).invoke(null, m.get(key));
+                    methods.get(key).invoke(null, m.get(key));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        Timber.v("committing to preferences %s", activeSharedPreferences);
 
         activeSharedPreferences.edit().commit();
         if(m.hasWaypoints()) {
