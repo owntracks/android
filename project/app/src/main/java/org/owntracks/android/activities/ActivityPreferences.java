@@ -215,9 +215,9 @@ public class ActivityPreferences extends ActivityBase {
             addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND,  R.string.preferencesLocatorAccuracyForeground, R.string.preferencesLocatorAccuracyForegroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
             addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND, R.string.preferencesLocatorAccuracyBackground, R.string.preferencesLocatorAccuracyBackgroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
             addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_DISPLACEMENT, R.string.preferencesLocatorDisplacement, R.integer.valLocatorDisplacement).withPreferencesSummary(R.string.preferencesLocatorDisplacementSummary);
-                    addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary);
+            addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary);
 
-            addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsSummary);
+            addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsDialog);
 
             PreferenceCategory encryption = getCategory(R.string.preferencesCategoryAdvancedEncryption);
             screen.addPreference(encryption);

@@ -133,6 +133,7 @@
     <string name="menuCurrentLoction">Aktuelle position</string>
     <string name="preferencesIgnoreInaccurateLocations">Ungenaue Positionen</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">Ungenaue Position ignorierne wenn sie ungenauer als die angegebenen Meter ist</string>
     <string name="noNavigationApp">keine passende App installiert</string>
     <string name="menuClear">Entfernen</string>
     <string name="configurationManagement">Konfigurationsverwaltung</string>
