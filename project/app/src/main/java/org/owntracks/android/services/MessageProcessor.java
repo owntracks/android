@@ -57,6 +57,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
             outgoingMessageProcessor.onEnterForeground();
     }
 
+    public void onEnterBackground() {
+    }
+
+
     public int getQueueLength() {
         return outgoingQueue.size();
     }
