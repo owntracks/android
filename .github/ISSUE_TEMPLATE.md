@@ -1,6 +1,6 @@
 <!--
 Thanks for asking a question or wanting to report an issue you've found. 
-Please deletethis text and fill in the template below. 
+Please delete this text and fill in the template below. 
 If unsure about something, just do as best as you're able.
 
 Make sure to read http://owntracks.org/booklet/features/android/ for a list 
