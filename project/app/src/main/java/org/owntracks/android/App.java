@@ -163,6 +163,7 @@ public class App extends Application  {
     private void onEnterForeground() {
         Timber.v("entering foreground");
         inForeground = true;
+        startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_CHANGE_BG);
         getMessageProcessor().onEnterForeground();
     }
 
@@ -170,6 +171,8 @@ public class App extends Application  {
         Timber.v("entering background");
         inForeground = false;
         startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_CHANGE_BG);
+        getMessageProcessor().onEnterBackground();
+
     }
 
     public static boolean isInForeground() {
