@@ -30,6 +30,7 @@
     <integer name="valMqttProtocolLevel">3</integer>
     <integer name="valPing">30</integer>
 
+    <bool name="valDebugVibrate">false</bool>
     <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
     <bool name="valCp">false</bool>

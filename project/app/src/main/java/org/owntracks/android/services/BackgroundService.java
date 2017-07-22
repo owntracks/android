@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -418,7 +419,15 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     }
 
     private void onLocationChanged(@Nullable Location location) {
+
         if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
+            if(preferences.getDebugVibrate()) {
+                Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+                long[] pattern = {200,200,200};
+                v.vibrate(pattern, -1);
+            }
+
+
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
             lastLocation = location;

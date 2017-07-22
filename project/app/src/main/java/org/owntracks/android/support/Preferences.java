@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.owntracks.android.messages.MessageWaypoint;
 import timber.log.Timber;
 
 
+@SuppressWarnings("WeakerAccess")
 public class Preferences {
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
@@ -992,6 +994,16 @@ public class Preferences {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
+    @Export(key = Keys.DEBUG_VIBRATE, exportModeHttpPrivate = true ,exportModeMqttPrivate = true, exportModeMqttPublic = true)
+    public boolean getDebugVibrate() {
+        return getBoolean(Keys.DEBUG_VIBRATE, R.bool.valDebugVibrate);
+    }
+
+    @Import(key = Keys.DEBUG_VIBRATE)
+    public void setDebugVibrate(boolean vibrate) {
+        setBoolean(Keys.DEBUG_VIBRATE, vibrate);
+    }
+
     public static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
@@ -1007,6 +1019,8 @@ public class Preferences {
         sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).apply();
 
     }
+
+
 
     // Maybe make this configurable
     // For now it makes things easier to change
@@ -1088,6 +1102,7 @@ public class Preferences {
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String CP                               = "cp";
+        public static final String DEBUG_VIBRATE                    = "debugVibrate";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";

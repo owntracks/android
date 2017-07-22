@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Vibrator;
 import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
@@ -203,12 +204,21 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     private void onMessageQueued(MessageBase m) {
+        if(preferences.getDebugVibrate()) {
+            Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(500);
+        }
+
         outgoingQueue.put(m.getMessageId(), m);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
         Timber.v("messageId:%s, queueLength:%s", m.getMessageId(), outgoingQueue.size());
     }
 
     void onMessageDeliveryFailed(Long messageId) {
+        if(preferences.getDebugVibrate()) {
+            Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(2000);
+        }
 
         MessageBase m = outgoingQueue.get(messageId);
         outgoingQueue.remove(messageId);
