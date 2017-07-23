@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.databinding.Bindable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,6 +75,16 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Bindable
     public Date getServiceStarted() {
         return serviceStarted;
+    }
+
+    @Override
+    public boolean getDozeWhitelisted() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || App.getPowerManager().isIgnoringBatteryOptimizations(App.getContext().getPackageName());
+    }
+
+    @Override
+    public void onIgnoreDozeClicked() {
+        getView().showIgnoreDozeActivity();
     }
 
     @Override
