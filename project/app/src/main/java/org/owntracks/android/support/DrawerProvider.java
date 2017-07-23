@@ -52,12 +52,15 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
     private final AppCompatActivity activity;
     private final Preferences preferences;
     private SecondarySwitchDrawerItem switchDrawerItemPub;
+
     private SecondarySwitchDrawerItem switchDrawerItemCopy;
     private Drawer drawer;
+    private boolean isBuilt;
 
     public DrawerProvider(AppCompatActivity activity, Preferences preferences) {
         this.preferences = preferences;
         this.activity = activity;
+
     }
 
     final AppCompatActivity getActivity() {
@@ -97,8 +100,12 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
         OnCheckedChangeListener l = new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Timber.v("setting pub to: %s", isChecked);
-                preferences.setPub(isChecked);
+                if(isBuilt) {
+                    Timber.v("setting pub to: %s", isChecked);
+                    preferences.setPub(isChecked);
+                } else {
+                    Timber.v("ignoring onCheckedChanged because drawer is not built yet");
+                }
             }
         };
         return new SecondarySwitchDrawerItem()
@@ -179,6 +186,7 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
                // .withDelayDrawerClickEvent(350)
                 //.withDelayOnDrawerClose(0)
                 .build();
+        isBuilt = true;
     }
 
 
