@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,7 +35,6 @@ import org.owntracks.android.messages.MessageWaypoint;
 import timber.log.Timber;
 
 
-@SuppressWarnings("WeakerAccess")
 public class Preferences {
     public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
@@ -58,7 +56,7 @@ public class Preferences {
 
     public static boolean isModeHttpPrivate(){ return modeId == App.MODE_ID_HTTP_PRIVATE; }
 
-    public static String getDeviceUUID() {
+    private static String getDeviceUUID() {
         return deviceUUID;
     }
 
@@ -75,7 +73,7 @@ public class Preferences {
     }
 
 
-    void initMode(int active) {
+    private void initMode(int active) {
         // Check for valid mode IDs and fallback to Private if an invalid mode is set
         if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC || active == App.MODE_ID_HTTP_PRIVATE) {
             setMode(active, true);
@@ -156,7 +154,7 @@ public class Preferences {
         void onAttachAfterModeChanged();
     }
 
-    public static boolean getBoolean(String key,  int defId) {
+    private static boolean getBoolean(String key,  int defId) {
         return getBoolean(key, defId, defId, false);
     }
 
@@ -168,7 +166,7 @@ public class Preferences {
         return activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
     }
 
-    public static boolean getBooleanRessource(int resId) {
+    private static boolean getBooleanRessource(int resId) {
         return App.getContext().getResources().getBoolean(resId);
     }
 
@@ -183,7 +181,7 @@ public class Preferences {
 
         return activeSharedPreferences.getInt(key, getIntResource(defIdPrivate));
     }
-    public static int getIntResource(int resId) {
+    private static int getIntResource(int resId) {
         return App.getContext().getResources().getInteger(resId);
     }
 
@@ -221,14 +219,14 @@ public class Preferences {
         return isModeMqttPrivate() ? getStringRessource(defIdPrivate) : getStringRessource(defIdPublic);
     }
 
-    public static String getStringRessource(int resId) {
+    private static String getStringRessource(int resId) {
         return App.getContext().getResources().getString(resId);
     }
 
-    public static void setString(String key, String value) {
+    private static void setString(String key, String value) {
         setString(key, value, true);
     }
-    public static void setString(String key, String value, boolean allowSetWhenPublic) {
+    private static void setString(String key, String value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
@@ -236,20 +234,20 @@ public class Preferences {
         activeSharedPreferences.edit().putString(key, value).apply();
     }
 
-    public static void setInt(String key, int value) {
+    private static void setInt(String key, int value) {
         setInt(key, value, true);
     }
-    public static void setInt(String key, int value, boolean allowSetWhenPublic) {
+    private static void setInt(String key, int value, boolean allowSetWhenPublic) {
         if((isModeMqttPublic() && !allowSetWhenPublic)) {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
         }
         activeSharedPreferences.edit().putInt(key, value).apply();
     }
-    public static void setBoolean(String key, boolean value) {
+    private static void setBoolean(String key, boolean value) {
         setBoolean(key, value, true);
     }
-    public static void setBoolean(String key, boolean value, boolean allowSetWhenPublic) {
+    private static void setBoolean(String key, boolean value, boolean allowSetWhenPublic) {
         if(isModeMqttPublic() && !allowSetWhenPublic) {
             Timber.e("setting of key denied in the current mode: " + key);
             return;
@@ -264,15 +262,8 @@ public class Preferences {
     @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
     public int getModeId() { return modeId; }
 
-
-    public SharedPreferences getActiveSharedPreferences() {
-        return activeSharedPreferences;
-    }
-
-
-
     @SuppressLint("CommitPrefEdits")
-    public static void importKeyValue(String key, String value) throws IllegalAccessException, IllegalArgumentException {
+    public void importKeyValue(String key, String value) throws IllegalAccessException, IllegalArgumentException {
         Timber.v("setting %s, for key %s", value, key);
         HashMap<String, Method> methods = getImportMethods();
 
@@ -289,7 +280,7 @@ public class Preferences {
         try {
             Type t = m.getGenericParameterTypes()[0];
             Timber.v("type of parameter: %s %s", t, t.getClass());
-            methods.get(key).invoke(null, convert(t, value));
+            methods.get(key).invoke(this, convert(t, value));
         } catch (InvocationTargetException e) {
             throw new IllegalAccessException();
         }
@@ -311,7 +302,7 @@ public class Preferences {
     }
 
 
-    @SuppressLint("CommitPrefEdits")
+    @SuppressLint({"CommitPrefEdits", "ApplySharedPref"})
     public void importFromMessage(MessageConfiguration m) {
         Timber.v("importing %s keys ", m.getKeys().size());
         HashMap<String, Method> methods = getImportMethods();
@@ -471,10 +462,6 @@ public class Preferences {
         return getDeviceId(true);
     }
 
-    public String getDeviceIdWithHintSupport() {
-        return getDeviceId(false);
-    }
-
     public String getDeviceId(boolean fallbackToDefault) {
         if(Preferences.isModeMqttPublic())
             return getDeviceUUID();
@@ -509,7 +496,7 @@ public class Preferences {
 
 
     // Not used on public, as many people might use the same device type
-    public String getDeviceIdDefault() {
+    private String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
         return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
@@ -609,7 +596,7 @@ public class Preferences {
             return tid;
     }
 
-    public String getTrackerIdDefault(){
+    private String getTrackerIdDefault(){
         String deviceId = getDeviceId();
         if(deviceId!=null && deviceId.length() >= 2)
             return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured deviceId.
@@ -664,7 +651,7 @@ public class Preferences {
     }
 
 
-    public static String getIntWithHintSupport(String key) {
+    private static String getIntWithHintSupport(String key) {
         int i = getInt(key, R.integer.valInvalid);
         if (i == -1) {
             return "";
@@ -1004,13 +991,11 @@ public class Preferences {
         setBoolean(Keys.DEBUG_VIBRATE, vibrate);
     }
 
-    public static String getEncryptionKey() {
+    static String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
 
-
-
-    public boolean getSetupCompleted() {
+    boolean getSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
         return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
@@ -1020,8 +1005,6 @@ public class Preferences {
 
     }
 
-
-
     // Maybe make this configurable
     // For now it makes things easier to change
     public static int getPubQosEvents() {
@@ -1029,14 +1012,6 @@ public class Preferences {
     }
 
     public static boolean getPubRetainEvents() {
-        return false;
-    }
-
-    public static int getPubQosCommands() {
-        return getPubQos();
-    }
-
-    public static boolean getPubRetainCommands() {
         return false;
     }
 
@@ -1087,10 +1062,7 @@ public class Preferences {
         setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean, false);
     }
 
-
-
-
-
+    @SuppressWarnings("WeakerAccess")
     public static class Keys {
         public static final String AUTH                             = "auth";
         public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
@@ -1154,6 +1126,7 @@ public class Preferences {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public @interface Export {
         String key();
         boolean exportModeMqttPrivate() default false;
@@ -1162,14 +1135,12 @@ public class Preferences {
     }
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public @interface Import {
         String key();
     }
 
-
-
-
-    public static List<Method> getExportMethods() {
+    private static List<Method> getExportMethods() {
         int modeId = App.getPreferences().getModeId();
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
@@ -1194,7 +1165,7 @@ public class Preferences {
         return new ArrayList<>(getImportMethods().keySet());
     }
 
-    public static HashMap<String, Method> getImportMethods() {
+    private static HashMap<String, Method> getImportMethods() {
         final HashMap<String, Method> methods = new HashMap<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -1216,6 +1187,4 @@ public class Preferences {
         String st = Preferences.getString(key, R.string.valEmpty);
         return (st != null && !st.isEmpty()) ? st : null;
     }
-
-
 }
