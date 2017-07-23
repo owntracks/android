@@ -72,11 +72,6 @@ public class BindingConversions {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    @BindingConversion
-    public static int convertBooleanToVisibility(boolean visible) {
-        return visible ? View.VISIBLE : View.GONE;
-    }
-
     public static int convertModeIdToLabelResId(int modeId) {
         switch (modeId) {
             case App.MODE_ID_HTTP_PRIVATE:
