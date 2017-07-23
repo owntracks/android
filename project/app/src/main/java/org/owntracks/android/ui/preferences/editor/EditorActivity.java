@@ -94,7 +94,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                         String value = inputValue.getText().toString();
 
                         try {
-                            Preferences.importKeyValue(key, value);
+                            preferences.importKeyValue(key, value);
                             viewModel.onPreferencesValueForKeySetSuccessful();
                             dialog.dismiss();
                         } catch (IllegalAccessException e) {
