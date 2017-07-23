@@ -1,7 +1,9 @@
 package org.owntracks.android.services;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Base64;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,16 +25,28 @@ import org.owntracks.android.services.MessageProcessor.EndpointState;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.ConnectionPool;
+import okhttp3.Dns;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -105,9 +119,16 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             SocketFactory f = new SocketFactory(socketFactoryOptions);
 
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel( HttpLoggingInterceptor.Level.BODY);
+            logging.setLevel( HttpLoggingInterceptor.Level.NONE);
 
-            mHttpClient = new OkHttpClient.Builder().sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]).addInterceptor(logging).build();
+            mHttpClient = new OkHttpClient.Builder()
+                    .followRedirects(true)
+                    .followSslRedirects(true)
+                    .connectTimeout(2, TimeUnit.MINUTES)
+                    .dns(new DebugDnsSelector(DebugDnsSelector.Mode.IPV4_FIRST))
+                    .connectionPool(new ConnectionPool())
+                    .sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0])
+                    .addInterceptor(logging).build();
 
 
 
@@ -141,7 +162,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     }
 
-    boolean sendMessage(Bundle b) {
+    int sendMessage(Bundle b) {
         String body = b.getString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD);
         String url = b.getString(HTTP_BUNDLE_KEY_URL);
         String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
@@ -150,7 +171,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
 
         if(body == null || url == null)
-            return false;
+            return getMessageProcessor().onMessageDeliveryFailed(messageId);
 
         Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
         //request.addHeader("Accept-Encoding", "gzip");
@@ -173,7 +194,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
             // Handle delivered message
             if((r != null) && (r.isSuccessful())) {
-                getMessageProcessor().onMessageDelivered(messageId);
 
                 // Handle response
                 if(r.body() != null ) {
@@ -194,18 +214,16 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
                     }
                 }
             } else {
-                getMessageProcessor().onMessageDeliveryFailed(messageId);
-                return false;
+                return getMessageProcessor().onMessageDeliveryFailed(messageId);
             }
 
         } catch (Exception e) {
-            Timber.e("error:IOException. Delivery failed ");
+            Timber.e("error:IOException. Delivery failed ", e);
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setError(e));
-            getMessageProcessor().onMessageDeliveryFailed(messageId);
-            return false;
+            return getMessageProcessor().onMessageDeliveryFailed(messageId);
         }
 
-        return true;
+        return getMessageProcessor().onMessageDelivered(messageId);
     }
 
     private static MessageProcessor getMessageProcessor() {
@@ -309,5 +327,66 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     @Override
     public boolean isConfigurationComplete() {
         return this.endpointUrl != null;
+    }
+
+    public static class DebugDnsSelector implements Dns {
+
+        public enum Mode {
+            SYSTEM,
+            IPV6_FIRST,
+            IPV4_FIRST,
+            IPV6_ONLY,
+            IPV4_ONLY
+        }
+
+        private Mode mode;
+
+        public DebugDnsSelector(Mode mode) {
+            this.mode = mode;
+        }
+
+        public static Dns byName(String ipMode) {
+            Mode selectedMode;
+            switch (ipMode) {
+                case "ipv6":
+                    selectedMode = Mode.IPV6_FIRST;
+                    break;
+                case "ipv4":
+                    selectedMode = Mode.IPV4_FIRST;
+                    break;
+                case "ipv6only":
+                    selectedMode = Mode.IPV6_ONLY;
+                    break;
+                case "ipv4only":
+                    selectedMode = Mode.IPV4_ONLY;
+                    break;
+                default:
+                    selectedMode = Mode.SYSTEM;
+                    break;
+            }
+
+            return new DebugDnsSelector(selectedMode);
+        }
+
+        @Override public List<InetAddress> lookup(String hostname) throws UnknownHostException {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Timber.v("looking up %s idle:%s powersave:%s mainthread:%s", hostname, App.getPowerManager().isDeviceIdleMode(), App.getPowerManager().isPowerSaveMode(), Looper.myLooper() == Looper.getMainLooper());
+            }
+
+            if (hostname == null) throw new UnknownHostException("hostname == null");
+            InetAddress l;
+            try {
+                l = InetAddress.getByName(hostname);
+            }catch (UnknownHostException e) {
+                e.printStackTrace();
+                Timber.e("message: %s", e.getMessage());
+                throw e;
+            }
+            Timber.v("address: %s", l.getHostAddress());
+            return Arrays.asList(l);
+        }
+
+        public void addOverride(String hostname, InetAddress address) {
+        }
     }
 }

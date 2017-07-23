@@ -1,24 +1,30 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.GcmTaskService;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
-import com.google.android.gms.gcm.TaskParams;
+import com.firebase.jobdispatcher.Constraint;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.JobParameters;
+import com.firebase.jobdispatcher.JobService;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.SimpleJobService;
+import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class Scheduler extends GcmTaskService {
+public class Scheduler extends SimpleJobService {
     public static final String BUNDLE_KEY_ACTION = "DISPATCHER_ACTION";
     public static final String BUNDLE_KEY_MESSAGE_ID = "MESSAGE_ID";
 
@@ -27,52 +33,58 @@ public class Scheduler extends GcmTaskService {
     private static final String PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING" ;
     private static final String PERIODIC_TASK_MQTT_PING = "PERIODIC_TASK_MQTT_PING" ;
     private static final String PERIODIC_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT";
+    private static Scheduler instance;
+    private static FirebaseJobDispatcher dispatcher;
+
+    public Scheduler() {
+         dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
+    }
+
+
 
     @Override
-    public int onRunTask(TaskParams taskParams) {
+    public int onRunJob(JobParameters taskParams) {
         Bundle extras = taskParams.getExtras();
         if(extras == null) {
             Timber.e("Bundle extras are not set");
-            return GcmNetworkManager.RESULT_FAILURE;
+            return RESULT_FAIL_NORETRY;
         }
 
         String action = extras.getString(BUNDLE_KEY_ACTION);
         if(action == null) {
             Timber.e("BUNDLE_KEY_ACTION is not set");
-            return GcmNetworkManager.RESULT_FAILURE;
+            return RESULT_FAIL_NORETRY;
         }
 
         Timber.v("BUNDLE_KEY_ACTION: %s", extras.getString(BUNDLE_KEY_ACTION));
 
         switch (action) {
             case ONEOFF_TASK_SEND_MESSAGE_HTTP:
-                return MessageProcessorEndpointHttp.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
+                return MessageProcessorEndpointHttp.getInstance().sendMessage(extras);
             case ONEOFF_TASK_SEND_MESSAGE_MQTT:
-                return MessageProcessorEndpointMqtt.getInstance().sendMessage(extras) ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
+                MessageProcessorEndpointMqtt.getInstance().sendMessage(extras);
+                return RESULT_SUCCESS; // Retry will be handled by MessageProcessor
             case PERIODIC_TASK_MQTT_PING:
-                return MessageProcessorEndpointMqtt.getInstance().sendPing() ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
+                return MessageProcessorEndpointMqtt.getInstance().sendPing() ? RESULT_SUCCESS : RESULT_FAIL_RETRY;
             case PERIODIC_TASK_MQTT_RECONNECT:
-                return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_FAILURE;
+                return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? RESULT_SUCCESS : RESULT_FAIL_RETRY;
             case PERIODIC_TASK_SEND_LOCATION_PING:
-                Intent mIntent = new Intent(this, BackgroundService.class);
-                mIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
-                startService(mIntent);
-                return GcmNetworkManager.RESULT_SUCCESS;
+                App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
+                return RESULT_SUCCESS;
             default:
                 Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
-                return GcmNetworkManager.RESULT_FAILURE;
+                return RESULT_FAIL_NORETRY;
         }
-
     }
 
     public void cancelHttpTasks() {
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(ONEOFF_TASK_SEND_MESSAGE_HTTP, Scheduler.class);
+        dispatcher.cancel(ONEOFF_TASK_SEND_MESSAGE_HTTP);
     }
 
     public void cancelMqttTasks() {
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(ONEOFF_TASK_SEND_MESSAGE_MQTT, Scheduler.class);
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_PING, Scheduler.class);
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_RECONNECT, Scheduler.class);
+        dispatcher.cancel(ONEOFF_TASK_SEND_MESSAGE_MQTT);
+        dispatcher.cancel(PERIODIC_TASK_MQTT_PING);
+        dispatcher.cancel(PERIODIC_TASK_MQTT_RECONNECT);
     }
 
 
@@ -86,51 +98,63 @@ public class Scheduler extends GcmTaskService {
             return;
         }
 
-        Task task = new OneoffTask.Builder()
+        Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
-                .setExecutionWindow(0L, App.isInForeground() ? 1L: 60L)
                 .setTag(Long.toString(b.getLong(BUNDLE_KEY_MESSAGE_ID)))
-                .setUpdateCurrent(false)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setRequiresCharging(false)
+                .setRecurring(false)
+                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                .setConstraints( Constraint.ON_ANY_NETWORK)
+                //.setTrigger(Trigger.executionWindow(0, App.isInForeground() ? 1: 60))
+                .setTrigger(Trigger.NOW)
+                .setReplaceCurrent(true)
+                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setExtras(b)
                 .build();
 
-        Timber.v("scheduling task %s, %s", b.get(BUNDLE_KEY_ACTION), task.getTag());
+        Timber.v("scheduling task %s, %s", b.get(BUNDLE_KEY_ACTION), job.getTag());
 
-        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+        dispatcher.schedule(job);
     }
 
     public void scheduleMqttPing(long keepAliveSeconds) {
-        PeriodicTask task = new PeriodicTask.Builder()
+
+        Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_PING)
+                .setRecurring(true)
+                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                .setConstraints( Constraint.ON_ANY_NETWORK)
+                .setTrigger(Trigger.executionWindow(0, (int)keepAliveSeconds))
+                .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_MQTT_PING))
-                .setPeriod(keepAliveSeconds)
-                .setUpdateCurrent(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .build();
+
         Timber.v("scheduling task PERIODIC_TASK_MQTT_PING");
-        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+
+        dispatcher.schedule(job);
     }
 
     public void cancelMqttPing() {
         Timber.v("canceling task PERIODIC_TASK_MQTT_PING");
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_PING, Scheduler.class);
+        dispatcher.cancel(PERIODIC_TASK_MQTT_PING);
     }
 
     public void scheduleLocationPing() {
-        PeriodicTask task = new PeriodicTask.Builder()
+
+        Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_SEND_LOCATION_PING)
+                .setRecurring(true)
+                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                .setConstraints( Constraint.ON_ANY_NETWORK)
+                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(Preferences.getPing())))
+                .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_SEND_LOCATION_PING))
-                .setPeriod(TimeUnit.MINUTES.toSeconds(Preferences.getPing()))
-                .setUpdateCurrent(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setFlex(TimeUnit.MINUTES.toSeconds(Preferences.getPing())/2)
                 .build();
+
         Timber.v("scheduling task PERIODIC_TASK_SEND_LOCATION_PING");
-        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+
+        dispatcher.schedule(job);
     }
 
     @NonNull
@@ -141,24 +165,27 @@ public class Scheduler extends GcmTaskService {
     }
 
     public void scheduleMqttReconnect() {
-        PeriodicTask task = new PeriodicTask.Builder()
+        Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_RECONNECT)
+                .setRecurring(true)
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(Constraint.ON_ANY_NETWORK)
+                .setTrigger(Trigger.executionWindow(0, (int)TimeUnit.MINUTES.toSeconds(10)))
+                .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_MQTT_RECONNECT))
-                .setPeriod(TimeUnit.MINUTES.toSeconds(10))
-                .setUpdateCurrent(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setFlex(TimeUnit.MINUTES.toSeconds(10))
                 .build();
+
         Timber.v("scheduling task PERIODIC_TASK_MQTT_RECONNECT");
-        GcmNetworkManager.getInstance(App.getContext()).schedule(task);
+        dispatcher.schedule(job);
     }
 
 
 
     public void cancelMqttReconnect() {
         Timber.v("canceling task PERIODIC_TASK_MQTT_RECONNECT");
-        GcmNetworkManager.getInstance(App.getContext()).cancelTask(PERIODIC_TASK_MQTT_RECONNECT, Scheduler.class);
+        dispatcher.cancel(PERIODIC_TASK_MQTT_RECONNECT);
     }
+
 
 }

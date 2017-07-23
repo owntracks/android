@@ -423,8 +423,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
             if(preferences.getDebugVibrate()) {
                 Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-                long[] pattern = {200,200,200};
-                v.vibrate(pattern, -1);
+                v.vibrate(500);
             }
 
 

@@ -170,21 +170,18 @@ public class MessageProcessor implements IncomingMessageProcessor {
         loadOutgoingMessageProcessor();
     }
 
-    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>();
+    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
 
     public void sendMessage(MessageBase message) {
         if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) return;
 
-        Timber.v("executing message on outgoingMessageProcessor");
         message.setOutgoingProcessor(outgoingMessageProcessor);
         onMessageQueued(message);
-
         this.outgoingMessageProcessorExecutor.execute(message);
     }
 
-     void onMessageDelivered(Long messageId) {
+     int onMessageDelivered(Long messageId) {
         MessageBase m = outgoingQueue.get(messageId);
-        outgoingQueue.remove(messageId);
 
 
         if(m != null) {
@@ -197,48 +194,52 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 eventBus.post(m);
             }
             eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+            outgoingQueue.remove(messageId);
 
         } else {
-            Timber.e("messageId:%s, error: called for unqueued message", messageId);
+            Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
         }
+        return Scheduler.RESULT_SUCCESS;
     }
 
     private void onMessageQueued(MessageBase m) {
-        if(preferences.getDebugVibrate()) {
-            Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(500);
-        }
-
         outgoingQueue.put(m.getMessageId(), m);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-        Timber.v("messageId:%s, queueLength:%s", m.getMessageId(), outgoingQueue.size());
+        Timber.v("messageId:%s, queueLength:%s, queue:%s", m.getMessageId(), outgoingQueue.size(), outgoingQueue);
     }
 
-    void onMessageDeliveryFailed(Long messageId) {
+    int onMessageDeliveryFailed(Long messageId) {
         if(preferences.getDebugVibrate()) {
             Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
             v.vibrate(2000);
         }
 
         MessageBase m = outgoingQueue.get(messageId);
-        outgoingQueue.remove(messageId);
+        //outgoingQueue.remove(messageId);
 
         if(m == null) {
-            Timber.e("type:base, messageId:%s, error: called for unqueued message", messageId);
+            Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
+            return Scheduler.RESULT_FAIL_NORETRY;
         } else {
             eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-            Timber.v("type:base, messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m.getOutgoingTTL() > 0)  {
-                Timber.d("type:base, messageId:%s, action: requeued",m.getMessageId() );
-                sendMessage(m);
+                if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) {
+                    Timber.e("messageId:%s, queueLength:%s, action: discarded/acceptMessages",m.getMessageId(),outgoingQueue.size() );
+                    return Scheduler.RESULT_FAIL_NORETRY;
+                }
+                Timber.d("messageId:%s, queueLength:%s, action: requeued", m.getMessageId(), outgoingQueue.size());
+                //onMessageQueued(m);
+                return Scheduler.RESULT_FAIL_RETRY;
+
             } else {
-                Timber.e("type:base, messageId:%s, action: discarded due to expired ttl",m.getMessageId() );
+                Timber.e("messageId:%s, queueLength:%s, action: discarded/expired",m.getMessageId(),outgoingQueue.size() );
+                return Scheduler.RESULT_FAIL_NORETRY;
             }
         }
     }
 
     void onMessageReceived(MessageBase message) {
-        Timber.v("messageId:%s", message.getMessageId());
+        //Timber.v("messageId:%s", message.getMessageId());
         message.setIncomingProcessor(this);
         incomingMessageProcessorExecutor.execute(message);
     }
