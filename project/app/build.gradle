@@ -4,7 +4,7 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 14
+def versionBuild = 15
 ext.pahoVersion = "1.1.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '11.0.2'
@@ -126,7 +126,7 @@ dependencies {
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.afollestad.material-dialogs:core:0.9.4.3'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.3'
-    compile('com.mikepenz:materialdrawer:5.9.4@aar') { transitive = true }
+    compile('com.mikepenz:materialdrawer:5.9.2@aar') { transitive = true }
     compile "com.mikepenz:materialize:1.0.2@aar"
 
     // Preprocessors
