@@ -531,13 +531,13 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
     private PendingIntent getLocationPendingIntent() {
         Intent locationIntent = new Intent(getApplicationContext(), BackgroundService.class);
-        return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getGeofencePendingIntent() {
         Intent geofeneIntent = new Intent(getApplicationContext(), BackgroundService.class);
         geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
-        return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(getApplicationContext(), INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
 
