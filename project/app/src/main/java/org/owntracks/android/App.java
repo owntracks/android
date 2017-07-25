@@ -197,6 +197,8 @@ public class App extends Application  {
             public void run() {
                 if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
                     //TODO: use NotificationManager.startServiceInForeground() on API >= O
+                    //mNotificationManager.startServiceInForeground(new Intent(this, LocationUpdatesService.class), NOTIFICATION_ID, getNotification());
+
                     c.startService((new Intent(c, BackgroundService.class)).setAction(action));
                 } else {
                     c.startService((new Intent(c, BackgroundService.class)).setAction(action));

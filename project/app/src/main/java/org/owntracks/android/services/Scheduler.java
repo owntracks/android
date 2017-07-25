@@ -62,19 +62,29 @@ public class Scheduler extends SimpleJobService {
             case ONEOFF_TASK_SEND_MESSAGE_HTTP:
                 return MessageProcessorEndpointHttp.getInstance().sendMessage(extras);
             case ONEOFF_TASK_SEND_MESSAGE_MQTT:
-                MessageProcessorEndpointMqtt.getInstance().sendMessage(extras);
-                return RESULT_SUCCESS; // Retry will be handled by MessageProcessor
+                return MessageProcessorEndpointMqtt.getInstance().sendMessage(extras);
             case PERIODIC_TASK_MQTT_PING:
-                return MessageProcessorEndpointMqtt.getInstance().sendPing() ? RESULT_SUCCESS : RESULT_FAIL_RETRY;
+                return MessageProcessorEndpointMqtt.getInstance().sendPing() ? returnSuccess() : returnFailRetry();
             case PERIODIC_TASK_MQTT_RECONNECT:
-                return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? RESULT_SUCCESS : RESULT_FAIL_RETRY;
+                return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? returnSuccess() : returnFailRetry();
             case PERIODIC_TASK_SEND_LOCATION_PING:
                 App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
-                return RESULT_SUCCESS;
+                return returnSuccess();
             default:
                 Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
-                return RESULT_FAIL_NORETRY;
+                return returnFailNoretry();
         }
+    }
+
+    public static int returnSuccess() {
+        return RESULT_SUCCESS;
+    }
+
+    public static int returnFailRetry() {
+        return RESULT_FAIL_NORETRY;
+    }
+    public static int returnFailNoretry() {
+        return RESULT_FAIL_NORETRY;
     }
 
     public void cancelHttpTasks() {

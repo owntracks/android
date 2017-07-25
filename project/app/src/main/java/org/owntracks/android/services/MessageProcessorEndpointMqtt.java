@@ -69,23 +69,22 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 	}
 
-	synchronized boolean sendMessage(Bundle b) {
+	synchronized int sendMessage(Bundle b) {
 		long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 		if(!connect()) {
 			Timber.e("not connected and connect failed");
-			return false;
+			return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
 		}
 
 		try {
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
-			App.getMessageProcessor().onMessageDelivered(messageId);
+
 			Timber.v("message sent: %s", b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID));
-			return true;
+			return App.getMessageProcessor().onMessageDelivered(messageId);
 		} catch (MqttException e) {
-			App.getMessageProcessor().onMessageDeliveryFailed(messageId);
 			e.printStackTrace();
-			return false;
+			return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
 		}
 	}
 

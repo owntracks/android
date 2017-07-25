@@ -199,7 +199,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         } else {
             Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
         }
-        return Scheduler.RESULT_SUCCESS;
+        return Scheduler.returnSuccess();
     }
 
     private void onMessageQueued(MessageBase m) {
@@ -219,21 +219,21 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         if(m == null) {
             Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
-            return Scheduler.RESULT_FAIL_NORETRY;
+            return Scheduler.returnFailNoretry();
         } else {
             eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
             if(m.getOutgoingTTL() > 0)  {
                 if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) {
                     Timber.e("messageId:%s, queueLength:%s, action: discarded/acceptMessages",m.getMessageId(),outgoingQueue.size() );
-                    return Scheduler.RESULT_FAIL_NORETRY;
+                    return Scheduler.returnFailNoretry();
                 }
                 Timber.d("messageId:%s, queueLength:%s, action: requeued", m.getMessageId(), outgoingQueue.size());
                 //onMessageQueued(m);
-                return Scheduler.RESULT_FAIL_RETRY;
+                return Scheduler.returnFailRetry();
 
             } else {
                 Timber.e("messageId:%s, queueLength:%s, action: discarded/expired",m.getMessageId(),outgoingQueue.size() );
-                return Scheduler.RESULT_FAIL_NORETRY;
+                return Scheduler.returnFailNoretry();
             }
         }
     }
