@@ -200,4 +200,7 @@
     <string name="ERROR">Error</string>
     <string name="ERROR_DATADISABLED">Data connection not available</string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
+	<string name="notificationChannelOngoing">Ongoing</string>
+	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
+	<string name="notificationChannelEventsDescription">Region transmissions</string>
 </resources>

@@ -3,6 +3,8 @@ package org.owntracks.android.services;
 import android.Manifest;
 import android.app.Notification;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -13,6 +15,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
@@ -22,7 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -32,6 +35,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -72,7 +76,11 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
     private static final int NOTIFICATION_ID_ONGOING = 1;
+    private static final String NOTIFICATION_CHANNEL_ONGOING = "O";
+
     private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
+    private static final String NOTIFICATION_CHANNEL_EVENTS = "E";
+
     private static int notificationEventsID = 3;
 
     private final String NOTIFICATION_GROUP_EVENTS = "events";
@@ -93,6 +101,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
 
+    private LocationCallback locationCallback;
     private Location lastLocation;
     private MessageLocation lastLocationMessage;
     private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
@@ -100,7 +109,9 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
     private NotificationCompat.Builder activeNotificationBuilder;
     private NotificationCompat.Builder notificationBuilderEvents;
-    private NotificationManagerCompat mNotificationManager;
+    private NotificationManager notificationManager;
+
+    private NotificationManagerCompat notificationManagerCompat;
     private Preferences preferences;
     private List<Waypoint> waypoints = Collections.emptyList();
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
@@ -108,19 +119,24 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private int lastQueueLength = 0;
     private Notification stackNotification;
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
 
     @Override
     public void onCreate() {
         preferences = App.getPreferences();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mNotificationManager = NotificationManagerCompat.from(this); //getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManagerCompat = NotificationManagerCompat.from(this); //getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                onLocationChanged(locationResult.getLastLocation());
+            }
+        };
+
+        setupNotificationChannels();
 
         sendOngoingNotification();
 
@@ -145,9 +161,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     }
 
     private void handleIntent(@NonNull Intent intent) {
-        if (LocationResult.hasResult(intent)) {
-            onLocationChanged(intent);
-        } else if (intent.getAction() != null) {
+        if (intent.getAction() != null) {
             Timber.v("intent received with action:%s", intent.getAction());
 
             switch (intent.getAction()) {
@@ -181,6 +195,28 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         }
     }
 
+    public void setupNotificationChannels() {
+        if (Build.VERSION.SDK_INT < 26) {
+            return;
+        }
+
+        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT);
+        ongoingChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        ongoingChannel.setDescription(getString(R.string.notificationChannelOngoingDescription));
+        ongoingChannel.enableLights(false);
+        ongoingChannel.enableVibration(false);
+        ongoingChannel.setShowBadge(true);
+        notificationManager.createNotificationChannel(ongoingChannel);
+
+        NotificationChannel eventsChannel = new NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, getString(R.string.events), NotificationManager.IMPORTANCE_HIGH);
+        ongoingChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        ongoingChannel.setDescription(getString(R.string.notificationChannelEventsDescription));
+        ongoingChannel.enableLights(false);
+        ongoingChannel.enableVibration(false);
+        ongoingChannel.setShowBadge(true);
+        notificationManager.createNotificationChannel(eventsChannel);
+    }
+
 
     @Nullable
     private NotificationCompat.Builder getOngoingNotificationBuilder() {
@@ -191,7 +227,9 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
             return activeNotificationBuilder;
 
 
-        activeNotificationBuilder = new NotificationCompat.Builder(this);
+        activeNotificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING);
+
+
 
         Intent resultIntent = new Intent(App.getContext(), MapActivity.class);
         resultIntent.setAction("android.intent.action.MAIN");
@@ -277,8 +315,8 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         Notification n = notificationBuilderEvents.build();
 
         Timber.v("sending new transition notification");
-        mNotificationManager.notify(notificationEventsID++, n);
-        //mNotificationManager.notify(NOTIFICATION_TAG_EVENTS_STACK, System.currentTimeMillis() / 1000, n) ;
+        notificationManagerCompat.notify(notificationEventsID++, n);
+        //notificationManagerCompat.notify(NOTIFICATION_TAG_EVENTS_STACK, System.currentTimeMillis() / 1000, n) ;
         sendEventStackNotification(title, text, when);
     }
 
@@ -338,7 +376,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
                 builder.setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
 
                 stackNotification = builder.build();
-                mNotificationManager.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
+                notificationManagerCompat.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
             }
         }
     }
@@ -413,12 +451,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     }
 
 
-    private void onLocationChanged(@NonNull Intent intent) {
-        LocationResult locationResult = LocationResult.extractResult(intent);
-        onLocationChanged(locationResult.getLastLocation());
-    }
-
-    private void onLocationChanged(@Nullable Location location) {
+    public void onLocationChanged(@Nullable Location location) {
 
         if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
             if(preferences.getDebugVibrate()) {
@@ -526,7 +559,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
 
         mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
         LocationRequest request = App.isInForeground() ? getForegroundLocationRequest() : getBackgroundLocationRequest();
-        mFusedLocationClient.requestLocationUpdates(request, getLocationPendingIntent());
+        mFusedLocationClient.requestLocationUpdates(request, locationCallback, App.getBackgroundHandler().getLooper());
     }
 
     private PendingIntent getLocationPendingIntent() {
@@ -717,7 +750,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         Timber.v("builder not present, lazy building");
 
 
-        notificationBuilderEvents = new NotificationCompat.Builder(this);
+        notificationBuilderEvents = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
 
 
         Intent openIntent = new Intent(this, MapActivity.class);
@@ -839,4 +872,43 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     public void onComplete(@NonNull Task<Location> task) {
         onLocationChanged(task.getResult());
     }
+
+
+
+
+
+
+    boolean mChangingConfiguration;
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public BackgroundService getService() {
+            return BackgroundService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // Called when a client (MainActivity in case of this sample) comes to the foreground
+        // and binds with this service. The service should cease to be a foreground service
+        // when that happens.
+        Timber.v("in onBind()");
+        return mBinder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        // Called when a client (MainActivity in case of this sample) returns to the foreground
+        // and binds once again with this service. The service should cease to be a foreground
+        // service when that happens.
+        Timber.v("in onRebind()");
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Timber.v("Last client unbound from service");
+        return true; // Ensures onRebind() is called when a client re-binds.
+    }
+
 }
