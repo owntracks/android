@@ -162,4 +162,8 @@
     <string name="ERROR">Fehler</string>
     <string name="ERROR_DATADISABLED">Datenverbindung nicht verfügbar</string>
     <string name="ERROR_CONFIGURATION">Konfiguration unvollständig</string>
+	<string name="notificationChannelOngoing">Ongoing</string>
+    <string name="notificationChannelOngoingDescription">Show a persistent notification to receive location updates in the background</string>
+    <string name="notificationChannelEventsDescription">Region transmissions</string>
+
 </resources>

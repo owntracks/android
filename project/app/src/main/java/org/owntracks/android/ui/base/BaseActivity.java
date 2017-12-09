@@ -1,9 +1,13 @@
 package org.owntracks.android.ui.base;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -18,6 +22,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RequirementsChecker;
@@ -98,6 +103,31 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         return mActivityComponent;
     }
 
+
+    private BackgroundService mService;
+    private boolean mBound;
+
+    protected boolean isBound() {
+        return mBound;
+    }
+
+    // Monitors the state of the connection to the service.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mBound = false;
+        }
+    };
+
     protected void setSupportToolbar(@NonNull Toolbar toolbar) {
         setSupportToolbar(toolbar, true, true);
     }
@@ -151,7 +181,20 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
 
         super.onStart();
+
+        bindService(new Intent(this, BackgroundService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
     }
+
+
+    @Override
+    protected void onStop() {
+        if (mBound) {
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+        super.onStop();
+    }
+
 
     @Override
     @CallSuper

@@ -50,6 +50,11 @@ public class App extends Application  {
     private static SimpleDateFormat dateFormaterToday;
 
     private static Handler mainHandler;
+
+    public static Handler getBackgroundHandler() {
+        return backgroundHandler;
+    }
+
     private static Handler backgroundHandler;
 
     private Activity currentActivity;
@@ -195,11 +200,8 @@ public class App extends Application  {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                    //TODO: use NotificationManager.startServiceInForeground() on API >= O
-                    //mNotificationManager.startServiceInForeground(new Intent(this, LocationUpdatesService.class), NOTIFICATION_ID, getNotification());
-
-                    c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    c.startForegroundService((new Intent(c, BackgroundService.class)).setAction(action));
                 } else {
                     c.startService((new Intent(c, BackgroundService.class)).setAction(action));
                 }
@@ -208,6 +210,8 @@ public class App extends Application  {
         };
         postOnBackgroundHandlerDelayed(r, 1000);
     }
+
+
 
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background
