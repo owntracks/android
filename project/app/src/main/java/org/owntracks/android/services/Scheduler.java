@@ -76,6 +76,8 @@ public class Scheduler extends SimpleJobService {
         }
     }
 
+
+
     public static int returnSuccess() {
         return RESULT_SUCCESS;
     }
@@ -98,6 +100,14 @@ public class Scheduler extends SimpleJobService {
     }
 
 
+    public boolean onStopJob(JobParameters job) {
+        // Remove stopd job from queue
+        if(job.getExtras() != null) {
+            App.getMessageProcessor().onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
+        }
+        return super.onStopJob(job);
+    }
+
     public void scheduleMessage(Bundle b)  {
         if(b.get(BUNDLE_KEY_MESSAGE_ID) == null) {
             Timber.e("Bundle without BUNDLE_KEY_MESSAGE_ID");
@@ -114,15 +124,15 @@ public class Scheduler extends SimpleJobService {
                 .setRecurring(false)
                 .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
-                //.setTrigger(Trigger.executionWindow(0, App.isInForeground() ? 1: 60))
-                .setTrigger(Trigger.NOW)
+                //.setTrigger(Trigger.executionWindow(0, App.isInForeground() ? 0: 60))
+                .setTrigger(Trigger.executionWindow(0,0))
+                //.setTrigger(Trigger.NOW)
                 .setReplaceCurrent(true)
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setExtras(b)
                 .build();
 
         Timber.v("scheduling task %s, %s", b.get(BUNDLE_KEY_ACTION), job.getTag());
-
         dispatcher.schedule(job);
     }
 
@@ -140,7 +150,6 @@ public class Scheduler extends SimpleJobService {
                 .build();
 
         Timber.v("scheduling task PERIODIC_TASK_MQTT_PING");
-
         dispatcher.schedule(job);
     }
 

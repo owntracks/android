@@ -208,6 +208,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
         Timber.v("messageId:%s, queueLength:%s, queue:%s", m.getMessageId(), outgoingQueue.size(), outgoingQueue);
     }
 
+    void onMessageDeliveryFailedFinal(Long messageId) {
+        Timber.e("messageID:%s");
+        outgoingQueue.remove(messageId);
+    }
+
     int onMessageDeliveryFailed(Long messageId) {
         if(preferences.getDebugVibrate()) {
             Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
