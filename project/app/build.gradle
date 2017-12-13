@@ -5,16 +5,15 @@ def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
 def versionBuild = 16
-ext.pahoVersion = "1.1.0"
+ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
-ext.playLibVersion = '11.0.2'
+ext.playLibVersion = '11.6.2'
 ext.okHttpVersion = '3.8.0'
-ext.supportLibVersion = '26.0.0'
-
+ext.supportLibVersion = '27.0.2'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '25.0.1'
+    compileSdkVersion 27
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "org.owntracks.android"
@@ -28,7 +27,6 @@ android {
                 arguments = [ eventBusIndex : 'org.owntracks.android.EventBusIndex' ]
             }
         }
-
     }
 
     buildTypes {
@@ -97,9 +95,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Play Services libraries
-    //compile "com.google.android.gms:play-services-gcm:${playLibVersion}"
-    compile 'com.firebase:firebase-jobdispatcher:0.7.0'
-
+    compile 'com.firebase:firebase-jobdispatcher:0.8.5'
     compile "com.google.android.gms:play-services-maps:${playLibVersion}"
     compile "com.google.android.gms:play-services-location:${playLibVersion}"
     compile "com.google.android.gms:play-services-places:${playLibVersion}"
@@ -109,8 +105,8 @@ dependencies {
     compile "com.google.dagger:dagger:${daggerVersion}"
     //compile "com.google.dagger:dagger-android-support:${daggerVersion}"
 
-    compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'org.greenrobot:eventbus:3.1.1'
+    compile 'org.greenrobot:greendao:3.2.2'
     compile 'org.altbeacon:android-beacon-library:2.10@aar'
 
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
@@ -124,23 +120,20 @@ dependencies {
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.3'
-    compile 'com.afollestad.material-dialogs:commons:0.9.4.3'
-    compile('com.mikepenz:materialdrawer:5.9.2@aar') { transitive = true }
-    compile "com.mikepenz:materialize:1.0.2@aar"
+    compile 'com.afollestad.material-dialogs:core:0.9.6.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    compile('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation "com.android.support:support-annotations:${supportLibVersion}"
+    implementation "com.android.support:design:${supportLibVersion}"
+    implementation "com.mikepenz:materialize:1.1.2@aar"
 
     // Preprocessors
-    annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.0.1'
+    annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.1.1'
     annotationProcessor  "com.google.dagger:dagger-compiler:${daggerVersion}"
-    //annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
 }
-
-//apt {
-//    arguments {
-//        eventBusIndex "org.owntracks.android.EventBusIndex"
-//    }
-//}
 
 greendao {
     schemaVersion 15
