@@ -193,8 +193,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 onMessageReceived(m);
                 eventBus.post(m);
             }
-            eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-            outgoingQueue.remove(messageId);
+            dequeue(m.getMessageId());
 
         } else {
             Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
@@ -209,16 +208,17 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onMessageDeliveryFailedFinal(Long messageId) {
-        Timber.e("messageID:%s");
+        Timber.e(":%s");
+        dequeue(messageId);
+    }
+
+    private void dequeue(long messageId) {
+        Timber.v("messageId:%s", messageId);
         outgoingQueue.remove(messageId);
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 
     int onMessageDeliveryFailed(Long messageId) {
-        if(preferences.getDebugVibrate()) {
-            Vibrator v = (Vibrator) App.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(2000);
-        }
-
         MessageBase m = outgoingQueue.get(messageId);
         //outgoingQueue.remove(messageId);
 
@@ -230,14 +230,15 @@ public class MessageProcessor implements IncomingMessageProcessor {
             if(m.getOutgoingTTL() > 0)  {
                 if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) {
                     Timber.e("messageId:%s, queueLength:%s, action: discarded/acceptMessages",m.getMessageId(),outgoingQueue.size() );
+                    dequeue(m.getMessageId());
                     return Scheduler.returnFailNoretry();
                 }
                 Timber.d("messageId:%s, queueLength:%s, action: requeued", m.getMessageId(), outgoingQueue.size());
-                //onMessageQueued(m);
                 return Scheduler.returnFailRetry();
 
             } else {
                 Timber.e("messageId:%s, queueLength:%s, action: discarded/expired",m.getMessageId(),outgoingQueue.size() );
+                dequeue(m.getMessageId());
                 return Scheduler.returnFailNoretry();
             }
         }
@@ -250,6 +251,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onEndpointStateChanged(EndpointState newState) {
+        Timber.v("message:%s, ", newState.getMessage());
         App.getEventBus().postSticky(newState);
     }
 

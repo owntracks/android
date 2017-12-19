@@ -83,13 +83,16 @@ public class Scheduler extends SimpleJobService {
     }
 
     public static int returnFailRetry() {
-        return RESULT_FAIL_NORETRY;
+        Timber.v("RESULT_FAIL_RETRY");
+        return RESULT_FAIL_RETRY;
     }
     public static int returnFailNoretry() {
+        Timber.v("RESULT_FAIL_NORETRY");
         return RESULT_FAIL_NORETRY;
     }
 
     public void cancelHttpTasks() {
+        Timber.v("canceling tasks");
         dispatcher.cancel(ONEOFF_TASK_SEND_MESSAGE_HTTP);
     }
 
@@ -101,6 +104,7 @@ public class Scheduler extends SimpleJobService {
 
 
     public boolean onStopJob(JobParameters job) {
+        Timber.v("stoping job");
         // Remove stopd job from queue
         if(job.getExtras() != null) {
             App.getMessageProcessor().onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
@@ -122,7 +126,9 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(Long.toString(b.getLong(BUNDLE_KEY_MESSAGE_ID)))
                 .setRecurring(false)
-                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                // Default linear retry strategy has a max backoff of 1h. Use custom prolicy with 30s to 10 minutes.
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 .setConstraints( Constraint.ON_ANY_NETWORK)
                 //.setTrigger(Trigger.executionWindow(0, App.isInForeground() ? 0: 60))
                 .setTrigger(Trigger.executionWindow(0,0))
@@ -142,7 +148,8 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_PING)
                 .setRecurring(true)
-                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 120))
+                //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(0, (int)keepAliveSeconds))
                 .setReplaceCurrent(true)
@@ -164,7 +171,8 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_SEND_LOCATION_PING)
                 .setRecurring(true)
-                .setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
+                //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(Preferences.getPing())))
                 .setReplaceCurrent(true)
@@ -188,7 +196,7 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_RECONNECT)
                 .setRecurring(true)
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 10, 600))
                 .setConstraints(Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(0, (int)TimeUnit.MINUTES.toSeconds(10)))
                 .setReplaceCurrent(true)
