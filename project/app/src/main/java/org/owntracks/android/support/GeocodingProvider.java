@@ -129,7 +129,7 @@ public class GeocodingProvider {
                 if ((addresses != null) && (addresses.size() > 0)) {
                     StringBuilder g = new StringBuilder();
                     Address a = addresses.get(0);
-
+                    Timber.v("%s", a);
                     //String th = a.getThoroughfare();
                     //String sth = a.getSubThoroughfare();
                     //String lcy = a.getLocality();
@@ -141,11 +141,11 @@ public class GeocodingProvider {
                     //    return g.toString();
                     //}
                     if (a.getAddressLine(0) != null)
-                        g.append(a.getAddressLine(0)).append(", ");
-                    if (a.getLocality() != null)
-                        g.append(a.getLocality());
-                    else if (a.getCountryName() != null)
-                        g.append(a.getCountryName());
+                        g.append(a.getAddressLine(0));//.append(", ");
+                    //if (a.getLocality() != null)
+                    //    g.append(a.getLocality());
+                    //else if (a.getCountryName() != null)
+                    //    g.append(a.getCountryName());
                     return g.toString();
                 } else {
                     return "not available";
