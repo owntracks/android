@@ -164,19 +164,21 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     int sendMessage(Bundle b) {
         String body = b.getString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD);
-        String url = b.getString(HTTP_BUNDLE_KEY_URL);
-        String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
+        //String url = b.getString(HTTP_BUNDLE_KEY_URL);
+        //String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
         long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 
-        Timber.v("url:%s, userInfo:%s, messageId:%s", url, userInfo,  messageId);
+        Timber.v("url:%s, userInfo:%s, messageId:%s", this.endpointUrl, this.endpointUserInfo,  messageId);
 
-        if(body == null || url == null)
+        if(body == null || this.endpointUrl == null) {
+            Timber.e("body or url null");
             return getMessageProcessor().onMessageDeliveryFailed(messageId);
+        }
 
-        Request.Builder request = new Request.Builder().url(url).method("POST", RequestBody.create(JSON, body));
+        Request.Builder request = new Request.Builder().url(this.endpointUrl).method("POST", RequestBody.create(JSON, body));
         //request.addHeader("Accept-Encoding", "gzip");
-        if(userInfo != null) {
-            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(userInfo.getBytes(), Base64.NO_WRAP));
+        if(this.endpointUserInfo != null) {
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(this.endpointUserInfo.getBytes(), Base64.NO_WRAP));
         } else if(App.getPreferences().getAuth()) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((Preferences.getUsername()+":"+Preferences.getPassword()).getBytes(), Base64.NO_WRAP));
         }
@@ -194,7 +196,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
             // Handle delivered message
             if((r != null) && (r.isSuccessful())) {
-
+                Timber.v("request was successful");
                 // Handle response
                 if(r.body() != null ) {
                     try {
@@ -214,6 +216,12 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
                     }
                 }
             } else {
+                Timber.e("request was not successful");
+                if(r != null)
+                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response "+r.code() ));
+                else
+                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response empty" ));
+
                 return getMessageProcessor().onMessageDeliveryFailed(messageId);
             }
 
