@@ -499,6 +499,9 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         message.setLon(lastLocation.getLongitude());
         message.setAlt(lastLocation.getAltitude());
         message.setAcc(Math.round(lastLocation.getAccuracy()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && lastLocation.hasVerticalAccuracy()) {
+            message.setVacc(Math.round(lastLocation.getVerticalAccuracyMeters()));
+        }
         message.setT(trigger);
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setTid(preferences.getTrackerId(true));
