@@ -43,7 +43,7 @@ public class FusedContact extends BaseObservable {
     }
 
     public boolean setMessageLocation(MessageLocation messageLocation) {
-        if(this.messageLocation != null && this.messageLocation.getTst() == messageLocation.getTst())
+        if(this.messageLocation != null && this.messageLocation.getTst() >= messageLocation.getTst())
             return false;
 
         if(BuildConfig.DEBUG)

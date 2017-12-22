@@ -14,11 +14,10 @@ ext.supportLibVersion = '27.0.2'
 android {
     compileSdkVersion 27
     buildToolsVersion '26.0.2'
-
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
