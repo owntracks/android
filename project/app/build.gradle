@@ -16,7 +16,7 @@ android {
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.owntracks.android"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
