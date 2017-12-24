@@ -90,6 +90,7 @@ public class App extends Application  {
         mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
+        //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
         getMessageProcessor().initialize();
@@ -249,7 +250,7 @@ public class App extends Application  {
             public void onReceive(Context context, Intent intent) {
                 String strAction = intent.getAction();
                 Timber.v("screenOnOffReceiver intent received");
-                if ((strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON)) && isInForeground())
+                if ((Intent.ACTION_SCREEN_OFF.equals(strAction) || Intent.ACTION_SCREEN_ON.equals(strAction)) && isInForeground())
                 {
                         onEnterBackground();
                 }
