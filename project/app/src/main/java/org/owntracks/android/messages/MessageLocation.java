@@ -33,7 +33,7 @@ public class MessageLocation extends MessageBase  {
     private String t;
     private int batt;
     private int acc;
-    private int vacc;
+    private int vac;
     private double lat;
     private double lon;
     private double alt;
@@ -179,12 +179,12 @@ public class MessageLocation extends MessageBase  {
         return alt;
     }
 
-    public void setVacc(int vacc) {
-        this.vacc = vacc;
+    public void setVac(int vac) {
+        this.vac = vac;
     }
 
-    public int getVacc() {
-        return this.vacc;
+    public int getVac() {
+        return this.vac;
     }
 }
 
