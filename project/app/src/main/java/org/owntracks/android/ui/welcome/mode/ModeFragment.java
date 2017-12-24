@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.welcome.mode;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,7 +30,7 @@ public class ModeFragment extends BaseFragment<UiWelcomeModeBinding, ModeFragmen
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(viewModel == null) { fragmentComponent().inject(this);};
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_mode, savedInstanceState);
     }

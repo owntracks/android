@@ -454,12 +454,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     public void onLocationChanged(@Nullable Location location) {
 
         if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
-            if(preferences.getDebugVibrate()) {
-                Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(500);
-            }
-
-
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
             lastLocation = location;
