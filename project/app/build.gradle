@@ -76,10 +76,11 @@ android {
     }
 
     lintOptions {
-        baseline file("../../as/lint-baseline.xml")
+        baseline file("../../lint/lint-baseline.xml")
         checkAllWarnings true
         warningsAsErrors true
         abortOnError true
+        disable 'TypographyFractions','TypographyQuotes', 'Typos'
 
     }
 
