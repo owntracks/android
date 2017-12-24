@@ -78,7 +78,7 @@ android {
     lintOptions {
         baseline file("../../lint/lint-baseline.xml")
         checkAllWarnings true
-        warningsAsErrors true
+        warningsAsErrors false
         abortOnError true
         disable 'TypographyFractions','TypographyQuotes', 'Typos'
 
