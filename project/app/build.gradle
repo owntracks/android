@@ -38,7 +38,7 @@ android {
         debug {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
-            minifyEnabled true
+            minifyEnabled false
         }
     }
 
@@ -107,15 +107,15 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.1.1'
     compile 'org.greenrobot:greendao:3.2.2'
-    compile 'org.altbeacon:android-beacon-library:2.10@aar'
+    compile 'org.altbeacon:android-beacon-library:2.12.4@aar'
 
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.8.7'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
-    compile 'com.jakewharton.timber:timber:4.5.1'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
+    compile 'com.jakewharton.timber:timber:4.6.0'
     compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
 
     // Widget libraries
