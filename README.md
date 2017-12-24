@@ -6,6 +6,9 @@ For setup instructions and documentation see general OwnTracks [wiki](https://gi
 
 The application can be installed from [Google Play](https://play.google.com/store/apps/details?id=org.owntracks.android). 
 
+## Status
+[![Build Status](https://travis-ci.org/owntracks/android.svg?branch=Android-v2.0.0)](https://travis-ci.org/owntracks/android)
+
 ## Contribute 
 To build a development version of the app from source, follow the instructions outlined below. 
 
