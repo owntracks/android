@@ -27,7 +27,7 @@ public class EncryptionProvider {
     private void initializeSecretBox() {
         String encryptionKey = preferences.getEncryptionKey();
         enabled = encryptionKey != null && encryptionKey.length() > 0;
-        Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
+        Log.v(TAG, "initializeSecretBox() - encryption enabled: " + enabled);
         if (!enabled)
             return;
 
@@ -40,7 +40,7 @@ public class EncryptionProvider {
     }
 
     public EncryptionProvider(Preferences preferences) {
-        this.preferences = preferences; 
+        this.preferences = preferences;
         preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         initializeSecretBox();
     }
@@ -82,7 +82,7 @@ public class EncryptionProvider {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if(Preferences.Keys._ENCRYPTION_KEY.equals(key))
+            if (Preferences.Keys._ENCRYPTION_KEY.equals(key))
                 initializeSecretBox();
         }
     }

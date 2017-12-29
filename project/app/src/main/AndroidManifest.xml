@@ -50,7 +50,9 @@
         android:theme="@style/Theme.Owntracks"
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:extractNativeLibs="false"
+        tools:ignore="UnusedAttribute">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
