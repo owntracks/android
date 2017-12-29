@@ -1,5 +1,22 @@
 package org.owntracks.android.support;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
+import org.owntracks.android.R;
+import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.messages.MessageWaypoint;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,24 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.owntracks.android.App;
-import org.owntracks.android.BuildConfig;
-import org.owntracks.android.R;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
-import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.messages.MessageWaypoint;
 
 import timber.log.Timber;
 
