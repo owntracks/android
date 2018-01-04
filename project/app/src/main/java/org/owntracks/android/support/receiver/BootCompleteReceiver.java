@@ -11,7 +11,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) && Preferences.getAutostartOnBoot()){
+		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) && App.getPreferences().getAutostartOnBoot()){
 			App.startBackgroundServiceCompat(context, null);
 		}
 	}

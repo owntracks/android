@@ -23,7 +23,6 @@ import org.owntracks.android.databinding.ActivityRegionBinding;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.support.Preferences;
 
 
 @Deprecated
@@ -64,7 +63,7 @@ public class ActivityRegion extends ActivityBase  {
         }
 
         binding.setItem(this.waypoint);
-        binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
+        binding.shareWrapper.setVisibility(App.getPreferences().isModeMqttPublic() ? View.GONE : View.VISIBLE);
         setupListenerAndRequiredFields();
     }
 
@@ -228,7 +227,7 @@ public class ActivityRegion extends ActivityBase  {
             w.setBeaconMajor(null);
         }
 
-        if(!Preferences.isModeMqttPublic())
+        if(!App.getPreferences().isModeMqttPublic())
             w.setShared(binding.share.isChecked());
         else
             w.setShared(false);
