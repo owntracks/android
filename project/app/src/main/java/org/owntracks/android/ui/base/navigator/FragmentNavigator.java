@@ -1,9 +1,7 @@
 package org.owntracks.android.ui.base.navigator;
 
-import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+import android.app.Fragment;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -27,13 +25,7 @@ public class FragmentNavigator extends BaseNavigator {
     }
 
     @Override
-    final AppCompatActivity getActivity() {
-        return AppCompatActivity.class.cast(fragment.getActivity());
+    final Activity getActivity() {
+        return fragment.getActivity();
     }
-
-    @Override
-    final FragmentManager getChildFragmentManager() {
-        return fragment.getChildFragmentManager();
-    }
-
 }

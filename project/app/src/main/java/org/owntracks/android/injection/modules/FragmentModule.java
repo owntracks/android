@@ -1,8 +1,9 @@
 package org.owntracks.android.injection.modules;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.preference.PreferenceFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.qualifier.ChildFragmentManager;
@@ -35,6 +36,11 @@ public class FragmentModule {
     public FragmentModule(Fragment fragment) {
         mFragment = fragment;
     }
+
+    public FragmentModule(PreferenceFragment fragment) {
+        mFragment = fragment;
+    }
+
 
     @Provides
     @PerFragment

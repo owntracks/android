@@ -7,7 +7,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +17,7 @@ import org.owntracks.android.BR;
 import org.owntracks.android.injection.components.DaggerFragmentComponent;
 import org.owntracks.android.injection.components.FragmentComponent;
 import org.owntracks.android.injection.modules.FragmentModule;
+import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
@@ -54,6 +55,7 @@ public abstract class BaseFragment<B extends ViewDataBinding, V extends MvvmView
 
     protected B binding;
     @Inject protected V viewModel;
+    @Inject protected Navigator navigator;
 
     private FragmentComponent mFragmentComponent;
 
