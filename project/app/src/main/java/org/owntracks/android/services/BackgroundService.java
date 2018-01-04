@@ -671,6 +671,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     public void onEvent(Events.ModeChanged e) {
         removeGeofences();
         setupGeofences();
+        sendOngoingNotification();
     }
 
     @SuppressWarnings("unused")

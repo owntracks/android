@@ -1,5 +1,6 @@
 package org.owntracks.android.messages;
 
+import org.owntracks.android.App;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
@@ -159,7 +160,7 @@ public class MessageLocation extends MessageBase  {
     }
 
     public boolean isValidMessage() {
-        return Preferences.getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(Preferences.getIgnoreStaleLocations() );
+        return App.getPreferences().getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(App.getPreferences().getIgnoreStaleLocations() );
     }
 
     public void setConn(String conn) {

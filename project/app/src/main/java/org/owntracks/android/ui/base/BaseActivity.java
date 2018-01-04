@@ -228,6 +228,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     protected boolean assertRequirements() {
         if(requirementsChecker.assertRequirements(this)) {
             navigator.startActivity(WelcomeActivity.class);

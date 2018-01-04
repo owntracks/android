@@ -3,6 +3,7 @@ package org.owntracks.android.injection.components;
 import org.owntracks.android.injection.modules.FragmentModule;
 import org.owntracks.android.injection.modules.ViewModelModule;
 import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
 import org.owntracks.android.ui.welcome.mode.ModeFragment;
@@ -35,5 +36,6 @@ public interface FragmentComponent {
     void inject(ModeFragment fragment);
     void inject(PermissionFragment fragment);
     void inject(VersionFragment fragment);
+    void inject(PreferencesFragment fragment);
 
 }

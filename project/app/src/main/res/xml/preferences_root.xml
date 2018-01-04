@@ -112,7 +112,7 @@
         </PreferenceScreen>
 
         <Preference
-            android:key="versionReadOnly"
+            android:key="version"
             android:title="@string/preferencesVersion" />
     </PreferenceScreen>
 </PreferenceScreen>
