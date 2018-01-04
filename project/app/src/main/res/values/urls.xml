@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="valRepoUrl" translatable="false">https://github.com/owntracks</string>
+    <string name="valRepoUrl" translatable="false">https://github.com/owntracks/android</string>
     <string name="valTwitterUrl" translatable="false">https://twitter.com/owntracks</string>
     <string name="valDocumentationUrl" translatable="false">http://owntracks.org/booklet</string>
-    <string name="valDocumentationUrlAndroid" translatable="false">http://owntracks.org/booklet/features/android/</string>
+    <string name="valDocumentationUrlAndroid" translatable="false">http://owntracks.org/booklet/features/android</string>
 
 </resources>
