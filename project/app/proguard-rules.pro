@@ -18,7 +18,7 @@
 
 # Skip obfuscation
 -dontobfuscate
-
+-optimizations !field/removal/writeonly,!field/marking/private,!class/merging/*,!code/allocation/variable
 
 -keep public class org.owntracks.android.** {
   public protected private *;
