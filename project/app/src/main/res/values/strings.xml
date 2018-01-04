@@ -38,7 +38,7 @@
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet/</string>
+    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
     <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
