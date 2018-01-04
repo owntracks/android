@@ -25,7 +25,7 @@ public class EncryptionProvider {
     }
 
     private void initializeSecretBox() {
-        String encryptionKey = Preferences.getEncryptionKey();
+        String encryptionKey = preferences.getEncryptionKey();
         enabled = encryptionKey != null && encryptionKey.length() > 0;
         Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
         if (!enabled)

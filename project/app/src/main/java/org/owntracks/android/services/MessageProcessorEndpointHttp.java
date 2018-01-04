@@ -95,8 +95,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     }
 
     private void loadHTTPClient() {
-        String tlsCaCrt = Preferences.getTlsCaCrtName();
-        String tlsClientCrt = Preferences.getTlsClientCrtName();
+        String tlsCaCrt = App.getPreferences().getTlsCaCrtName();
+        String tlsClientCrt = App.getPreferences().getTlsClientCrtName();
         SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
         if (tlsCaCrt.length() > 0) {
@@ -109,7 +109,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
         if (tlsClientCrt.length() > 0)	{
             try {
-                socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
+                socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(App.getPreferences().getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             }
@@ -135,8 +135,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | IOException | UnrecoverableKeyException | CertificateException e) {
             e.printStackTrace();
         }
-        headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
-        headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
+        headerUsername = App.getPreferences().getStringOrNull(Preferences.Keys.USERNAME);
+        headerDevice = App.getPreferences().getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
 
@@ -180,7 +180,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         if(this.endpointUserInfo != null) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(this.endpointUserInfo.getBytes(), Base64.NO_WRAP));
         } else if(App.getPreferences().getAuth()) {
-            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((Preferences.getUsername()+":"+Preferences.getPassword()).getBytes(), Base64.NO_WRAP));
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((App.getPreferences().getUsername()+":"+App.getPreferences().getPassword()).getBytes(), Base64.NO_WRAP));
         }
 
         if(headerUsername != null) {
@@ -327,9 +327,9 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
             loadHTTPClient();
         else if(Preferences.Keys.USERNAME.equals(key))
-            headerUsername = Preferences.getStringOrNull(Preferences.Keys.USERNAME);
+            headerUsername = App.getPreferences().getStringOrNull(Preferences.Keys.USERNAME);
         else if(Preferences.Keys.DEVICE_ID.equals(key))
-            headerDevice = Preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
+            headerDevice = App.getPreferences().getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
     @Override

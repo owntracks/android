@@ -190,7 +190,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		try {
 
 			String prefix = "tcp";
-			if (Preferences.getTls()) {
+			if (App.getPreferences().getTls()) {
 				if (App.getPreferences().getWs()) {
 					prefix = "wss";
 				} else
@@ -254,15 +254,15 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			Timber.v("setting up connect options");
 			 connectOptions = new MqttConnectOptions();
 			if (App.getPreferences().getAuth()) {
-				connectOptions.setPassword(Preferences.getPassword().toCharArray());
-				connectOptions.setUserName(Preferences.getUsername());
+				connectOptions.setPassword(App.getPreferences().getPassword().toCharArray());
+				connectOptions.setUserName(App.getPreferences().getUsername());
 			}
 
-			connectOptions.setMqttVersion(Preferences.getMqttProtocolLevel());
+			connectOptions.setMqttVersion(App.getPreferences().getMqttProtocolLevel());
 
-			if (Preferences.getTls()) {
-				String tlsCaCrt = Preferences.getTlsCaCrtName();
-				String tlsClientCrt = Preferences.getTlsClientCrtName();
+			if (App.getPreferences().getTls()) {
+				String tlsCaCrt = App.getPreferences().getTlsCaCrtName();
+				String tlsClientCrt = App.getPreferences().getTlsClientCrtName();
 
 				SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
@@ -276,7 +276,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 				if (tlsClientCrt.length() > 0) {
 					try {
-						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(Preferences.getTlsClientCrtPassword());
+						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(App.getPreferences().getTlsClientCrtPassword());
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}
@@ -289,9 +289,9 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 
             setWill(connectOptions);
-			connectOptions.setKeepAliveInterval(Preferences.getKeepalive());
+			connectOptions.setKeepAliveInterval(App.getPreferences().getKeepalive());
 			connectOptions.setConnectionTimeout(30);
-			connectOptions.setCleanSession(Preferences.getCleanSession());
+			connectOptions.setCleanSession(App.getPreferences().getCleanSession());
 
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
@@ -334,24 +334,24 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 
 		List<String> topics = new ArrayList<>();
-		String subTopicBase = Preferences.getSubTopic();
+		String subTopicBase = App.getPreferences().getSubTopic();
 
-		if(!Preferences.getSub()) // Don't subscribe if base topic is invalid
+		if(!App.getPreferences().getSub()) // Don't subscribe if base topic is invalid
 			return;
 		else if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
 			topics.add(subTopicBase);
 		} else {
 
 			topics.add(subTopicBase);
-			if(Preferences.getInfo())
-				topics.add(subTopicBase + Preferences.getPubTopicInfoPart());
+			if(App.getPreferences().getInfo())
+				topics.add(subTopicBase + App.getPreferences().getPubTopicInfoPart());
 
-			if (!Preferences.isModeMqttPublic())
-				topics.add(App.getPreferences().getPubTopicBase() + Preferences.getPubTopicCommandsPart());
+			if (!App.getPreferences().isModeMqttPublic())
+				topics.add(App.getPreferences().getPubTopicBase() + App.getPreferences().getPubTopicCommandsPart());
 
-			if (!Preferences.isModeMqttPublic()) {
-				topics.add(subTopicBase + Preferences.getPubTopicEventsPart());
-				topics.add(subTopicBase + Preferences.getPubTopicWaypointsPart());
+			if (!App.getPreferences().isModeMqttPublic()) {
+				topics.add(subTopicBase + App.getPreferences().getPubTopicEventsPart());
+				topics.add(subTopicBase + App.getPreferences().getPubTopicWaypointsPart());
 			}
 
 
@@ -381,7 +381,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	private int[] getSubTopicsQos(String[] topics) {
 		int[] qos = new int[topics.length];
-		Arrays.fill(qos, Preferences.getSubQos());
+		Arrays.fill(qos, App.getPreferences().getSubQos());
 		return qos;
 	}
 
@@ -543,7 +543,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	@Override
 	public void processOutgoingMessage(MessageTransition message) {
 		message.setTopic(App.getPreferences().getPubTopicEvents());
-		message.setQos(Preferences.getPubQosEvents());
+		message.setQos(App.getPreferences().getPubQosEvents());
 		message.setRetained(Preferences.getPubRetainEvents());
 		scheduleMessage(mqttMessageToBundle(message));
 	}

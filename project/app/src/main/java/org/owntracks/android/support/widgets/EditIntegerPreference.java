@@ -4,6 +4,7 @@ import android.content.Context;
 
 import android.util.AttributeSet;
 
+import org.owntracks.android.App;
 import org.owntracks.android.support.Preferences;
 
 public class EditIntegerPreference extends EditStringPreference {
@@ -19,7 +20,8 @@ public class EditIntegerPreference extends EditStringPreference {
     @Override
     protected boolean persistString(String value) {
         if(value == null || "".equals(value)) {
-            Preferences.clearKey(getKey());
+            // Todo: improve
+            App.getPreferences().clearKey(getKey());
             return true;
         }
         try {

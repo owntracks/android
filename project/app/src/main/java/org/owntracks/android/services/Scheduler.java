@@ -148,7 +148,7 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_PING)
                 .setRecurring(true)
-                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 120))
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(0, (int)keepAliveSeconds))
@@ -174,7 +174,7 @@ public class Scheduler extends SimpleJobService {
                 .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
-                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(Preferences.getPing())))
+                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(App.getPreferences().getPing())))
                 .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_SEND_LOCATION_PING))
                 .build();
