@@ -1,5 +1,7 @@
 package org.owntracks.android.injection.modules;
 
+import org.owntracks.android.ui.preferences.PreferencesFragmentMvvm;
+import org.owntracks.android.ui.preferences.PreferencesFragmentViewModel;
 import org.owntracks.android.ui.preferences.connection.ConnectionMvvm;
 import org.owntracks.android.ui.preferences.connection.ConnectionViewModel;
 import org.owntracks.android.ui.preferences.editor.EditorMvvm;
@@ -40,4 +42,6 @@ public abstract class ViewModelModule {
     @Binds abstract ModeFragmentMvvm.ViewModel bindModeFragmentViewModel(ModeFragmentViewModel viewModel);
     @Binds abstract PermissionFragmentMvvm.ViewModel bindPermissionFragmentViewModel(PermissionFragmentViewModel viewModel);
     @Binds abstract PlayFragmentMvvm.ViewModel bindPlayFragmentViewModel(PlayFragmentViewModel viewModel);
+    @Binds abstract PreferencesFragmentMvvm.ViewModel bindPreferencesFragmentViewModel(PreferencesFragmentViewModel viewModel);
+
 }

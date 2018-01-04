@@ -29,10 +29,6 @@ public class ActivityNavigator extends BaseNavigator {
         return activity;
     }
 
-    @Override
-    final FragmentManager getChildFragmentManager() {
-        throw new UnsupportedOperationException("Activities do not have a child fragment manager.");
-    }
 }
 
 

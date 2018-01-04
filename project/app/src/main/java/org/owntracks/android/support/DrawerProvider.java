@@ -20,12 +20,12 @@ import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityPreferences;
 import org.owntracks.android.activities.ActivityRegions;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.ui.preferences.PreferencesActivity;
 import org.owntracks.android.ui.status.StatusActivity;
 
 import timber.log.Timber;
@@ -160,7 +160,7 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
                         switchDrawerItemPub,
                         switchDrawerItemCopy,
                         secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
-                        secondaryDrawerItemForClass(activity, ActivityPreferences.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
+                        secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

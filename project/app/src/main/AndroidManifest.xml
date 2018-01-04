@@ -74,7 +74,7 @@
         </activity>
 
         <activity
-            android:name=".activities.ActivityPreferences"
+            android:name=".ui.preferences.PreferencesActivity"
             android:label="@string/title_activity_preferences"
             android:hardwareAccelerated="true"
             android:parentActivityName=".ui.map.MapActivity" />
@@ -83,10 +83,10 @@
             android:name=".ui.preferences.editor.EditorActivity"
             android:configChanges="orientation"
             android:label="@string/configurationManagement"
-            android:parentActivityName=".activities.ActivityPreferences">
+            android:parentActivityName=".ui.preferences.PreferencesActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.ActivityPreferences" />
+                android:value=".ui.preferences.PreferencesActivity" />
         </activity>
 
 

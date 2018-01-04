@@ -39,7 +39,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_preferences_connection, savedInstanceState);
-        setSupportToolbar(binding.toolbar);
+        setSupportToolbar(binding.toolbar, true, false);
         setDrawer(binding.toolbar);
         setHasEventBus(true);
     }
@@ -139,6 +139,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         activeDialogViewModel.onActivityResult(requestCode, resultCode, data);
+
     }
 
     public void recreateOptionsMenu() {
