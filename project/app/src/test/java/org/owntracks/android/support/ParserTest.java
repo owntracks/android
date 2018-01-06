@@ -13,8 +13,12 @@ import org.owntracks.android.messages.MessageUnknown;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,20 +54,16 @@ public class ParserTest {
         when(encryptionProvider.isPayloadEncryptionEnabled()).thenReturn(true);
     }
 
+    public String getResourceFileAsString(String resourceFileName) {
+        InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        return reader.lines().collect(Collectors.joining("\n"));
+    }
+
     @Test
     public void ParserCorrectlyConvertsLocationToPrettyJSON() throws Exception {
         Parser parser = new Parser(null);
-        String expected = "{\n" +
-                "  \"_type\" : \"location\",\n" +
-                "  \"batt\" : 30,\n" +
-                "  \"acc\" : 10,\n" +
-                "  \"vac\" : 0,\n" +
-                "  \"lat\" : 50.1,\n" +
-                "  \"lon\" : 60.2,\n" +
-                "  \"alt\" : 20.0,\n" +
-                "  \"tst\" : 123456789,\n" +
-                "  \"conn\" : \"TestConn\"\n" +
-                "}";
+        String expected = getResourceFileAsString("prettyLocation.json");
         assertEquals(expected, parser.toJsonPlainPretty(messageLocation));
     }
 
