@@ -301,7 +301,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			return true;
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
-			Log.e(TAG, e.toString());
+			Timber.e(e);
             e.printStackTrace();
 			changeState(e);
 			return false;
@@ -462,9 +462,16 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		if(isConnected()) {
 			return true;
 		} else {
-			connect();
+			scheduleConnectionInBackground();
 			return false;
 		}
+	}
+
+	/***
+	 * Trying to connect in the foreground can block the UI thread if the endpoint is slow
+	 */
+	private void scheduleConnectionInBackground() {
+		App.getScheduler().scheduleMqttReconnect(0,30);
 	}
 
 	private void changeState(Exception e) {
@@ -581,7 +588,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void onCreateFromProcessor() {
-		connect();
+		scheduleConnectionInBackground();
 	}
 
 

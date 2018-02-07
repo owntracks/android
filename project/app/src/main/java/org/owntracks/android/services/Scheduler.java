@@ -1,7 +1,5 @@
 package org.owntracks.android.services;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
@@ -10,15 +8,12 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
-import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.SimpleJobService;
 import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
-import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
 
@@ -186,19 +181,19 @@ public class Scheduler extends SimpleJobService {
 
     @NonNull
     public static Bundle getBundleForAction(String action) {
-        Bundle b  = new Bundle();
+        Bundle b = new Bundle();
         b.putString(BUNDLE_KEY_ACTION, action);
         return b;
     }
 
-    public void scheduleMqttReconnect() {
+    public void scheduleMqttReconnect(int executionWindowStart, int executionWindowEnd) {
         Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_RECONNECT)
                 .setRecurring(true)
-                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 10, 600))
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 .setConstraints(Constraint.ON_ANY_NETWORK)
-                .setTrigger(Trigger.executionWindow(0, (int)TimeUnit.MINUTES.toSeconds(10)))
+                .setTrigger(Trigger.executionWindow(executionWindowStart, executionWindowEnd))
                 .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_MQTT_RECONNECT))
                 .build();
@@ -207,6 +202,9 @@ public class Scheduler extends SimpleJobService {
         dispatcher.schedule(job);
     }
 
+    public void scheduleMqttReconnect() {
+        scheduleMqttReconnect(0, (int) TimeUnit.MINUTES.toSeconds(10));
+    }
 
 
     public void cancelMqttReconnect() {
