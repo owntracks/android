@@ -93,7 +93,12 @@ public class App extends Application  {
         //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
-        getMessageProcessor().initialize();
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                getMessageProcessor().initialize();
+            }
+        });
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
@@ -174,16 +179,26 @@ public class App extends Application  {
     private void onEnterForeground() {
         Timber.v("entering foreground");
         inForeground = true;
-        startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_CHANGE_BG);
-        getMessageProcessor().onEnterForeground();
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
+                getMessageProcessor().onEnterForeground();
+            }
+        });
+
     }
 
     private void onEnterBackground() {
         Timber.v("entering background");
         inForeground = false;
-        startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_CHANGE_BG);
-        getMessageProcessor().onEnterBackground();
-
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
+                getMessageProcessor().onEnterBackground();
+            }
+        });
     }
 
     public static boolean isInForeground() {

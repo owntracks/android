@@ -8,6 +8,7 @@ import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.messages.MessageBase;
@@ -157,14 +158,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
         acceptMessages = true;
     }
     @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10)
+    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
     public void onEvent(Events.ModeChanged event) {
         acceptMessages = false;
         loadOutgoingMessageProcessor();
     }
 
     @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10)
+    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
     public void onEvent(Events.EndpointChanged event) {
         acceptMessages = false;
         loadOutgoingMessageProcessor();

@@ -196,7 +196,7 @@ public class Scheduler extends SimpleJobService {
                 .setService(Scheduler.class)
                 .setTag(PERIODIC_TASK_MQTT_RECONNECT)
                 .setRecurring(true)
-                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 10, 600))
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 .setConstraints(Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(0, (int)TimeUnit.MINUTES.toSeconds(10)))
                 .setReplaceCurrent(true)
