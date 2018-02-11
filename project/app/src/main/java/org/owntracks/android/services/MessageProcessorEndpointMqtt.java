@@ -3,8 +3,12 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -217,7 +221,21 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
         return true;
 	}
 
+	@WorkerThread
 	private boolean connect() {
+		boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
+				: Thread.currentThread() == Looper.getMainLooper().getThread();
+
+		if(isUiThread) {
+			try {
+				throw new Exception("BLOCKING CONNECT ON MAIN THREAD");
+			} catch (Exception e) {
+				Timber.e(e);
+				e.printStackTrace();
+			}
+		} else {
+			Timber.e("Thread: %s", Thread.currentThread());
+		}
 
 		if(isConnected()) {
 			Timber.v("already connected");
@@ -458,6 +476,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		return false;
 	}
 
+	@WorkerThread
 	boolean checkConnection() {
 		if(isConnected()) {
 			return true;
@@ -581,7 +600,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public void onCreateFromProcessor() {
-		connect();
+		App.getScheduler().scheduleMqttReconnect();
+		//connect();
 	}
 
 
