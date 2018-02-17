@@ -39,6 +39,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:checked="@{vm.tls}"
+                android:onCheckedChanged="@{(view, checked) -> vm.onTlsCheckedChanged(checked)}"
                 android:layout_gravity="end" />
         </RelativeLayout>
 
