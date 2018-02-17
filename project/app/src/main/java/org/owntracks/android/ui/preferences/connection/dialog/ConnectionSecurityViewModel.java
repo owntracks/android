@@ -9,6 +9,7 @@ import android.provider.OpenableColumns;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -69,6 +70,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
     public void setTls(boolean tls) {
         this.tls = tls;
+        notifyChange();
     }
 
     public String getTlsCaCrtName() {
@@ -100,6 +102,9 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         this.tlsClientCrtPasswortDirty = true;
     }
 
+    public void onTlsCheckedChanged(boolean isChecked) {
+        setTls(isChecked);
+    }
 
     public void onTlsCaCrtNameClick(final View v) {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -174,7 +179,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         @Override
         protected String doInBackground(Uri... params) {
             try {
-                Timber.v("CopyTask with URI: %s" + params[0]);
+                Timber.v("CopyTask with URI: %s", params[0]);
                 String filename = uriToFilename(params[0]);
                 Timber.v("filename for save is: %s", filename);
 
