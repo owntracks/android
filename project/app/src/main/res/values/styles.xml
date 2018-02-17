@@ -15,6 +15,11 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="popupMenuStyle">@style/PopupMenu</item>
         <item name="android:actionModeBackground">@color/primary</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="preferenceTheme">@style/Theme.Owntracks.Base</item>
     </style>
 
 

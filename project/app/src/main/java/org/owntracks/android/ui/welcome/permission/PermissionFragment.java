@@ -5,7 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +15,10 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomePermissionsBinding;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.ui.base.BaseFragment;
+import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-public class PermissionFragment extends BaseFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
+public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
     public static final int ID = 3;
 
     private static PermissionFragment instance;

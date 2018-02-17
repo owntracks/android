@@ -7,23 +7,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 
-import org.owntracks.android.ui.preferences.connection.ConnectionActivity;
 
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
 public interface Navigator {
     String EXTRA_ARGS = "_args";
 
@@ -37,8 +23,9 @@ public interface Navigator {
     void startActivityForResult(Intent intent, int requestCode);
     void startActivityForResult(@NonNull Class<? extends Activity> activityClass, int requestCode, int flags);
 
-    void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args);
-    void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args);
+    void replaceFragment(@IdRes int containerId, @NonNull android.support.v4.app.Fragment fragment, Bundle args);
+    void replaceFragment(@IdRes int containerId, @NonNull android.app.Fragment fragment, Bundle args);
+
     Bundle getExtrasBundle(Intent intent);
 
 }

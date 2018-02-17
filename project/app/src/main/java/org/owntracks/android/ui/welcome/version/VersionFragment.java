@@ -5,18 +5,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeVersionBinding;
-import org.owntracks.android.ui.base.BaseFragment;
+import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
-public class VersionFragment extends BaseFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
+public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
     public static final int ID = 5;
 
     private static VersionFragment instance;

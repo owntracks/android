@@ -1,7 +1,7 @@
 package org.owntracks.android.injection.components;
 
 import android.content.Context;
-import android.app.FragmentManager;
+import android.support.v4.app.FragmentManager;
 
 import org.owntracks.android.injection.modules.ActivityModule;
 import org.owntracks.android.injection.modules.ViewModelModule;
@@ -16,7 +16,8 @@ import dagger.Component;
 @Component(dependencies = AppComponent.class, modules = {ActivityModule.class, ViewModelModule.class})
 public interface ActivityComponent {
     @ActivityContext Context activityContext();
-    @ActivityFragmentManager FragmentManager activityFragmentManager();
+    @ActivityFragmentManager
+    FragmentManager activityFragmentManager();
 
     void inject(org.owntracks.android.ui.contacts.ContactsActivity activity);
     void inject(org.owntracks.android.ui.map.MapActivity activity);

@@ -25,6 +25,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.components.DaggerFragmentComponent;
 import org.owntracks.android.injection.components.FragmentComponent;
+import org.owntracks.android.injection.components.SupportFragmentComponent;
 import org.owntracks.android.injection.modules.FragmentModule;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
@@ -39,7 +40,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-// Class cannot extend BaseFragement. BaseFragment methods are implemented directly.
+// Class cannot extend BaseFragement. BaseSupportFragment methods are implemented directly.
 public class PreferencesFragment extends PreferenceFragment implements PreferencesFragmentMvvm.View, Preference.OnPreferenceClickListener {
     private static final String UI_SCREEN_ROOT = "root";
     private static final String UI_SCREEN_CONNECTION = "connectionScreen";

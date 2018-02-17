@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +15,10 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomePlayBinding;
-import org.owntracks.android.ui.base.BaseFragment;
+import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-public class PlayFragment extends BaseFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
+public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     public static final int ID = 2;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1;
 

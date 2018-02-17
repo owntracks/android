@@ -1,15 +1,17 @@
 package org.owntracks.android.ui.base.navigator;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+
+import org.greenrobot.eventbus.util.ErrorDialogManager;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -73,23 +75,6 @@ public abstract class BaseNavigator implements Navigator {
         activity.startActivity(intent);
     }
 
-    @Override
-    public final void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
-        replaceFragmentInternal(getActivity().getFragmentManager(), containerId, fragment, null, args);
-    }
-
-    @Override
-    public void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args) {
-        replaceFragmentInternal(getActivity().getFragmentManager(), containerId, fragment, fragmentTag, args);
-    }
-
-    private void replaceFragmentInternal(FragmentManager fm, @IdRes int containerId, Fragment fragment, String fragmentTag, Bundle args) {
-        if(args != null) { fragment.setArguments(args);}
-        FragmentTransaction ft = fm.beginTransaction().replace(containerId, fragment, fragmentTag);
-        ft.commit();
-        fm.executePendingTransactions();
-    }
-
     public Bundle getExtrasBundle(Intent intent) {
         return intent.hasExtra(Navigator.EXTRA_ARGS) ? intent.getBundleExtra(Navigator.EXTRA_ARGS) : new Bundle();
     }
@@ -105,4 +90,22 @@ public abstract class BaseNavigator implements Navigator {
         intent.setFlags(flags);
         startActivityForResult(intent, requestCode);
     }
+
+    @Override
+    public final void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
+            if(args != null) { fragment.setArguments(args);}
+            FragmentTransaction ft = fragment.getFragmentManager().beginTransaction().replace(containerId, fragment, null);
+            ft.commit();
+        fragment.getFragmentManager().executePendingTransactions();
+    }
+
+    @Override
+    public void replaceFragment(int containerId, @NonNull android.app.Fragment fragment, Bundle args) {
+        if(args != null) { fragment.setArguments(args);}
+        android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction().replace(containerId, fragment, null);
+        ft.commit();
+        getActivity().getFragmentManager().executePendingTransactions();
+    }
+
+
 }
