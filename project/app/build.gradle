@@ -4,7 +4,7 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 16
+def versionBuild = 18
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '11.8.0'
@@ -26,19 +26,23 @@ android {
                 arguments = [ eventBusIndex : 'org.owntracks.android.EventBusIndex' ]
             }
         }
+        resConfigs "en", "de"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            useProguard true
+            minifyEnabled true
+            shrinkResources true
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
+            useProguard true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
-            minifyEnabled false
         }
     }
 
@@ -96,8 +100,9 @@ android {
 
 dependencies {
     // Support libraries
-    compile "com.android.support:support-v13:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:preference-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
