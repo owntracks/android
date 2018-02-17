@@ -30,19 +30,6 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 import timber.log.Timber;
 
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
 public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
     private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;
@@ -53,7 +40,6 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
     private final Preferences preferences;
     private SecondarySwitchDrawerItem switchDrawerItemPub;
 
-    private SecondarySwitchDrawerItem switchDrawerItemCopy;
     private Drawer drawer;
     private boolean isBuilt;
 
@@ -120,30 +106,8 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
                 .withIconColorRes(COLOR_ICON_SECONDARY);
     }
 
-    private SecondarySwitchDrawerItem switchDrawerItemCopy() {
-        OnCheckedChangeListener l = new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                preferences.setCp(isChecked);
-            }
-        };
-        return new SecondarySwitchDrawerItem()
-                .withIdentifier(100002)
-                .withName(R.string.drawerSwitchCopy)
-                .withSelectable(false)
-                .withCheckable(false)
-                .withChecked(preferences.getCp())
-                .withOnCheckedChangeListener(l)
-                .withIconTintingEnabled(true)
-                .withIcon(R.drawable.ic_layers_black_24dp)
-                .withIconColorRes(COLOR_ICON_SECONDARY);
-
-    }
-
     public void attach(@NonNull Toolbar toolbar) {
         switchDrawerItemPub = switchDrawerItemPub();
-        switchDrawerItemCopy = switchDrawerItemCopy();
-
 
         this.drawer = new DrawerBuilder()
                 .withActivity(activity)
@@ -158,7 +122,6 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
 
                 ).addStickyDrawerItems(
                         switchDrawerItemPub,
-                        switchDrawerItemCopy,
                         secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
                         secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -209,11 +172,7 @@ public class DrawerProvider implements Preferences.OnPreferenceChangedListener {
         if(Preferences.Keys.PUB.equals(key) && switchDrawerItemPub != null && drawer != null) {
             switchDrawerItemPub.withChecked(preferences.getPub());
             drawer.updateStickyFooterItem(switchDrawerItemPub);
-        } else if(Preferences.Keys.CP.equals(key) && switchDrawerItemCopy != null && drawer != null) {
-            drawer.updateStickyFooterItem(switchDrawerItemCopy);
-            switchDrawerItemCopy.withSetSelected(preferences.getCp());
-        }
-    }
+        }     }
 
     public void unregisterPreferencesChangeListener() {
         preferences.unregisterOnPreferenceChangedListener(this);
