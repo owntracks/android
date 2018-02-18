@@ -216,8 +216,9 @@ public class App extends Application  {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getPreferences().getNotification()) {
                     c.startForegroundService((new Intent(c, BackgroundService.class)).setAction(action));
+
                 } else {
                     c.startService((new Intent(c, BackgroundService.class)).setAction(action));
                 }
