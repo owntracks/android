@@ -205,7 +205,8 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         ongoingChannel.setDescription(getString(R.string.notificationChannelOngoingDescription));
         ongoingChannel.enableLights(false);
         ongoingChannel.enableVibration(false);
-        ongoingChannel.setShowBadge(true);
+        ongoingChannel.setShowBadge(false);
+        ongoingChannel.setSound(null,null);
         notificationManager.createNotificationChannel(ongoingChannel);
 
         NotificationChannel eventsChannel = new NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, getString(R.string.events), NotificationManager.IMPORTANCE_HIGH);
