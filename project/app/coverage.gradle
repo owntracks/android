@@ -1,0 +1,44 @@
+apply plugin: 'jacoco'
+
+android {
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    // Class R is used, but usage will not be covered, so ignore this class from report
+    def coverageSourceDirs = ['java']
+
+    def coverageExcludes = ['**/R.class',
+                        '**/R$*.class',
+                        '**/*$$ViewBinder*.*',
+                        '**/inject/*',
+                        '**/*$InjectAdapter.*',
+                        '**/BuildConfig.*',
+                        '**/Manifest*.*',
+                        '**/Dagger*.*',
+                        '**/*_Provide*Factory.*',
+                        '**/*_Member*Injector.*',
+                        '**/*_Factory.*']
+
+    def coverageClassDirectories = [fileTree(dir: 'app/build/intermediates/classes/debug', excludes: coverageExcludes)]
+    //sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testDebugUnitTest.exec')
+    //classDirectories = files(coverageClassDirectories)
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/debug',
+            excludes: coverageExcludes
+    )
+    sourceDirectories = files('app/src/main/java/org/owntracks')
+}
