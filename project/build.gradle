@@ -1,5 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+apply plugin: 'com.github.ben-manes.versions'
 buildscript {
     repositories {
         mavenCentral()
@@ -9,6 +10,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
     }
 }
 
