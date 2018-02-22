@@ -213,20 +213,24 @@ public class App extends Application  {
     }
 
     public static void startBackgroundServiceCompat(final @NonNull Context c, final @Nullable String action) {
+        startBackgroundServiceCompat(c, (new Intent(c, BackgroundService.class)).setAction(action));
+    }
+
+    public static void startBackgroundServiceCompat(final @NonNull Context c, @NonNull final Intent intent) {
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getPreferences().getNotification()) {
-                    c.startForegroundService((new Intent(c, BackgroundService.class)).setAction(action));
-
+                    c.startForegroundService(intent);
                 } else {
-                    c.startService((new Intent(c, BackgroundService.class)).setAction(action));
+                    c.startService(intent);
                 }
-
             }
         };
         postOnBackgroundHandlerDelayed(r, 1000);
     }
+
+
 
 
 

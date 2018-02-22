@@ -308,12 +308,12 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
                     Intent reportIntent = new Intent(App.getContext(), BackgroundService.class);
                     reportIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_RESPONSE);
-                    App.getContext().startService(reportIntent);
+                    App.startBackgroundServiceCompat(App.getContext(), reportIntent);
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
                     Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
                     waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_WAYPOINTS);
-                    App.getContext().startService(waypointsIntent);
+                    App.startBackgroundServiceCompat(App.getContext(), waypointsIntent);
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     MessageWaypoints w = message.getWaypoints();
