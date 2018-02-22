@@ -2,7 +2,7 @@ OwnTracks for Android
 =======
 
 This is the OwnTracks Android app. 
-For setup instructions and documentation see general OwnTracks [wiki](https://github.com/owntracks/owntracks/wiki/Android).
+For setup instructions and documentation see the [OwnTracks booklet](http://owntracks.org/booklet/features/android/).
 
 The application can be installed from [Google Play](https://play.google.com/store/apps/details?id=org.owntracks.android). 
 
