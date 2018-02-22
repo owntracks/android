@@ -138,8 +138,10 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onClearContactClicked() {
         MessageClear m = new MessageClear();
-        m.setTopic(activeContact.getId());
-        App.getMessageProcessor().sendMessage(m);
+        if(activeContact != null) {
+            m.setTopic(activeContact.getId());
+            App.getMessageProcessor().sendMessage(m);
+        }
     }
 
 

@@ -509,6 +509,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void setBottomSheetHidden() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        if(mMenu != null)
+            mMenu.close();
     }
 
     @Override
