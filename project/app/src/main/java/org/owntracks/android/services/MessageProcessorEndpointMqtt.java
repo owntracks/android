@@ -3,7 +3,6 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -75,10 +74,26 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	synchronized int sendMessage(Bundle b) {
 		long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
-		if(!connect()) {
-			Timber.e("not connected and connect failed");
-			return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
+
+		// Try to connect on demand if disconnected
+		// Do not try to do this if previous attempts were not successful
+		// Normal reconnect scheduler will take over
+		if(!isConnected()) {
+			Timber.d("not connected. Pressure is %s", sendMessageConnectPressure);
+			if(sendMessageConnectPressure > 2 ) {
+				Timber.d("connect pressure too high, falling back to normal scheduler");
+				return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
+			} else{
+				Timber.d("pressure ok, connecting on demand");
+
+				sendMessageConnectPressure++;
+				if(!connect()) {
+					return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
+				}
+			}
 		}
+
+		// Connection should be established
 
 		try {
 			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
@@ -221,8 +236,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
         return true;
 	}
 
+	private int sendMessageConnectPressure = 0;
+
 	@WorkerThread
 	private boolean connect() {
+		sendMessageConnectPressure++;
 		boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
 				: Thread.currentThread() == Looper.getMainLooper().getThread();
 
@@ -252,7 +270,6 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			changeState(EndpointState.ERROR_CONFIGURATION);
 			return false;
 		}
-
 
 		// Check if there is a data connection.
 		if (!isOnline()) {
@@ -316,6 +333,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			App.getScheduler().scheduleMqttPing(connectOptions.getKeepAliveInterval());
 			changeState(EndpointState.CONNECTED);
 
+			sendMessageConnectPressure =0; // allow new connection attempts from sendMessage
 			return true;
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
@@ -491,6 +509,10 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private void changeState(EndpointState newState) {
+		//Reduce unnecessary work caused by state updates to the same state
+		if(state == newState)
+			return;
+
 		state = newState;
 		getMessageProcessor().onEndpointStateChanged(newState);
 	}
