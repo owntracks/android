@@ -103,7 +103,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             try {
                 socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Timber.e(e);
             }
         }
 
@@ -111,7 +111,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             try {
                 socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(App.getPreferences().getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
+                Timber.e(e1);
             }
         }
 
@@ -124,8 +124,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             mHttpClient = new OkHttpClient.Builder()
                     .followRedirects(true)
                     .followSslRedirects(true)
-                    .connectTimeout(2, TimeUnit.MINUTES)
-                    .dns(new DebugDnsSelector(DebugDnsSelector.Mode.IPV4_FIRST))
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    //.dns(new DebugDnsSelector(DebugDnsSelector.Mode.IPV4_FIRST))
                     .connectionPool(new ConnectionPool())
                     .sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0])
                     .addInterceptor(logging).build();
@@ -133,7 +133,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
 
         } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | IOException | UnrecoverableKeyException | CertificateException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            Timber.e(e);
         }
         headerUsername = App.getPreferences().getStringOrNull(Preferences.Keys.USERNAME);
         headerDevice = App.getPreferences().getStringOrNull(Preferences.Keys.DEVICE_ID);
@@ -162,11 +163,18 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     }
 
-    int sendMessage(Bundle b) {
-        String body = b.getString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD);
+    int sendMessage(MessageBase message) {
+        long messageId = message.getMessageId();
+        String body = null;
+        try {
+            body = App.getParser().toJsonPlain(message);
+        } catch (IOException e) {
+            getMessageProcessor().onMessageDeliveryFailedFinal(messageId);
+        }
+
         //String url = b.getString(HTTP_BUNDLE_KEY_URL);
         //String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
-        long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
+        //long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 
         Timber.v("url:%s, userInfo:%s, messageId:%s", this.endpointUrl, this.endpointUserInfo,  messageId);
 
@@ -226,7 +234,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             }
 
         } catch (Exception e) {
-            Timber.e("error:IOException. Delivery failed ", e);
+            Timber.e(e,"error:IOException. Delivery failed ");
             App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setError(e));
             return getMessageProcessor().onMessageDeliveryFailed(messageId);
         }
@@ -247,51 +255,49 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
             b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
         } catch (Exception e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
         return b;
     }
 
     @Override
     public void processOutgoingMessage(MessageBase message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageCmd message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageEvent message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageLocation message) {
-
-        message.setTopic(App.getPreferences().getPubTopicBase());
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageTransition message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageWaypoint message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageWaypoints message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
     public void processOutgoingMessage(MessageClear message) {
-        scheduleMessage(message);
+        sendMessage(message);
     }
 
     @Override
@@ -307,12 +313,12 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     }
 
     private void scheduleMessage(MessageBase m) {
-            Bundle b = httpMessageToBundle(m);
-            b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_HTTP);
-            if(App.isInForeground())
-                sendMessage(b);
-            else
-                App.getScheduler().scheduleMessage(b);
+            //Bundle b = httpMessageToBundle(m);
+        //b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_HTTP);
+        //if(App.isInForeground())
+            //    sendMessage(b);
+        //  else
+        //      App.getScheduler().scheduleMessage(b);
     }
 
     @Override
@@ -386,7 +392,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             try {
                 l = InetAddress.getByName(hostname);
             }catch (UnknownHostException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 Timber.e("message: %s", e.getMessage());
                 throw e;
             }
