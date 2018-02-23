@@ -571,7 +571,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
         MapLocationSource() {
             super();
-            App.getEventBus().register(this);
         }
 
         @Override
@@ -580,6 +579,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             mListener = onLocationChangedListener;
             if (mLocation != null)
                 this.mListener.onLocationChanged(mLocation);
+            App.getEventBus().register(this);
+
         }
 
         @Override
