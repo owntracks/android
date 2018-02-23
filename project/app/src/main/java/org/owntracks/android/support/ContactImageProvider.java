@@ -1,10 +1,8 @@
 package org.owntracks.android.support;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -31,7 +29,7 @@ import java.lang.ref.WeakReference;
 
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
-    private static BitmapDrawable placeholder;
+    private static final int FACE_DIMENSIONS = (int) (48 * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f));
 
 
     public void invalidateCacheLevelCard(String key) {
@@ -39,10 +37,10 @@ public class ContactImageProvider {
     }
 
 
-    private class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
+    private static class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
         final WeakReference<ImageView> target;
 
-        public ContactDrawableWorkerTaskForImageView(ImageView imageView) {
+        ContactDrawableWorkerTaskForImageView(ImageView imageView) {
             target = new WeakReference<>(imageView);
         }
 
@@ -61,10 +59,10 @@ public class ContactImageProvider {
         }
 
     }
-    private class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
+    private static class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
         final WeakReference<Marker> target;
 
-        public ContactDrawableWorkerTaskForMarker(Marker marker) {
+        ContactDrawableWorkerTaskForMarker(Marker marker) {
             target = new WeakReference<>(marker);
         }
 
@@ -90,12 +88,12 @@ public class ContactImageProvider {
     }
 
     public void setImageViewAsync(ImageView imageView, FusedContact contact) {
-        imageView.setImageDrawable(placeholder);
+        //imageView.setImageDrawable(placeholder);
         (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
 
-    private Bitmap getBitmapFromCache(FusedContact contact) {
+    private static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
@@ -127,19 +125,9 @@ public class ContactImageProvider {
         return d;
     }
 
-    public ContactImageProvider(Context c){
+    public ContactImageProvider(){
         memoryCache = new ContactBitmapMemoryCache();
-
-        Rect rect = new Rect(0, 0, 1, 1);
-        Bitmap image = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(image);
-        int color = Color.argb(0, 0, 0, 255);
-        Paint paint = new Paint();
-        paint.setColor(color);
-        canvas.drawBitmap(image, 0, 0, paint);
-        placeholder = new BitmapDrawable(c.getResources(), image);
         App.getEventBus().register(this);
-
     }
 
     private static class ContactBitmapMemoryCache {
@@ -176,7 +164,7 @@ public class ContactImageProvider {
     private void invalidateCache() {
         memoryCache.clear();
     }
-    private Bitmap getRoundedShape(Bitmap bitmap) {
+    private static Bitmap getRoundedShape(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
@@ -197,7 +185,7 @@ public class ContactImageProvider {
         return output;
     }
 
-    private Bitmap drawableToBitmap(Drawable drawable) {
+    private static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable)drawable).getBitmap();
         }
@@ -215,11 +203,6 @@ public class ContactImageProvider {
         return bitmap;
     }
 
-    private static final int FACE_DIMENSIONS = (int) convertDpToPixel(48);
-
-    private static float convertDpToPixel(float dp) {
-        return dp * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {

@@ -15,6 +15,8 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 
 import timber.log.Timber;
@@ -91,7 +93,7 @@ public class MemoryContactsRepo implements ContactsRepo {
                     mList.remove(c);
                 }
             });
-            c.setDeleted(true);
+            c.setDeleted();
             App.getEventBus().post(c);
 
             majorRevision-=MAJOR_STEP;
@@ -110,9 +112,10 @@ public class MemoryContactsRepo implements ContactsRepo {
     }
 
     @Override
-    public void update(@NonNull String id, @NonNull MessageLocation m) {
+    public synchronized void update(@NonNull String id, @NonNull MessageLocation m) {
         FusedContact c = getByIdLazy(id);
         c.setMessageLocation(m);
+        Collections.sort(mList);
         App.getEventBus().post(c);
         revision++;
     }
