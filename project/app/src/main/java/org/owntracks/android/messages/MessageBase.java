@@ -35,6 +35,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         protected String _mqtt_topic_base;
         @JsonIgnore
         private boolean delivered;
+        private boolean processing;
 
         @JsonIgnore
         public long getMessageId() {
@@ -118,15 +119,19 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
 
 
         @JsonIgnore
-        public void setIncomingProcessor(IncomingMessageProcessor processor) {
+        public void setIncomingProcessor(@NonNull IncomingMessageProcessor processor) {
                 this._processorOut = null;
                 this._processorIn = new WeakReference<>(processor);
         }
 
         @JsonIgnore
-        public void setOutgoingProcessor(OutgoingMessageProcessor processor) {
+        public void setOutgoingProcessor(@NonNull OutgoingMessageProcessor processor) {
                 this._processorIn = null;
                 this._processorOut = new WeakReference<>(processor);
+        }
+
+        public void clearOutgoingProcessor() {
+                this._processorOut = null;
         }
 
         @JsonIgnore
@@ -189,4 +194,9 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         public boolean isDelivered() {
                 return delivered;
         }
+
+        public boolean isProcessing() {
+                return processing;
+        }
+
 }

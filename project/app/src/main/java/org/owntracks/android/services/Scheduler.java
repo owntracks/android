@@ -1,7 +1,5 @@
 package org.owntracks.android.services;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
@@ -10,15 +8,12 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
-import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.SimpleJobService;
 import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
-import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,8 +26,11 @@ public class Scheduler extends SimpleJobService {
     public static final String ONEOFF_TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
     public static final String ONEOFF_TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT";
     private static final String PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING" ;
-    private static final String PERIODIC_TASK_MQTT_PING = "PERIODIC_TASK_MQTT_PING" ;
+    private static final String PERIODIC_TASK_MQTT_KEEPALIVE = "PERIODIC_TASK_MQTT_KEEPALIVE" ;
     private static final String PERIODIC_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT";
+    private static final String PERIODIC_TASK_PROCESS_QUEUE = "PERIODIC_TASK_PROCESS_QUEUE";
+
+
     private static Scheduler instance;
     private static FirebaseJobDispatcher dispatcher;
 
@@ -59,16 +57,20 @@ public class Scheduler extends SimpleJobService {
         Timber.v("BUNDLE_KEY_ACTION: %s", extras.getString(BUNDLE_KEY_ACTION));
 
         switch (action) {
-            case ONEOFF_TASK_SEND_MESSAGE_HTTP:
-                return MessageProcessorEndpointHttp.getInstance().sendMessage(extras);
-            case ONEOFF_TASK_SEND_MESSAGE_MQTT:
-                return MessageProcessorEndpointMqtt.getInstance().sendMessage(extras);
-            case PERIODIC_TASK_MQTT_PING:
+            //case ONEOFF_TASK_SEND_MESSAGE_HTTP:
+             //   return MessageProcessorEndpointHttp.getInstance().sendMessage(extras);
+           // case ONEOFF_TASK_SEND_MESSAGE_MQTT:
+            //    return returnSuccess();// MessageProcessorEndpointMqtt.getInstance().sendMessage(extras);
+            case PERIODIC_TASK_MQTT_KEEPALIVE:
                 return MessageProcessorEndpointMqtt.getInstance().sendPing() ? returnSuccess() : returnFailRetry();
             case PERIODIC_TASK_MQTT_RECONNECT:
                 return MessageProcessorEndpointMqtt.getInstance().checkConnection() ? returnSuccess() : returnFailRetry();
             case PERIODIC_TASK_SEND_LOCATION_PING:
                 App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_PING);
+                return returnSuccess();
+            case PERIODIC_TASK_PROCESS_QUEUE:
+                Timber.v("processing queue");
+                App.getMessageProcessor().processQueueHead();
                 return returnSuccess();
             default:
                 Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
@@ -98,7 +100,7 @@ public class Scheduler extends SimpleJobService {
 
     public void cancelMqttTasks() {
         dispatcher.cancel(ONEOFF_TASK_SEND_MESSAGE_MQTT);
-        dispatcher.cancel(PERIODIC_TASK_MQTT_PING);
+        dispatcher.cancel(PERIODIC_TASK_MQTT_KEEPALIVE);
         dispatcher.cancel(PERIODIC_TASK_MQTT_RECONNECT);
     }
 
@@ -146,24 +148,30 @@ public class Scheduler extends SimpleJobService {
 
         Job job = dispatcher.newJobBuilder()
                 .setService(Scheduler.class)
-                .setTag(PERIODIC_TASK_MQTT_PING)
+                .setTag(PERIODIC_TASK_MQTT_KEEPALIVE)
                 .setRecurring(true)
                 .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
                 .setTrigger(Trigger.executionWindow(0, (int)keepAliveSeconds))
                 .setReplaceCurrent(true)
-                .setExtras(getBundleForAction(PERIODIC_TASK_MQTT_PING))
+                .setExtras(getBundleForAction(PERIODIC_TASK_MQTT_KEEPALIVE))
                 .build();
 
-        Timber.v("scheduling task PERIODIC_TASK_MQTT_PING");
+        Timber.v("scheduling task PERIODIC_TASK_MQTT_KEEPALIVE");
         dispatcher.schedule(job);
     }
 
     public void cancelMqttPing() {
-        Timber.v("canceling task PERIODIC_TASK_MQTT_PING");
-        dispatcher.cancel(PERIODIC_TASK_MQTT_PING);
+        Timber.v("canceling task PERIODIC_TASK_MQTT_KEEPALIVE");
+        dispatcher.cancel(PERIODIC_TASK_MQTT_KEEPALIVE);
     }
+
+    public void cancelPeriodicQueueProcessing() {
+        Timber.v("canceling task PERIODIC_TASK_PROCESS_QUEUE");
+        dispatcher.cancel(PERIODIC_TASK_PROCESS_QUEUE);
+    }
+
 
     public void scheduleLocationPing() {
 
@@ -215,4 +223,19 @@ public class Scheduler extends SimpleJobService {
     }
 
 
+    public void scheduleQueueProcessing() {
+        Job job = dispatcher.newJobBuilder()
+                .setService(Scheduler.class)
+                .setTag(PERIODIC_TASK_PROCESS_QUEUE)
+                .setRecurring(true)
+                .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
+                .setConstraints(Constraint.ON_ANY_NETWORK)
+                .setTrigger(Trigger.executionWindow(0, (int)TimeUnit.MINUTES.toSeconds(10)))
+                .setReplaceCurrent(true)
+                .setExtras(getBundleForAction(PERIODIC_TASK_PROCESS_QUEUE))
+                .build();
+
+        Timber.v("scheduling task PERIODIC_TASK_PROCESS_QUEUE");
+        dispatcher.schedule(job);
+    }
 }

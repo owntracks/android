@@ -34,6 +34,7 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
@@ -72,40 +73,48 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 	}
 
-	synchronized int sendMessage(Bundle b) {
-		long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
+	//synchronized int sendMessage(Bundle b) {
+	synchronized int sendMessage(MessageBase m) {
+		long messageId = m.getMessageId();//b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 
 		// Try to connect on demand if disconnected
 		// Do not try to do this if previous attempts were not successful
 		// Normal reconnect scheduler will take over
-		if(!isConnected()) {
-			Timber.d("not connected. Pressure is %s", sendMessageConnectPressure);
-			if(sendMessageConnectPressure > 2 ) {
-				Timber.d("connect pressure too high, falling back to normal scheduler");
-				return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
-			} else{
-				Timber.d("pressure ok, connecting on demand");
+		//if (!isConnected()) {
+			//Timber.d("not connected. Pressure is %s", sendMessageConnectPressure);
+			//if (sendMessageConnectPressure > 2) {
+			//	Timber.d("connect pressure too high, falling back to normal scheduler");
+			//	return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
+			//} else {
+			//	Timber.d("pressure ok, connecting on demand");
 
 				sendMessageConnectPressure++;
-				if(!connect()) {
+				if (!connect()) {
+					Timber.v("failed connection attempts :%s", sendMessageConnectPressure);
 					return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
 				}
-			}
-		}
+			//}
+		//}
 
 		// Connection should be established
 
 		try {
-			IMqttDeliveryToken pubToken = this.mqttClient.publish(b.getString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC), mqttMessageFromBundle(b));
+			IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), App.getParser().toJsonBytes(m), m.getQos(), m.getRetained());
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
 
-			Timber.v("message sent: %s", b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID));
+			Timber.v("message sent: %s", messageId);
 			return App.getMessageProcessor().onMessageDelivered(messageId);
 		} catch (MqttException e) {
 			e.printStackTrace();
 			return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
+		} catch (Exception e) {
+		// Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
+			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped", m.getMessageId());
+			return App.getMessageProcessor().onMessageDeliveryFailedFinal(messageId);
 		}
 	}
+
+
 
 	@SuppressWarnings("ConstantConditions")
 	private MqttMessage mqttMessageFromBundle(Bundle b) {
@@ -559,18 +568,22 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	public void processOutgoingMessage(MessageBase message) {
 		message.setTopic(App.getPreferences().getPubTopicBase());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//schedulesMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageCmd message) {
 		message.setTopic(App.getPreferences().getPubTopicCommands());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageEvent message) {
-		scheduleMessage(mqttMessageToBundle(message));
+		message.setTopic(App.getPreferences().getPubTopicEvents());
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -578,7 +591,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(App.getPreferences().getPubTopicLocations());
 		message.setQos(App.getPreferences().getPubQosLocations());
 		message.setRetained(App.getPreferences().getPubRetainLocations());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -586,7 +600,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(App.getPreferences().getPubTopicEvents());
 		message.setQos(App.getPreferences().getPubQosEvents());
 		message.setRetained(Preferences.getPubRetainEvents());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -594,7 +609,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(App.getPreferences().getPubTopicWaypoints());
 		message.setQos(Preferences.getPubQosWaypoints());
 		message.setRetained(Preferences.getPubRetainWaypoints());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -602,16 +618,20 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		message.setTopic(App.getPreferences().getPubTopicWaypoints());
 		message.setQos(App.getPreferences().getPubQosWaypoints());
 		message.setRetained(App.getPreferences().getPubRetainWaypoints());
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageClear message) {
 		message.setRetained(true);
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+
+		//scheduleMessage(mqttMessageToBundle(message));
 
 		message.setTopic(message.getTopic()+MessageCard.BASETOPIC_SUFFIX);
-		scheduleMessage(mqttMessageToBundle(message));
+		sendMessage(message);
+		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
@@ -629,10 +649,10 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 
 	private void scheduleMessage(Bundle b) {
-			if(App.isInForeground())
-				sendMessage(b);
-			else
-				App.getScheduler().scheduleMessage(b);
+			//if(App.isInForeground())
+			//	sendMessage(b);
+			//else
+			//	App.getScheduler().scheduleMessage(b);
 	}
 
 
