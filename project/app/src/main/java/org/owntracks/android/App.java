@@ -140,7 +140,9 @@ public class App extends Application  {
     }
 
 
-
+    public static void removeMainHandlerRunnable(Runnable r) {
+        mainHandler.removeCallbacks(r);
+    }
     public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
         mainHandler.postDelayed(r, delayMilis);
     }
