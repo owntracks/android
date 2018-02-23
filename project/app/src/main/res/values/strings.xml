@@ -203,4 +203,5 @@
 	<string name="notificationChannelOngoing">Ongoing</string>
 	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
 	<string name="notificationChannelEventsDescription">Region transmissions</string>
+    <string name="timeNow">now</string>
 </resources>

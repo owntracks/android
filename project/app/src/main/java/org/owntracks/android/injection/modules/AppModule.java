@@ -102,7 +102,7 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static ContactImageProvider provideContactImageProvider(@AppContext Context context) { return new ContactImageProvider(context); }
+    static ContactImageProvider provideContactImageProvider() { return new ContactImageProvider(); }
 
     @Provides
     @PerApplication
