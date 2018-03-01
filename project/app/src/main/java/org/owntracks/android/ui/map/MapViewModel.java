@@ -72,12 +72,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Override
-    public long getContactsRevision() {
-        return contactsRepo.getRevision();
-    }
-
-
-    @Override
     public void restore(@NonNull String contactId) {
         Timber.v("restoring contact id:%s", contactId);
         activateContact(contactId, true);

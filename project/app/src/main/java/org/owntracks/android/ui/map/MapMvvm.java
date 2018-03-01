@@ -30,7 +30,7 @@ public interface MapMvvm {
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         FusedContact getContact();
         Collection<FusedContact> getContacts();
-        long getContactsRevision();
+        //long getContactsRevision();
 
         void onMarkerClick(@NonNull String contactId);
         void onMapClick();

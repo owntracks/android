@@ -254,8 +254,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } catch (Exception e) {
             flagStateMapReady = false;
         }
-        // Save current repo state so we ca apply updates to contacts on resume
-        repoRevision = viewModel.getContactsRevision();
     }
 
     private void handleIntentExtras(Intent intent) {
@@ -410,30 +408,25 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
     private void doUpdateMarkerAll() {
-        Timber.v("repoRevision:%s", repoRevision);
-        long newRepoRevision = viewModel.getContactsRevision();
-
-        if (repoRevision < newRepoRevision) {
-            Timber.v("repoRevision:%s, newRepoRevision:%s => updating marker", repoRevision, newRepoRevision);
-            addMarker();
-        } else if (repoRevision > newRepoRevision) {
-            Timber.v("repoRevision:%s, newRepoRevision:%s => reinitializing marker", repoRevision, newRepoRevision);
-            clearMarker();
-            addMarker();
-        } else {
-            Timber.v("no update");
-        }
-        repoRevision = newRepoRevision;
+        Timber.v("readding all marker");
+        clearMarker();
+        addMarker();
     }
 
     private void addMarker() {
         for (Object c : viewModel.getContacts()) {
             doUpdateMarkerSingle(FusedContact.class.cast(c));
         }
-        repoRevision = viewModel.getContactsRevision();
+    }
+    private void doRemoveMarker(@Nullable FusedContact contact) {
+        if(contact == null)
+            return;
+
+        Marker m = mMarkers.get(contact.getId());
+        if(m != null)
+            m.remove();
 
     }
-
     private void doUpdateMarkerSingle(@Nullable FusedContact contact) {
         if (contact == null || !contact.hasLocation() || mMap == null)
             return;
@@ -528,10 +521,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     public void contactRemove(FusedContact c) {
-        doUpdateMarkerAll();
-        //if(mode==FLAG_ACTION_MODE_FREE && c==viewModel.getContact())
-        //    queueActionModeFree();
-
+        //doUpdateMarkerAll();
+        doRemoveMarker(c);
     }
 
     @Override
