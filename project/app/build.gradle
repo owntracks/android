@@ -9,7 +9,7 @@ ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '11.8.0'
 ext.okHttpVersion = '3.8.0'
-ext.supportLibVersion = '27.0.2'
+ext.supportLibVersion = '27.1.0'
 
 android {
     compileSdkVersion 27

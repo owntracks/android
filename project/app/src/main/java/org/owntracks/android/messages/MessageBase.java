@@ -45,15 +45,6 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         private final Long _messageId = System.currentTimeMillis();
 
         @JsonIgnore
-        private int _outgoingTTL = 2;
-
-        @JsonIgnore
-        public int getOutgoingTTL() {
-                return _outgoingTTL;
-        }
-
-
-        @JsonIgnore
         private int _mqtt_qos;
 
         @JsonIgnore
@@ -111,7 +102,6 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
                 if(_processorIn != null && _processorIn.get() !=  null)
                         processIncomingMessage(_processorIn.get());
                 if(_processorOut != null && _processorOut.get() !=  null) {
-                        _outgoingTTL --;
                         processOutgoingMessage(_processorOut.get());
                 }
         }
