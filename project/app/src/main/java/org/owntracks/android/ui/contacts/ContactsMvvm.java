@@ -1,10 +1,11 @@
 package org.owntracks.android.ui.contacts;
 
-import android.databinding.ObservableList;
-
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+
+import java.util.Collection;
+import java.util.List;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -22,10 +23,14 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 public interface ContactsMvvm {
 
     interface View extends MvvmView {
+        void removeContact(FusedContact c);
+        void addContact(FusedContact c);
+        void updateContact(FusedContact c);
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        ObservableList<FusedContact> getContacts();
+
+        Collection<FusedContact> getContacts();
         void onContactClick(FusedContact contact);
     }
 }

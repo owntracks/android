@@ -2,14 +2,15 @@ package org.owntracks.android.injection.modules;
 
 import android.content.Context;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.MemoryContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Runner;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 
@@ -29,8 +30,11 @@ import dagger.Provides;
 @Module
 public abstract class DataModule {
 
-    @Binds
-    abstract ContactsRepo bindContactsRepo(MemoryContactsRepo memoryContactsRepo);
+    @Provides
+    @PerApplication
+    static ContactsRepo provideContactsRepo(EventBus eventBus, Runner runner) {
+        return new MemoryContactsRepo(eventBus, runner);
+    }
 
     @Provides
     @PerApplication

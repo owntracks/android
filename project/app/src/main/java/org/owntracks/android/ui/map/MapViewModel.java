@@ -17,6 +17,8 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -65,8 +67,8 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Override
-    public List<FusedContact> getContacts() {
-        return this.contactsRepo.getAll();
+    public Collection<FusedContact> getContacts() {
+        return this.contactsRepo.getAllAsList();
     }
 
     @Override
@@ -144,22 +146,27 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.FusedContactAdded e) {
+        onEvent(e.getContact());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.FusedContactRemoved c) {
+        if(c.getContact() == activeContact) {
+            clearContact();
+            getView().setModeFree();
+        }
+        getView().contactRemove(c.getContact());
+
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FusedContact c) {
-
         if(c != activeContact )
             getView().contactUpdate(c);
-        else if(!c.isDeleted())
+        else
             getView().contactUpdateActive();
-        else {
-            if(c == activeContact) {
-                clearContact();
-                getView().setModeFree();
-            }
-            getView().contactRemove(c);
-        }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

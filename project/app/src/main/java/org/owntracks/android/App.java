@@ -48,14 +48,12 @@ public class App extends Application  {
 
     private static SimpleDateFormat dateFormater;
     private static SimpleDateFormat dateFormaterToday;
+    private static SimpleDateFormat dateFormaterDate;
 
-    private static Handler mainHandler;
 
     public static Handler getBackgroundHandler() {
-        return backgroundHandler;
+        return getAppComponent().runner().getBackgroundHandler();
     }
-
-    private static Handler backgroundHandler;
 
     private Activity currentActivity;
     private static boolean inForeground;
@@ -82,12 +80,8 @@ public class App extends Application  {
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
         dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        dateFormaterDate = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-        HandlerThread mServiceHandlerThread = new HandlerThread("backgroundHandlerThread");
-        mServiceHandlerThread.start();
-
-        backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
-        mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
         //noinspection ResultOfMethodCallIgnored
@@ -141,29 +135,36 @@ public class App extends Application  {
 
 
     public static void removeMainHandlerRunnable(Runnable r) {
-        mainHandler.removeCallbacks(r);
+        getAppComponent().runner().removeMainHandlerRunnable(r);
     }
     public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
-        mainHandler.postDelayed(r, delayMilis);
-    }
-
-    public static void postOnMainHandler(Runnable r) {
-        mainHandler.post(r);
+        getAppComponent().runner().postOnMainHandlerDelayed(r, delayMilis);
     }
 
     public static void postOnBackgroundHandlerDelayed(Runnable r, long delayMilis) {
-        backgroundHandler.postDelayed(r, delayMilis);
+        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, delayMilis);
     }
 
     private static void postOnBackgroundHandler(Runnable r) {
-        backgroundHandler.post(r);
+        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, 1);
     }
 
     public static String formatDate(long tstSeconds) {
         return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
     }
 
-	public static String formatDate(@NonNull Date d) {
+
+    public static String formatDateShort(long tstSeconds) {
+        Date d = new Date(TimeUnit.SECONDS.toMillis(tstSeconds));
+        if(DateUtils.isToday(d.getTime())) {
+            return dateFormaterToday.format(d);
+        } else {
+            return dateFormaterDate.format(d);
+
+        }
+    }
+
+    public static String formatDate(@NonNull Date d) {
         if(DateUtils.isToday(d.getTime())) {
             return dateFormaterToday.format(d);
         } else {
@@ -234,8 +235,6 @@ public class App extends Application  {
         };
         postOnBackgroundHandlerDelayed(r, 1000);
     }
-
-
 
 
 

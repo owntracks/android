@@ -12,6 +12,8 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class BindingConversions {
@@ -76,17 +78,23 @@ public class BindingConversions {
     }
 
     @BindingAdapter("app:relativeTimeSpanString")
-    public static void setRelativeTimeSpanString(TextView view, long tst) {
-        long deltaMs = System.currentTimeMillis() - tst * 1000;
-        if (deltaMs < DateUtils.MINUTE_IN_MILLIS) {
-            view.setText(R.string.timeNow);
-        } else if(deltaMs < DateUtils.HOUR_IN_MILLIS) {
-            view.setText(String.format("%sm", TimeUnit.MILLISECONDS.toMinutes(deltaMs)));
-        } else if (deltaMs < DateUtils.DAY_IN_MILLIS) {
-            view.setText(String.format("%sh", TimeUnit.MILLISECONDS.toHours(deltaMs)));
+    public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
+
+
+        if(DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
+            view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         } else {
-            view.setText(String.format("%sd", TimeUnit.MILLISECONDS.toDays(deltaMs)));
+            view.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         }
+        //if (deltaMs < DateUtils.MINUTE_IN_MILLIS) {
+        //    view.setText(R.string.timeNow);
+        //} else if(deltaMs < DateUtils.HOUR_IN_MILLIS) {
+        //    view.setText(String.format("%sm", TimeUnit.MILLISECONDS.toMinutes(deltaMs)));
+        //} else if (deltaMs < DateUtils.DAY_IN_MILLIS) {
+        //    view.setText(String.format("%sh", TimeUnit.MILLISECONDS.toHours(deltaMs)));
+        //} else {
+        //    view.setText(String.format("%sd", TimeUnit.MILLISECONDS.toDays(deltaMs)));
+        //}
         //view.setText(DateUtils.getRelativeTimeSpanString(tst*1000, System.currentTimeMillis(), 1 ,DateUtils.FORMAT_ABBREV_ALL));
     }
 

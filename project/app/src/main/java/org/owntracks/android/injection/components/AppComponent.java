@@ -17,6 +17,7 @@ import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Runner;
 
 import dagger.Component;
 
@@ -48,5 +49,5 @@ public interface AppComponent {
     ContactImageProvider contactImageProvider();
     GeocodingProvider geocodingProvider();
     Preferences preferences();
-
+    Runner runner();
 }

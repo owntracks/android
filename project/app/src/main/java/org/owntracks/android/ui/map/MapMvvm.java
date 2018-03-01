@@ -6,6 +6,7 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface MapMvvm {
@@ -28,7 +29,7 @@ public interface MapMvvm {
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         FusedContact getContact();
-        List<FusedContact> getContacts();
+        Collection<FusedContact> getContacts();
         long getContactsRevision();
 
         void onMarkerClick(@NonNull String contactId);

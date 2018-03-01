@@ -3,6 +3,7 @@ package org.owntracks.android.support;
 import java.util.Date;
 
 import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.model.FusedContact;
 
 public class Events {
     public static abstract class E {
@@ -82,6 +83,28 @@ public class Events {
             return length;
         }
 
+    }
+
+    public static class FusedContactAdded extends E {
+        private final FusedContact fusedContact;
+
+        public FusedContactAdded(FusedContact c) {
+            this.fusedContact = c;
+        }
+        public FusedContact getContact() {
+            return this.fusedContact;
+        }
+    }
+
+    public static class FusedContactRemoved extends E {
+        private final FusedContact fusedContact;
+
+        public FusedContactRemoved(FusedContact c) {
+            this.fusedContact = c;
+        }
+        public FusedContact getContact() {
+            return this.fusedContact;
+        }
     }
 
 }
