@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
@@ -274,6 +275,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         }
 
         builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        builder.setSound(null, AudioManager.STREAM_NOTIFICATION);
         builder.setContentText(lastEndpointState.getLabel(App.getContext()));
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
