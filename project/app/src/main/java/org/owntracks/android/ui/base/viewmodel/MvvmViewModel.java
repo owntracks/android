@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 
@@ -27,4 +28,5 @@ public interface MvvmViewModel<V extends MvvmView> extends Observable {
 
     void saveInstanceState(@NonNull Bundle outState);
     void restoreInstanceState(@NonNull Bundle savedInstanceState);
+
 }

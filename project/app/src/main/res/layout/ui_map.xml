@@ -46,7 +46,7 @@
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
-            <include bind:contact="@{vm.contact}" android:id="@+id/contactPeek" layout="@layout/ui_row_contact"/>
+            <include bind:contact="@{vm.activeContact}" android:id="@+id/contactPeek" layout="@layout/ui_row_contact"/>
 
             <TextView
                 android:id="@+id/locationDate"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@{App.formatDate(vm.contact.fusedLocationDate)}"
+                android:text="@{App.formatDate(vm.activeContact.fusedLocationDate)}"
                 android:paddingLeft="72dp"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
@@ -76,7 +76,7 @@
                 android:id="@+id/acc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.contact.fusedLocationAccuracy}"
+                android:text="@{vm.activeContact.fusedLocationAccuracy}"
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -107,7 +107,7 @@
                 android:id="@+id/tid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.contact.trackerId}"
+                android:text="@{vm.activeContact.trackerId}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -131,7 +131,7 @@
                 android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.contact.id}"
+                android:text="@{vm.activeContact.id}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
