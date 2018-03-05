@@ -1,13 +1,17 @@
 package org.owntracks.android.ui.map;
 
+import android.databinding.Bindable;
 import android.support.annotation.NonNull;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface MapMvvm {
 
@@ -16,30 +20,33 @@ public interface MapMvvm {
         void setBottomSheetCollapsed();
         void setBottomSheetHidden();
 
-        void contactUpdate(FusedContact contact);
-        void contactUpdateActive();
-        void contactRemove(FusedContact c);
+        void updateContact(FusedContact contact);
+        void removeContact(FusedContact c);
 
-        void setModeContact(boolean center);
-        void setModeDevice();
-        void setModeFree();
-        void clearMarker();
+        void clearMarkers();
+        void updateCamera(@NonNull LatLng latLng);
 
     }
 
-    interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        FusedContact getContact();
-        Collection<FusedContact> getContacts();
-        //long getContactsRevision();
+    interface ViewModel<V extends MvvmView> extends MvvmViewModel<V>  {
+        LatLng getCurrentLocation();
 
-        void onMarkerClick(@NonNull String contactId);
-        void onMapClick();
+
+        @Bindable
+        FusedContact getActiveContact();
+        Collection<FusedContact> getContacts();
+
         void onBottomSheetLongClick();
         void onBottomSheetClick();
         void onMenuCenterDeviceClicked();
         void onClearContactClicked();
 
         void restore(String contactId);
+        boolean hasLocation();
 
+        LocationSource getMapLocationSource();
+        GoogleMap.OnMapClickListener getOnMapClickListener();
+        GoogleMap.OnMarkerClickListener getOnMarkerClickListener();
+        void onMapReady();
     }
 }

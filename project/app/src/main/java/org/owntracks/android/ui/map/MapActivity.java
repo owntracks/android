@@ -2,7 +2,6 @@ package org.owntracks.android.ui.map;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,14 +20,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
@@ -40,119 +36,15 @@ import java.util.WeakHashMap;
 
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
+public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback {
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
     private static final long ZOOM_LEVEL_STREET = 15;
-    private static final int FLAG_ACTION_MODE_FREE = 0;
-    private static final int FLAG_ACTION_MODE_DEVICE = 1;
-    private static final int FLAG_ACTION_MODE_CONTACT = 2;
 
     final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
-    long repoRevision = -1;
     private GoogleMap mMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
-    private MapLocationSource mMapLocationSource;
-    private boolean flagStateMapReady = false;
-    private boolean flagStateLocationReady = false;
-    private boolean flagRefreshDevice = false;
-    private boolean flagRefreshContactActive = false;
-    private boolean flagRefreshContactAll = false;
-    private boolean flagRefreshAll = false;
-    private int mode = FLAG_ACTION_MODE_DEVICE;
+    private boolean isMapReady = false;
     private Menu mMenu;
-
-    // EVENT ENGINE ACTIONS
-    private void queueActionModeDevice() {
-        mode = FLAG_ACTION_MODE_DEVICE;
-        flagRefreshDevice = true;  // misuse data update flag to center if ready
-        executePendingActions();
-    }
-
-    private void queueActionModeContact(boolean center) {
-        mode = FLAG_ACTION_MODE_CONTACT;
-        flagRefreshContactActive = center;
-        executePendingActions();
-    }
-
-    private void queueActionModeFree() {
-        Timber.v("queueing free mode");
-        mode = FLAG_ACTION_MODE_FREE;
-        executePendingActions();
-    }
-
-    private void queueActionMapUpdate() {
-        flagRefreshAll = true;
-        executePendingActions();
-    }
-
-    private void executePendingActions() {
-        Timber.v("flag flagStateLocationReady: %s", flagStateLocationReady);
-        Timber.v("flag flagStateMapReady: %s", flagStateMapReady);
-        Timber.v("flag flagRefreshDevice: %s", flagRefreshDevice);
-        Timber.v("flag flagRefreshContactActive: %s", flagRefreshContactActive);
-        Timber.v("flag flagRefreshContactAll: %s", flagRefreshContactAll);
-        Timber.v("flag flagRefreshAll: %s", flagRefreshAll);
-        Timber.v("flag int mode: %s", mode);
-
-
-        if (!flagStateMapReady) {
-            return;
-        }
-
-        // MAP NEEDS UPDATE. HANDLE BEFORE VIEW UPDATES
-        if (flagRefreshContactAll) {
-            flagRefreshContactAll = false;
-            doUpdateMarkerAll();
-        }
-        // DEVICE OR ACTIVE CONTACT UPDATED. UPDATE VIEW
-        if (flagStateLocationReady && flagRefreshDevice && mode == FLAG_ACTION_MODE_DEVICE) {
-            flagRefreshDevice = false;
-            doCenterDevice();
-        } else if (flagRefreshContactActive && (mode == FLAG_ACTION_MODE_CONTACT)) {
-            flagRefreshContactActive = false;
-            doCenterContact();
-        } else if (flagRefreshAll) {
-            flagRefreshAll = false;
-
-            doUpdateMarkerAll();
-            if (flagStateLocationReady && mode == FLAG_ACTION_MODE_DEVICE) {
-                doCenterDevice();
-            } else if (mode == FLAG_ACTION_MODE_CONTACT) {
-                doCenterContact();
-            }
-        }
-    }
-
-    // EVENT ENGINE STATE CALLBACKS
-    public void onLocationSourceUpdated() {
-        Timber.v("onLocationSourceUpdated");
-
-        flagStateLocationReady = true;
-        flagRefreshDevice = true;
-        executePendingActions();
-        enableLocationMenus();
-    }
-
-    private void onStateMapReady() {
-        flagStateMapReady = true;
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
-
-    private void onActiveContactUpdated() {
-        flagRefreshContactActive = true;
-        executePendingActions();
-    }
-
-    private void onActiveContactRemoved() {
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
-
-    private void onContactRemoved() {
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -166,14 +58,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         setSupportToolbar(this.binding.toolbar, false, true);
         setDrawer(this.binding.toolbar);
 
-        this.mMapLocationSource = new MapLocationSource();
-
         // Workaround for Google Maps crash on Android 6
         try {
             binding.mapView.onCreate(savedInstanceState);
         } catch (Exception e) {
-            Timber.e("not showing map due to issue https://issuetracker.google.com/issues/35827842");
-            flagStateMapReady = false;
+            Timber.e("not showing map due to issue   ");
+            isMapReady = false;
         }
         this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);
         this.binding.contactPeek.contactRow.setOnClickListener(this);
@@ -208,7 +98,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             if (binding.mapView != null)
                 binding.mapView.onSaveInstanceState(bundle);
         } catch (Exception ignored) {
-            flagStateMapReady = false;
+            isMapReady = false;
         }
 
     }
@@ -219,7 +109,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             if (binding.mapView != null)
                 binding.mapView.onDestroy();
         } catch (Exception ignored) {
-            flagStateMapReady = false;
+            isMapReady = false;
         }
         super.onDestroy();
     }
@@ -227,22 +117,24 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void onResume() {
         super.onResume();
+        this.isMapReady = false;
 
         try {
             if (binding.mapView != null)
                 binding.mapView.onResume();
 
-            if (mMap == null)
+            if (mMap == null) {
+                this.isMapReady = false;
                 initMapDelayed();
-
-            queueActionMapUpdate();
+            } else {
+                this.isMapReady = true;
+            }
 
         } catch (Exception e) {
             Timber.e("not showing map due to crash in Google Maps library");
-            flagStateMapReady = false;
+            isMapReady = false;
         }
         handleIntentExtras(getIntent());
-        executePendingActions();
     }
 
     @Override
@@ -252,7 +144,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             if (binding.mapView != null)
                 binding.mapView.onPause();
         } catch (Exception e) {
-            flagStateMapReady = false;
+            isMapReady = false;
         }
     }
 
@@ -264,6 +156,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             Timber.v("intent has extras from drawerProvider");
             String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
             if (contactId != null) {
+
                 viewModel.restore(contactId);
             }
         }
@@ -276,7 +169,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             if (binding.mapView != null)
                 binding.mapView.onLowMemory();
         } catch (Exception ignored) {
-            flagStateMapReady = false;
+            isMapReady = false;
         }
     }
 
@@ -287,12 +180,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         try {
             if (binding.mapView != null)
                 binding.mapView.onLowMemory();
-        } catch (Exception ignored){flagStateMapReady = false;}
+        } catch (Exception ignored){
+            isMapReady = false;
+        }
     }
 
     public void initMapDelayed() {
-        flagStateMapReady = false;
-        //flagStateLocationReady = false;
+        isMapReady = false;
 
         App.postOnMainHandlerDelayed(new Runnable() {
             @Override
@@ -303,7 +197,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
     private void initMap() {
-        flagStateMapReady = false;
+        isMapReady = false;
         try {
             binding.mapView.getMapAsync(this);
         } catch (Exception ignored) { }
@@ -313,10 +207,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_map, menu);
         this.mMenu = menu;
-        if (!flagStateLocationReady)
-            disableLocationMenus();
-        else
+        if (!viewModel.hasLocation())
             enableLocationMenus();
+        else
+            disableLocationMenus();
+
         return true;
     }
 
@@ -361,11 +256,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
-        this.mMap.setLocationSource(getMapLocationSource());
+        this.mMap.setLocationSource(viewModel.getMapLocationSource());
         this.mMap.setMyLocationEnabled(true);
         this.mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        this.mMap.setOnMapClickListener(this);
-        this.mMap.setOnMarkerClickListener(this);
+        this.mMap.setOnMapClickListener(viewModel.getOnMapClickListener());
+        this.mMap.setOnMarkerClickListener(viewModel.getOnMarkerClickListener());
         this.mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -377,58 +272,27 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 return null;
             }
         });
-        onStateMapReady();
+        this.isMapReady = true;
+        viewModel.onMapReady();
     }
 
-    @Override
-    public void onMapClick(LatLng latLng) {
-        queueActionModeFree();
-        viewModel.onMapClick();
+
+    public void updateCamera(@NonNull LatLng latLng) {
+        if(isMapReady)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        if (marker.getTag() != null) {
-            viewModel.onMarkerClick(String.class.cast(marker.getTag()));
-        }
-        return true;
-    }
-
-    // MAP INTERACTION
-    private void doCenterDevice() {
-        doUpdateCamera(mMapLocationSource.getLatLng(), ZOOM_LEVEL_STREET);
-    }
-
-    private void doCenterContact() {
-        doUpdateCamera(viewModel.getContact().getLatLng(), ZOOM_LEVEL_STREET);
-    }
-
-    private void doUpdateCamera(LatLng latLng, long zoom) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-    }
-
-    private void doUpdateMarkerAll() {
-        Timber.v("readding all marker");
-        clearMarker();
-        addMarker();
-    }
-
-    private void addMarker() {
-        for (Object c : viewModel.getContacts()) {
-            doUpdateMarkerSingle(FusedContact.class.cast(c));
-        }
-    }
-    private void doRemoveMarker(@Nullable FusedContact contact) {
+    private void removeMarker(@Nullable FusedContact contact) {
         if(contact == null)
             return;
 
         Marker m = mMarkers.get(contact.getId());
         if(m != null)
             m.remove();
-
     }
-    private void doUpdateMarkerSingle(@Nullable FusedContact contact) {
-        if (contact == null || !contact.hasLocation() || mMap == null)
+
+    private void updateMarker(@Nullable FusedContact contact) {
+        if (contact == null || !contact.hasLocation() || !isMapReady)
             return;
 
         Marker m = mMarkers.get(contact.getId());
@@ -442,14 +306,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
 
         App.getContactImageProvider().setMarkerAsync(m, contact);
-
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_navigate:
-                FusedContact c = viewModel.getContact();
+                FusedContact c = viewModel.getActiveContact();
                 if (c != null && c.hasLocation()) {
                     try {
                         LatLng l = c.getLatLng();
@@ -471,13 +334,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
     }
 
-    public LocationSource getMapLocationSource() {
-        if (mMapLocationSource == null)
-            mMapLocationSource = new MapLocationSource();
-
-        return mMapLocationSource;
-    }
-
     @Override
     public boolean onLongClick(View view) {
         viewModel.onBottomSheetLongClick();
@@ -487,7 +343,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void setBottomSheetExpanded() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }    // BOTTOM SHEET CALLBACKS
+    }
+
+    // BOTTOM SHEET CALLBACKS
     @Override
     public void onClick(View view) {
         viewModel.onBottomSheetClick();
@@ -496,7 +354,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void setBottomSheetCollapsed() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
     }
 
     @Override
@@ -507,42 +364,18 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
     @Override
-    public void contactUpdate(FusedContact c) {
-        Timber.v("id:%s", c.getId());
-        doUpdateMarkerSingle(c);
+    public void updateContact(FusedContact c) {
+        updateMarker(c);
     }
 
     @Override
-    public void contactUpdateActive() {
-        Timber.v("");
-        onActiveContactUpdated();
-        doUpdateMarkerSingle(viewModel.getContact());
+    public void removeContact(FusedContact c) {
+        removeMarker(c);
     }
 
     @Override
-    public void contactRemove(FusedContact c) {
-        //doUpdateMarkerAll();
-        doRemoveMarker(c);
-    }
-
-    @Override
-    public void setModeContact(boolean center) {
-        queueActionModeContact(center);
-    }
-
-    @Override
-    public void setModeDevice() {
-        queueActionModeDevice();
-    }
-
-    @Override
-    public void setModeFree() {
-        queueActionModeFree();
-    }
-
-    @Override
-    public void clearMarker() {
-        if (flagStateMapReady)
+    public void clearMarkers() {
+        if (isMapReady)
             mMap.clear();
         mMarkers.clear();
     }
@@ -554,44 +387,5 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         if (App.getPreferences().getModeId() == App.MODE_ID_HTTP_PRIVATE)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
-    }
-
-    public class MapLocationSource implements LocationSource {
-        LocationSource.OnLocationChangedListener mListener;
-        Location mLocation;
-
-        MapLocationSource() {
-            super();
-        }
-
-        @Override
-        public void activate(OnLocationChangedListener onLocationChangedListener) {
-            Timber.v("location source activated");
-            mListener = onLocationChangedListener;
-            if (mLocation != null)
-                this.mListener.onLocationChanged(mLocation);
-            App.getEventBus().register(this);
-
-        }
-
-        @Override
-        public void deactivate() {
-            mListener = null;
-            App.getEventBus().unregister(this);
-        }
-
-        @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
-        public void update(Location l) {
-            Timber.v("location source updated");
-
-            this.mLocation = l;
-            if (mListener != null)
-                this.mListener.onLocationChanged(this.mLocation);
-            onLocationSourceUpdated();
-        }
-
-        LatLng getLatLng() {
-            return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-        }
     }
 }

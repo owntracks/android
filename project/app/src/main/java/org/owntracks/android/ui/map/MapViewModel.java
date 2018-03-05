@@ -1,16 +1,21 @@
 package org.owntracks.android.ui.map;
 
-import android.content.Context;
 import android.databinding.Bindable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.model.FusedContact;
@@ -18,33 +23,22 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import timber.log.Timber;
 
-
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
-
 @PerActivity
-public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View> {
+public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View>, LocationSource, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
     private final ContactsRepo contactsRepo;
     private FusedContact activeContact;
+    private LocationSource.OnLocationChangedListener mListener;
+    Location mLocation;
 
+    private static final int VIEW_FREE = 0;
+    private static final int VIEW_CONTACT = 1;
+    private static final int VIEW_DEVICE = 2;
+    private static int mode = VIEW_DEVICE;
 
     @Inject
     public MapViewModel(ContactsRepo contactsRepo) {
@@ -61,8 +55,80 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Override
+    public LocationSource getMapLocationSource() {
+        return this;
+    }
+
+    @Override
+    public GoogleMap.OnMapClickListener getOnMapClickListener() {
+        return this;
+    }
+
+    @Override
+    public GoogleMap.OnMarkerClickListener getOnMarkerClickListener() {
+        return this;
+    }
+
+    @Override
+    public void onMapReady() {
+        for(Object c : contactsRepo.getAllAsList()) {
+            getView().updateContact(FusedContact.class.cast(c));
+        }
+
+        if(mode == VIEW_DEVICE) {
+            setViewModeDevice();
+        } else if(mode == VIEW_CONTACT) {
+            setViewModeContact(activeContact, true);
+        } else {
+            setViewModeFree();
+        }
+    }
+
+    private void setViewModeContact(@NonNull String contactId, boolean center) {
+        FusedContact c = contactsRepo.getById(contactId);
+        if(c != null)
+            setViewModeContact(c, center);
+        else
+            Timber.e("contact not found %s, ", contactId);
+    }
+
+    private void setViewModeContact(@NonNull FusedContact contact, boolean center) {
+        Timber.v("setting view mode: VIEW_CONTACT for %s", contact.getId());
+        mode = VIEW_CONTACT;
+        setActiveContact(contact);
+        getView().setBottomSheetCollapsed();
+
+        if(center)
+            getView().updateCamera(activeContact.getLatLng());
+
+    }
+
+    private void setViewModeFree() {
+        Timber.v("setting view mode: VIEW_FREE");
+        mode = VIEW_FREE;
+        clearActiveContact();
+    }
+
+    private void setViewModeDevice() {
+        Timber.v("setting view mode: VIEW_DEVICE");
+
+        mode = VIEW_DEVICE;
+        clearActiveContact();
+        if(hasLocation())
+            getView().updateCamera(getCurrentLocation());
+    }
+
+
+
+    @Override
+    @Nullable
+    public LatLng getCurrentLocation() {
+        return mLocation != null ? new LatLng(mLocation.getLatitude(), mLocation.getLongitude()) : null;
+    }
+
+    @Override
     @Bindable
-    public FusedContact getContact() {
+    public FusedContact getActiveContact() {
         return activeContact;
     }
 
@@ -74,52 +140,34 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void restore(@NonNull String contactId) {
         Timber.v("restoring contact id:%s", contactId);
-        activateContact(contactId, true);
+        setViewModeContact(contactId, true);
     }
 
     @Override
-    public void onMarkerClick(@NonNull String contactId) {
-        activateContact(contactId, false);
+    public boolean hasLocation() {
+        return mLocation != null;
     }
 
+    private void setActiveContact(@Nullable FusedContact contact) {
+        if(contact == null) {
+            clearActiveContact();
+            setViewModeFree();
 
-    @Override
-    public void onMapClick() {
-        clearContact();
-    }
-
-    @Override
-    public void onBottomSheetLongClick() {
-        getView().setModeContact(true);
-    }
-
-
-    private void activateContact(@NonNull String contactId, boolean center) {
-        activeContact = contactsRepo.getById(contactId);
-        if(activeContact == null) {
-            Timber.e("contact %s could not be loaded from repo", contactId);
-            getView().setModeDevice();
             return;
         }
+        Timber.v("contactId:%s, obj:%s ", contact.getId(), activeContact);
 
-        Timber.v("contactId:%s, obj:%s ", contactId, activeContact);
-
-        notifyPropertyChanged(BR.contact);
-        getView().setBottomSheetCollapsed();
-        getView().setModeContact(center);
-
+        activeContact = contact;
+        notifyPropertyChanged(BR.activeContact);
     }
 
-    private void clearContact() {
+    private void clearActiveContact() {
         activeContact = null;
-        notifyPropertyChanged(BR.contact);
+        notifyPropertyChanged(BR.activeContact);
         getView().setBottomSheetHidden();
     }
 
 
-    private void clearMap() {
-        getView().clearMarker();
-    }
 
     @Override
     public void onBottomSheetClick() {
@@ -128,8 +176,9 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void onMenuCenterDeviceClicked() {
-        getView().setModeDevice();
+        setViewModeDevice();
     }
+
 
     @Override
     public void onClearContactClicked() {
@@ -148,24 +197,70 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.FusedContactRemoved c) {
         if(c.getContact() == activeContact) {
-            clearContact();
-            getView().setModeFree();
+            clearActiveContact();
+            setViewModeFree();
         }
-        getView().contactRemove(c.getContact());
+        getView().removeContact(c.getContact());
 
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FusedContact c) {
-        if(c != activeContact )
-            getView().contactUpdate(c);
-        else
-            getView().contactUpdateActive();
+        getView().updateContact(c);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.ModeChanged e) {
-        clearMap();
-        clearContact();
+        getView().clearMarkers();
+        clearActiveContact();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
+    public void onEventMainThread(@NonNull Location l) {
+        Timber.v("location source updated");
+
+        this.mLocation = l;
+        if (mListener != null) {
+            this.mListener.onLocationChanged(this.mLocation);
+        }
+        if(mode == VIEW_DEVICE) {
+            getView().updateCamera(getCurrentLocation());
+        }
+    }
+
+    // Map Callback
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+       Timber.v("location source activated");
+       mListener = onLocationChangedListener;
+       if (mLocation != null)
+           this.mListener.onLocationChanged(mLocation);
+    }
+
+    // Map Callback
+    @Override
+    public void deactivate() {
+        mListener = null;
+    }
+
+    // Map Callback
+    @Override
+    public void onMapClick(LatLng latLng) {
+        setViewModeFree();
+    }
+
+    // Map Callback
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (marker.getTag() != null) {
+            setViewModeContact(String.class.cast(marker.getTag()), false);
+        }
+        return true;
+    }
+
+    @Override
+    public void onBottomSheetLongClick() {
+        setViewModeContact(activeContact.getId(), true);
+    }
+
 }
