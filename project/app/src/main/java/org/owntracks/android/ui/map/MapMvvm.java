@@ -20,10 +20,10 @@ public interface MapMvvm {
         void setBottomSheetCollapsed();
         void setBottomSheetHidden();
 
-        void updateContact(FusedContact contact);
-        void removeContact(FusedContact c);
-
+        void updateMarker(FusedContact contact);
+        void removeMarker(FusedContact c);
         void clearMarkers();
+
         void updateCamera(@NonNull LatLng latLng);
 
     }
