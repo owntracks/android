@@ -52,7 +52,8 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:extractNativeLibs="false"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="UnusedAttribute"
+        tools:replace="android:allowBackup">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

@@ -6,14 +6,18 @@ import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
-import org.abstractj.kalium.crypto.Random;
-import org.abstractj.kalium.crypto.SecretBox;
+import org.libsodium.jni.crypto.Random;
+import org.libsodium.jni.crypto.SecretBox;
+
+
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
 
 public class EncryptionProvider {
     private static final String TAG = "EncryptionProvider";
-    private static final int crypto_secretbox_NONCEBYTES = org.abstractj.kalium.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
-    private static final int crypto_secretbox_KEYBYTES = org.abstractj.kalium.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+    private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
+    private static final int crypto_secretbox_KEYBYTES = XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 
     private static SecretBox b;
     private static Random r;
@@ -59,7 +63,7 @@ public class EncryptionProvider {
         return encrypt(plaintext.getBytes());
     }
 
-    public String encrypt(@NonNull byte[] plaintext) {
+    String encrypt(@NonNull byte[] plaintext) {
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
         byte[] cyphertext = b.encrypt(nonce, plaintext);
         byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
