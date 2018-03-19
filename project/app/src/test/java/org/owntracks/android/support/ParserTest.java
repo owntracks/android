@@ -30,9 +30,15 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PrepareForTest({App.class})
 public class ParserTest {
     private MessageLocation messageLocation;
+
     @Mock
     private
     Preferences testPreferences;
+
+    // Need to mock this as we can't unit test native lib off-device
+    @Mock
+    private
+    EncryptionProvider encryptionProvider;
 
     @Before
     public void setupMessageLocation() {
@@ -73,11 +79,6 @@ public class ParserTest {
         String expected = "{\"_type\":\"location\",\"batt\":30,\"acc\":10,\"vac\":0,\"lat\":50.1,\"lon\":60.2,\"alt\":20.0,\"tst\":123456789,\"conn\":\"TestConn\"}";
         assertEquals(expected, parser.toJsonPlain(messageLocation));
     }
-
-    // Need to mock this as we can't unit test native lib off-device
-    @Mock
-    private
-    EncryptionProvider encryptionProvider;
 
     @Test
     public void ParserCorrectlyConvertsLocationToJSONWithEncryption() throws Exception {
@@ -176,12 +177,13 @@ public class ParserTest {
     public void ParserReturnsMessageUnknownOnValidOtherJSON() throws Exception {
         Parser parser = new Parser(encryptionProvider);
         MessageBase message = parser.fromJson("{\"some\":\"invalid message\"}");
-        assertEquals(MessageUnknown.class,message.getClass());
+        assertEquals(MessageUnknown.class, message.getClass());
     }
 
     @Test(expected = JsonParseException.class)
     public void ParserThrowsCorrectExceptionWhenGivenInvalidJSON() throws Exception {
         Parser parser = new Parser(encryptionProvider);
-        MessageBase message = parser.fromJson("not JSON");
+        parser.fromJson("not JSON");
     }
+
 }

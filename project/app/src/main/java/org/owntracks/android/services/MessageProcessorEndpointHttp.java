@@ -17,16 +17,14 @@ import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
+import org.owntracks.android.services.MessageProcessor.EndpointState;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
-import org.owntracks.android.support.Parser;
-import org.owntracks.android.services.MessageProcessor.EndpointState;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,10 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -163,12 +158,12 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     }
 
-    int sendMessage(MessageBase message) {
+    private int sendMessage(MessageBase message) {
         long messageId = message.getMessageId();
         String body = null;
         try {
-            body = App.getParser().toJsonPlain(message);
-        } catch (IOException e) {
+            body = App.getParser().toJson(message);
+        } catch (IOException | Parser.EncryptionException e) {
             getMessageProcessor().onMessageDeliveryFailedFinal(messageId);
         }
 
