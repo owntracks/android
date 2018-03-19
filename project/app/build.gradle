@@ -23,7 +23,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ eventBusIndex : 'org.owntracks.android.EventBusIndex' ]
+                arguments = [eventBusIndex: 'org.owntracks.android.EventBusIndex']
             }
         }
         resConfigs "en", "de"
@@ -54,7 +54,6 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDir 'jniLibs'
             java.srcDirs = ['src/main/java', 'build/generated/source/greendao/org/owntracks/android/db']
         }
     }
@@ -86,7 +85,7 @@ android {
         checkAllWarnings true
         warningsAsErrors false
         abortOnError false
-        disable 'TypographyFractions','TypographyQuotes', 'Typos'
+        disable 'TypographyFractions', 'TypographyQuotes', 'Typos'
 
     }
     testOptions {
@@ -116,7 +115,6 @@ dependencies {
     compile "com.google.android.gms:play-services-location:${playLibVersion}"
     compile "com.google.android.gms:play-services-places:${playLibVersion}"
 
-
     // Utility libraries
     compile "com.google.dagger:dagger:${daggerVersion}"
     //compile "com.google.dagger:dagger-android-support:${daggerVersion}"
@@ -128,11 +126,10 @@ dependencies {
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.3'
-    compile 'com.jakewharton.timber:timber:4.6.0'
-    compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
+    compile "com.fasterxml.jackson.core:jackson-core:2.9.3"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.3"
+    compile "com.jakewharton.timber:timber:4.6.0"
+    compile "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
@@ -146,15 +143,14 @@ dependencies {
     implementation "com.mikepenz:materialize:1.1.2@aar"
 
     // Preprocessors
-    annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.1.1'
-    annotationProcessor  "com.google.dagger:dagger-compiler:${daggerVersion}"
+    annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.1.1'
+    annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.9'
 
     testCompile 'org.powermock:powermock-module-junit4:1.7.1'
     testCompile 'org.powermock:powermock-api-mockito2:1.7.1'
-
 }
 
 
@@ -162,3 +158,6 @@ greendao {
     schemaVersion 15
 }
 
+tasks.withType(Test) {
+    systemProperty "java.library.path", "jniLibs/x86_64"
+}
