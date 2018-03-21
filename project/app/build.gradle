@@ -121,14 +121,14 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.1.1'
     compile 'org.greenrobot:greendao:3.2.2'
-    compile 'org.altbeacon:android-beacon-library:2.12.4@aar'
+    compile 'org.altbeacon:android-beacon-library:2.13.1@aar'
 
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
     compile "com.fasterxml.jackson.core:jackson-core:2.9.3"
     compile "com.fasterxml.jackson.core:jackson-databind:2.9.3"
-    compile "com.jakewharton.timber:timber:4.6.0"
+    compile "com.jakewharton.timber:timber:4.6.1"
     compile "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
