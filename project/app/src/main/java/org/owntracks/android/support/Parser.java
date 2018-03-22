@@ -94,7 +94,6 @@ public class Parser {
         if (encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(encryptionProvider.encrypt(input));
-            Timber.e("Encrpted data is %s", m.getData());
             return defaultMapper.writeValueAsString(m);
         }
         return input;
@@ -104,7 +103,6 @@ public class Parser {
         if (encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setdata(encryptionProvider.encrypt(input));
-            Timber.e("Encrpted data is %s", m.getData());
             return defaultMapper.writeValueAsBytes(m);
         }
         return input;
