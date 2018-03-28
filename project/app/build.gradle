@@ -28,6 +28,7 @@ android {
             }
         }
         resConfigs "en", "de"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -91,6 +92,7 @@ android {
 
     }
     testOptions {
+        animationsDisabled = true
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
 
@@ -163,7 +165,4 @@ greendao {
     schemaVersion 15
 }
 
-//tasks.withType(Test) {
-//    systemProperty "java.library.path", "jniLibs/x86_64"
-//}
 apply from: "coverage.gradle"
