@@ -7,5 +7,6 @@
   "lon" : 60.2,
   "alt" : 20.0,
   "tst" : 123456789,
-  "conn" : "TestConn"
+  "conn" : "TestConn",
+  "vel" : 5.6
 }
