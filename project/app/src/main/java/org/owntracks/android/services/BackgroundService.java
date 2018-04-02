@@ -205,7 +205,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         ongoingChannel.enableLights(false);
         ongoingChannel.enableVibration(false);
         ongoingChannel.setShowBadge(false);
-        ongoingChannel.setSound(null,null);
+        ongoingChannel.setSound(null, null);
         notificationManager.createNotificationChannel(ongoingChannel);
 
         NotificationChannel eventsChannel = new NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, getString(R.string.events), NotificationManager.IMPORTANCE_HIGH);
@@ -214,7 +214,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         eventsChannel.enableLights(false);
         eventsChannel.enableVibration(false);
         eventsChannel.setShowBadge(true);
-        eventsChannel.setSound(null,null);
+        eventsChannel.setSound(null, null);
         notificationManager.createNotificationChannel(eventsChannel);
     }
 
@@ -500,6 +500,9 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         message.setLon(lastLocation.getLongitude());
         message.setAlt(lastLocation.getAltitude());
         message.setAcc(Math.round(lastLocation.getAccuracy()));
+        if (lastLocation.hasSpeed()) {
+            message.setVelocity(lastLocation.getSpeed() * 3.6); // Convert m/s to km/h
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && lastLocation.hasVerticalAccuracy()) {
             message.setVac(Math.round(lastLocation.getVerticalAccuracyMeters()));
         }
