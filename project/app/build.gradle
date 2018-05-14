@@ -125,7 +125,6 @@ dependencies {
     implementation "com.google.dagger:dagger:${daggerVersion}"
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'org.greenrobot:greendao:3.2.2'
-    implementation 'org.altbeacon:android-beacon-library:2.13.1@aar'
 
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"

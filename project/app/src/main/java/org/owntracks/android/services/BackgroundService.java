@@ -6,7 +6,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,7 +18,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -41,14 +39,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -69,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class BackgroundService extends Service implements BeaconConsumer, RangeNotifier, MonitorNotifier, OnCompleteListener<Location> {
+public class BackgroundService extends Service implements OnCompleteListener<Location> {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -94,9 +84,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "EC";
 
 
-    private static final int BEACON_MODE_LEGACY_SCANNING = 1;
-    private static final int BEACON_MODE_OFF = 2;
-
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
 
@@ -114,7 +101,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     private Preferences preferences;
     private List<Waypoint> waypoints = Collections.emptyList();
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
-    private BeaconManager beaconManager;
     private int lastQueueLength = 0;
     private Notification stackNotification;
 
@@ -142,7 +128,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         setupLocationRequest();
         setupGeofences();
         setupLocationPing();
-        setupBeaconManager();
 
         App.getEventBus().register(this);
         App.getEventBus().postSticky(new Events.ServiceStarted());
@@ -166,8 +151,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
             switch (intent.getAction()) {
                 case INTENT_ACTION_CHANGE_BG:
                     setupLocationRequest();
-                    if (beaconManager != null && beaconManager.isBound(this))
-                        beaconManager.setBackgroundMode(!App.isInForeground());
                     return;
                 case INTENT_ACTION_SEND_LOCATION_PING:
                     publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
@@ -667,9 +650,7 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Waypoint e) {
         removeGeofences();
-        removeBeacons();
         setupGeofences();
-        setupBeacons();
     }
 
     @SuppressWarnings("unused")
@@ -726,7 +707,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
     public void onEvent(Events.PermissionGranted event) {
         Timber.v("location permission granted");
         setupGeofences();
-        setupBeacons();
         setupLocationRequest();
 
         try {
@@ -775,105 +755,6 @@ public class BackgroundService extends Service implements BeaconConsumer, RangeN
         return notificationBuilderEvents;
     }
 
-    public void setupBeaconManager() {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (bluetoothAdapter == null || preferences.getBeaconMode() == BEACON_MODE_OFF) {
-            Timber.e("bluetooth not available or BEACON_MODE_OFF");
-            return;
-        }
-
-        try { // bluetoothAdapter.isMultipleAdvertisementSupported might throw a NullPointerException for some reason
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Timber.v("isMultipleAdvertisementSupported: %s", bluetoothAdapter.isMultipleAdvertisementSupported());
-                Timber.v("isOffloadedFilteringSupported: %s", bluetoothAdapter.isOffloadedFilteringSupported());
-                Timber.v("isOffloadedScanBatchingSupported: %s", bluetoothAdapter.isOffloadedScanBatchingSupported());
-            }
-        } catch (NullPointerException ignored) {
-        }
-
-
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25")); //altbeacon
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
-        try {
-            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(preferences.getBeaconLayout())); // custom
-        } catch (BeaconParser.BeaconLayoutException ignored) {
-        }
-        beaconManager.setForegroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(30));
-        beaconManager.setBackgroundBetweenScanPeriod(TimeUnit.SECONDS.toMillis(120));
-        beaconManager.bind(this);
-    }
-
-    @Override
-    public void onBeaconServiceConnect() {
-        if (preferences.getBeaconMode() == BEACON_MODE_LEGACY_SCANNING) {
-            BeaconManager.setAndroidLScanningDisabled(true);
-        }
-
-        try {
-            beaconManager.updateScanPeriods();
-        } catch (RemoteException ignored) {
-        }
-
-        beaconManager.addMonitorNotifier(this);
-        beaconManager.addRangeNotifier(this);
-        beaconManager.setRegionStatePersistenceEnabled(true);
-        setupBeacons();
-    }
-
-    private void setupBeacons() {
-        if (beaconManager == null)
-            return;
-
-        for (Waypoint w : waypoints) {
-            if (w.hasBeacon()) {
-
-                try {
-                    Region r = new Region(w.getId().toString(), Identifier.parse(w.getId().toString()), w.getBeaconMajor() != null ? Identifier.fromInt(w.getBeaconMajor()) : null, w.getBeaconMinor() != null ? Identifier.fromInt(w.getBeaconMinor()) : null);
-                    beaconManager.startMonitoringBeaconsInRegion(r);
-                    Timber.v("region %s UUID:%s major:%s minor:%s", r.getUniqueId(), r.getId1(), r.getId2(), r.getId3());
-                } catch (Exception ignored) {
-                }
-
-            }
-        }
-    }
-
-    void removeBeacons() {
-        if (beaconManager == null)
-            return;
-
-        for (Region r : beaconManager.getMonitoredRegions()) {
-            try {
-                beaconManager.stopMonitoringBeaconsInRegion(r);
-            } catch (RemoteException ignored) {
-            }
-        }
-    }
-
-    @Override
-    public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-
-    }
-
-    @Override
-    public void didEnterRegion(Region region) {
-        Waypoint w = App.getDao().loadWaypointForId(region.getUniqueId());
-        onWaypointTransition(w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_ENTER, MessageTransition.TRIGGER_BEACON);
-
-    }
-
-    @Override
-    public void didExitRegion(Region region) {
-        Waypoint w = App.getDao().loadWaypointForId(region.getUniqueId());
-        onWaypointTransition(w, w.getLocation(), Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_BEACON);
-    }
-
-    @Override
-    public void didDetermineStateForRegion(int i, Region region) {
-        Timber.v("state determined for %s", region.getUniqueId());
-    }
 
     @Override
     public void onComplete(@NonNull Task<Location> task) {
