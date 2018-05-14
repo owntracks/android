@@ -40,6 +40,8 @@ public class ParserTest {
     private
     EncryptionProvider encryptionProvider;
 
+    private String expectedJson = "{\"_type\":\"location\",\"batt\":30,\"acc\":10,\"vac\":0,\"lat\":50.1,\"lon\":60.2,\"alt\":20.0,\"tst\":123456789,\"conn\":\"TestConn\",\"vel\":5.6}";
+
     @Before
     public void setupMessageLocation() {
         messageLocation = new MessageLocation();
@@ -50,6 +52,7 @@ public class ParserTest {
         messageLocation.setLat(50.1);
         messageLocation.setLon(60.2);
         messageLocation.setTst(123456789);
+        messageLocation.setVelocity(5.6);
     }
 
     @Before
@@ -76,8 +79,7 @@ public class ParserTest {
     @Test
     public void ParserCorrectlyConvertsLocationToPlainJSON() throws Exception {
         Parser parser = new Parser(null);
-        String expected = "{\"_type\":\"location\",\"batt\":30,\"acc\":10,\"vac\":0,\"lat\":50.1,\"lon\":60.2,\"alt\":20.0,\"tst\":123456789,\"conn\":\"TestConn\"}";
-        assertEquals(expected, parser.toJsonPlain(messageLocation));
+        assertEquals(expectedJson, parser.toJsonPlain(messageLocation));
     }
 
     @Test
@@ -93,10 +95,8 @@ public class ParserTest {
     public void ParserCorrectlyConvertsLocationToJSONWithEncryptionDisabled() throws Exception {
         when(encryptionProvider.isPayloadEncryptionEnabled()).thenReturn(false);
         when(encryptionProvider.encrypt(anyString())).thenReturn("TestCipherText");
-
         Parser parser = new Parser(encryptionProvider);
-        String expected = "{\"_type\":\"location\",\"batt\":30,\"acc\":10,\"vac\":0,\"lat\":50.1,\"lon\":60.2,\"alt\":20.0,\"tst\":123456789,\"conn\":\"TestConn\"}";
-        assertEquals(expected, parser.toJson(messageLocation));
+        assertEquals(expectedJson, parser.toJson(messageLocation));
     }
 
 
@@ -122,7 +122,7 @@ public class ParserTest {
     @Test
     public void ParserReturnsMessageLocationFromValidEncryptedLocationInput() throws Exception {
         when(encryptionProvider.isPayloadEncryptionEnabled()).thenReturn(true);
-        String messageLocationJSON = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0}";
+        String messageLocationJSON = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"vel\":2.3}";
         when(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON);
 
         Parser parser = new Parser(encryptionProvider);
@@ -140,6 +140,7 @@ public class ParserTest {
         assertEquals(5.0408462, messageLocation.getLongitude(), 0);
         assertEquals("p", messageLocation.getT());
         assertEquals(0.0, messageLocation.getVac(), 0);
+        assertEquals(2.3, messageLocation.getVelocity(), 0);
     }
 
     @Test(expected = Parser.EncryptionException.class)

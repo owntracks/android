@@ -1,29 +1,29 @@
 package org.owntracks.android.messages;
 
-import org.owntracks.android.App;
-import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
-import org.owntracks.android.support.Preferences;
-
-import java.lang.ref.WeakReference;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.android.gms.maps.model.LatLng;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.owntracks.android.App;
+import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
+
+import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageLocation extends MessageBase  {
+public class MessageLocation extends MessageBase {
     public static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
-    public static final String REPORT_TYPE_BEACON= "b";
-    public static final String REPORT_TYPE_CIRCULAR= "c";
+    public static final String REPORT_TYPE_BEACON = "b";
+    public static final String REPORT_TYPE_CIRCULAR = "c";
     public static final String REPORT_TYPE_PING = "p";
     public static final String REPORT_TYPE_DEFAULT = null;
 
@@ -38,6 +38,7 @@ public class MessageLocation extends MessageBase  {
     private double lat;
     private double lon;
     private double alt;
+    private double vel;
     private long tst;
     private String geocoder;
     private WeakReference<FusedContact> _contact;
@@ -67,6 +68,14 @@ public class MessageLocation extends MessageBase  {
         return lon;
     }
 
+    @JsonProperty("vel")
+    public double getVelocity() {
+        return vel;
+    }
+
+    public void setVelocity(double vel) {
+        this.vel = vel;
+    }
 
     public String getT() {
         return t;
@@ -130,13 +139,16 @@ public class MessageLocation extends MessageBase  {
     }
 
     @JsonIgnore
-    public String getBaseTopicSuffix() {  return null; }
+    public String getBaseTopicSuffix() {
+        return null;
+    }
 
     public void setContact(FusedContact contact) {
         this._contact = new WeakReference<>(contact);
     }
+
     private void notifyContactPropertyChanged() {
-        if(_contact != null && _contact.get() != null)
+        if (_contact != null && _contact.get() != null)
             this._contact.get().notifyMessageLocationPropertyChanged();
 
     }
@@ -162,7 +174,7 @@ public class MessageLocation extends MessageBase  {
     }
 
     public boolean isValidMessage() {
-        return App.getPreferences().getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(App.getPreferences().getIgnoreStaleLocations() );
+        return App.getPreferences().getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst * 1000) < TimeUnit.DAYS.toMillis(App.getPreferences().getIgnoreStaleLocations());
     }
 
     public void setConn(String conn) {
@@ -176,6 +188,7 @@ public class MessageLocation extends MessageBase  {
     public void setAlt(double alt) {
         this.alt = alt;
     }
+
     public double getAlt() {
         return alt;
     }
