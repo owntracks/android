@@ -107,7 +107,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.1.0'
 
     // Play Services libraries
     compile 'com.firebase:firebase-jobdispatcher:0.8.5'
@@ -117,7 +117,6 @@ dependencies {
 
     // Utility libraries
     compile "com.google.dagger:dagger:${daggerVersion}"
-    //compile "com.google.dagger:dagger-android-support:${daggerVersion}"
 
     compile 'org.greenrobot:eventbus:3.1.1'
     compile 'org.greenrobot:greendao:3.2.2'
