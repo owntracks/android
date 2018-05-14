@@ -1,5 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+apply plugin: 'com.github.ben-manes.versions'
 buildscript {
     repositories {
         mavenCentral()
@@ -8,7 +9,9 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath "org.jacoco:org.jacoco.core:${jacocoVersion}"
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
     }
 }
 
@@ -16,7 +19,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://maven.google.com"  }
+        maven { url "https://maven.google.com" }
         maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
         google()
     }
