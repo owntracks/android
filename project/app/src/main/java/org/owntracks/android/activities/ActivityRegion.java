@@ -213,20 +213,6 @@ public class ActivityRegion extends ActivityBase  {
             w.setGeofenceRadius(null);
         }
 
-        w.setBeaconUUID(binding.beaconUUID.getText().toString());
-        try {
-
-            w.setBeaconMinor(Integer.valueOf(binding.beaconMinor.getText().toString()));
-        } catch (NumberFormatException e) {
-            w.setBeaconMinor(null);
-        }
-
-        try {
-            w.setBeaconMajor(Integer.valueOf(binding.beaconMajor.getText().toString()));
-        } catch (NumberFormatException e) {
-            w.setBeaconMajor(null);
-        }
-
         if(!App.getPreferences().isModeMqttPublic())
             w.setShared(binding.share.isChecked());
         else

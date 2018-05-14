@@ -78,7 +78,6 @@
     <string name="contactDetailsReportedTime">Reported</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
-    <string name="geofenceActive">Geofence enabled</string>
     <string name="waypointRemove">Remove</string>
     <string name="importConfig">Import</string>
     <string name="tls" translatable="false">TLS</string>
@@ -104,9 +103,6 @@
 
     <string name="aLocation">a region</string>
     <string name="events">Events</string>
-    <string name="beaconUUID" translatable="false">Beacon UUID</string>
-    <string name="beaconMajor" translatable="false">Beacon major</string>
-    <string name="beaconMinor" translatable="false">Beacon minor</string>
     <string name="title_activity_regions">Regions</string>
     <string name="title_activity_region">Region</string>
     <string name="title_activity_map">Map</string>
@@ -127,9 +123,8 @@
     <string name="exportWaypointsToEndpoint">Publish Waypoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successful</string>
-    <string name="geofenceAndBeaconInactive">Geofence and beacon disabled</string>
-    <string name="geofenceAndBeaconActive">Geofence and beacon enabled</string>
-    <string name="beaconActive">Beacon enabled</string>
+    <string name="geofenceInactive">Geofence disabled</string>
+    <string name="geofenceActive">Geofence  enabled</string>
 
 
     <string name="welcomeFixIssue">Fix</string>

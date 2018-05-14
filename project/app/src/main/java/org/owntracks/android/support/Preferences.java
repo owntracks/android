@@ -765,18 +765,6 @@ public class Preferences {
 
     }
 
-    @Import(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD)
-    private void setBeaconBackgroundScanPeriod(int anInt) {
-        setInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, anInt);
-
-    }
-
-    @Import(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD)
-    private void setBeaconForegroundScanPeriod(int anInt) {
-        setInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, anInt);
-
-    }
-
     @Import(key =Keys.LOCATOR_DISPLACEMENT)
     private void setLocatorDisplacement(int anInt) {
         setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
@@ -910,53 +898,11 @@ public class Preferences {
         return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
-    @Export(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true )
-    public int getBeaconBackgroundScanPeriod() {
-        return getInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, R.integer.valBeaconBackgroundScanPeriod);
-    }
-
-    @Export(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public int getBeaconForegroundScanPeriod() {
-        return getInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, R.integer.valBeaconForegroundScanPeriod);
-    }
-
     @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
     public int getLocatorAccuracyBackground() {
         return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
-    @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public String getBeaconLayout() {
-        return getString(Keys.BEACON_LAYOUT, R.string.valBeaconLayout);
-    }
-
-    @Import(key =Keys.BEACON_LAYOUT)
-    public void setBeaconLayout(String beaconLayout) {
-        setString(Keys.BEACON_LAYOUT, beaconLayout);
-    }
-
-
-    @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public int getBeaconMode() {
-        return getInt(Keys.BEACON_MODE, R.integer.valBeaconMode);
-    }
-
-    @Import(key =Keys.BEACON_MODE)
-    public void setBeaconMode(int beaconMode) {
-        if(beaconMode >= 0 && beaconMode <= 2)
-            setInt(Keys.BEACON_MODE, beaconMode);
-    }
-
-
-    @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public boolean getBeaconRangingEnabled() {
-        return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
-    }
-
-    @Import(key =Keys.BEACON_RANGING)
-    public void setBeaconRangingEnabled(boolean val) {
-        setBoolean(Keys.BEACON_RANGING, val);
-    }
 
     public boolean getInfo() {
         return getBoolean(Keys.INFO, R.bool.valInfo, R.bool.valInfoPublic, false);
@@ -1069,11 +1015,6 @@ public class Preferences {
     public static class Keys {
         public static final String AUTH                             = "auth";
         public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
-        public static final String BEACON_BACKGROUND_SCAN_PERIOD    = "beaconBackgroundScanPeriod";
-        public static final String BEACON_FOREGROUND_SCAN_PERIOD    = "beaconForegroundScanPeriod";
-        public static final String BEACON_LAYOUT                    = "beaconLayout";
-        public static final String BEACON_RANGING                   = "ranging";
-        public static final String BEACON_MODE                      = "beaconMode";
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String CP                               = "cp";
