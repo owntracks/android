@@ -65,12 +65,18 @@ import javax.inject.Inject;
 public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends AppCompatActivity {
 
     protected B binding;
-    @Inject protected V viewModel;
-    @Inject protected EventBus eventBus;
-    @Inject protected DrawerProvider drawerProvider;
-    @Inject protected Preferences preferences;
-    @Inject protected RequirementsChecker requirementsChecker;
-    @Inject protected Navigator navigator;
+    @Inject
+    protected V viewModel;
+    @Inject
+    protected EventBus eventBus;
+    @Inject
+    protected DrawerProvider drawerProvider;
+    @Inject
+    protected Preferences preferences;
+    @Inject
+    protected RequirementsChecker requirementsChecker;
+    @Inject
+    protected Navigator navigator;
 
     private ActivityComponent mActivityComponent;
 
@@ -84,7 +90,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
     protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)"); }
+        if (viewModel == null) {
+            throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
+        }
         binding = DataBindingUtil.setContentView(this, layoutResId);
         binding.setVariable(BR.vm, viewModel);
 
@@ -93,7 +101,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     }
 
     protected final ActivityComponent activityComponent() {
-        if(mActivityComponent == null) {
+        if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .appComponent(App.getAppComponent())
                     .activityModule(new ActivityModule(this))
@@ -116,9 +124,11 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
+            if (service != null) {
+                BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
+                mService = binder.getService();
+                mBound = true;
+            }
         }
 
         @Override
@@ -135,7 +145,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     protected void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
         setSupportActionBar(toolbar);
 
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             if (showTitle)
                 getSupportActionBar().setTitle(getTitle());
 
@@ -168,15 +178,17 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     @CallSuper
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(viewModel != null) { viewModel.saveInstanceState(outState); }
+        if (viewModel != null) {
+            viewModel.saveInstanceState(outState);
+        }
     }
 
 
     @Override
     public void onStart() {
-        if(disablesAnimation)
+        if (disablesAnimation)
             overridePendingTransition(0, 0);
-        else if(App.isInForeground())
+        else if (App.isInForeground())
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
 
 
@@ -200,7 +212,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     @CallSuper
     protected void onDestroy() {
         super.onDestroy();
-        if(viewModel != null) { viewModel.detachView(); }
+        if (viewModel != null) {
+            viewModel.detachView();
+        }
         binding = null;
         viewModel = null;
         mActivityComponent = null;
@@ -211,7 +225,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onResume() {
         super.onResume();
 
-        if(hasEventBus && !eventBus.isRegistered(viewModel))
+        if (hasEventBus && !eventBus.isRegistered(viewModel))
             eventBus.register(viewModel);
     }
 
@@ -219,10 +233,10 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onPause() {
         super.onPause();
 
-        if(eventBus.isRegistered(viewModel))
+        if (eventBus.isRegistered(viewModel))
             eventBus.unregister(viewModel);
 
-        if(disablesAnimation)
+        if (disablesAnimation)
             overridePendingTransition(0, 0);
         else
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
@@ -230,7 +244,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
     @SuppressWarnings("UnusedReturnValue")
     protected boolean assertRequirements() {
-        if(requirementsChecker.assertRequirements(this)) {
+        if (requirementsChecker.assertRequirements(this)) {
             navigator.startActivity(WelcomeActivity.class);
             finish();
             return true;

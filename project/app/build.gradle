@@ -10,6 +10,7 @@ ext.daggerVersion = '2.10'
 ext.playLibVersion = '11.8.0'
 ext.okHttpVersion = '3.8.0'
 ext.supportLibVersion = '27.1.0'
+ext.jacksonVersion = '2.9.4'
 
 android {
     compileSdkVersion 27
@@ -27,6 +28,7 @@ android {
             }
         }
         resConfigs "en", "de"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -45,6 +47,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
             resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key}"
+            testCoverageEnabled true
         }
     }
 
@@ -89,7 +92,10 @@ android {
 
     }
     testOptions {
+        animationsDisabled = true
         unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+
         unitTests.all {
             testLogging {
                 events "passed", "skipped", "failed"
@@ -101,40 +107,39 @@ android {
 
 dependencies {
     // Support libraries
-    compile "com.android.support:support-v4:${supportLibVersion}"
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile "com.android.support:preference-v7:${supportLibVersion}"
-    compile "com.android.support:design:${supportLibVersion}"
-    compile "com.android.support:cardview-v7:${supportLibVersion}"
-    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
-    compile 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation "com.android.support:support-v4:${supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:preference-v7:${supportLibVersion}"
+    implementation "com.android.support:design:${supportLibVersion}"
+    implementation "com.android.support:cardview-v7:${supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Play Services libraries
-    compile 'com.firebase:firebase-jobdispatcher:0.8.5'
-    compile "com.google.android.gms:play-services-maps:${playLibVersion}"
-    compile "com.google.android.gms:play-services-location:${playLibVersion}"
-    compile "com.google.android.gms:play-services-places:${playLibVersion}"
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
+    implementation "com.google.android.gms:play-services-location:${playLibVersion}"
+    implementation "com.google.android.gms:play-services-places:${playLibVersion}"
 
     // Utility libraries
-    compile "com.google.dagger:dagger:${daggerVersion}"
+    implementation "com.google.dagger:dagger:${daggerVersion}"
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'org.altbeacon:android-beacon-library:2.13.1@aar'
 
-    compile 'org.greenrobot:eventbus:3.1.1'
-    compile 'org.greenrobot:greendao:3.2.2'
-    compile 'org.altbeacon:android-beacon-library:2.13.1@aar'
-
-    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
-    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-    compile "com.fasterxml.jackson.core:jackson-core:2.9.3"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.3"
-    compile "com.jakewharton.timber:timber:4.6.1"
-    compile "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.jakewharton.timber:timber:4.6.1"
+    implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
-    compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.6.0'
-    compile 'com.afollestad.material-dialogs:commons:0.9.6.0'
-    compile('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    implementation('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
@@ -145,11 +150,13 @@ dependencies {
     annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.1.1'
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
 
-    testCompile 'org.powermock:powermock-module-junit4:1.7.1'
-    testCompile 'org.powermock:powermock-api-mockito2:1.7.1'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
+    testImplementation "org.robolectric:robolectric:3.8"
+
 }
 
 
@@ -157,6 +164,4 @@ greendao {
     schemaVersion 15
 }
 
-tasks.withType(Test) {
-    systemProperty "java.library.path", "jniLibs/x86_64"
-}
+apply from: "coverage.gradle"
