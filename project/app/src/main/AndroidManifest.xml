@@ -164,7 +164,7 @@
         </provider>
 
 
-        <service android:name=".services.Scheduler"
+        <service android:name=".workers.Scheduler"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>

@@ -34,11 +34,11 @@ import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
+import org.owntracks.android.workers.Scheduler;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	private String lastConnectionId;
 	private static EndpointState state;
 
-	synchronized boolean sendPing() {
+	public synchronized boolean sendPing() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
 			mqttClient.ping();
@@ -176,7 +176,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		@Override
 		public void connectionLost(Throwable cause) {
-			Timber.e(cause, "connectionLost error");
+			Timber.w(cause, "connectionLost error");
 			App.getScheduler().cancelMqttPing();
             App.getScheduler().scheduleMqttReconnect();
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
@@ -261,7 +261,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				e.printStackTrace();
 			}
 		} else {
-			Timber.e("Thread: %s", Thread.currentThread());
+			Timber.i("Thread: %s", Thread.currentThread());
 		}
 
 		if(isConnected()) {
@@ -504,7 +504,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	@WorkerThread
-	boolean checkConnection() {
+	public boolean checkConnection() {
 		if(isConnected()) {
 			return true;
 		} else {
