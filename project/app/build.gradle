@@ -136,7 +136,6 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.jakewharton.timber:timber:4.6.1"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
-    implementation ("com.byteowls:jopencage:1.1.0")
 
     // Widget libraries
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
