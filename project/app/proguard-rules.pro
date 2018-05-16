@@ -41,7 +41,6 @@ public static java.lang.String TABLENAME;
 -dontwarn rx.**
 
 
-
 # EVENTBUS
 -keepattributes *Annotation*
 -keepclassmembers,includedescriptorclasses class ** {

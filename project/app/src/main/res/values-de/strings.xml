@@ -102,8 +102,7 @@
     <string name="geofenceActive">Geofence aktiv</string>
     <string name="welcomeFixIssue">Korrigieren</string>
     <string name="play_services_now_available">Google Play-Dienste sind jetzt verfügbar</string>
-    <string name="play_services_not_available_recoverable">Google Play-Dienste sind nicht aktiviert oder installiert</string>
-    <string name="play_services_not_available_not_recoverable">Google Play-Dienste sind für Dein Gerät nicht verfügbar</string>
+    <string name="play_services_not_available">Google Play-Dienste sind nicht verfügbar</string>
     <string name="transitionEntering">betritt</string>
     <string name="transitionLeaving">verlässt</string>
     <string name="errorPreferencesImportFailed">Import fehlgeschlagen</string>

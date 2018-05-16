@@ -219,7 +219,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
         PreferenceCategory ongoing = getCategory(R.string.preferencesCategoryNotificationOngoing);
         screen.addPreference(ongoing);
-        addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION, R.string.preferencesNotification, R.string.preferencesNotificationSummary, R.bool.valNotification);
         addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION_LOCATION, R.string.preferencesNotificationLocation, R.string.preferencesNotificationLocationSummary, R.bool.valNotificationLocation);
 
         PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificationBackground);
@@ -229,8 +228,8 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     private void setupDependencies(PreferenceScreen root) {
-        setDependency(root, Preferences.Keys.NOTIFICATION_LOCATION, Preferences.Keys.NOTIFICATION);
-        setDependency(root, Preferences.Keys.NOTIFICATION_EVENTS, Preferences.Keys.NOTIFICATION);
+        //setDependency(root, Preferences.Keys.NOTIFICATION_LOCATION, Preferences.Keys.NOTIFICATION);
+        //setDependency(root, Preferences.Keys.NOTIFICATION_EVENTS, Preferences.Keys.NOTIFICATION);
     }
 
     private void setDependency(PreferenceScreen root, String dependingKey, String dependsOnKey) {

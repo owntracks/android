@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomePlayBinding;
 import org.owntracks.android.ui.base.BaseSupportFragment;
@@ -75,16 +76,12 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
             viewModel.setFixAvailable(false);
             binding.message.setVisibility(View.VISIBLE);
             binding.message.setText(getString(R.string.play_services_now_available));
-        } else if(googleAPI.isUserResolvableError(result)){
+        } else {
             WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
             viewModel.setFixAvailable(true);
             binding.message.setVisibility(View.VISIBLE);
-            binding.message.setText(getString(R.string.play_services_not_available_recoverable));
-        } else {
-            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
-            viewModel.setFixAvailable(false);
-            binding.message.setVisibility(View.VISIBLE);
-            binding.message.setText(getString(R.string.play_services_not_available_not_recoverable));
+            binding.message.setText(getString(R.string.play_services_not_available));
+            viewModel.setFixAvailable(googleAPI.isUserResolvableError(result));
         }
     }
 
@@ -95,6 +92,6 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
 
     @Override
     public boolean isNextEnabled() {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity()) == ConnectionResult.SUCCESS;
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
     }
 }

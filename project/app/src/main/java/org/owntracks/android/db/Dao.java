@@ -22,6 +22,7 @@ public  class Dao {
     }
     private void initialize(Context c) {
         org.owntracks.android.db.DaoMaster.DevOpenHelper helper1 = new org.owntracks.android.db.DaoMaster.DevOpenHelper(c, NAME, null);
+        helper1.setLoadSQLCipherNativeLibs(false);
         db = helper1.getWritableDatabase();
         org.owntracks.android.db.DaoMaster daoMaster1 = new org.owntracks.android.db.DaoMaster(db);
         org.owntracks.android.db.DaoSession daoSession1 = daoMaster1.newSession();

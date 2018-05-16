@@ -16,6 +16,7 @@ import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.OpencageGeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
@@ -101,7 +102,10 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static GeocodingProvider provideGeocodingProvider(@AppContext Context context) { return new GeocodingProvider(context); }
+    static GeocodingProvider provideGeocodingProvider(@AppContext Context context, Preferences preferences) {
+        return new OpencageGeocodingProvider(preferences);
+        //return new GeocodingProvider(context);
+    }
 
     @Provides
     @PerApplication
