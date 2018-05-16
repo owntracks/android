@@ -1,26 +1,14 @@
 package org.owntracks.android.support;
 
-import android.annotation.SuppressLint;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.annotation.CallSuper;
-import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.LruCache;
-import android.util.SparseArray;
 import android.widget.TextView;
-
-import com.byteowls.jopencage.JOpenCageGeocoder;
-import com.byteowls.jopencage.model.JOpenCageComponents;
-import com.byteowls.jopencage.model.JOpenCageResponse;
-import com.byteowls.jopencage.model.JOpenCageReverseRequest;
 
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.services.BackgroundService;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
@@ -28,13 +16,13 @@ import timber.log.Timber;
 public class OpencageGeocodingProvider implements GeocodingProvider {
 
     private static LruCache<String, String> cache;
-    static JOpenCageGeocoderCompat jOpenCageGeocoder;
+    static OpencageGeocoder jOpenCageGeocoder;
     Preferences preferences;
 
     public OpencageGeocodingProvider(Preferences preferences) {
         cache = new LruCache<String, String>(20);
         this.preferences = preferences;
-        jOpenCageGeocoder = new JOpenCageGeocoderCompat(preferences.getOpenCageGeocoderApiKey());
+        jOpenCageGeocoder = new OpencageGeocoder(preferences.getOpenCageGeocoderApiKey());
     }
 
     private static String getCache(MessageLocation m) {
@@ -50,17 +38,22 @@ public class OpencageGeocodingProvider implements GeocodingProvider {
     }
 
     private boolean isCachedGeocoderAvailable(MessageLocation m) {
-        if(m.hasGeocoder()) {
-            return true;
-        }
-
-        m.setGeocoder(getCache(m));
+        String s = getCache(m);
         Timber.v("cache lookup for %s (hash %s) -> %s", m.getMessageId(), locationHash(m), getCache(m));
 
-        return m.hasGeocoder();
+        if(s != null) {
+            m.setGeocoder(s);
+            return true;
+        } else {
+            return false;
+        }
     }
     @Override
     public void resolve(MessageLocation m, TextView tv) {
+        if(m.hasGeocoder()) {
+            tv.setText(m.getGeocoder());
+            return;
+        }
 
         if(isCachedGeocoderAvailable(m)) {
             tv.setText(m.getGeocoder());
@@ -72,6 +65,11 @@ public class OpencageGeocodingProvider implements GeocodingProvider {
 
     @Override
     public void resolve(MessageLocation m, BackgroundService s) {
+        if(m.hasGeocoder()) {
+            s.onGeocodingProviderResult(m);
+            return;
+        }
+
         if(isCachedGeocoderAvailable(m)) {
             s.onGeocodingProviderResult(m);
         } else {
@@ -142,20 +140,18 @@ public class OpencageGeocodingProvider implements GeocodingProvider {
             if(m == null) {
                 return "Resolve failed";
             }
-            JOpenCageReverseRequest request = new JOpenCageReverseRequest(m.getLatitude(), m.getLongitude());
-            request.setNoAnnotations(true);
 
-            JOpenCageResponse response = jOpenCageGeocoder.reverse(request);
+            //JOpenCageResponse response = jOpenCageGeocoder.reverse(m.getLatitude(), m.getLongitude());
 
-            JOpenCageComponents c = response.getFirstComponents();
+           // JOpenCageComponents c = response.getFirstComponents();
 
             //response.
             //StringBuilder b = new StringBuilder();
             // b.append(c.getRoad()).append(",");
             //if(c.getHouseNumber() != null)
             //    b.append(c.getHouseNumber()).append(",");
-            return response.getResults().get(0).getFormatted();// b.append(c.getCity()).toString();
-
+            //return response.getResults().get(0).getFormatted();// b.append(c.getCity()).toString();
+            return jOpenCageGeocoder.reverse(m.getLatitude(), m.getLongitude());
         }
 
         @Override
