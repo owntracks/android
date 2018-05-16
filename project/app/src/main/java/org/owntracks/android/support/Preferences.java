@@ -156,6 +156,7 @@ public class Preferences {
         }
     }
 
+
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -382,6 +383,17 @@ public class Preferences {
             dao.insert(w);
             App.getEventBus().post(w);
         }
+    }
+
+
+    @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
+    public void setOpenCageGeocoderApiKey(String key) {
+        setString(Keys.CP, key, true);
+    }
+
+    @Export(key = Keys.OPENCAGE_GEOCODER_API_KEY, exportModeMqttPrivate = true, exportModeHttpPrivate = true, exportModeMqttPublic = true)
+    public String getOpenCageGeocoderApiKey() {
+        return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.OPENCAGE_API_KEY);
     }
 
     @Import(key = Keys.CP)
@@ -719,11 +731,6 @@ public class Preferences {
         setBoolean(Keys.PUB, aBoolean);
     }
 
-    @Import(key =Keys.NOTIFICATION)
-    private void setNotification(boolean aBoolean) {
-        setBoolean(Keys.NOTIFICATION, aBoolean);
-    }
-
     @Import(key =Keys.NOTIFICATION_HIGHER_PRIORITY)
     private void setNotificationHigherPriority(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, aBoolean);
@@ -845,11 +852,6 @@ public class Preferences {
     @Export(key =Keys.TLS_CLIENT_CRT, exportModeMqttPrivate =true)
     public String getTlsClientCrtName() {
         return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
-    }
-
-    @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public boolean getNotification() {
-        return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
     }
 
     @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
@@ -1036,6 +1038,7 @@ public class Preferences {
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
+        public static final String OPENCAGE_GEOCODER_API_KEY        = "opencageApiKey";
         public static final String PASSWORD                         = "password";
         public static final String PING                             = "ping";
         public static final String PORT                             = "port";

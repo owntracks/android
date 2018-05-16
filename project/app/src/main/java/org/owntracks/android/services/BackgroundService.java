@@ -204,9 +204,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Nullable
     private NotificationCompat.Builder getOngoingNotificationBuilder() {
-        if (!preferences.getNotification())
-            return null;
-
         if (activeNotificationBuilder != null)
             return activeNotificationBuilder;
 
@@ -247,7 +244,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         if (builder == null)
             return;
 
-        Timber.v("updating notification %s %s", this.lastLocationMessage != null, preferences.getNotificationLocation());
 
         if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
             builder.setContentTitle(this.lastLocationMessage.getGeocoder());
@@ -490,7 +486,12 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             message.setVac(Math.round(lastLocation.getVerticalAccuracyMeters()));
         }
         message.setT(trigger);
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        if(MessageLocation.REPORT_TYPE_PING.equals(trigger)) {
+            message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        } else {
+            message.setTst(TimeUnit.MILLISECONDS.toSeconds(lastLocation.getTime()));
+        }
+
         message.setTid(preferences.getTrackerId(true));
         message.setCp(preferences.getCp());
         if (preferences.getPubLocationExtendedData()) {

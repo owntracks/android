@@ -226,7 +226,7 @@ public class App extends Application  {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getPreferences().getNotification()) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent);
                 } else {
                     context.startService(intent);

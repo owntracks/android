@@ -50,7 +50,7 @@
             android:text="@string/welcome_play_description"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-
+            android:layout_centerHorizontal="true"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
@@ -59,7 +59,8 @@
             android:minHeight="@dimen/welcome_content_min_height"
             android:layout_below="@+id/screen_heading"
             android:layout_alignLeft="@+id/screen_heading"
-            android:layout_alignStart="@+id/screen_heading" />
+            android:layout_alignStart="@+id/screen_heading"
+            />
 
 
 		<TextView
@@ -67,16 +68,15 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_above="@+id/recover"
-			android:layout_alignParentBottom="true"
-			android:layout_marginBottom="24dp"
+			android:layout_centerHorizontal="true"
 			android:gravity="center_horizontal"
 			android:paddingLeft="24dp"
 			android:paddingRight="24dp"
-			android:text="@string/play_services_not_available_general"
+			android:text="@string/play_services_not_available"
 			android:textColor="#ffffff"
 			android:textSize="16sp"
-			android:visibility="gone"
-			tools:text="test"/>
+			android:visibility="visible"
+			tools:text="@string/play_services_not_available" />
 		<Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
