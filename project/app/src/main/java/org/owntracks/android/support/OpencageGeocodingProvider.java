@@ -17,10 +17,11 @@ public class OpencageGeocodingProvider implements GeocodingProvider {
 
     private static LruCache<String, String> cache;
     static OpencageGeocoder jOpenCageGeocoder;
-    Preferences preferences;
+    private Preferences preferences;
 
     public OpencageGeocodingProvider(Preferences preferences) {
-        cache = new LruCache<String, String>(20);
+        Timber.i("Using Opencage geocoding provider");
+        cache = new LruCache<>(20);
         this.preferences = preferences;
         jOpenCageGeocoder = new OpencageGeocoder(preferences.getOpenCageGeocoderApiKey());
     }
