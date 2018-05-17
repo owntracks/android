@@ -22,6 +22,12 @@ public class GoogleGeocodingProvider implements GeocodingProvider {
     private static final Double RUN_SECOND = 2d;
     private static Geocoder geocoder;
 
+    public GoogleGeocodingProvider(Context c){
+        Timber.i("Using Google geocoding provider");
+        geocoder = new Geocoder(App.getContext(), Locale.getDefault());
+    }
+
+
     public void resolve(MessageLocation m, TextView tv) {
         if(m.hasGeocoder()) {
             tv.setText(m.getGeocoder());
@@ -176,11 +182,5 @@ public class GoogleGeocodingProvider implements GeocodingProvider {
         abstract void onPostExecuteResultAvailable(String result);
         abstract void retry();
 
-    }
-
-
-
-    public GoogleGeocodingProvider(Context c){
-        geocoder = new Geocoder(App.getContext(), Locale.getDefault());
     }
 }

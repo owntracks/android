@@ -7,15 +7,14 @@ import android.os.Build;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.GoogleGeocodingProvider;
 import org.owntracks.android.support.OpencageGeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
@@ -103,8 +102,14 @@ public class AppModule {
     @Provides
     @PerApplication
     static GeocodingProvider provideGeocodingProvider(@AppContext Context context, Preferences preferences) {
-        return new OpencageGeocodingProvider(preferences);
-        //return new GeocodingProvider(context);
+        switch(preferences.getGeocodingProviderType()){
+            case OPENCAGE:
+                return new OpencageGeocodingProvider(preferences);
+            case GOOGLE:
+            default:
+                return new GoogleGeocodingProvider(context);
+
+        }
     }
 
     @Provides
