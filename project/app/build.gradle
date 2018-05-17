@@ -48,7 +48,6 @@ android {
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key}"
-            resValue "string", "OPENCAGE_API_KEY", "${opencage_api_key}"
             applicationIdSuffix '.debug'
             testCoverageEnabled true
         }
