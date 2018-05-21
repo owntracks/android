@@ -226,6 +226,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         if(mode == VIEW_DEVICE) {
             getView().updateCamera(getCurrentLocation());
         }
+        getView().enableLocationMenus();
     }
 
     // Map Callback

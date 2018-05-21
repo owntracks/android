@@ -245,7 +245,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
     }
 
-    private void enableLocationMenus() {
+    public void enableLocationMenus() {
         if (this.mMenu != null) {
             this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
             this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
