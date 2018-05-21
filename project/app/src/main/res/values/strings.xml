@@ -197,4 +197,7 @@
 	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
 	<string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="timeNow">now</string>
+    <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google</string>
 </resources>

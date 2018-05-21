@@ -163,5 +163,8 @@
     <string name="notificationChannelOngoingDescription">Show a persistent notification to receive location updates in the background</string>
     <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="timeNow">now</string>
+    <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
 
 </resources>

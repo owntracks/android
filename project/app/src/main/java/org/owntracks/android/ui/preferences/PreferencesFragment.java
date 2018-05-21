@@ -212,6 +212,8 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
         screen.addPreference(misc);
         addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
+        addEditStringPreference(misc, Preferences.Keys.OPENCAGE_GEOCODER_API_KEY, R.string.preferencesOpencageGeocoderApiKey, R.string.preferencesOpencageGeocoderApiKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesOpencageGeocoderApiKeyDialog);
+
     }
 
     private void populateScreenNotification(PreferenceScreen screen) {
@@ -274,14 +276,15 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    private boolean addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueAllModes) {
+    private EditStringPreference addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueAllModes) {
         return addEditStringPreference(parent, key, titleRes, summaryRes, defaultValueAllModes, defaultValueAllModes);
     }
 
-    private boolean addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueResPrivate, @StringRes int defaultValueResPublic) {
+    @Nullable
+    private EditStringPreference addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueResPrivate, @StringRes int defaultValueResPublic) {
         // Skip if no default value exists for current mode. Can be used to exclude preferences in some modes
         if((viewModel.getPreferences().isModeMqttPrivate() && defaultValueResPrivate == 0) || (viewModel.getPreferences().isModeMqttPublic() && defaultValueResPublic == 0)) {
-            return false;
+            return null;
         }
 
         EditStringPreference p = new EditStringPreference(getActivity());
@@ -295,7 +298,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setPersistent(true);
 
         parent.addPreference(p);
-        return true;
+        return p;
     }
 
     private EditIntegerPreference addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @IntegerRes int defaultValueAllModes) {
