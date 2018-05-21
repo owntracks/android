@@ -38,7 +38,7 @@ android {
             shrinkResources true
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key}"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHODLER" }"
         }
 
         debug {
@@ -47,8 +47,7 @@ android {
             shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key}"
-            resValue "string", "OPENCAGE_API_KEY", "${opencage_api_key}"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  opencage_api_key : "PLACEHODLER" }"
             applicationIdSuffix '.debug'
             testCoverageEnabled true
         }

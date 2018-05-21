@@ -393,7 +393,7 @@ public class Preferences {
 
     @Export(key = Keys.OPENCAGE_GEOCODER_API_KEY, exportModeMqttPrivate = true, exportModeHttpPrivate = true, exportModeMqttPublic = true)
     public String getOpenCageGeocoderApiKey() {
-        return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.OPENCAGE_API_KEY);
+        return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.valEmpty);
     }
 
     @Import(key = Keys.CP)

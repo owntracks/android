@@ -11,19 +11,18 @@ import okhttp3.Request;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class OpencageGeocoder {
+public class GeocoderOpencage implements Geocoder {
     private OkHttpClient httpClient;
     private String apiKey;
     private ObjectMapper jsonMapper;
     private final static String OPENCAGE_HOST = "api.opencagedata.com";
 
-    OpencageGeocoder(String apiKey) {
+    GeocoderOpencage(String apiKey) {
         this.apiKey = apiKey;
         httpClient = new OkHttpClient();
         jsonMapper = new ObjectMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-
 
     public String reverse(double latitude, double longitude) {
 
