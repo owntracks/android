@@ -23,7 +23,7 @@ public interface MapMvvm {
         void updateMarker(FusedContact contact);
         void removeMarker(FusedContact c);
         void clearMarkers();
-
+        void enableLocationMenus();
         void updateCamera(@NonNull LatLng latLng);
 
     }
