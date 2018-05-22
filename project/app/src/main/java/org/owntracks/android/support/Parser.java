@@ -24,14 +24,13 @@ public class Parser {
         defaultMapper = new ObjectMapper();
         defaultMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         defaultMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-
         arrayCompatMapper = new ObjectMapper();
         arrayCompatMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         arrayCompatMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public String toJsonPlainPretty(@NonNull MessageBase message) throws IOException {
-        return defaultMapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
+        return defaultMapper.writerWithDefaultPrettyPrinter().writeValueAsString(message).replaceAll("\\r\\n", "\n");
     }
 
 
