@@ -51,7 +51,6 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.map.MapActivity;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,6 +99,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private NotificationManagerCompat notificationManagerCompat;
     private Preferences preferences;
     private List<Waypoint> waypoints = Collections.emptyList();
+    private List<String> inregions = new LinkedList<>();
+
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
     private Notification stackNotification;
@@ -391,16 +392,19 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
+        if(w.getLastTransition() != transition) {
+            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER)
+                inregions.add(w.getDescription());
+            else
+                inregions.remove(w.getDescription());
+        }
         w.setLastTransition(transition);
         w.setLastTriggered(System.currentTimeMillis());
         App.getDao().getWaypointDao().update(w);
 
         if (trigger.equals(MessageTransition.TRIGGER_LOCATION)) {
             publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
-        } else if (trigger.equals(MessageTransition.TRIGGER_BEACON)) {
-            publishLocationMessage(MessageLocation.REPORT_TYPE_BEACON);
         }
-
         publishTransitionMessage(w, l, transition, trigger);
 
         App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
@@ -494,6 +498,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         message.setTid(preferences.getTrackerId(true));
         message.setCp(preferences.getCp());
+        message.setInRegions(inregions);
+
         if (preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
 
@@ -509,6 +515,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
                 }
             }
         }
+
+        Timber.v("inregions length: %s", inregions.size());
 
         App.getMessageProcessor().sendMessage(message);
     }
@@ -644,6 +652,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     private void removeGeofences() {
+        inregions.clear();
         mGeofencingClient.removeGeofences(getGeofencePendingIntent());
     }
 
