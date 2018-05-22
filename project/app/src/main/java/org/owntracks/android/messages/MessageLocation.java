@@ -13,6 +13,7 @@ import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -22,7 +23,6 @@ public class MessageLocation extends MessageBase {
     public static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
-    public static final String REPORT_TYPE_BEACON = "b";
     public static final String REPORT_TYPE_CIRCULAR = "c";
     public static final String REPORT_TYPE_PING = "p";
     public static final String REPORT_TYPE_DEFAULT = null;
@@ -44,11 +44,22 @@ public class MessageLocation extends MessageBase {
     private WeakReference<FusedContact> _contact;
     private LatLng point;
     private String conn;
+    private List<String> inregions;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty("_cp")
     private boolean cp = false;
 
+    @JsonProperty("inregions")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public List<String> getInRegions() {
+        return inregions;
+    }
+
+    @JsonProperty("inregions")
+    public void setInRegions(List<String> inregions) {
+        this.inregions = inregions;
+    }
 
     public boolean getCp() {
         return cp;
