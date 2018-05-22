@@ -18,6 +18,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -40,10 +42,13 @@ public class ParserTest {
     private
     EncryptionProvider encryptionProvider;
 
-    private String expectedJson = "{\"_type\":\"location\",\"batt\":30,\"acc\":10,\"vac\":0,\"lat\":50.1,\"lon\":60.2,\"alt\":20.0,\"tst\":123456789,\"conn\":\"TestConn\",\"vel\":5.6}";
+    private String expectedJson = "{\"_type\":\"location\",\"acc\":10,\"alt\":20.0,\"batt\":30,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":0,\"vel\":5.6}";
 
     @Before
     public void setupMessageLocation() {
+        List<String> regions = new LinkedList<>();
+        regions.add("Testregion1");
+        regions.add("Testregion2");
         messageLocation = new MessageLocation();
         messageLocation.setAcc(10);
         messageLocation.setAlt(20);
@@ -53,6 +58,8 @@ public class ParserTest {
         messageLocation.setLon(60.2);
         messageLocation.setTst(123456789);
         messageLocation.setVelocity(5.6);
+        messageLocation.setInRegions(regions);
+
     }
 
     @Before
@@ -103,7 +110,7 @@ public class ParserTest {
     @Test
     public void ParserReturnsMessageLocationFromValidLocationInput() throws Exception {
         Parser parser = new Parser(encryptionProvider);
-        String input = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0}";
+        String input = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"inregions\":[\"Testregion1\",\"Testregion2\"]}";
         MessageBase messageBase = parser.fromJson(input);
         assertEquals(MessageLocation.class, messageBase.getClass());
         MessageLocation messageLocation = (MessageLocation) messageBase;
@@ -117,6 +124,9 @@ public class ParserTest {
         assertEquals(5.0408462, messageLocation.getLongitude(), 0);
         assertEquals("p", messageLocation.getT());
         assertEquals(0.0, messageLocation.getVac(), 0);
+        assertEquals(0.0, messageLocation.getVac(), 0);
+        assertEquals(2, messageLocation.getInRegions().size());
+
     }
 
     @Test

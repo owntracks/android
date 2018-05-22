@@ -9,6 +9,7 @@ import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
+@JsonPropertyOrder(alphabetic=true)
 public abstract class MessageBase extends BaseObservable implements Runnable {
         static final String TYPE = "base";
 
