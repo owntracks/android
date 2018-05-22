@@ -516,8 +516,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             }
         }
 
-        Timber.v("inregions length: %s", inregions.size());
-
         App.getMessageProcessor().sendMessage(message);
     }
 
