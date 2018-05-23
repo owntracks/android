@@ -53,7 +53,7 @@
     <string name="latitude">Breite</string>
     <string name="longitude">Länge</string>
     <string name="radius">Radius</string>
-    <string name="addWaypoint">Region hinzufügen</string>
+    <string name="addWaypoint">Ort hinzufügen</string>
     <string name="export">Export</string>
     <string name="exportConfiguration">Exportieren</string>
     <string name="preferencesExport">Export</string>
@@ -64,7 +64,7 @@
     <string name="contactDetailsReportedTime">Zeitstempel</string>
     <string name="contactDetailsName">Name</string>
     <string name="contactDetailsTopic">Kennung</string>
-    <string name="waypointListPlaceholder">Keine Regionen angelegt</string>
+    <string name="waypointListPlaceholder">Keine Orte angelegt</string>
     <string name="geofenceActive">Geofence aktiv</string>
     <string name="waypointRemove">Entfernen</string>
     <string name="importConfig">Import</string>
@@ -94,12 +94,12 @@
     <string name="snackbarImportCompleted">Einstellungen importiert</string>
     <string name="snackbarConfigIncomplete">Konfiguration unvollständig</string>
 
-    <string name="aLocation">eine Region</string>
+    <string name="aLocation">eine Ort</string>
     <string name="events">Ereignisse</string>
     <string name="notificationMessageTitle">Nachrichten</string>
     <string name="locationPermissionNotAvailable">Standortzugriff verweigert</string>
-    <string name="title_activity_regions">Regionen</string>
-    <string name="title_activity_region">Region</string>
+    <string name="title_activity_regions">Orte</string>
+    <string name="title_activity_region">Ort</string>
     <string name="title_activity_map">Karte</string>
     <string name="title_activity_contacts">Freunde</string>
     <string name="title_activity_status">Status</string>
@@ -112,7 +112,7 @@
     <string name="preferencesCategoryAdvancedLocator">Ortung</string>
     <string name="preferencesCategoryAdvancedEncryption">Verschlüsselung</string>
     <string name="preferencesCategoryAdvancedMisc">Weiteres</string>
-    <string name="waypointRemoved">Region entfernt</string>
+    <string name="waypointRemoved">Ort entfernt</string>
     <string name="preferencesImportFile">Konfiguration importieren</string>
     <string name="preferencesImportFileSummary">Konfiguration aus Datei importieren</string>
     <string name="preferencesExportToFile">Konfiguration exportieren</string>
@@ -182,7 +182,7 @@
     <string name="preferencesLoadFailed">Die effektive Konfiguration konnte nicht geladen werden</string>
     <string name="preferencesEditorKey">Schlüssel</string>
     <string name="preferencesEditorValue">Wert</string>
-    <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
+    <string name="exportWaypointsToEndpoint">Orte veröffentlichen</string>
     <string name="drawerSwitchReporting">Veröffentlichen</string>
     <string name="drawerSwitchCopy">Kopieren</string>
 
