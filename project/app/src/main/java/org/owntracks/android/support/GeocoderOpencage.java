@@ -11,6 +11,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import timber.log.Timber;
 
+import static org.owntracks.android.services.MessageProcessorEndpointHttp.USERAGENT;
+
 public class GeocoderOpencage implements Geocoder {
     private OkHttpClient httpClient;
     private String apiKey;
@@ -45,16 +47,20 @@ public class GeocoderOpencage implements Geocoder {
 
         Request request = new Request.Builder()
                 .url(url)
+                .header("User-Agent",USERAGENT)
                 .get()
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) throw new IOException("Unexpected code " + response);
-            String rs = response.body().string();
+            String rs = null;
+            if (response.body() != null) {
+                rs = response.body().string();
+            }
             Timber.v(rs);
 
             return jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Timber.e(e);
             return null;
         }

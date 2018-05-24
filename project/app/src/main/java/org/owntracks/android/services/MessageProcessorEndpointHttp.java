@@ -9,6 +9,7 @@ import android.util.Base64;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
@@ -70,6 +71,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
 
     private static MessageProcessorEndpointHttp instance;
+    public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
+
     public static MessageProcessorEndpointHttp getInstance() {
         if(instance == null) {
             instance = new MessageProcessorEndpointHttp();
@@ -178,8 +181,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             return getMessageProcessor().onMessageDeliveryFailed(messageId);
         }
 
-        Request.Builder request = new Request.Builder().url(this.endpointUrl).method("POST", RequestBody.create(JSON, body));
-        //request.addHeader("Accept-Encoding", "gzip");
+        Request.Builder request = new Request.Builder().url(this.endpointUrl).header("User-Agent",USERAGENT).method("POST", RequestBody.create(JSON, body));
         if(this.endpointUserInfo != null) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(this.endpointUserInfo.getBytes(), Base64.NO_WRAP));
         } else if(App.getPreferences().getAuth()) {
