@@ -50,7 +50,7 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
-    DrawerProvider provideDrawerProvider(Preferences preferences) { return new DrawerProvider(mActivity, preferences); }
+    DrawerProvider provideDrawerProvider() { return new DrawerProvider(mActivity); }
 
     @Provides
     @PerActivity

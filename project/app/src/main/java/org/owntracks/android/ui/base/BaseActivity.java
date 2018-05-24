@@ -164,7 +164,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
     protected void setDrawer(@NonNull Toolbar toolbar) {
         drawerProvider.attach(toolbar);
-        drawerProvider.registerPreferencesChangeListener();
     }
 
 
@@ -218,7 +217,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         binding = null;
         viewModel = null;
         mActivityComponent = null;
-        drawerProvider.unregisterPreferencesChangeListener();
     }
 
 
