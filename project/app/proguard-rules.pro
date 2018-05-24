@@ -78,3 +78,6 @@ public static java.lang.String TABLENAME;
 
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
+
+-printseeds obfuscation/seeds.txt
+-printmapping obfuscation/mapping.txt

@@ -46,6 +46,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
+import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -99,7 +100,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private NotificationManagerCompat notificationManagerCompat;
     private Preferences preferences;
     private List<Waypoint> waypoints = Collections.emptyList();
-    private List<String> inregions = new LinkedList<>();
 
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
@@ -392,20 +392,17 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
-        if(w.getLastTransition() != transition) {
-            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER)
-                inregions.add(w.getDescription());
-            else
-                inregions.remove(w.getDescription());
-        }
         w.setLastTransition(transition);
         w.setLastTriggered(System.currentTimeMillis());
         App.getDao().getWaypointDao().update(w);
 
-        if (trigger.equals(MessageTransition.TRIGGER_LOCATION)) {
+        publishTransitionMessage(w, l, transition, trigger);
+
+        //If transition is caused by a geofence event, send a location message.
+        //If transition is caused by a location change (TRIGGER_LOCATION), a location message is send before already.
+        if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
             publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
         }
-        publishTransitionMessage(w, l, transition, trigger);
 
         App.getEventBus().postSticky(new Events.WaypointTransition(w, transition));
 
@@ -422,7 +419,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             Timber.e("GeofencingEvent hasError: %s", event.getErrorCode());
             return;
         }
-
 
         int transition = event.getGeofenceTransition();
         for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
@@ -445,12 +441,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             App.getEventBus().postSticky(lastLocation);
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
 
-            for (Waypoint w : waypoints) {
-                if (w.hasGeofence()) {
-                    //noinspection ConstantConditions
-                    onWaypointTransition(w, location, location.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
-                }
-            }
 
         }
     }
@@ -478,6 +468,16 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
+        // Check if publish would trigger a region if fusedRegionDetection is enabled
+        if(preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
+            for (Waypoint w : waypoints) {
+                if (w.hasGeofence()) {
+                    //noinspection ConstantConditions
+                    onWaypointTransition(w, lastLocation, lastLocation.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+                }
+            }
+        }
+
         MessageLocation message = new MessageLocation();
         message.setLat(lastLocation.getLatitude());
         message.setLon(lastLocation.getLongitude());
@@ -498,7 +498,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         message.setTid(preferences.getTrackerId(true));
         message.setCp(preferences.getCp());
-        message.setInRegions(inregions);
+        message.setInRegions(getInRegions());
 
         if (preferences.getPubLocationExtendedData()) {
             message.setBatt(App.getBatteryLevel());
@@ -517,6 +517,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         }
 
         App.getMessageProcessor().sendMessage(message);
+
+
     }
 
     private void publishTransitionMessage(@NonNull Waypoint w, @NonNull Location triggeringLocation, int transition, String trigger) {
@@ -619,7 +621,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             if (w.hasGeofence()) {
                 Timber.v("desc:%s", w.getDescription());
 
-                w.setLastTransition(0); // Reset in-memory status
+                //w.setLastTransition(0); // Reset in-memory status
 
                 try {
                     //noinspection ConstantConditions
@@ -636,9 +638,12 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             }
         }
 
+
         if (geofences.size() > 0) {
             GeofencingRequest.Builder b = new GeofencingRequest.Builder();
+            b.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
             GeofencingRequest request = b.addGeofences(geofences).build();
+
             mGeofencingClient.addGeofences(request, getGeofencePendingIntent());
         }
 
@@ -650,15 +655,20 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     private void removeGeofences() {
-        inregions.clear();
         mGeofencingClient.removeGeofences(getGeofencePendingIntent());
     }
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Waypoint e) {
+        if(e.getShared())
+            publishWaypointMessage(e);
         removeGeofences();
         setupGeofences();
+    }
+
+    private void publishWaypointMessage(@NonNull Waypoint e) {
+        App.getMessageProcessor().sendMessage(MessageWaypoint.fromDaoObject(e));
     }
 
     @SuppressWarnings("unused")
@@ -770,6 +780,16 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     private final IBinder mBinder = new LocalBinder();
+
+    public List<String> getInRegions() {
+        LinkedList<String> l = new LinkedList<>();
+        for(Waypoint w : waypoints) {
+            if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER && w.getShared())
+                l.add(w.getDescription());
+
+        }
+        return l;
+    }
 
     public class LocalBinder extends Binder {
         public BackgroundService getService() {

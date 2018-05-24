@@ -50,7 +50,7 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());
-        new DrawerProvider(this, App.getPreferences()).attach(toolbar);
+        new DrawerProvider(this).attach(toolbar);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);

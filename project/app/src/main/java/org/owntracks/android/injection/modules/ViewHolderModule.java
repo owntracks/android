@@ -48,7 +48,7 @@ public class ViewHolderModule {
 
     @Provides
     @PerViewHolder
-    DrawerProvider provideDrawerProvider(Preferences preferences) { return new DrawerProvider(activity, preferences); }
+    DrawerProvider provideDrawerProvider() { return new DrawerProvider(activity); }
 
     @Provides
     @PerViewHolder
