@@ -150,7 +150,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 this.outgoingMessageProcessor = MessageProcessorEndpointHttp.getInstance();
                 break;
             case App.MODE_ID_MQTT_PRIVATE:
-            case App.MODE_ID_MQTT_PUBLIC:
             default:
                 this.outgoingMessageProcessor = MessageProcessorEndpointMqtt.getInstance();
 

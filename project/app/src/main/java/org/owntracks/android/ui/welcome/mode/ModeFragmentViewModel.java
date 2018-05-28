@@ -37,9 +37,6 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
             case App.MODE_ID_MQTT_PRIVATE:
                 setCheckedButton(R.id.radioModeMqttPrivate);
                 break;
-            case App.MODE_ID_MQTT_PUBLIC:
-                setCheckedButton(R.id.radioModeMqttPublic);
-                break;
         }
     }
 
@@ -64,9 +61,6 @@ public class ModeFragmentViewModel extends BaseViewModel<ModeFragmentMvvm.View> 
                 break;
             case R.id.radioModeMqttPrivate:
                 preferences.setMode(App.MODE_ID_MQTT_PRIVATE, true);
-                break;
-            case R.id.radioModeMqttPublic:
-                preferences.setMode(App.MODE_ID_MQTT_PUBLIC, true);
                 break;
         }
         preferences.setSetupCompleted();

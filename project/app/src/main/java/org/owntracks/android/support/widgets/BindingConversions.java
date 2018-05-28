@@ -103,10 +103,8 @@ public class BindingConversions {
             case App.MODE_ID_HTTP_PRIVATE:
                 return R.string.mode_http_private_label;
             case App.MODE_ID_MQTT_PRIVATE:
-                return R.string.mode_mqtt_private_label;
-            case App.MODE_ID_MQTT_PUBLIC:
             default:
-                return R.string.mode_mqtt_public_label;
+                return R.string.mode_mqtt_private_label;
         }
     }
 }

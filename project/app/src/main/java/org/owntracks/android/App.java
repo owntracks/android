@@ -42,7 +42,6 @@ import timber.log.Timber;
 
 public class App extends Application  {
     public static final int MODE_ID_MQTT_PRIVATE =0;
-    public static final int MODE_ID_MQTT_PUBLIC =2;
     public static final int MODE_ID_HTTP_PRIVATE = 3;
 
     private static SimpleDateFormat dateFormater;
