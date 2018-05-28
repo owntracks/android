@@ -51,7 +51,6 @@ public class MessageLocation extends MessageBase {
     private boolean cp = false;
 
     @JsonProperty("inregions")
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     public List<String> getInRegions() {
         return inregions;
     }
