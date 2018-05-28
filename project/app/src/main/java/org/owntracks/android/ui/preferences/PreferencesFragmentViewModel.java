@@ -56,9 +56,6 @@ public class PreferencesFragmentViewModel extends BaseViewModel<PreferencesFragm
             case App.MODE_ID_MQTT_PRIVATE:
                 mode = this.context.getString(R.string.mode_mqtt_private_label);
                 break;
-            case App.MODE_ID_MQTT_PUBLIC:
-                mode = this.context.getString(R.string.mode_mqtt_public_label);
-                break;
             case App.MODE_ID_HTTP_PRIVATE:
                 mode = this.context.getString(R.string.mode_http_private_label);
                 break;

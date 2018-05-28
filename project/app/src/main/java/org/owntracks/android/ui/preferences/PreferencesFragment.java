@@ -230,8 +230,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     private void setupDependencies(PreferenceScreen root) {
-        //setDependency(root, Preferences.Keys.NOTIFICATION_LOCATION, Preferences.Keys.NOTIFICATION);
-        //setDependency(root, Preferences.Keys.NOTIFICATION_EVENTS, Preferences.Keys.NOTIFICATION);
     }
 
     private void setDependency(PreferenceScreen root, String dependingKey, String dependsOnKey) {
@@ -247,29 +245,20 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         return c;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueAllModes) {
-        return addSwitchPreference(parent, key, titleRes, summaryRes, defaultValueAllModes, defaultValueAllModes);
-    }
-
     private void addToolbar(PreferenceScreen parent) {
         ToolbarPreference t = new ToolbarPreference(getActivity(), parent);
         t.setTitle(parent.getTitle());
         parent.addPreference(t);
     }
 
-    private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueResPrivate, @BoolRes int defaultValueResPublic) {
-        // Skip if no default value exists for current mode. Can be used to exclude preferences in some modes
-        if((viewModel.getPreferences().isModeMqttPrivate() && defaultValueResPrivate == 0) || (viewModel.getPreferences().isModeMqttPublic() && defaultValueResPublic == 0)) {
-            return false;
-        }
+    private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueAllModes) {
 
         SwitchPreference p = new SwitchPreference(getActivity());
         p.setKey(key);
         p.setTitle(titleRes);
         p.setSummary(summaryRes);
         p.setPersistent(false);
-        p.setChecked(viewModel.getPreferences().getBoolean(key, defaultValueResPrivate, defaultValueResPublic, false));
+        p.setChecked(viewModel.getPreferences().getBoolean(key, defaultValueAllModes));
         p.setPersistent(true);
         parent.addPreference(p);
         return true;
@@ -277,16 +266,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
     @SuppressWarnings("UnusedReturnValue")
     private EditStringPreference addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueAllModes) {
-        return addEditStringPreference(parent, key, titleRes, summaryRes, defaultValueAllModes, defaultValueAllModes);
-    }
-
-    @Nullable
-    private EditStringPreference addEditStringPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @StringRes int defaultValueResPrivate, @StringRes int defaultValueResPublic) {
-        // Skip if no default value exists for current mode. Can be used to exclude preferences in some modes
-        if((viewModel.getPreferences().isModeMqttPrivate() && defaultValueResPrivate == 0) || (viewModel.getPreferences().isModeMqttPublic() && defaultValueResPublic == 0)) {
-            return null;
-        }
-
         EditStringPreference p = new EditStringPreference(getActivity());
         p.setKey(key);
         p.setTitle(titleRes);
@@ -294,7 +273,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setSummary(summaryRes);
         p.setPersistent(false);
         p.setText(getEditStringPreferenceTextValueWithHintSupport(key));
-        p.setHint(viewModel.getPreferences().getStringDefaultValue(defaultValueResPrivate, defaultValueResPublic));
+        p.setHint(getString(defaultValueAllModes));
         p.setPersistent(true);
 
         parent.addPreference(p);
@@ -302,17 +281,13 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     private EditIntegerPreference addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @IntegerRes int defaultValueAllModes) {
-        return addEditIntegerPreference(parent, key,  titleRes, defaultValueAllModes, defaultValueAllModes);
-    }
-
-    private EditIntegerPreference addEditIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @IntegerRes int defaultValueResPrivate, @IntegerRes int defaultValueResPublic) {
         EditIntegerPreference p = new EditIntegerPreference(getActivity());
         p.setKey(key);
         p.setDialogTitle(titleRes);
         p.setTitle(titleRes);
         p.setPersistent(false);
         p.setText(getEditIntegerPreferenceTextValueWithHintSupport(key));
-        p.setHint(Integer.toString(viewModel.getPreferences().getIntegerDefaultValue(defaultValueResPrivate, defaultValueResPublic)));
+        p.setHint(Integer.toString(viewModel.getPreferences().getIntegerDefaultValue(defaultValueAllModes)));
         p.setPersistent(true);
 
         parent.addPreference(p);
@@ -335,15 +310,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
     @SuppressWarnings("UnusedReturnValue")
     private boolean addListIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @ArrayRes int entriesRes, @ArrayRes int entryValuesRes, @IntegerRes int defaultValueAllModes) {
-        return addListIntegerPreference(parent, key, titleRes, summaryRes, entriesRes, entryValuesRes, defaultValueAllModes, defaultValueAllModes);
-    }
-
-    private boolean addListIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @ArrayRes int entriesRes, @ArrayRes int entryValuesRes, @IntegerRes int defaultValueResPrivate, @IntegerRes int defaultValueResPublic) {
-        // Skip if no default value exists for current mode. Can be used to exclude preferences in some modes
-        if((viewModel.getPreferences().isModeMqttPrivate() && defaultValueResPrivate == 0) || (viewModel.getPreferences().isModeMqttPublic() && defaultValueResPublic == 0)) {
-            return false;
-        }
-
         ListIntegerPreference p = new ListIntegerPreference(parent.getContext());
         p.setKey(key);
         p.setTitle(titleRes);
@@ -353,7 +319,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setEntryValues(entryValuesRes);
 
         p.setPersistent(false);
-        p.setValueIndex(viewModel.getPreferences().getInt(key, defaultValueResPrivate, defaultValueResPublic, false));
+        p.setValueIndex(viewModel.getPreferences().getInt(key, defaultValueAllModes));
         p.setPersistent(true);
 
         parent.addPreference(p);

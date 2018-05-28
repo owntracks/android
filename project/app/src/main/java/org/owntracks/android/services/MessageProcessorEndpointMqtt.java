@@ -391,13 +391,9 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			if(App.getPreferences().getInfo())
 				topics.add(subTopicBase + App.getPreferences().getPubTopicInfoPart());
 
-			if (!App.getPreferences().isModeMqttPublic())
-				topics.add(App.getPreferences().getPubTopicBase() + App.getPreferences().getPubTopicCommandsPart());
-
-			if (!App.getPreferences().isModeMqttPublic()) {
-				topics.add(subTopicBase + App.getPreferences().getPubTopicEventsPart());
-				topics.add(subTopicBase + App.getPreferences().getPubTopicWaypointsPart());
-			}
+			topics.add(App.getPreferences().getPubTopicBase() + App.getPreferences().getPubTopicCommandsPart());
+			topics.add(subTopicBase + App.getPreferences().getPubTopicEventsPart());
+			topics.add(subTopicBase + App.getPreferences().getPubTopicWaypointsPart());
 
 
 		}
@@ -495,12 +491,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public boolean isConfigurationComplete() {
-		if (App.getPreferences().isModeMqttPrivate()) {
-			return !App.getPreferences().getHost().trim().equals("") && !App.getPreferences().getUsername().trim().equals("") && (!App.getPreferences().getAuth() || !App.getPreferences().getPassword().trim().equals(""));
-		} else if (App.getPreferences().isModeMqttPublic()) {
-			return true;
-		}
-		return false;
+		return !App.getPreferences().getHost().trim().equals("") && !App.getPreferences().getUsername().trim().equals("") && (!App.getPreferences().getAuth() || !App.getPreferences().getPassword().trim().equals(""));
 	}
 
 	@WorkerThread

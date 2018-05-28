@@ -63,7 +63,7 @@ public class ActivityRegion extends ActivityBase  {
         }
 
         binding.setItem(this.waypoint);
-        binding.shareWrapper.setVisibility(App.getPreferences().isModeMqttPublic() ? View.GONE : View.VISIBLE);
+        binding.shareWrapper.setVisibility(View.VISIBLE);
         setupListenerAndRequiredFields();
     }
 
@@ -213,11 +213,7 @@ public class ActivityRegion extends ActivityBase  {
             w.setGeofenceRadius(null);
         }
 
-        if(!App.getPreferences().isModeMqttPublic())
-            w.setShared(binding.share.isChecked());
-        else
-            w.setShared(false);
-
+        w.setShared(binding.share.isChecked());
 
         if (update)
             update(w);

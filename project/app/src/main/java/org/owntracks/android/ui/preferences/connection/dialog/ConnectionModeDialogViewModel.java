@@ -47,10 +47,8 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
             case App.MODE_ID_HTTP_PRIVATE:
                 return R.id.radioModeHttpPrivate;
             case App.MODE_ID_MQTT_PRIVATE:
-                return R.id.radioModeMqttPrivate;
-            case App.MODE_ID_MQTT_PUBLIC:
             default:
-                return R.id.radioModeMqttPublic;
+                return R.id.radioModeMqttPrivate;
         }
     }
 
@@ -59,10 +57,8 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
             case R.id.radioModeHttpPrivate:
                 return App.MODE_ID_HTTP_PRIVATE;
             case R.id.radioModeMqttPrivate:
-                return App.MODE_ID_MQTT_PRIVATE;
-            case R.id.radioModeMqttPublic:
             default:
-                return App.MODE_ID_MQTT_PUBLIC;
+                return App.MODE_ID_MQTT_PRIVATE;
         }
     }
 }
