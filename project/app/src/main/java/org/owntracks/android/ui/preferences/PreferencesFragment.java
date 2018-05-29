@@ -287,7 +287,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setTitle(titleRes);
         p.setPersistent(false);
         p.setText(getEditIntegerPreferenceTextValueWithHintSupport(key));
-        p.setHint(Integer.toString(viewModel.getPreferences().getIntegerDefaultValue(defaultValueAllModes)));
+        p.setHint(Integer.toString(getResources().getInteger((defaultValueAllModes))));
         p.setPersistent(true);
 
         parent.addPreference(p);
