@@ -117,7 +117,9 @@ public class ActivityRegions extends ActivityBase implements LoaderManager.Loade
 
         Waypoint w = App.getDao().getWaypointDao().loadByRowId(id);
         App.getDao().getWaypointDao().delete(w);
+        w.setDeleted(true);
         App.getEventBus().post(w);
+
         Toasts.showWaypointRemovedToast();
         if(mActionMode != null)
             mActionMode.finish();

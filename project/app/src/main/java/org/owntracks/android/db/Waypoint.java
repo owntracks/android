@@ -37,6 +37,17 @@ public class Waypoint {
     @Transient
     private int lastTransition = 0;
 
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    @Transient
+    private boolean isDeleted;
+
     @Generated(hash = 96494712)
     public Waypoint(Long id, @NotNull String description, double geofenceLatitude, double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId,
             int type) {

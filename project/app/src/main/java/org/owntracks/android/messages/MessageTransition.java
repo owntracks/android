@@ -18,7 +18,6 @@ public class MessageTransition extends MessageBase{
     public static final String EVENT_ENTER = "enter";
     public static final String EVENT_LEAVE = "leave";
 
-    public static final String TRIGGER_BEACON = "b";
     public static final String TRIGGER_CIRCULAR = "c";
     public static final String TRIGGER_LOCATION = "l";
 
