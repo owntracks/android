@@ -52,7 +52,6 @@ public class App extends Application  {
     public static Handler getBackgroundHandler() {
         return getAppComponent().runner().getBackgroundHandler();
     }
-
     private Activity currentActivity;
     private static boolean inForeground;
     private int runningActivities = 0;
@@ -85,12 +84,14 @@ public class App extends Application  {
         //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
-        App.postOnBackgroundHandler(new Runnable() {
-            @Override
-            public void run() {
+        // Running this on a background thread will deadlock FirebaseJobDispatcher.
+        // Initialize will call Scheduler to connect off the main thread anyway.
+        //App.postOnBackgroundHandler(new Runnable() {
+        //    @Override
+        //    public void run() {
                 getMessageProcessor().initialize();
-            }
-        });
+        //    }
+        //});
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
