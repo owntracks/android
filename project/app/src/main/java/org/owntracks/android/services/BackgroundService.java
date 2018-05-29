@@ -661,8 +661,13 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Waypoint e) {
-        if(e.getShared())
-            publishWaypointMessage(e);
+        if(e.isDeleted()) {
+            //TODO
+        } else {
+            if(e.getShared() )
+                publishWaypointMessage(e);
+
+        }
         removeGeofences();
         setupGeofences();
     }
