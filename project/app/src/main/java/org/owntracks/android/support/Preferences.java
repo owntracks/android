@@ -6,14 +6,12 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
 
@@ -33,10 +31,10 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Preferences {
-    public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
-    public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
+    private static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
+    private static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
 
     private static SharedPreferences activeSharedPreferences;
     private static SharedPreferences sharedPreferences;
@@ -45,28 +43,20 @@ public class Preferences {
     private static SharedPreferences httpSharedPreferences;
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
-    private static String deviceUUID = "";
+    private final Context context;
 
     private String sharedPreferencesName;
 
-    public boolean isModeMqttPrivate(){ return modeId == App.MODE_ID_MQTT_PRIVATE; }
-
-    public boolean isModeHttpPrivate(){ return modeId == App.MODE_ID_HTTP_PRIVATE; }
-
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    private static String getDeviceUUID() {
-        return deviceUUID;
-    }
-
-    public Preferences(Context c){
+    public Preferences(@AppContext Context c){
         Timber.v("initializing");
+        context = c;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
         httpSharedPreferences = c.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE);
 
-        deviceUUID = sharedPreferences.getString(Keys._DEVICE_UUID, "undefined-uuid");
         initMode(sharedPreferences.getInt(Keys.MODE_ID, getIntResource(R.integer.valModeId)));
     }
 
@@ -152,22 +142,15 @@ public class Preferences {
     }
 
     private boolean getBooleanRessource(int resId) {
-        return App.getContext().getResources().getBoolean(resId);
+        return context.getResources().getBoolean(resId);
     }
 
     public int getInt(String key,  int defId) {
         return activeSharedPreferences.getInt(key, getIntResource(defId));
     }
     private int getIntResource(int resId) {
-        return App.getContext().getResources().getInteger(resId);
+        return context.getResources().getInteger(resId);
     }
-
-    //TODO refactor
-    public int getIntegerDefaultValue(int defaultValueResPrivate) {
-        return getIntResource(defaultValueResPrivate);
-    }
-
-
 
     // Gets the key from specified preferences
     // If the returned value is an empty string or null, the default id is returned
@@ -182,7 +165,7 @@ public class Preferences {
     }
 
     private String getStringRessource(int resId) {
-        return App.getContext().getResources().getString(resId);
+        return context.getResources().getString(resId);
     }
 
     private void setString(String key, String value) {
@@ -997,13 +980,12 @@ public class Preferences {
     }
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    @SuppressWarnings({"unused", "WeakerAccess"})
     public @interface Import {
         String key();
     }
 
-    private static List<Method> getExportMethods() {
-        int modeId = App.getPreferences().getModeId();
+    private List<Method> getExportMethods() {
+        int modeId = getModeId();
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
