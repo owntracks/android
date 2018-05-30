@@ -157,14 +157,14 @@
     <string name="permissions_granted">Permissions have been granted</string>
     <string name="icon_description_cloud">Cloud</string>
     <string name="icon_description_owntracks">Owntracks</string>
-    <string name="enjoy_description">Enjoy Owntracks</string>
+    <string name="enjoy_description">Select preferences from the menu and configure OwnTracks for your server before using it</string>
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
     <string name="title_activity_load">Import</string>
     <string name="errorPreferencesImportFailedParseException">unable to parse file</string>
     <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
-    +    <string name="preferencesIgnoreInaccurateLocationsDialog">Ignore location, if the accuracy is greater than the given meters</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">Ignore location, if the accuracy is greater than the given meters</string>
     <string name="errorPreferencesImportFailedMemory">Your device ran out of memory</string>
     <string name="noNavigationApp">no suitable app installed</string>
     <string name="menuClear">Clear</string>

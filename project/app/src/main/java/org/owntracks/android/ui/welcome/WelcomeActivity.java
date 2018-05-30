@@ -13,7 +13,6 @@ import org.owntracks.android.databinding.UiWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.mode.ModeFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
 import org.owntracks.android.ui.welcome.play.PlayFragment;
 import org.owntracks.android.ui.welcome.version.VersionFragment;
@@ -39,13 +38,13 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     private void setupPagerAdapter() {
         requirementsChecker.assertRequirements(this);
 
-        if (!requirementsChecker.isInitialSetupCheckPassed()) {
+        boolean isInitialSetup = !requirementsChecker.isInitialSetupCheckPassed();
+        if (isInitialSetup) {
             viewPagerAdapter.addItemId(IntroFragment.ID);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 viewPagerAdapter.addItemId(VersionFragment.ID);
 
-            viewPagerAdapter.addItemId(ModeFragment.ID);
         }
 
         if (!requirementsChecker.isPlayCheckPassed()) {
@@ -56,7 +55,9 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
             viewPagerAdapter.addItemId(PermissionFragment.ID);
         }
 
-        viewPagerAdapter.addItemId(FinishFragment.ID);
+        if (isInitialSetup) {
+            viewPagerAdapter.addItemId(FinishFragment.ID);
+        }
         binding.viewPager.setAdapter(viewPagerAdapter);
         binding.viewPager.addOnPageChangeListener(this);
 

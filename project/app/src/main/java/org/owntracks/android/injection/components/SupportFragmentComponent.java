@@ -6,7 +6,6 @@ import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.mode.ModeFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
 import org.owntracks.android.ui.welcome.play.PlayFragment;
 import org.owntracks.android.ui.welcome.version.VersionFragment;
@@ -32,7 +31,6 @@ public interface SupportFragmentComponent {
     void inject(IntroFragment fragment);
     void inject(PlayFragment fragment);
     void inject(FinishFragment fragment);
-    void inject(ModeFragment fragment);
     void inject(PermissionFragment fragment);
     void inject(VersionFragment fragment);
 }

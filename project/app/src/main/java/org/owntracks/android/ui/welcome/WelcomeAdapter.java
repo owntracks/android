@@ -8,7 +8,6 @@ import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.mode.ModeFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
 import org.owntracks.android.ui.welcome.play.PlayFragment;
 import org.owntracks.android.ui.welcome.version.VersionFragment;
@@ -54,9 +53,6 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter {
         switch (ids.get(position)) {
             case IntroFragment.ID:
                 fragment = IntroFragment.getInstance();
-                break;
-            case ModeFragment.ID:
-                fragment = ModeFragment.getInstance();
                 break;
             case PlayFragment.ID:
                 fragment = PlayFragment.getInstance();
