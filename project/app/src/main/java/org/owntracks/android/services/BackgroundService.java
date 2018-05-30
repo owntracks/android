@@ -531,7 +531,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         message.setAcc(triggeringLocation.getAccuracy());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
-        message.setDesc(w.getShared() ? w.getDescription() : null);
+        message.setDesc(w.getDescription());
         App.getMessageProcessor().sendMessage(message);
 
     }
@@ -661,11 +661,10 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Waypoint e) {
-        if(e.isDeleted()) {
-            //TODO
+        if(!e.isDeleted()) {
+            //TODO handle update better
         } else {
-            if(e.getShared() )
-                publishWaypointMessage(e);
+           publishWaypointMessage(e);
 
         }
         removeGeofences();
@@ -789,7 +788,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     public List<String> getInRegions() {
         LinkedList<String> l = new LinkedList<>();
         for(Waypoint w : waypoints) {
-            if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER && w.getShared())
+            if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER )
                 l.add(w.getDescription());
 
         }

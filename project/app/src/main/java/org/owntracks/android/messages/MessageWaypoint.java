@@ -27,7 +27,6 @@ public class MessageWaypoint extends MessageBase{
     private long tst;
 
     // Optional types for optional values
-    private Boolean shared;
     private Integer rad;
     private String uuid;
     private Integer major;
@@ -73,15 +72,6 @@ public class MessageWaypoint extends MessageBase{
         this.tst = tst;
     }
 
-    @JsonIgnore
-    public boolean isShared() {
-        return shared != null && shared;
-    }
-
-    public void setShared(Boolean shared) {
-        this.shared = shared;
-    }
-
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
@@ -103,7 +93,6 @@ public class MessageWaypoint extends MessageBase{
         w.setBeaconUUID(getUuid());
         w.setBeaconMajor(getMajor());
         w.setBeaconMinor(getMinor());
-        w.setShared(true);
         w.setDate(new Date(TimeUnit.SECONDS.toMillis(getTst())));
 
         return w;
@@ -115,7 +104,6 @@ public class MessageWaypoint extends MessageBase{
         message.setLat(w.getGeofenceLatitude());
         message.setLon(w.getGeofenceLongitude());
         message.setRad(w.getGeofenceRadius());
-        message.setShared(w.getShared());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
         message.setUuid(w.getBeaconUUID());
         message.setMajor(w.getBeaconMajor());
