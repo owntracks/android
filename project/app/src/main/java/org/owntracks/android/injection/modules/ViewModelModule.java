@@ -16,8 +16,6 @@ import org.owntracks.android.ui.status.StatusMvvm;
 import org.owntracks.android.ui.status.StatusViewModel;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 import org.owntracks.android.ui.welcome.WelcomeViewModel;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentMvvm;
-import org.owntracks.android.ui.welcome.mode.ModeFragmentViewModel;
 import org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm;
 import org.owntracks.android.ui.welcome.permission.PermissionFragmentViewModel;
 import org.owntracks.android.ui.welcome.play.PlayFragmentMvvm;
@@ -39,9 +37,7 @@ public abstract class ViewModelModule {
     @Binds abstract WelcomeMvvm.ViewModel bindWelcomeViewModel(WelcomeViewModel viewModel);
 
     //Fragments
-    @Binds abstract ModeFragmentMvvm.ViewModel bindModeFragmentViewModel(ModeFragmentViewModel viewModel);
     @Binds abstract PermissionFragmentMvvm.ViewModel bindPermissionFragmentViewModel(PermissionFragmentViewModel viewModel);
     @Binds abstract PlayFragmentMvvm.ViewModel bindPlayFragmentViewModel(PlayFragmentViewModel viewModel);
     @Binds abstract PreferencesFragmentMvvm.ViewModel bindPreferencesFragmentViewModel(PreferencesFragmentViewModel viewModel);
-
 }
