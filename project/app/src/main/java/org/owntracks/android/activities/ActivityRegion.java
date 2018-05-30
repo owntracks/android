@@ -59,11 +59,9 @@ public class ActivityRegion extends ActivityBase  {
         if(this.waypoint == null) {
             this.update = false;
             this.waypoint = new Waypoint();
-            this.waypoint.setDefaults();
         }
 
         binding.setItem(this.waypoint);
-        binding.shareWrapper.setVisibility(View.VISIBLE);
         setupListenerAndRequiredFields();
     }
 
@@ -79,7 +77,6 @@ public class ActivityRegion extends ActivityBase  {
         binding.latitude.addTextChangedListener(requiredForSave);
         binding.longitude.addTextChangedListener(requiredForSave);
 
-        binding.share.setChecked(this.waypoint.getShared());
     }
 
     private void conditionallyEnableSaveButton() {
@@ -212,8 +209,6 @@ public class ActivityRegion extends ActivityBase  {
         } catch (NumberFormatException e) {
             w.setGeofenceRadius(null);
         }
-
-        w.setShared(binding.share.isChecked());
 
         if (update)
             update(w);

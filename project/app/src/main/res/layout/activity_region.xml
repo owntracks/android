@@ -117,31 +117,6 @@
                     app:met_iconLeft="@drawable/ic_radius"
                     />
 
-                <RelativeLayout
-                    android:id="@+id/shareWrapper"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginLeft="76dp"
-                    android:layout_marginStart="76dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:text="@string/share"
-                        android:textSize="18sp"
-                        android:id="@+id/descShare"/>
-                    <Switch
-
-                        android:id="@+id/share"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
             </LinearLayout>
         </ScrollView>
 

@@ -24,11 +24,11 @@ public class Waypoint {
     private double geofenceLongitude;
     private Integer geofenceRadius;
     private String geofenceId;
-    private String wifiSSID;
+    private String wifiSSID; // unused
     private String beaconUUID;
     private Integer beaconMajor;
     private Integer beaconMinor;
-    private Boolean shared;
+    private Boolean shared; // unused
     private java.util.Date date;
     private Long lastTriggered;
     private int modeId;
@@ -219,10 +219,6 @@ public class Waypoint {
         l.setLongitude(getGeofenceLongitude());
         l.setAccuracy(0);
         return l;
-    }
-
-    public void setDefaults() {
-        this.setShared(false);
     }
 
     public void setLastTransition(int status) {
