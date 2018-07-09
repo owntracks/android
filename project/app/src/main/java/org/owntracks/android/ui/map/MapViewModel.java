@@ -75,12 +75,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             getView().updateMarker(FusedContact.class.cast(c));
         }
 
-        if(mode == VIEW_DEVICE) {
-            setViewModeDevice();
-        } else if(mode == VIEW_CONTACT) {
+        if(mode == VIEW_CONTACT && activeContact != null)
             setViewModeContact(activeContact, true);
-        } else {
+        else if (mode == VIEW_FREE) {
             setViewModeFree();
+        } else {
+            setViewModeDevice();
         }
     }
 
@@ -93,7 +93,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     private void setViewModeContact(@NonNull FusedContact contact, boolean center) {
-        Timber.v("setting view mode: VIEW_CONTACT for %s", contact.getId());
         mode = VIEW_CONTACT;
         setActiveContact(contact);
         getView().setBottomSheetCollapsed();
