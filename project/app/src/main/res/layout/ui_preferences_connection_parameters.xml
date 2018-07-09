@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/tlsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/preferencesCleanSessionEnabled"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/cleanSession"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="@={vm.cleanSession}" />
+        </RelativeLayout>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/keepalive"
+            android:nextFocusUp="@id/keepalive"
+            android:nextFocusLeft="@id/keepalive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:digits="0123456789"
+            android:hint="@string/preferencesKeepalive"
+            android:inputType="textNoSuggestions"
+            android:text="@={vm.keepaliveText}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_helperText="@string/seconds"
+            app:met_primaryColor="@color/accent" />
+
+    </LinearLayout>
+</layout>

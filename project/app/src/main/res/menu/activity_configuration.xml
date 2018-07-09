@@ -20,5 +20,11 @@
         app:showAsAction="never"
         android:title="@string/preferencesEditor">
     </item>
+    <item
+        android:id="@+id/restart"
+        android:orderInCategory="10"
+        app:showAsAction="never"
+        android:title="@string/restart">
+    </item>
 
 </menu>

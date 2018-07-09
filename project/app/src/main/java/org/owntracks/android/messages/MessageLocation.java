@@ -1,29 +1,32 @@
 package org.owntracks.android.messages;
 
-import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.Preferences;
-
-import java.lang.ref.WeakReference;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.google.android.gms.maps.model.LatLng;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.owntracks.android.App;
+import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageLocation extends MessageBase  {
-    static final String TYPE = "location";
+public class MessageLocation extends MessageBase {
+    public static final String TYPE = "location";
     public static final String REPORT_TYPE_USER = "u";
     public static final String REPORT_TYPE_RESPONSE = "r";
-    public static final String REPORT_TYPE_BEACON= "b";
-    public static final String REPORT_TYPE_CIRCULAR= "c";
+    public static final String REPORT_TYPE_CIRCULAR = "c";
+    public static final String REPORT_TYPE_PING = "p";
+    public static final String REPORT_TYPE_DEFAULT = null;
+
     public static final String CONN_TYPE_OFFLINE = "o";
     public static final String CONN_TYPE_WIFI = "w";
     public static final String CONN_TYPE_MOBILE = "m";
@@ -31,18 +34,31 @@ public class MessageLocation extends MessageBase  {
     private String t;
     private int batt;
     private int acc;
+    private int vac;
     private double lat;
     private double lon;
+    private double alt;
+    private double vel;
     private long tst;
     private String geocoder;
     private WeakReference<FusedContact> _contact;
     private LatLng point;
     private String conn;
-
+    private List<String> inregions;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty("_cp")
     private boolean cp = false;
+
+    @JsonProperty("inregions")
+    public List<String> getInRegions() {
+        return inregions;
+    }
+
+    @JsonProperty("inregions")
+    public void setInRegions(List<String> inregions) {
+        this.inregions = inregions;
+    }
 
     public boolean getCp() {
         return cp;
@@ -62,12 +78,14 @@ public class MessageLocation extends MessageBase  {
         return lon;
     }
 
-    @JsonIgnore
-    public double getAltitude() {
-        return 0;
+    @JsonProperty("vel")
+    public double getVelocity() {
+        return vel;
     }
 
-
+    public void setVelocity(double vel) {
+        this.vel = vel;
+    }
 
     public String getT() {
         return t;
@@ -131,13 +149,16 @@ public class MessageLocation extends MessageBase  {
     }
 
     @JsonIgnore
-    public String getBaseTopicSuffix() {  return null; }
+    public String getBaseTopicSuffix() {
+        return null;
+    }
 
     public void setContact(FusedContact contact) {
         this._contact = new WeakReference<>(contact);
     }
+
     private void notifyContactPropertyChanged() {
-        if(_contact != null && _contact.get() != null)
+        if (_contact != null && _contact.get() != null)
             this._contact.get().notifyMessageLocationPropertyChanged();
 
     }
@@ -163,7 +184,7 @@ public class MessageLocation extends MessageBase  {
     }
 
     public boolean isValidMessage() {
-        return Preferences.getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst*1000) < TimeUnit.DAYS.toMillis(Preferences.getIgnoreStaleLocations() );
+        return App.getPreferences().getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst * 1000) < TimeUnit.DAYS.toMillis(App.getPreferences().getIgnoreStaleLocations());
     }
 
     public void setConn(String conn) {
@@ -174,4 +195,20 @@ public class MessageLocation extends MessageBase  {
         return this.conn;
     }
 
+    public void setAlt(double alt) {
+        this.alt = alt;
+    }
+
+    public double getAlt() {
+        return alt;
+    }
+
+    public void setVac(int vac) {
+        this.vac = vac;
+    }
+
+    public int getVac() {
+        return this.vac;
+    }
 }
+

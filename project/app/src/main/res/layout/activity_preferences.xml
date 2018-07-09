@@ -21,7 +21,7 @@
     <FrameLayout
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/content_frame"
-        android:layout_below="@id/fragmentToolbar"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

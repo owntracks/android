@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/connect"
-        android:icon="@drawable/ic_done"
+        android:icon="@drawable/ic_autorenew_white_24dp"
         android:orderInCategory="97"
-        app:showAsAction="ifRoom"
-        android:title="Connect"
+        app:showAsAction="always"
+        android:title="Reconnect"
         >
     </item>
     <item
-        android:id="@+id/disconnect"
-        android:icon="@drawable/ic_close"
-        android:orderInCategory="97"
+        android:id="@+id/status"
+        android:icon="@drawable/ic_info_outline_white_24dp"
+        android:orderInCategory="99"
         app:showAsAction="ifRoom"
-        android:title="Disconnect"
+        android:title="Status"
         >
     </item>
+
 </menu>

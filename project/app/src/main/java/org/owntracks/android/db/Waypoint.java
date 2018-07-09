@@ -6,6 +6,8 @@ import org.greenrobot.greendao.annotation.*;
 
 // KEEP INCLUDES - put your custom includes here
     import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 // KEEP INCLUDES END
 /**
  * Entity mapped to table "WAYPOINT".
@@ -22,15 +24,29 @@ public class Waypoint {
     private double geofenceLongitude;
     private Integer geofenceRadius;
     private String geofenceId;
-    private String wifiSSID;
+    private String wifiSSID; // unused
     private String beaconUUID;
     private Integer beaconMajor;
     private Integer beaconMinor;
-    private Boolean shared;
+    private Boolean shared; // unused
     private java.util.Date date;
     private Long lastTriggered;
     private int modeId;
     private int type;
+    
+    @Transient
+    private int lastTransition = 0;
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    @Transient
+    private boolean isDeleted;
 
     @Generated(hash = 96494712)
     public Waypoint(Long id, @NotNull String description, double geofenceLatitude, double geofenceLongitude, Integer geofenceRadius, String geofenceId, String wifiSSID, String beaconUUID, Integer beaconMajor, Integer beaconMinor, Boolean shared, java.util.Date date, Long lastTriggered, int modeId,
@@ -83,7 +99,12 @@ public class Waypoint {
     }
 
     public void setGeofenceLatitude(double geofenceLatitude) {
-        this.geofenceLatitude = geofenceLatitude;
+        if(geofenceLatitude > 90)
+            this.geofenceLatitude = 90;
+        if(geofenceLatitude < -90)
+            this.geofenceLatitude = -90;
+        else
+            this.geofenceLatitude = geofenceLatitude;
     }
 
     public double getGeofenceLongitude() {
@@ -91,9 +112,15 @@ public class Waypoint {
     }
 
     public void setGeofenceLongitude(double geofenceLongitude) {
-        this.geofenceLongitude = geofenceLongitude;
+        if(geofenceLongitude > 180 )
+            this.geofenceLongitude = 180 ;
+        if(geofenceLongitude < -180 )
+            this.geofenceLongitude = -180 ;
+        else
+            this.geofenceLongitude = geofenceLongitude;
     }
 
+    @Nullable
     public Integer getGeofenceRadius() {
         return geofenceRadius;
     }
@@ -126,6 +153,7 @@ public class Waypoint {
         this.beaconUUID = beaconUUID;
     }
 
+    @Nullable
     public Integer getBeaconMajor() {
         return beaconMajor;
     }
@@ -134,6 +162,7 @@ public class Waypoint {
         this.beaconMajor = beaconMajor;
     }
 
+    @Nullable
     public Integer getBeaconMinor() {
         return beaconMinor;
     }
@@ -158,6 +187,7 @@ public class Waypoint {
         this.date = date;
     }
 
+    @Nullable
     public Long getLastTriggered() {
         return lastTriggered;
     }
@@ -182,16 +212,32 @@ public class Waypoint {
         this.type = type;
     }
 
+    @NonNull
     public Location getLocation() {
         Location l= new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
         l.setLongitude(getGeofenceLongitude());
-        l.setAccuracy(getGeofenceRadius() != null ? getGeofenceRadius() : 0);
+        l.setAccuracy(0);
         return l;
     }
 
+    public void setLastTransition(int status) {
+        this.lastTransition = status;
+    }
 
-    public void setDefaults() {
-        this.setShared(false);
+    public int getLastTransition() {
+        return this.lastTransition;
+    }
+
+    public boolean isUnknown() {
+        return this.lastTransition == 0;
+    }
+
+    public boolean hasBeacon() {
+        return getBeaconUUID() != null;
+    }
+
+    public boolean hasGeofence() {
+        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
     }
 }

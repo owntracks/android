@@ -2,30 +2,36 @@ package org.owntracks.android.support;
 
 
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
-import org.abstractj.kalium.crypto.Random;
-import org.abstractj.kalium.crypto.SecretBox;
+import org.libsodium.jni.crypto.Random;
+import org.libsodium.jni.crypto.SecretBox;
+
+
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
 
 public class EncryptionProvider {
     private static final String TAG = "EncryptionProvider";
-    private static final int crypto_secretbox_NONCEBYTES = org.abstractj.kalium.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
-    private static final int crypto_secretbox_KEYBYTES = org.abstractj.kalium.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+    private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
+    private static final int crypto_secretbox_KEYBYTES = XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 
     private static SecretBox b;
     private static Random r;
     private static boolean enabled;
+    private final Preferences preferences;
 
-    public static boolean isPayloadEncryptionEnabled() {
+    boolean isPayloadEncryptionEnabled() {
         return enabled;
     }
 
-    private static void initializeSecretBox() {
-        String encryptionKey = Preferences.getEncryptionKey();
+    private void initializeSecretBox() {
+        String encryptionKey = preferences.getEncryptionKey();
         enabled = encryptionKey != null && encryptionKey.length() > 0;
-        Log.v(TAG, "initializeSecretBox() - encryption enabled: " +enabled);
+        Log.v(TAG, "initializeSecretBox() - encryption enabled: " + enabled);
         if (!enabled)
             return;
 
@@ -37,12 +43,13 @@ public class EncryptionProvider {
         Log.v(TAG, "SecretBox initialized");
     }
 
-    public static void initialize() {
-        Preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
+    public EncryptionProvider(Preferences preferences) {
+        this.preferences = preferences;
+        preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
         initializeSecretBox();
     }
 
-    public static String decrypt(String cyphertextb64) {
+    String decrypt(String cyphertextb64) {
         byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
         byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
@@ -52,9 +59,13 @@ public class EncryptionProvider {
         return new String(b.decrypt(nonce, cyphertext));
     }
 
-    public static String encrypt(String plaintext) {
+    String encrypt(@NonNull String plaintext) {
+        return encrypt(plaintext.getBytes());
+    }
+
+    String encrypt(@NonNull byte[] plaintext) {
         byte[] nonce = r.randomBytes(crypto_secretbox_NONCEBYTES);
-        byte[] cyphertext = b.encrypt(nonce, plaintext.getBytes());
+        byte[] cyphertext = b.encrypt(nonce, plaintext);
         byte[] out = new byte[crypto_secretbox_NONCEBYTES + cyphertext.length];
 
         System.arraycopy(nonce, 0, out, 0, crypto_secretbox_NONCEBYTES);
@@ -63,11 +74,10 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private static class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
-        public SecretBoxManager() {
-            Preferences.registerOnPreferenceChangedListener(this);
+    private class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
+        SecretBoxManager() {
+            preferences.registerOnPreferenceChangedListener(this);
         }
-
 
         @Override
         public void onAttachAfterModeChanged() {
@@ -76,7 +86,7 @@ public class EncryptionProvider {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if(Preferences.Keys._ENCRYPTION_KEY.equals(key))
+            if (Preferences.Keys._ENCRYPTION_KEY.equals(key))
                 initializeSecretBox();
         }
     }

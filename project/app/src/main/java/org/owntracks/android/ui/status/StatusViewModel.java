@@ -3,33 +3,40 @@ package org.owntracks.android.ui.status;
 import android.Manifest;
 import android.content.Context;
 import android.databinding.Bindable;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.services.ServiceMessage;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 
 @PerActivity
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
-    ServiceMessage.EndpointState endpointState;
+    MessageProcessor.EndpointState endpointState;
     String endpointMessage;
 
-    Context context;
+    final Context context;
     private Date appStarted;
     private Date serviceStarted;
-    private Date locationUpdated;
+    private long locationUpdated;
     private boolean locationPermission;
+    private int queueLength;
 
     @Inject
     public StatusViewModel(@AppContext Context context) {
@@ -42,7 +49,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public ServiceMessage.EndpointState getEndpointState() {
+    public MessageProcessor.EndpointState getEndpointState() {
         return endpointState;
     }
 
@@ -55,7 +62,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     @Bindable
     public int getEndpointQueue() {
-        return 0;
+        return queueLength;
     }
 
     @Override
@@ -71,39 +78,30 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Override
-    @Bindable
-    public Date getAppStarted() {
-        return appStarted;
+    public boolean getDozeWhitelisted() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || App.getPowerManager().isIgnoringBatteryOptimizations(App.getContext().getPackageName());
+    }
+
+    @Override
+    public void onIgnoreDozeClicked() {
+        getView().showIgnoreDozeActivity();
     }
 
     @Override
     @Bindable
-    public Date getLocationUpdated() {
+    public long getLocationUpdated() {
         return locationUpdated;
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(Events.EndpointStateChanged e) {
-        this.endpointState = e.getState();
-        if(e.getException() != null)
-            this.endpointMessage = e.getException().toString();
+    public void onEvent(MessageProcessor.EndpointState e) {
+        this.endpointState = e;
+        if(e.getError() != null)
+            this.endpointMessage = e.getError().toString();
         else
             this.endpointMessage = e.getMessage();
         notifyPropertyChanged(BR.endpointState);
         notifyPropertyChanged(BR.endpointMessage);
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(Events.PermissionGranted e) {
-        if(Manifest.permission.ACCESS_FINE_LOCATION.equals(e.getPermission()))
-            this.locationPermission = true;
-        notifyPropertyChanged(BR.locationUpdated);
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(Events.AppStarted e) {
-        this.appStarted = e.getDate();
-        notifyPropertyChanged(BR.appStarted);
     }
 
     @Subscribe(sticky = true)
@@ -113,8 +111,16 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(Events.CurrentLocationUpdated e) {
-        this.locationUpdated = e.getDate();
+    public void onEvent(Location l) {
+        this.locationUpdated = TimeUnit.MILLISECONDS.toSeconds(l.getTime());
         notifyPropertyChanged(BR.locationUpdated);
     }
+
+    @Subscribe(sticky = true)
+    public void onEvent(Events.QueueChanged e) {
+        Timber.e("queue changed %s", e.getNewLength());
+        this.queueLength = e.getNewLength();
+        notifyPropertyChanged(BR.endpointQueue);
+    }
+
 }

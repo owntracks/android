@@ -21,8 +21,8 @@ import org.owntracks.android.support.Events;
 @Deprecated
 public abstract class ActivityBase extends AppCompatActivity  {
     private static final String TAG = "ActivityBase";
-    protected static final java.lang.String DISABLES_ANIMATION = "disablesAnimation";
-    Toolbar toolbar;
+    static final java.lang.String DISABLES_ANIMATION = "disablesAnimation";
+    private Toolbar toolbar;
     private boolean disablesAnimation = false;
 
     boolean hasIntentExtras() {
@@ -57,7 +57,7 @@ public abstract class ActivityBase extends AppCompatActivity  {
         }
     }
 
-    void onRunActionWithPermissionCheck(int action, boolean granted) {
+    private void onRunActionWithPermissionCheck(int action, boolean granted) {
 
     }
 
@@ -117,7 +117,7 @@ public abstract class ActivityBase extends AppCompatActivity  {
         setSupportToolbar(false);
     }
 
-    void setSupportToolbar(boolean hideTitle) {
+    private void setSupportToolbar(boolean hideTitle) {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getTitle());

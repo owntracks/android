@@ -1,99 +1,81 @@
 package org.owntracks.android.support;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.security.Key;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.IllegalFormatException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.owntracks.android.App;
-import org.owntracks.android.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-
-import org.owntracks.android.db.Dao;
+import org.owntracks.android.App;
+import org.owntracks.android.BuildConfig;
+import org.owntracks.android.R;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.messages.MessageWaypoints;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Preferences {
-    public static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
-    public static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
-    public static final String FILENAME_PUBLIC = "org.owntracks.android.preferences.public";
+    private static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
+    private static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
 
     private static SharedPreferences activeSharedPreferences;
     private static SharedPreferences sharedPreferences;
 
     private static SharedPreferences privateSharedPreferences;
     private static SharedPreferences httpSharedPreferences;
-    private static SharedPreferences publicSharedPreferences;
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
-    private static String deviceUUID = "";
+    private final Context context;
 
-    public static boolean isModeMqttPrivate(){ return modeId == App.MODE_ID_MQTT_PRIVATE; }
+    private String sharedPreferencesName;
 
-    public static boolean isModeMqttPublic(){ return modeId == App.MODE_ID_MQTT_PUBLIC; }
+    public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    public static boolean isModeHttpPrivate(){ return modeId == App.MODE_ID_HTTP_PRIVATE; }
-
-    public static String getDeviceUUID() {
-        return deviceUUID;
-    }
-
-    public static void initialize(Context c){
-        Timber.v("preferences initializing");
+    public Preferences(@AppContext Context c){
+        Timber.v("initializing");
+        context = c;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
         httpSharedPreferences = c.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE);
-        publicSharedPreferences = c.getSharedPreferences(FILENAME_PUBLIC, Context.MODE_PRIVATE);
 
-        deviceUUID = sharedPreferences.getString(Keys._DEVICE_UUID, "undefined-uuid");
         initMode(sharedPreferences.getInt(Keys.MODE_ID, getIntResource(R.integer.valModeId)));
     }
 
 
-    public static void initMode(int active) {
-        // Check for valid mode IDs and fallback to Private if an invalid mode is set
-        if(active == App.MODE_ID_MQTT_PRIVATE || active == App.MODE_ID_MQTT_PUBLIC || active == App.MODE_ID_HTTP_PRIVATE) {
-            setMode(active, true);
-        } else {
-            setMode(App.MODE_ID_MQTT_PRIVATE, true);
-        }
+    private void initMode(int active) {
+        // Check for valid mode IDs and fallback to MQTT if an invalid mode is set
+        setMode(active == App.MODE_ID_HTTP_PRIVATE ? App.MODE_ID_HTTP_PRIVATE : App.MODE_ID_MQTT_PRIVATE, true);
     }
 
-    public static void setMode(int active) {
+    public void setMode(int active) {
         setMode(active, false);
     }
-    private static void setMode(int active, boolean init){
+    public void setMode(int active, boolean init){
         Timber.v("setMode: " + active);
 
-        if(!init && modeId == active)
+        if(!init && modeId == active) {
+            Timber.v("mode is already set to requested mode");
             return;
+        }
 
         Timber.v("setting mode to: " + active);
 
@@ -103,12 +85,11 @@ public class Preferences {
         switch (modeId) {
             case App.MODE_ID_MQTT_PRIVATE:
                 activeSharedPreferences = privateSharedPreferences;
-                break;
-            case App.MODE_ID_MQTT_PUBLIC:
-                activeSharedPreferences = publicSharedPreferences;
+                sharedPreferencesName = FILENAME_PRIVATE;
                 break;
             case App.MODE_ID_HTTP_PRIVATE:
                 activeSharedPreferences = httpSharedPreferences;
+                sharedPreferencesName = FILENAME_HTTP;
                 break;
 
         }
@@ -117,7 +98,6 @@ public class Preferences {
         // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
         privateSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
         httpSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
-        publicSharedPreferences.edit().putInt(Keys.MODE_ID, modeId).apply();
 
         attachAllActivePreferenceChangeListeners();
 
@@ -129,12 +109,12 @@ public class Preferences {
 
     private static LinkedList<OnPreferenceChangedListener> activeSharedPreferencesChangeListener;
 
-    public static void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+    public void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
         activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
         activeSharedPreferencesChangeListener.push(listener);
     }
 
-    public static void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
+    public void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
         activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
         activeSharedPreferencesChangeListener.remove(listener);
     }
@@ -153,150 +133,61 @@ public class Preferences {
     }
 
 
-
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
 
-
-
-
-
-
-
-
-
-    //public static String getContactKey(int resId) {
-    //    return App.getContext().getString(resId);
-    //}
-
-    public static boolean getBoolean(String key,  int defId) {
-        return getBoolean(key, defId, defId, false);
+    public boolean getBoolean(String key, int defId) {
+        return activeSharedPreferences.getBoolean(key, getBooleanRessource(defId));
     }
 
-    public static boolean getBoolean(String key, int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
-        if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getBooleanRessource(defIdPublic) :  activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPublic));
-        }
-
-        return activeSharedPreferences.getBoolean(key, getBooleanRessource(defIdPrivate));
+    private boolean getBooleanRessource(int resId) {
+        return context.getResources().getBoolean(resId);
     }
 
-    public static boolean getBooleanRessource(int resId) {
-        return App.getContext().getResources().getBoolean(resId);
+    public int getInt(String key,  int defId) {
+        return activeSharedPreferences.getInt(key, getIntResource(defId));
     }
-
-    // For keys that do not need overrides in any modes
-    public static int getInt(String key,  int defId) {
-        return getInt(key, defId, defId, false);
+    private int getIntResource(int resId) {
+        return context.getResources().getInteger(resId);
     }
-    public static int getInt(String key,  int defIdPrivate, int defIdPublic, boolean forceDefIdPublic) {
-        if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getIntResource(defIdPublic) :  activeSharedPreferences.getInt(key, getIntResource(defIdPublic));
-        }
-
-        return activeSharedPreferences.getInt(key, getIntResource(defIdPrivate));
-    }
-    public static int getIntResource(int resId) {
-        return App.getContext().getResources().getInteger(resId);
-    }
-
-
-    public static int getIntegerDefaultValue(int defaultValueResPrivate, int defaultValueResPublic) {
-        return isModeMqttPrivate() ? getIntResource(defaultValueResPrivate) : getIntResource(defaultValueResPublic);
-    }
-
-
 
     // Gets the key from specified preferences
     // If the returned value is an empty string or null, the default id is returned
     // This is a quick fix as an empty string does not return the default value
-    private static String getStringWithFallback(SharedPreferences preferences, String key, int defId) {
+    private String getStringWithFallback(SharedPreferences preferences, String key, int defId) {
         String s = preferences.getString(key, "");
         return ("".equals(s)) ? getStringRessource(defId) : s;
     }
 
-    public static String getString(String key,  int defId) {
-        return getString(key, defId, defId, defId, false, false);
-    }
-    public static String getString(String key,  int defIdPrivate, int defIdPublic, int defIdHttp, boolean forceDefIdPublic, boolean forceDefIdHttp) {
-        if (isModeHttpPrivate()) {
-            return forceDefIdHttp ? getStringRessource(defIdHttp) : getStringWithFallback(httpSharedPreferences, key, defIdHttp);
-        }
-
-        if (isModeMqttPublic()) {
-            return forceDefIdPublic ? getStringRessource(defIdPublic) : getStringWithFallback(publicSharedPreferences, key, defIdPublic);
-        }
-
-        return getStringWithFallback(privateSharedPreferences, key, defIdPrivate);
+    public String getString(String key,  int defId) {
+         return getStringWithFallback(activeSharedPreferences, key, defId);
     }
 
-    public static String getStringDefaultValue(@StringRes  int defIdPrivate, @StringRes int defIdPublic) {
-        return isModeMqttPrivate() ? getStringRessource(defIdPrivate) : getStringRessource(defIdPublic);
+    private String getStringRessource(int resId) {
+        return context.getResources().getString(resId);
     }
 
-    public static String getStringRessource(int resId) {
-        return App.getContext().getResources().getString(resId);
-    }
-
-    public static void setString(String key, String value) {
-        setString(key, value, true);
-    }
-    public static void setString(String key, String value, boolean allowSetWhenPublic) {
-        if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Timber.e("setting of key denied in the current mode: " + key);
-            return;
-        }
+    private void setString(String key, String value) {
         activeSharedPreferences.edit().putString(key, value).apply();
     }
 
-    public static void setInt(String key, int value) {
-        setInt(key, value, true);
-    }
-    public static void setInt(String key, int value, boolean allowSetWhenPublic) {
-        if((isModeMqttPublic() && !allowSetWhenPublic)) {
-            Timber.e("setting of key denied in the current mode: " + key);
-            return;
-        }
+    private void setInt(String key, int value) {
         activeSharedPreferences.edit().putInt(key, value).apply();
     }
-    public static void setBoolean(String key, boolean value) {
-        setBoolean(key, value, true);
-    }
-    public static void setBoolean(String key, boolean value, boolean allowSetWhenPublic) {
-        if(isModeMqttPublic() && !allowSetWhenPublic) {
-            Timber.e("setting of key denied in the current mode: " + key);
-            return;
-        }
+    private void setBoolean(String key, boolean value) {
         activeSharedPreferences.edit().putBoolean(key, value).apply();
     }
 
-    public static void clearKey(String key) {
+    public void clearKey(String key) {
         activeSharedPreferences.edit().remove(key).apply();
     }
 
-    @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getModeId() { return modeId; }
-
-
-    public SharedPreferences getActiveSharedPreferences() {
-        return activeSharedPreferences;
-    }
-
-    public static boolean canConnect() {
-        if(isModeMqttPrivate()) {
-            return !getHost().trim().equals("") && !getUsername().trim().equals("")  && (!getAuth() || !getPassword().trim().equals(""));
-        } else if(isModeMqttPublic()) {
-            return true;
-        }
-        return false;
-    }
-
-
-
+    @Export(key =Keys.MODE_ID, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getModeId() { return modeId; }
 
     @SuppressLint("CommitPrefEdits")
-    public static void importKeyValue(String key, String value) throws IllegalAccessException, IllegalArgumentException {
+    public void importKeyValue(String key, String value) throws IllegalAccessException, IllegalArgumentException {
         Timber.v("setting %s, for key %s", value, key);
         HashMap<String, Method> methods = getImportMethods();
 
@@ -304,17 +195,23 @@ public class Preferences {
         if(m == null)
             throw new IllegalAccessException();
 
+
+        if(value == null) {
+            clearKey(key);
+            return;
+        }
+
         try {
             Type t = m.getGenericParameterTypes()[0];
             Timber.v("type of parameter: %s %s", t, t.getClass());
-            methods.get(key).invoke(null, convert(t, value));
+            methods.get(key).invoke(this, convert(t, value));
         } catch (InvocationTargetException e) {
             throw new IllegalAccessException();
         }
 
     }
 
-    private static Object convert( Type t, String value ) throws IllegalArgumentException{
+    private Object convert( Type t, String value ) throws IllegalArgumentException{
         if( Boolean.TYPE == t ) {
             if(!"true".equals(value)&& !"false".equals(value) )
                 throw new IllegalArgumentException();
@@ -329,12 +226,13 @@ public class Preferences {
     }
 
 
-        @SuppressLint("CommitPrefEdits")
-    public static void importFromMessage(MessageConfiguration m) {
-
+    @SuppressLint({"CommitPrefEdits", "ApplySharedPref"})
+    public void importFromMessage(MessageConfiguration m) {
+        Timber.v("importing %s keys ", m.getKeys().size());
         HashMap<String, Method> methods = getImportMethods();
 
         if(m.containsKey(Keys.MODE_ID)) {
+            Timber.v("setting mode to %s", m.get(Keys.MODE_ID));
             setMode((Integer) m.get(Keys.MODE_ID));
             m.removeKey(Keys.MODE_ID);
         }
@@ -351,13 +249,16 @@ public class Preferences {
                 if(value==null) {
                     Timber.v("clearing value for key %s", key);
                     clearKey(key);
-                } else
+                } else {
                     Timber.v("method: %s", methods.get(key).getName());
-                   methods.get(key).invoke(null, m.get(key));
-            } catch (Exception e) {
+                    methods.get(key).invoke(this, m.get(key));
+                }
+                } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        Timber.v("committing to preferences %s", activeSharedPreferences);
 
         activeSharedPreferences.edit().commit();
         if(m.hasWaypoints()) {
@@ -367,21 +268,21 @@ public class Preferences {
 
     }
 
-    public static MessageWaypointCollection waypointsToJSON() {
+    public MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(Waypoint waypoint : Dao.getWaypointDao().loadAll()) {
+        for(Waypoint waypoint : App.getDao().getWaypointDao().loadAll()) {
             messages.add(MessageWaypoint.fromDaoObject(waypoint));
         }
         return messages;
     }
 
 
-    public static void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
+    public void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
         if(j == null)
             return;
 
-        WaypointDao dao = Dao.getWaypointDao();
+        WaypointDao dao = App.getDao().getWaypointDao();
         List<Waypoint> deviceWaypoints =  dao.loadAll();
 
         for (MessageWaypoint m: j) {
@@ -392,96 +293,109 @@ public class Preferences {
                 if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
                     Timber.v("removing existing waypoint with same tst before adding it");
                     dao.delete(e);
-                    App.getEventBus().post(new Events.WaypointRemoved(e));
+                    App.getEventBus().post(w);
                 }
             }
 
             dao.insert(w);
-            App.getEventBus().post(new Events.WaypointAdded(w));
+            App.getEventBus().post(w);
         }
     }
 
+    @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
+    public void setOpenCageGeocoderApiKey(String key) {
+        setString(Keys.CP, key);
+    }
+
+    @Export(key = Keys.OPENCAGE_GEOCODER_API_KEY, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
+    public String getOpenCageGeocoderApiKey() {
+        return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.valEmpty);
+    }
+
     @Import(key = Keys.CP)
-    public static void setCp(boolean cp) {
-        setBoolean(Keys.CP, cp, false);
+    public void setCp(boolean cp) {
+        setBoolean(Keys.CP, cp);
     }
 
     @Export(key = Keys.CP, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
-    public static boolean getCp() {
+    public boolean getCp() {
         return getBoolean(Keys.CP, R.bool.valCp);
     }
 
     @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getRemoteConfiguration() {
-        return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration, R.bool.valRemoteConfigurationPublic, true);
+    public boolean getRemoteConfiguration() {
+        return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration);
     }
 
     @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getRemoteCommand() {
+    public boolean getRemoteCommand() {
         return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
 
     @Import(key =Keys.REMOTE_CONFIGURATION )
-    public static void setRemoteConfiguration(boolean aBoolean) {
-        setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean, false);
+    public void setRemoteConfiguration(boolean aBoolean) {
+        setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean);
     }
 
     @Import(key =Keys.REMOTE_COMMAND)
-    public static void setRemoteCommand(boolean aBoolean) {
-        setBoolean(Keys.REMOTE_COMMAND, aBoolean, true);
+    public void setRemoteCommand(boolean aBoolean) {
+        setBoolean(Keys.REMOTE_COMMAND, aBoolean);
     }
 
     @Import(key =Keys.CLEAN_SESSION)
-    public static void setCleanSession(boolean aBoolean) {
-        setBoolean(Keys.CLEAN_SESSION, aBoolean, false);
+    public void setCleanSession(boolean aBoolean) {
+        setBoolean(Keys.CLEAN_SESSION, aBoolean);
     }
 
     @Export(key =Keys.CLEAN_SESSION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getCleanSession() {
-        return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession,R.bool.valCleanSessionPublic, true);
+    public boolean getCleanSession() {
+        return getBoolean(Keys.CLEAN_SESSION, R.bool.valCleanSession);
     }
 
 
     @Export(key =Keys.PUB_EXTENDED_DATA, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static boolean getPubLocationExtendedData() {
-        return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData, R.bool.valPubExtendedData, false);
+    public boolean getPubLocationExtendedData() {
+        return getBoolean(Keys.PUB_EXTENDED_DATA, R.bool.valPubExtendedData);
     }
 
-    @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getLocatorDisplacement() {
+    @Export(key =Keys.LOCATOR_DISPLACEMENT, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getLocatorDisplacement() {
         return getInt(Keys.LOCATOR_DISPLACEMENT, R.integer.valLocatorDisplacement);
     }
 
-    public static long getLocatorIntervalMillis() {
-        return TimeUnit.SECONDS.toMillis(getLocatorInterval());
-    }
-
-    @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeMqttPublic =true, exportModeHttpPrivate =true)
-    public static int getLocatorInterval() {
+    @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getLocatorInterval() {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
-    @Export(key =Keys.USERNAME, exportModeMqttPrivate =true)
-    public static String getUsername() {
-        // in public, the username is just used to build the topic public/user/$deviceId
-        return getString(Keys.USERNAME, R.string.valEmpty, R.string.valUsernamePublic, R.string.valEmpty, true, false);
+    @Export(key =Keys.PING, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getPing() {
+        return getInt(Keys.PING, R.integer.valPing);
+    }
+
+    @Import(key =Keys.PING)
+    private void setPing(int anInt) {
+        setInt(Keys.PING, anInt);
+
+    }
+
+    @Export(key =Keys.USERNAME, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public String getUsername() {
+        return getString(Keys.USERNAME, R.string.valEmpty);
     }
 
     @Export(key =Keys.AUTH, exportModeMqttPrivate =true)
-    public static boolean getAuth() {
-        return getBoolean(Keys.AUTH, R.bool.valAuth, R.bool.valAuthPublic, true);
+    public  boolean getAuth() {
+        return getBoolean(Keys.AUTH, R.bool.valAuth);
 
     }
 
     @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true)
-    public static String getDeviceId() {
+    public String getDeviceId() {
         return getDeviceId(true);
     }
 
-    public static String getDeviceId(boolean fallbackToDefault) {
-        if(Preferences.isModeMqttPublic())
-            return getDeviceUUID();
-
+    public String getDeviceId(boolean fallbackToDefault) {
         String deviceId = getString(Keys.DEVICE_ID, R.string.valEmpty);
         if ("".equals(deviceId) && fallbackToDefault)
             return getDeviceIdDefault();
@@ -489,120 +403,117 @@ public class Preferences {
     }
 
     @Export(key =Keys.IGNORE_STALE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public static int getIgnoreStaleLocations() {
+    public int getIgnoreStaleLocations() {
         return getInt(Keys.IGNORE_STALE_LOCATIONS, R.integer.valIgnoreStaleLocations);
     }
 
     @Import(key =Keys.IGNORE_STALE_LOCATIONS )
-    public static void setIgnoreSTaleLocations(int days) {
-        setInt(Keys.IGNORE_STALE_LOCATIONS, days, false);
+    public void setIgnoreSTaleLocations(int days) {
+        setInt(Keys.IGNORE_STALE_LOCATIONS, days);
     }
 
-    @Export(key =Keys.IGNORE_INACCURATE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true, exportModeMqttPublic = true)
-    public static int getIgnoreInaccurateLocations() {
+    @Export(key =Keys.IGNORE_INACCURATE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getIgnoreInaccurateLocations() {
         return getInt(Keys.IGNORE_INACCURATE_LOCATIONS, R.integer.valIgnoreInaccurateLocations);
     }
 
     @Import(key =Keys.IGNORE_INACCURATE_LOCATIONS )
-    public static void setIgnoreInaccurateLocations(int meters) {
-        setInt(Keys.IGNORE_INACCURATE_LOCATIONS, meters, true);
+    public void setIgnoreInaccurateLocations(int meters) {
+        setInt(Keys.IGNORE_INACCURATE_LOCATIONS, meters);
     }
 
 
 
 
     // Not used on public, as many people might use the same device type
-    public static String getDeviceIdDefault() {
+    private String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
         return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
 
     @Export(key =Keys.CLIENT_ID, exportModeMqttPrivate =true)
-    public static String getClientId() {
-        if(isModeMqttPublic())
-            return MqttAsyncClient.generateClientId();
-
+    public String getClientId() {
         String clientId = getString(Keys.CLIENT_ID, R.string.valEmpty);
         if ("".equals(clientId))
             clientId = getClientIdDefault();
         return clientId;
     }
 
-    private static String getClientIdDefault() {
+    private String getClientIdDefault() {
         return (getUsername()+ getDeviceId()).replaceAll("\\W", "").toLowerCase();
     }
 
     @Import(key =Keys.CLIENT_ID)
-    public static void setClientId(String clientId) {
+    public void setClientId(String clientId) {
         setString(Keys.CLIENT_ID, clientId);
     }
 
     @Import(key =Keys.PUB_TOPIC_BASE)
-    public static void setDeviceTopicBase(String deviceTopic) {
-        setString(Keys.PUB_TOPIC_BASE, deviceTopic, false);
+    public void setDeviceTopicBase(String deviceTopic) {
+        setString(Keys.PUB_TOPIC_BASE, deviceTopic);
     }
 
-    public static String getPubTopicLocations() {
+    public String getPubTopicLocations() {
         return getPubTopicBase();
     }
 
-    public static String getPubTopicWaypoints() {
+    public String getPubTopicWaypoints() {
         return getPubTopicBase() +getPubTopicWaypointsPart();
     }
 
-    public static String getPubTopicWaypointsPart() {
+    public String getPubTopicWaypointsPart() {
         return "/waypoint";
     }
 
-    public static String getPubTopicEvents() {
+    public String getPubTopicEvents() {
         return getPubTopicBase() + getPubTopicEventsPart();
     }
 
-    public static String getPubTopicEventsPart() {
+    public String getPubTopicEventsPart() {
         return "/event";
     }
-    public static String getPubTopicInfoPart() {
+    public String getPubTopicInfoPart() {
         return "/info";
     }
-    public static String getPubTopicCommands() {
+    public String getPubTopicCommands() {
         return getPubTopicBase() +getPubTopicCommandsPart();
     }
-    public static String getPubTopicCommandsPart() {
+    public String getPubTopicCommandsPart() {
         return "/cmd";
     }
 
 
     @Export(key =Keys.PUB_TOPIC_BASE, exportModeMqttPrivate =true)
-    public static String getPubTopicBaseFormatString() {
-        return getString(Keys.PUB_TOPIC_BASE, R.string.valPubTopic, R.string.valPubTopicPublic, R.string.valEmpty, true, false);
+    public String getPubTopicBaseFormatString() {
+        return getString(Keys.PUB_TOPIC_BASE, R.string.valPubTopic);
     }
 
-    public static String getPubTopicBase() {
+    public String getPubTopicBase() {
         return getPubTopicBaseFormatString().replace("%u", getUsername()).replace("%d", getDeviceId());
     }
 
     @Export(key =Keys.SUB_TOPIC, exportModeMqttPrivate =true)
-    public static String getSubTopic() {
-        return getString(Keys.SUB_TOPIC, R.string.valSubTopic, R.string.valSubTopicPublic, R.string.valEmpty, true, false);
+    public String getSubTopic() {
+        return getString(Keys.SUB_TOPIC, R.string.valSubTopic);
     }
 
     @Export(key =Keys.SUB, exportModeMqttPrivate =true)
-    public static boolean getSub() {
-        return getBoolean(Keys.SUB, R.bool.valSub, R.bool.valSubPublic, true);
+    public boolean getSub() {
+        return getBoolean(Keys.SUB, R.bool.valSub);
     }
 
     @Import(key =Keys.SUB)
-    private static void setSub(boolean sub) {
-        setBoolean(Keys.SUB, sub, false);
+    private void setSub(boolean sub) {
+        setBoolean(Keys.SUB, sub);
     }
 
 
-    @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static String getTrackerId() {
+    @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true)
+    public String getTrackerId() {
         return getTrackerId(false);
-
     }
-    public static String getTrackerId(boolean fallback) {
+
+    public String getTrackerId(boolean fallback) {
 
         String tid = getString(Keys.TRACKER_ID, R.string.valEmpty);
 
@@ -612,7 +523,7 @@ public class Preferences {
             return tid;
     }
 
-    public static String getTrackerIdDefault(){
+    private String getTrackerIdDefault(){
         String deviceId = getDeviceId();
         if(deviceId!=null && deviceId.length() >= 2)
             return deviceId.substring(deviceId.length() - 2);   // defaults to the last two characters of configured deviceId.
@@ -621,21 +532,30 @@ public class Preferences {
     }
 
     @Import(key =Keys.HOST)
-    public static void setHost(String value) {
-            setString(Keys.HOST, value, false);
+    public void setHost(String value) {
+        setString(Keys.HOST, value);
+        App.getEventBus().post(new Events.EndpointChanged());
     }
 
-    public static void setPortDefault(int value) {
+    public void setPortDefault() {
         clearKey(Keys.PORT);
     }
+    public void setKeepaliveDefault() {
+        clearKey(Keys.KEEPALIVE);
+    }
+
+
 
     @Import(key =Keys.PORT)
-    public static void setPort(int value) {
-            setInt(Keys.PORT, value, false);
+    public void setPort(int value) {
+        if(value < 1 || value > 65535)
+            setPortDefault();
+        else
+            setInt(Keys.PORT, value);
    }
 
     @Import(key =Keys.TRACKER_ID)
-    public static void setTrackerId(String value){
+    public void setTrackerId(String value){
         int len=value.length();
         // value validation - must be max 2 characters, only letters and digits
         if(len>=2){
@@ -653,12 +573,12 @@ public class Preferences {
     }
 
     @Export(key =Keys.PORT, exportModeMqttPrivate =true)
-    public static int getPort() {
-        return getInt(Keys.PORT, R.integer.valPort, R.integer.valPortPublic, true);
+    public int getPort() {
+        return getInt(Keys.PORT, R.integer.valPort);
     }
 
 
-    public static String getIntWithHintSupport(String key) {
+    private String getIntWithHintSupport(String key) {
         int i = getInt(key, R.integer.valInvalid);
         if (i == -1) {
             return "";
@@ -667,379 +587,281 @@ public class Preferences {
         }
     }
 
-    public static String getPortWithHintSupport() {
+    public String getPortWithHintSupport() {
         return getIntWithHintSupport(Keys.PORT);
     }
 
     @Import(key =Keys.MQTT_PROTOCOL_LEVEL)
-    public static void setMqttProtocolLevel(int value) {
+    public void setMqttProtocolLevel(int value) {
         if(value != 0 && value != 3 && value != 4)
             return;
 
-        setInt(Keys.MQTT_PROTOCOL_LEVEL, value, false);
+        setInt(Keys.MQTT_PROTOCOL_LEVEL, value);
     }
 
     @Export(key =Keys.MQTT_PROTOCOL_LEVEL, exportModeMqttPrivate =true)
-    public static int getMqttProtocolLevel() {
-        return getInt(Keys.MQTT_PROTOCOL_LEVEL, R.integer.valMqttProtocolLevel, R.integer.valMqttProtocolLevelPublic, true);
+    public int getMqttProtocolLevel() {
+        return getInt(Keys.MQTT_PROTOCOL_LEVEL, R.integer.valMqttProtocolLevel);
     }
 
     @Import(key =Keys.KEEPALIVE)
-    public static void setKeepalive(int value) {
-        setInt(Keys.KEEPALIVE, value, false);
+    public void setKeepalive(int value)
+    {
+        if(value < 1)
+            setKeepaliveDefault();
+        else
+            setInt(Keys.KEEPALIVE, value);
     }
 
-    public static String getKeepaliveWithHintSupport() {
+    public String getKeepaliveWithHintSupport() {
         return getIntWithHintSupport(Keys.KEEPALIVE);
     }
 
     @Export(key =Keys.KEEPALIVE, exportModeMqttPrivate =true)
-    public static int getKeepalive() {
-        return getInt(Keys.KEEPALIVE, R.integer.valKeepalive, R.integer.valKeepalivePublic, true);
+    public int getKeepalive() {
+        int keepalive = getInt(Keys.KEEPALIVE, R.integer.valKeepalive);
+        if(keepalive < 30)
+            keepalive = 30;
+        return keepalive;
     }
 
     @Import(key =Keys.USERNAME)
-    public static void setUsername(String value) {
-
-            setString(Keys.USERNAME, value);
+    public void setUsername(String value) {
+        setString(Keys.USERNAME, value);
     }
 
     @Import(key =Keys.PUB_EXTENDED_DATA)
-    private static void setPubLocationExtendedData(boolean aBoolean) {
+    private void setPubLocationExtendedData(boolean aBoolean) {
         setBoolean(Keys.PUB_EXTENDED_DATA, aBoolean);
     }
 
     @Import(key =Keys.PUB)
-    public static void setPub(boolean aBoolean) {
+    public void setPub(boolean aBoolean) {
         setBoolean(Keys.PUB, aBoolean);
     }
 
-    @Import(key =Keys.NOTIFICATION)
-    private static void setNotification(boolean aBoolean) {
-        setBoolean(Keys.NOTIFICATION, aBoolean);
-    }
-
     @Import(key =Keys.NOTIFICATION_HIGHER_PRIORITY)
-    private static void setNotificationHigherPriority(boolean aBoolean) {
+    private void setNotificationHigherPriority(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, aBoolean);
     }
 
     @Import(key =Keys.NOTIFICATION_LOCATION)
-    private static void setNotificationLocation(boolean aBoolean) {
+    private void setNotificationLocation(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_LOCATION, aBoolean);
     }
     @Import(key =Keys.NOTIFICATION_EVENTS)
-    public static void setNotificationEvents(boolean notificationEvents) {
+    public void setNotificationEvents(boolean notificationEvents) {
         setBoolean(Keys.NOTIFICATION_EVENTS, notificationEvents);
     }
 
     @Import(key =Keys.SUB_TOPIC)
-    private static void setSubTopic(String string) {
-        setString(Keys.SUB_TOPIC, string, false);
+    private void setSubTopic(String string) {
+        setString(Keys.SUB_TOPIC, string);
     }
 
     @Import(key =Keys.AUTOSTART_ON_BOOT)
-    private static void setAutostartOnBoot(boolean aBoolean) {
+    private void setAutostartOnBoot(boolean aBoolean) {
         setBoolean(Keys.AUTOSTART_ON_BOOT, aBoolean);
 
     }
     @Import(key =Keys.LOCATOR_ACCURACY_FOREGROUND)
-    private static void setLocatorAccuracyForeground(int anInt) {
+    private void setLocatorAccuracyForeground(int anInt) {
         setInt(Keys.LOCATOR_ACCURACY_FOREGROUND, anInt);
 
     }
 
     @Import(key =Keys.LOCATOR_ACCURACY_BACKGROUND)
-    private static void setLocatorAccuracyBackground(int anInt) {
+    private void setLocatorAccuracyBackground(int anInt) {
         setInt(Keys.LOCATOR_ACCURACY_BACKGROUND, anInt);
 
     }
     @Import(key =Keys.LOCATOR_INTERVAL)
-    private static void setLocatorInterval(int anInt) {
+    private void setLocatorInterval(int anInt) {
         setInt(Keys.LOCATOR_INTERVAL, anInt);
 
     }
 
-    @Import(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD)
-    private static void setBeaconBackgroundScanPeriod(int anInt) {
-        setInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, anInt);
-
-    }
-
-    @Import(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD)
-    private static void setBeaconForegroundScanPeriod(int anInt) {
-        setInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, anInt);
-
-    }
-
     @Import(key =Keys.LOCATOR_DISPLACEMENT)
-    private static void setLocatorDisplacement(int anInt) {
+    private void setLocatorDisplacement(int anInt) {
         setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
 
     }
     @Import(key =Keys.PUB_RETAIN)
-    private static void setPubRetain(boolean aBoolean) {
-        setBoolean(Keys.PUB_RETAIN, aBoolean, false);
+    private void setPubRetain(boolean aBoolean) {
+        setBoolean(Keys.PUB_RETAIN, aBoolean);
 
     }
     @Import(key =Keys.PUB_QOS)
-    private static void setPubQos(int anInt) {
-        setInt(Keys.PUB_QOS, anInt, false);
+    private void setPubQos(int anInt) {
+        setInt(Keys.PUB_QOS, anInt);
     }
 
 
     @Import(key =Keys.SUB_QOS)
-    private static void setSubQos(int anInt) {
-        setInt(Keys.SUB_QOS, anInt > 2 ? 2 : anInt, false);
+    private void setSubQos(int anInt) {
+        setInt(Keys.SUB_QOS, anInt > 2 ? 2 : anInt);
     }
 
 
     @Import(key =Keys.PASSWORD)
-    public static void setPassword(String password) {
+    public void setPassword(String password) {
             setString(Keys.PASSWORD, password);
     }
 
     @Import(key =Keys.DEVICE_ID)
-    public static void setDeviceId(String deviceId) {
-        setString(Keys.DEVICE_ID, deviceId, false);
+    public void setDeviceId(String deviceId) {
+        setString(Keys.DEVICE_ID, deviceId);
     }
 
 
     @Import(key =Keys.AUTH)
-    public static void setAuth(boolean auth) {
-        setBoolean(Keys.AUTH, auth, false);
+    public void setAuth(boolean auth) {
+        setBoolean(Keys.AUTH, auth);
     }
 
     @Import(key =Keys.TLS)
-    public static void setTls(boolean tlsSpecifier) {
-        setBoolean(Keys.TLS, tlsSpecifier, false);
+    public void setTls(boolean tlsSpecifier) {
+        setBoolean(Keys.TLS, tlsSpecifier);
     }
 
     @Import(key =Keys.WS)
-    public static void setWs(boolean wsEnable) {
-        setBoolean(Keys.WS, wsEnable, false);
+    public void setWs(boolean wsEnable) {
+        setBoolean(Keys.WS, wsEnable);
     }
 
-    public static void setTlsCaCrt(String name) {
-        setString(Keys.TLS_CA_CRT, name, false);
+    public void setTlsCaCrt(String name) {
+        setString(Keys.TLS_CA_CRT, name);
     }
-    public static void setTlsClientCrt(String name) {
-        setString(Keys.TLS_CLIENT_CRT, name, false);
+    public void setTlsClientCrt(String name) {
+        setString(Keys.TLS_CLIENT_CRT, name);
     }
     @Export(key =Keys.HOST, exportModeMqttPrivate =true)
-    public static String getHost() {
-        return getString(Keys.HOST, R.string.valEmpty, R.string.valHostPublic, R.string.valEmpty, true, false);
+    public String getHost() {
+        return getString(Keys.HOST, R.string.valEmpty);
     }
-    @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true)
-    public static String getPassword() {
-        return getString(Keys.PASSWORD, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty, true, false);
+    @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public String getPassword() {
+        return getString(Keys.PASSWORD, R.string.valEmpty);
     }
 
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
-    public static boolean getTls() {
-        return getBoolean(Keys.TLS, R.bool.valTls, R.bool.valTlsPublic, true);
+    public boolean getTls() {
+        return getBoolean(Keys.TLS, R.bool.valTls);
     }
     @Export(key =Keys.WS, exportModeMqttPrivate =true)
-    public static boolean getWs() {
-        return getBoolean(Keys.WS, R.bool.valWs, R.bool.valWsPublic, true);
+    public boolean getWs() {
+        return getBoolean(Keys.WS, R.bool.valWs);
     }
 
     @Export(key =Keys.TLS_CA_CRT, exportModeMqttPrivate =true)
-    public static String getTlsCaCrtName() {
-        return getString(Keys.TLS_CA_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
+    public String getTlsCaCrtName() {
+        return getString(Keys.TLS_CA_CRT, R.string.valEmpty);
     }
 
     @Export(key =Keys.TLS_CLIENT_CRT, exportModeMqttPrivate =true)
-    public static String getTlsClientCrtName() {
-        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty, R.string.valEmpty, R.string.valEmpty,true, false);
+    public String getTlsClientCrtName() {
+        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty);
     }
 
-    @Export(key =Keys.NOTIFICATION, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getNotification() {
-        return getBoolean(Keys.NOTIFICATION, R.bool.valNotification);
-    }
-
-    @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getNotificationHigherPriority() {
+    @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public boolean getNotificationHigherPriority() {
         return getBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, R.bool.valNotificationHigherPriority);
     }
 
 
-
-    @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static boolean getNotificationLocation() {
+    @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true)
+    public  boolean getNotificationLocation() {
         return getBoolean(Keys.NOTIFICATION_LOCATION, R.bool.valNotificationLocation);
     }
 
-    public static boolean getNotificationEvents() {
+    public boolean getNotificationEvents() {
         return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
     }
 
     @Export(key =Keys.PUB_QOS, exportModeMqttPrivate =true)
-    public static int getPubQos() {
-        return getInt(Keys.PUB_QOS, R.integer.valPubQos, R.integer.valPubQosPublic, true);
+    public int getPubQos() {
+        return getInt(Keys.PUB_QOS, R.integer.valPubQos);
     }
 
     @Export(key =Keys.SUB_QOS, exportModeMqttPrivate =true)
-    public static int getSubQos() {
-        return getInt(Keys.SUB_QOS, R.integer.valSubQos, R.integer.valSubQosPublic, true);
+    public int getSubQos() {
+        return getInt(Keys.SUB_QOS, R.integer.valSubQos);
     }
 
     @Export(key =Keys.PUB_RETAIN, exportModeMqttPrivate =true)
-    public static boolean getPubRetain() {
-        return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain, R.bool.valPubRetainPublic, true);
+    public boolean getPubRetain() {
+        return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain);
     }
 
-    @Export(key =Keys.PUB, exportModeMqttPrivate =true, exportModeMqttPublic = true)
-    public static boolean getPub() {
+    @Export(key =Keys.PUB, exportModeMqttPrivate =true)
+    public boolean getPub() {
         return getBoolean(Keys.PUB, R.bool.valPub);
     }
 
 
-    @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getAutostartOnBoot() {
+    @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public boolean getAutostartOnBoot() {
         return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
     }
 
-    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getLocatorAccuracyForeground() {
+    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public int getLocatorAccuracyForeground() {
         return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
     }
 
-    @Export(key =Keys.BEACON_BACKGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true )
-    public static int getBeaconBackgroundScanPeriod() {
-        return getInt(Keys.BEACON_BACKGROUND_SCAN_PERIOD, R.integer.valBeaconBackgroundScanPeriod);
-    }
-
-    @Export(key =Keys.BEACON_FOREGROUND_SCAN_PERIOD, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getBeaconForegroundScanPeriod() {
-        return getInt(Keys.BEACON_FOREGROUND_SCAN_PERIOD, R.integer.valBeaconForegroundScanPeriod);
-    }
-
-    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getLocatorAccuracyBackground() {
+    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
+    public int getLocatorAccuracyBackground() {
         return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
     }
 
-    @Export(key =Keys.BEACON_LAYOUT, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static String getBeaconLayout() {
-        return getString(Keys.BEACON_LAYOUT, R.string.valBeaconLayout);
-    }
 
-    @Import(key =Keys.BEACON_LAYOUT)
-    public static void setBeaconLayout(String beaconLayout) {
-        setString(Keys.BEACON_LAYOUT, beaconLayout);
-    }
-
-
-    @Export(key =Keys.BEACON_MODE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static int getBeaconMode() {
-        return getInt(Keys.BEACON_MODE, R.integer.valBeaconMode);
-    }
-
-    @Import(key =Keys.BEACON_MODE)
-    public static void setBeaconMode(int beaconMode) {
-        if(beaconMode >= 0 && beaconMode <= 2)
-            setInt(Keys.BEACON_MODE, beaconMode);
-    }
-
-
-    @Export(key =Keys.BEACON_RANGING, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getBeaconRangingEnabled() {
-        return getBoolean(Keys.BEACON_RANGING, R.bool.valBeaconRangingEnabled);
-    }
-
-    @Import(key =Keys.BEACON_RANGING)
-    public static void setBeaconRangingEnabled(boolean val) {
-        setBoolean(Keys.BEACON_RANGING, val);
-    }
-
-
-    // Enable cards
-    public static boolean getInfo() {
-        return getBoolean(Keys.INFO, R.bool.valInfo, R.bool.valInfoPublic, false);
+    public boolean getInfo() {
+        return getBoolean(Keys.INFO, R.bool.valInfo);
     }
 
     @Import(key =Keys.INFO)
-    public static void setInfo(boolean info) {
+    public void setInfo(boolean info) {
         setBoolean(Keys.INFO, info);
     }
 
-    public static String getTlsClientCrtPassword() {
+    public String getTlsClientCrtPassword() {
         return getString(Keys.TLS_CLIENT_CRT_PASSWORD, R.string.valEmpty);
     }
 
-
-
-
-    @Export(key =Keys.HTTP_SCHEDULER_DIRECT, exportModeMqttPrivate =false, exportModeMqttPublic = false, exportModeHttpPrivate =true)
-    public static boolean getHttpSchedulerAllowDirectStrategy() {
-        return getBoolean(Keys.HTTP_SCHEDULER_DIRECT, R.bool.valTrue);
-    }
-
-    @Import(key =Keys.HTTP_SCHEDULER_DIRECT)
-    public static void setHttpSchedulerAllowDirectStrategy(boolean aBoolean) {
-        setBoolean(Keys.HTTP_SCHEDULER_DIRECT, aBoolean, false);
-    }
-
-
-
-
     @Import(key =Keys.URL)
-    public static void setUrl(String url) {
+    public void setUrl(String url) {
         setString(Keys.URL, url);
     }
 
     @Export(key = Keys.URL, exportModeHttpPrivate = true)
-    public static String getUrl() {
+    public String getUrl() {
         return getString(Keys.URL, R.string.valEmpty);
     }
-    public static void setTlsClientCrtPassword(String password) {
+    public void setTlsClientCrtPassword(String password) {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
-    public static String getEncryptionKey() {
+    String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
 
-
-
-    public static boolean getSetupCompleted() {
+    boolean getSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
         return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
 
-    public static void setSetupCompleted() {
+    public void setSetupCompleted() {
         sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).apply();
 
     }
 
-    @Export(key = Keys.PLAY_OVERRIDE, exportModeMqttPrivate =true, exportModeMqttPublic = true, exportModeHttpPrivate = true)
-    public static boolean getPlayOverride() {
-        return activeSharedPreferences.getBoolean(Keys.PLAY_OVERRIDE, false);
-    }
-
-    @Import(key = Keys.PLAY_OVERRIDE)
-    public static void setPlayOverride(boolean playOverride) {
-        activeSharedPreferences.edit().putBoolean(Keys.PLAY_OVERRIDE, playOverride).apply();
-    }
-
-
     // Maybe make this configurable
     // For now it makes things easier to change
-    public static int getPubQosEvents() {
+    public int getPubQosEvents() {
         return getPubQos();
     }
 
     public static boolean getPubRetainEvents() {
-        return false;
-    }
-
-    public static int getPubQosCommands() {
-        return getPubQos();
-    }
-
-    public static boolean getPubRetainCommands() {
         return false;
     }
 
@@ -1051,24 +873,24 @@ public class Preferences {
         return false;
     }
 
-    public static int getPubQosLocations() {
+    public int getPubQosLocations() {
         return getPubQos();
     }
 
-    public static boolean getPubRetainLocations() {
+    public boolean getPubRetainLocations() {
         return getPubRetain();
     }
 
 
-    public static MessageConfiguration exportToMessage() {
+    public MessageConfiguration exportToMessage() {
         List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
+        cfg.set(Keys._VERSION, BuildConfig.VERSION_CODE);
         for(Method m : methods) {
             m.setAccessible(true);
-
+            Timber.v("key %s", m.getAnnotation(Export.class).key());
             try {
-                //If the underlying method is static, then the specified obj argument is ignored. It may be null.
-                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(null));
+                cfg.set(m.getAnnotation(Export.class).key(), m.invoke(this));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1080,20 +902,27 @@ public class Preferences {
         return cfg;
     }
 
+    @Export(key =Keys.FUSED_REGION_DETECTION, exportModeMqttPrivate = true, exportModeHttpPrivate =true)
+    public boolean getFuseRegionDetection() {
+        return getBoolean(Keys.FUSED_REGION_DETECTION, R.bool.valTrue);
+    }
+
+    @Import(key =Keys.FUSED_REGION_DETECTION)
+    public void setFusedRegionDetection(boolean aBoolean) {
+        setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean);
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public static class Keys {
         public static final String AUTH                             = "auth";
         public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
-        public static final String BEACON_BACKGROUND_SCAN_PERIOD    = "beaconBackgroundScanPeriod";
-        public static final String BEACON_FOREGROUND_SCAN_PERIOD    = "beaconForegroundScanPeriod";
-        public static final String BEACON_LAYOUT                    = "beaconLayout";
-        public static final String BEACON_RANGING                   = "ranging";
-        public static final String BEACON_MODE                      = "beaconMode";
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String CP                               = "cp";
+        public static final String DEBUG_VIBRATE                    = "debugVibrate";
         public static final String DEVICE_ID                        = "deviceId";
+        public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
-        public static final String HTTP_SCHEDULER_DIRECT            = "httpSchedulerConsiderStrategyDirect";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
         public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
         public static final String INFO                             = "info";
@@ -1108,8 +937,9 @@ public class Preferences {
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
+        public static final String OPENCAGE_GEOCODER_API_KEY        = "opencageApiKey";
         public static final String PASSWORD                         = "password";
-        public static final String PLAY_OVERRIDE                    = "playOverride";
+        public static final String PING                             = "ping";
         public static final String PORT                             = "port";
         public static final String PUB                              = "pub";
         public static final String PUB_EXTENDED_DATA                = "pubExtendedData";
@@ -1135,16 +965,17 @@ public class Preferences {
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIRST_START                     = "firstStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
+        public static final String _VERSION                         = "_build";
 
 
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public @interface Export {
         String key();
         boolean exportModeMqttPrivate() default false;
-        boolean exportModeMqttPublic() default false;
         boolean exportModeHttpPrivate() default false;
     }
     @Retention(RetentionPolicy.RUNTIME)
@@ -1153,10 +984,8 @@ public class Preferences {
         String key();
     }
 
-
-
-
-    public static List<Method> getExportMethods() {
+    private List<Method> getExportMethods() {
+        int modeId = getModeId();
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -1165,7 +994,7 @@ public class Preferences {
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
                     Export annotInstance = method.getAnnotation(Export.class);
-                    if(getModeId() == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || getModeId() == App.MODE_ID_MQTT_PUBLIC && annotInstance.exportModeMqttPublic() ||getModeId() == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
+                    if(modeId == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || modeId == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
                         methods.add(method);
                     }
                 }
@@ -1180,7 +1009,7 @@ public class Preferences {
         return new ArrayList<>(getImportMethods().keySet());
     }
 
-    public static HashMap<String, Method> getImportMethods() {
+    private static HashMap<String, Method> getImportMethods() {
         final HashMap<String, Method> methods = new HashMap<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -1198,10 +1027,8 @@ public class Preferences {
     }
 
     @Nullable
-    public static String getStringOrNull(@NonNull String key) {
-        String st = Preferences.getString(key, R.string.valEmpty);
+    public String getStringOrNull(@NonNull String key) {
+        String st = getString(key, R.string.valEmpty);
         return (st != null && !st.isEmpty()) ? st : null;
     }
-
-
 }

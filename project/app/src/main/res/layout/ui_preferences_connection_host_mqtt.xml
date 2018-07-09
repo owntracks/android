@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/host"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/preferencesHost"
+            android:inputType="textVisiblePassword|textNoSuggestions"
+            android:text="@={vm.hostText}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="@string/preferencesHost"
+            app:met_primaryColor="@color/accent" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+
+            android:id="@+id/port"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:digits="0123456789"
+            android:hint="@string/preferencesPort"
+            android:inputType="number|textNoSuggestions"
+            android:maxLength="5"
+            android:text="@={vm.portText}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/accent"
+
+            />
+
+        <RelativeLayout
+            android:id="@+id/tlsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/preferencesWebsocket"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/ws"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:checked="@={vm.ws}" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</layout>

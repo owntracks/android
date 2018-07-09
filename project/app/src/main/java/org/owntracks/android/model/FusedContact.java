@@ -18,18 +18,15 @@ import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.GeocodingProvider;
 
 import timber.log.Timber;
 
-public class FusedContact extends BaseObservable {
-    private static final String TAG = "FusedContact";
-
+public class FusedContact extends BaseObservable implements Comparable<FusedContact>{
     private final String id;
     private MessageLocation messageLocation;
     private MessageCard messageCard;
     private Integer imageProvider = 0;
+    private long tst = 0;
 
     @Bindable
     public Integer getImageProvider() {
@@ -43,33 +40,31 @@ public class FusedContact extends BaseObservable {
     }
 
     public FusedContact(@Nullable String id) {
-        this.id = id != null ? id : "NOID";
+        this.id = (id != null && !id.isEmpty()) ? id : "NOID";
     }
 
-    public boolean setMessageLocation(MessageLocation messageLocation) {
-        if(this.messageLocation != null && this.messageLocation.getTst() == messageLocation.getTst())
-            return false;
+    public void setMessageLocation(MessageLocation messageLocation) {
+        if(tst >= messageLocation.getTst())
+            return;
 
-        if(BuildConfig.DEBUG)
-            Timber.v("update contact:%s, tst:%s", id, messageLocation.getTst());
+        Timber.v("update contact:%s, tst:%s", id, messageLocation.getTst());
 
         this.messageLocation = messageLocation;
         this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
+        this.tst = messageLocation.getTst();
         notifyMessageLocationPropertyChanged();
-        return true;
     }
 
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
 
-        ContactImageProvider.invalidateCacheLevelCard(getId());
+        App.getContactImageProvider().invalidateCacheLevelCard(getId());
         notifyMessageCardPropertyChanged();
     }
 
     private void notifyMessageCardPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.imageProvider);
-
         this.notifyPropertyChanged(BR.id);
 
     }
@@ -79,7 +74,7 @@ public class FusedContact extends BaseObservable {
         this.notifyPropertyChanged(BR.messageLocation);
         this.notifyPropertyChanged(BR.fusedLocationDate);
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
-
+        this.notifyPropertyChanged(BR.tst);
         this.notifyPropertyChanged(BR.trackerId);
         this.notifyPropertyChanged(BR.id);
 
@@ -101,19 +96,18 @@ public class FusedContact extends BaseObservable {
         if(hasCard() && getMessageCard().hasName())
             return getMessageCard().getName();
         else
-            return "Device-"+getTrackerId();
+            return getTrackerId();
     }
 
     @BindingAdapter({"imageProvider", "contact"})
     public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
-        ContactImageProvider.setImageViewAsync(view, c);
-
+        App.getContactImageProvider().setImageViewAsync(view, c);
     }
 
     @BindingAdapter({"android:text", "messageLocation"})
     public static void displayFusedLocationInViewAsync(TextView view,  FusedContact c, MessageLocation m) {
         if(m != null)
-            GeocodingProvider.resolve(m, view);
+            App.getGeocodingProvider().resolve(m, view);
         else
             view.setText(R.string.na);
     }
@@ -168,7 +162,17 @@ public class FusedContact extends BaseObservable {
         return deleted;
     }
 
-    public void  setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void  setDeleted() {
+        this.deleted = true;
+    }
+
+    @Bindable
+    public long getTst() {
+        return tst;
+    }
+
+    @Override
+    public int compareTo(@NonNull FusedContact o) {
+        return this.tst > o.tst?-1: this.tst < o.tst ? 1 : 0;
     }
 }

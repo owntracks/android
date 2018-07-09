@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,13 +26,12 @@ public class MessageCmd extends MessageBase{
     public static final String ACTION_REPORT_LOCATION = "reportLocation";
     public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
     public static final String ACTION_SET_CONFIGURATION = "setConfiguration";
-    public static final String ACTION_SET_WAYPOINTS_KEY_WAYPOINTS = "waypoints";
     public static final String ACTION_RESTART = "restart";
-    public static final String ACTION_RECONNECT = "reconnect";
+    public static final String ACTION_REOCONNECT = "reconnect";
     public static final String ACTION_WAYPOINTS = "waypoints";
 
     private MessageWaypoints waypoints;
-    private Map<String,Object> map = new HashMap<>();
+    private final Map<String,Object> map = new HashMap<>();
     private MessageConfiguration configuration;
 
     @JsonAnyGetter

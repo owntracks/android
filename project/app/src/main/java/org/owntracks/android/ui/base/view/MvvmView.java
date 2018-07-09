@@ -1,7 +1,5 @@
 package org.owntracks.android.ui.base.view;
 
-import org.owntracks.android.model.FusedContact;
-
 /* Copyright 2016 Patrick Löwenstein
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

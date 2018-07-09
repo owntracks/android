@@ -1,95 +1,115 @@
 package org.owntracks.android.support;
 
-import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.support.annotation.CallSuper;
+import android.support.v4.util.LruCache;
 import android.widget.TextView;
 
-import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.services.ServiceNotification;
+import org.owntracks.android.services.BackgroundService;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
 
 public class GeocodingProvider {
-    private static final Double RUN_FIRST = 1d;
-    private static final Double RUN_SECOND = 2d;
+
+    private static LruCache<String, String> cache;
     private static Geocoder geocoder;
 
-    public static void resolve(MessageLocation m, TextView tv) {
-        if(m.hasGeocoder()) {
-            tv.setText(m.getGeocoder());
+    public GeocodingProvider(Preferences preferences) {
+        cache = new LruCache<>(40);
+        if("".equals(preferences.getOpenCageGeocoderApiKey())) {
+            geocoder = new GeocoderGoogle();
         } else {
-            tv.setText(m.getGeocoderFallback()); // will print lat : lon until Geocoder is available
-            TextViewLocationResolverTask.run(m, tv, RUN_FIRST);
+            geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
         }
     }
 
-    public static void resolve(MessageLocation m, ServiceNotification s) {
-        Timber.v("loading for service %s", m.getTopic());
-        NotificationLocationResolverTask.run(m, s, RUN_FIRST);
+    private static String getCache(MessageLocation m) {
+        return cache.get(locationHash(m));
     }
+
+    static void putCache(MessageLocation m, String geocoder) {
+        cache.put(locationHash(m), geocoder);
+    }
+
+    private static String locationHash(MessageLocation m) {
+        return String.format(Locale.US,"%.6f-%.6f", m.getLatitude(), m.getLongitude());
+    }
+
+    private boolean isCachedGeocoderAvailable(MessageLocation m) {
+        String s = getCache(m);
+        Timber.v("cache lookup for %s (hash %s) -> %s", m.getMessageId(), locationHash(m), getCache(m));
+
+        if(s != null) {
+            m.setGeocoder(s);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void resolve(MessageLocation m, TextView tv) {
+        if(m.hasGeocoder()) {
+            tv.setText(m.getGeocoder());
+            return;
+        }
+
+        if(isCachedGeocoderAvailable(m)) {
+            tv.setText(m.getGeocoder());
+        } else {
+            tv.setText(m.getGeocoderFallback()); // will print lat : lon until GeocodingProvider is available
+            TextViewLocationResolverTask.run(m, tv);
+        }
+    }
+
+    public void resolve(MessageLocation m, BackgroundService s) {
+        if(m.hasGeocoder()) {
+            s.onGeocodingProviderResult(m);
+            return;
+        }
+
+        if(isCachedGeocoderAvailable(m)) {
+            s.onGeocodingProviderResult(m);
+        } else {
+            NotificationLocationResolverTask.run(m, s);
+        }
+    }
+
 
     private static class NotificationLocationResolverTask extends MessageLocationResolverTask {
 
-        private final WeakReference<ServiceNotification> service;
+        private final WeakReference<BackgroundService> service;
 
-        static void run(MessageLocation m, ServiceNotification s, double run) {
-            (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+        static void run(MessageLocation m, BackgroundService s) {
+            (new NotificationLocationResolverTask(m, s)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
-        @Override
-        void retry() {
-            Timber.v("retrying");
-            MessageLocation m = message.get();
-            ServiceNotification s = service.get();
-
-            if(m != null && s != null)
-                run(m, s, RUN_SECOND);
-        }
-
-        NotificationLocationResolverTask(MessageLocation m, ServiceNotification service) {
+        NotificationLocationResolverTask(MessageLocation m, BackgroundService service) {
             super(m);
             this.service = new WeakReference<>(service);
-
         }
 
         @Override
-        void onPostExecuteResultAvailable(String result) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
             MessageLocation m = this.message.get();
-            ServiceNotification s = this.service.get();
+            BackgroundService s = this.service.get();
             if(m!=null && s!=null) {
-                s.onMessageLocationGeocoderResult(m);
+                s.onGeocodingProviderResult(m);
             }
         }
-
-
     }
 
     private static class TextViewLocationResolverTask extends MessageLocationResolverTask {
 
         private final WeakReference<TextView> textView;
 
-        static void run(MessageLocation m, TextView tv, double run) {
-            (new TextViewLocationResolverTask(m, tv)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, m.getLatitude(), m.getLongitude(), run);
+        static void run(MessageLocation m, TextView tv) {
+            (new TextViewLocationResolverTask(m, tv)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
-
-        @Override
-        void retry() {
-            MessageLocation m = message.get();
-            TextView tv = textView.get();
-
-            if(m != null && tv != null)
-                run(m, tv, RUN_SECOND);
-        }
-
-
 
         TextViewLocationResolverTask(MessageLocation m, TextView tv) {
             super(m);
@@ -98,8 +118,8 @@ public class GeocodingProvider {
         }
 
         @Override
-        void onPostExecuteResultAvailable(String result) {
-            Timber.v("TextViewLocationResolverTask run:%s result: %s", run, result);
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
 
             TextView s = this.textView.get();
             if(s!=null && result != null) {
@@ -108,80 +128,31 @@ public class GeocodingProvider {
         }
     }
 
-    private static abstract class MessageLocationResolverTask extends AsyncTask<Double, Void, String>  {
-        protected Double run;
-
-
+    private static abstract class MessageLocationResolverTask extends AsyncTask<Void, Void, String>  {
         final WeakReference<MessageLocation> message;
         MessageLocationResolverTask(MessageLocation m) {
             this.message = new WeakReference<>(m);
         }
 
         @Override
-        protected String doInBackground(Double... params) {
-            run = params[2];
-
-            if(!Geocoder.isPresent()) {
-                Timber.e("geocoder is not present");
-                return null;
+        protected String doInBackground(Void... params) {
+            MessageLocation m = message.get();
+            if(m == null) {
+                return "Resolve failed";
             }
 
-            List<Address> addresses;
-            try {
-                addresses = geocoder.getFromLocation(params[0], params[1], 1);
-                if ((addresses != null) && (addresses.size() > 0)) {
-                    StringBuilder g = new StringBuilder();
-                    Address a = addresses.get(0);
-
-                    //String th = a.getThoroughfare();
-                    //String sth = a.getSubThoroughfare();
-                    //String lcy = a.getLocality();
-                    //String co = a.getCountryCode();
-                    //String ad0 = a.getAddressLine(0);
-                    //if (ad0 != null && th != null && sth != null && lcy !=null && co != null && ad0.equalsIgnoreCase(lcy))
-                    //{
-                    //    g.append(th).append(" ").append(sth).append(", ").append(lcy).append(", ").append(co);
-                    //    return g.toString();
-                    //}
-                    if (a.getAddressLine(0) != null)
-                        g.append(a.getAddressLine(0)).append(", ");
-                    if (a.getLocality() != null)
-                        g.append(a.getLocality());
-                    else if (a.getCountryName() != null)
-                        g.append(a.getCountryName());
-                    return g.toString();
-                } else {
-                    return "not available";
-                }
-            } catch (IOException e) {
-                return null;
-            }
+            return geocoder.reverse(m.getLatitude(), m.getLongitude());
         }
 
         @Override
+        @CallSuper
         protected void onPostExecute(String result) {
             MessageLocation m = message.get();
-            Timber.v("result run:%s result:%s message:%s", run, result, m);
-
-            // Retry once if request timed out or we didn't get a result for some temporary reason
-            if(result == null && run.equals(RUN_FIRST) && m != null) {
-                retry();
-                return;
-            }
-
-
+            Timber.v("geocoding result: %s", result);
             if(m!=null && result != null) {
                 m.setGeocoder(result);
-                onPostExecuteResultAvailable(result);
+                putCache(m, result);
             }
         }
-
-        abstract void onPostExecuteResultAvailable(String result);
-        abstract void retry();
-
-    }
-
-    public static void initialize(Context c){
-        geocoder = new Geocoder(App.getContext(), Locale.getDefault());
     }
 }

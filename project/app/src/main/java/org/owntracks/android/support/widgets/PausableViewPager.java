@@ -11,7 +11,6 @@ public class PausableViewPager  extends android.support.v4.view.ViewPager{
             super(context, attrs);
         }
 
-
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         return false;
@@ -20,6 +19,10 @@ public class PausableViewPager  extends android.support.v4.view.ViewPager{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return false;
+    }
+
+    public void forward() {
+        setCurrentItem(getCurrentItem()+1);
     }
 
 }

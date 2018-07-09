@@ -5,11 +5,19 @@ import android.content.res.Resources;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.DataModule;
 import org.owntracks.android.injection.modules.NetModule;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Runner;
 
 import dagger.Component;
 
@@ -34,5 +42,12 @@ public interface AppComponent {
 
     ContactsRepo contactsRepo();
     EventBus eventBus();
-
+    Scheduler scheduler();
+    Parser parser();
+    Dao dao();
+    MessageProcessor messageProcessor();
+    ContactImageProvider contactImageProvider();
+    GeocodingProvider geocodingProvider();
+    Preferences preferences();
+    Runner runner();
 }

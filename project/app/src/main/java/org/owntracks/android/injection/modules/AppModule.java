@@ -3,27 +3,26 @@ package org.owntracks.android.injection.modules;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
 
 import org.greenrobot.eventbus.EventBus;
+import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.EncryptionProvider;
+import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Runner;
+
+import java.util.Locale;
 
 import dagger.Module;
 import dagger.Provides;
 
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
 @Module
 public class AppModule {
 
@@ -48,8 +47,58 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    EventBus provideEventbus() {
+    static EventBus provideEventbus() {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
+
+    @Provides
+    @PerApplication
+    static Scheduler provideScheduler() {
+        return new Scheduler();
+    }
+
+    @Provides
+    @PerApplication
+    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences) {
+        return new MessageProcessor(eventBus, repo, preferences);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Provides
+    @PerApplication
+    static Locale provideLocale(@AppContext Context context) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? context.getResources().getConfiguration().getLocales().get(0) : context.getResources().getConfiguration().locale;
+    }
+
+
+    @Provides
+    @PerApplication
+    static Parser provideParser(EncryptionProvider provider) {
+        return new Parser(provider);
+    }
+
+    @Provides
+    @PerApplication
+    static EncryptionProvider provideEncryptionProvider(Preferences preferences) {
+        return new EncryptionProvider(preferences);
+    }
+
+    @Provides
+    @PerApplication
+    static GeocodingProvider provideGeocodingProvider(Preferences preferences) {
+        return new GeocodingProvider(preferences);
+    }
+
+    @Provides
+    @PerApplication
+    static ContactImageProvider provideContactImageProvider() { return new ContactImageProvider(); }
+
+    @Provides
+    @PerApplication
+    static Preferences providePreferences(@AppContext Context context) { return new Preferences(context); }
+
+    @Provides
+    @PerApplication
+    static Runner provideRunner(@AppContext Context context) { return new Runner(context); }
 }

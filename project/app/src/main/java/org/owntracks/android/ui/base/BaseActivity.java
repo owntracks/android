@@ -1,9 +1,13 @@
 package org.owntracks.android.ui.base;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -18,12 +22,16 @@ import org.owntracks.android.R;
 import org.owntracks.android.injection.components.ActivityComponent;
 import org.owntracks.android.injection.components.DaggerActivityComponent;
 import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.support.DrawerProvider;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 
 /* Copyright 2016 Patrick Löwenstein
@@ -45,7 +53,7 @@ import javax.inject.Provider;
  * view model is injected and the binding is created when the content view is set.
  * Each subclass therefore has to call the following code in onCreate():
  *    ()activityComponent.inject(this);
- *    setAndBindContentView(R.layout.my_activity_layout, savedInstanceState);
+ *    bindAndAttachContentView(R.layout.my_activity_layout, savedInstanceState);
  *
  * After calling these methods, the binding and the view model is initialized.
  * saveInstanceState() and restoreInstanceState() methods of the view model
@@ -56,35 +64,44 @@ import javax.inject.Provider;
  * view model. */
 public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends AppCompatActivity {
 
-    public static final String FLAG_DISABLES_ANIMATION = "disablesAnimation";
     protected B binding;
-    @Inject protected V viewModel;
-    @Inject protected EventBus eventBus;
-    @Inject protected Provider<Navigator> navigator;
+    @Inject
+    protected V viewModel;
+    @Inject
+    protected EventBus eventBus;
+    @Inject
+    protected DrawerProvider drawerProvider;
+    @Inject
+    protected Preferences preferences;
+    @Inject
+    protected RequirementsChecker requirementsChecker;
+    @Inject
+    protected Navigator navigator;
 
     private ActivityComponent mActivityComponent;
 
-    protected boolean hasEventBus = true;
+    private boolean hasEventBus = true;
     private boolean disablesAnimation = false;
 
-    private Toolbar toolbar;
-
     protected void setHasEventBus(boolean enable) {
-        hasEventBus = enable;
+        this.hasEventBus = enable;
     }
 
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
-    protected final void setAndBindContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)"); }
+    protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
+        if (viewModel == null) {
+            throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
+        }
         binding = DataBindingUtil.setContentView(this, layoutResId);
         binding.setVariable(BR.vm, viewModel);
+
         //noinspection unchecked
         viewModel.attachView((MvvmView) this, savedInstanceState);
     }
 
     protected final ActivityComponent activityComponent() {
-        if(mActivityComponent == null) {
+        if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .appComponent(App.getAppComponent())
                     .activityModule(new ActivityModule(this))
@@ -94,58 +111,109 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         return mActivityComponent;
     }
 
+
+    private BackgroundService mService;
+    private boolean mBound;
+
+    protected boolean isBound() {
+        return mBound;
+    }
+
+    // Monitors the state of the connection to the service.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (service != null) {
+                BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
+                mService = binder.getService();
+                mBound = true;
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mBound = false;
+        }
+    };
+
     protected void setSupportToolbar(@NonNull Toolbar toolbar) {
         setSupportToolbar(toolbar, true, true);
     }
 
-    void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
+    protected void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
         setSupportActionBar(toolbar);
-        if(showTitle)
-          getSupportActionBar().setTitle(getTitle());
-        getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(showHome);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
+        if (getSupportActionBar() != null) {
+            if (showTitle)
+                getSupportActionBar().setTitle(getTitle());
 
+            getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
+            getSupportActionBar().setDisplayShowHomeEnabled(showHome);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
+        }
+
+    }
+
+    protected void setSupportToolbarWithDrawer(@NonNull Toolbar toolbar) {
+        setSupportToolbar(toolbar, true, true);
+        setDrawer(toolbar);
     }
 
 
     protected void setDrawer(@NonNull Toolbar toolbar) {
-        navigator.get().attachDrawer(toolbar);
+        drawerProvider.attach(toolbar);
     }
+
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        if(getIntent() != null && getIntent().getExtras() !=  null)
-            disablesAnimation = getIntent().getExtras().getBoolean(FLAG_DISABLES_ANIMATION);
-
+        disablesAnimation = (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NO_ANIMATION) != 0;
     }
 
     @Override
     @CallSuper
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(viewModel != null) { viewModel.saveInstanceState(outState); }
+        if (viewModel != null) {
+            viewModel.saveInstanceState(outState);
+        }
     }
 
 
     @Override
     public void onStart() {
-        if(disablesAnimation)
+        if (disablesAnimation)
             overridePendingTransition(0, 0);
-        else if(App.isInForeground())
+        else if (App.isInForeground())
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
 
 
         super.onStart();
+
+        bindService(new Intent(this, BackgroundService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
     }
+
+
+    @Override
+    protected void onStop() {
+        if (mBound) {
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+        super.onStop();
+    }
+
 
     @Override
     @CallSuper
     protected void onDestroy() {
         super.onDestroy();
-        if(viewModel != null) { viewModel.detachView(); }
+        if (viewModel != null) {
+            viewModel.detachView();
+        }
         binding = null;
         viewModel = null;
         mActivityComponent = null;
@@ -155,7 +223,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onResume() {
         super.onResume();
 
-        if(hasEventBus && !eventBus.isRegistered(viewModel))
+        if (hasEventBus && !eventBus.isRegistered(viewModel))
             eventBus.register(viewModel);
     }
 
@@ -163,19 +231,22 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onPause() {
         super.onPause();
 
-        if(eventBus.isRegistered(viewModel))
+        if (eventBus.isRegistered(viewModel))
             eventBus.unregister(viewModel);
 
-        if(disablesAnimation)
+        if (disablesAnimation)
             overridePendingTransition(0, 0);
         else
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
     }
 
-    protected Bundle getExtrasBundle(Intent intent) {
-        return intent.getBundleExtra(Navigator.EXTRA_ARGS);
+    @SuppressWarnings("UnusedReturnValue")
+    protected boolean assertRequirements() {
+        if (requirementsChecker.assertRequirements(this)) {
+            navigator.startActivity(WelcomeActivity.class);
+            finish();
+            return true;
+        }
+        return false;
     }
-
-
-
 }
