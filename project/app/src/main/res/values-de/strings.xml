@@ -29,7 +29,6 @@
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Quelltext</string>
     <string name="preferencesDocumentation">Handbuch</string>
-    <string name="preferencesCommunity">Community</string>
     <string name="preferencesEncryptionKeySummary">Symmetrischer Schlüssel für Inhalts-Verschlüsselung</string>
     <string name="preferencesEncryptionKey">Verschlüsselungs-Schlüssel</string>
     <string name="na">Nicht verfügbar</string>
@@ -54,30 +53,21 @@
     <string name="longitude">Länge</string>
     <string name="radius">Radius</string>
     <string name="addWaypoint">Region hinzufügen</string>
-    <string name="export">Export</string>
     <string name="exportConfiguration">Exportieren</string>
-    <string name="preferencesExport">Export</string>
     <string name="contactLocationUnknown">Kein Standort verfügbar</string>
     <string name="menuContactNavigate">Navigieren</string>
-    <string name="contactDetailsLocation">Standort</string>
     <string name="contactDetailsAccuracy">Genauigkeit</string>
     <string name="contactDetailsReportedTime">Zeitstempel</string>
-    <string name="contactDetailsName">Name</string>
     <string name="contactDetailsTopic">Kennung</string>
     <string name="waypointListPlaceholder">Keine Regionen angelegt</string>
-    <string name="geofenceActive">Geofence aktiv</string>
     <string name="waypointRemove">Entfernen</string>
     <string name="importConfig">Import</string>
-    <string name="importWarning">Die folgenden Einstellungen werden importiert</string>
     <string name="preferencesSecurity">Sicherheit</string>
     <string name="accept">Übernehmen</string>
     <string name="preferencesIdentification">Identifikation</string>
-    <string name="preferencesOptions">Parameter</string>
+    <string name="preferencesParameters">Parameter</string>
     <string name="seconds">Sekunden</string>
     <string name="preferencesProfileId">Modus</string>
-    <string name="snackbarConnected">Verbunden</string>
-    <string name="snackbarDisconnected">Getrennt</string>
-    <string name="snackbarDisconnectedError">Getrennt mit Fehler</string>
     <string-array name="locatorAccuracy_readable">
         <item>Hoher Energieverbrauch</item>
         <item>Ausgeglichener Energieverbrauch</item>
@@ -89,15 +79,8 @@
     <string name="mode_mqtt_public_label">MQTT Öffentlich</string>
     <string name="mode_http_private_label">HTTP Privat</string>
 
-    <string name="refresh">Aktualisieren</string>
-    <string name="connectivityDisconnectedConfigIncomplete">Verbindung nicht konfiguriert</string>
-    <string name="snackbarImportCompleted">Einstellungen importiert</string>
-    <string name="snackbarConfigIncomplete">Konfiguration unvollständig</string>
-
     <string name="aLocation">eine Region</string>
     <string name="events">Ereignisse</string>
-    <string name="notificationMessageTitle">Nachrichten</string>
-    <string name="locationPermissionNotAvailable">Standortzugriff verweigert</string>
     <string name="title_activity_regions">Regionen</string>
     <string name="title_activity_region">Region</string>
     <string name="title_activity_map">Karte</string>
@@ -113,48 +96,24 @@
     <string name="preferencesCategoryAdvancedEncryption">Verschlüsselung</string>
     <string name="preferencesCategoryAdvancedMisc">Weiteres</string>
     <string name="waypointRemoved">Region entfernt</string>
-    <string name="preferencesImportFile">Konfiguration importieren</string>
-    <string name="preferencesImportFileSummary">Konfiguration aus Datei importieren</string>
-    <string name="preferencesExportToFile">Konfiguration exportieren</string>
-    <string name="preferencesExportToFileSummary">Konfiguration in Datei exportieren</string>
     <string name="preferencesExportFailed">Einstellungs-Export fehlgeschlagen</string>
     <string name="preferencesExportSuccess">Export erfolgreich</string>
-    <string name="geofenceAndBeaconInactive">Geofence und Beacon inaktiv</string>
-    <string name="geofenceAndBeaconActive">Geofence und Beacon aktiv</string>
-    <string name="beaconActive">Beacon aktiv</string>
-    <string name="preferencesExportQueued">Export eingereiht</string>
+    <string name="geofenceInactive">Geofence inaktiv</string>
+    <string name="geofenceActive">Geofence aktiv</string>
     <string name="welcomeFixIssue">Korrigieren</string>
-    <string name="welcomeFixQuit">Verlassen</string>
     <string name="play_services_now_available">Google Play-Dienste sind jetzt verfügbar</string>
-    <string name="play_services_not_available_recoverable">Google Play-Dienste sind nicht aktiviert oder installiert</string>
-    <string name="play_services_not_available_not_recoverable">Google Play-Dienste sind für Dein Gerät nicht verfügbar</string>
-    <string name="messageQueued">Nachricht eingereiht</string>
-    <string name="connectivityDisconnectedDataDisabled">"Getrennt: Datenverbindung inaktiv"</string>
+    <string name="play_services_not_available">Google Play-Dienste sind nicht verfügbar</string>
     <string name="transitionEntering">betritt</string>
     <string name="transitionLeaving">verlässt</string>
-    <string name="INITIAL">Initialisieren</string>
-    <string name="IDLE">Aktiv</string>
-    <string name="CONNECTING">Verbinden</string>
-    <string name="CONNECTED">Verbunden</string>
-    <string name="DISCONNECTING">Trennen</string>
-    <string name="DISCONNECTED">Getrennt</string>
-    <string name="DISCONNECTED_USERDISCONNECT">Getrennt</string>
-    <string name="ERROR">Fehler</string>
-    <string name="ERROR_DATADISABLED">Datenverbindung nicht verfügbar</string>
-    <string name="ERROR_CONFIGURATION">Konfiguration unvollständig</string>
     <string name="errorPreferencesImportFailed">Import fehlgeschlagen</string>
     <string name="errorPreferencesImportFailedParseException">Konfiguration fehlerhaft</string>
     <string name="errorPreferencesImportFailedMemory">Nicht genug Speicher verfügbar</string>
     <string name="welcome_play_description">Owntracks benötigt die Google Play-Dienste</string>
     <string name="play_services_not_available_general">Google Play-Dienste sind nicht verfügbar</string>
     <string name="icon_description_warning">Warnung</string>
-    <string name="play_override_continue">Ja, auf eigenes Risiko fortfahren</string>
-    <string name="play_override_question">Es scheint, als ob die Google Play-Dienste auf Deinem Gerät nicht genutzt werden können. Falls Du fortfährst, wird diese App im Modus ohne Entwicklerunterstützung laufen. Einige Funktionen sind möglicherweise nicht verfügbar.</string>
     <string name="welcome_play_heading">Google Play-Dienste</string>
     <string name="welcome_heading">Willkommen</string>
     <string name="welcome_description">Die folgenden Schritte werden Dir helfen, Owntracks einzurichten</string>
-    <string name="preferencesPlayOverride">Google Play-Dienste übergehen</string>
-    <string name="preferencesPlayOverrideSummary">Google Play-Dienste nicht verwenden. Neustart erforderlich. Warnung: Keine Entwicklerunterstützung in diesem Modus! Einige Funktionen werden nicht verfügbar sein.</string>
     <string name="mqtt_private_description">Owntracks mit deinem eigenen Server verwenden</string>
     <string name="mqtt_public_description">Teste Owntracks und teile Deine Position anonym mit anderen Nutzern</string>
     <string name="mode_heading">Modus</string>
@@ -169,9 +128,9 @@
     <string name="icon_description_done">Fertig</string>
     <string name="title_activity_load">Konfigurations import</string>
     <string name="menuCurrentLoction">Aktuelle position</string>
-    <string name="geocorderResolving">lade</string>
     <string name="preferencesIgnoreInaccurateLocations">Ungenaue Positionen</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">Ungenaue Position ignorierne wenn sie ungenauer als die angegebenen Meter ist</string>
     <string name="noNavigationApp">keine passende App installiert</string>
     <string name="menuClear">Entfernen</string>
     <string name="configurationManagement">Konfigurationsverwaltung</string>
@@ -185,6 +144,27 @@
     <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
     <string name="drawerSwitchReporting">Veröffentlichen</string>
     <string name="drawerSwitchCopy">Kopieren</string>
-
+    <string name="restart">Neu starten</string>
+    <string name="notificationEventsTitle" formatted="false">%1$d neue Ereignisse</string>
+    <string name="ui_fragment_welcome_version_title">Einschränkungen</string>
+    <string name="ui_fragment_welcome_version_description">Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar</string>
+    <string name="ui_fragment_welcome_version_learn_more">Mehr erfahren</string>
+    <string name="INITIAL">Initialisieren</string>
+    <string name="IDLE">Aktiv</string>
+    <string name="CONNECTING">Verbinden</string>
+    <string name="CONNECTED">Verbunden</string>
+    <string name="DISCONNECTING">Trennen</string>
+    <string name="DISCONNECTED">Getrennt</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Getrennt</string>
+    <string name="ERROR">Fehler</string>
+    <string name="ERROR_DATADISABLED">Datenverbindung nicht verfügbar</string>
+    <string name="ERROR_CONFIGURATION">Konfiguration unvollständig</string>
+	<string name="notificationChannelOngoing">Ongoing</string>
+    <string name="notificationChannelOngoingDescription">Show a persistent notification to receive location updates in the background</string>
+    <string name="notificationChannelEventsDescription">Region transmissions</string>
+    <string name="timeNow">now</string>
+    <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
 
 </resources>

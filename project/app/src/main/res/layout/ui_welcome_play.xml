@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="vm" type="org.owntracks.android.ui.welcome.play.PlayFragmentMvvm.ViewModel" />
+        <import type="android.view.View" />
+    </data>
+    <RelativeLayout
+
+        android:id="@+id/welcome_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:background="@color/primary"
+        >
+
+
+        <ImageView
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="48dp"
+
+            android:id="@+id/img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_assignment_late_white_48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentTop="true"
+
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/icon_description_warning" />
+
+        <TextView
+            android:id="@+id/screen_heading"
+            android:text="@string/welcome_play_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="#ffffff"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:gravity="bottom|center_horizontal"
+            android:layout_below="@+id/img"
+            android:layout_marginBottom="8dp"
+            />
+
+
+		<TextView
+            android:id="@+id/screen_desc"
+            android:text="@string/welcome_play_description"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:layout_centerHorizontal="true"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#ffffff"
+            android:gravity="top|center_horizontal"
+            android:minHeight="@dimen/welcome_content_min_height"
+            android:layout_below="@+id/screen_heading"
+            android:layout_alignLeft="@+id/screen_heading"
+            android:layout_alignStart="@+id/screen_heading"
+            />
+
+
+		<TextView
+			android:id="@+id/message"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_above="@+id/recover"
+			android:layout_centerHorizontal="true"
+			android:gravity="center_horizontal"
+			android:paddingLeft="24dp"
+			android:paddingRight="24dp"
+			android:text="@string/play_services_not_available"
+			android:textColor="#ffffff"
+			android:textSize="16sp"
+			android:visibility="visible"
+			tools:text="@string/play_services_not_available" />
+		<Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/welcomeFixIssue"
+            android:id="@+id/recover"
+            android:visibility="@{vm.fixAvailable}"
+            android:onClick="@{() -> vm.onFixClicked()}"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
+</layout>

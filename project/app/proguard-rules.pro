@@ -18,7 +18,7 @@
 
 # Skip obfuscation
 -dontobfuscate
-
+-optimizations !field/removal/writeonly,!field/marking/private,!class/merging/*,!code/allocation/variable
 
 -keep public class org.owntracks.android.** {
   public protected private *;
@@ -39,7 +39,6 @@ public static java.lang.String TABLENAME;
 -keep class **$Properties
 -dontwarn org.greenrobot.greendao.database.**
 -dontwarn rx.**
-
 
 
 # EVENTBUS
@@ -79,3 +78,6 @@ public static java.lang.String TABLENAME;
 
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
+
+-printseeds obfuscation/seeds.txt
+-printmapping obfuscation/mapping.txt

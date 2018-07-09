@@ -3,7 +3,6 @@ package org.owntracks.android.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,17 +20,12 @@ import com.google.android.gms.maps.model.LatLng;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.ActivityRegionBinding;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.support.SimpleTextChangeListener;
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.services.ServiceProxy;
-import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.widgets.Toasts;
 
 
-
+@Deprecated
 public class ActivityRegion extends ActivityBase  {
     private static final String TAG = "ActivityRegion";
 
@@ -47,14 +41,6 @@ public class ActivityRegion extends ActivityBase  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, ServiceProxy.class));
-        ServiceProxy.runOrBind(this, new Runnable() {
-            @Override
-            public void run() {
-                Log.v("ActivityRegions", "ServiceProxy bound");
-            }
-        });
-
 
         //setContentView(R.layout.activity_waypoint);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_region);
@@ -63,7 +49,7 @@ public class ActivityRegion extends ActivityBase  {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        this.dao = Dao.getWaypointDao();
+        this.dao = App.getDao().getWaypointDao();
 
 
         if (hasIntentExtras()) {
@@ -73,11 +59,9 @@ public class ActivityRegion extends ActivityBase  {
         if(this.waypoint == null) {
             this.update = false;
             this.waypoint = new Waypoint();
-            this.waypoint.setDefaults();
         }
 
         binding.setItem(this.waypoint);
-        binding.shareWrapper.setVisibility(Preferences.isModeMqttPublic() ? View.GONE : View.VISIBLE);
         setupListenerAndRequiredFields();
     }
 
@@ -93,16 +77,20 @@ public class ActivityRegion extends ActivityBase  {
         binding.latitude.addTextChangedListener(requiredForSave);
         binding.longitude.addTextChangedListener(requiredForSave);
 
-        binding.share.setChecked(this.waypoint.getShared());
     }
 
     private void conditionallyEnableSaveButton() {
 
         boolean enabled;
         try {
+
+            float lat = Float.parseFloat(binding.latitude.getText().toString());
+            float lon = Float.parseFloat(binding.longitude.getText().toString());
+
             enabled = (binding.description.getText().toString().length() > 0)
                     && (binding.latitude.getText().toString().length() > 0)
-                    && (binding.longitude.getText().toString().length() > 0);
+                    && (binding.longitude.getText().toString().length() > 0)
+                    && ((lat <= 90) && (lat >= -90)) && ((lon <= 180) && (lon >= -180));
 
         } catch (Exception e) {
             enabled = false; // invalid input or NumberFormatException result in no valid input
@@ -117,15 +105,6 @@ public class ActivityRegion extends ActivityBase  {
 
     @Override
     public void onDestroy() {
-       // handler.removeCallbacksAndMessages(null); // disable handler
-        ServiceProxy.runOrBind(this, new Runnable() {
-
-            @Override
-            public void run() {
-                ServiceProxy.closeServiceConnection();
-
-            }
-        });
         super.onDestroy();
     }
 
@@ -133,13 +112,13 @@ public class ActivityRegion extends ActivityBase  {
     private void add(Waypoint w) {
         long id = this.dao.insert(w);
         Log.v(TAG, "added waypoint with id: " + id);
-        App.getEventBus().post(new Events.WaypointAdded(w)); // For ServiceLocator update
+        App.getEventBus().post(w); // For ServiceLocator update
         //App.getEventBus().postSticky(new Events.WaypointAddedByUser(w)); // For UI update
     }
 
     private void update(Waypoint w) {
         this.dao.update(w);
-        App.getEventBus().post(new Events.WaypointUpdated(w)); // For ServiceLocator update
+        App.getEventBus().post(w); // For ServiceLocator update
         //App.getEventBus().postSticky(new Events.WaypointUpdatedByUser(w)); // For UI update
     }
 
@@ -210,42 +189,12 @@ public class ActivityRegion extends ActivityBase  {
 
     }
 
-
-
-    protected  void onRunActionWithPermissionCheck(int action, boolean granted) {
-        switch (action) {
-            case PERMISSION_REQUEST_USE_CURRENT:
-                Log.v(TAG, "request code: PERMISSION_REQUEST_REPORT_LOCATION");
-                if (granted) {
-                    ServiceProxy.runOrBind(this, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Location l = ServiceProxy.getServiceLocator().getLastKnownLocation();
-                            if(l != null) {
-                                waypoint.setGeofenceLatitude(l.getLatitude());
-                                waypoint.setGeofenceLongitude(l.getLongitude());
-                            } else {
-
-                                Toasts.showCurrentLocationNotAvailable();
-                            }
-                        }
-                    });
-                } else {
-                    Toasts.showLocationPermissionNotAvailable();
-                }
-
-        }
-    }
-
-
-
     private void save() {
        Waypoint w = this.waypoint;
 
 
         if (!update) {
-            w.setModeId(Preferences.getModeId());
+            w.setModeId(App.getPreferences().getModeId());
             w.setDate(new java.util.Date());
         }
 
@@ -253,35 +202,13 @@ public class ActivityRegion extends ActivityBase  {
         try {
             w.setGeofenceLatitude(Double.parseDouble(binding.latitude.getText().toString()));
             w.setGeofenceLongitude(Double.parseDouble(binding.longitude.getText().toString()));
-        } catch (NumberFormatException e) {
-
-        }
+        } catch (NumberFormatException ignored) { }
 
         try {
             w.setGeofenceRadius(Integer.parseInt(binding.radius.getText().toString()));
         } catch (NumberFormatException e) {
             w.setGeofenceRadius(null);
         }
-
-        w.setBeaconUUID(binding.beaconUUID.getText().toString());
-        try {
-
-            w.setBeaconMinor(Integer.valueOf(binding.beaconMinor.getText().toString()));
-        } catch (NumberFormatException e) {
-            w.setBeaconMinor(null);
-        }
-
-        try {
-            w.setBeaconMajor(Integer.valueOf(binding.beaconMajor.getText().toString()));
-        } catch (NumberFormatException e) {
-            w.setBeaconMajor(null);
-        }
-
-        if(!Preferences.isModeMqttPublic())
-            w.setShared(binding.share.isChecked());
-        else
-            w.setShared(false);
-
 
         if (update)
             update(w);

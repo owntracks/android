@@ -1,10 +1,10 @@
 package org.owntracks.android.ui.map;
 
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -21,190 +21,58 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.activities.ActivityWelcome;
-import org.owntracks.android.databinding.UiActivityMapBinding;
+import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceLocator;
-import org.owntracks.android.services.ServiceMessage;
-import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.util.WeakHashMap;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
-
-    private static final long ZOOM_LEVEL_STREET = 15;
+public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback {
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
+    private static final long ZOOM_LEVEL_STREET = 15;
 
-    @Inject
-    protected Provider<Navigator> navigator;
-
-    WeakHashMap<String, Marker> mMarkers = new WeakHashMap <>();
-
+    final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
     private GoogleMap mMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
-    private MapLocationSource mMapLocationSource;
-
-
-    private boolean flagStateMapReady = false;
-    private boolean flagStateLocationReady = false;
-
-    private static final int FLAG_ACTION_MODE_FREE = 0;
-    private static final int FLAG_ACTION_MODE_DEVICE = 1;
-    private static final int FLAG_ACTION_MODE_CONTACT = 2;
-
-    private boolean flagRefreshDevice = false;
-    private boolean flagRefreshContactActive = false;
-    private boolean flagRefreshContactAll = false;
-    private boolean flagRefreshAll = false;
-    private int mode = FLAG_ACTION_MODE_DEVICE;
+    private boolean isMapReady = false;
     private Menu mMenu;
 
-    // EVENT ENGINE ACTIONS
-    private void queueActionModeDevice() {
-        mode = FLAG_ACTION_MODE_DEVICE;
-        flagRefreshDevice = true;  // misuse data update flag to center if ready
-        executePendingActions();
-    }
-
-    private void queueActionModeContact(boolean center) {
-        mode = FLAG_ACTION_MODE_CONTACT;
-        flagRefreshContactActive = center;
-        executePendingActions();
-    }
-
-    private void queueActionModeFree() {
-        Timber.v("queing free mode");
-        mode = FLAG_ACTION_MODE_FREE;
-        executePendingActions();
-    }
-
-
-    private void queueActionMapUpdate() {
-        flagRefreshAll = true;
-        executePendingActions();
-    }
-
-
-    private void executePendingActions() {
-        Timber.v("flag flagStateMapReady: %s",flagStateMapReady);
-        Timber.v("flag flagRefreshDevice: %s",flagRefreshDevice);
-        Timber.v("flag flagRefreshContactActive: %s",flagRefreshContactActive);
-        Timber.v("flag flagRefreshContactAll: %s",flagRefreshContactAll);
-        Timber.v("flag flagRefreshAll: %s",flagRefreshAll);
-        Timber.v("flag int mode: %s",mode);
-
-
-
-        if(!flagStateMapReady) {
-            return;
-        }
-
-        // MAP NEEDS UPDATE. HANDLE BEFORE VIEW UPDATES
-        if(flagRefreshContactAll) {
-            flagRefreshContactAll = false;
-            doUpdateMarkerAll();
-        }
-        // DEVICE OR ACTIVE CONTACT UPDATED. UPDATE VIEW
-        if(flagStateLocationReady && flagRefreshDevice && mode == FLAG_ACTION_MODE_DEVICE) {
-            flagRefreshDevice = false;
-            doCenterDevice();
-        } else if (flagRefreshContactActive && (mode == FLAG_ACTION_MODE_CONTACT)) {
-            flagRefreshContactActive = false;
-            doCenterContact();
-        } else if(flagRefreshAll) {
-            flagRefreshAll = false;
-
-            doUpdateMarkerAll();
-            if(flagStateLocationReady && mode == FLAG_ACTION_MODE_DEVICE) {
-                doCenterDevice();
-            } else if(mode == FLAG_ACTION_MODE_CONTACT) {
-                doCenterContact();
-            }
-        }
-
-
-
-
-    }
-
-
-    // EVENT ENGINE STATE CALLBACKS
-    private void onLocationSourceUpdated() {
-        flagStateLocationReady = true;
-        flagRefreshDevice = true;
-        executePendingActions();
-        enableLocationMenus();
-    }
-
-    private void onStateMapReady() {
-        flagStateMapReady = true;
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
-
-
-    private void onActiveContactUpdated() {
-        flagRefreshContactActive = true;
-        executePendingActions();
-    }
-
-    private void onActiveContactRemoved() {
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
-
-    private void onContactRemoved() {
-        flagRefreshContactAll = true;
-        executePendingActions();
-    }
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        ActivityWelcome.runChecks(this);
-
         activityComponent().inject(this);
-        setAndBindContentView(R.layout.ui_activity_map, savedInstanceState);
 
-        setSupportToolbar(binding.toolbar);
-        setDrawer(binding.toolbar);
+        assertRequirements();
+        bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
 
-        this.mMapLocationSource = new MapLocationSource();
+        setSupportToolbar(this.binding.toolbar, false, true);
+        setDrawer(this.binding.toolbar);
 
         // Workaround for Google Maps crash on Android 6
         try {
             binding.mapView.onCreate(savedInstanceState);
         } catch (Exception e) {
-            Timber.e("not showing map due to issue https://issuetracker.google.com/issues/35827842");
-            flagStateMapReady = false;
+            Timber.e("not showing map due to issue   ");
+            isMapReady = false;
         }
-        this.bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout);
-        binding.contactPeek.contactRow.setOnClickListener(this);
-        binding.contactPeek.contactRow.setOnLongClickListener(this);
-        binding.moreButton.setOnClickListener(new View.OnClickListener() {
+        this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);
+        this.binding.contactPeek.contactRow.setOnClickListener(this);
+        this.binding.contactPeek.contactRow.setOnLongClickListener(this);
+        this.binding.moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupMenu(v);
@@ -213,7 +81,7 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         });
         setBottomSheetHidden();
 
-        AppBarLayout appBarLayout = binding.appBarLayout;
+        AppBarLayout appBarLayout = this.binding.appBarLayout;
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
         behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
@@ -224,79 +92,78 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         });
         params.setBehavior(behavior);
 
+        App.startBackgroundServiceCompat(this);
     }
 
-    @Override
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleIntentExtras(intent);
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        try {
-            if(binding.mapView != null)
-                binding.mapView.onPause();
-        } catch (Exception e) {
-            flagStateMapReady = false;
-        }
-        // Save current repo state so we ca apply updates to contacts on resume
-        repoRevision = viewModel.getContactsRevision();
-    }
-
-
-    private void handleIntentExtras(Intent intent) {
-        Timber.v("handleIntentExtras");
-
-        Bundle b = getExtrasBundle(intent);
-        if(b != null) {
-            Timber.v("intent has extras from navigator");
-            String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
-            if(contactId != null) {
-                viewModel.restore(contactId);
-            }
-        }
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        try {
-            if(binding.mapView != null)
-                binding.mapView.onResume();
-
-            if (mMap == null)
-                initMapDelayed();
-
-            queueActionMapUpdate();
-
-        } catch (Exception e) {
-            Timber.e("not showing map due to crash in Google Maps library");
-            flagStateMapReady = false;
-        }
-        handleIntentExtras(getIntent());
-
-    }
-
-    @Override
-    public void onDestroy() {
-        try {
-            if(binding.mapView != null)
-                binding.mapView.onDestroy();
-        } catch (Exception ignored){flagStateMapReady = false;}
-        super.onDestroy();
-    }
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         try {
             if (binding.mapView != null)
                 binding.mapView.onSaveInstanceState(bundle);
-        } catch (Exception ignored){flagStateMapReady = false;}
+        } catch (Exception ignored) {
+            isMapReady = false;
+        }
 
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            if (binding.mapView != null)
+                binding.mapView.onDestroy();
+        } catch (Exception ignored) {
+            isMapReady = false;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.isMapReady = false;
+
+        try {
+            if (binding.mapView != null)
+                binding.mapView.onResume();
+
+            if (mMap == null) {
+                this.isMapReady = false;
+                initMapDelayed();
+            } else {
+                this.isMapReady = true;
+            }
+
+        } catch (Exception e) {
+            Timber.e("not showing map due to crash in Google Maps library");
+            isMapReady = false;
+        }
+        handleIntentExtras(getIntent());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            if (binding.mapView != null)
+                binding.mapView.onPause();
+        } catch (Exception e) {
+            isMapReady = false;
+        }
+    }
+
+    private void handleIntentExtras(Intent intent) {
+        Timber.v("handleIntentExtras");
+
+        Bundle b = navigator.getExtrasBundle(intent);
+        if (b != null) {
+            Timber.v("intent has extras from drawerProvider");
+            String contactId = b.getString(BUNDLE_KEY_CONTACT_ID);
+            if (contactId != null) {
+
+                viewModel.restore(contactId);
+            }
+        }
     }
 
     @Override
@@ -305,12 +172,25 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         try {
             if (binding.mapView != null)
                 binding.mapView.onLowMemory();
-        } catch (Exception ignored){flagStateMapReady = false;}
+        } catch (Exception ignored) {
+            isMapReady = false;
+        }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntentExtras(intent);
+        try {
+            if (binding.mapView != null)
+                binding.mapView.onLowMemory();
+        } catch (Exception ignored){
+            isMapReady = false;
+        }
     }
 
     public void initMapDelayed() {
-        flagStateMapReady = false;
-        flagStateLocationReady = false;
+        isMapReady = false;
 
         App.postOnMainHandlerDelayed(new Runnable() {
             @Override
@@ -318,13 +198,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
                 initMap();
             }
         }, 500);
-
-        Timber.v("trace start %s", System.currentTimeMillis());
-        Timber.v("trace end %s", System.currentTimeMillis());
     }
 
     private void initMap() {
-        flagStateMapReady = false;
+        isMapReady = false;
         try {
             binding.mapView.getMapAsync(this);
         } catch (Exception ignored) { }
@@ -334,31 +211,21 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_map, menu);
         this.mMenu = menu;
-        if(!flagStateLocationReady)
+        if (!viewModel.hasLocation())
+            enableLocationMenus();
+        else
             disableLocationMenus();
+
         return true;
     }
 
-    private void disableLocationMenus() {
-        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
-        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
-    }
-    private void enableLocationMenus() {
-        this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
-        this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
 
+            App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
 
-            PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_LOCATOR, ServiceLocator.RECEIVER_ACTION_PUBLISH_LASTKNOWN_MANUAL, null);
-            try {
-                p.send();
-            } catch (PendingIntent.CanceledException e) {
-                e.printStackTrace();
-            }
             return true;
         } else if (itemId == R.id.menu_mylocation) {
             viewModel.onMenuCenterDeviceClicked();
@@ -371,6 +238,20 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         return false;
     }
 
+    private void disableLocationMenus() {
+        if (this.mMenu != null) {
+            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
+            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
+        }
+    }
+
+    public void enableLocationMenus() {
+        if (this.mMenu != null) {
+            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
+            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
+        }
+    }
+
     // MAP CALLBACKS
     @SuppressWarnings("MissingPermission")
     @Override
@@ -379,11 +260,11 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
-        this.mMap.setLocationSource(getMapLocationSource());
+        this.mMap.setLocationSource(viewModel.getMapLocationSource());
         this.mMap.setMyLocationEnabled(true);
         this.mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        this.mMap.setOnMapClickListener(this);
-        this.mMap.setOnMarkerClickListener(this);
+        this.mMap.setOnMapClickListener(viewModel.getOnMapClickListener());
+        this.mMap.setOnMarkerClickListener(viewModel.getOnMarkerClickListener());
         this.mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -395,64 +276,36 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
                 return null;
             }
         });
-        onStateMapReady();
+        this.isMapReady = true;
+        viewModel.onMapReady();
+    }
+
+
+    public void updateCamera(@NonNull LatLng latLng) {
+        if(isMapReady)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
     }
 
     @Override
-    public void onMapClick(LatLng latLng) {
-        queueActionModeFree();
-        viewModel.onMapClick();
+    public void clearMarkers() {
+        if (isMapReady)
+            mMap.clear();
+        mMarkers.clear();
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        if(marker.getTag() != null) {
-            viewModel.onMarkerClick(String.class.cast(marker.getTag()));
-        }
-        return true;
+    public void removeMarker(@Nullable FusedContact contact) {
+        if(contact == null)
+            return;
+
+        Marker m = mMarkers.get(contact.getId());
+        if(m != null)
+            m.remove();
     }
 
-    // MAP INTERACTION
-    private void doCenterDevice() {
-        doUpdateCamera(mMapLocationSource.getLatLng(), ZOOM_LEVEL_STREET);
-    }
-
-    private void doCenterContact() {
-        doUpdateCamera(viewModel.getContact().getLatLng(), ZOOM_LEVEL_STREET);
-    }
-
-    private void doUpdateCamera(LatLng latLng, long zoom) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-    }
-
-    long repoRevision = -1;
-    private void  doUpdateMarkerAll() {
-        Timber.v("repoRevision:%s", repoRevision);
-        long newRepoRevision = viewModel.getContactsRevision();
-
-        if(repoRevision < newRepoRevision) {
-            Timber.v("repoRevision:%s, newRepoRevision:%s => updating marker", repoRevision, newRepoRevision);
-            addMarker();
-        } else if(repoRevision > newRepoRevision) {
-            Timber.v("repoRevision:%s, newRepoRevision:%s => reinitializing marker", repoRevision, newRepoRevision);
-            clearMarker();
-            addMarker();
-        } else {
-            Timber.v("no update");
-        }
-        repoRevision = newRepoRevision;
-    }
-
-    private void addMarker() {
-        for (Object c : viewModel.getContacts()) {
-            doUpdateMarkerSingle(FusedContact.class.cast(c));
-        }
-        repoRevision = viewModel.getContactsRevision();
-
-    }
-
-    private void doUpdateMarkerSingle(@Nullable FusedContact contact) {
-        if (contact == null || !contact.hasLocation() || mMap == null)
+    @Override
+    public void updateMarker(@Nullable FusedContact contact) {
+        if (contact == null || !contact.hasLocation() || !isMapReady)
             return;
 
         Marker m = mMarkers.get(contact.getId());
@@ -465,16 +318,15 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
             mMarkers.put(contact.getId(), m);
         }
 
-        ContactImageProvider.setMarkerAsync(m, contact);
-
+        App.getContactImageProvider().setMarkerAsync(m, contact);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_navigate:
-                FusedContact c = viewModel.getContact();
-                if(c != null && c.hasLocation()) {
+                FusedContact c = viewModel.getActiveContact();
+                if (c != null && c.hasLocation()) {
                     try {
                         LatLng l = c.getLatLng();
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
@@ -489,74 +341,10 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
 
                 return true;
             case R.id.menu_clear:
-                Bundle b = new Bundle();
-                b.putString(ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT_EXTRA_TOPIC, viewModel.getContact().getId());
-                PendingIntent p  = ServiceProxy.getBroadcastIntentForService(this, ServiceProxy.SERVICE_MESSAGE, ServiceMessage.RECEIVER_ACTION_CLEAR_CONTACT, b);
-                try {
-                    p.send();
-                } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
-                return true;
-
+                viewModel.onClearContactClicked();
             default:
                 return false;
         }
-    }
-
-    public LocationSource getMapLocationSource() {
-        if(mMapLocationSource == null)
-            mMapLocationSource = new MapLocationSource();
-
-        return mMapLocationSource;
-    }
-
-
-    public class MapLocationSource implements LocationSource {
-        LocationSource.OnLocationChangedListener mListener;
-        GeocodableLocation mLocation;
-
-        MapLocationSource() {
-            super();
-            App.getEventBus().register(this);
-        }
-
-        @Override
-        public void activate(OnLocationChangedListener onLocationChangedListener) {
-            mListener = onLocationChangedListener;
-            if(mLocation != null)
-                this.mListener.onLocationChanged(mLocation);
-        }
-
-        @Override
-        public void deactivate() {
-            mListener = null;
-            App.getEventBus().unregister(this);
-        }
-
-        @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
-        public void update(Events.CurrentLocationUpdated l) {
-            Timber.v("update to location: %s", l.getLocation().toLatLonString());
-            this.mLocation = l.getLocation();
-            if(mListener != null)
-                this.mListener.onLocationChanged(this.mLocation);
-            onLocationSourceUpdated();
-        }
-
-        public GeocodableLocation getLocation() {
-            return mLocation;
-        }
-
-        LatLng getLatLng() {
-            return mLocation.getLatLng();
-        }
-
-    }
-
-    // BOTTOM SHEET CALLBACKS
-    @Override
-    public void onClick(View view) {
-        viewModel.onBottomSheetClick();
     }
 
     @Override
@@ -570,67 +358,29 @@ public class MapActivity extends BaseActivity<UiActivityMapBinding, MapMvvm.View
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    // BOTTOM SHEET CALLBACKS
+    @Override
+    public void onClick(View view) {
+        viewModel.onBottomSheetClick();
+    }
+
     @Override
     public void setBottomSheetCollapsed() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
     }
 
     @Override
     public void setBottomSheetHidden() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-
-    @Override
-    public void contactUpdate(FusedContact c) {
-        Timber.v("id:%s",c.getId());
-        doUpdateMarkerSingle(c);
-    }
-
-    @Override
-    public void contactUpdateActive() {
-        Timber.v("");
-        onActiveContactUpdated();
-        doUpdateMarkerSingle(viewModel.getContact());
-    }
-
-    @Override
-    public void contactRemove(FusedContact c) {
-        doUpdateMarkerAll();
-        //if(mode==FLAG_ACTION_MODE_FREE && c==viewModel.getContact())
-        //    queueActionModeFree();
-
-    }
-
-    @Override
-    public void setModeDevice() {
-        queueActionModeDevice();
-    }
-
-    @Override
-    public void setModeFree() {
-        queueActionModeFree();
-    }
-
-    @Override
-    public void clearMarker() {
-        if(flagStateMapReady)
-            mMap.clear();
-        mMarkers.clear();
-    }
-
-
-    @Override
-    public void setModeContact(boolean center) {
-        queueActionModeContact(center);
+        if(mMenu != null)
+            mMenu.close();
     }
 
     private void showPopupMenu(View v) {
-        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START ); //new PopupMenu(this, v);
+        PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-        if(Preferences.getModeId() == App.MODE_ID_HTTP_PRIVATE)
+        if (App.getPreferences().getModeId() == App.MODE_ID_HTTP_PRIVATE)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }

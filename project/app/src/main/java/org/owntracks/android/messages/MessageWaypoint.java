@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,7 +27,6 @@ public class MessageWaypoint extends MessageBase{
     private long tst;
 
     // Optional types for optional values
-    private Boolean shared;
     private Integer rad;
     private String uuid;
     private Integer major;
@@ -74,15 +72,6 @@ public class MessageWaypoint extends MessageBase{
         this.tst = tst;
     }
 
-    @JsonIgnore
-    public boolean isShared() {
-        return shared != null && shared;
-    }
-
-    public void setShared(Boolean shared) {
-        this.shared = shared;
-    }
-
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
@@ -104,7 +93,6 @@ public class MessageWaypoint extends MessageBase{
         w.setBeaconUUID(getUuid());
         w.setBeaconMajor(getMajor());
         w.setBeaconMinor(getMinor());
-        w.setShared(true);
         w.setDate(new Date(TimeUnit.SECONDS.toMillis(getTst())));
 
         return w;
@@ -116,7 +104,6 @@ public class MessageWaypoint extends MessageBase{
         message.setLat(w.getGeofenceLatitude());
         message.setLon(w.getGeofenceLongitude());
         message.setRad(w.getGeofenceRadius());
-        message.setShared(w.getShared());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
         message.setUuid(w.getBeaconUUID());
         message.setMajor(w.getBeaconMajor());

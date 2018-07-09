@@ -1,47 +1,55 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
-def versionMajor = 1
-def versionMinor = 2
-def versionPatch = 7
-def versionBuild = 1
-ext.pahoVersion = "1.1.0"
-ext.daggerVersion = '2.6'
-ext.playLibVersion = '10.2.6'
+def versionMajor = 2
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 25
+ext.pahoVersion = "1.2.0"
+ext.daggerVersion = '2.10'
+ext.playLibVersion = '15.0.1'
 ext.okHttpVersion = '3.8.0'
-ext.supportLibVersion = '25.3.1'
-
+ext.supportLibVersion = '27.1.1'
+ext.jacksonVersion = '2.9.4'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.1'
-
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "org.owntracks.android"
-        minSdkVersion 16
-        targetSdkVersion 25
+        minSdkVersion 21
+        targetSdkVersion 27
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ eventBusIndex : 'org.owntracks.android.EventBusIndex' ]
+                arguments = [eventBusIndex: 'org.owntracks.android.EventBusIndex']
             }
         }
-
+        resConfigs "en", "de"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            useProguard false
+            minifyEnabled false
+            shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHODLER" }"
         }
 
         debug {
+            useProguard false
+            minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHODLER" }"
             applicationIdSuffix '.debug'
-            minifyEnabled true
+            testCoverageEnabled true
         }
     }
 
@@ -51,7 +59,6 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDir 'jniLibs'
             java.srcDirs = ['src/main/java', 'build/generated/source/greendao/org/owntracks/android/db']
         }
     }
@@ -77,58 +84,85 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
-}
-repositories {
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
+
+    lintOptions {
+        baseline file("../../lint/lint-baseline.xml")
+        checkAllWarnings true
+        warningsAsErrors false
+        abortOnError false
+        disable 'TypographyFractions', 'TypographyQuotes', 'Typos'
+
+    }
+    testOptions {
+        animationsDisabled = true
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+
+        unitTests.all {
+            testLogging {
+                events "passed", "skipped", "failed"
+                exceptionFormat "full"
+            }
+        }
+    }
 }
 
 dependencies {
     // Support libraries
-    compile "com.android.support:support-v4:${supportLibVersion}"
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile "com.android.support:design:${supportLibVersion}"
-    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation "com.android.support:support-v4:${supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:preference-v7:${supportLibVersion}"
+    implementation "com.android.support:design:${supportLibVersion}"
+    implementation "com.android.support:cardview-v7:${supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
     // Play Services libraries
-    compile "com.google.android.gms:play-services-gcm:${playLibVersion}"
-    compile "com.google.android.gms:play-services-maps:${playLibVersion}"
-    compile "com.google.android.gms:play-services-location:${playLibVersion}"
-    compile "com.google.android.gms:play-services-places:${playLibVersion}"
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
+    implementation "com.google.android.gms:play-services-location:${playLibVersion}"
+    implementation "com.google.android.gms:play-services-places:${playLibVersion}"
 
     // Utility libraries
-    compile "com.google.dagger:dagger:${daggerVersion}"
-    compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'org.greenrobot:greendao:3.2.0'
-    compile 'org.altbeacon:android-beacon-library:2.10@aar'
+    implementation "com.google.dagger:dagger:${daggerVersion}"
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'org.greenrobot:greendao:3.2.2'
 
-    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
-    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    compile 'com.fasterxml.jackson.core:jackson-core:2.8.7'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
-    compile 'com.jakewharton.timber:timber:4.1.2'
-    compile files('jniLibs/kalium-jni-1.0.0-SNAPSHOT.jar', )
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.jakewharton.timber:timber:4.6.1"
+    implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
-    compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
-    compile 'com.afollestad.material-dialogs:commons:0.9.4.5'
-    compile('com.mikepenz:materialdrawer:5.9.1@aar') { transitive = true }
-    compile "com.mikepenz:materialize:1.0.1@aar"
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    implementation('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation "com.android.support:support-annotations:${supportLibVersion}"
+    implementation "com.android.support:design:${supportLibVersion}"
+    implementation "com.mikepenz:materialize:1.1.2@aar"
 
     // Preprocessors
-    annotationProcessor  'org.greenrobot:eventbus-annotation-processor:3.0.1'
-    annotationProcessor  'com.google.guava:guava:19.0' // needed by Dagger
-    annotationProcessor  "com.google.dagger:dagger-compiler:${daggerVersion}"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.1.1'
+    annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
+
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
+    testImplementation "org.robolectric:robolectric:3.8"
+
 }
 
-//apt {
-//    arguments {
-//        eventBusIndex "org.owntracks.android.EventBusIndex"
-//    }
-//}
 
 greendao {
     schemaVersion 15
 }
 
+apply from: "coverage.gradle"

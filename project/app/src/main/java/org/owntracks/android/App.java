@@ -7,127 +7,125 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.ServiceProxy;
+import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.EncryptionProvider;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.provider.Settings.Secure;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import timber.log.Timber;
 
 public class App extends Application  {
-    private static App sInstance;
-    private static SimpleDateFormat dateFormater;
-    private static SimpleDateFormat dateFormaterToday;
-
-    private static Handler mainHandler;
-    private static Handler backgroundHandler;
-
-    private static Activity currentActivity;
-    private static boolean inForeground;
-    private static int runningActivities = 0;
-
     public static final int MODE_ID_MQTT_PRIVATE =0;
-    public static final int MODE_ID_MQTT_PUBLIC =2;
     public static final int MODE_ID_HTTP_PRIVATE = 3;
 
+    private static SimpleDateFormat dateFormater;
+    private static SimpleDateFormat dateFormaterToday;
+    private static SimpleDateFormat dateFormaterDate;
+
+
+    public static Handler getBackgroundHandler() {
+        return getAppComponent().runner().getBackgroundHandler();
+    }
+    private Activity currentActivity;
+    private static boolean inForeground;
+    private int runningActivities = 0;
+
     private static AppComponent sAppComponent = null;
+
+    public static PowerManager getPowerManager() {
+        return PowerManager.class.cast(getContext().getSystemService(Context.POWER_SERVICE));
+    }
 
 
     @Override
 	public void onCreate() {
 		super.onCreate();
-        Timber.d("trace / App onCreate start %s", System.currentTimeMillis());
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
                 protected String createStackElementTag(StackTraceElement element) {
                     return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
-
                 }
             });
         }
-        sInstance = this;
-        sAppComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
+        sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
+        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        dateFormaterDate = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-
-
-        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        dateFormaterToday = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-
-        HandlerThread mServiceHandlerThread = new HandlerThread("ServiceThread");
-        mServiceHandlerThread.start();
-
-        backgroundHandler = new Handler(mServiceHandlerThread.getLooper());
-        mainHandler = new Handler(getMainLooper());
 
         checkFirstStart();
-
-
-        Preferences.initialize(App.getInstance());
-        Parser.initialize(App.getInstance());
-        ContactImageProvider.initialize(App.getInstance());
-        GeocodingProvider.initialize(App.getInstance());
-        Dao.initialize(App.getInstance());
-        EncryptionProvider.initialize();
-        getEventBus().register(this);
-        startService(new Intent(this, ServiceProxy.class));
-        getEventBus().postSticky(new Events.AppStarted());
+        //noinspection ResultOfMethodCallIgnored
+        App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
+        enableForegroundBackgroundDetection();
+        // Running this on a background thread will deadlock FirebaseJobDispatcher.
+        // Initialize will call Scheduler to connect off the main thread anyway.
+        //App.postOnBackgroundHandler(new Runnable() {
+        //    @Override
+        //    public void run() {
+                getMessageProcessor().initialize();
+        //    }
+        //});
     }
-
-    public static App getInstance() { return sInstance; }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
 
-    public static Resources getRes() { return sInstance.getResources(); }
+    public static GeocodingProvider getGeocodingProvider() { return sAppComponent.geocodingProvider(); }
+
+    public static ContactImageProvider getContactImageProvider() { return sAppComponent.contactImageProvider(); }
+
+    public static Parser getParser() { return sAppComponent.parser(); }
 
     public static EventBus getEventBus() {
         return sAppComponent.eventBus();
     }
 
-    public static ContactsRepo getContactsRepo() {
-        return sAppComponent.contactsRepo();
+    public static Scheduler getScheduler() {
+        return sAppComponent.scheduler();
     }
 
-    public static void enableForegroundBackgroundDetection() {
-        sInstance.registerActivityLifecycleCallbacks(new LifecycleCallbacks());
-        sInstance.registerScreenOnReceiver();
+    public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
+
+    public static Preferences getPreferences() { return sAppComponent.preferences(); }
+
+
+    public static Dao getDao() {
+        return sAppComponent.dao();
     }
 
-
+    private void enableForegroundBackgroundDetection() {
+        registerActivityLifecycleCallbacks(new LifecycleCallbacks());
+        registerScreenOnReceiver();
+    }
 
     public static Context getContext() {
-		return sInstance;
+		return sAppComponent.context();
 	}
 
     public static FusedContact getFusedContact(String topic) {
@@ -135,34 +133,37 @@ public class App extends Application  {
     }
 
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.ModeChanged e) {
-        getContactsRepo().clearAll();
-        ContactImageProvider.invalidateCache();
+    public static void removeMainHandlerRunnable(Runnable r) {
+        getAppComponent().runner().removeMainHandlerRunnable(r);
     }
-
     public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
-        mainHandler.postDelayed(r, delayMilis);
-    }
-
-    public static void postOnMainHandler(Runnable r) {
-        mainHandler.post(r);
+        getAppComponent().runner().postOnMainHandlerDelayed(r, delayMilis);
     }
 
     public static void postOnBackgroundHandlerDelayed(Runnable r, long delayMilis) {
-        backgroundHandler.postDelayed(r, delayMilis);
+        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, delayMilis);
     }
 
-    public static void postOnBackgroundHandler(Runnable r) {
-        backgroundHandler.post(r);
+    private static void postOnBackgroundHandler(Runnable r) {
+        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, 1);
     }
 
     public static String formatDate(long tstSeconds) {
         return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
     }
 
-	public static String formatDate(@NonNull Date d) {
+
+    public static String formatDateShort(long tstSeconds) {
+        Date d = new Date(TimeUnit.SECONDS.toMillis(tstSeconds));
+        if(DateUtils.isToday(d.getTime())) {
+            return dateFormaterToday.format(d);
+        } else {
+            return dateFormaterDate.format(d);
+
+        }
+    }
+
+    public static String formatDate(@NonNull Date d) {
         if(DateUtils.isToday(d.getTime())) {
             return dateFormaterToday.format(d);
         } else {
@@ -176,40 +177,81 @@ public class App extends Application  {
 		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
 	}
 
-    @Subscribe
-    public void onEvent(Events.BrokerChanged e) {
-        getContactsRepo().clearAll();
-    }
 
-    private static void onEnterForeground() {
+    private void onEnterForeground() {
+        Timber.v("entering foreground");
         inForeground = true;
-        ServiceProxy.onEnterForeground();
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
+                getMessageProcessor().onEnterForeground();
+            }
+        });
+
     }
 
-    private static void onEnterBackground() {
+    private void onEnterBackground() {
+        Timber.v("entering background");
         inForeground = false;
-        ServiceProxy.onEnterBackground();
+        App.postOnBackgroundHandler(new Runnable() {
+            @Override
+            public void run() {
+                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
+                getMessageProcessor().onEnterBackground();
+            }
+        });
     }
 
     public static boolean isInForeground() {
         return inForeground;
     }
 
+    public static void restart() {
+        Intent intent = new Intent(getContext(), MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        Runtime.getRuntime().exit(0);
+    }
+
+    public static void startBackgroundServiceCompat(final @NonNull Context context) {
+        startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)));
+    }
+    public static void startBackgroundServiceCompat(final @NonNull Context context, final @Nullable String action) {
+        startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)).setAction(action));
+    }
+
+    public static void startBackgroundServiceCompat(final @NonNull Context context, @NonNull final Intent intent) {
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent);
+                } else {
+                    context.startService(intent);
+                }
+            }
+        };
+        postOnBackgroundHandlerDelayed(r, 1000);
+    }
+
+
+
     /*
      * Keeps track of running activities and if the app is in running in the foreground or background
      */
-    private static final class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private final class LifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         public void onActivityStarted(Activity activity) {
 
-            App.runningActivities++;
+            runningActivities++;
             currentActivity = activity;
-            if (App.runningActivities == 1) App.onEnterForeground();
+            if (runningActivities == 1) onEnterForeground();
         }
 
         public void onActivityStopped(Activity activity) {
-            App.runningActivities--;
+            runningActivities--;
             if(currentActivity == activity)  currentActivity = null;
-            if (App.runningActivities == 0) App.onEnterBackground();
+            if (runningActivities == 0) onEnterBackground();
         }
 
         public void onActivityResumed(Activity activity) {  }
@@ -230,29 +272,17 @@ public class App extends Application  {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String strAction = intent.getAction();
-
-                KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-
-                if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON))
+                Timber.v("screenOnOffReceiver intent received");
+                if ((Intent.ACTION_SCREEN_OFF.equals(strAction) || Intent.ACTION_SCREEN_ON.equals(strAction)) && isInForeground())
                 {
-                  //  if( myKM.inKeyguardRestrictedInputMode())
-                    //{
-                        if(App.isInForeground())
-                            App.onEnterBackground();
-                   /* } else
-                   // {
-                        if(App.isInForeground())
-                            App.onEnterBackground();
-
-                    }*/
+                        onEnterBackground();
                 }
             }
         };
 
-        getApplicationContext().registerReceiver(screenOnOffReceiver, theFilter);
+        registerReceiver(screenOnOffReceiver, theFilter);
 
     }
-
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
@@ -265,8 +295,6 @@ public class App extends Application  {
 
             p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
 
-        } else {
-            Timber.v("Consecutive application launch");
         }
     }
 

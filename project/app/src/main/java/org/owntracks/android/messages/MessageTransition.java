@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.google.android.gms.location.Geofence;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,8 +18,9 @@ public class MessageTransition extends MessageBase{
     public static final String EVENT_ENTER = "enter";
     public static final String EVENT_LEAVE = "leave";
 
-    public static final String TRIGGER_BEACON = "b";
     public static final String TRIGGER_CIRCULAR = "c";
+    public static final String TRIGGER_LOCATION = "l";
+
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @JsonIgnore
@@ -153,4 +153,5 @@ public class MessageTransition extends MessageBase{
     public double getLat() {
         return lat;
     }
+
 }

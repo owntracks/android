@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.base.navigator;
 
 import android.app.Activity;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,8 +10,8 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+
+import org.greenrobot.eventbus.util.ErrorDialogManager;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -27,8 +28,7 @@ import android.support.v7.app.AppCompatActivity;
  * limitations under the License. */
 public abstract class BaseNavigator implements Navigator {
 
-    abstract AppCompatActivity getActivity();
-    abstract FragmentManager getChildFragmentManager();
+    abstract Activity getActivity();
 
     @Override
     public final void startActivity(@NonNull Intent intent) {
@@ -52,11 +52,20 @@ public abstract class BaseNavigator implements Navigator {
 
     @Override
     public final void startActivity(@NonNull Class<? extends Activity> activityClass, Bundle args) {
+        startActivity(activityClass, args, 0);
+    }
+
+
+    @Override
+    public void startActivity(@NonNull Class<? extends Activity> activityClass, Bundle args, int flags) {
         Activity activity = getActivity();
         Intent intent = new Intent(activity, activityClass);
+        intent.setFlags(flags);
         if(args != null) { intent.putExtra(EXTRA_ARGS, args); }
         activity.startActivity(intent);
+
     }
+
 
     @Override
     public final void startActivity(@NonNull Class<? extends Activity> activityClass, Parcelable args) {
@@ -66,54 +75,37 @@ public abstract class BaseNavigator implements Navigator {
         activity.startActivity(intent);
     }
 
+    public Bundle getExtrasBundle(Intent intent) {
+        return intent.hasExtra(Navigator.EXTRA_ARGS) ? intent.getBundleExtra(Navigator.EXTRA_ARGS) : new Bundle();
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        getActivity().startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startActivityForResult(@NonNull Class<? extends Activity> activityClass, int requestCode, int flags) {
+        Intent intent = new Intent(getActivity(), activityClass);
+        intent.setFlags(flags);
+        startActivityForResult(intent, requestCode);
+    }
+
     @Override
     public final void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
-        replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, null, args, false, null);
-    }
-
-    @Override
-    public void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args) {
-        replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, fragmentTag, args, false, null);
-    }
-
-    @Override
-    public final void replaceFragmentAndAddToBackStack(@IdRes int containerId, @NonNull Fragment fragment, Bundle args, String backstackTag) {
-        replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, null, args, true, backstackTag);
-    }
-
-    @Override
-    public void replaceFragmentAndAddToBackStack(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args, String backstackTag) {
-        replaceFragmentInternal(getActivity().getSupportFragmentManager(), containerId, fragment, fragmentTag, args, true, backstackTag);
-    }
-
-    @Override
-    public final void replaceChildFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
-        replaceFragmentInternal(getChildFragmentManager(), containerId, fragment, null, args, false, null);
-    }
-
-    @Override
-    public void replaceChildFragment(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args) {
-        replaceFragmentInternal(getChildFragmentManager(), containerId, fragment, fragmentTag, args, false, null);
-    }
-
-    @Override
-    public final void replaceChildFragmentAndAddToBackStack(@IdRes int containerId, @NonNull Fragment fragment, Bundle args, String backstackTag) {
-        replaceFragmentInternal(getChildFragmentManager(), containerId, fragment, null, args, true, backstackTag);
-    }
-
-    @Override
-    public final void replaceChildFragmentAndAddToBackStack(@IdRes int containerId, @NonNull Fragment fragment, @NonNull String fragmentTag, Bundle args, String backstackTag) {
-        replaceFragmentInternal(getChildFragmentManager(), containerId, fragment, fragmentTag, args, true, backstackTag);
-    }
-
-    private void replaceFragmentInternal(FragmentManager fm, @IdRes int containerId, Fragment fragment, String fragmentTag, Bundle args, boolean addToBackstack, String backstackTag) {
-        if(args != null) { fragment.setArguments(args);}
-        FragmentTransaction ft = fm.beginTransaction().replace(containerId, fragment, fragmentTag);
-        if(addToBackstack) {
-            ft.addToBackStack(backstackTag).commitNow();
-        } else {
+            if(args != null) { fragment.setArguments(args);}
+            FragmentTransaction ft = fragment.getFragmentManager().beginTransaction().replace(containerId, fragment, null);
             ft.commit();
-            fm.executePendingTransactions();
-        }
+        fragment.getFragmentManager().executePendingTransactions();
     }
+
+    @Override
+    public void replaceFragment(int containerId, @NonNull android.app.Fragment fragment, Bundle args) {
+        if(args != null) { fragment.setArguments(args);}
+        android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction().replace(containerId, fragment, null);
+        ft.commit();
+        getActivity().getFragmentManager().executePendingTransactions();
+    }
+
+
 }
