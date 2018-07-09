@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -79,7 +80,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     public boolean getDozeWhitelisted() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || App.getPowerManager().isIgnoringBatteryOptimizations(App.getContext().getPackageName());
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PowerManager.class.cast(App.getContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(App.getContext().getPackageName());
     }
 
     @Override

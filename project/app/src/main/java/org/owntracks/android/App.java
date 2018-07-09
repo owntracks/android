@@ -44,23 +44,12 @@ public class App extends Application  {
     public static final int MODE_ID_MQTT_PRIVATE =0;
     public static final int MODE_ID_HTTP_PRIVATE = 3;
 
-    private static SimpleDateFormat dateFormater;
-    private static SimpleDateFormat dateFormaterToday;
-    private static SimpleDateFormat dateFormaterDate;
 
-
-    public static Handler getBackgroundHandler() {
-        return getAppComponent().runner().getBackgroundHandler();
-    }
     private Activity currentActivity;
     private static boolean inForeground;
     private int runningActivities = 0;
 
     private static AppComponent sAppComponent = null;
-
-    public static PowerManager getPowerManager() {
-        return PowerManager.class.cast(getContext().getSystemService(Context.POWER_SERVICE));
-    }
 
 
     @Override
@@ -75,23 +64,21 @@ public class App extends Application  {
             });
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
-        dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        dateFormaterDate = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
 
         checkFirstStart();
+
         //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
-        //App.postOnBackgroundHandler(new Runnable() {
-        //    @Override
-        //    public void run() {
+        sAppComponent.runner().postOnMainHandlerDelayed (new Runnable() {
+            @Override
+            public void run() {
                 getMessageProcessor().initialize();
-        //    }
-        //});
+            }
+        }, 510);
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
@@ -128,73 +115,22 @@ public class App extends Application  {
 		return sAppComponent.context();
 	}
 
-    public static FusedContact getFusedContact(String topic) {
-        return sAppComponent.contactsRepo().getById(topic);
-    }
-
-
-    public static void removeMainHandlerRunnable(Runnable r) {
-        getAppComponent().runner().removeMainHandlerRunnable(r);
-    }
-    public static void postOnMainHandlerDelayed(Runnable r, long delayMilis) {
-        getAppComponent().runner().postOnMainHandlerDelayed(r, delayMilis);
-    }
-
-    public static void postOnBackgroundHandlerDelayed(Runnable r, long delayMilis) {
-        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, delayMilis);
-    }
-
-    private static void postOnBackgroundHandler(Runnable r) {
-        getAppComponent().runner().postOnBackgroundHandlerDelayed(r, 1);
-    }
-
-    public static String formatDate(long tstSeconds) {
-        return formatDate(new Date(TimeUnit.SECONDS.toMillis(tstSeconds)));
-    }
-
-
-    public static String formatDateShort(long tstSeconds) {
-        Date d = new Date(TimeUnit.SECONDS.toMillis(tstSeconds));
-        if(DateUtils.isToday(d.getTime())) {
-            return dateFormaterToday.format(d);
-        } else {
-            return dateFormaterDate.format(d);
-
-        }
-    }
-
-    public static String formatDate(@NonNull Date d) {
-        if(DateUtils.isToday(d.getTime())) {
-            return dateFormaterToday.format(d);
-        } else {
-            return dateFormater.format(d);
-        }
-	}
-
-	public static int getBatteryLevel() {
-		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		Intent batteryStatus = getContext().registerReceiver(null, ifilter);
-		return batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
-	}
-
-
     private void onEnterForeground() {
         Timber.v("entering foreground");
         inForeground = true;
-        App.postOnBackgroundHandler(new Runnable() {
+        sAppComponent.runner().postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
                 startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
                 getMessageProcessor().onEnterForeground();
             }
         });
-
     }
 
     private void onEnterBackground() {
         Timber.v("entering background");
         inForeground = false;
-        App.postOnBackgroundHandler(new Runnable() {
+        sAppComponent.runner().postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
                 startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
@@ -232,9 +168,8 @@ public class App extends Application  {
                 }
             }
         };
-        postOnBackgroundHandlerDelayed(r, 1000);
+        sAppComponent.runner().postOnBackgroundHandlerDelayed(r, 1000);
     }
-
 
 
     /*
@@ -291,11 +226,7 @@ public class App extends Application  {
 
         if(p.getBoolean(Preferences.Keys._FIRST_START, true)) {
             Timber.v("Initial application launch");
-            String uuid = UUID.randomUUID().toString().toUpperCase();
-
-            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
-
+            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).apply();
         }
     }
-
 }

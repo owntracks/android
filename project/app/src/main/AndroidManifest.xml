@@ -62,18 +62,33 @@
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ui.map.MapActivity" />
-
         <activity
-            android:name=".activities.ActivityRegions"
+            android:name=".ui.regions.RoomRegionsActivity"
+            android:label="Room regions"
+            android:launchMode="singleTop">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
+
+        </activity>
+        <activity
+            android:name=".ui.regions.RoomRegionActivity"
+            android:label="Room regions"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".ui.regions.RegionsActivity"
             android:label="@string/title_activity_regions"
             android:launchMode="singleTop" />
+
         <activity
-            android:name=".activities.ActivityRegion"
+            android:name=".ui.region.RegionActivity"
             android:label="@string/title_activity_region"
-            android:parentActivityName=".activities.ActivityRegions">
+            android:parentActivityName=".ui.regions.RegionsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.ActivityRegions" />
+                android:value=".ui.regions.RegionsActivity" />
         </activity>
 
         <activity

@@ -2,6 +2,8 @@ package org.owntracks.android.support.widgets;
 
 import android.databinding.BindingAdapter;
 import android.databinding.BindingConversion;
+import android.databinding.InverseMethod;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -18,33 +20,20 @@ import java.util.concurrent.TimeUnit;
 
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
-    @BindingConversion
-    public static String convertDoubleToString(Double d) {
-        return  d != null? d.toString() : EMPTY_STRING;
 
-    }
-    @BindingConversion
-    @Deprecated
-    public static Double convertStringToDouble(String d) {
-        return d != null ? Double.parseDouble(d) : null;
-    }
 
+    // XX to String
     @BindingConversion
-    public static Double convertToDouble(String d) {
-        return d != null ? Double.parseDouble(d) : null;
-    }
-
-    @BindingConversion
-    @Deprecated
-    public static String convertStringToString(String s) {
-        return  s != null ? s : EMPTY_STRING;
-    }
-
-    @BindingConversion
-    @Deprecated
-    public static String convertIntegerToString(Integer d) {
+    @InverseMethod("convertToInteger")
+    public static String convertToString(@Nullable Integer d) {
         return  d != null? d.toString() : EMPTY_STRING;
     }
+
+    @BindingConversion
+    public static String convertToString(@Nullable Long d) {
+        return  d != null? d.toString() : EMPTY_STRING;
+    }
+
 
     @BindingConversion
     public static String convertToString(boolean d) {
@@ -52,7 +41,8 @@ public class BindingConversions {
     }
 
     @BindingConversion
-    public static String convertToString(Integer d) {
+    @InverseMethod("convertToDouble")
+    public static String convertToString(@Nullable Double d) {
         return  d != null? d.toString() : EMPTY_STRING;
     }
 
@@ -62,12 +52,31 @@ public class BindingConversions {
     }
 
 
+    // XX to Integer
+    @BindingConversion
+    public static Integer convertToInteger(String d) {
+        try {
+            return Integer.parseInt(d);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    // XX to Double
+    @BindingConversion
+    @Nullable
+    public static Double convertToDouble(@Nullable String d) {
+        return d != null ? Double.parseDouble(d) : null;
+    }
+
+
+    // Misc
     @BindingAdapter({"android:text"})
     public static void setText(TextView view, MessageProcessor.EndpointState state) {
         view.setText(state != null ? state.getLabel(view.getContext()) : view.getContext().getString(R.string.na));
     }
 
-    @BindingAdapter("app:met_helperText")
+    @BindingAdapter("met_helperText")
     public static void setVisibility(MaterialEditText view, String text) {
         view.setHelperText(text);
     }
@@ -77,10 +86,8 @@ public class BindingConversions {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    @BindingAdapter("app:relativeTimeSpanString")
+    @BindingAdapter("relativeTimeSpanString")
     public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
-
-
         if(DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
             view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         } else {

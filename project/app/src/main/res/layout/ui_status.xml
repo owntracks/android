@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="org.owntracks.android.App"/>
+        <import type="org.owntracks.android.support.DateFormatter"/>
         <import type="android.view.View"/>
         <variable name="vm" type="org.owntracks.android.ui.status.StatusViewModel" />
     </data>
@@ -124,7 +124,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.locationUpdated != 0 ? App.formatDate(vm.locationUpdated) : @string/na}"
+                android:text="@{vm.locationUpdated != 0 ? DateFormatter.formatDate(vm.locationUpdated) : @string/na}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 
@@ -143,7 +143,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.serviceStarted != null ? App.formatDate(vm.serviceStarted) : @string/na}"
+                android:text="@{vm.serviceStarted != null ? DateFormatter.formatDate(vm.serviceStarted) : @string/na}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />
 

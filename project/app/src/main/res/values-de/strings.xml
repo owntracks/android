@@ -49,7 +49,7 @@
     <string name="preferencesRemoteCommand">Fernkommandos</string>
     <string name="preferencesRemoteCommandSummary">Fernkommandos aktivieren</string>
     <string name="description">Beschreibung</string>
-    <string name="latitude">Breite</string>
+    <string name="coordinates">Koordinaten</string>
     <string name="longitude">Länge</string>
     <string name="radius">Radius</string>
     <string name="addWaypoint">Region hinzufügen</string>
@@ -166,5 +166,6 @@
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
+    <string name="placePickerNotAvailable">Standortauswahl konnte nicht geöffnet werden</string>
 
 </resources>

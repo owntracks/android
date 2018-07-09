@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.db.Dao;
+import org.owntracks.android.db.room.WaypointsDatabase;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.DataModule;
 import org.owntracks.android.injection.modules.NetModule;
@@ -45,6 +46,7 @@ public interface AppComponent {
     Scheduler scheduler();
     Parser parser();
     Dao dao();
+    WaypointsDatabase waypointsDatabase();
     MessageProcessor messageProcessor();
     ContactImageProvider contactImageProvider();
     GeocodingProvider geocodingProvider();
