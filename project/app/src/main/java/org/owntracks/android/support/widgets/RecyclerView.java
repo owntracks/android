@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
-
+// Recycler view that dynamically shows/hides an empty placeholder view
 public class RecyclerView extends android.support.v7.widget.RecyclerView {
     private View emptyView;
 
@@ -50,9 +50,7 @@ public class RecyclerView extends android.support.v7.widget.RecyclerView {
 
         emptyObserver.onChanged();
     }
-
     public void setEmptyView(View emptyView) {
         this.emptyView = emptyView;
     }
-
 }

@@ -55,7 +55,7 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.FusedContactAdded c) {
-        //TODO: add, sort
+        //TODO: insert, sort
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

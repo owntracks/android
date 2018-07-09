@@ -32,9 +32,12 @@ import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import java.util.WeakHashMap;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -48,7 +51,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     private boolean isMapReady = false;
     private Menu mMenu;
 
-
+    @Inject
+    protected Runner runner;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -192,7 +196,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void initMapDelayed() {
         isMapReady = false;
 
-        App.postOnMainHandlerDelayed(new Runnable() {
+        //runner.postOnMainHandlerDelayed();
+        runner.postOnMainHandlerDelayed(new Runnable() {
             @Override
             public void run() {
                 initMap();

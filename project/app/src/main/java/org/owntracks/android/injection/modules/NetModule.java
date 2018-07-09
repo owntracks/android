@@ -23,25 +23,9 @@ import okhttp3.OkHttpClient;
 @Module
 public class NetModule {
 
-    //@Provides
-    //@PerApplication
-    //static Gson provideGson() {
-    //    return new GsonBuilder()
-    //            // Custom type adapters for models are not needed when using Gson, but this
-    //            // type adapter is a good example if you want to write one yourself.
-    //            .registerTypeAdapter(Country.class, CountryTypeAdapter.INSTANCE)
-    //            // These type adapters for RealmLists are needed, since RealmString and RealmStringMapEntry
-    //            // wrappers are not recognized by Gson in the default configuration.
-    //            .registerTypeAdapter(new TypeToken<RealmList<RealmString>>(){}.getType(), RealmStringListTypeAdapter.INSTANCE)
-    //            .registerTypeAdapter(new TypeToken<RealmList<RealmStringMapEntry>>(){}.getType(), RealmStringMapEntryListTypeAdapter.INSTANCE)
-    //            .create();
-    //}
-
     @Provides
     @PerApplication
     static OkHttpClient provideOkHttpClient() {
         return new OkHttpClient();
     }
-
-
 }

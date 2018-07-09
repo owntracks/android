@@ -32,7 +32,7 @@ public class Runner {
         backgroundHandler.postDelayed(r, delayMilis);
     }
 
-    private void postOnBackgroundHandler(Runnable r) {
+    public void postOnBackgroundHandler(Runnable r) {
         backgroundHandler.post(r);
     }
 

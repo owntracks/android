@@ -5,7 +5,7 @@
 
     <data>
         <variable name="vm" type="org.owntracks.android.ui.map.MapViewModel" />
-        <import type="org.owntracks.android.App"/>
+        <import type="org.owntracks.android.support.DateFormatter"/>
         <import type="android.view.View" />
     </data>
 
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@{App.formatDate(vm.activeContact.fusedLocationDate)}"
+                android:text="@{DateFormatter.formatDate(vm.activeContact.fusedLocationDate)}"
                 android:paddingLeft="72dp"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"

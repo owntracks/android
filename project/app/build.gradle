@@ -4,11 +4,11 @@ apply plugin: 'org.greenrobot.greendao'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 25
+def versionBuild = 26
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '15.0.1'
-ext.okHttpVersion = '3.8.0'
+ext.okHttpVersion = '3.10.0'
 ext.supportLibVersion = '27.1.1'
 ext.jacksonVersion = '2.9.4'
 
@@ -133,19 +133,25 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation "com.jakewharton.timber:timber:4.6.1"
+    implementation "com.jakewharton.timber:timber:4.7.0"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
-    implementation('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
+    implementation('com.mikepenz:materialdrawer:6.0.7@aar') { transitive = true }
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
     implementation "com.mikepenz:materialize:1.1.2@aar"
+
+
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.persistence.room:runtime:1.1.0"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
 
     // Preprocessors
     annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.1.1'

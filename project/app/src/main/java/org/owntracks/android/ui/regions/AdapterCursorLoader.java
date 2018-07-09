@@ -1,19 +1,23 @@
-package org.owntracks.android.ui.waypoints;
+package org.owntracks.android.ui.regions;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.owntracks.android.BR;
 import org.owntracks.android.R;
+import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.ui.base.BaseAdapter;
+import org.owntracks.android.ui.base.BaseAdapterItemView;
 
-// TODO: refactor to MVVM pattern
-@Deprecated
-public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class AdapterCursorLoader extends BaseAdapter<Waypoint> {
 
-    private static final String TAG = "AdapterCursorLoader";
     private static final String ID_COLUMN = "_id";
     private OnViewHolderClickListener onViewHolderClickListener;
 
@@ -73,11 +77,21 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
 
 
     AdapterCursorLoader(Context context) {
+        super(null);
         mCursor = null;
         mDataValid = false;
         setHasStableIds(true);
     }
 
+    AdapterCursorLoader(ObservableList items, AdapterCursorLoader.ClickListener clickListener) {
+        super(BaseAdapterItemView.of(BR.contact, R.layout.ui_row_contact));
+        setItems(items);
+        setClickListener(clickListener);
+    }
+
+    interface ClickListener extends BaseAdapter.ClickListener<FusedContact> {
+        void onClick(@NonNull FusedContact object , @NonNull View view, boolean longClick);
+    }
 
 
     @Override
@@ -96,30 +110,10 @@ public abstract class AdapterCursorLoader extends RecyclerView.Adapter<RecyclerV
     protected abstract void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor, int position);
 
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (!mDataValid) {
-            throw new IllegalStateException("this should only be called when the cursor is valid");
-        }
 
-        if (!mCursor.moveToPosition(position)) {
-            throw new IllegalStateException("couldn't move cursor to position " + position);
-        }
-
-        onBindViewHolder(viewHolder, mCursor, position);
-    }
 
     protected abstract ClickableViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
 
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ClickableViewHolder v = onCreateItemViewHolder(parent,viewType);
-        if(onViewHolderClickListener != null) {
-            v.setOnViewHolderClickListener(onViewHolderClickListener);
-        }
-
-        return v;
-    }
 
     public interface OnViewHolderClickListener<T extends ClickableViewHolder> {
         void onViewHolderClick(View rootView, T viewHolder);

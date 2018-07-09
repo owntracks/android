@@ -3,11 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" >
     <data>
         <import type="android.view.View"/>
+        <variable name="vm" type="org.owntracks.android.ui.region.RegionViewModel" />
 
-        <variable name="item" type="org.owntracks.android.db.Waypoint"/>
     </data>
-
-
 
     <LinearLayout
         android:layout_height="wrap_content"
@@ -50,10 +48,11 @@
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:text="@{item.description}"/>
+                    android:text="@={vm.waypoint.description}"/>
             </RelativeLayout>
 
         </android.support.v7.widget.Toolbar>
+
 
 
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -67,23 +66,21 @@
                 android:orientation="vertical"
                 android:layout_marginEnd="@dimen/default_spacing"
                 android:layout_marginRight="@dimen/default_spacing">
-
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:visibility="gone"
                     android:layout_marginLeft="@dimen/default_spacing_half"
                     android:layout_marginStart="@dimen/default_spacing_half"
+                    app:met_iconLeft="@drawable/ic_location"
+                    android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/longitude"
-                    android:id="@+id/longitude"
-                    android:text="@{item.geofenceLongitude}"
-                    android:inputType="numberDecimal|numberSigned"
+                    android:hint="@string/coordinates"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    app:met_iconLeft="@drawable/ic_location"
-                    app:met_helperText="-180...180"/>
-
+                    android:enabled="false"
+                    android:id="@+id/latitude"
+                    android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)+' '+org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)}"
+                    />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginLeft="@dimen/default_spacing_half"
@@ -93,7 +90,7 @@
                     android:hint="@string/radius"
                     android:id="@+id/radius"
                     android:digits="0123456789"
-                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(item.geofenceRadius)}'
+                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceRadius)}'
                     android:inputType="numberDecimal"
                     app:met_helperText="Meters"
                     app:met_floatingLabel="normal"

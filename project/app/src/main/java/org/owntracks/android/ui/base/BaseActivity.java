@@ -95,6 +95,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         }
         binding = DataBindingUtil.setContentView(this, layoutResId);
         binding.setVariable(BR.vm, viewModel);
+        binding.setLifecycleOwner(this);
 
         //noinspection unchecked
         viewModel.attachView((MvvmView) this, savedInstanceState);
