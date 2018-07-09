@@ -93,6 +93,8 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     private void setViewModeContact(@NonNull FusedContact contact, boolean center) {
+        if(contact == null) return;
+
         Timber.v("setting view mode: VIEW_CONTACT for %s", contact.getId());
         mode = VIEW_CONTACT;
         setActiveContact(contact);
