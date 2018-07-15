@@ -42,3 +42,6 @@ apk/
 project/android.iml
 *.apk
 *.iml
+
+project/app/release/
+

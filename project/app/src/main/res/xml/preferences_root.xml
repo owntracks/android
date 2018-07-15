@@ -82,10 +82,6 @@
                 android:title="Mikepenz"
                 android:summary="MaterialDrawer, Materialize" />
             <Preference
-                android:key="rengwuxian-materialedittext"
-                android:title="Rengwuxian"
-                android:summary="MaterialEditText" />
-            <Preference
                 android:key="afollestad-materialdialogs"
                 android:title="Afollestad"
                 android:summary="Material-Dialogs" />
@@ -112,7 +108,7 @@
         </PreferenceScreen>
 
         <Preference
-            android:key="versionReadOnly"
+            android:key="version"
             android:title="@string/preferencesVersion" />
     </PreferenceScreen>
 </PreferenceScreen>

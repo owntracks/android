@@ -7,6 +7,8 @@ import android.view.View;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.scopes.PerViewHolder;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.ui.base.navigator.ActivityNavigator;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
@@ -46,6 +48,9 @@ public class ViewHolderModule {
 
     @Provides
     @PerViewHolder
-    Navigator provideNavigator() { return new ActivityNavigator(activity); }
+    DrawerProvider provideDrawerProvider() { return new DrawerProvider(activity); }
 
+    @Provides
+    @PerViewHolder
+    Navigator provideNavigator() { return new ActivityNavigator(activity); }
 }

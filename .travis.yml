@@ -1,14 +1,12 @@
 language: android
+before_script: cd project
+# Workaround to get travis to user Android 27: https://github.com/travis-ci/travis-ci/issues/8874
+before_install:
+- yes | sdkmanager "platforms;android-27"
 android:
-  components:
-     - tools
-     - platform-tools
-
-    # The BuildTools version used by your project
-    - build-tools-26.0.2
-
-    # The SDK version used to compile your project
-    - android-27
-
-    # Additional components
-    - extra-google-google_play_services
+    components:
+        - tools
+        - platform-tools
+        - build-tools-27.0.3
+        - android-27
+        - extra-google-google_play_services

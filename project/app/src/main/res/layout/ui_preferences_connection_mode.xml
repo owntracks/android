@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<data>
+
+		<import type="android.view.View"/>
+
+		<variable
+			name="vm"
+			type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDialogViewModel"/>
+	</data>
+
+
+	<RadioGroup
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dp"
+		android:checkedButton="@={vm.mode}">
+
+		<android.support.v7.widget.AppCompatRadioButton
+			android:id="@+id/radioModeHttpPrivate"
+			style="@style/RadioGroupItem"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/mode_http_private_label"
+			android:textSize="@dimen/listitem_textsize"/>
+
+		<android.support.v7.widget.AppCompatRadioButton
+			android:id="@+id/radioModeMqttPrivate"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minHeight="@dimen/listitem_height"
+			android:paddingBottom="@dimen/listitem_vertical_margin_choice"
+			android:paddingLeft="@dimen/listitem_control_margin"
+			android:paddingStart="@dimen/listitem_control_margin"
+			android:paddingTop="@dimen/listitem_vertical_margin_choice"
+			android:text="@string/mode_mqtt_private_label"
+			android:textSize="@dimen/listitem_textsize"/>
+	</RadioGroup>
+</layout>

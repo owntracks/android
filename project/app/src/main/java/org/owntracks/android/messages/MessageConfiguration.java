@@ -5,26 +5,22 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.support.OutgoingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import timber.log.Timber;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageConfiguration extends MessageBase{
     static final String TYPE = "configuration";
     private static final String BASETOPIC_SUFFIX = "/cmd";
-    private Map<String,Object> map = new TreeMap<>();
+    private final Map<String,Object> map = new TreeMap<>();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MessageWaypointCollection waypoints;
@@ -45,7 +41,6 @@ public class MessageConfiguration extends MessageBase{
     @JsonAnyGetter
     @JsonPropertyOrder(alphabetic=true)
     public Map<String,Object> any() {
-        Timber.v("getting map. length: %s", map.size());
         return map;
     }
 
@@ -53,8 +48,6 @@ public class MessageConfiguration extends MessageBase{
     public void set(String key, Object value) {
         if(value instanceof String && "".equals(value))
             return;
-        Timber.v("load key:%s, value:%s", key, value);
-
         map.put(key, value);
     }
 

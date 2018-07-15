@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+	<data>
+		<variable
+			name="vm"
+			type="org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm.ViewModel"/>
+		<import type="android.view.View"/>
+	</data>
+
+	<RelativeLayout
+		android:id="@+id/welcome_fragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/primary"
+		android:clipChildren="false">
+
+
+		<ImageView
+			android:id="@+id/img"
+			android:layout_width="wrap_content"
+
+			android:layout_height="wrap_content"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginBottom="48dp"
+			android:layout_marginTop="48dp"
+			android:contentDescription="@string/icon_description_warning"
+
+			android:scaleType="centerInside"
+			android:src="@drawable/ic_assignment_late_white_48dp"/>
+
+		<TextView
+			android:id="@+id/screen_heading"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/img"
+			android:layout_marginBottom="8dp"
+			android:gravity="bottom|center_horizontal"
+			android:paddingLeft="24dp"
+			android:paddingRight="24dp"
+			android:text="@string/permissions_heading"
+			android:textColor="#ffffff"
+			android:textSize="24sp"/>
+
+		<TextView
+			android:id="@+id/message"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_marginBottom="8dp"
+			android:gravity="center_horizontal"
+			android:text="@string/permissions_granted"
+			android:textColor="#ffffff"
+			android:textSize="16sp"
+			android:visibility="@{vm.permissionGranted}"/>
+
+		<Button
+			android:id="@+id/button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_centerHorizontal="true"
+			android:onClick="@{() -> vm.onFixClicked()}"
+			android:text="@string/welcomeFixIssue"
+			android:visibility="@{!vm.permissionGranted}"/>
+
+		<TextView
+			android:id="@+id/screen_desc"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+
+			android:layout_alignParentStart="true"
+			android:layout_below="@+id/screen_heading"
+			android:gravity="top|center_horizontal"
+			android:minHeight="@dimen/welcome_content_min_height"
+			android:paddingLeft="24dp"
+			android:paddingRight="24dp"
+			android:text="@string/permissions_description"
+			android:textColor="#ffffff"
+			android:textSize="16sp"/>
+
+
+	</RelativeLayout>
+</layout>

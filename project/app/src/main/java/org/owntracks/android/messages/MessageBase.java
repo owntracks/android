@@ -2,14 +2,14 @@ package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
 import android.support.annotation.NonNull;
 
-import org.owntracks.android.support.IncomingMessageProcessor;
-import org.owntracks.android.support.OutgoingMessageProcessor;
-import org.owntracks.android.support.PausableThreadPoolExecutor;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -27,13 +27,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageWaypoints.class, name=MessageWaypoints.TYPE),
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
-public abstract class MessageBase extends BaseObservable implements PausableThreadPoolExecutor.ExecutorRunnable {
-        protected static final String TAG = "MessageBase";
+@JsonPropertyOrder(alphabetic=true)
+public abstract class MessageBase extends BaseObservable implements Runnable {
+        static final String TYPE = "base";
 
         @JsonIgnore
         protected String _mqtt_topic;
         @JsonIgnore
         protected String _mqtt_topic_base;
+        @JsonIgnore
+        private boolean delivered;
 
         @JsonIgnore
         public long getMessageId() {
@@ -41,26 +44,13 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         }
 
         @JsonIgnore
-        private Long _messageId = System.currentTimeMillis();
-
-        @JsonIgnore
-        private int _outgoingTTL = 2;
-
-        @JsonIgnore
-        public int getOutgoingTTL() {
-                return _outgoingTTL;
-        }
-
+        private final Long _messageId = System.currentTimeMillis();
 
         @JsonIgnore
         private int _mqtt_qos;
 
         @JsonIgnore
         private boolean _mqtt_retained;
-        private volatile boolean cancelOnRun = false;
-        private int direction = DIRECTION_INCOMING;
-        private static final int DIRECTION_INCOMING = 1;
-        private static final int DIRECTION_OUTGOING = 2;
         private String tid;
 
         @JsonIgnore
@@ -111,34 +101,28 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
 
         @Override
         public void run(){
-
-                // If the message is enqueued to a ThreadPoolExecutor, stopping that executor results in the first queued message runnable being run
-                // We check if the running thread is shutting down and don't submit that messagfe to the message handler
-                if(cancelOnRun)
-                        return;
-
                 if(_processorIn != null && _processorIn.get() !=  null)
                         processIncomingMessage(_processorIn.get());
                 if(_processorOut != null && _processorOut.get() !=  null) {
-                        _outgoingTTL --;
                         processOutgoingMessage(_processorOut.get());
                 }
         }
 
-        @Override
-        public void cancelOnRun() {
-                this.cancelOnRun = true;
-        }
-
 
         @JsonIgnore
-        public void setIncomingProcessor(IncomingMessageProcessor processor) {
+        public void setIncomingProcessor(@NonNull IncomingMessageProcessor processor) {
+                this._processorOut = null;
                 this._processorIn = new WeakReference<>(processor);
         }
 
         @JsonIgnore
-        public void setOutgoingProcessor(OutgoingMessageProcessor processor) {
+        public void setOutgoingProcessor(@NonNull OutgoingMessageProcessor processor) {
+                this._processorIn = null;
                 this._processorOut = new WeakReference<>(processor);
+        }
+
+        public void clearOutgoingProcessor() {
+                this._processorOut = null;
         }
 
         @JsonIgnore
@@ -158,24 +142,13 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
         }
 
         @JsonIgnore
-        public void setIncoming() {
-                this.direction = DIRECTION_INCOMING;
-        }
-
-        @JsonIgnore
-        public void setOutgoing() {
-                this.direction = DIRECTION_OUTGOING;
-
-        }
-
-        @JsonIgnore
         public boolean isIncoming() {
-                return this.direction == DIRECTION_INCOMING;
+                return this._processorIn != null;
         }
 
         @JsonIgnore
         public boolean isOutgoing() {
-                return !isIncoming();
+                return this._processorOut != null;
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -203,5 +176,13 @@ public abstract class MessageBase extends BaseObservable implements PausableThre
                 }
         }
 
+        @JsonIgnore
+        public void setDelivered(boolean delivered) {
+                this.delivered = delivered;
+        }
 
+        @JsonIgnore
+        public boolean isDelivered() {
+                return delivered;
+        }
 }

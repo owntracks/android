@@ -19,16 +19,12 @@ import java.util.Date;
 @Deprecated
 public class AdapterWaypoints extends AdapterCursorLoader {
     private String labelGeofence;
-    private String labelBeacon = "Beacon active";
-    private String labelGeofenceAndBeacon = "Geofence and beacon active";
     private String labelNothing = "Geofence and beacon inactive";
 
     public AdapterWaypoints(Context context) {
         super(context);
         labelGeofence = context.getString(R.string.geofenceActive);
-        labelBeacon = context.getString(R.string.beaconActive);
-        labelGeofenceAndBeacon = context.getString(R.string.geofenceAndBeaconActive);
-        labelNothing = context.getString(R.string.geofenceAndBeaconInactive);
+        labelNothing = context.getString(R.string.geofenceInactive);
 
     }
 
@@ -70,12 +66,10 @@ public class AdapterWaypoints extends AdapterCursorLoader {
         if(geofence || beaconUUID) {
             long lastTriggered = cursor.getLong(cursor.getColumnIndex(WaypointDao.Properties.LastTriggered.columnName));
 
-            if (geofence && !beaconUUID) {
+            if (geofence) {
                 ((ItemViewHolder) viewHolder).mText.setText(labelGeofence);
-            } else if (!geofence) {
-                ((ItemViewHolder) viewHolder).mText.setText(labelBeacon);
             } else {
-                ((ItemViewHolder) viewHolder).mText.setText(labelGeofenceAndBeacon);
+                ((ItemViewHolder) viewHolder).mText.setText(labelNothing);
             }
 
             if(lastTriggered != 0) {

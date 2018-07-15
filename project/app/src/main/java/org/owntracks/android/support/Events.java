@@ -4,14 +4,17 @@ import java.util.Date;
 
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.GeocodableLocation;
-import org.owntracks.android.services.ServiceMessage;
-
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 public class Events {
+    public static abstract class E {
+        final Date date;
+        public E() {
+            this.date = new Date();
+        }
+        public Date getDate() {
+            return this.date;
+        }
+    }
 
     public static class ModeChanged extends E {
         final int newModeId;
@@ -32,7 +35,7 @@ public class Events {
 
 	public static class WaypointTransition extends E {
 		final Waypoint w;
-		int transition;
+		final int transition;
 
 		public WaypointTransition(Waypoint w, int transition) {
 			super();
@@ -50,219 +53,9 @@ public class Events {
 
 	}
 
-	public static class WaypointAddedByUser extends E {
-		final Waypoint w;
-
-		public WaypointAddedByUser(Waypoint w) {
-			super();
-			this.w = w;
-		}
-
-		public Waypoint getWaypoint() {
-			return this.w;
-		}
-
+	public static class EndpointChanged extends E {
+		public EndpointChanged() {}
 	}
-    public static class WaypointAdded extends E {
-        final Waypoint w;
-
-        public WaypointAdded(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-
-    public static class WaypointUpdated extends E {
-        final Waypoint w;
-
-        public WaypointUpdated(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-    public static class WaypointUpdatedByUser extends E {
-        final Waypoint w;
-
-        public WaypointUpdatedByUser(Waypoint w) {
-            super();
-            this.w = w;
-        }
-
-        public Waypoint getWaypoint() {
-            return this.w;
-        }
-
-    }
-
-
-	public static class WaypointRemoved extends E {
-		final Waypoint w;
-
-		public WaypointRemoved(Waypoint w) {
-			super();
-			this.w = w;
-		}
-
-		public Waypoint getWaypoint() {
-			return this.w;
-		}
-
-	}
-
-	public static abstract class E {
-		final Date date;
-
-		public E() {
-			this.date = new Date();
-		}
-
-		public Date getDate() {
-			return this.date;
-		}
-
-	}
-
-	public static class Dummy extends E {
-		public Dummy() {
-		}
-	}
-
-	public static class PublishSuccessful extends E {
-		final Object extra;
-        final boolean wasQueued;
-
-		public PublishSuccessful(Object extra, boolean wasQueued) {
-			super();
-			this.extra = extra;
-            this.wasQueued = wasQueued;
-		}
-
-		public Object getExtra() {
-			return this.extra;
-		}
-        public boolean wasQueued() {return  this.wasQueued;}
-	}
-
-	public static class CurrentLocationUpdated extends E {
-		final GeocodableLocation l;
-
-		public CurrentLocationUpdated(Location l) {
-			super();
-			this.l = new GeocodableLocation(l);
-		}
-
-		public CurrentLocationUpdated(GeocodableLocation l) {
-			this.l = l;
-		}
-
-		public GeocodableLocation getLocation() {
-			return this.l;
-		}
-
-	}
-
-	public static class ContactAdded extends E {
-        final FusedContact contact;
-
-		public ContactAdded(FusedContact f) {
-			super();
-			this.contact = f;
-		}
-
-		public FusedContact getContact() {
-			return this.contact;
-		}
-
-	}
-
-    public static class FusedContactAdded extends E {
-        final FusedContact contact;
-
-        public FusedContactAdded(FusedContact f) {
-            super();
-            this.contact = f;
-        }
-
-        public FusedContact getContact() {
-            return this.contact;
-        }
-    }
-
-    public static class FusedContactUpdated extends E {
-        final FusedContact contact;
-
-        public FusedContactUpdated(FusedContact f) {
-            super();
-            this.contact = f;
-        }
-
-        public FusedContact getContact() {
-            return this.contact;
-        }
-    }
-
-    public static class ContactUpdated extends E {
-		private final FusedContact c;
-
-		public ContactUpdated(FusedContact c) {
-			super();
-			this.c = c;
-		}
-
-		public FusedContact getContact() {
-			return this.c;
-		}
-	}
-
-
-	public static class BrokerChanged extends E {
-		public BrokerChanged() {}
-	}
-
-	public static class EndpointStateChanged extends E {
-		private final ServiceMessage.EndpointState state;
-		private Exception exception = null;
-		private String message = null;
-
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state) {
-			super();
-			this.state = state;
-		}
-
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  Exception exception) {
-			super();
-			this.state = state;
-			this.exception = exception;
-		}
-		public EndpointStateChanged(@NonNull ServiceMessage.EndpointState state, @Nullable  String message) {
-			super();
-			this.state = state;
-			this.message = message;
-		}
-
-		public ServiceMessage.EndpointState getState() {
-				return this.state;
-			}
-		@Nullable  public Exception getException() {
-				return this.exception;
-			}
-		@Nullable  public String getMessage() {
-			return this.message;
-		}
-
-    }
 
     public static class PermissionGranted extends E {
         private final String permission;
@@ -274,8 +67,44 @@ public class Events {
         }
     }
 
-	public static class AppStarted extends E {
-	}
 	public static class ServiceStarted extends E {
 	}
+
+    public static class QueueChanged extends E {
+        int length;
+
+        public QueueChanged() {
+        }
+        public QueueChanged withNewLength(int length) {
+            this.length = length;
+            return this;
+        }
+        public int getNewLength() {
+            return length;
+        }
+
+    }
+
+    public static class FusedContactAdded extends E {
+        private final FusedContact fusedContact;
+
+        public FusedContactAdded(FusedContact c) {
+            this.fusedContact = c;
+        }
+        public FusedContact getContact() {
+            return this.fusedContact;
+        }
+    }
+
+    public static class FusedContactRemoved extends E {
+        private final FusedContact fusedContact;
+
+        public FusedContactRemoved(FusedContact c) {
+            this.fusedContact = c;
+        }
+        public FusedContact getContact() {
+            return this.fusedContact;
+        }
+    }
+
 }
