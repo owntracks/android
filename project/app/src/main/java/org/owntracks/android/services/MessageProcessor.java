@@ -3,7 +3,6 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Vibrator;
 import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,8 +23,8 @@ import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
+import org.owntracks.android.workers.Scheduler;
 
-import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

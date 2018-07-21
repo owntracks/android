@@ -1,26 +1,5 @@
 package org.owntracks.android;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.injection.components.AppComponent;
-import org.owntracks.android.injection.components.DaggerAppComponent;
-import org.owntracks.android.injection.modules.AppModule;
-import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.BackgroundService;
-import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.Scheduler;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.GeocodingProvider;
-import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.ui.map.MapActivity;
-
 import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -37,6 +16,27 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.owntracks.android.db.Dao;
+import org.owntracks.android.injection.components.AppComponent;
+import org.owntracks.android.injection.components.DaggerAppComponent;
+import org.owntracks.android.injection.modules.AppModule;
+import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.workers.Scheduler;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 

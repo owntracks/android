@@ -23,6 +23,7 @@ import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
+import org.owntracks.android.workers.Scheduler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

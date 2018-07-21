@@ -11,6 +11,7 @@ ext.playLibVersion = '15.0.1'
 ext.okHttpVersion = '3.8.0'
 ext.supportLibVersion = '27.1.1'
 ext.jacksonVersion = '2.9.4'
+ext.androidWorkVersion = '1.0.0-alpha01'
 
 android {
     compileSdkVersion 27
@@ -118,10 +119,15 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
     // Play Services libraries
-    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
     implementation "com.google.android.gms:play-services-location:${playLibVersion}"
     implementation "com.google.android.gms:play-services-places:${playLibVersion}"
+
+    // Android WorkManager
+    implementation "android.arch.work:work-runtime:${androidWorkVersion}" // use -ktx for Kotlin
+
+    // optional - Firebase JobDispatcher support
+    implementation "android.arch.work:work-firebase:${androidWorkVersion}"
 
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
@@ -157,6 +163,9 @@ dependencies {
     testImplementation 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
     testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
     testImplementation "org.robolectric:robolectric:3.8"
+
+    // WorkManager test helpers
+    androidTestImplementation "android.arch.work:work-testing:${androidWorkVersion}"
 
 }
 
