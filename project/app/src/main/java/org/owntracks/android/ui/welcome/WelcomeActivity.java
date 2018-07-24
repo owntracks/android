@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.welcome;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -11,11 +10,7 @@ import android.widget.ImageView;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.welcome.finish.FinishFragment;
-import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.permission.PermissionFragment;
-import org.owntracks.android.ui.welcome.play.PlayFragment;
-import org.owntracks.android.ui.welcome.version.VersionFragment;
+import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
@@ -24,7 +19,7 @@ import timber.log.Timber;
 
 public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.ViewModel> implements WelcomeMvvm.View, ViewPager.OnPageChangeListener {
     @Inject
-    WelcomeAdapter viewPagerAdapter;
+    WelcomeAdapter welcomeAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,36 +27,17 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
-        setupPagerAdapter();
-    }
-
-    private void setupPagerAdapter() {
-        requirementsChecker.assertRequirements(this);
-
-        boolean isInitialSetup = !requirementsChecker.isInitialSetupCheckPassed();
-        if (isInitialSetup) {
-            viewPagerAdapter.addItemId(IntroFragment.ID);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                viewPagerAdapter.addItemId(VersionFragment.ID);
-
+        if (requirementsChecker.areRequirementsMet(this)) {
+            navigator.startActivity(MapActivity.class);
+            finish();
         }
 
-        if (!requirementsChecker.isPlayCheckPassed()) {
-            viewPagerAdapter.addItemId(PlayFragment.ID);
-        }
+        welcomeAdapter.setupFragments();
 
-        if (!requirementsChecker.isPermissionCheckPassed()) {
-            viewPagerAdapter.addItemId(PermissionFragment.ID);
-        }
-
-        if (isInitialSetup) {
-            viewPagerAdapter.addItemId(FinishFragment.ID);
-        }
-        binding.viewPager.setAdapter(viewPagerAdapter);
+        binding.viewPager.setAdapter(welcomeAdapter);
         binding.viewPager.addOnPageChangeListener(this);
 
-        Timber.v("pager setup with %s fragments", viewPagerAdapter.getCount());
+        Timber.v("pager setup with %s fragments", welcomeAdapter.getCount());
         buildPagerIndicator();
         showFragment(0);
 
@@ -70,13 +46,13 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     public void showNextFragment() {
         int currentItem = binding.viewPager.getCurrentItem();
-        viewPagerAdapter.getFragment(currentItem).onNextClicked();
+        welcomeAdapter.getFragment(currentItem).onNextClicked();
         showFragment(currentItem + 1);
     }
 
     public void setPagerIndicator(int index) {
-        if (index < viewPagerAdapter.getCount()) {
-            for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
+        if (index < welcomeAdapter.getCount()) {
+            for (int i = 0; i < welcomeAdapter.getCount(); i++) {
                 ImageView circle = (ImageView) binding.circles.getChildAt(i);
                 if (i == index) {
                     circle.setAlpha(1f);
@@ -103,15 +79,15 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
 
     public void showFragment(int position) {
         binding.viewPager.setCurrentItem(position);
-        viewModel.setNextEnabled(viewPagerAdapter.getFragment(position).isNextEnabled());
-        viewModel.setDoneEnabled(position == viewPagerAdapter.getLastItemPosition());
+        viewModel.setNextEnabled(welcomeAdapter.getFragment(position).isNextEnabled());
+        viewModel.setDoneEnabled(position == welcomeAdapter.getLastItemPosition());
     }
 
     private void buildPagerIndicator() {
         float scale = getResources().getDisplayMetrics().density;
         int padding = (int) (5 * scale + 0.5f);
 
-        for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
+        for (int i = 0; i < welcomeAdapter.getCount(); i++) {
             ImageView circle = new ImageView(this);
             circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fiber_manual_record_white_18dp));
             circle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));

@@ -20,13 +20,13 @@ public class RequirementsChecker {
         this.preferences = preferences;
     }
 
-    public boolean assertRequirements(Context c) {
+    public boolean areRequirementsMet(Context c) {
         this.playCheckPassed = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(c) == ConnectionResult.SUCCESS;
         this.permissionCheckPassed = ContextCompat.checkSelfPermission(c, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         this.initialSetupCheckPassed = preferences.getSetupCompleted();
 
         Timber.v("playCheckPassed:%s, permissionCheckPassed:%s, initialSetupCheckPassed%s", playCheckPassed, permissionCheckPassed, initialSetupCheckPassed);
-        return !(isPlayCheckPassed() && isPermissionCheckPassed() && isInitialSetupCheckPassed());
+        return isPlayCheckPassed() && isPermissionCheckPassed() && isInitialSetupCheckPassed();
     }
 
     public boolean isPlayCheckPassed() {
