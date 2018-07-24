@@ -5,15 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
 
-
-@PerFragment
+@PerActivity
 public class PlayFragmentViewModel extends BaseViewModel<PlayFragmentMvvm.View> implements PlayFragmentMvvm.ViewModel<PlayFragmentMvvm.View> {
 
     private boolean playServicesAvailable;

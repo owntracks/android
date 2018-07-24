@@ -3,7 +3,6 @@ package org.owntracks.android.ui.welcome.intro;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,10 @@ import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
+import javax.inject.Inject;
+
 public class IntroFragment extends BaseSupportFragment<UiWelcomeIntroBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
-    public static final int ID = 1;
-
-    private static IntroFragment instance;
-    public static Fragment getInstance() {
-        if(instance == null)
-            instance = new IntroFragment();
-        return instance;
-    }
-
+    @Inject
     public IntroFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }

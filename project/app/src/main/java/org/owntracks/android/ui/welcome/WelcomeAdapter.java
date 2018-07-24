@@ -1,11 +1,13 @@
 package org.owntracks.android.ui.welcome;
 
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
@@ -21,23 +23,46 @@ import timber.log.Timber;
 @PerActivity
 public class WelcomeAdapter extends FragmentStatePagerAdapter {
 
-    private final ArrayList<Integer> ids = new ArrayList<>();
+    @Inject IntroFragment introFragment;
+
+    @Inject VersionFragment versionFragment;
+
+    @Inject PlayFragment playFragment;
+
+    @Inject PermissionFragment permissionFragment;
+
+    @Inject FinishFragment finishFragment;
+
+    private final ArrayList<Fragment> fragments = new ArrayList<>();
+
+    private RequirementsChecker requirementsChecker;
 
     @Inject
-    public WelcomeAdapter(@ActivityFragmentManager FragmentManager fm) {
+    WelcomeAdapter(@ActivityFragmentManager FragmentManager fm, RequirementsChecker requirementsChecker) {
         super(fm);
+        this.requirementsChecker = requirementsChecker;
     }
 
-    public void addItemId(int id) {
-        ids.add(id);
-    }
+    public void setupFragments() {
+        fragments.add(introFragment);
 
-    public int getLastItemId() {
-        return ids.get(getLastItemPosition());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            fragments.add(versionFragment);
+
+
+        if (!requirementsChecker.isPlayCheckPassed()) {
+            fragments.add(playFragment);
+        }
+
+        if (!requirementsChecker.isPermissionCheckPassed()) {
+            fragments.add(permissionFragment);
+        }
+        fragments.add(finishFragment);
+
     }
 
     public int getLastItemPosition() {
-        return ids.size()-1;
+        return fragments.size() - 1;
     }
 
 
@@ -46,34 +71,17 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
-        Fragment fragment = null;
-        Timber.v("position:%s id:%s", position, ids.get(position));
-
-        switch (ids.get(position)) {
-            case IntroFragment.ID:
-                fragment = IntroFragment.getInstance();
-                break;
-            case PlayFragment.ID:
-                fragment = PlayFragment.getInstance();
-                break;
-            case PermissionFragment.ID:
-                fragment = PermissionFragment.getInstance();
-                break;
-            case FinishFragment.ID:
-                fragment = FinishFragment.getInstance();
-                break;
-            case VersionFragment.ID:
-                fragment = VersionFragment.getInstance();
-                break;
-
+    public Fragment getItem(final int position) {
+        if (fragments.size() < position) {
+            Timber.e("Welcome position %d is out of bounds for fragment list length %d", position, fragments.size());
+            throw new IndexOutOfBoundsException();
         }
-
-        return fragment;
+        Timber.v("position:%s fragment:%s", position, fragments.get(position).toString());
+        return fragments.get(position);
     }
 
     @Override
     public int getCount() {
-        return ids.size();
+        return fragments.size();
     }
 }

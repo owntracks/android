@@ -79,8 +79,11 @@ public class App extends Application  {
         dateFormaterToday = new SimpleDateFormat("HH:mm", Locale.getDefault());
         dateFormaterDate = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        if (isFirstStart(p)) {
+            setFirstStartPreferences(p);
+        }
 
-        checkFirstStart();
         //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
         enableForegroundBackgroundDetection();
@@ -286,16 +289,19 @@ public class App extends Application  {
 
     // Checks if the app is started for the first time.
     // On every new install this returns true for the first time and false afterwards
-    private void checkFirstStart() {
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+    private boolean isFirstStart(SharedPreferences p) {
+        return p.getBoolean(Preferences.Keys._FIRST_START, true);
 
-        if(p.getBoolean(Preferences.Keys._FIRST_START, true)) {
-            Timber.v("Initial application launch");
-            String uuid = UUID.randomUUID().toString().toUpperCase();
+    }
 
-            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1)).apply();
+    private void setFirstStartPreferences(SharedPreferences p) {
+        Timber.v("Initial application launch");
+        String uuid = UUID.randomUUID().toString().toUpperCase();
 
-        }
+        p.edit().putBoolean(Preferences.Keys._FIRST_START, false)
+                .putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true)
+                .putString(Preferences.Keys._DEVICE_UUID, "A"+uuid.substring(1))
+                .apply();
     }
 
 }

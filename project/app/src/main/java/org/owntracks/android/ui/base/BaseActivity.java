@@ -29,7 +29,6 @@ import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import javax.inject.Inject;
 
@@ -238,15 +237,5 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             overridePendingTransition(0, 0);
         else
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    protected boolean assertRequirements() {
-        if (requirementsChecker.assertRequirements(this)) {
-            navigator.startActivity(WelcomeActivity.class);
-            finish();
-            return true;
-        }
-        return false;
     }
 }
