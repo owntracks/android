@@ -2,7 +2,6 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.model.FusedContact;
 
@@ -35,22 +34,16 @@ public class Events {
     }
 
 	public static class WaypointTransition extends E {
-		final Waypoint w;
+		final WaypointModel w;
 		final int transition;
         //TODO
-        public WaypointTransition(WaypointModel w, int transition) {
-            super();
-            this.w = new Waypoint(); //TODO: fix
-            this.transition = transition;
-
-        }
-		public WaypointTransition(Waypoint w, int transition) {
+		public WaypointTransition(WaypointModel w, int transition) {
 			super();
 			this.w = w;
 			this.transition = transition;
 		}
 
-		public Waypoint getWaypoint() {
+		public WaypointModel getWaypoint() {
 			return this.w;
 		}
 

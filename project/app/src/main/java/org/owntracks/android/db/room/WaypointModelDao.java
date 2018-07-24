@@ -22,12 +22,11 @@ interface WaypointModelDao {
     List<WaypointModel> getAllSync();
 
 
-    @Query("select * from WaypointModel where id = :id")
+    @Query("select * from WaypointModel where _id = :id")
     LiveData<WaypointModel> getById(long id);
 
-    @Query("select * from WaypointModel where id = :id")
-
     @WorkerThread
+    @Query("select * from WaypointModel where _id = :id")
     WaypointModel getSync(long id);
 
     @Insert(onConflict = REPLACE)

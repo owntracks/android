@@ -10,8 +10,6 @@ import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
 import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -29,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
