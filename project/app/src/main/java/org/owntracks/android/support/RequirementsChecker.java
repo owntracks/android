@@ -27,6 +27,7 @@ public class RequirementsChecker {
 
         Timber.v("playCheckPassed:%s, permissionCheckPassed:%s, initialSetupCheckPassed%s", playCheckPassed, permissionCheckPassed, initialSetupCheckPassed);
         return !(isPlayCheckPassed() && isPermissionCheckPassed() && isInitialSetupCheckPassed());
+        //True starts activity
     }
 
     public boolean isPlayCheckPassed() {

@@ -6,8 +6,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,6 +15,7 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
@@ -24,6 +23,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -49,12 +49,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.db.room.WaypointModel;
-import org.owntracks.android.db.room.WaypointsDatabase;
 import org.owntracks.android.injection.components.DaggerServiceComponent;
-import org.owntracks.android.injection.modules.ServiceModule;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
@@ -114,7 +111,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private NotificationManager notificationManager;
 
     private NotificationManagerCompat notificationManagerCompat;
-    private List<Waypoint> waypoints = Collections.emptyList();
+    private List<WaypointModel> waypoints = Collections.emptyList();
 
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
@@ -125,12 +122,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Inject
     protected EventBus eventBus;
-
-    @Inject
-    protected WaypointsDatabase waypointsDatabase;
-
-    @Inject
-    protected Dao dao;
 
     @Inject
     protected Scheduler scheduler;
@@ -146,12 +137,13 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Inject
     protected Runner runner;
-    private LiveData<List<WaypointModel>> waypointsLiveData;
 
+    @Inject
+    protected WaypointsRepo waypointsRepo;
 
     @Override
     public void onCreate() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).serviceModule(new ServiceModule(this)).build().inject(this);
+        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 
         Timber.v("Preferences instance: %s", preferences);
 
@@ -168,34 +160,18 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
                 onLocationChanged(locationResult.getLastLocation());
             }
         };
-        waypointsLiveData = waypointsDatabase.waypointModel().getAll();
-        waypointsLiveData.observeForever(waypointsLiveDataObserver);
 
         setupNotificationChannels();
-
         sendOngoingNotification();
 
         setupLocationRequest();
-        setupGeofences();
         setupLocationPing();
+        new GeofenceTask().execute();
 
         eventBus.register(this);
         eventBus.postSticky(new Events.ServiceStarted());
-
     }
 
-    public void onDestroy() {
-        waypointsLiveData.removeObserver(waypointsLiveDataObserver);
-    }
-
-    Observer<List<WaypointModel>> waypointsLiveDataObserver = new Observer<List<WaypointModel>>() {
-        @Override
-        public void onChanged(@Nullable List<WaypointModel> waypointModels) {
-            Timber.v("waypoints changed");
-            removeGeofences();
-            setupGeofences();
-        }
-    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -445,43 +421,29 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
+        WaypointModel w = waypointsRepo.getSync(id);
 
         // Don't send transition if the region is already triggered
         // If the region status is unknown, send transition only if the device is inside
+        if (preferences.getFuseRegionDetection() && ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
+            Timber.d("ignoring transition: duplicate");
+            w.setLastTransition(transition);
+            waypointsRepo.update(w);
+            return;
+        }
 
-      //  if (preferences.getFuseRegionDetection() && ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
-        //      Timber.d("ignoring transition: duplicate");
-        //     w.setLastTransition(transition);
-        //    return;
-        // }
+        w.setLastTransition(transition);
+        w.setLastTriggered(System.currentTimeMillis());
+        waypointsRepo.update(w);
 
-        //w.setLastTransition(transition);
-        //w.setLastTriggered(System.currentTimeMillis());
-        //dao.getWaypointDao().update(w);
-        WaypointModel m = findWaypointModel(id);
+        Timber.v("geofence update transient %s %s", id, w);
 
-        Timber.v("geofence update transient %s %s", id, m);
+        publishTransitionMessage(w, l, transition, trigger);
+        if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
+            publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
+        }
 
-
-        m.setLastTriggered(System.currentTimeMillis());
-        m.setLastTransition(transition);
-        /*.observeForever(new Observer<WaypointModel>() {
-            @Override
-            public void onChanged(@Nullable WaypointModel waypointModel) {
-                //publishTransitionMessage(waypointModel, l, transition, trigger);
-                //TODO cancel observe
-
-                //If transition is caused by a geofence event, send a location message.
-                //If transition is caused by a location change (TRIGGER_LOCATION), a location message is send before already.
-                if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
-                    publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
-                }
-
-                eventBus.postSticky(new Events.WaypointTransition(waypointModel, transition));
-            }
-        });*/
-
-
+        eventBus.postSticky(new Events.WaypointTransition(w, transition));
     }
 
 
@@ -502,7 +464,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
             //Waypoint w = dao.loadWaypointForId();
 
-            //WaypointModel b = findWaypointModel(event.getTriggeringGeofences().get(index).getRequestId());
 
             onWaypointTransition(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()), event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
 
@@ -511,32 +472,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             //    onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
         }
     }
-
-        @Nullable
-        private WaypointModel findWaypointModel(String requestId) {
-        return findWaypointModel(         Long.parseLong(requestId));
-
-        }
-
-            private WaypointModel findWaypointModel(long requestId) {
-        List<WaypointModel> b = waypointsLiveData.getValue();
-        if(b == null) {
-            return null;
-        }
-        for(WaypointModel w : waypointsLiveData.getValue()) {
-            if(w.getId() == requestId) {
-                return w;
-            }
-        }
-        return null;
-
-    }
-
-
-
-
-
-
 
     public void onLocationChanged(@Nullable Location location) {
 
@@ -547,8 +482,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
             eventBus.postSticky(lastLocation);
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
-
-
         }
     }
 
@@ -576,8 +509,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         }
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if(waypointsLiveData.getValue() != null && preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
-            for (WaypointModel w : waypointsLiveData.getValue()) {
+        if(waypoints.size() > 0 && preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
+            for (WaypointModel w : waypointsRepo.getAllSync()) {
                 if (w.hasGeofence()) {
                     //noinspection ConstantConditions
 
@@ -716,6 +649,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     @SuppressWarnings("MissingPermission")
+    @WorkerThread
     private void setupGeofences() {
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
@@ -726,13 +660,12 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         LinkedList<Geofence> geofences = new LinkedList<>();
 
-        //waypoints = dao.loadWaypointsForCurrentMode();
+        waypoints = waypointsRepo.getAllSync();
 
-        List<WaypointModel> l =   waypointsLiveData.getValue();
-        if(l == null || l.size() == 0)
+        if(waypoints == null || waypoints.size() == 0)
             return;
 
-        for (WaypointModel w : l){
+        for (WaypointModel w : waypoints){
 
             if (w.hasGeofence()) {
                 Timber.v("desc:%s", w.getDescription());
@@ -775,18 +708,18 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Waypoint e) {
-        if(!e.isDeleted()) {
-            //TODO handle update better
-        } else {
-           publishWaypointMessage(e);
-
-        }
-        removeGeofences();
-        setupGeofences();
+    public void onEvent(Events.WaypointAdded e) {
+        publishWaypointMessage(e.getWaypointModel());
+        new GeofenceTask().execute();
     }
 
-    private void publishWaypointMessage(@NonNull Waypoint e) {
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(Events.WaypointRemoved e) {
+        new GeofenceTask().execute();
+    }
+
+    private void publishWaypointMessage(@NonNull WaypointModel e) {
         messageProcessor.sendMessage(MessageWaypoint.fromDaoObject(e));
     }
 
@@ -837,7 +770,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         this.lastQueueLength = e.getNewLength();
         sendOngoingNotification();
     }
-
 
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
@@ -902,7 +834,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     public List<String> getInRegions() {
         LinkedList<String> l = new LinkedList<>();
-        for(Waypoint w : waypoints) {
+        for(WaypointModel w : waypoints) {
             if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER )
                 l.add(w.getDescription());
 
@@ -940,4 +872,14 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         return true; // Ensures onRebind() is called when a client re-binds.
     }
 
+
+    public class GeofenceTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            removeGeofences();
+            setupGeofences();
+            return null;
+        }
+    }
 }

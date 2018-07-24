@@ -75,12 +75,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             getView().updateMarker(FusedContact.class.cast(c));
         }
 
-        if(mode == VIEW_DEVICE) {
-            setViewModeDevice();
-        } else if(mode == VIEW_CONTACT) {
+        if(mode == VIEW_CONTACT && activeContact != null)
             setViewModeContact(activeContact, true);
-        } else {
+        else if (mode == VIEW_FREE) {
             setViewModeFree();
+        } else {
+            setViewModeDevice();
         }
     }
 

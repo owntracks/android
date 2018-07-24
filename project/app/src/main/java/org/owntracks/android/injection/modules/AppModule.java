@@ -7,6 +7,7 @@ import android.os.Build;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
@@ -96,7 +97,7 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static Preferences providePreferences(@AppContext Context context) { return new Preferences(context); }
+    static Preferences providePreferences(@AppContext Context context, WaypointsRepo waypointsRepo) { return new Preferences(context, waypointsRepo); }
 
     @Provides
     @PerApplication

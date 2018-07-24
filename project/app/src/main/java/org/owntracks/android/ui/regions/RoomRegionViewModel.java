@@ -1,17 +1,11 @@
 package org.owntracks.android.ui.regions;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.databinding.ObservableField;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.BR;
-
-import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.db.room.WaypointModel;
-import org.owntracks.android.db.room.WaypointsDatabase;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.base.viewmodel.BaseArchitectureViewModel;
 
@@ -21,7 +15,7 @@ import timber.log.Timber;
 
 @PerActivity
 public class RoomRegionViewModel extends BaseArchitectureViewModel  {
-    private WaypointsDatabase waypointsDatabase;
+    private WaypointsRepo waypointsRepo;
     private WaypointModel model;
     public final MutableLiveData<String> description = new MutableLiveData<>();
     public final MutableLiveData<Double> latitude = new MutableLiveData<>();
@@ -33,9 +27,9 @@ public class RoomRegionViewModel extends BaseArchitectureViewModel  {
     public final MutableLiveData<Boolean> canSave = new MutableLiveData<>();
 
     @Inject
-    public RoomRegionViewModel(WaypointsDatabase waypointsDatabase) {
+    public RoomRegionViewModel(WaypointsRepo waypointsRepo) {
         super();
-        this.waypointsDatabase = waypointsDatabase;
+        this.waypointsRepo = waypointsRepo;
     }
 
     public void setWaypoint(WaypointModel w) {
@@ -43,7 +37,7 @@ public class RoomRegionViewModel extends BaseArchitectureViewModel  {
 
     public void loadWaypoint(long id) {
         Timber.v("loading waypoint with id: %s",id);
-        new LoadTask(waypointsDatabase).execute(id);
+        new LoadTask(waypointsRepo).execute(id);
     }
 
     public void onloadWaypoint(@Nullable WaypointModel model) {
@@ -72,26 +66,29 @@ public class RoomRegionViewModel extends BaseArchitectureViewModel  {
 
     public void saveWaypoint() {
         if(canSaveWaypoint()) {
-            if(model == null)
+            if(model == null) {
                 model = new WaypointModel();
+            }
 
             model.setDescription(description.getValue());
             model.setGeofenceLatitude(latitude.getValue());
             model.setGeofenceLongitude(longitude.getValue());
             model.setGeofenceRadius(radius.getValue());
-            waypointsDatabase.insert(model);
+
+            // Will do insert or update
+            waypointsRepo.insert(model);
         }
     }
 
     private class LoadTask extends AsyncTask<Long, Void, WaypointModel> {
-        private final WaypointsDatabase waypointsDatabase;
+        private final WaypointsRepo waypointsRepo;
 
-        public LoadTask(WaypointsDatabase waypointsDatabase) {
-            this.waypointsDatabase = waypointsDatabase;
+        public LoadTask(WaypointsRepo waypointsRepo) {
+            this.waypointsRepo = waypointsRepo;
         }
         @Override
         protected WaypointModel doInBackground(final Long... params) {
-            return waypointsDatabase.waypointModel().getByIdSync(params[0]);
+            return waypointsRepo.getSync(params[0]);
         }
 
         @Override

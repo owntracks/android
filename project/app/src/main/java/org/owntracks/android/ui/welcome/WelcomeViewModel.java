@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
 
@@ -17,10 +18,11 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
 
     private boolean doneEnabled;
     private boolean nextEnabled;
+    private final Preferences preferences;
 
     @Inject
-    public WelcomeViewModel() {
-
+    public WelcomeViewModel(Preferences preferences) {
+        this.preferences = preferences;
     }
     public void attachView(@NonNull WelcomeMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
@@ -38,8 +40,11 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
 
     @Override
     public void onDoneClicked() {
+        preferences.setSetupCompleted();
         navigator.get().startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }
+
+
 
     @Override
     public void setNextEnabled(boolean enabled) {

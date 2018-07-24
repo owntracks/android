@@ -26,8 +26,6 @@ public interface ActivityComponent {
     void inject(org.owntracks.android.ui.preferences.load.LoadActivity activity);
     void inject(org.owntracks.android.ui.status.StatusActivity activity);
     void inject(org.owntracks.android.ui.welcome.WelcomeActivity activity);
-    void inject(org.owntracks.android.ui.region.RegionActivity activity);
-    void inject(org.owntracks.android.ui.regions.RegionsActivity activity);
     void inject(org.owntracks.android.ui.regions.RoomRegionsActivity activity);
     void inject(org.owntracks.android.ui.regions.RoomRegionActivity activity);
 
