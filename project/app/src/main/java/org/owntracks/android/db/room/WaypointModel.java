@@ -18,14 +18,12 @@ public class WaypointModel {
     private String description;
     private double geofenceLatitude;
     private double geofenceLongitude;
-    private int geofenceRadius;
-
+    private Integer geofenceRadius;
 
     @Ignore
     public WaypointModel() {
         setId(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
-
 
     public WaypointModel(long id, String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius) {
         this.id = id;
@@ -63,7 +61,6 @@ public class WaypointModel {
             this.geofenceLatitude = -90;
         else
             this.geofenceLatitude = geofenceLatitude;
-
     }
 
     public double getGeofenceLongitude() {
@@ -98,7 +95,7 @@ public class WaypointModel {
         return l;
     }
     @Ignore
-        private long lastTriggered;
+    private long lastTriggered;
 
     public void setGeofenceRadius(int geofenceRadius) {
         this.geofenceRadius = geofenceRadius;
@@ -107,45 +104,46 @@ public class WaypointModel {
     @Ignore
     private int modeId;
 
-        //@Transient
-        @Ignore
-        private int lastTransition;
+    @Ignore
+    private int lastTransition;
 
-        @Ignore
-        public long getLastTriggered() {
-            return lastTriggered;
-        }
+    @Ignore
+    public long getLastTriggered() {
+        return lastTriggered;
+    }
 
-        public void setLastTriggered(long lastTriggered) {
-            this.lastTriggered = lastTriggered;
-        }
+    public void setLastTriggered(long lastTriggered) {
+        this.lastTriggered = lastTriggered;
+    }
 
     @Ignore
     public int getModeId() {
             return modeId;
         }
 
+    public void setModeId(int modeId) {
+        this.modeId = modeId;
+    }
 
-        public void setModeId(int modeId) {
-            this.modeId = modeId;
-        }
-
-
-        public void setLastTransition(int status) {
-            this.lastTransition = status;
-        }
+    public void setLastTransition(int status) {
+        this.lastTransition = status;
+    }
 
     @Ignore
     public int getLastTransition() {
             return this.lastTransition;
         }
 
-        public boolean isUnknown() {
+    public boolean isUnknown() {
             return this.lastTransition == 0;
         }
 
-        public boolean hasGeofence() {
-            return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
-        }
-
+    public boolean hasGeofence() {
+        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
     }
+
+    @Ignore
+    public long getTst() {
+        return id;
+    }
+}

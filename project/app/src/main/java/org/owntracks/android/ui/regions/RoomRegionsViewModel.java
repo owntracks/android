@@ -2,7 +2,7 @@ package org.owntracks.android.ui.regions;
 
 import android.arch.lifecycle.LiveData;
 
-import org.owntracks.android.db.room.WaypointsDatabase;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.base.viewmodel.BaseArchitectureViewModel;
@@ -17,19 +17,19 @@ import timber.log.Timber;
 public class RoomRegionsViewModel extends BaseArchitectureViewModel {
     private final LiveData<List<WaypointModel>> waypointsList;
 
-    private WaypointsDatabase waypointsDatabase;
+    private WaypointsRepo waypointsRepo;
 
     @Inject
-        public RoomRegionsViewModel(WaypointsDatabase waypointsDatabase) {
+        public RoomRegionsViewModel(WaypointsRepo waypointsRepo) {
             super();
             Timber.v("new vm instantiated");
-            this.waypointsDatabase = waypointsDatabase;
+            this.waypointsRepo = waypointsRepo;
 
-            waypointsList = waypointsDatabase.waypointModel().getAll();
+            waypointsList = waypointsRepo.getAll();
         }
 
         public void delete(WaypointModel w) {
-            waypointsDatabase.delete(w);
+            waypointsRepo.delete(w);
         }
 
         public LiveData<List<WaypointModel>> getWaypointsList() {

@@ -31,7 +31,7 @@ public class RoomRecyclerviewAdapter extends RecyclerView.Adapter<RoomRecyclervi
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.row_waypoint, parent, false));
+        return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.ui_row_waypoint, parent, false));
     }
 
     @Override

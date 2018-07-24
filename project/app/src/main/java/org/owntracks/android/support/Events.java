@@ -91,6 +91,32 @@ public class Events {
         }
 
     }
+    public static class WaypointEvent extends E {
+        private final WaypointModel m;
+
+        public WaypointEvent(WaypointModel m) {
+            this.m = m;
+        }
+        public WaypointModel getWaypointModel() {
+            return this.m;
+        }
+    }
+
+    public static class WaypointAdded extends WaypointEvent {
+        public WaypointAdded(WaypointModel m) {
+            super(m);
+        }
+    }
+    public static class WaypointUpdated extends WaypointEvent {
+        public WaypointUpdated(WaypointModel m) {
+            super(m);
+        }
+    }
+    public static class WaypointRemoved extends WaypointEvent {
+        public WaypointRemoved(WaypointModel m) {
+            super(m);
+        }
+    }
 
     public static class FusedContactAdded extends E {
         private final FusedContact fusedContact;

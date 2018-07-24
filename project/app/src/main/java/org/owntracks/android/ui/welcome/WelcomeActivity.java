@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.welcome;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
@@ -30,21 +32,25 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
+
+        if(!requirementsChecker.assertRequirements(this)) {
+            navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            finish();
+            return;
+        }
+
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
         setupPagerAdapter();
     }
 
     private void setupPagerAdapter() {
-        requirementsChecker.assertRequirements(this);
 
-        boolean isInitialSetup = !requirementsChecker.isInitialSetupCheckPassed();
-        if (isInitialSetup) {
+        if(!requirementsChecker.isInitialSetupCheckPassed()) {
             viewPagerAdapter.addItemId(IntroFragment.ID);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 viewPagerAdapter.addItemId(VersionFragment.ID);
-
         }
 
         if (!requirementsChecker.isPlayCheckPassed()) {
@@ -55,16 +61,16 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
             viewPagerAdapter.addItemId(PermissionFragment.ID);
         }
 
-        if (isInitialSetup) {
+        if(!requirementsChecker.isInitialSetupCheckPassed()) {
             viewPagerAdapter.addItemId(FinishFragment.ID);
         }
+
         binding.viewPager.setAdapter(viewPagerAdapter);
         binding.viewPager.addOnPageChangeListener(this);
 
         Timber.v("pager setup with %s fragments", viewPagerAdapter.getCount());
         buildPagerIndicator();
         showFragment(0);
-
     }
 
     @Override

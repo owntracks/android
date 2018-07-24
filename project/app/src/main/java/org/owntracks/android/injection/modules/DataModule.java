@@ -5,8 +5,9 @@ import android.content.Context;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.MemoryContactsRepo;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.room.WaypointsDatabase;
+import org.owntracks.android.data.repos.RoomWaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
@@ -39,15 +40,7 @@ public abstract class DataModule {
 
     @Provides
     @PerApplication
-    static Dao provideDao(@AppContext Context context, Preferences preferences) {
-        return new Dao(context, preferences);
+    static WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus) {
+        return new RoomWaypointsRepo(context, eventBus);
     }
-
-    @Provides
-    @PerApplication
-    static WaypointsDatabase provideRoomWaypointDatabase(@AppContext Context context, EventBus eventBus) {
-        return WaypointsDatabase.getDatabase(context, eventBus);
-    }
-
-
 }

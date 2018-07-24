@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
@@ -83,31 +84,17 @@ public class MessageWaypoint extends MessageBase{
     }
 
 
-    public Waypoint toDaoObject() {
-        Waypoint w = new Waypoint();
-
-        w.setDescription(getDesc());
-        w.setGeofenceLatitude(getLat());
-        w.setGeofenceLongitude(getLon());
-        w.setGeofenceRadius(getRad());
-        w.setBeaconUUID(getUuid());
-        w.setBeaconMajor(getMajor());
-        w.setBeaconMinor(getMinor());
-        w.setDate(new Date(TimeUnit.SECONDS.toMillis(getTst())));
-
-        return w;
+    public WaypointModel toDaoObject() {
+        return new WaypointModel(getTst(),getDesc(), getLat(), getLon(), getRad() );
     }
 
-    public static MessageWaypoint fromDaoObject(Waypoint w) {
+    public static MessageWaypoint fromDaoObject(WaypointModel w) {
         MessageWaypoint message = new MessageWaypoint();
         message.setDesc(w.getDescription());
         message.setLat(w.getGeofenceLatitude());
         message.setLon(w.getGeofenceLongitude());
         message.setRad(w.getGeofenceRadius());
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
-        message.setUuid(w.getBeaconUUID());
-        message.setMajor(w.getBeaconMajor());
-        message.setMinor(w.getBeaconMinor());
+        message.setTst(w.getTst());
         return message;
     }
 

@@ -9,8 +9,10 @@ import android.support.annotation.Nullable;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
@@ -44,14 +46,16 @@ public class Preferences {
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
     private final Context context;
+    private final WaypointsRepo waypointsRepo;
 
     private String sharedPreferencesName;
 
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    public Preferences(@AppContext Context c){
+    public Preferences(@AppContext Context c, WaypointsRepo waypointsRepo){
         Timber.v("initializing");
-        context = c;
+        this.context = c;
+        this.waypointsRepo = waypointsRepo;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -271,7 +275,7 @@ public class Preferences {
     public MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(Waypoint waypoint : App.getDao().getWaypointDao().loadAll()) {
+        for(WaypointModel waypoint : waypointsRepo.getAllSync()) {
             messages.add(MessageWaypoint.fromDaoObject(waypoint));
         }
         return messages;
@@ -282,23 +286,13 @@ public class Preferences {
         if(j == null)
             return;
 
-        WaypointDao dao = App.getDao().getWaypointDao();
-        List<Waypoint> deviceWaypoints =  dao.loadAll();
 
         for (MessageWaypoint m: j) {
-            Waypoint w = m.toDaoObject();
+            WaypointModel w = m.toDaoObject();
 
-            for(Waypoint e : deviceWaypoints) {
-                // remove exisiting waypoint before importing new one
-                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
-                    Timber.v("removing existing waypoint with same tst before adding it");
-                    dao.delete(e);
-                    App.getEventBus().post(w);
-                }
-            }
+            waypointsRepo.insert(w);
 
-            dao.insert(w);
-            App.getEventBus().post(w);
+            //App.getEventBus().post(w);
         }
     }
 

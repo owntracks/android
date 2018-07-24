@@ -18,7 +18,7 @@ import org.owntracks.android.ui.preferences.PreferencesActivity;
 import dagger.Component;
 
 @PerActivity
-@Component(dependencies = AppComponent.class, modules = {ServiceModule.class})
+@Component(dependencies = AppComponent.class)
 public interface ServiceComponent {
     void inject(org.owntracks.android.services.BackgroundService service);
 }

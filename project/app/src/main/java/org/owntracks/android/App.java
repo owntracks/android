@@ -70,6 +70,7 @@ public class App extends Application  {
 
         //noinspection ResultOfMethodCallIgnored
         App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
+
         enableForegroundBackgroundDetection();
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
@@ -100,11 +101,6 @@ public class App extends Application  {
     public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
 
     public static Preferences getPreferences() { return sAppComponent.preferences(); }
-
-
-    public static Dao getDao() {
-        return sAppComponent.dao();
-    }
 
     private void enableForegroundBackgroundDetection() {
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
