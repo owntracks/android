@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.DataModule;
 import org.owntracks.android.injection.modules.NetModule;

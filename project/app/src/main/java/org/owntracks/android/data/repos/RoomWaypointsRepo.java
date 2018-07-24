@@ -2,23 +2,15 @@ package org.owntracks.android.data.repos;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 
 import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.App;
-import org.owntracks.android.db.Dao;
-import org.owntracks.android.db.Waypoint;
 import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.db.room.WaypointsDatabase;
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.support.Preferences;
 
 import java.util.List;
 
-import dagger.Provides;
 import timber.log.Timber;
 
 public class RoomWaypointsRepo extends WaypointsRepo {

@@ -1,5 +1,6 @@
 package org.owntracks.android.db.room;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -12,12 +13,15 @@ import java.util.concurrent.TimeUnit;
 @Entity
 public class WaypointModel {
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
     private long id;
-
-    //@NonNull
+    @ColumnInfo(name = "DESCRIPTION")
     private String description;
+    @ColumnInfo(name = "GEOFENCE_LATITUDE")
     private double geofenceLatitude;
+    @ColumnInfo(name = "GEOFENCE_LONGITUDE")
     private double geofenceLongitude;
+    @ColumnInfo(name = "GEOFENCE_RADIUS")
     private Integer geofenceRadius;
 
     @Ignore

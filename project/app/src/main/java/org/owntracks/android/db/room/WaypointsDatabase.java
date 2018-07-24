@@ -21,12 +21,12 @@ import timber.log.Timber;
 
 @Database(entities = {WaypointModel.class}, version = 2, exportSchema = false)
 public abstract class WaypointsDatabase extends RoomDatabase  {
+    private static final String DBNAME = "org.owntracks.android.db";
 
     private static WaypointsDatabase INSTANCE;
-    private static String DBNAME = "org.owntracks.android.db";
     public static WaypointsDatabase getDatabase(@AppContext Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context, WaypointsDatabase.class, "DBNAME").addMigrations(MIGRATION_1_2).build();
+            INSTANCE = Room.databaseBuilder(context, WaypointsDatabase.class, DBNAME).addMigrations(MIGRATION_1_2).build();
         }
         return INSTANCE;
     }
@@ -61,7 +61,7 @@ public abstract class WaypointsDatabase extends RoomDatabase  {
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            //NOOP
+            Timber.v("running migration from schema version 1->2: NOOP");
         }
     };
 

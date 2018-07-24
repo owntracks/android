@@ -6,11 +6,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.MemoryContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.db.Dao;
 import org.owntracks.android.data.repos.RoomWaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 
 import dagger.Module;
