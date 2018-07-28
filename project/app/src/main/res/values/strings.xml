@@ -67,6 +67,7 @@
     <string name="description">Description</string>
     <string name="coordinates">Coordinates</string>
     <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
     <string name="radius">Radius</string>
     <string name="addWaypoint">Add waypoint</string>
     <string name="exportConfiguration">Export</string>
