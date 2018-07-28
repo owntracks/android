@@ -21,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.injection.components.DaggerMessageProcessorComponent;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -92,6 +91,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		if (!connect()) {
 			Timber.v("failed connection attempts :%s", sendMessageConnectPressure);
 			messageProcessor.onMessageDeliveryFailed(messageId);
+			return;
 		}
 
 		try {

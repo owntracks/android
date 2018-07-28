@@ -1,15 +1,13 @@
 package org.owntracks.android.services;
 
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Looper;
 import android.util.Base64;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
+import org.owntracks.android.injection.components.DaggerMessageProcessorComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
@@ -26,23 +24,19 @@ import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionPool;
-import okhttp3.Dns;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -57,9 +51,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     private static final String HEADER_DEVICE = "X-Limit-D";
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
-    private static final String HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD = "HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD";
-    private static final String HTTP_BUNDLE_KEY_USERINFO = "HTTP_BUNDLE_KEY_USERINFO";
-    private static final String HTTP_BUNDLE_KEY_URL = "HTTP_BUNDLE_KEY_URL";
 
     private static String headerUsername;
     private static String headerDevice;
@@ -73,6 +64,20 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     private static MessageProcessorEndpointHttp instance;
     public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
 
+    @Inject
+    protected Preferences preferences;
+
+    @Inject
+    protected Parser parser;
+
+    @Inject
+    protected MessageProcessor messageProcessor;
+
+    @Inject
+    protected Scheduler scheduler;
+
+
+
     public static MessageProcessorEndpointHttp getInstance() {
         if(instance == null) {
             instance = new MessageProcessorEndpointHttp();
@@ -82,7 +87,9 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
 
     private MessageProcessorEndpointHttp() {
-        App.getPreferences().registerOnPreferenceChangedListener(this);
+        DaggerMessageProcessorComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+
+        preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
         loadHTTPClient();
     }
@@ -93,8 +100,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     }
 
     private void loadHTTPClient() {
-        String tlsCaCrt = App.getPreferences().getTlsCaCrtName();
-        String tlsClientCrt = App.getPreferences().getTlsClientCrtName();
+        String tlsCaCrt = preferences.getTlsCaCrtName();
+        String tlsClientCrt = preferences.getTlsClientCrtName();
         SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
         if (tlsCaCrt.length() > 0) {
@@ -107,7 +114,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
         if (tlsClientCrt.length() > 0)	{
             try {
-                socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(App.getPreferences().getTlsClientCrtPassword());
+                socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
                 Timber.e(e1);
             }
@@ -134,18 +141,18 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
             //e.printStackTrace();
             Timber.e(e);
         }
-        headerUsername = App.getPreferences().getStringOrNull(Preferences.Keys.USERNAME);
-        headerDevice = App.getPreferences().getStringOrNull(Preferences.Keys.DEVICE_ID);
+        headerUsername = preferences.getStringOrNull(Preferences.Keys.USERNAME);
+        headerDevice = preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
 
     private void loadEndpointUrl() {
         URL endpoint;
         try {
-            endpoint = new URL(App.getPreferences().getUrl());
-            App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE);
+            endpoint = new URL(preferences.getUrl());
+            messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
-            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
             return;
         }
 
@@ -161,31 +168,29 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     }
 
-    private int sendMessage(MessageBase message) {
+    private void sendMessage(MessageBase message) {
         long messageId = message.getMessageId();
-        String body = null;
+        String body;
         try {
-            body = App.getParser().toJson(message);
+            body = parser.toJson(message);
         } catch (IOException | Parser.EncryptionException e) {
-            getMessageProcessor().onMessageDeliveryFailedFinal(messageId);
+            messageProcessor.onMessageDeliveryFailedFinal(messageId);
+            return;
         }
-
-        //String url = b.getString(HTTP_BUNDLE_KEY_URL);
-        //String userInfo = b.getString(HTTP_BUNDLE_KEY_USERINFO);
-        //long messageId = b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
 
         Timber.v("url:%s, userInfo:%s, messageId:%s", this.endpointUrl, this.endpointUserInfo,  messageId);
 
         if(body == null || this.endpointUrl == null) {
             Timber.e("body or url null");
-            return getMessageProcessor().onMessageDeliveryFailed(messageId);
+            messageProcessor.onMessageDeliveryFailed(messageId);
+            return;
         }
 
         Request.Builder request = new Request.Builder().url(this.endpointUrl).header("User-Agent",USERAGENT).method("POST", RequestBody.create(JSON, body));
         if(this.endpointUserInfo != null) {
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(this.endpointUserInfo.getBytes(), Base64.NO_WRAP));
-        } else if(App.getPreferences().getAuth()) {
-            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((App.getPreferences().getUsername()+":"+App.getPreferences().getPassword()).getBytes(), Base64.NO_WRAP));
+        } else if(preferences.getAuth()) {
+            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((preferences.getUsername()+":"+preferences.getPassword()).getBytes(), Base64.NO_WRAP));
         }
 
         if(headerUsername != null) {
@@ -206,55 +211,39 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
                 if(r.body() != null ) {
                     try {
 
-                        MessageBase[] result = App.getParser().fromJson(r.body().byteStream());
-                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
+                        MessageBase[] result = parser.fromJson(r.body().byteStream());
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
 
                         for (MessageBase aResult : result) {
-                            getMessageProcessor().onMessageReceived(aResult);
+                            messageProcessor.onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.IDLE.setMessage("HTTP " +r.code() + ", JsonParseException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("HTTP " +r.code() + ", JsonParseException"));
                     } catch (Parser.EncryptionException e) {
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
                 }
             } else {
                 Timber.e("request was not successful");
                 if(r != null)
-                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response "+r.code() ));
+                    messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("Response "+r.code() ));
                 else
-                    App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setMessage("Response empty" ));
+                    messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("Response empty" ));
 
-                return getMessageProcessor().onMessageDeliveryFailed(messageId);
+                messageProcessor.onMessageDeliveryFailed(messageId);
+                return;
             }
 
         } catch (Exception e) {
             Timber.e(e,"error:IOException. Delivery failed ");
-            App.getMessageProcessor().onEndpointStateChanged(EndpointState.ERROR.setError(e));
-            return getMessageProcessor().onMessageDeliveryFailed(messageId);
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setError(e));
+            messageProcessor.onMessageDeliveryFailed(messageId);
+            return;
         }
 
-        return getMessageProcessor().onMessageDelivered(messageId);
-    }
-
-    private static MessageProcessor getMessageProcessor() {
-        return App.getMessageProcessor();
-    }
-
-    private Bundle httpMessageToBundle(MessageBase m)  {
-        Bundle b = new Bundle();
-        b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
-
-        try {
-            b.putString(HTTP_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJson(m));
-            b.putString(HTTP_BUNDLE_KEY_USERINFO, getInstance().endpointUserInfo);
-            b.putString(HTTP_BUNDLE_KEY_URL, getInstance().endpointUrl);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-        return b;
+        messageProcessor.onMessageDelivered(messageId);
     }
 
     @Override
@@ -299,8 +288,8 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     @Override
     public void onDestroy() {
-        App.getScheduler().cancelHttpTasks();
-        App.getPreferences().unregisterOnPreferenceChangedListener(this);
+        scheduler.cancelHttpTasks();
+        preferences.unregisterOnPreferenceChangedListener(this);
 
     }
 
@@ -308,16 +297,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     public void onEnterForeground() {
 
     }
-
-    private void scheduleMessage(MessageBase m) {
-            //Bundle b = httpMessageToBundle(m);
-        //b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_HTTP);
-        //if(App.isInForeground())
-            //    sendMessage(b);
-        //  else
-        //      App.getScheduler().scheduleMessage(b);
-    }
-
     @Override
     public void onAttachAfterModeChanged() {
 
@@ -330,9 +309,9 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
         else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
             loadHTTPClient();
         else if(Preferences.Keys.USERNAME.equals(key))
-            headerUsername = App.getPreferences().getStringOrNull(Preferences.Keys.USERNAME);
+            headerUsername = preferences.getStringOrNull(Preferences.Keys.USERNAME);
         else if(Preferences.Keys.DEVICE_ID.equals(key))
-            headerDevice = App.getPreferences().getStringOrNull(Preferences.Keys.DEVICE_ID);
+            headerDevice = preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
     @Override

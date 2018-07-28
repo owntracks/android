@@ -20,6 +20,7 @@ import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBi
 import org.owntracks.android.databinding.UiPreferencesConnectionModeBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionParametersBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
@@ -33,6 +34,9 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Inject
     Runner runner;
+
+    @Inject
+    protected MessageProcessor messageProcessor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,12 +168,12 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.connect:
-                if(App.getMessageProcessor().isEndpointConfigurationComplete()) {
+                if(messageProcessor.isEndpointConfigurationComplete()) {
                     Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
-                            App.getMessageProcessor().reconnect();
+                            messageProcessor.reconnect();
                         }
                     };
                     runner.postOnBackgroundHandlerDelayed(r, 1);
