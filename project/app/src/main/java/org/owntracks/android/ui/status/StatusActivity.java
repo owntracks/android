@@ -24,14 +24,4 @@ public class StatusActivity extends BaseActivity<UiStatusBinding, StatusMvvm.Vie
         setSupportToolbar(binding.toolbar);
         setDrawer(binding.toolbar);
     }
-
-    @SuppressLint("BatteryLife")
-    @Override
-    public void showIgnoreDozeActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-            startActivity(intent);
-        }
-    }
 }

@@ -84,11 +84,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Override
-    public void onIgnoreDozeClicked() {
-        getView().showIgnoreDozeActivity();
-    }
-
-    @Override
     @Bindable
     public long getLocationUpdated() {
         return locationUpdated;
