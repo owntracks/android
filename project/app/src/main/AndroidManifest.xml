@@ -73,7 +73,7 @@
             android:launchMode="singleTop">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".ui.regions.RegionsActivity" />
+            android:value=".ui.regions.RoomRegionsActivity" />
         </activity>
         <activity
             android:name=".ui.preferences.PreferencesActivity"
@@ -101,53 +101,42 @@
             <!-- Support two dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data
                     android:host="*"
                     android:mimeType="*/*"
                     android:pathPattern=".*\\..*\\.otrc"
                     android:scheme="content" />
             </intent-filter>
+
             <!-- Support three dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data
                     android:host="*"
                     android:mimeType="*/*"
                     android:pathPattern=".*\\..*\\..*\\.otrc"
                     android:scheme="content" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/json" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/otrc" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
@@ -174,7 +163,8 @@
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true"
+            tools:ignore="ExportedService">
 
             <intent-filter>
                 <action android:name="C" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
@@ -184,6 +174,7 @@
                 <action android:name="LR" /> <!-- INTENT_ACTION_SEND_LOCATION_RESPONSE -->
                 <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
                 <action android:name="W" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
+                <action android:name="RRLU" /> <!-- REREQUEST_LOCATION_UPDATES -->
             </intent-filter>
         </service>
 
