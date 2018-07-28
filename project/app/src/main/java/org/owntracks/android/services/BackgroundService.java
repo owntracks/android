@@ -21,6 +21,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -30,6 +31,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.util.LongSparseArray;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -63,7 +65,7 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
-import java.util.Collections;
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +97,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     public static final String INTENT_ACTION_SEND_LOCATION_RESPONSE = "LR";
     public static final String INTENT_ACTION_SEND_WAYPOINTS = "W";
     public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "EC";
-
+    public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "RRLU";
 
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
@@ -111,7 +113,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private NotificationManager notificationManager;
 
     private NotificationManagerCompat notificationManagerCompat;
-    private List<WaypointModel> waypoints = Collections.emptyList();
+    private LongSparseArray<WaypointModel> waypoints = new LongSparseArray<>();
 
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
@@ -166,7 +168,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         setupLocationRequest();
         setupLocationPing();
-        new GeofenceTask().execute();
+
+        new GeofenceTask(this).execute();
 
         eventBus.register(this);
         eventBus.postSticky(new Events.ServiceStarted());
@@ -210,6 +213,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
                     return;
                 case INTENT_ACTION_CLEAR_NOTIFICATIONS:
                     clearEventStackNotification();
+                case INTENT_ACTION_REREQUEST_LOCATION_UPDATES:
+                    setupLocationRequest();
 
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
@@ -357,7 +362,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             // we check that previous notifications in the group include at least 2 notifications
             if (activeNotifications.size() > 1) {
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
                 String summary = getString(R.string.notificationEventsTitle, activeNotifications.size());
                 builder.setContentTitle(getString(R.string.events));
                 builder.setContentText(summary);
@@ -413,30 +418,27 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
 
-    private void onWaypointTransition(long id, @NonNull final Location l, final int transition, @NonNull final String trigger) {
-        Timber.v("geofence %s transition:%s, trigger:%s", id, transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
+    @MainThread
+    private void onWaypointTransition(WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
+        Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getId(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
         if (ignoreLowAccuracy(l)) {
             Timber.d("ignoring transition: low accuracy ");
             return;
         }
 
-        WaypointModel w = waypointsRepo.getSync(id);
-
         // Don't send transition if the region is already triggered
         // If the region status is unknown, send transition only if the device is inside
-        if (preferences.getFuseRegionDetection() && ((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
-            Timber.d("ignoring transition: duplicate");
+        if (((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
+            Timber.d("ignoring initial or duplicate transition");
             w.setLastTransition(transition);
-            waypointsRepo.update(w);
+            waypointsRepo.update(w, false);
             return;
         }
 
         w.setLastTransition(transition);
-        w.setLastTriggered(System.currentTimeMillis());
-        waypointsRepo.update(w);
-
-        Timber.v("geofence update transient %s %s", id, w);
+        w.setLastTriggeredNow();
+        waypointsRepo.update(w, false);
 
         publishTransitionMessage(w, l, transition, trigger);
         if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
@@ -461,15 +463,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         final int transition = event.getGeofenceTransition();
         for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
-
-            //Waypoint w = dao.loadWaypointForId();
-
-
-            onWaypointTransition(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()), event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
-
-
-            //if (w != null)
-            //    onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
+            onWaypointTransition(waypoints.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId())), event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
         }
     }
 
@@ -510,12 +504,9 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
         if(waypoints.size() > 0 && preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
-            for (WaypointModel w : waypointsRepo.getAllSync()) {
-                if (w.hasGeofence()) {
-                    //noinspection ConstantConditions
-
-                    onWaypointTransition(w.getId(), lastLocation, lastLocation.distanceTo(w.getLocation()) <= w.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
-                }
+            for(int i = 0; i < waypoints.size(); i++) {
+                WaypointModel waypoint = waypoints.get(waypoints.keyAt(i));
+                onWaypointTransition(waypoint, lastLocation, lastLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
             }
         }
 
@@ -548,9 +539,9 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
                 message.setBatt(batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1));
             }
 
-            NetworkInfo activeNetwork = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-            if (activeNetwork != null) {
-
+            ConnectivityManager cm = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
+            NetworkInfo activeNetwork;
+            if (cm != null && (activeNetwork = cm.getActiveNetworkInfo()) != null) {
                 if (!activeNetwork.isConnected()) {
                     message.setConn(MessageLocation.CONN_TYPE_OFFLINE);
                 } else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
@@ -575,7 +566,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         message.setLon(triggeringLocation.getLongitude());
         message.setAcc(triggeringLocation.getAccuracy());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        //TODO: message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime()));
+        message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getTst()));
         message.setDesc(w.getDescription());
         messageProcessor.sendMessage(message);
 
@@ -606,9 +597,9 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     private PendingIntent getGeofencePendingIntent() {
-        Intent geofeneIntent = new Intent(getApplicationContext(), BackgroundService.class);
+        Intent geofeneIntent = new Intent(this, BackgroundService.class);
         geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
-        return PendingIntent.getBroadcast(getApplicationContext(), INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
 
@@ -659,44 +650,32 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
         LinkedList<Geofence> geofences = new LinkedList<>();
+        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllSync();
 
-        waypoints = waypointsRepo.getAllSync();
+        waypoints = new LongSparseArray<>(geofences.size());
 
-        if(waypoints == null || waypoints.size() == 0)
-            return;
-
-        for (WaypointModel w : waypoints){
+        for (WaypointModel w : loadedWaypoints){
 
             if (w.hasGeofence()) {
+                waypoints.put(w.getId(), w); // lookup later is only required for waypoints that have geofences. Ignore the rest.
                 Timber.v("desc:%s", w.getDescription());
 
-                //w.setLastTransition(0); // Reset in-memory status
-
-                try {
-                    //noinspection ConstantConditions
-                    geofences.add(new Geofence.Builder()
-                            .setRequestId(Long.toString(w.getId()))
-                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                            .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                            .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                            .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
-                } catch (Exception e) {
-                    Timber.e("invalid geofence for waypoint %s", w.getDescription());
-                }
+                geofences.add(new Geofence.Builder()
+                        .setRequestId(Long.toString(w.getId()))
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
+                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
             }
         }
-
 
         if (geofences.size() > 0) {
             GeofencingRequest.Builder b = new GeofencingRequest.Builder();
             b.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
             GeofencingRequest request = b.addGeofences(geofences).build();
-
             mGeofencingClient.addGeofences(request, getGeofencePendingIntent());
         }
-
     }
-
 
     private boolean missingLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED;
@@ -710,13 +689,15 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
         publishWaypointMessage(e.getWaypointModel());
-        new GeofenceTask().execute();
+        removeGeofences();
+        setupGeofences();
     }
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointRemoved e) {
-        new GeofenceTask().execute();
+        removeGeofences();
+        setupGeofences();
     }
 
     private void publishWaypointMessage(@NonNull WaypointModel e) {
@@ -775,8 +756,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @Subscribe(sticky = true)
     public void onEvent(Events.PermissionGranted event) {
         Timber.v("location permission granted");
+        removeGeofences();
         setupGeofences();
-        setupLocationRequest();
 
         try {
             Timber.v("Getting last location");
@@ -834,7 +815,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     public List<String> getInRegions() {
         LinkedList<String> l = new LinkedList<>();
-        for(WaypointModel w : waypoints) {
+        for(int i = 0; i < waypoints.size(); i++) {
+            WaypointModel w = waypoints.get(waypoints.keyAt(i));
             if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER )
                 l.add(w.getDescription());
 
@@ -873,12 +855,16 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
 
-    public class GeofenceTask extends AsyncTask {
-
+    public static class GeofenceTask extends AsyncTask<Void, Void, Void> {
+        WeakReference<BackgroundService> ref;
+        GeofenceTask(BackgroundService service) {
+            ref = new WeakReference<>(service);
+        }
         @Override
-        protected Object doInBackground(Object[] objects) {
-            removeGeofences();
-            setupGeofences();
+        protected Void doInBackground(Void... voids) {
+            if(ref.get() != null) {
+                ref.get().setupGeofences();
+            }
             return null;
         }
     }

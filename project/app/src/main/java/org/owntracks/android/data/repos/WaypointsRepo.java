@@ -25,9 +25,11 @@ public abstract class WaypointsRepo {
         eventBus.post(new Events.WaypointAdded(w));
 
     }
-    public void update(WaypointModel w) {
+    public void update(WaypointModel w, boolean notify) {
         update_impl(w);
-        eventBus.post(new Events.WaypointUpdated(w));
+        if(notify) {
+            eventBus.post(new Events.WaypointUpdated(w));
+        }
     }
 
     public void delete(WaypointModel w) {
