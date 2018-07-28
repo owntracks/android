@@ -13,23 +13,19 @@ import java.util.concurrent.TimeUnit;
 @Entity
 public class WaypointModel {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "_id")
-    private long id;
-    @ColumnInfo(name = "DESCRIPTION")
+    private Long id;
+    @NonNull
     private String description;
-    @ColumnInfo(name = "GEOFENCE_LATITUDE")
     private double geofenceLatitude;
-    @ColumnInfo(name = "GEOFENCE_LONGITUDE")
     private double geofenceLongitude;
-    @ColumnInfo(name = "GEOFENCE_RADIUS")
-    private Integer geofenceRadius;
+    private int geofenceRadius;
 
     @Ignore
     public WaypointModel() {
         setId(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
 
-    public WaypointModel(long id, String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius) {
+    public WaypointModel(long id, @NonNull String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius) {
         this.id = id;
         this.description = description;
         this.geofenceLatitude = geofenceLatitude;
@@ -41,11 +37,12 @@ public class WaypointModel {
         this.id = id;
     }
 
-    public long getId() {
+    @NonNull
+    public Long getId() {
         return id;
     }
 
-    @Nullable
+    @NonNull
     public String getDescription() {
         return description;
     }
@@ -78,16 +75,10 @@ public class WaypointModel {
             this.geofenceLongitude = -180 ;
         else
             this.geofenceLongitude = geofenceLongitude;
-
     }
 
-    @Nullable
-    public Integer getGeofenceRadius() {
+    public int getGeofenceRadius() {
         return geofenceRadius;
-    }
-
-    public void setGeofenceRadius(Integer geofenceRadius) {
-        this.geofenceRadius = geofenceRadius;
     }
 
     @NonNull
@@ -143,7 +134,7 @@ public class WaypointModel {
         }
 
     public boolean hasGeofence() {
-        return (getGeofenceRadius() != null) && (getGeofenceRadius() > 0);
+        return geofenceRadius > 0;
     }
 
     @Ignore

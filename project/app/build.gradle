@@ -164,6 +164,10 @@ dependencies {
     testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
     testImplementation "org.robolectric:robolectric:3.8"
 
+    // Debug builds only
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.facebook.stetho:stetho-okhttp:1.5.0'
+
 }
 
 
