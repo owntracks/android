@@ -26,8 +26,15 @@ public class BindingConversions {
     @BindingConversion
     @InverseMethod("convertToInteger")
     public static String convertToString(@Nullable Integer d) {
-        return  d != null? d.toString() : EMPTY_STRING;
+        return  d != null ? d.toString() : EMPTY_STRING;
     }
+
+    @BindingConversion
+    @InverseMethod("convertToIntegerZeroIsEmpty")
+    public static String convertToStringZeroIsEmpty(@Nullable Integer d) {
+        return  d != null && d > 0 ? d.toString() : EMPTY_STRING;
+    }
+
 
     @BindingConversion
     public static String convertToString(@Nullable Long d) {
@@ -61,6 +68,12 @@ public class BindingConversions {
             return 0;
         }
     }
+
+    @BindingConversion
+    public static Integer convertToIntegerZeroIsEmpty(String d) {
+        return convertToInteger(d);
+    }
+
 
     // XX to Double
     @BindingConversion

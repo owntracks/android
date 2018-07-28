@@ -26,6 +26,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.stetho.Stetho;
+
 import timber.log.Timber;
 
 public class App extends Application  {
@@ -50,6 +52,7 @@ public class App extends Application  {
                     return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
                 }
             });
+            Stetho.initializeWithDefaults(this);
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
 

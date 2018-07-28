@@ -8,6 +8,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
+import android.database.SQLException;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
@@ -19,14 +20,14 @@ import java.util.List;
 
 import timber.log.Timber;
 
-@Database(entities = {WaypointModel.class}, version = 2, exportSchema = false)
+@Database(entities = {WaypointModel.class}, version = 16, exportSchema = false)
 public abstract class WaypointsDatabase extends RoomDatabase  {
     private static final String DBNAME = "org.owntracks.android.db";
 
     private static WaypointsDatabase INSTANCE;
     public static WaypointsDatabase getDatabase(@AppContext Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context, WaypointsDatabase.class, DBNAME).addMigrations(MIGRATION_1_2).build();
+            INSTANCE = Room.databaseBuilder(context, WaypointsDatabase.class, DBNAME).build();
         }
         return INSTANCE;
     }
@@ -58,11 +59,25 @@ public abstract class WaypointsDatabase extends RoomDatabase  {
     }
 
 
-    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+    private static final Migration LEGACY = new Migration(1, 15) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            Timber.v("running migration from schema version 1->2: NOOP");
+            Timber.v("running migration from schema version 0->15: SKIP LEGACY SCHEMA VERSIONS");
         }
     };
+    private static final Migration M_15_16 = new Migration(15, 16) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Timber.v("running migration from schema version 15->16: MIGRATE LEGACY DATA");
 
+            try {
+                database.execSQL("CREATE TABLE WaypointModel(id INTEGER PRIMARY KEY, description TEXT NOT NULL, geofenceLatitude REAL NOT NULL, geofenceLongitude REAL NOT NULL, geofenceRadius INTEGER)");
+                database.execSQL("INSERT INTO WaypointModel(id, description, geofenceLatitude, geofenceLongitude, geofenceRadius) SELECT _id, DESCRIPTION, GEOFENCE_LATITUDE, GEOFENCE_LONGITUDE, GEOFENCE_RADIUS FROM WAYPOINT;");
+                //database.execSQL("DROP TABLE if exists WAYPOINT");
+            } catch (SQLException e) {
+                Timber.e("not migrating existing waypoints");
+            }
+
+        }
+    };
 }

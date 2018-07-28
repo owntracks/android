@@ -118,7 +118,7 @@
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
                     app:met_iconLeft="@drawable/ic_radius"
-                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.radius)}'                    />
+                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.radius)}'                    />
 
                 <TextView
                     android:layout_marginLeft="@dimen/default_spacing_half"
