@@ -90,7 +90,6 @@
                     android:enabled="false"
                     android:id="@+id/longitude"
                     android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.longitude)}"
-
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText

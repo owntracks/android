@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.firebase.jobdispatcher.Constraint;
@@ -14,6 +15,7 @@ import com.firebase.jobdispatcher.SimpleJobService;
 import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
+import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,15 +32,15 @@ public class Scheduler extends SimpleJobService {
     private static final String PERIODIC_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT";
     private static final String PERIODIC_TASK_PROCESS_QUEUE = "PERIODIC_TASK_PROCESS_QUEUE";
 
+    private FirebaseJobDispatcher dispatcher;
+    private final Preferences preferences;
+    private MessageProcessor messageProcessor;
 
-    private static Scheduler instance;
-    private static FirebaseJobDispatcher dispatcher;
-
-    public Scheduler() {
-         dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
+    public Scheduler(Preferences preferences, MessageProcessor messageProcessor) {
+        this.preferences = preferences;
+        this.messageProcessor = messageProcessor;
+        this.dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
     }
-
-
 
     @Override
     public int onRunJob(JobParameters taskParams) {
@@ -70,7 +72,7 @@ public class Scheduler extends SimpleJobService {
                 return returnSuccess();
             case PERIODIC_TASK_PROCESS_QUEUE:
                 Timber.v("processing queue");
-                App.getMessageProcessor().processQueueHead();
+                messageProcessor.processQueueHead();
                 return returnSuccess();
             default:
                 Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
@@ -182,7 +184,7 @@ public class Scheduler extends SimpleJobService {
                 .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
-                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(App.getPreferences().getPing())))
+                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(preferences.getPing())))
                 .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_SEND_LOCATION_PING))
                 .build();

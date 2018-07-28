@@ -25,13 +25,15 @@ import timber.log.Timber;
 @PerActivity
 public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadMvvm.ViewModel<LoadMvvm.View> {
     private final Preferences preferences;
+    private final Parser parser;
     @Bindable
     private String configurationPretty;
     private MessageConfiguration configuration;
 
     @Inject
-    public LoadViewModel(@AppContext Context context, Preferences preferences) {
+    public LoadViewModel(@AppContext Context context, Preferences preferences, Parser parser) {
         this.preferences = preferences;
+        this.parser = parser;
     }
 
     public void attachView(@NonNull LoadMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -45,8 +47,8 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public void setConfiguration(String json) throws IOException, Parser.EncryptionException {
         Timber.v("%s", json);
-        this.configuration = MessageConfiguration.class.cast(App.getParser().fromJson(json.getBytes()));
-        this.configurationPretty = App.getParser().toJsonPlainPretty(this.configuration);
+        this.configuration = MessageConfiguration.class.cast(parser.fromJson(json.getBytes()));
+        this.configurationPretty = parser.toJsonPlainPretty(this.configuration);
         notifyPropertyChanged(BR.configurationPretty);
         getView().showSaveButton();
     }

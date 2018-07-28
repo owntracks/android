@@ -19,6 +19,7 @@ import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
@@ -33,6 +34,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private final ContactsRepo contactsRepo;
     private FusedContact activeContact;
     private LocationSource.OnLocationChangedListener mListener;
+    private MessageProcessor messageProcessor;
     Location mLocation;
 
     private static final int VIEW_FREE = 0;
@@ -41,9 +43,10 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private static int mode = VIEW_DEVICE;
 
     @Inject
-    public MapViewModel(ContactsRepo contactsRepo) {
+    public MapViewModel(ContactsRepo contactsRepo, MessageProcessor messageProcessor) {
         Timber.v("onCreate");
         this.contactsRepo = contactsRepo;
+        this.messageProcessor = messageProcessor;
     }
 
     @Override
@@ -185,7 +188,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         MessageClear m = new MessageClear();
         if(activeContact != null) {
             m.setTopic(activeContact.getId());
-            App.getMessageProcessor().sendMessage(m);
+            messageProcessor.sendMessage(m);
         }
     }
 

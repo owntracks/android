@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
+
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
@@ -44,15 +47,16 @@ public class Preferences {
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
     private final Context context;
     private final WaypointsRepo waypointsRepo;
-
+    private EventBus eventBus;
     private String sharedPreferencesName;
 
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    public Preferences(@AppContext Context c, WaypointsRepo waypointsRepo){
+    public Preferences(@AppContext Context c, WaypointsRepo waypointsRepo, EventBus eventBus){
         Timber.v("initializing");
         this.context = c;
         this.waypointsRepo = waypointsRepo;
+        this.eventBus = eventBus;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -104,7 +108,7 @@ public class Preferences {
 
         if(!init) {
             Timber.v("broadcasting mode change event");
-            App.getEventBus().post(new Events.ModeChanged(oldModeId,modeId));
+            eventBus.post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
 
@@ -269,6 +273,7 @@ public class Preferences {
 
     }
 
+    @WorkerThread
     public MessageWaypointCollection waypointsToJSON() {
 
         MessageWaypointCollection messages = new MessageWaypointCollection();
@@ -277,7 +282,6 @@ public class Preferences {
         }
         return messages;
     }
-
 
     public void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
         if(j == null)
@@ -288,8 +292,6 @@ public class Preferences {
             WaypointModel w = m.toDaoObject();
 
             waypointsRepo.insert(w);
-
-            //App.getEventBus().post(w);
         }
     }
 
@@ -525,7 +527,7 @@ public class Preferences {
     @Import(key =Keys.HOST)
     public void setHost(String value) {
         setString(Keys.HOST, value);
-        App.getEventBus().post(new Events.EndpointChanged());
+        eventBus.post(new Events.EndpointChanged());
     }
 
     public void setPortDefault() {
@@ -852,15 +854,15 @@ public class Preferences {
         return getPubQos();
     }
 
-    public static boolean getPubRetainEvents() {
+    public boolean getPubRetainEvents() {
         return false;
     }
 
-    public static int getPubQosWaypoints() {
+    public int getPubQosWaypoints() {
         return 0;
     }
 
-    public static boolean getPubRetainWaypoints() {
+    public boolean getPubRetainWaypoints() {
         return false;
     }
 
@@ -872,8 +874,8 @@ public class Preferences {
         return getPubRetain();
     }
 
-
-    public MessageConfiguration exportToMessage() {
+    @WorkerThread
+    public MessageConfiguration exportToMessage(boolean includeWaypoints) {
         List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
         cfg.set(Keys._VERSION, BuildConfig.VERSION_CODE);
@@ -887,8 +889,8 @@ public class Preferences {
             }
         }
 
-
-        cfg.setWaypoints(waypointsToJSON());
+        if(includeWaypoints)
+            cfg.setWaypoints(waypointsToJSON());
 
         return cfg;
     }
