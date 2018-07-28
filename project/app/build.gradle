@@ -1,10 +1,9 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.greenrobot.greendao'
 
 def versionMajor = 2
-def versionMinor = 0
+def versionMinor = 1
 def versionPatch = 0
-def versionBuild = 26
+def versionBuild = 1
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '15.0.1'
@@ -55,12 +54,6 @@ android {
 
     dataBinding {
         enabled = true
-    }
-
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java', 'build/generated/source/greendao/org/owntracks/android/db']
-        }
     }
 
     signingConfigs {
@@ -126,7 +119,6 @@ dependencies {
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
     implementation 'org.greenrobot:eventbus:3.1.1'
-    implementation 'org.greenrobot:greendao:3.2.2'
 
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
@@ -164,11 +156,6 @@ dependencies {
     testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
     testImplementation "org.robolectric:robolectric:3.8"
 
-}
-
-
-greendao {
-    schemaVersion 15
 }
 
 apply from: "coverage.gradle"

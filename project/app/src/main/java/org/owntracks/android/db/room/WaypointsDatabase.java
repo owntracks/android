@@ -9,12 +9,9 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.database.SQLException;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.support.ObservableMutableLiveData;
 
 import java.util.List;
 
