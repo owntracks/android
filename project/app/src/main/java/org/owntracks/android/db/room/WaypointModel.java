@@ -1,12 +1,10 @@
 package org.owntracks.android.db.room;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,10 +13,13 @@ public class WaypointModel {
     @PrimaryKey(autoGenerate = true)
     private Long id;
     @NonNull
+    @SuppressWarnings("NullableProblems")
     private String description;
     private double geofenceLatitude;
     private double geofenceLongitude;
     private int geofenceRadius;
+    private long lastTriggered;
+    private int lastTransition;
 
     @Ignore
     public WaypointModel() {
@@ -33,13 +34,13 @@ public class WaypointModel {
         this.geofenceRadius = geofenceRadius;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     @NonNull
     public Long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @NonNull
@@ -47,7 +48,7 @@ public class WaypointModel {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(@NonNull String description) {
         this.description = description;
     }
 
@@ -81,43 +82,34 @@ public class WaypointModel {
         return geofenceRadius;
     }
 
+    public void setGeofenceRadius(int geofenceRadius) {
+        this.geofenceRadius = geofenceRadius;
+    }
+
     @NonNull
     public Location getLocation() {
         Location l= new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
         l.setLongitude(getGeofenceLongitude());
-        l.setAccuracy(0);
+        l.setAccuracy(getGeofenceRadius());
         return l;
     }
-    @Ignore
-    private long lastTriggered;
 
-    public void setGeofenceRadius(int geofenceRadius) {
-        this.geofenceRadius = geofenceRadius;
-    }
-
-    @Ignore
-    private int modeId;
-
-    @Ignore
-    private int lastTransition;
-
-    @Ignore
     public long getLastTriggered() {
-        return lastTriggered;
+        return lastTriggered; // unit is seconds
     }
 
     public void setLastTriggered(long lastTriggered) {
-        this.lastTriggered = lastTriggered;
+        this.lastTriggered = lastTriggered;  // unit is seconds
     }
 
     @Ignore
-    public int getModeId() {
-            return modeId;
-        }
+    public void setLastTriggeredNow() {
+        setLastTriggered(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+    }
 
-    public void setModeId(int modeId) {
-        this.modeId = modeId;
+    public int getLastTransition() {
+        return this.lastTransition;
     }
 
     public void setLastTransition(int status) {
@@ -125,20 +117,17 @@ public class WaypointModel {
     }
 
     @Ignore
-    public int getLastTransition() {
-            return this.lastTransition;
-        }
-
     public boolean isUnknown() {
-            return this.lastTransition == 0;
-        }
+        return this.lastTransition == 0;
+    }
 
+    @Ignore
     public boolean hasGeofence() {
         return geofenceRadius > 0;
     }
 
     @Ignore
     public long getTst() {
-        return id;
+        return id; // unit is seconds
     }
 }
