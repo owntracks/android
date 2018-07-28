@@ -26,8 +26,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.facebook.stetho.Stetho;
-
 import timber.log.Timber;
 
 public class App extends Application  {
@@ -52,7 +50,6 @@ public class App extends Application  {
                     return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
                 }
             });
-            Stetho.initializeWithDefaults(this);
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
 
@@ -60,7 +57,7 @@ public class App extends Application  {
         checkFirstStart();
 
         //noinspection ResultOfMethodCallIgnored
-        App.getPreferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
+        sAppComponent.preferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
 
         enableForegroundBackgroundDetection();
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
@@ -68,29 +65,36 @@ public class App extends Application  {
         sAppComponent.runner().postOnMainHandlerDelayed (new Runnable() {
             @Override
             public void run() {
-                getMessageProcessor().initialize();
+                sAppComponent.messageProcessor().initialize();
             }
         }, 510);
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
 
+    @Deprecated
     public static GeocodingProvider getGeocodingProvider() { return sAppComponent.geocodingProvider(); }
 
+    @Deprecated
     public static ContactImageProvider getContactImageProvider() { return sAppComponent.contactImageProvider(); }
 
+    @Deprecated
     public static Parser getParser() { return sAppComponent.parser(); }
 
+    @Deprecated
     public static EventBus getEventBus() {
         return sAppComponent.eventBus();
     }
 
+    @Deprecated
     public static Scheduler getScheduler() {
         return sAppComponent.scheduler();
     }
 
+    @Deprecated
     public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
 
+    @Deprecated
     public static Preferences getPreferences() { return sAppComponent.preferences(); }
 
     private void enableForegroundBackgroundDetection() {
@@ -109,7 +113,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
-                getMessageProcessor().onEnterForeground();
+                sAppComponent.messageProcessor().onEnterForeground();
             }
         });
     }
@@ -121,7 +125,7 @@ public class App extends Application  {
             @Override
             public void run() {
                 startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
-                getMessageProcessor().onEnterBackground();
+                sAppComponent.messageProcessor().onEnterBackground();
             }
         });
     }

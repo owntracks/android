@@ -55,8 +55,8 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static Scheduler provideScheduler() {
-        return new Scheduler();
+    static Scheduler provideScheduler(Preferences preferences, MessageProcessor messageProcessor) {
+        return new Scheduler(preferences, messageProcessor);
     }
 
     @Provides
@@ -97,7 +97,7 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static Preferences providePreferences(@AppContext Context context, WaypointsRepo waypointsRepo) { return new Preferences(context, waypointsRepo); }
+    static Preferences providePreferences(@AppContext Context context, WaypointsRepo waypointsRepo, EventBus eventBus) { return new Preferences(context, waypointsRepo, eventBus); }
 
     @Provides
     @PerApplication

@@ -13,7 +13,6 @@ public interface EditorMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        void onExportConfigurationToFileClicked();
         void onPreferencesValueForKeySetSuccessful();
         String getEffectiveConfiguration();
     }
