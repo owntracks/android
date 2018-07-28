@@ -93,7 +93,7 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static ContactImageProvider provideContactImageProvider() { return new ContactImageProvider(); }
+    static ContactImageProvider provideContactImageProvider(EventBus eventBus) { return new ContactImageProvider(eventBus); }
 
     @Provides
     @PerApplication

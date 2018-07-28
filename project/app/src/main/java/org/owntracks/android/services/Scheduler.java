@@ -111,7 +111,7 @@ public class Scheduler extends SimpleJobService {
         Timber.v("stoping job");
         // Remove stopd job from queue
         if(job.getExtras() != null) {
-            App.getMessageProcessor().onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
+            messageProcessor.onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
         }
         return super.onStopJob(job);
     }

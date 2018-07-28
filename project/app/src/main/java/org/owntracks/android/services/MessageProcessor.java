@@ -285,7 +285,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     void onEndpointStateChanged(EndpointState newState) {
         Timber.v("message:%s, ", newState.getMessage());
-        App.getEventBus().postSticky(newState);
+        eventBus.postSticky(newState);
     }
 
     @Override

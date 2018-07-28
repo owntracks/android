@@ -82,19 +82,6 @@ public class App extends Application  {
     public static Parser getParser() { return sAppComponent.parser(); }
 
     @Deprecated
-    public static EventBus getEventBus() {
-        return sAppComponent.eventBus();
-    }
-
-    @Deprecated
-    public static Scheduler getScheduler() {
-        return sAppComponent.scheduler();
-    }
-
-    @Deprecated
-    public static MessageProcessor getMessageProcessor() { return sAppComponent.messageProcessor(); }
-
-    @Deprecated
     public static Preferences getPreferences() { return sAppComponent.preferences(); }
 
     private void enableForegroundBackgroundDetection() {
