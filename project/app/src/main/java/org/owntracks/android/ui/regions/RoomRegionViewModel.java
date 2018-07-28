@@ -64,19 +64,27 @@ public class RoomRegionViewModel extends BaseArchitectureViewModel  {
         return this.description.getValue() != null && this.latitude.getValue() != null && this.longitude.getValue() != null;
     }
 
+
+
     public void saveWaypoint() {
         if(canSaveWaypoint()) {
-            if(model == null) {
+            boolean isNew = model == null;
+            if(isNew) {
                 model = new WaypointModel();
             }
 
             model.setDescription(description.getValue());
-            model.setGeofenceLatitude(latitude.getValue());
-            model.setGeofenceLongitude(longitude.getValue());
-            model.setGeofenceRadius(radius.getValue());
+            model.setGeofenceLatitude(latitude.getValue() == null ? 0 : latitude.getValue());
+            model.setGeofenceLongitude(longitude.getValue() == null ? 0 : longitude.getValue());
+            model.setGeofenceRadius(radius.getValue() == null ? 0 : radius.getValue());
 
             // Will do insert or update
-            waypointsRepo.insert(model);
+            if(isNew) {
+                waypointsRepo.insert(model);
+            } else {
+                waypointsRepo.update(model, true);
+            }
+
         }
     }
 

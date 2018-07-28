@@ -12,27 +12,18 @@
         android:layout_width="match_parent"
         android:orientation="vertical" >
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        <android.support.design.widget.AppBarLayout
+            android:elevation="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:title=""
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            android:elevation="4dp"
-            app:contentInsetStart="72dp">
-
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="112dp">
-
-
-            </RelativeLayout>
-
-        </android.support.v7.widget.Toolbar>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        </android.support.design.widget.AppBarLayout>
 
 
 
@@ -48,10 +39,10 @@
                 android:layout_marginEnd="@dimen/default_spacing"
                 android:layout_marginRight="@dimen/default_spacing">
                 <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
                     android:layout_height="wrap_content"
                     android:hint="@string/description"
                     android:background="@android:color/transparent"
@@ -60,7 +51,6 @@
                     android:inputType="textVisiblePassword"
                     android:id="@+id/description"
                     android:text="@={vm.description}"
-                    app:met_iconLeft="@drawable/ic_location"
                     android:onTextChanged="@{() -> vm.onTextChanged()}"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
@@ -71,10 +61,10 @@
                     android:layout_alignParentStart="true"/>
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-                    app:met_iconLeft="@drawable/ic_location"
                     android:layout_marginTop="20dp"
+
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/coordinates"
@@ -88,9 +78,8 @@
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-                    app:met_iconLeft="@drawable/ic_location"
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -105,8 +94,10 @@
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
+                    android:layout_marginTop="20dp"
+
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/radius"
@@ -117,35 +108,41 @@
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    app:met_iconLeft="@drawable/ic_radius"
                     android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.radius)}'                    />
 
-                <TextView
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/waypointId"
-                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.id) }'                    />
+                    <!--Debugging only-->
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_marginLeft="@dimen/default_spacing_half"
+                            android:layout_marginStart="@dimen/default_spacing_half"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/waypointId"
+                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.id) }'                    />
 
-                <TextView
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/lastTriggered"
-                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTriggered) }'                    />
-                    />
-                <TextView
-                    android:layout_marginLeft="@dimen/default_spacing_half"
-                    android:layout_marginStart="@dimen/default_spacing_half"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/lastTransition"
-                    android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTransition) }'                    />
-                    />
-
+                        <TextView
+                            android:layout_marginLeft="@dimen/default_spacing_half"
+                            android:layout_marginStart="@dimen/default_spacing_half"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lastTriggered"
+                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTriggered) }'                    />
+                            />
+                        <TextView
+                            android:layout_marginLeft="@dimen/default_spacing_half"
+                            android:layout_marginStart="@dimen/default_spacing_half"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lastTransition"
+                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTransition) }'                    />
+                            />
+                </LinearLayout>
             </LinearLayout>
+
         </ScrollView>
 
     </LinearLayout>

@@ -46,9 +46,6 @@ public class RoomRegionActivity extends BaseArchitectureActivity<ArchUiRegionBin
         Bundle b = navigator.getExtrasBundle(getIntent());
         if(b != null) {
             viewModel.loadWaypoint(b.getLong("waypointId",-1));
-        } else {
-
-            viewModel.setWaypoint(new WaypointModel());
         }
 
 

@@ -43,9 +43,9 @@ public class RoomRecyclerviewAdapter extends RecyclerView.Adapter<RoomRecyclervi
         holder.itemView.setOnClickListener(clickListener);
 
         holder.title.setText(model.getDescription());
-        holder.subtitle.setText(String.format(Locale.getDefault(), "Timestamp: %s", model.getId()));
-        if(model.getLastTransition() > 0)
-            BindingConversions.setRelativeTimeSpanString(holder.meta,model.getLastTransition());
+        holder.subtitle.setText(String.format(Locale.getDefault(), "Timestamp: %s", model.getTst()));
+        if(model.getLastTriggered() > 0)
+            BindingConversions.setRelativeTimeSpanString(holder.meta,model.getLastTriggered());
     }
 
     @Override
