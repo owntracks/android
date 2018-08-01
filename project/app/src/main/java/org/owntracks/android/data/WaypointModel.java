@@ -1,46 +1,61 @@
-package org.owntracks.android.db.room;
+package org.owntracks.android.data;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Entity
-public class WaypointModel {
-    @PrimaryKey(autoGenerate = true)
-    private Long id;
-    @NonNull
-    @SuppressWarnings("NullableProblems")
-    private String description;
-    private double geofenceLatitude;
-    private double geofenceLongitude;
-    private int geofenceRadius;
-    private long lastTriggered;
-    private int lastTransition;
+import io.objectbox.annotation.Entity;
+import io.objectbox.annotation.Id;
+import io.objectbox.annotation.Index;
+import io.objectbox.annotation.Unique;
+import org.owntracks.android.BR;
 
-    @Ignore
+@Entity
+public class WaypointModel extends BaseObservable {
+
+    @Id
+    private long id;
+    private String description = "";
+    private double geofenceLatitude = 0.0;
+    private double geofenceLongitude = 0.0;
+    private int geofenceRadius = 0;
+    private long lastTriggered = 0;
+    private int lastTransition = 0;
+    @Unique
+    @Index
+    private long tst = 0;
+
     public WaypointModel() {
-        setId(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
 
-    public WaypointModel(long id, @NonNull String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius) {
+    public WaypointModel(long id, long tst, @NonNull String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius, int lastTransition, long lastTriggered) {
         this.id = id;
+        this.tst = tst;
         this.description = description;
         this.geofenceLatitude = geofenceLatitude;
         this.geofenceLongitude = geofenceLongitude;
         this.geofenceRadius = geofenceRadius;
+        this.lastTransition = lastTransition;
+        this.lastTriggered = lastTriggered;
     }
 
-    @NonNull
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getTst() {
+        return tst; // unit is seconds
+    }
+    public void setTst(long tst) {
+        this.tst = tst;
     }
 
     @NonNull
@@ -52,6 +67,7 @@ public class WaypointModel {
         this.description = description;
     }
 
+    @Bindable
     public double getGeofenceLatitude() {
         return geofenceLatitude;
     }
@@ -63,8 +79,10 @@ public class WaypointModel {
             this.geofenceLatitude = -90;
         else
             this.geofenceLatitude = geofenceLatitude;
+        notifyPropertyChanged(BR.geofenceLatitude);
     }
 
+    @Bindable
     public double getGeofenceLongitude() {
         return geofenceLongitude;
     }
@@ -76,6 +94,7 @@ public class WaypointModel {
             this.geofenceLongitude = -180 ;
         else
             this.geofenceLongitude = geofenceLongitude;
+        notifyPropertyChanged(BR.geofenceLongitude);
     }
 
     public int getGeofenceRadius() {
@@ -103,7 +122,6 @@ public class WaypointModel {
         this.lastTriggered = lastTriggered;  // unit is seconds
     }
 
-    @Ignore
     public void setLastTriggeredNow() {
         setLastTriggered(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
@@ -116,18 +134,15 @@ public class WaypointModel {
         this.lastTransition = status;
     }
 
-    @Ignore
     public boolean isUnknown() {
         return this.lastTransition == 0;
     }
 
-    @Ignore
     public boolean hasGeofence() {
         return geofenceRadius > 0;
     }
 
-    @Ignore
-    public long getTst() {
-        return id; // unit is seconds
+    public String toString() {
+        return "WaypointModel("+getId()+","+getTst()+","+getDescription()+")";
     }
 }

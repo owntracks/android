@@ -8,6 +8,7 @@ import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.location.Geofence;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
@@ -106,17 +107,24 @@ public class BindingConversions {
         } else {
             view.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         }
-        //if (deltaMs < DateUtils.MINUTE_IN_MILLIS) {
-        //    view.setText(R.string.timeNow);
-        //} else if(deltaMs < DateUtils.HOUR_IN_MILLIS) {
-        //    view.setText(String.format("%sm", TimeUnit.MILLISECONDS.toMinutes(deltaMs)));
-        //} else if (deltaMs < DateUtils.DAY_IN_MILLIS) {
-        //    view.setText(String.format("%sh", TimeUnit.MILLISECONDS.toHours(deltaMs)));
-        //} else {
-        //    view.setText(String.format("%sd", TimeUnit.MILLISECONDS.toDays(deltaMs)));
-        //}
-        //view.setText(DateUtils.getRelativeTimeSpanString(tst*1000, System.currentTimeMillis(), 1 ,DateUtils.FORMAT_ABBREV_ALL));
     }
+
+    @BindingAdapter("lastTransition")
+    public static void setLastTransition(TextView view, int transition) {
+        switch (transition) {
+            case 0:
+                view.setText(view.getResources().getString(R.string.region_unknown));
+                break;
+            case Geofence.GEOFENCE_TRANSITION_ENTER:
+                view.setText(view.getResources().getString(R.string.region_inside));
+                break;
+            case Geofence.GEOFENCE_TRANSITION_EXIT:
+                view.setText(view.getResources().getString(R.string.region_outside));
+                break;
+
+        }
+    }
+
 
     public static int convertModeIdToLabelResId(int modeId) {
         switch (modeId) {

@@ -1,4 +1,6 @@
 package org.owntracks.android.ui.preferences.editor;
+import android.databinding.Bindable;
+
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 public interface EditorMvvm {
@@ -14,6 +16,6 @@ public interface EditorMvvm {
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void onPreferencesValueForKeySetSuccessful();
-        String getEffectiveConfiguration();
+        @Bindable String getEffectiveConfiguration();
     }
 }

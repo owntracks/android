@@ -6,14 +6,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
+import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
@@ -46,16 +45,15 @@ public class Preferences {
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
     private final Context context;
-    private final WaypointsRepo waypointsRepo;
     private EventBus eventBus;
     private String sharedPreferencesName;
+    private boolean isFirstStart = false;
 
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    public Preferences(@AppContext Context c, WaypointsRepo waypointsRepo, EventBus eventBus){
+    public Preferences(@AppContext Context c, EventBus eventBus){
         Timber.v("initializing");
         this.context = c;
-        this.waypointsRepo = waypointsRepo;
         this.eventBus = eventBus;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
@@ -75,14 +73,14 @@ public class Preferences {
         setMode(active, false);
     }
     public void setMode(int active, boolean init){
-        Timber.v("setMode: " + active);
+        Timber.v("setMode: %s", active);
 
         if(!init && modeId == active) {
             Timber.v("mode is already set to requested mode");
             return;
         }
 
-        Timber.v("setting mode to: " + active);
+        Timber.v("setting mode to: %s", active);
 
         detachAllActivePreferenceChangeListeners();
         int oldModeId = modeId;
@@ -137,6 +135,18 @@ public class Preferences {
         }
     }
 
+    public boolean isFirstStart() {
+        return isFirstStart;
+    }
+
+    public void checkFirstStart() {
+        if(sharedPreferences.getBoolean(Keys._FIRST_START, true)) {
+            Timber.v("Initial application launch");
+            isFirstStart = true;
+            sharedPreferences.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).apply();
+        }
+
+    }
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
@@ -266,34 +276,10 @@ public class Preferences {
         Timber.v("committing to preferences %s", activeSharedPreferences);
 
         activeSharedPreferences.edit().commit();
-        if(m.hasWaypoints()) {
-            importWaypointsFromJson(m.getWaypoints());
-        }
 
 
     }
 
-    @WorkerThread
-    public MessageWaypointCollection waypointsToJSON() {
-
-        MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(WaypointModel waypoint : waypointsRepo.getAllSync()) {
-            messages.add(MessageWaypoint.fromDaoObject(waypoint));
-        }
-        return messages;
-    }
-
-    public void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
-        if(j == null)
-            return;
-
-
-        for (MessageWaypoint m: j) {
-            WaypointModel w = m.toDaoObject();
-
-            waypointsRepo.insert(w);
-        }
-    }
 
     @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
     public void setOpenCageGeocoderApiKey(String key) {
@@ -874,8 +860,7 @@ public class Preferences {
         return getPubRetain();
     }
 
-    @WorkerThread
-    public MessageConfiguration exportToMessage(boolean includeWaypoints) {
+    public MessageConfiguration exportToMessage() {
         List<Method> methods = getExportMethods();
         MessageConfiguration cfg = new MessageConfiguration();
         cfg.set(Keys._VERSION, BuildConfig.VERSION_CODE);
@@ -889,9 +874,6 @@ public class Preferences {
             }
         }
 
-        if(includeWaypoints)
-            cfg.setWaypoints(waypointsToJSON());
-
         return cfg;
     }
 
@@ -904,6 +886,17 @@ public class Preferences {
     public void setFusedRegionDetection(boolean aBoolean) {
         setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean);
     }
+
+    public boolean isObjectboxMigrated() {
+        return !isFirstStart && sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
+
+    }
+
+    public void setObjectBoxMigrated() {
+        sharedPreferences.edit().putBoolean(Keys._OBJECTBOX_MIGRATED, true).apply();
+    }
+
+
 
     @SuppressWarnings("WeakerAccess")
     public static class Keys {
@@ -959,6 +952,7 @@ public class Preferences {
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
         public static final String _VERSION                         = "_build";
 
+        public static final String _OBJECTBOX_MIGRATED                     = "_objectboxMigrated";
 
     }
 

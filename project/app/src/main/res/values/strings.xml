@@ -202,4 +202,7 @@
     <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google</string>
     <string name="placePickerNotAvailable">Unable to open location picker</string>
+    <string name="region_unknown">Status unknown</string>
+    <string name="region_inside">Currently inside</string>
+    <string name="region_outside">Currently outside</string>
 </resources>

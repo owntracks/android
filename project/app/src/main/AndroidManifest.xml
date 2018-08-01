@@ -63,17 +63,17 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ui.map.MapActivity" />
         <activity
-            android:name=".ui.regions.RoomRegionsActivity"
+            android:name=".ui.regions.RegionsActivity"
             android:label="Regions"
             android:launchMode="singleTop">
         </activity>
         <activity
-            android:name=".ui.regions.RoomRegionActivity"
+            android:name=".ui.region.RegionActivity"
             android:label="Region"
             android:launchMode="singleTop">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".ui.regions.RoomRegionsActivity" />
+            android:value=".ui.regions.RegionsActivity" />
         </activity>
         <activity
             android:name=".ui.preferences.PreferencesActivity"

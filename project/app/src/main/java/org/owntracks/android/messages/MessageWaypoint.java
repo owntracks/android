@@ -3,11 +3,14 @@ package org.owntracks.android.messages;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.owntracks.android.db.room.WaypointModel;
+import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import io.objectbox.annotation.Unique;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -76,21 +79,6 @@ public class MessageWaypoint extends MessageBase{
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processOutgoingMessage(this);
-    }
-
-
-    public WaypointModel toDaoObject() {
-        return new WaypointModel(getTst(),getDesc(), getLat(), getLon(), getRad() );
-    }
-
-    public static MessageWaypoint fromDaoObject(WaypointModel w) {
-        MessageWaypoint message = new MessageWaypoint();
-        message.setDesc(w.getDescription());
-        message.setLat(w.getGeofenceLatitude());
-        message.setLon(w.getGeofenceLongitude());
-        message.setRad(w.getGeofenceRadius());
-        message.setTst(w.getTst());
-        return message;
     }
 
 

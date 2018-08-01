@@ -2,7 +2,7 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
-import org.owntracks.android.db.room.WaypointModel;
+import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.model.FusedContact;
 
 public class Events {

@@ -11,6 +11,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -36,6 +37,7 @@ import timber.log.Timber;
 public class MessageProcessor implements IncomingMessageProcessor {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
+    private final WaypointsRepo waypointsRepo;
     private final Preferences preferences;
 
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
@@ -44,6 +46,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private OutgoingMessageProcessor outgoingMessageProcessor;
 
     private boolean acceptMessages =  false;
+    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
 
     public void reconnect() {
         if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
@@ -116,10 +119,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
+        this.waypointsRepo = waypointsRepo; 
 
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
@@ -171,7 +175,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
         loadOutgoingMessageProcessor();
     }
 
-    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
 
     public void sendMessage(MessageBase message) {
         if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) return;
@@ -349,11 +352,16 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     MessageWaypoints w = message.getWaypoints();
-                    if (w != null)
-                        preferences.importWaypointsFromJson(w.getWaypoints());
+                    if(message.getWaypoints() != null) {
+                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                    }
+
                     break;
                 case MessageCmd.ACTION_SET_CONFIGURATION:
                     preferences.importFromMessage(message.getConfiguration());
+                    if(message.getWaypoints() != null) {
+                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                    }
                     break;
                 case MessageCmd.ACTION_REOCONNECT:
                     reconnect();
