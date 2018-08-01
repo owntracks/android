@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -22,9 +21,8 @@ import javax.inject.Inject;
 public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements EditorMvvm.ViewModel<EditorMvvm.View> {
     private final Parser parser;
     private final Preferences preferences;
-
     @Bindable
-    String effectiveConfiguration;
+    private String effectiveConfiguration;
     
     @Inject
     public EditorViewModel(Preferences preferences, Parser parser) {
@@ -39,7 +37,7 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
 
     private void updateEffectiveConfiguration() {
         try {
-            MessageConfiguration m = preferences.exportToMessage(false);
+            MessageConfiguration m = preferences.exportToMessage();
             m.set(Preferences.Keys.PASSWORD, "********");
             setEffectiveConfiguration(parser.toJsonPlainPretty(m));
         } catch (IOException e) {
@@ -55,6 +53,7 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
     @Bindable
     public void setEffectiveConfiguration(String effectiveConfiguration) {
         this.effectiveConfiguration = effectiveConfiguration;
+        notifyPropertyChanged(BR.effectiveConfiguration);
     }
 
     @Override

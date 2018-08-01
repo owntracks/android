@@ -15,7 +15,6 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
@@ -24,7 +23,6 @@ import android.os.Looper;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -50,9 +48,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.db.room.WaypointModel;
 import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
@@ -65,7 +63,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
-import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -169,7 +166,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         setupLocationRequest();
         setupLocationPing();
 
-        new GeofenceTask(this).execute();
+        setupGeofences();
 
         eventBus.register(this);
         eventBus.postSticky(new Events.ServiceStarted());
@@ -420,7 +417,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @MainThread
     private void onWaypointTransition(WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
-        Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getId(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
+        Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getTst(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
         if (ignoreLowAccuracy(l)) {
             Timber.d("ignoring transition: low accuracy ");
@@ -640,7 +637,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     }
 
     @SuppressWarnings("MissingPermission")
-    @WorkerThread
     private void setupGeofences() {
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
@@ -650,23 +646,20 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
         LinkedList<Geofence> geofences = new LinkedList<>();
-        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllSync();
+        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
         waypoints = new LongSparseArray<>(geofences.size());
 
         for (WaypointModel w : loadedWaypoints){
+            waypoints.put(w.getTst(), w);
+            Timber.v("desc:%s", w.getDescription());
 
-            if (w.hasGeofence()) {
-                waypoints.put(w.getId(), w); // lookup later is only required for waypoints that have geofences. Ignore the rest.
-                Timber.v("desc:%s", w.getDescription());
-
-                geofences.add(new Geofence.Builder()
-                        .setRequestId(Long.toString(w.getId()))
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
-            }
+            geofences.add(new Geofence.Builder()
+                    .setRequestId(Long.toString(w.getId()))
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
+                    .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
         }
 
         if (geofences.size() > 0) {
@@ -689,6 +682,16 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
         publishWaypointMessage(e.getWaypointModel());
+        if(e.getWaypointModel().hasGeofence()) {
+            removeGeofences();
+            setupGeofences();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(Events.WaypointUpdated e) {
+        publishWaypointMessage(e.getWaypointModel());
         removeGeofences();
         setupGeofences();
     }
@@ -696,12 +699,14 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointRemoved e) {
-        removeGeofences();
-        setupGeofences();
+        if(e.getWaypointModel().hasGeofence()) {
+            removeGeofences();
+            setupGeofences();
+        }
     }
 
     private void publishWaypointMessage(@NonNull WaypointModel e) {
-        messageProcessor.sendMessage(MessageWaypoint.fromDaoObject(e));
+        messageProcessor.sendMessage(waypointsRepo.fromDaoObject(e));
     }
 
     @SuppressWarnings("unused")
@@ -852,20 +857,5 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     public boolean onUnbind(Intent intent) {
         Timber.v("Last client unbound from service");
         return true; // Ensures onRebind() is called when a client re-binds.
-    }
-
-
-    public static class GeofenceTask extends AsyncTask<Void, Void, Void> {
-        WeakReference<BackgroundService> ref;
-        GeofenceTask(BackgroundService service) {
-            ref = new WeakReference<>(service);
-        }
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if(ref.get() != null) {
-                ref.get().setupGeofences();
-            }
-            return null;
-        }
     }
 }

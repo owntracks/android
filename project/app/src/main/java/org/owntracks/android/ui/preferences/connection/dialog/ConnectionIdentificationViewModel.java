@@ -1,10 +1,10 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
+import android.databinding.Bindable;
 
 import org.owntracks.android.support.Preferences;
-
-import timber.log.Timber;
+import org.owntracks.android.BR;
 
 public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
     boolean authentication;
@@ -52,12 +52,14 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
             preferences.setTrackerId(trackerId);
     }
 
-    public boolean isAuthentication() {
+    @Bindable
+    public boolean getAuthentication() {
         return authentication;
     }
 
     public void setAuthentication(boolean authentication) {
         this.authentication = authentication;
+        notifyPropertyChanged(BR.authentication);
     }
 
     public String getUsername() {

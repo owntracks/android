@@ -21,4 +21,6 @@ import dagger.Component;
 @Component(dependencies = AppComponent.class)
 public interface ServiceComponent {
     void inject(org.owntracks.android.services.BackgroundService service);
+    void inject(org.owntracks.android.services.Scheduler scheduler);
+
 }

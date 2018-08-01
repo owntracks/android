@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.preferences.editor;
 
 import android.content.Intent;
-import android.databinding.Bindable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,7 +21,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesEditorBinding;
-import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.load.LoadActivity;
@@ -32,7 +31,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import javax.inject.Inject;
+
+import io.objectbox.annotation.Index;
+
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
+    @Inject Preferences preferences;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,7 +177,9 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         protected Boolean doInBackground(Void... voids) {
             String exportStr;
             try {
-                exportStr = App.getParser().toJsonPlain(App.getPreferences().exportToMessage(true));
+                MessageConfiguration message = App.getPreferences().exportToMessage();
+                message.setWaypoints(App.getAppComponent().waypointsRepo().exportToMessage());
+                exportStr = App.getParser().toJsonPlain(message);
             } catch (IOException e) {
                 return false;
             }

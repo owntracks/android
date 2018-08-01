@@ -15,9 +15,12 @@ import com.firebase.jobdispatcher.SimpleJobService;
 import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
+import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -33,12 +36,12 @@ public class Scheduler extends SimpleJobService {
     private static final String PERIODIC_TASK_PROCESS_QUEUE = "PERIODIC_TASK_PROCESS_QUEUE";
 
     private FirebaseJobDispatcher dispatcher;
-    private final Preferences preferences;
-    private MessageProcessor messageProcessor;
+    @Inject protected Preferences preferences;
+    @Inject protected MessageProcessor messageProcessor;
 
-    public Scheduler(Preferences preferences, MessageProcessor messageProcessor) {
-        this.preferences = preferences;
-        this.messageProcessor = messageProcessor;
+    public Scheduler() {
+        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+
         this.dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
     }
 

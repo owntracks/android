@@ -1,11 +1,11 @@
-package org.owntracks.android.ui.regions;
+package org.owntracks.android.ui.region;
 
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
-import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -17,41 +17,42 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.R;
-import org.owntracks.android.databinding.ArchUiRegionBinding;
-import org.owntracks.android.db.room.WaypointModel;
-import org.owntracks.android.support.SimpleTextChangeListener;
-import org.owntracks.android.support.widgets.BindingConversions;
-import org.owntracks.android.ui.base.BaseArchitectureActivity;
+import org.owntracks.android.databinding.UiRegionBinding;
+import org.owntracks.android.ui.base.BaseActivity;
 
-import timber.log.Timber;
+public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel> implements RegionMvvm.View{
 
-public class RoomRegionActivity extends BaseArchitectureActivity<ArchUiRegionBinding, RoomRegionViewModel> {
     private static final int REQUEST_PLACE_PICKER = 19283;
 
     private MenuItem saveButton;
-   /* private final Observable.OnPropertyChangedCallback waypointPropertyChangedCallback = new Observable.OnPropertyChangedCallback() {
-        @Override
-        public void onPropertyChanged(Observable observable, int i) {
-            conditionallyEnableSaveButton();
-        }
-    };*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
         setHasEventBus(false);
-        bindAndAttachContentView(R.layout.arch_ui_region, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_region, savedInstanceState);
         setSupportToolbar(binding.toolbar);
+
         Bundle b = navigator.getExtrasBundle(getIntent());
         if(b != null) {
-            viewModel.loadWaypoint(b.getLong("waypointId",-1));
+            viewModel.loadWaypoint(b.getLong("waypointId",0));
         }
 
 
-        viewModel.canSave.observe(this, new Observer<Boolean>() {
+        binding.description.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
                 conditionallyEnableSaveButton();
             }
         });
@@ -118,5 +119,4 @@ public class RoomRegionActivity extends BaseArchitectureActivity<ArchUiRegionBin
             saveButton.getIcon().setAlpha(viewModel.canSaveWaypoint() ? 255 : 130);
         }
     }
-
 }

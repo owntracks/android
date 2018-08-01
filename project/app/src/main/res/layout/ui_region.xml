@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" >
     <data>
         <import type="android.view.View"/>
-        <variable name="vm" type="org.owntracks.android.ui.regions.RoomRegionViewModel" />
-
+        <variable name="vm" type="org.owntracks.android.ui.region.RegionViewModel" />
     </data>
 
     <LinearLayout
@@ -50,8 +49,7 @@
                     android:gravity="bottom"
                     android:inputType="textVisiblePassword"
                     android:id="@+id/description"
-                    android:text="@={vm.description}"
-                    android:onTextChanged="@{() -> vm.onTextChanged()}"
+                    android:text="@={vm.waypoint.description}"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
@@ -73,7 +71,7 @@
                     app:met_primaryColor="@color/accent"
                     android:enabled="false"
                     android:id="@+id/latitude"
-                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.latitude)}"
+                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)}"
 
                     />
 
@@ -89,7 +87,7 @@
                     app:met_primaryColor="@color/accent"
                     android:enabled="false"
                     android:id="@+id/longitude"
-                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.longitude)}"
+                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLongitude)}"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
@@ -107,39 +105,9 @@
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.radius)}'                    />
+                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}'                    />
 
-                    <!--Debugging only-->
-                    <LinearLayout
-                        android:visibility="gone"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_marginLeft="@dimen/default_spacing_half"
-                            android:layout_marginStart="@dimen/default_spacing_half"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/waypointId"
-                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.id) }'                    />
 
-                        <TextView
-                            android:layout_marginLeft="@dimen/default_spacing_half"
-                            android:layout_marginStart="@dimen/default_spacing_half"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/lastTriggered"
-                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTriggered) }'                    />
-                            />
-                        <TextView
-                            android:layout_marginLeft="@dimen/default_spacing_half"
-                            android:layout_marginStart="@dimen/default_spacing_half"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/lastTransition"
-                            android:text='@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.lastTransition) }'                    />
-                            />
-                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>

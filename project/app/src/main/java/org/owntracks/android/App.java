@@ -38,6 +38,7 @@ public class App extends Application  {
     private int runningActivities = 0;
 
     private static AppComponent sAppComponent = null;
+    private static boolean firstStart = false;
 
 
     @Override
@@ -52,12 +53,7 @@ public class App extends Application  {
             });
         }
         sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
-
-
-        checkFirstStart();
-
-        //noinspection ResultOfMethodCallIgnored
-        sAppComponent.preferences().getModeId(); //Dirty hack to make sure preferences are initialized for all classes not using DI
+        sAppComponent.preferences().checkFirstStart();
 
         enableForegroundBackgroundDetection();
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
@@ -195,16 +191,5 @@ public class App extends Application  {
 
         registerReceiver(screenOnOffReceiver, theFilter);
 
-    }
-
-    // Checks if the app is started for the first time.
-    // On every new install this returns true for the first time and false afterwards
-    private void checkFirstStart() {
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if(p.getBoolean(Preferences.Keys._FIRST_START, true)) {
-            Timber.v("Initial application launch");
-            p.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).apply();
-        }
     }
 }

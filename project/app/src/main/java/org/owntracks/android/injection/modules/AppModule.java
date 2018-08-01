@@ -55,14 +55,14 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static Scheduler provideScheduler(Preferences preferences, MessageProcessor messageProcessor) {
-        return new Scheduler(preferences, messageProcessor);
+    static Scheduler provideScheduler() {
+        return new Scheduler(); // Needs to have zero argument constructor
     }
 
     @Provides
     @PerApplication
-    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences) {
-        return new MessageProcessor(eventBus, repo, preferences);
+    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences, WaypointsRepo waypointsRepo) {
+        return new MessageProcessor(eventBus, repo, preferences, waypointsRepo);
     }
 
     @SuppressWarnings("deprecation")
@@ -94,10 +94,6 @@ public class AppModule {
     @Provides
     @PerApplication
     static ContactImageProvider provideContactImageProvider(EventBus eventBus) { return new ContactImageProvider(eventBus); }
-
-    @Provides
-    @PerApplication
-    static Preferences providePreferences(@AppContext Context context, WaypointsRepo waypointsRepo, EventBus eventBus) { return new Preferences(context, waypointsRepo, eventBus); }
 
     @Provides
     @PerApplication

@@ -2,14 +2,12 @@ package org.owntracks.android.support;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.CompoundButton;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -23,10 +21,8 @@ import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
-import org.owntracks.android.ui.regions.RoomRegionsActivity;
+import org.owntracks.android.ui.regions.RegionsActivity;
 import org.owntracks.android.ui.status.StatusActivity;
-
-import timber.log.Timber;
 
 public class DrawerProvider  {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
@@ -84,7 +80,7 @@ public class DrawerProvider  {
                 .addDrawerItems(
                         drawerItemForClass(activity, MapActivity.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
                         drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
-                        drawerItemForClass(activity, RoomRegionsActivity.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp)
+                        drawerItemForClass(activity, RegionsActivity.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp)
 
 
                 ).addStickyDrawerItems(
