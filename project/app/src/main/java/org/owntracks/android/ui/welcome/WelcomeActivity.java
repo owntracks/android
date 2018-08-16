@@ -27,7 +27,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
-        if (requirementsChecker.areRequirementsMet(this)) {
+        if (requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(MapActivity.class);
             finish();
         }
