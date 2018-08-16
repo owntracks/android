@@ -55,7 +55,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
 
-        if (!requirementsChecker.areRequirementsMet(this)) {
+        if (!requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(WelcomeActivity.class);
             finish();
         }
