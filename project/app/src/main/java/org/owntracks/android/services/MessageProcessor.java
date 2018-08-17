@@ -179,13 +179,12 @@ public class MessageProcessor implements IncomingMessageProcessor {
     public void sendMessage(MessageBase message) {
         if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) return;
 
-
         outgoingQueue.put(message.getMessageId(), message);
         Timber.v("messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
         processQueueHead();
     }
 
-     int onMessageDelivered(Long messageId) {
+     void onMessageDelivered(Long messageId) {
         MessageBase m = outgoingQueue.get(messageId);
 
 
@@ -204,10 +203,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
         }
         processQueueHead();
-        return Scheduler.returnSuccess();
     }
-
-
 
     public synchronized void processQueueHead() {
         MessageBase head = outgoingQueue.get(outgoingQueue.keyAt(0));
@@ -217,7 +213,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             return;
         }
-        //outgoingMessageProcessor.processOutgoingMessage(head);
         if (head.isOutgoing()) {
             Timber.e("queue is already processing");
            return;
@@ -229,16 +224,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     }
 
-
-
-    int onMessageDeliveryFailedFinal(Long messageId) {
+    void onMessageDeliveryFailedFinal(Long messageId) {
         Timber.e(":%s", messageId);
         dequeue(messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-
-        //App.getScheduler().scheduleQueueProcessing();
-
-        return Scheduler.returnFailNoretry();
     }
 
     private void dequeue(long messageId) {
@@ -246,42 +235,20 @@ public class MessageProcessor implements IncomingMessageProcessor {
         outgoingQueue.remove(messageId);
     }
 
-    int onMessageDeliveryFailed(Long messageId) {
+    void onMessageDeliveryFailed(Long messageId) {
         Timber.v("queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
 
         MessageBase m = outgoingQueue.get(messageId);
-        //outgoingQueue.remove(messageId);
 
          if(m != null) {
              m.clearOutgoingProcessor();
          }
 
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-
-        //  Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
-          //  return Scheduler.returnFailNoretry();
-        //} else {
-            //eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-            //if(m.getOutgoingTTL() > 0)  {
-                //if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) {
-            ////    Timber.e("messageId:%s, queueLength:%s, action: discarded/acceptMessages",m.getMessageId(),outgoingQueue.size() );
-            ////     dequeue(m.getMessageId());
-            ////    return Scheduler.returnFailNoretry();
-            ////}
-            ////Timber.d("messageId:%s, queueLength:%s, action: requeued", m.getMessageId(), outgoingQueue.size());
-            ////return Scheduler.returnFailRetry();
-
-            //} else {
-             //   Timber.e("messageId:%s, queueLength:%s, action: discarded/expired",m.getMessageId(),outgoingQueue.size() );
-             //   dequeue(m.getMessageId());
-             //   return Scheduler.returnFailNoretry();
-            //}
-        return Scheduler.returnFailRetry();
-        }
+    }
 
 
     void onMessageReceived(MessageBase message) {
-        //Timber.v("messageId:%s", message.getMessageId());
         message.setIncomingProcessor(this);
         incomingMessageProcessorExecutor.execute(message);
     }
