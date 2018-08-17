@@ -38,7 +38,7 @@ android {
             shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHODLER" }"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHOLDER_API_KEY" }"
         }
 
         debug {
@@ -47,7 +47,7 @@ android {
             shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHODLER" }"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHOLDER_API_KEY" }"
             applicationIdSuffix '.debug'
             testCoverageEnabled true
         }
@@ -105,9 +105,14 @@ android {
             }
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
+
     // Support libraries
     implementation "com.android.support:support-v4:${supportLibVersion}"
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
@@ -125,9 +130,8 @@ dependencies {
 
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
-    implementation 'org.greenrobot:eventbus:3.1.1'
-    implementation 'org.greenrobot:greendao:3.2.2'
-
+    implementation "org.greenrobot:eventbus:3.1.1"
+    implementation "org.greenrobot:greendao:3.2.2"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
@@ -137,10 +141,10 @@ dependencies {
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
-    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
-    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
-    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
-    implementation('com.mikepenz:materialdrawer:6.0.2@aar') { transitive = true }
+    implementation "com.rengwuxian.materialedittext:library:2.1.4"
+    implementation "com.afollestad.material-dialogs:core:0.9.6.0"
+    implementation "com.afollestad.material-dialogs:commons:0.9.6.0"
+    implementation("com.mikepenz:materialdrawer:6.0.6@aar") { transitive = true }
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
@@ -148,15 +152,14 @@ dependencies {
     implementation "com.mikepenz:materialize:1.1.2@aar"
 
     // Preprocessors
-    annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.1.1'
+    annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
-
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.15.0'
-
-    testImplementation 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
-    testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:2.15.0"
+    testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"
+    testImplementation "org.powermock:powermock-api-mockito2:2.0.0-beta.5"
     testImplementation "org.robolectric:robolectric:3.8"
+    testImplementation "org.robolectric:shadows-playservices:3.8"
 
 }
 

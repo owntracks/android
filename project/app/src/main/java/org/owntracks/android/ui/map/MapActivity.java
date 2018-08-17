@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -31,8 +30,8 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
-import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import java.util.WeakHashMap;
 
@@ -56,7 +55,10 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
 
-        assertRequirements();
+        if (!requirementsChecker.areRequirementsMet()) {
+            navigator.startActivity(WelcomeActivity.class);
+            finish();
+        }
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
 
         setSupportToolbar(this.binding.toolbar, false, true);

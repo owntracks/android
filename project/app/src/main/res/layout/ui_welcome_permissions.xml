@@ -58,7 +58,7 @@
 			android:visibility="@{vm.permissionGranted}"/>
 
 		<Button
-			android:id="@+id/button"
+			android:id="@+id/fix_permissions_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
