@@ -38,7 +38,6 @@ public class App extends Application  {
     private int runningActivities = 0;
 
     private static AppComponent sAppComponent = null;
-    private static boolean firstStart = false;
 
 
     @Override
