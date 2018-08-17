@@ -1,19 +1,16 @@
 package org.owntracks.android.ui.welcome.permission;
 
-import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
 
-
-@PerFragment
+@PerActivity
 public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmentMvvm.View> implements PermissionFragmentMvvm.ViewModel<PermissionFragmentMvvm.View> {
     boolean permissionGranted;
 

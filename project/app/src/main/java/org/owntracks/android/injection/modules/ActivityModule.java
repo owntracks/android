@@ -58,6 +58,6 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
-    RequirementsChecker provideRequirementsChecker(Preferences preferences) {return new RequirementsChecker(preferences); }
+    RequirementsChecker provideRequirementsChecker(Preferences preferences) {return new RequirementsChecker(preferences, mActivity); }
 
 }

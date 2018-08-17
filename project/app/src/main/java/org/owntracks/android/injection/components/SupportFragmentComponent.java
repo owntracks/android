@@ -2,8 +2,7 @@ package org.owntracks.android.injection.components;
 
 import org.owntracks.android.injection.modules.SupportFragmentModule;
 import org.owntracks.android.injection.modules.ViewModelModule;
-import org.owntracks.android.injection.scopes.PerFragment;
-import org.owntracks.android.ui.preferences.PreferencesFragment;
+import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
 import org.owntracks.android.ui.welcome.intro.IntroFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
@@ -25,7 +24,7 @@ import dagger.Component;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-@PerFragment
+@PerActivity
 @Component(dependencies = AppComponent.class, modules = {SupportFragmentModule.class, ViewModelModule.class})
 public interface SupportFragmentComponent {
     void inject(IntroFragment fragment);
