@@ -135,6 +135,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 this.isMapReady = false;
                 initMapDelayed();
             } else {
+                viewModel.onMapReady();
                 this.isMapReady = true;
             }
 

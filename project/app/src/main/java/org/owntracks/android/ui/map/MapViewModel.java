@@ -219,7 +219,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
-    public void onEventMainThread(@NonNull Location l) {
+    public void onEvent(@NonNull Location l) {
         Timber.v("location source updated");
 
         this.mLocation = l;
@@ -227,6 +227,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             this.mListener.onLocationChanged(this.mLocation);
         }
         if(mode == VIEW_DEVICE) {
+            //noinspection ConstantConditions
             getView().updateCamera(getCurrentLocation());
         }
         getView().enableLocationMenus();
