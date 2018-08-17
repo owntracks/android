@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
@@ -19,11 +19,15 @@ import javax.inject.Inject;
 
 @PerActivity
 public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements EditorMvvm.ViewModel<EditorMvvm.View> {
+    private final Parser parser;
+    private final Preferences preferences;
     @Bindable
-    String effectiveConfiguration;
-
+    private String effectiveConfiguration;
+    
     @Inject
-    public EditorViewModel() {
+    public EditorViewModel(Preferences preferences, Parser parser) {
+        this.preferences = preferences;
+        this.parser = parser; 
     }
 
     public void attachView(@NonNull EditorMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -33,10 +37,9 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
 
     private void updateEffectiveConfiguration() {
         try {
-            MessageConfiguration m = App.getPreferences().exportToMessage();
-            m.setWaypoints(null);
+            MessageConfiguration m = preferences.exportToMessage();
             m.set(Preferences.Keys.PASSWORD, "********");
-            setEffectiveConfiguration(App.getParser().toJsonPlainPretty(m));
+            setEffectiveConfiguration(parser.toJsonPlainPretty(m));
         } catch (IOException e) {
             getView().displayLoadFailed();
         }
@@ -50,24 +53,8 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
     @Bindable
     public void setEffectiveConfiguration(String effectiveConfiguration) {
         this.effectiveConfiguration = effectiveConfiguration;
+        notifyPropertyChanged(BR.effectiveConfiguration);
     }
-
-    @Override
-    public void onExportConfigurationToFileClicked() {
-        String exportStr;
-        try {
-            exportStr = App.getParser().toJsonPlain(App.getPreferences().exportToMessage());
-        } catch (IOException e) {
-            getView().displayExportToFileFailed();
-            return;
-        }
-
-        // Actual export handled by view because it requires a contexts
-        if(getView().exportConfigurationToFile(exportStr)) {
-            getView().displayExportToFileSuccessful();
-        }
-    }
-
 
     @Override
     public void onPreferencesValueForKeySetSuccessful() {

@@ -8,7 +8,7 @@ import org.owntracks.android.injection.modules.ViewModelModule;
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.ui.preferences.PreferencesActivity;
+import org.owntracks.android.ui.region.RegionActivity;
 
 import dagger.Component;
 
@@ -16,8 +16,7 @@ import dagger.Component;
 @Component(dependencies = AppComponent.class, modules = {ActivityModule.class, ViewModelModule.class})
 public interface ActivityComponent {
     @ActivityContext Context activityContext();
-    @ActivityFragmentManager
-    FragmentManager activityFragmentManager();
+    @ActivityFragmentManager FragmentManager activityFragmentManager();
 
     void inject(org.owntracks.android.ui.contacts.ContactsActivity activity);
     void inject(org.owntracks.android.ui.map.MapActivity activity);
@@ -27,5 +26,7 @@ public interface ActivityComponent {
     void inject(org.owntracks.android.ui.preferences.load.LoadActivity activity);
     void inject(org.owntracks.android.ui.status.StatusActivity activity);
     void inject(org.owntracks.android.ui.welcome.WelcomeActivity activity);
+    void inject(org.owntracks.android.ui.regions.RegionsActivity activity);
+    void inject(org.owntracks.android.ui.region.RegionActivity activity);
 
 }

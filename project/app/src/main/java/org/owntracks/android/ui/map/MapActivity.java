@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -30,10 +31,13 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import java.util.WeakHashMap;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -47,7 +51,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     private boolean isMapReady = false;
     private Menu mMenu;
 
-
+    @Inject
+    protected Runner runner;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,10 +60,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
 
-        if (!requirementsChecker.areRequirementsMet()) {
-            navigator.startActivity(WelcomeActivity.class);
-            finish();
-        }
+        assertRequirements();
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
 
         setSupportToolbar(this.binding.toolbar, false, true);
@@ -133,6 +135,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 this.isMapReady = false;
                 initMapDelayed();
             } else {
+                viewModel.onMapReady();
                 this.isMapReady = true;
             }
 
@@ -194,7 +197,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void initMapDelayed() {
         isMapReady = false;
 
-        App.postOnMainHandlerDelayed(new Runnable() {
+        //runner.postOnMainHandlerDelayed();
+        runner.postOnMainHandlerDelayed(new Runnable() {
             @Override
             public void run() {
                 initMap();
@@ -382,7 +386,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-        if (App.getPreferences().getModeId() == App.MODE_ID_HTTP_PRIVATE)
+        if (preferences.getModeId() == App.MODE_ID_HTTP_PRIVATE)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }

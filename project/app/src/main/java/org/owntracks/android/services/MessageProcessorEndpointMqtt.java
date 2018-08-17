@@ -4,11 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
-import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -18,11 +15,12 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
+import org.owntracks.android.injection.components.DaggerMessageProcessorComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -48,21 +46,35 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, StatefulServiceMessageProcessor {
-	private static final String TAG = "ServiceMessageMqtt";
-
-	private static final String MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD = "MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD";
-	private static final String MQTT_BUNDLE_KEY_MESSAGE_TOPIC = "MQTT_BUNDLE_KEY_MESSAGE_TOPIC";
-	private static final String MQTT_BUNDLE_KEY_MESSAGE_RETAINED = "MQTT_BUNDLE_KEY_MESSAGE_RETAINED";
-	private static final String MQTT_BUNDLE_KEY_MESSAGE_QOS = "MQTT_BUNDLE_KEY_MESSAGE_QOS";
-
 	private CustomMqttClient mqttClient;
 	private MqttConnectOptions connectOptions;
 	private String lastConnectionId;
 	private static EndpointState state;
 
+	@Inject
+	protected MessageProcessor messageProcessor;
+
+	@Inject
+	protected Parser parser;
+
+	@Inject
+	protected Preferences preferences;
+
+	@Inject
+	protected Scheduler scheduler;
+
+	@Inject
+	protected EventBus eventBus;
+
+	private MessageProcessorEndpointMqtt() {
+		DaggerMessageProcessorComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+	}
+	
 	synchronized boolean sendPing() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
@@ -73,87 +85,30 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 	}
 
-	//synchronized int sendMessage(Bundle b) {
-	synchronized int sendMessage(MessageBase m) {
-		long messageId = m.getMessageId();//b.getLong(Scheduler.BUNDLE_KEY_MESSAGE_ID);
-
-		// Try to connect on demand if disconnected
-		// Do not try to do this if previous attempts were not successful
-		// Normal reconnect scheduler will take over
-		//if (!isConnected()) {
-			//Timber.d("not connected. Pressure is %s", sendMessageConnectPressure);
-			//if (sendMessageConnectPressure > 2) {
-			//	Timber.d("connect pressure too high, falling back to normal scheduler");
-			//	return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
-			//} else {
-			//	Timber.d("pressure ok, connecting on demand");
-
-				sendMessageConnectPressure++;
-				if (!connect()) {
-					Timber.v("failed connection attempts :%s", sendMessageConnectPressure);
-					return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
-				}
-			//}
-		//}
-
-		// Connection should be established
+	private synchronized void sendMessage(MessageBase m) {
+		long messageId = m.getMessageId();
+		sendMessageConnectPressure++;
+		if (!connect()) {
+			Timber.v("failed connection attempts :%s", sendMessageConnectPressure);
+			messageProcessor.onMessageDeliveryFailed(messageId);
+			return;
+		}
 
 		try {
-			IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), App.getParser().toJsonBytes(m), m.getQos(), m.getRetained());
+			IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), parser.toJsonBytes(m), m.getQos(), m.getRetained());
 			pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
 
 			Timber.v("message sent: %s", messageId);
-			return App.getMessageProcessor().onMessageDelivered(messageId);
+			messageProcessor.onMessageDelivered(messageId);
 		} catch (MqttException e) {
 			e.printStackTrace();
-			return App.getMessageProcessor().onMessageDeliveryFailed(messageId);
-		} catch (Exception e) {
-		// Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
-			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped", m.getMessageId());
-			return App.getMessageProcessor().onMessageDeliveryFailedFinal(messageId);
-		}
-	}
-
-
-
-	@SuppressWarnings("ConstantConditions")
-	private MqttMessage mqttMessageFromBundle(Bundle b) {
-		MqttMessage  m = new MqttMessage();
-		m.setPayload(b.getByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD));
-		m.setQos(b.getInt(MQTT_BUNDLE_KEY_MESSAGE_QOS));
-		m.setRetained(b.getBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED));
-		return m;
-	}
-
-	@NonNull
-	private Bundle mqttMessageToBundle(MessageBase m)  {
-		Bundle b = new Bundle();
-		b.putLong(Scheduler.BUNDLE_KEY_MESSAGE_ID, m.getMessageId());
-		b.putString(Scheduler.BUNDLE_KEY_ACTION, Scheduler.ONEOFF_TASK_SEND_MESSAGE_MQTT);
-
-		try {
-			// Message properties
-			b.putByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, App.getParser().toJsonBytes(m));
-			b.putString(MQTT_BUNDLE_KEY_MESSAGE_TOPIC, m.getTopic());
-			b.putInt(MQTT_BUNDLE_KEY_MESSAGE_QOS, m.getQos());
-			b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, m.getRetained());
+			messageProcessor.onMessageDeliveryFailed(messageId);
 		} catch (Exception e) {
 			// Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
-			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped" ,m.getMessageId());
-			return b;
+			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped", m.getMessageId());
+			messageProcessor.onMessageDeliveryFailedFinal(messageId);
 		}
-		return b;
 	}
-
-	@NonNull
-	private Bundle mqttMessageToBundle(@NonNull MessageClear m) {
-		Bundle b = mqttMessageToBundle(MessageBase.class.cast(m));
-		b.putByteArray(MQTT_BUNDLE_KEY_MESSAGE_PAYLOAD, new byte[0]);
-		b.putBoolean(MQTT_BUNDLE_KEY_MESSAGE_RETAINED, true);
-		return b;
-	}
-
-
 
 	private static MessageProcessorEndpointMqtt instance;
 	public static MessageProcessorEndpointMqtt getInstance() {
@@ -177,15 +132,15 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		@Override
 		public void connectionLost(Throwable cause) {
 			Timber.e(cause, "connectionLost error");
-			App.getScheduler().cancelMqttPing();
-            App.getScheduler().scheduleMqttReconnect();
+			scheduler.cancelMqttPing();
+            scheduler.scheduleMqttReconnect();
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 		}
 
 		@Override
-		public void messageArrived(String topic, MqttMessage message) throws Exception {
+		public void messageArrived(String topic, MqttMessage message)  {
 			try {
-				MessageBase m = App.getParser().fromJson(message.getPayload());
+				MessageBase m = parser.fromJson(message.getPayload());
 				if (!m.isValidMessage()) {
 					Timber.e("message failed validation");
 					return;
@@ -194,20 +149,19 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				m.setTopic(topic);
 				m.setRetained(message.isRetained());
 				m.setQos(message.getQos());
-				App.getMessageProcessor().onMessageReceived(m);
+				messageProcessor.onMessageReceived(m);
 			} catch (Exception e) {
 				if (message.getPayload().length == 0) {
 					Timber.v("clear message received: %s", topic);
 					MessageClear m = new MessageClear();
 					m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
-					App.getMessageProcessor().onMessageReceived(m);
+					messageProcessor.onMessageReceived(m);
 				} else {
 					Timber.e(e, "payload:%s ", new String(message.getPayload()));
 				}
 			}
 		}
 	};
-
 
 	private boolean initClient() {
 		if (this.mqttClient != null) {
@@ -218,21 +172,21 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		try {
 
 			String prefix = "tcp";
-			if (App.getPreferences().getTls()) {
-				if (App.getPreferences().getWs()) {
+			if (preferences.getTls()) {
+				if (preferences.getWs()) {
 					prefix = "wss";
 				} else
 					prefix = "ssl";
 			} else {
-				if (App.getPreferences().getWs())
+				if (preferences.getWs())
 					prefix = "ws";
 			}
 
-			String cid = App.getPreferences().getClientId();
-            String connectString = prefix + "://" + App.getPreferences().getHost() + ":" + App.getPreferences().getPort();
-			Timber.v("mode: " + App.getPreferences().getModeId());
-			Timber.v("client id: " + cid);
-			Timber.v("connect string: " + connectString);
+			String cid = preferences.getClientId();
+            String connectString = prefix + "://" + preferences.getHost() + ":" + preferences.getPort();
+			Timber.v("mode: %s", preferences.getModeId());
+			Timber.v("client id: %s", cid);
+			Timber.v("connect string: %s", connectString);
 
 			this.mqttClient = new CustomMqttClient(connectString, cid, new MqttClientMemoryPersistence());
 			this.mqttClient.setCallback(iCallbackClient);
@@ -297,16 +251,16 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		try {
 			Timber.v("setting up connect options");
 			 connectOptions = new MqttConnectOptions();
-			if (App.getPreferences().getAuth()) {
-				connectOptions.setPassword(App.getPreferences().getPassword().toCharArray());
-				connectOptions.setUserName(App.getPreferences().getUsername());
+			if (preferences.getAuth()) {
+				connectOptions.setPassword(preferences.getPassword().toCharArray());
+				connectOptions.setUserName(preferences.getUsername());
 			}
 
-			connectOptions.setMqttVersion(App.getPreferences().getMqttProtocolLevel());
+			connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
 
-			if (App.getPreferences().getTls()) {
-				String tlsCaCrt = App.getPreferences().getTlsCaCrtName();
-				String tlsClientCrt = App.getPreferences().getTlsClientCrtName();
+			if (preferences.getTls()) {
+				String tlsCaCrt = preferences.getTlsCaCrtName();
+				String tlsClientCrt = preferences.getTlsClientCrtName();
 
 				SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
@@ -320,34 +274,30 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 				if (tlsClientCrt.length() > 0) {
 					try {
-						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(App.getPreferences().getTlsClientCrtPassword());
+						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}
 				}
 
-
-
 				connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
 			}
 
-
             setWill(connectOptions);
-			connectOptions.setKeepAliveInterval(App.getPreferences().getKeepalive());
+			connectOptions.setKeepAliveInterval(preferences.getKeepalive());
 			connectOptions.setConnectionTimeout(30);
-			connectOptions.setCleanSession(App.getPreferences().getCleanSession());
+			connectOptions.setCleanSession(preferences.getCleanSession());
 
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
-			App.getScheduler().scheduleMqttPing(connectOptions.getKeepAliveInterval());
+			scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
 			changeState(EndpointState.CONNECTED);
 
 			sendMessageConnectPressure =0; // allow new connection attempts from sendMessage
 			return true;
 
 		} catch (Exception e) { // Catch paho and socket factory exceptions
-			Log.e(TAG, e.toString());
-            e.printStackTrace();
+			Timber.e(e);
 			changeState(e);
 			return false;
 		}
@@ -359,7 +309,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(App.getPreferences().getPubTopicBase(), lwt.toString().getBytes(), 0, false);
+            m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
         } catch(JSONException ignored) {}
 
 	}
@@ -369,31 +319,31 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	private void onConnect() {
-		App.getScheduler().cancelMqttReconnect();
+		scheduler.cancelMqttReconnect();
 		// Check if we're connecting to the same broker that we were already connected to
 		String connectionId = getConnectionId();
 		if(lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
-			App.getEventBus().post(new Events.EndpointChanged());
+			eventBus.post(new Events.EndpointChanged());
 			lastConnectionId = connectionId;
-			Log.v(TAG, "lastConnectionId changed to: " + lastConnectionId);
+			Timber.v("lastConnectionId changed to: %s", lastConnectionId);
 		}
 
 		List<String> topics = new ArrayList<>();
-		String subTopicBase = App.getPreferences().getSubTopic();
+		String subTopicBase = preferences.getSubTopic();
 
-		if(!App.getPreferences().getSub()) // Don't subscribe if base topic is invalid
+		if(!preferences.getSub()) // Don't subscribe if base topic is invalid
 			return;
 		else if(subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
 			topics.add(subTopicBase);
 		} else {
 
 			topics.add(subTopicBase);
-			if(App.getPreferences().getInfo())
-				topics.add(subTopicBase + App.getPreferences().getPubTopicInfoPart());
+			if(preferences.getInfo())
+				topics.add(subTopicBase + preferences.getPubTopicInfoPart());
 
-			topics.add(App.getPreferences().getPubTopicBase() + App.getPreferences().getPubTopicCommandsPart());
-			topics.add(subTopicBase + App.getPreferences().getPubTopicEventsPart());
-			topics.add(subTopicBase + App.getPreferences().getPubTopicWaypointsPart());
+			topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
+			topics.add(subTopicBase + preferences.getPubTopicEventsPart());
+			topics.add(subTopicBase + preferences.getPubTopicWaypointsPart());
 
 
 		}
@@ -405,11 +355,11 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
     private void subscribe(String[] topics) {
 		if(!isConnected()) {
-            Log.e(TAG, "subscribe when not connected");
+            Timber.e("subscribe when not connected");
             return;
         }
         for(String s : topics) {
-            Log.v(TAG, "subscribe() - Will subscribe to: " + s);
+			Timber.v( "subscribe() - Will subscribe to: %s", s);
         }
 		try {
 			int qos[] = getSubTopicsQos(topics);
@@ -422,19 +372,19 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	private int[] getSubTopicsQos(String[] topics) {
 		int[] qos = new int[topics.length];
-		Arrays.fill(qos, App.getPreferences().getSubQos());
+		Arrays.fill(qos, preferences.getSubQos());
 		return qos;
 	}
 
 	@SuppressWarnings("unused")
 	private void unsubscribe(String[] topics) {
 		if(!isConnected()) {
-			Log.e(TAG, "subscribe when not connected");
+			Timber.e("subscribe when not connected");
 			return;
 		}
 
 		for(String s : topics) {
-			Log.v(TAG, "unsubscribe() - Will unsubscribe from: " + s);
+			Timber.v("unsubscribe() - Will unsubscribe from: %s", s);
 		}
 
 		try {
@@ -454,7 +404,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 		try {
 			if (isConnected()) {
-				Log.v(TAG, "Disconnecting");
+				Timber.v("Disconnecting");
 				this.mqttClient.disconnect(0);
 			}
 		} catch (Exception e) {
@@ -466,8 +416,8 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				changeState(EndpointState.DISCONNECTED_USERDISCONNECT);
 			else
 				changeState(EndpointState.DISCONNECTED);
-			App.getScheduler().cancelMqttPing();
-			App.getScheduler().cancelMqttReconnect();
+			scheduler.cancelMqttPing();
+			scheduler.cancelMqttReconnect();
 
 		}
 	}
@@ -491,7 +441,7 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 
 	@Override
 	public boolean isConfigurationComplete() {
-		return !App.getPreferences().getHost().trim().equals("") && !App.getPreferences().getUsername().trim().equals("") && (!App.getPreferences().getAuth() || !App.getPreferences().getPassword().trim().equals(""));
+		return !preferences.getHost().trim().equals("") && !preferences.getUsername().trim().equals("") && (!preferences.getAuth() || !preferences.getPassword().trim().equals(""));
 	}
 
 	@WorkerThread
@@ -514,27 +464,25 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			return;
 
 		state = newState;
-		getMessageProcessor().onEndpointStateChanged(newState);
+		messageProcessor.onEndpointStateChanged(newState);
 	}
 
 	private void changeState(EndpointState newState, Exception e) {
 		state = newState;
-		getMessageProcessor().onEndpointStateChanged(newState.setError(e));
-	}
-
-	private MessageProcessor getMessageProcessor() {
-		return App.getMessageProcessor();
+		messageProcessor.onEndpointStateChanged(newState.setError(e));
 	}
 
 	private boolean isOnline() {
 		ConnectivityManager cm = (ConnectivityManager) App.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(cm == null)
+			return false;
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         if(netInfo != null && netInfo.isAvailable() && netInfo.isConnected()) {
             return true;
         } else {
-            Log.e(TAG, "isOnline == false. activeNetworkInfo: "+ (netInfo != null) +", available:" + (netInfo != null && netInfo.isAvailable()) + ", connected:" + (netInfo != null && netInfo.isConnected()));
-            return false;
+			Timber.e("isOnline == false. available:%s, connected:%s", netInfo != null && netInfo.isAvailable(), netInfo != null && netInfo.isConnected());
+			return false;
         }
 	}
 
@@ -558,100 +506,78 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 	}
 
 	public void processOutgoingMessage(MessageBase message) {
-		message.setTopic(App.getPreferences().getPubTopicBase());
+		message.setTopic(preferences.getPubTopicBase());
 		sendMessage(message);
-		//schedulesMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageCmd message) {
-		message.setTopic(App.getPreferences().getPubTopicCommands());
+		message.setTopic(preferences.getPubTopicCommands());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageEvent message) {
-		message.setTopic(App.getPreferences().getPubTopicEvents());
+		message.setTopic(preferences.getPubTopicEvents());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageLocation message) {
-		message.setTopic(App.getPreferences().getPubTopicLocations());
-		message.setQos(App.getPreferences().getPubQosLocations());
-		message.setRetained(App.getPreferences().getPubRetainLocations());
+		message.setTopic(preferences.getPubTopicLocations());
+		message.setQos(preferences.getPubQosLocations());
+		message.setRetained(preferences.getPubRetainLocations());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageTransition message) {
-		message.setTopic(App.getPreferences().getPubTopicEvents());
-		message.setQos(App.getPreferences().getPubQosEvents());
-		message.setRetained(Preferences.getPubRetainEvents());
+		message.setTopic(preferences.getPubTopicEvents());
+		message.setQos(preferences.getPubQosEvents());
+		message.setRetained(preferences.getPubRetainEvents());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageWaypoint message) {
-		message.setTopic(App.getPreferences().getPubTopicWaypoints());
-		message.setQos(Preferences.getPubQosWaypoints());
-		message.setRetained(Preferences.getPubRetainWaypoints());
+		message.setTopic(preferences.getPubTopicWaypoints());
+		message.setQos(preferences.getPubQosWaypoints());
+		message.setRetained(preferences.getPubRetainWaypoints());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageWaypoints message) {
-		message.setTopic(App.getPreferences().getPubTopicWaypoints());
-		message.setQos(App.getPreferences().getPubQosWaypoints());
-		message.setRetained(App.getPreferences().getPubRetainWaypoints());
+		message.setTopic(preferences.getPubTopicWaypoints());
+		message.setQos(preferences.getPubQosWaypoints());
+		message.setRetained(preferences.getPubRetainWaypoints());
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void processOutgoingMessage(MessageClear message) {
 		message.setRetained(true);
 		sendMessage(message);
-
-		//scheduleMessage(mqttMessageToBundle(message));
-
 		message.setTopic(message.getTopic()+MessageCard.BASETOPIC_SUFFIX);
 		sendMessage(message);
-		//scheduleMessage(mqttMessageToBundle(message));
 	}
 
 	@Override
 	public void onDestroy() {
 		disconnect(false);
-		App.getScheduler().cancelMqttTasks();;
+		scheduler.cancelMqttTasks();
 	}
 
 	@Override
 	public void onCreateFromProcessor() {
-		App.getScheduler().scheduleMqttReconnect();
-		//connect();
+		scheduler.scheduleMqttReconnect();
 	}
-
-
-
-	private void scheduleMessage(Bundle b) {
-			//if(App.isInForeground())
-			//	sendMessage(b);
-			//else
-			//	App.getScheduler().scheduleMessage(b);
-	}
-
 
 	private static final class MqttClientMemoryPersistence implements MqttClientPersistence {
 		private static Hashtable<String, MqttPersistable> data;
 
 		@Override
-		public void open(String s, String s2) throws MqttPersistenceException {
+		public void open(String s, String s2)  {
 			if(data == null) {
 				data = new Hashtable<>();
 			}
@@ -663,37 +589,37 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 		}
 
 		@Override
-		public void close() throws MqttPersistenceException {
+		public void close() {
 
 		}
 
 		@Override
-		public void put(String key, MqttPersistable persistable) throws MqttPersistenceException {
+		public void put(String key, MqttPersistable persistable) {
 			data.put(key, persistable);
 		}
 
 		@Override
-		public MqttPersistable get(String key) throws MqttPersistenceException {
+		public MqttPersistable get(String key)  {
 			return data.get(key);
 		}
 
 		@Override
-		public void remove(String key) throws MqttPersistenceException {
+		public void remove(String key)  {
 			data.remove(key);
 		}
 
 		@Override
-		public Enumeration keys() throws MqttPersistenceException {
+		public Enumeration keys()  {
 			return data.keys();
 		}
 
 		@Override
-		public void clear() throws MqttPersistenceException {
+		public void clear()  {
 			data.clear();
 		}
 
 		@Override
-		public boolean containsKey(String key) throws MqttPersistenceException {
+		public boolean containsKey(String key)  {
 			return data.containsKey(key);
 		}
 	}

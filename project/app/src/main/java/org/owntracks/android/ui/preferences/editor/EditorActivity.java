@@ -2,6 +2,7 @@ package org.owntracks.android.ui.preferences.editor;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesEditorBinding;
+import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.load.LoadActivity;
@@ -27,8 +29,14 @@ import org.owntracks.android.ui.preferences.load.LoadActivity;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
+
+import io.objectbox.annotation.Index;
 
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
+    @Inject Preferences preferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +59,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.exportConfigurationFile:
-                viewModel.onExportConfigurationToFileClicked();
+                new ExportTask(this).execute();
                 return true;
             case R.id.importConfigurationFile:
                 showImportConfigurationFilePickerView();
@@ -157,5 +165,38 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     }
     public void displayPreferencesValueForKeySetFailedValue() {
         Toast.makeText(this, R.string.preferencesEditorValueError, Toast.LENGTH_SHORT).show();
+    }
+
+
+    public static class ExportTask extends AsyncTask<Void, Void, Boolean> {
+        WeakReference<EditorActivity> ref;
+        ExportTask(EditorActivity activity) {
+            ref = new WeakReference<>(activity);
+        }
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            String exportStr;
+            try {
+                MessageConfiguration message = App.getPreferences().exportToMessage();
+                message.setWaypoints(App.getAppComponent().waypointsRepo().exportToMessage());
+                exportStr = App.getParser().toJsonPlain(message);
+            } catch (IOException e) {
+                return false;
+            }
+            if(ref.get() != null)
+                ref.get().exportConfigurationToFile(exportStr);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if(ref.get() != null) {
+                if (success) {
+                    ref.get().displayExportToFileSuccessful();
+                } else {
+                    ref.get().displayExportToFileSuccessful();
+                }
+            }
+        }
     }
 }

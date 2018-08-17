@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.NonNull;
 
 import com.firebase.jobdispatcher.Constraint;
@@ -14,8 +15,12 @@ import com.firebase.jobdispatcher.SimpleJobService;
 import com.firebase.jobdispatcher.Trigger;
 
 import org.owntracks.android.App;
+import org.owntracks.android.injection.components.DaggerServiceComponent;
+import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -30,15 +35,15 @@ public class Scheduler extends SimpleJobService {
     private static final String PERIODIC_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT";
     private static final String PERIODIC_TASK_PROCESS_QUEUE = "PERIODIC_TASK_PROCESS_QUEUE";
 
-
-    private static Scheduler instance;
-    private static FirebaseJobDispatcher dispatcher;
+    private FirebaseJobDispatcher dispatcher;
+    @Inject protected Preferences preferences;
+    @Inject protected MessageProcessor messageProcessor;
 
     public Scheduler() {
-         dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
+        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+
+        this.dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(App.getContext()));
     }
-
-
 
     @Override
     public int onRunJob(JobParameters taskParams) {
@@ -70,7 +75,7 @@ public class Scheduler extends SimpleJobService {
                 return returnSuccess();
             case PERIODIC_TASK_PROCESS_QUEUE:
                 Timber.v("processing queue");
-                App.getMessageProcessor().processQueueHead();
+                messageProcessor.processQueueHead();
                 return returnSuccess();
             default:
                 Timber.e("unknown BUNDLE_KEY_ACTION received: %s", action);
@@ -109,7 +114,7 @@ public class Scheduler extends SimpleJobService {
         Timber.v("stoping job");
         // Remove stopd job from queue
         if(job.getExtras() != null) {
-            App.getMessageProcessor().onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
+            messageProcessor.onMessageDeliveryFailedFinal(job.getExtras().getLong(BUNDLE_KEY_MESSAGE_ID));
         }
         return super.onStopJob(job);
     }
@@ -182,7 +187,7 @@ public class Scheduler extends SimpleJobService {
                 .setRetryStrategy(dispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_LINEAR, 30, 600))
                 //.setRetryStrategy(RetryStrategy.DEFAULT_LINEAR)
                 .setConstraints( Constraint.ON_ANY_NETWORK)
-                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(App.getPreferences().getPing())))
+                .setTrigger(Trigger.executionWindow(30, (int)TimeUnit.MINUTES.toSeconds(preferences.getPing())))
                 .setReplaceCurrent(true)
                 .setExtras(getBundleForAction(PERIODIC_TASK_SEND_LOCATION_PING))
                 .build();

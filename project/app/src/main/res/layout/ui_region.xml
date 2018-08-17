@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+    <data>
+        <import type="android.view.View"/>
+        <variable name="vm" type="org.owntracks.android.ui.region.RegionViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical" >
+
+        <android.support.design.widget.AppBarLayout
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        </android.support.design.widget.AppBarLayout>
+
+
+
+        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="@dimen/default_spacing"
+                android:layout_marginRight="@dimen/default_spacing">
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/description"
+                    android:background="@android:color/transparent"
+                    android:textCursorDrawable="@drawable/cursor_white"
+                    android:gravity="bottom"
+                    android:inputType="textVisiblePassword"
+                    android:id="@+id/description"
+                    android:text="@={vm.waypoint.description}"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"/>
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginTop="20dp"
+
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/latitude"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    android:enabled="false"
+                    android:id="@+id/latitude"
+                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)}"
+
+                    />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/longitude"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    android:enabled="false"
+                    android:id="@+id/longitude"
+                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLongitude)}"
+                    />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:layout_marginTop="20dp"
+
+                    android:layout_marginLeft="@dimen/default_spacing"
+                    android:layout_marginStart="@dimen/default_spacing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/radius"
+                    android:id="@+id/radius"
+                    android:digits="0123456789"
+                    android:inputType="numberDecimal"
+                    app:met_helperText="Meters"
+                    app:met_floatingLabel="normal"
+                    app:met_baseColor="@color/textPrimary"
+                    app:met_primaryColor="@color/accent"
+                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}'                    />
+
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+</layout>

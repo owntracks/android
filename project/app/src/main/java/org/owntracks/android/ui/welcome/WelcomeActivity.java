@@ -25,6 +25,13 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
+
+        if(!requirementsChecker.assertRequirements(this)) {
+            navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            finish();
+            return;
+        }
+
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
         if (requirementsChecker.areRequirementsMet()) {
@@ -40,7 +47,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         Timber.v("pager setup with %s fragments", welcomeAdapter.getCount());
         buildPagerIndicator();
         showFragment(0);
-
     }
 
     @Override

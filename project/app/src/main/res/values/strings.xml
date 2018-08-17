@@ -65,8 +65,9 @@
     <string name="preferencesRemoteCommand">Remote commands</string>
     <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
     <string name="description">Description</string>
-    <string name="latitude">Latitude</string>
+    <string name="coordinates">Coordinates</string>
     <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
     <string name="radius">Radius</string>
     <string name="addWaypoint">Add waypoint</string>
     <string name="exportConfiguration">Export</string>
@@ -181,7 +182,7 @@
     <string name="restart">Restart</string>
     <string name="notificationEventsTitle" formatted="false">%1$d new events</string>
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
-    <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner</string>
+    <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner. \n\n A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences. </string>
     <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
     <string name="INITIAL">"Initializing</string>
     <string name="IDLE">Idle</string>
@@ -200,4 +201,8 @@
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google</string>
+    <string name="placePickerNotAvailable">Unable to open location picker</string>
+    <string name="region_unknown">Status unknown</string>
+    <string name="region_inside">Currently inside</string>
+    <string name="region_outside">Currently outside</string>
 </resources>

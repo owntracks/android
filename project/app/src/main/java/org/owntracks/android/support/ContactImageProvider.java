@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
@@ -129,9 +130,9 @@ public class ContactImageProvider {
         return d;
     }
 
-    public ContactImageProvider(){
+    public ContactImageProvider(EventBus eventBus){
         memoryCache = new ContactBitmapMemoryCache();
-        App.getEventBus().register(this);
+        eventBus.register(this);
     }
 
     private static class ContactBitmapMemoryCache {

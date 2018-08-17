@@ -2,7 +2,7 @@ package org.owntracks.android.support;
 
 import java.util.Date;
 
-import org.owntracks.android.db.Waypoint;
+import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.model.FusedContact;
 
 public class Events {
@@ -34,16 +34,16 @@ public class Events {
     }
 
 	public static class WaypointTransition extends E {
-		final Waypoint w;
+		final WaypointModel w;
 		final int transition;
-
-		public WaypointTransition(Waypoint w, int transition) {
+        //TODO
+		public WaypointTransition(WaypointModel w, int transition) {
 			super();
 			this.w = w;
 			this.transition = transition;
 		}
 
-		public Waypoint getWaypoint() {
+		public WaypointModel getWaypoint() {
 			return this.w;
 		}
 
@@ -83,6 +83,32 @@ public class Events {
             return length;
         }
 
+    }
+    public static class WaypointEvent extends E {
+        private final WaypointModel m;
+
+        public WaypointEvent(WaypointModel m) {
+            this.m = m;
+        }
+        public WaypointModel getWaypointModel() {
+            return this.m;
+        }
+    }
+
+    public static class WaypointAdded extends WaypointEvent {
+        public WaypointAdded(WaypointModel m) {
+            super(m);
+        }
+    }
+    public static class WaypointUpdated extends WaypointEvent {
+        public WaypointUpdated(WaypointModel m) {
+            super(m);
+        }
+    }
+    public static class WaypointRemoved extends WaypointEvent {
+        public WaypointRemoved(WaypointModel m) {
+            super(m);
+        }
     }
 
     public static class FusedContactAdded extends E {

@@ -1,14 +1,11 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -24,15 +21,22 @@ import org.owntracks.android.databinding.UiPreferencesConnectionModeBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionParametersBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.widgets.Toasts;
+import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
 import org.owntracks.android.ui.status.StatusActivity;
 
+import javax.inject.Inject;
+
 
 public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel> implements ConnectionMvvm.View {
     private BaseDialogViewModel activeDialogViewModel ;
+
+    @Inject
+    Runner runner;
+
+    @Inject
+    protected MessageProcessor messageProcessor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,15 +168,15 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.connect:
-                if(App.getMessageProcessor().isEndpointConfigurationComplete()) {
+                if(messageProcessor.isEndpointConfigurationComplete()) {
                     Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
-                            App.getMessageProcessor().reconnect();
+                            messageProcessor.reconnect();
                         }
                     };
-                    App.postOnBackgroundHandlerDelayed(r, 1);
+                    runner.postOnBackgroundHandlerDelayed(r, 1);
 
                 } else {
                     Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();

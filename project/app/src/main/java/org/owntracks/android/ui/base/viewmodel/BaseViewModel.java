@@ -1,5 +1,8 @@
 package org.owntracks.android.ui.base.viewmodel;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.ViewModel;
 import android.databinding.BaseObservable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -30,6 +33,7 @@ public abstract class BaseViewModel<V extends MvvmView> extends BaseObservable i
     @Inject protected Provider<Navigator> navigator;
 
     private V mView;
+
 
     public V getView() {
         return mView;
