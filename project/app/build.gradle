@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'io.objectbox'
 
 def versionMajor = 2
-def versionMinor = 0
+def versionMinor = 1
 def versionPatch = 0
-def versionBuild = 26
+def versionBuild = 1
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '15.0.1'
-ext.okHttpVersion = '3.8.0'
+ext.okHttpVersion = '3.10.0'
 ext.supportLibVersion = '27.1.1'
 ext.jacksonVersion = '2.9.4'
 
@@ -55,12 +55,6 @@ android {
 
     dataBinding {
         enabled = true
-    }
-
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java', 'build/generated/source/greendao/org/owntracks/android/db']
-        }
     }
 
     signingConfigs {
@@ -120,7 +114,7 @@ dependencies {
     implementation "com.android.support:design:${supportLibVersion}"
     implementation "com.android.support:cardview-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     // Play Services libraries
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
@@ -130,26 +124,44 @@ dependencies {
 
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
+<<<<<<< HEAD
     implementation "org.greenrobot:eventbus:3.1.1"
     implementation "org.greenrobot:greendao:3.2.2"
+=======
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
+>>>>>>> message_box
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation "com.jakewharton.timber:timber:4.6.1"
+    implementation "com.jakewharton.timber:timber:4.7.0"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
+<<<<<<< HEAD
     implementation "com.rengwuxian.materialedittext:library:2.1.4"
     implementation "com.afollestad.material-dialogs:core:0.9.6.0"
     implementation "com.afollestad.material-dialogs:commons:0.9.6.0"
     implementation("com.mikepenz:materialdrawer:6.0.6@aar") { transitive = true }
+=======
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    implementation('com.mikepenz:materialdrawer:6.0.7@aar') { transitive = true }
+>>>>>>> message_box
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
     implementation "com.mikepenz:materialize:1.1.2@aar"
+
+
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
 
     // Preprocessors
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
@@ -161,11 +173,6 @@ dependencies {
     testImplementation "org.robolectric:robolectric:3.8"
     testImplementation "org.robolectric:shadows-playservices:3.8"
 
-}
-
-
-greendao {
-    schemaVersion 15
 }
 
 apply from: "coverage.gradle"

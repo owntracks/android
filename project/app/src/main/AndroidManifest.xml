@@ -62,20 +62,19 @@
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ui.map.MapActivity" />
-
         <activity
-            android:name=".activities.ActivityRegions"
-            android:label="@string/title_activity_regions"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".activities.ActivityRegion"
-            android:label="@string/title_activity_region"
-            android:parentActivityName=".activities.ActivityRegions">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.ActivityRegions" />
+            android:name=".ui.regions.RegionsActivity"
+            android:label="Regions"
+            android:launchMode="singleTop">
         </activity>
-
+        <activity
+            android:name=".ui.region.RegionActivity"
+            android:label="Region"
+            android:launchMode="singleTop">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".ui.regions.RegionsActivity" />
+        </activity>
         <activity
             android:name=".ui.preferences.PreferencesActivity"
             android:label="@string/title_activity_preferences"
@@ -102,53 +101,42 @@
             <!-- Support two dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data
                     android:host="*"
                     android:mimeType="*/*"
                     android:pathPattern=".*\\..*\\.otrc"
                     android:scheme="content" />
             </intent-filter>
+
             <!-- Support three dots in file name: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data
                     android:host="*"
                     android:mimeType="*/*"
                     android:pathPattern=".*\\..*\\..*\\.otrc"
                     android:scheme="content" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/json" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/otrc" />
             </intent-filter>
-            <intent-filter tools:ignore="GoogleAppIndexingWarning">
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
@@ -175,7 +163,8 @@
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true"
+            tools:ignore="ExportedService">
 
             <intent-filter>
                 <action android:name="C" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
@@ -185,6 +174,7 @@
                 <action android:name="LR" /> <!-- INTENT_ACTION_SEND_LOCATION_RESPONSE -->
                 <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
                 <action android:name="W" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
+                <action android:name="RRLU" /> <!-- REREQUEST_LOCATION_UPDATES -->
             </intent-filter>
         </service>
 

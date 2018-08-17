@@ -49,17 +49,18 @@
     <string name="preferencesRemoteCommand">Fernkommandos</string>
     <string name="preferencesRemoteCommandSummary">Fernkommandos aktivieren</string>
     <string name="description">Beschreibung</string>
-    <string name="latitude">Breite</string>
-    <string name="longitude">Länge</string>
+    <string name="coordinates">Koordinaten</string>
+    <string name="longitude">Längengrad</string>
+    <string name="latitude">Breitengrad</string>
     <string name="radius">Radius</string>
-    <string name="addWaypoint">Region hinzufügen</string>
+    <string name="addWaypoint">Ort hinzufügen</string>
     <string name="exportConfiguration">Exportieren</string>
     <string name="contactLocationUnknown">Kein Standort verfügbar</string>
     <string name="menuContactNavigate">Navigieren</string>
     <string name="contactDetailsAccuracy">Genauigkeit</string>
     <string name="contactDetailsReportedTime">Zeitstempel</string>
     <string name="contactDetailsTopic">Kennung</string>
-    <string name="waypointListPlaceholder">Keine Regionen angelegt</string>
+    <string name="waypointListPlaceholder">Keine Orte angelegt</string>
     <string name="waypointRemove">Entfernen</string>
     <string name="importConfig">Import</string>
     <string name="preferencesSecurity">Sicherheit</string>
@@ -79,10 +80,10 @@
     <string name="mode_mqtt_public_label">MQTT Öffentlich</string>
     <string name="mode_http_private_label">HTTP Privat</string>
 
-    <string name="aLocation">eine Region</string>
+    <string name="aLocation">einen Ort</string>
     <string name="events">Ereignisse</string>
-    <string name="title_activity_regions">Regionen</string>
-    <string name="title_activity_region">Region</string>
+    <string name="title_activity_regions">Orte</string>
+    <string name="title_activity_region">Ort</string>
     <string name="title_activity_map">Karte</string>
     <string name="title_activity_contacts">Freunde</string>
     <string name="title_activity_status">Status</string>
@@ -95,7 +96,7 @@
     <string name="preferencesCategoryAdvancedLocator">Ortung</string>
     <string name="preferencesCategoryAdvancedEncryption">Verschlüsselung</string>
     <string name="preferencesCategoryAdvancedMisc">Weiteres</string>
-    <string name="waypointRemoved">Region entfernt</string>
+    <string name="waypointRemoved">Ort entfernt</string>
     <string name="preferencesExportFailed">Einstellungs-Export fehlgeschlagen</string>
     <string name="preferencesExportSuccess">Export erfolgreich</string>
     <string name="geofenceInactive">Geofence inaktiv</string>
@@ -141,7 +142,7 @@
     <string name="preferencesLoadFailed">Die effektive Konfiguration konnte nicht geladen werden</string>
     <string name="preferencesEditorKey">Schlüssel</string>
     <string name="preferencesEditorValue">Wert</string>
-    <string name="exportWaypointsToEndpoint">Regionen veröffentlichen</string>
+    <string name="exportWaypointsToEndpoint">Orte veröffentlichen</string>
     <string name="drawerSwitchReporting">Veröffentlichen</string>
     <string name="drawerSwitchCopy">Kopieren</string>
     <string name="restart">Neu starten</string>
@@ -166,5 +167,9 @@
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
+    <string name="placePickerNotAvailable">Standortauswahl konnte nicht geöffnet werden</string>
+    <string name="region_unknown">Status unbekannt</string>
+    <string name="region_inside">Aktuell innerhalb</string>
+    <string name="region_outside">Aktuell außerhalb</string>
 
 </resources>

@@ -21,5 +21,4 @@ class ContactsAdapter extends BaseAdapter<FusedContact> {
     interface ClickListener extends BaseAdapter.ClickListener<FusedContact> {
         void onClick(@NonNull FusedContact object , @NonNull View view, boolean longClick);
     }
-
 }

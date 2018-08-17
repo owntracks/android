@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
-import org.owntracks.android.db.Waypoint;
-import org.owntracks.android.db.WaypointDao;
+import org.owntracks.android.data.WaypointModel;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
@@ -27,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
@@ -44,14 +45,16 @@ public class Preferences {
 
     private static int modeId = App.MODE_ID_MQTT_PRIVATE;
     private final Context context;
-
+    private EventBus eventBus;
     private String sharedPreferencesName;
+    private boolean isFirstStart = false;
 
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
-    public Preferences(@AppContext Context c){
+    public Preferences(@AppContext Context c, EventBus eventBus){
         Timber.v("initializing");
-        context = c;
+        this.context = c;
+        this.eventBus = eventBus;
         activeSharedPreferencesChangeListener = new LinkedList<>();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
         privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
@@ -70,14 +73,14 @@ public class Preferences {
         setMode(active, false);
     }
     public void setMode(int active, boolean init){
-        Timber.v("setMode: " + active);
+        Timber.v("setMode: %s", active);
 
         if(!init && modeId == active) {
             Timber.v("mode is already set to requested mode");
             return;
         }
 
-        Timber.v("setting mode to: " + active);
+        Timber.v("setting mode to: %s", active);
 
         detachAllActivePreferenceChangeListeners();
         int oldModeId = modeId;
@@ -103,7 +106,7 @@ public class Preferences {
 
         if(!init) {
             Timber.v("broadcasting mode change event");
-            App.getEventBus().post(new Events.ModeChanged(oldModeId,modeId));
+            eventBus.post(new Events.ModeChanged(oldModeId,modeId));
         }
     }
 
@@ -132,6 +135,18 @@ public class Preferences {
         }
     }
 
+    public boolean isFirstStart() {
+        return isFirstStart;
+    }
+
+    public void checkFirstStart() {
+        if(sharedPreferences.getBoolean(Keys._FIRST_START, true)) {
+            Timber.v("Initial application launch");
+            isFirstStart = true;
+            sharedPreferences.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).apply();
+        }
+
+    }
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
@@ -261,46 +276,10 @@ public class Preferences {
         Timber.v("committing to preferences %s", activeSharedPreferences);
 
         activeSharedPreferences.edit().commit();
-        if(m.hasWaypoints()) {
-            importWaypointsFromJson(m.getWaypoints());
-        }
 
 
     }
 
-    public MessageWaypointCollection waypointsToJSON() {
-
-        MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(Waypoint waypoint : App.getDao().getWaypointDao().loadAll()) {
-            messages.add(MessageWaypoint.fromDaoObject(waypoint));
-        }
-        return messages;
-    }
-
-
-    public void importWaypointsFromJson(@Nullable  MessageWaypointCollection j) {
-        if(j == null)
-            return;
-
-        WaypointDao dao = App.getDao().getWaypointDao();
-        List<Waypoint> deviceWaypoints =  dao.loadAll();
-
-        for (MessageWaypoint m: j) {
-            Waypoint w = m.toDaoObject();
-
-            for(Waypoint e : deviceWaypoints) {
-                // remove exisiting waypoint before importing new one
-                if(TimeUnit.MILLISECONDS.toSeconds(e.getDate().getTime()) == TimeUnit.MILLISECONDS.toSeconds(w.getDate().getTime())) {
-                    Timber.v("removing existing waypoint with same tst before adding it");
-                    dao.delete(e);
-                    App.getEventBus().post(w);
-                }
-            }
-
-            dao.insert(w);
-            App.getEventBus().post(w);
-        }
-    }
 
     @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
     public void setOpenCageGeocoderApiKey(String key) {
@@ -534,7 +513,7 @@ public class Preferences {
     @Import(key =Keys.HOST)
     public void setHost(String value) {
         setString(Keys.HOST, value);
-        App.getEventBus().post(new Events.EndpointChanged());
+        eventBus.post(new Events.EndpointChanged());
     }
 
     public void setPortDefault() {
@@ -861,15 +840,15 @@ public class Preferences {
         return getPubQos();
     }
 
-    public static boolean getPubRetainEvents() {
+    public boolean getPubRetainEvents() {
         return false;
     }
 
-    public static int getPubQosWaypoints() {
+    public int getPubQosWaypoints() {
         return 0;
     }
 
-    public static boolean getPubRetainWaypoints() {
+    public boolean getPubRetainWaypoints() {
         return false;
     }
 
@@ -880,7 +859,6 @@ public class Preferences {
     public boolean getPubRetainLocations() {
         return getPubRetain();
     }
-
 
     public MessageConfiguration exportToMessage() {
         List<Method> methods = getExportMethods();
@@ -896,9 +874,6 @@ public class Preferences {
             }
         }
 
-
-        cfg.setWaypoints(waypointsToJSON());
-
         return cfg;
     }
 
@@ -911,6 +886,17 @@ public class Preferences {
     public void setFusedRegionDetection(boolean aBoolean) {
         setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean);
     }
+
+    public boolean isObjectboxMigrated() {
+        return !isFirstStart && sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
+
+    }
+
+    public void setObjectBoxMigrated() {
+        sharedPreferences.edit().putBoolean(Keys._OBJECTBOX_MIGRATED, true).apply();
+    }
+
+
 
     @SuppressWarnings("WeakerAccess")
     public static class Keys {
@@ -961,12 +947,12 @@ public class Preferences {
         public static final String URL                              = "url";
 
         // Internal keys
-        public static final String _DEVICE_UUID                     = "deviceUUID";
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";
         public static final String _FIRST_START                     = "firstStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
         public static final String _VERSION                         = "_build";
 
+        public static final String _OBJECTBOX_MIGRATED                     = "_objectboxMigrated";
 
     }
 
@@ -989,7 +975,7 @@ public class Preferences {
         final List<Method> methods = new ArrayList<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+            // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
             final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
@@ -1013,7 +999,7 @@ public class Preferences {
         final HashMap<String, Method> methods = new HashMap<>();
         Class<?> klass  = Preferences.class;
         while (klass != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+            // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
             final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Import.class) ) {

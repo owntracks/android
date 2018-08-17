@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomePermissionsBinding;
@@ -31,7 +32,7 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);};
+        if(viewModel == null) { fragmentComponent().inject(this);}
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState);
     }
 
@@ -42,7 +43,7 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            App.getEventBus().postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
+            eventBus.postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
         checkPermission();
     }

@@ -11,9 +11,7 @@
     android:padding="16dp"
     android:layout_toRightOf="@+id/imageMask"
     android:layout_toEndOf="@+id/imageMask"
-    android:orientation="vertical"
-
-    >
+    android:orientation="vertical">
 
 
     <RelativeLayout

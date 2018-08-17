@@ -7,6 +7,7 @@ import android.os.Build;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
@@ -55,13 +56,13 @@ public class AppModule {
     @Provides
     @PerApplication
     static Scheduler provideScheduler() {
-        return new Scheduler();
+        return new Scheduler(); // Needs to have zero argument constructor
     }
 
     @Provides
     @PerApplication
-    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences) {
-        return new MessageProcessor(eventBus, repo, preferences);
+    static MessageProcessor provideMessageProcessor(EventBus eventBus, ContactsRepo repo, Preferences preferences, WaypointsRepo waypointsRepo) {
+        return new MessageProcessor(eventBus, repo, preferences, waypointsRepo);
     }
 
     @SuppressWarnings("deprecation")
@@ -92,11 +93,7 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static ContactImageProvider provideContactImageProvider() { return new ContactImageProvider(); }
-
-    @Provides
-    @PerApplication
-    static Preferences providePreferences(@AppContext Context context) { return new Preferences(context); }
+    static ContactImageProvider provideContactImageProvider(EventBus eventBus) { return new ContactImageProvider(eventBus); }
 
     @Provides
     @PerApplication

@@ -22,6 +22,7 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     private final Preferences preferences;
     private boolean doneEnabled;
     private boolean nextEnabled;
+    private final Preferences preferences;
 
     @Inject
     public WelcomeViewModel(Preferences preferences) {
@@ -46,6 +47,8 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
         preferences.setSetupCompleted();
         navigator.get().startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }
+
+
 
     @Override
     public void setNextEnabled(boolean enabled) {

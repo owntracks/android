@@ -9,7 +9,6 @@ import java.util.Date;
 public interface StatusMvvm {
 
     interface View extends MvvmView {
-        void showIgnoreDozeActivity();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
@@ -20,6 +19,5 @@ public interface StatusMvvm {
         long getLocationUpdated();
         Date getServiceStarted();
         boolean getDozeWhitelisted();
-        void onIgnoreDozeClicked(); 
     }
 }
