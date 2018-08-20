@@ -49,7 +49,8 @@ public class AppModule {
     @Provides
     @PerApplication
     static EventBus provideEventbus() {
-        return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
+        //addIndex(new org.owntracks.android.EventBusIndex()).
+        return EventBus.builder().sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
 

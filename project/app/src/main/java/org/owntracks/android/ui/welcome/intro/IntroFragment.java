@@ -16,7 +16,6 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 import javax.inject.Inject;
 
 public class IntroFragment extends BaseSupportFragment<UiWelcomeIntroBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
-    @Inject
     public IntroFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }

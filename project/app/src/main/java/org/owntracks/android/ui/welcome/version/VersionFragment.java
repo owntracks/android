@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
 
-    @Inject
     public VersionFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }

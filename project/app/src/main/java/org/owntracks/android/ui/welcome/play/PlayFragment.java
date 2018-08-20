@@ -23,7 +23,6 @@ import javax.inject.Inject;
 public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1;
 
-    @Inject
     public PlayFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }

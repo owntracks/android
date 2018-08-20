@@ -40,7 +40,6 @@ public abstract class DataModule {
     @Provides
     @PerApplication
     static WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
-        //return new RoomWaypointsRepo(context, eventBus);
         return new ObjectboxWaypointsRepo(context, eventBus, preferences);
     }
 
