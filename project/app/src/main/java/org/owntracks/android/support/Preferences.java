@@ -888,7 +888,7 @@ public class Preferences {
     }
 
     public boolean isObjectboxMigrated() {
-        return !isFirstStart && sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
+        return isFirstStart || sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
 
     }
 

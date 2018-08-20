@@ -34,6 +34,7 @@ import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import java.util.WeakHashMap;
 
@@ -60,7 +61,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
 
-        assertRequirements();
+
+        if (!requirementsChecker.areRequirementsMet()) {
+            navigator.startActivity(WelcomeActivity.class);
+            finish();
+        }
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
 
         setSupportToolbar(this.binding.toolbar, false, true);

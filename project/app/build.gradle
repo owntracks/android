@@ -124,13 +124,8 @@ dependencies {
 
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
-<<<<<<< HEAD
     implementation "org.greenrobot:eventbus:3.1.1"
-    implementation "org.greenrobot:greendao:3.2.2"
-=======
-    implementation 'org.greenrobot:eventbus:3.1.1'
 
->>>>>>> message_box
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
@@ -140,17 +135,10 @@ dependencies {
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
     // Widget libraries
-<<<<<<< HEAD
     implementation "com.rengwuxian.materialedittext:library:2.1.4"
     implementation "com.afollestad.material-dialogs:core:0.9.6.0"
     implementation "com.afollestad.material-dialogs:commons:0.9.6.0"
     implementation("com.mikepenz:materialdrawer:6.0.6@aar") { transitive = true }
-=======
-    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
-    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
-    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
-    implementation('com.mikepenz:materialdrawer:6.0.7@aar') { transitive = true }
->>>>>>> message_box
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"

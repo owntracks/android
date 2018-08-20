@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.welcome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -26,7 +27,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         super.onCreate(savedInstanceState);
         activityComponent().inject(this);
 
-        if(!requirementsChecker.assertRequirements(this)) {
+        if(requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             finish();
             return;
@@ -34,10 +35,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
 
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
-        if (requirementsChecker.areRequirementsMet()) {
-            navigator.startActivity(MapActivity.class);
-            finish();
-        }
 
         welcomeAdapter.setupFragments();
 
