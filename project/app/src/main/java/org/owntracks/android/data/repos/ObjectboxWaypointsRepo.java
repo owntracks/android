@@ -1,12 +1,12 @@
 package org.owntracks.android.data.repos;
 
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.greenrobot.eventbus.EventBus;
+import org.owntracks.android.data.MyObjectBox;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.WaypointModel_;
 import org.owntracks.android.injection.qualifier.AppContext;
@@ -54,34 +54,44 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
     }
 
     private void migrateLegacyData(Context context) {
-        LegacyOpenHelper helper = new LegacyOpenHelper(context);
+        try {
 
-        SQLiteDatabase db = helper.getReadableDatabase();
+            LegacyOpenHelper helper = new LegacyOpenHelper(context);
 
-        String table = "WAYPOINT";
-        String[] columns = {"DATE", "DESCRIPTION", "GEOFENCE_RADIUS","GEOFENCE_LATITUDE", "GEOFENCE_LONGITUDE"};
+            SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.query(table, columns, null, null, null, null, null, null);
-        if (cursor.moveToFirst()){
-            do{
-                try {
-                    WaypointModel w = new WaypointModel(0, cursor.getLong(cursor.getColumnIndex("DATE")),
-                            cursor.getString(cursor.getColumnIndex("DESCRIPTION")),
-                            cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LATITUDE")),
-                            cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LONGITUDE")),
-                            cursor.getInt(cursor.getColumnIndex("GEOFENCE_RADIUS")), 0, 0);
+            String table = "WAYPOINT";
+            String[] columns = {"DATE", "DESCRIPTION", "GEOFENCE_RADIUS", "GEOFENCE_LATITUDE", "GEOFENCE_LONGITUDE"};
 
-                    Timber.v("Migration for model %s", w.toString());
-                    insert_impl(w);
-                } catch (UniqueViolationException exception) {
-                    Timber.v("UniqueViolationException during insert");
+            Cursor cursor = db.query(table, columns, null, null, null, null, null, null);
+            try {
+                if (cursor.moveToFirst()) {
+                    do {
+                        try {
+                            WaypointModel w = new WaypointModel(0, cursor.getLong(cursor.getColumnIndex("DATE")),
+                                    cursor.getString(cursor.getColumnIndex("DESCRIPTION")),
+                                    cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LATITUDE")),
+                                    cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LONGITUDE")),
+                                    cursor.getInt(cursor.getColumnIndex("GEOFENCE_RADIUS")), 0, 0);
+
+                            Timber.v("Migration for model %s", w.toString());
+                            insert_impl(w);
+                        } catch (UniqueViolationException exception) {
+                            Timber.v("UniqueViolationException during insert");
+                        }
+                    } while (cursor.moveToNext());
                 }
-            }while(cursor.moveToNext());
+            } catch (Exception e) {
+                Timber.e(e, "Error during migration");
+            } finally {
+                cursor.close();
+                db.close();
+            }
+        } catch (Exception e) {
+            Timber.e(e, "Error during migration");
+        } finally {
+            preferences.setObjectBoxMigrated();
         }
-        cursor.close();
-        db.close();
-
-        preferences.setObjectBoxMigrated();
     }
 
     @Override
