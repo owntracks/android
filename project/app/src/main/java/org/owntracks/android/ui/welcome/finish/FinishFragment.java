@@ -16,6 +16,8 @@ import javax.inject.Inject;
 
 
 public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
+
+    @Inject
     public FinishFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }

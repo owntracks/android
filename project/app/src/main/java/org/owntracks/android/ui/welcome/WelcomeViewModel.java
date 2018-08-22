@@ -22,7 +22,6 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     private final Preferences preferences;
     private boolean doneEnabled;
     private boolean nextEnabled;
-    private final Preferences preferences;
 
     @Inject
     public WelcomeViewModel(Preferences preferences) {
