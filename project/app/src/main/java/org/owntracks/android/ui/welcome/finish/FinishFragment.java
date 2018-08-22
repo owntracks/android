@@ -25,7 +25,7 @@ public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);};
+        if(viewModel == null) { fragmentComponent().inject(this);}
 
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_finish, savedInstanceState);
     }

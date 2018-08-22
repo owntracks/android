@@ -28,7 +28,7 @@ public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);};
+        if(viewModel == null) { fragmentComponent().inject(this);}
         View v = setAndBindContentView(inflater, container, R.layout.ui_welcome_version, savedInstanceState);
         binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this);
         return v;
