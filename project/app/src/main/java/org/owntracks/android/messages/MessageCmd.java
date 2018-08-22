@@ -109,7 +109,7 @@ public class MessageCmd extends MessageBase{
     @JsonIgnore
     public void setTopic(String topic) {
         // Full topic is needed instead of the normalized base topic to verify if the message arrived on the correct topic
-        this._mqtt_topic = topic;
+        this._topic = topic;
     }
 
 
