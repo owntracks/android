@@ -32,11 +32,15 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         static final String TYPE = "base";
 
         @JsonIgnore
-        protected String _mqtt_topic;
+        protected String _topic;
         @JsonIgnore
-        protected String _mqtt_topic_base;
+        protected String _topic_base;
+
         @JsonIgnore
         private boolean delivered;
+
+        @JsonIgnore
+        private boolean isHttp;
 
         @JsonIgnore
         public long getMessageId() {
@@ -81,8 +85,8 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         @JsonIgnore
         @NonNull
         public String getContactKey() {
-                if(_mqtt_topic_base != null)
-                        return _mqtt_topic_base;
+                if(_topic_base != null)
+                        return _topic_base;
                 if(tid != null)
                         return tid;
                 return
@@ -90,13 +94,13 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
         public String getTopic() {
-                return _mqtt_topic;
+                return _topic;
         }
 
         @JsonIgnore
         public void setTopic(String topic) {
-                this._mqtt_topic = topic;
-                this._mqtt_topic_base = getBaseTopic(topic); // Normalized topic for all message types
+                this._topic = topic;
+                this._topic_base = getBaseTopic(topic); // Normalized topic for all message types
         }
 
         @Override
@@ -184,5 +188,15 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         @JsonIgnore
         public boolean isDelivered() {
                 return delivered;
+        }
+
+        @JsonIgnore
+        public boolean isHttp() {
+                return isHttp;
+        }
+
+        @JsonIgnore
+        public void setIsHttp(boolean isHttp) {
+                this.isHttp = isHttp;
         }
 }

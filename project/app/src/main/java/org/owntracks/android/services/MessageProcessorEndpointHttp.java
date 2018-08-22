@@ -215,6 +215,10 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
                         messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
 
                         for (MessageBase aResult : result) {
+                            if(aResult.hasTid()) {
+                                aResult.setIsHttp(true);
+                                aResult.setTopic("owntracks/http/" + aResult.getTid());
+                            }
                             messageProcessor.onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {

@@ -291,11 +291,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return;
         }
 
-
-        if(!preferences.getPubTopicCommands().equals(message.getTopic())) {
+        if(!message.isHttp() &&  !preferences.getPubTopicCommands().equals(message.getTopic())) {
             Timber.e("cmd message received on wrong topic");
             return;
         }
+
 
         String actions = message.getAction();
         if(actions == null) {
@@ -307,7 +307,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
-
+                    if(message.isHttp()) {
+                        Timber.e("command not supported in HTTP mode: %s", cmd);
+                        break;
+                    }
                     Intent reportIntent = new Intent(App.getContext(), BackgroundService.class);
                     reportIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_RESPONSE);
                     App.startBackgroundServiceCompat(App.getContext(), reportIntent);
@@ -331,6 +334,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     }
                     break;
                 case MessageCmd.ACTION_REOCONNECT:
+                    if(message.isHttp()) {
+                        Timber.e("command not supported in HTTP mode: %s", cmd);
+                        break;
+                    }
                     reconnect();
                     break;
                 case MessageCmd.ACTION_RESTART:
