@@ -23,6 +23,7 @@ import javax.inject.Inject;
 public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
     private final int PERMISSIONS_REQUEST_CODE = 1;
 
+    @Inject
     public PermissionFragment() {
         if(viewModel == null) { fragmentComponent().inject(this); }
     }
