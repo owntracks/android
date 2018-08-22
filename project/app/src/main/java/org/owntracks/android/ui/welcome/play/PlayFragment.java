@@ -31,7 +31,7 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);};
+        if(viewModel == null) { fragmentComponent().inject(this);}
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState);
     }
 
