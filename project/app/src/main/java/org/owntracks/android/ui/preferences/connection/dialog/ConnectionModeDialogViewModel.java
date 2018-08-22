@@ -8,6 +8,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Preferences;
 
 import timber.log.Timber;
@@ -44,9 +46,9 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
 
     private int modeToResId(int mode) {
         switch (mode) {
-            case App.MODE_ID_HTTP_PRIVATE:
+            case MessageProcessorEndpointHttp.MODE_ID:
                 return R.id.radioModeHttpPrivate;
-            case App.MODE_ID_MQTT_PRIVATE:
+            case MessageProcessorEndpointMqtt.MODE_ID:
             default:
                 return R.id.radioModeMqttPrivate;
         }
@@ -55,10 +57,10 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
     private int resIdToMode(int resId) {
         switch (resId) {
             case R.id.radioModeHttpPrivate:
-                return App.MODE_ID_HTTP_PRIVATE;
+                return MessageProcessorEndpointHttp.MODE_ID;
             case R.id.radioModeMqttPrivate:
             default:
-                return App.MODE_ID_MQTT_PRIVATE;
+                return MessageProcessorEndpointMqtt.MODE_ID;
         }
     }
 }

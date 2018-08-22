@@ -21,6 +21,7 @@ import org.owntracks.android.databinding.UiPreferencesConnectionModeBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionParametersBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
 import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
@@ -65,7 +66,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Override
     public void showHostDialog() {
-        if(viewModel.getModeId() == App.MODE_ID_HTTP_PRIVATE) {
+        if(viewModel.getModeId() == MessageProcessorEndpointHttp.MODE_ID) {
             UiPreferencesConnectionHostHttpBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_host_http, null, false);
             dialogBinding.setVm(viewModel.getHostDialogViewModelHttp());
             activeDialogViewModel = dialogBinding.getVm();
@@ -155,7 +156,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
             menu.clear();
         }
 
-        if(viewModel.getModeId() == App.MODE_ID_HTTP_PRIVATE) {
+        if(viewModel.getModeId() == MessageProcessorEndpointHttp.MODE_ID) {
             getMenuInflater().inflate(R.menu.preferences_connection_http, menu);
         } else {
             getMenuInflater().inflate(R.menu.preferences_connection_mqtt, menu);

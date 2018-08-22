@@ -3,7 +3,6 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Vibrator;
 import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
@@ -19,14 +18,11 @@ import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
-import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
-import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -43,24 +39,19 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
-    private OutgoingMessageProcessor outgoingMessageProcessor;
+    private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
     private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
 
     public void reconnect() {
-        if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
-            StatefulServiceMessageProcessor.class.cast(outgoingMessageProcessor).reconnect();
-    }
-
-    public void disconnect() {
-        if(outgoingMessageProcessor instanceof StatefulServiceMessageProcessor)
-            StatefulServiceMessageProcessor.class.cast(outgoingMessageProcessor).disconnect();
+        if(endpoint instanceof StatefulServiceMessageProcessor)
+            StatefulServiceMessageProcessor.class.cast(endpoint).reconnect();
     }
 
     public void onEnterForeground() {
-        if(outgoingMessageProcessor != null)
-            outgoingMessageProcessor.onEnterForeground();
+        if(endpoint != null)
+            endpoint.onEnterForeground();
     }
 
     public void onEnterBackground() {
@@ -72,7 +63,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     public boolean isEndpointConfigurationComplete() {
-        return this.outgoingMessageProcessor != null && this.outgoingMessageProcessor.isConfigurationComplete();
+        return this.endpoint != null && this.endpoint.isConfigurationComplete();
     }
 
 
@@ -141,8 +132,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
             outgoingMessageProcessorExecutor.purge();
         }
 
-        if(outgoingMessageProcessor != null) {
-            outgoingMessageProcessor.onDestroy();
+        if(endpoint != null) {
+            endpoint.onDestroy();
         }
 
         outgoingQueue.clear();
@@ -150,15 +141,15 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (preferences.getModeId()) {
-            case App.MODE_ID_HTTP_PRIVATE:
-                this.outgoingMessageProcessor = MessageProcessorEndpointHttp.getInstance();
+            case MessageProcessorEndpointHttp.MODE_ID:
+                this.endpoint = MessageProcessorEndpointHttp.getInstance();
                 break;
-            case App.MODE_ID_MQTT_PRIVATE:
+            case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.outgoingMessageProcessor = MessageProcessorEndpointMqtt.getInstance();
+                this.endpoint = MessageProcessorEndpointMqtt.getInstance();
 
         }
-        this.outgoingMessageProcessor.onCreateFromProcessor();
+        this.endpoint.onCreateFromProcessor();
         acceptMessages = true;
     }
     @SuppressWarnings("UnusedParameters")
@@ -177,7 +168,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
 
     public void sendMessage(MessageBase message) {
-        if(!acceptMessages || !outgoingMessageProcessor.isConfigurationComplete()) return;
+        if(!acceptMessages || !endpoint.isConfigurationComplete()) return;
 
         outgoingQueue.put(message.getMessageId(), message);
         Timber.v("messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
@@ -194,7 +185,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             m.setDelivered(true);
             Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
             if(m instanceof MessageLocation) {
-                onMessageReceived(m);
+                endpoint.onMessageReceived(m);
                 eventBus.post(m);
             }
             dequeue(m.getMessageId());
@@ -219,7 +210,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
         Timber.v("getting first message from queue: %s", head.getMessageId());
 
-        head.setOutgoingProcessor(outgoingMessageProcessor);
+        head.setOutgoingProcessor(endpoint);
         this.outgoingMessageProcessorExecutor.execute(head);
 
     }
@@ -275,6 +266,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageLocation message) {
+        Timber.v("processing location message %s", message.getContactKey());
         contactsRepo.update(message.getContactKey(),message);
 
     }
@@ -291,7 +283,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return;
         }
 
-        if(!message.isHttp() &&  !preferences.getPubTopicCommands().equals(message.getTopic())) {
+        if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID &&  !preferences.getPubTopicCommands().equals(message.getTopic())) {
             Timber.e("cmd message received on wrong topic");
             return;
         }
@@ -307,7 +299,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
-                    if(message.isHttp()) {
+                    if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
@@ -321,7 +313,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     App.startBackgroundServiceCompat(App.getContext(), waypointsIntent);
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
-                    MessageWaypoints w = message.getWaypoints();
                     if(message.getWaypoints() != null) {
                         waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
                     }
@@ -334,7 +325,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     }
                     break;
                 case MessageCmd.ACTION_REOCONNECT:
-                    if(message.isHttp()) {
+                    if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }

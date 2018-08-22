@@ -2,6 +2,7 @@ package org.owntracks.android.messages;
 import android.databinding.BaseObservable;
 import android.support.annotation.NonNull;
 
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
@@ -40,7 +41,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         private boolean delivered;
 
         @JsonIgnore
-        private boolean isHttp;
+        private int modeId;
 
         @JsonIgnore
         public long getMessageId() {
@@ -190,13 +191,16 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
                 return delivered;
         }
 
+
         @JsonIgnore
-        public boolean isHttp() {
-                return isHttp;
+        public void setModeId(int modeId) {
+                this.modeId = modeId;
         }
 
         @JsonIgnore
-        public void setIsHttp(boolean isHttp) {
-                this.isHttp = isHttp;
+        public int getModeId() {
+                return this.modeId;
         }
+
+
 }

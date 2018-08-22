@@ -50,7 +50,9 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, StatefulServiceMessageProcessor {
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor {
+	public static final int MODE_ID = 0;
+
 	private CustomMqttClient mqttClient;
 	private MqttConnectOptions connectOptions;
 	private String lastConnectionId;
@@ -149,13 +151,13 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 				m.setTopic(topic);
 				m.setRetained(message.isRetained());
 				m.setQos(message.getQos());
-				messageProcessor.onMessageReceived(m);
+				onMessageReceived(m);
 			} catch (Exception e) {
 				if (message.getPayload().length == 0) {
 					Timber.v("clear message received: %s", topic);
 					MessageClear m = new MessageClear();
 					m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
-					messageProcessor.onMessageReceived(m);
+					onMessageReceived(m);
 				} else {
 					Timber.e(e, "payload:%s ", new String(message.getPayload()));
 				}
@@ -634,6 +636,16 @@ public class MessageProcessorEndpointMqtt implements OutgoingMessageProcessor, S
 			if(comms != null)
 				comms.checkForActivity();
 		}
+	}
+
+	@Override
+	int getModeId() {
+		return MODE_ID;
+	}
+
+	@Override
+	protected MessageBase onFinalizeMessage(MessageBase message) {
+		return message;
 	}
 }
 

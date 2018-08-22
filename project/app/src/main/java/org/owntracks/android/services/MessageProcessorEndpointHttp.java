@@ -45,7 +45,9 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
 
-public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, Preferences.OnPreferenceChangedListener {
+public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements Preferences.OnPreferenceChangedListener {
+    public static final int MODE_ID = 3;
+
     // Headers according to https://github.com/owntracks/recorder#http-mode
     private static final String HEADER_USERNAME = "X-Limit-U";
     private static final String HEADER_DEVICE = "X-Limit-D";
@@ -69,9 +71,6 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
 
     @Inject
     protected Parser parser;
-
-    @Inject
-    protected MessageProcessor messageProcessor;
 
     @Inject
     protected Scheduler scheduler;
@@ -215,11 +214,7 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
                         messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
 
                         for (MessageBase aResult : result) {
-                            if(aResult.hasTid()) {
-                                aResult.setIsHttp(true);
-                                aResult.setTopic("owntracks/http/" + aResult.getTid());
-                            }
-                            messageProcessor.onMessageReceived(aResult);
+                            onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
@@ -321,5 +316,18 @@ public class MessageProcessorEndpointHttp implements OutgoingMessageProcessor, P
     @Override
     public boolean isConfigurationComplete() {
         return this.endpointUrl != null;
+    }
+
+    @Override
+    int getModeId() {
+        return MODE_ID;
+    }
+
+    @Override
+    protected MessageBase onFinalizeMessage(MessageBase message) {
+        if(message.hasTid()) {
+            message.setTopic("owntracks/http/" + message.getTid());
+        }
+        return message;
     }
 }

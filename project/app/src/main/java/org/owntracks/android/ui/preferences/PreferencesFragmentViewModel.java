@@ -12,6 +12,8 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -53,10 +55,10 @@ public class PreferencesFragmentViewModel extends BaseViewModel<PreferencesFragm
     private String getModeSummary(int modeId){
         String mode;
         switch (modeId) {
-            case App.MODE_ID_MQTT_PRIVATE:
+            case MessageProcessorEndpointMqtt.MODE_ID:
                 mode = this.context.getString(R.string.mode_mqtt_private_label);
                 break;
-            case App.MODE_ID_HTTP_PRIVATE:
+            case MessageProcessorEndpointHttp.MODE_ID:
                 mode = this.context.getString(R.string.mode_http_private_label);
                 break;
             default:
