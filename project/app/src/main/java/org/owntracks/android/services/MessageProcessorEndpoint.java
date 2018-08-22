@@ -12,7 +12,7 @@ import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import javax.inject.Inject;
 
-abstract class MessageProcessorEndpoint implements OutgoingMessageProcessor {
+public abstract class MessageProcessorEndpoint implements OutgoingMessageProcessor {
     @Inject
     protected MessageProcessor messageProcessor;
 

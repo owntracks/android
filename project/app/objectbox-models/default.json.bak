@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:4484003322503948018",
-      "lastPropertyId": "7:3668132826995978522",
+      "lastPropertyId": "8:2353765053577762792",
       "name": "WaypointModel",
       "properties": [
         {
@@ -35,13 +35,18 @@
         {
           "id": "7:3668132826995978522",
           "name": "lastTransition"
+        },
+        {
+          "id": "8:2353765053577762792",
+          "indexId": "1:3621608531039221384",
+          "name": "tst"
         }
       ],
       "relations": []
     }
   ],
   "lastEntityId": "1:4484003322503948018",
-  "lastIndexId": "0:0",
+  "lastIndexId": "1:3621608531039221384",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 4,

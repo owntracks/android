@@ -22,5 +22,6 @@ import dagger.Component;
 public interface ServiceComponent {
     void inject(org.owntracks.android.services.BackgroundService service);
     void inject(org.owntracks.android.services.Scheduler scheduler);
-
+    void inject(org.owntracks.android.services.MessageProcessorEndpointHttp endpoint);
+    void inject(org.owntracks.android.services.MessageProcessorEndpointMqtt endpoint);
 }
