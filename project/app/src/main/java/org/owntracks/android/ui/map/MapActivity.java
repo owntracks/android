@@ -31,6 +31,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -391,7 +392,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-        if (preferences.getModeId() == App.MODE_ID_HTTP_PRIVATE)
+        if (preferences.getModeId() == MessageProcessorEndpointHttp.MODE_ID)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }

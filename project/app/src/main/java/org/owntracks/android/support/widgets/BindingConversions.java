@@ -14,6 +14,8 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -128,9 +130,9 @@ public class BindingConversions {
 
     public static int convertModeIdToLabelResId(int modeId) {
         switch (modeId) {
-            case App.MODE_ID_HTTP_PRIVATE:
+            case MessageProcessorEndpointHttp.MODE_ID:
                 return R.string.mode_http_private_label;
-            case App.MODE_ID_MQTT_PRIVATE:
+            case MessageProcessorEndpointMqtt.MODE_ID:
             default:
                 return R.string.mode_mqtt_private_label;
         }

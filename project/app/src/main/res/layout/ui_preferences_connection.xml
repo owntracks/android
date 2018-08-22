@@ -6,7 +6,7 @@
 
         <import type="android.view.View" />
 
-        <import type="org.owntracks.android.App" />
+        <import type="org.owntracks.android.services.MessageProcessorEndpointHttp" />
         <import type="org.owntracks.android.support.widgets.BindingConversions" />
 
         <variable
@@ -176,7 +176,7 @@
                     android:contentDescription="divider"
                     android:scaleType="matrix"
                     android:src="@android:drawable/divider_horizontal_bright"
-                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}" />
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}" />
 
                 <LinearLayout
                     android:id="@+id/security"
@@ -187,7 +187,7 @@
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onSecurityClick()}"
                     android:paddingRight="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}">
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -216,7 +216,7 @@
                     android:contentDescription="divider"
                     android:scaleType="matrix"
                     android:src="@android:drawable/divider_horizontal_bright"
-                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}" />
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}" />
 
                 <LinearLayout
                     android:id="@+id/parameters"
@@ -227,7 +227,7 @@
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onParametersClick()}"
                     android:paddingRight="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != App.MODE_ID_HTTP_PRIVATE}">
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"

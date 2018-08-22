@@ -16,6 +16,8 @@ import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -43,7 +45,7 @@ public class Preferences {
     private static SharedPreferences privateSharedPreferences;
     private static SharedPreferences httpSharedPreferences;
 
-    private static int modeId = App.MODE_ID_MQTT_PRIVATE;
+    private static int modeId = MessageProcessorEndpointMqtt.MODE_ID;
     private final Context context;
     private EventBus eventBus;
     private String sharedPreferencesName;
@@ -66,7 +68,7 @@ public class Preferences {
 
     private void initMode(int active) {
         // Check for valid mode IDs and fallback to MQTT if an invalid mode is set
-        setMode(active == App.MODE_ID_HTTP_PRIVATE ? App.MODE_ID_HTTP_PRIVATE : App.MODE_ID_MQTT_PRIVATE, true);
+        setMode(active == MessageProcessorEndpointHttp.MODE_ID ? MessageProcessorEndpointHttp.MODE_ID : MessageProcessorEndpointMqtt.MODE_ID, true);
     }
 
     public void setMode(int active) {
@@ -86,11 +88,11 @@ public class Preferences {
         int oldModeId = modeId;
         modeId = active;
         switch (modeId) {
-            case App.MODE_ID_MQTT_PRIVATE:
+            case MessageProcessorEndpointMqtt.MODE_ID:
                 activeSharedPreferences = privateSharedPreferences;
                 sharedPreferencesName = FILENAME_PRIVATE;
                 break;
-            case App.MODE_ID_HTTP_PRIVATE:
+            case MessageProcessorEndpointHttp.MODE_ID:
                 activeSharedPreferences = httpSharedPreferences;
                 sharedPreferencesName = FILENAME_HTTP;
                 break;
@@ -980,7 +982,7 @@ public class Preferences {
             for (final Method method : allMethods) {
                 if (method.isAnnotationPresent(Export.class) ) {
                     Export annotInstance = method.getAnnotation(Export.class);
-                    if(modeId == App.MODE_ID_MQTT_PRIVATE && annotInstance.exportModeMqttPrivate() || modeId == App.MODE_ID_HTTP_PRIVATE && annotInstance.exportModeHttpPrivate()) {
+                    if(modeId == MessageProcessorEndpointMqtt.MODE_ID && annotInstance.exportModeMqttPrivate() || modeId == MessageProcessorEndpointHttp.MODE_ID && annotInstance.exportModeHttpPrivate()) {
                         methods.add(method);
                     }
                 }

@@ -29,10 +29,6 @@ import android.support.annotation.Nullable;
 import timber.log.Timber;
 
 public class App extends Application  {
-    public static final int MODE_ID_MQTT_PRIVATE =0;
-    public static final int MODE_ID_HTTP_PRIVATE = 3;
-
-
     private Activity currentActivity;
     private static boolean inForeground;
     private int runningActivities = 0;
