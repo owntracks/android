@@ -57,15 +57,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
     public void onEnterBackground() {
     }
 
-
-    public int getQueueLength() {
-        return outgoingQueue.size();
-    }
-
     public boolean isEndpointConfigurationComplete() {
         return this.endpoint != null && this.endpoint.isConfigurationComplete();
     }
-
 
     public enum EndpointState {
         INITIAL,
@@ -116,8 +110,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
         this.contactsRepo = contactsRepo;
         this.waypointsRepo = waypointsRepo; 
 
-        this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
-        this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<Runnable>());
+        this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+        this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.eventBus.register(this);
     }
 

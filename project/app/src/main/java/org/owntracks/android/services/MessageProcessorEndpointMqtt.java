@@ -20,7 +20,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
-import org.owntracks.android.injection.components.DaggerMessageProcessorComponent;
+import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -74,7 +74,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	protected EventBus eventBus;
 
 	private MessageProcessorEndpointMqtt() {
-		DaggerMessageProcessorComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+		DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 	}
 	
 	synchronized boolean sendPing() {
@@ -645,6 +645,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 	@Override
 	protected MessageBase onFinalizeMessage(MessageBase message) {
+		// Not relevant for MQTT mode
 		return message;
 	}
 }

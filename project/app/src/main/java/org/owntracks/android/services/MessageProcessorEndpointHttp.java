@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
-import org.owntracks.android.injection.components.DaggerMessageProcessorComponent;
+import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
@@ -20,7 +20,6 @@ import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
 
     private MessageProcessorEndpointHttp() {
-        DaggerMessageProcessorComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
@@ -294,11 +293,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onEnterForeground() {
-
+        //NOOP
     }
     @Override
     public void onAttachAfterModeChanged() {
-
+        //NOOP
     }
 
     @Override
@@ -325,6 +324,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     protected MessageBase onFinalizeMessage(MessageBase message) {
+        // Build pseudo topic based on tid
         if(message.hasTid()) {
             message.setTopic("owntracks/http/" + message.getTid());
         }
