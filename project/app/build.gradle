@@ -155,7 +155,7 @@ dependencies {
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
     testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.15.0"
+    testImplementation "org.mockito:mockito-core:2.22.0"
     testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"
     testImplementation "org.powermock:powermock-api-mockito2:2.0.0-beta.5"
     testImplementation "org.robolectric:robolectric:3.8"
