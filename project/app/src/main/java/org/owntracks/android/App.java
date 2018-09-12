@@ -1,12 +1,9 @@
 package org.owntracks.android;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.services.BackgroundService;
-import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
@@ -19,10 +16,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -51,6 +46,7 @@ public class App extends Application  {
         sAppComponent.preferences().checkFirstStart();
 
         enableForegroundBackgroundDetection();
+
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         sAppComponent.runner().postOnMainHandlerDelayed (new Runnable() {
@@ -59,6 +55,7 @@ public class App extends Application  {
                 sAppComponent.messageProcessor().initialize();
             }
         }, 510);
+
     }
 
     public static AppComponent getAppComponent() { return sAppComponent; }
@@ -185,6 +182,10 @@ public class App extends Application  {
         };
 
         registerReceiver(screenOnOffReceiver, theFilter);
+
+    }
+
+    private void requestLocationUpdates() {
 
     }
 }

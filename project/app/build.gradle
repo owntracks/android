@@ -4,7 +4,7 @@ apply plugin: 'io.objectbox'
 def versionMajor = 2
 def versionMinor = 1
 def versionPatch = 0
-def versionBuild = 1
+def versionBuild = 2
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '15.0.1'
@@ -117,7 +117,6 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     // Play Services libraries
-    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
     implementation "com.google.android.gms:play-services-location:${playLibVersion}"
     implementation "com.google.android.gms:play-services-places:${playLibVersion}"
@@ -133,6 +132,8 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.jakewharton.timber:timber:4.7.0"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
+
+    implementation "android.arch.work:work-runtime:1.0.0-alpha08"
 
     // Widget libraries
     implementation "com.rengwuxian.materialedittext:library:2.1.4"

@@ -24,7 +24,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="?android:attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
 
@@ -46,37 +46,12 @@
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
 
-            <include bind:contact="@{vm.activeContact}" android:id="@+id/contactPeek" layout="@layout/ui_row_contact"/>
-
-            <TextView
-                android:id="@+id/locationDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:text="@{DateFormatter.formatDate(vm.activeContact.fusedLocationDate)}"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_horizontal_margin"
-                style="@style/ListItemPrimary"/>
-
-            <TextView
-                android:id="@+id/locationDateLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/contactDetailsReportedTime"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary"/>
+            <include android:id="@+id/contactPeek" layout="@layout/ui_row_contact"/>
 
             <TextView
                 android:id="@+id/acc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.activeContact.fusedLocationAccuracy}"
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -107,7 +82,6 @@
                 android:id="@+id/tid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.activeContact.trackerId}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"
@@ -131,7 +105,6 @@
                 android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{vm.activeContact.id}"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:paddingLeft="72dp"

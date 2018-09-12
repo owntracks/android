@@ -17,6 +17,7 @@ import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;

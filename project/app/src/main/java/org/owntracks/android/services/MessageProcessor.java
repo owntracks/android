@@ -209,7 +209,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     }
 
-    void onMessageDeliveryFailedFinal(Long messageId) {
+    public void onMessageDeliveryFailedFinal(Long messageId) {
         Timber.e(":%s", messageId);
         dequeue(messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));

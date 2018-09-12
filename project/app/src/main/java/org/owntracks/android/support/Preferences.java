@@ -18,6 +18,7 @@ import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
+import org.owntracks.android.services.worker.Scheduler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
@@ -350,10 +352,12 @@ public class Preferences {
     }
 
     @Export(key =Keys.PING, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    // Unit is minutes
     public int getPing() {
-        return getInt(Keys.PING, R.integer.valPing);
+        return Math.max(getInt(Keys.PING, R.integer.valPing), (int) TimeUnit.MILLISECONDS.toMinutes(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS));
     }
 
+    // Unit is minutes
     @Import(key =Keys.PING)
     private void setPing(int anInt) {
         setInt(Keys.PING, anInt);
@@ -598,12 +602,11 @@ public class Preferences {
         return getIntWithHintSupport(Keys.KEEPALIVE);
     }
 
+    // Unit is seconds
+    // Minimum time is 15minutes because work manager cannot schedule any faster
     @Export(key =Keys.KEEPALIVE, exportModeMqttPrivate =true)
     public int getKeepalive() {
-        int keepalive = getInt(Keys.KEEPALIVE, R.integer.valKeepalive);
-        if(keepalive < 30)
-            keepalive = 30;
-        return keepalive;
+        return Math.max(getInt(Keys.KEEPALIVE, R.integer.valKeepalive), (int)TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS));
     }
 
     @Import(key =Keys.USERNAME)

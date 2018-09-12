@@ -151,15 +151,6 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-
-        <service android:name=".services.Scheduler"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
-
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
@@ -178,14 +169,15 @@
             </intent-filter>
         </service>
 
-        <receiver
+
+        <!--<receiver
             android:name=".support.receiver.BootCompleteReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
 
         <activity
             android:name=".ui.status.StatusActivity"
