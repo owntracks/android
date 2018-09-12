@@ -11,7 +11,7 @@ import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.Scheduler;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.GeocodingProvider;

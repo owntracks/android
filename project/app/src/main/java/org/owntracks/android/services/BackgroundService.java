@@ -50,12 +50,13 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
@@ -100,7 +101,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private GeofencingClient mGeofencingClient;
 
     private LocationCallback locationCallback;
-    private Location lastLocation;
     private MessageLocation lastLocationMessage;
     private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
 
@@ -133,6 +133,9 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Inject
     protected ContactsRepo contactsRepo;
+
+    @Inject
+    LocationRepo locationRepo;
 
     @Inject
     protected Runner runner;
@@ -466,12 +469,10 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     public void onLocationChanged(@Nullable Location location) {
 
-        if (location != null && ((lastLocation == null) || (location.getTime() > lastLocation.getTime()))) {
+        if (location != null && location.getTime() > locationRepo.getCurrentLocationTime()) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
-            lastLocation = location;
-
-            eventBus.postSticky(lastLocation);
+            locationRepo.setCurrentLocation(location);
             publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
         }
     }
@@ -485,7 +486,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private void publishLocationMessage(@Nullable String trigger) {
         Timber.v("trigger:%s", trigger);
 
-        if (lastLocation == null) {
+        if (!locationRepo.hasLocation()) {
             Timber.e("no location available");
             return;
         }
@@ -495,15 +496,15 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
-        if (ignoreLowAccuracy(lastLocation)) {
+        if (ignoreLowAccuracy(locationRepo.getCurrentLocation())) {
             return;
         }
-
+        Location lastLocation = locationRepo.getCurrentLocation();
         // Check if publish would trigger a region if fusedRegionDetection is enabled
         if(waypoints.size() > 0 && preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
             for(int i = 0; i < waypoints.size(); i++) {
                 WaypointModel waypoint = waypoints.get(waypoints.keyAt(i));
-                onWaypointTransition(waypoint, lastLocation, lastLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+                onWaypointTransition(waypoint, locationRepo.getCurrentLocation(), lastLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
             }
         }
 
@@ -584,8 +585,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         }
 
         mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
-        LocationRequest request = App.isInForeground() ? getForegroundLocationRequest() : getBackgroundLocationRequest();
-        mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
+        mFusedLocationClient.requestLocationUpdates(App.isInForeground() ? getForegroundLocationRequest() : getBackgroundLocationRequest(), locationCallback,  runner.getBackgroundHandler().getLooper());
     }
 
     private PendingIntent getLocationPendingIntent() {

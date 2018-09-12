@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.MemoryContactsRepo;
 import org.owntracks.android.data.repos.ObjectboxWaypointsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
@@ -45,6 +46,12 @@ public abstract class DataModule {
 
     @Provides
     @PerApplication
+    static LocationRepo provideLocationRepo(EventBus eventBus) { return new LocationRepo(eventBus); }
+
+
+    @Provides
+    @PerApplication
     static Preferences providePreferences(@AppContext Context context, EventBus eventBus) { return new Preferences(context, eventBus); }
+
 
 }

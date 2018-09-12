@@ -31,9 +31,9 @@ import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -77,7 +77,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 	}
 	
-	synchronized boolean sendPing() {
+	public synchronized boolean sendPing() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
 			mqttClient.ping();
@@ -447,7 +447,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	}
 
 	@WorkerThread
-	boolean checkConnection() {
+	public boolean checkConnection() {
 		if(isConnected()) {
 			return true;
 		} else {
