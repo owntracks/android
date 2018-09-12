@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map;
 
+import android.arch.lifecycle.LiveData;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
@@ -24,13 +25,11 @@ public interface MapMvvm {
         void removeMarker(FusedContact c);
         void clearMarkers();
         void enableLocationMenus();
-        void updateCamera(@NonNull LatLng latLng);
 
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V>  {
         LatLng getCurrentLocation();
-
 
         @Bindable
         FusedContact getActiveContact();
@@ -43,10 +42,15 @@ public interface MapMvvm {
 
         void restore(String contactId);
         boolean hasLocation();
+        void onMapReady();
 
         LocationSource getMapLocationSource();
         GoogleMap.OnMapClickListener getOnMapClickListener();
         GoogleMap.OnMarkerClickListener getOnMarkerClickListener();
-        void onMapReady();
+
+        LiveData<FusedContact> getContact();
+        LiveData<Boolean> getBottomSheetHidden();
+        LiveData<LatLng> getCenter();
+
     }
 }
