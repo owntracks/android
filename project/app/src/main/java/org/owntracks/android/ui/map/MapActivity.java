@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map;
 
+import android.arch.lifecycle.Observer;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,7 +34,9 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Runner;
+import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
 
@@ -43,7 +46,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback {
+public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer {
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
     private static final long ZOOM_LEVEL_STREET = 15;
 
@@ -55,6 +58,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Inject
     protected Runner runner;
+
+    @Inject
+    protected ContactImageProvider contactImageProvider;
+
+    @Inject
+    protected GeocodingProvider geocodingProvider;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +112,50 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         params.setBehavior(behavior);
 
         App.startBackgroundServiceCompat(this);
+
+        viewModel.getContact().observe(this, this);
+        viewModel.getBottomSheetHidden().observe(this, new Observer() {
+            @Override
+            public void onChanged(@Nullable Object o) {
+                if(Boolean.class.cast(o)) {
+                    setBottomSheetHidden();
+                } else {
+                    setBottomSheetCollapsed();
+                }
+            }
+        });
+        viewModel.getCenter().observe(this, new Observer() {
+            @Override
+            public void onChanged(@Nullable Object o) {
+                if(o != null) {
+                    updateCamera(LatLng.class.cast(o));
+                }
+            }
+        });
+
     }
+
+    @Override
+    public void onChanged(@Nullable Object activeContact) {
+        if (activeContact != null) {
+            FusedContact c = FusedContact.class.cast(activeContact);
+            Timber.v("for contact: %s", c.getId());
+
+            binding.contactPeek.name.setText(c.getFusedName());
+            if(c.hasLocation()) {
+                contactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
+                geocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
+                BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
+                binding.acc.setText(c.getFusedLocationAccuracy());
+                binding.tid.setText(c.getTrackerId());
+                binding.id.setText(c.getId());
+            } else {
+                binding.contactPeek.location.setText(R.string.na);
+                binding.contactPeek.locationDate.setText(R.string.na);
+            }
+        }
+    }
+
 
     @Override
     public void onSaveInstanceState(Bundle bundle) {
@@ -116,6 +168,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
 
     }
+
+
 
     @Override
     public void onDestroy() {
@@ -330,13 +384,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             mMarkers.put(contact.getId(), m);
         }
 
-        App.getContactImageProvider().setMarkerAsync(m, contact);
+        contactImageProvider.setMarkerAsync(m, contact);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_navigate:
+
                 FusedContact c = viewModel.getActiveContact();
                 if (c != null && c.hasLocation()) {
                     try {
@@ -378,6 +433,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     public void setBottomSheetCollapsed() {
+        Timber.v("vm contact: %s", binding.getVm().getActiveContact());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
@@ -396,4 +452,5 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }
+
 }

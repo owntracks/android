@@ -1,5 +1,7 @@
 package org.owntracks.android.ui.map;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.databinding.Bindable;
 import android.location.Location;
 import android.os.Bundle;
@@ -40,7 +42,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private static final int VIEW_FREE = 0;
     private static final int VIEW_CONTACT = 1;
     private static final int VIEW_DEVICE = 2;
+
+
     private static int mode = VIEW_DEVICE;
+    private MutableLiveData<FusedContact> liveContact = new MutableLiveData<>();
+    private MutableLiveData<Boolean> liveBottomSheetHidden = new MutableLiveData<>();
+    private MutableLiveData<LatLng> liveCamera = new MutableLiveData<>();
 
     @Inject
     public MapViewModel(ContactsRepo contactsRepo, MessageProcessor messageProcessor) {
@@ -87,6 +94,22 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         }
     }
 
+    @Override
+    public LiveData<FusedContact> getContact() {
+        return liveContact;
+    }
+
+    @Override
+    public LiveData<Boolean> getBottomSheetHidden() {
+        return liveBottomSheetHidden;
+    }
+
+    @Override
+    public LiveData<LatLng> getCenter() {
+        return liveCamera;
+    }
+
+
     private void setViewModeContact(@NonNull String contactId, boolean center) {
         FusedContact c = contactsRepo.getById(contactId);
         if(c != null)
@@ -95,13 +118,17 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             Timber.e("contact not found %s, ", contactId);
     }
 
-    private void setViewModeContact(@NonNull FusedContact contact, boolean center) {
+    private void setViewModeContact(@NonNull FusedContact c, boolean center) {
         mode = VIEW_CONTACT;
-        setActiveContact(contact);
-        getView().setBottomSheetCollapsed();
+        Timber.v("contactId:%s, obj:%s ", c.getId(), activeContact);
+
+        activeContact = c;
+
+        liveContact.postValue(c);
+        liveBottomSheetHidden.postValue(false);
 
         if(center)
-            getView().updateCamera(activeContact.getLatLng());
+            liveCamera.postValue(c.getLatLng());
 
     }
 
@@ -117,7 +144,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         mode = VIEW_DEVICE;
         clearActiveContact();
         if(hasLocation())
-            getView().updateCamera(getCurrentLocation());
+            liveCamera.postValue(getCurrentLocation());
     }
 
 
@@ -150,26 +177,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         return mLocation != null;
     }
 
-    private void setActiveContact(@Nullable FusedContact contact) {
-        if(contact == null) {
-            clearActiveContact();
-            setViewModeFree();
-
-            return;
-        }
-        Timber.v("contactId:%s, obj:%s ", contact.getId(), activeContact);
-
-        activeContact = contact;
-        notifyPropertyChanged(BR.activeContact);
-    }
 
     private void clearActiveContact() {
         activeContact = null;
-        notifyPropertyChanged(BR.activeContact);
-        getView().setBottomSheetHidden();
+        liveContact.postValue(null);
+        liveBottomSheetHidden.postValue(true);
     }
-
-
 
     @Override
     public void onBottomSheetClick() {
@@ -209,6 +222,10 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FusedContact c) {
         getView().updateMarker(c);
+        if(c == activeContact) {
+            liveContact.postValue(c);
+            liveCamera.postValue(c.getLatLng());
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -227,7 +244,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         }
         if(mode == VIEW_DEVICE) {
             //noinspection ConstantConditions
-            getView().updateCamera(getCurrentLocation());
+            liveCamera.postValue(getCurrentLocation());
         }
         getView().enableLocationMenus();
     }
