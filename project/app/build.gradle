@@ -8,7 +8,7 @@ def versionBuild = 2
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.10'
 ext.playLibVersion = '15.0.1'
-ext.okHttpVersion = '3.10.0'
+ext.okHttpVersion = '3.11.0'
 ext.supportLibVersion = '27.1.1'
 ext.jacksonVersion = '2.9.4'
 
