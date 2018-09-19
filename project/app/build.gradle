@@ -10,7 +10,7 @@ ext.daggerVersion = '2.17'
 ext.playLibVersion = '15.0.1'
 ext.okHttpVersion = '3.11.0'
 ext.supportLibVersion = '27.1.1'
-ext.jacksonVersion = '2.9.6'
+ext.jacksonVersion = '2.9.7'
 
 android {
     compileSdkVersion 27
