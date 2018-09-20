@@ -133,7 +133,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
 
-    implementation "android.arch.work:work-runtime:1.0.0-alpha08"
+    implementation "android.arch.work:work-runtime:1.0.0-alpha09"
 
     // Widget libraries
     implementation "com.rengwuxian.materialedittext:library:2.1.4"
