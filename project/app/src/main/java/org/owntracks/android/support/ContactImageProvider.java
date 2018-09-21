@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
@@ -32,6 +33,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import timber.log.Timber;
 
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
@@ -98,6 +101,7 @@ public class ContactImageProvider {
         (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
+    @Nullable
     private static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
@@ -114,9 +118,20 @@ public class ContactImageProvider {
 
             if(contact.getMessageCard().hasFace()) {
                 byte[] imageAsBytes = Base64.decode(contact.getMessageCard().getFace().getBytes(), Base64.DEFAULT);
-                d = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length), FACE_DIMENSIONS, FACE_DIMENSIONS, true));
-                contact.getMessageCard().setFace(null);
-                memoryCache.putLevelCard(contact.getId(), d);
+                Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+
+                if(b == null) {
+                    Timber.e("Decoding card bitmap failed");
+                    Bitmap fallbackBitmap = Bitmap.createBitmap(FACE_DIMENSIONS, FACE_DIMENSIONS, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(fallbackBitmap);
+                    Paint paint = new Paint();
+                    paint.setColor(0xFFFFFFFF);
+                    canvas.drawRect(0F, 0F, (float) FACE_DIMENSIONS, (float) FACE_DIMENSIONS, paint);
+                    d = getRoundedShape(fallbackBitmap);
+                } else {
+                    d = getRoundedShape(Bitmap.createScaledBitmap(b, FACE_DIMENSIONS, FACE_DIMENSIONS, true));
+                    memoryCache.putLevelCard(contact.getId(), d);
+                }
                 return d;
             }
         }
