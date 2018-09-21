@@ -131,7 +131,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.jakewharton.timber:timber:4.7.1"
-    implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:1.0.8"
+    implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
 
     implementation "android.arch.work:work-runtime:1.0.0-alpha09"
 
