@@ -29,6 +29,7 @@
     <bool name="valNotificationHigherPriority">false</bool>
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationEvents">true</bool>
+    <bool name="valNotificationShowSelf">true</bool>
     <bool name="valSub" >true</bool>
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>

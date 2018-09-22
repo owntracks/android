@@ -19,7 +19,9 @@
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationEvents">Events </string>
+    <string name="preferencesNotificationShowSelf">Own events </string>
     <string name="preferencesNotificationEventsSummary">Notify about received events </string>
+    <string name="preferencesNotificationShowSelfSummary">Display your own events </string>
     <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>

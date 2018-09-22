@@ -226,6 +226,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificationBackground);
         screen.addPreference(background);
         addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
+        addSwitchPreference(background, Preferences.Keys.NOTIFICATION_SHOW_SELF, R.string.preferencesNotificationShowSelf, R.string.preferencesNotificationShowSelfSummary, R.bool.valNotificationShowSelf);
 
     }
 

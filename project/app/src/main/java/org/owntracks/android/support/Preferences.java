@@ -638,6 +638,11 @@ public class Preferences {
         setBoolean(Keys.NOTIFICATION_EVENTS, notificationEvents);
     }
 
+    @Import(key =Keys.NOTIFICATION_SHOW_SELF)
+    public void setNotificationHideSelf(boolean notificationHideSelf) {
+        setBoolean(Keys.NOTIFICATION_SHOW_SELF, notificationHideSelf);
+    }
+
     @Import(key =Keys.SUB_TOPIC)
     private void setSubTopic(String string) {
         setString(Keys.SUB_TOPIC, string);
@@ -760,6 +765,10 @@ public class Preferences {
 
     public boolean getNotificationEvents() {
         return getBoolean(Keys.NOTIFICATION_EVENTS, R.bool.valNotificationEvents);
+    }
+
+    public boolean getNotificationShowSelf() {
+        return getBoolean(Keys.NOTIFICATION_SHOW_SELF, R.bool.valNotificationShowSelf);
     }
 
     @Export(key =Keys.PUB_QOS, exportModeMqttPrivate =true)
@@ -926,6 +935,7 @@ public class Preferences {
         public static final String MQTT_PROTOCOL_LEVEL              = "mqttProtocolLevel";
         public static final String NOTIFICATION                     = "notification";
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
+        public static final String NOTIFICATION_SHOW_SELF           = "notificationHideSelf";
         public static final String NOTIFICATION_HIGHER_PRIORITY     = "notificationHigherPriority";
         public static final String NOTIFICATION_LOCATION            = "notificationLocation";
         public static final String OPENCAGE_GEOCODER_API_KEY        = "opencageApiKey";

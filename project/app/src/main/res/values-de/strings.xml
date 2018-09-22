@@ -13,7 +13,9 @@
     <string name="preferencesLicensesSummary">"Danke an die Autoren"</string>
     <string name="preferencesNotification">Benachrichtigungen</string>
     <string name="preferencesNotificationEvents">Ereignisse</string>
+    <string name="preferencesNotificationShowSelf">Eigene Ereignisse</string>
     <string name="preferencesNotificationEventsSummary">Über empfangene Ereignisse benachrichtigen</string>
+    <string name="preferencesNotificationShowSelfSummary">Informiere über eigene Ereignisse</string>
     <string name="preferencesNotificationSummary">"Benachrichtigung anzeigen, um nicht automatisch beendet zu werden"</string>
     <string name="preferencesNotificationLocationSummary">"Letzten gemeldeten Standort und Zeitpunkt anzeigen"</string>
     <string name="preferencesNotificationLocation">"Letzter gemeldeter Standort"</string>

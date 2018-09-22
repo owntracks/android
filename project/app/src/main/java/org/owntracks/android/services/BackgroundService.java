@@ -313,6 +313,10 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             return;
         }
 
+        if (!preferences.getNotificationShowSelf() && message.getTid().equals(preferences.getTrackerId())) {
+            return;
+        }
+
         FusedContact c = contactsRepo.getById(message.getContactKey());
 
         long when = message.getTst() * 1000;
