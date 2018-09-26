@@ -13,12 +13,18 @@ ext.supportLibVersion = '28.0.0'
 ext.jacksonVersion = '2.9.7'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    // Workaround. Remove on WorkManager alpha10
+    // https://developer.android.com/jetpack/docs/release-notes#september_19_2018
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
+
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
