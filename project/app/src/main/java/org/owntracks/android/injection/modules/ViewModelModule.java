@@ -27,24 +27,9 @@ import org.owntracks.android.ui.welcome.play.PlayFragmentViewModel;
 
 import dagger.Binds;
 import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
 
 @Module
 public abstract class ViewModelModule {
-
-    // Activities
-    @Binds abstract MapMvvm.ViewModel bindMapViewModel(MapViewModel viewModel);
-    @Binds abstract ContactsMvvm.ViewModel bindContactsViewModel(ContactsViewModel viewModel);
-    @Binds abstract StatusMvvm.ViewModel bindStatusViewModel(StatusViewModel viewModel);
-    @Binds abstract EditorMvvm.ViewModel bindEditorViewModel(EditorViewModel viewModel);
-    @Binds abstract ConnectionMvvm.ViewModel bindConnectionViewModel(ConnectionViewModel viewModel);
-    @Binds abstract LoadMvvm.ViewModel bindLoadViewModel(LoadViewModel viewModel);
-    @Binds abstract WelcomeMvvm.ViewModel bindWelcomeViewModel(WelcomeViewModel viewModel);
-    @Binds abstract RegionMvvm.ViewModel bindRegionViewModel(RegionViewModel viewModel);
-    @Binds abstract RegionsMvvm.ViewModel bindRegionsViewModel(RegionsViewModel viewModel);
-
-    //Fragments
-    @Binds abstract PermissionFragmentMvvm.ViewModel bindPermissionFragmentViewModel(PermissionFragmentViewModel viewModel);
-    @Binds abstract PlayFragmentMvvm.ViewModel bindPlayFragmentViewModel(PlayFragmentViewModel viewModel);
     @Binds abstract PreferencesFragmentMvvm.ViewModel bindPreferencesFragmentViewModel(PreferencesFragmentViewModel viewModel);
-
 }

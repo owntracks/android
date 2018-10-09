@@ -15,6 +15,7 @@ import org.owntracks.android.databinding.UiRegionsBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.region.RegionActivity;
 
+import dagger.android.AndroidInjection;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import timber.log.Timber;
@@ -28,7 +29,6 @@ public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasEventBus(false);
-        activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_regions, savedInstanceState);
         setSupportToolbar(binding.toolbar);
         setDrawer(binding.toolbar);

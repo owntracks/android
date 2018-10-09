@@ -70,9 +70,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import dagger.android.DaggerService;
 import timber.log.Timber;
 
-public class BackgroundService extends Service implements OnCompleteListener<Location> {
+public class BackgroundService extends DaggerService implements OnCompleteListener<Location> {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -145,7 +146,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Override
     public void onCreate() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 
         Timber.v("Preferences instance: %s", preferences);
 

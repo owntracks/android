@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
@@ -35,7 +36,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_preferences_load, savedInstanceState);
 
         setHasEventBus(false);

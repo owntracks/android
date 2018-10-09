@@ -29,6 +29,8 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+
 
 public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel> implements ConnectionMvvm.View {
     private BaseDialogViewModel activeDialogViewModel ;
@@ -42,7 +44,6 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_preferences_connection, savedInstanceState);
         setSupportToolbar(binding.toolbar, true, false);
         setDrawer(binding.toolbar);

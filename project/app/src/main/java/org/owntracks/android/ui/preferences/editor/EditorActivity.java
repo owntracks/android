@@ -33,6 +33,7 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import io.objectbox.annotation.Index;
 
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
@@ -41,7 +42,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
         bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState);
 
         setHasEventBus(false);

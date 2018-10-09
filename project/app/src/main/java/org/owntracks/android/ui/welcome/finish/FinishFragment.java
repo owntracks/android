@@ -14,19 +14,13 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
+
 
 public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
-
-    @Inject
-    public FinishFragment() {
-        if(viewModel == null) { fragmentComponent().inject(this); }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);}
-
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_finish, savedInstanceState);
     }
 

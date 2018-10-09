@@ -1,46 +1,34 @@
 package org.owntracks.android.injection.modules;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-
-import org.owntracks.android.injection.qualifier.ActivityContext;
-import org.owntracks.android.injection.qualifier.ChildFragmentManager;
 import org.owntracks.android.injection.qualifier.DefaultFragmentManager;
 import org.owntracks.android.injection.scopes.PerFragment;
-import org.owntracks.android.ui.base.navigator.FragmentNavigator;
-import org.owntracks.android.ui.base.navigator.SupportFragmentNavigator;
-import org.owntracks.android.ui.base.navigator.Navigator;
 
+import javax.inject.Named;
+
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class FragmentModule {
+public abstract class FragmentModule {
 
-    private final Fragment mFragment;
+    public static final String FRAGMENT = "FragmentModule.fragment";
+    public static final String CHILD_FRAGMENT_MANAGER = "FragmentModule.childFragmentManager";
 
-    public FragmentModule(Fragment fragment) {
-        mFragment = fragment;
-    }
-
-    @Provides
+    @Binds
     @PerFragment
-    @ActivityContext
-    Context provideActivityContext() { return mFragment.getActivity(); }
+    abstract android.app.Fragment bindFragment(android.app.Fragment f);
 
     @Provides
     @PerFragment
     @DefaultFragmentManager
-    FragmentManager provideDefaultFragmentManager() { return mFragment.getFragmentManager(); }
+    static FragmentManager provideDefaultFragmentManager(android.app.Fragment f) { return f.getFragmentManager(); }
 
     @Provides
+    @Named(CHILD_FRAGMENT_MANAGER)
     @PerFragment
-    @ChildFragmentManager
-    FragmentManager provideChildFragmentManager() { return mFragment.getChildFragmentManager(); }
-
-    @Provides
-    @PerFragment
-    Navigator provideNavigator() { return new FragmentNavigator(mFragment); }
-
+    static android.app.FragmentManager childFragmentManager(@Named(FRAGMENT) android.app.Fragment fragment) {
+        return fragment.getChildFragmentManager();
+    }
 }

@@ -44,7 +44,7 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     @Override
     public void onDoneClicked() {
         preferences.setSetupCompleted();
-        navigator.get().startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
 

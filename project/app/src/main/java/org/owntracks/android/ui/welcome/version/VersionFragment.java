@@ -17,18 +17,12 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
+
 public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
-
-    @Inject
-    public VersionFragment() {
-        if(viewModel == null) { fragmentComponent().inject(this); }
-    }
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);}
         View v = setAndBindContentView(inflater, container, R.layout.ui_welcome_version, savedInstanceState);
         binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this);
         return v;

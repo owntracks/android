@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
+import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
@@ -74,6 +75,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	protected EventBus eventBus;
 
 	private MessageProcessorEndpointMqtt() {
+		DaggerAppComponent.
 		DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
 	}
 	

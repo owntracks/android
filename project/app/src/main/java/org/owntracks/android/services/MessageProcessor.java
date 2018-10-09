@@ -27,6 +27,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 
@@ -104,6 +106,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
+    @Inject
     public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo) {
         this.preferences = preferences;
         this.eventBus = eventBus;
@@ -299,12 +302,12 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     }
                     Intent reportIntent = new Intent(App.getContext(), BackgroundService.class);
                     reportIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_RESPONSE);
-                    App.startBackgroundServiceCompat(App.getContext(), reportIntent);
+                    App.getInstance().startBackgroundServiceCompat(App.getContext(), reportIntent);
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
                     Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
                     waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_WAYPOINTS);
-                    App.startBackgroundServiceCompat(App.getContext(), waypointsIntent);
+                    App.getInstance().startBackgroundServiceCompat(App.getContext(), waypointsIntent);
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     if(message.getWaypoints() != null) {

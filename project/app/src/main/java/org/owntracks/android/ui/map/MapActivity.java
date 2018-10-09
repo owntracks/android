@@ -44,6 +44,7 @@ import java.util.WeakHashMap;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer {
@@ -67,9 +68,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
 
 
         if (!requirementsChecker.areRequirementsMet()) {
@@ -111,7 +110,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         });
         params.setBehavior(behavior);
 
-        App.startBackgroundServiceCompat(this);
+        App.getInstance().startBackgroundServiceCompat(this);
 
         viewModel.getContact().observe(this, this);
         viewModel.getBottomSheetHidden().observe(this, new Observer() {
@@ -290,7 +289,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
 
-            App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
+            App.getInstance().startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
 
             return true;
         } else if (itemId == R.id.menu_mylocation) {

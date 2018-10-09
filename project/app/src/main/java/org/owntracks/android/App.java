@@ -2,12 +2,14 @@ package org.owntracks.android;
 
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
-import org.owntracks.android.injection.modules.AppModule;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
@@ -21,19 +23,51 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
-public class App extends Application  {
+public class App extends DaggerApplication  {
     private Activity currentActivity;
     private static boolean inForeground;
     private int runningActivities = 0;
+    private static App sInstance;
 
-    private static AppComponent sAppComponent = null;
+    @Inject
+    DispatchingAndroidInjector<Activity> mActivityInjector;
+
+    @Inject
+    Preferences preferences;
+
+    @Inject
+    Runner runner;
+
+    @Inject
+    MessageProcessor messageProcessor;
+
+    @Inject
+    GeocodingProvider geocodingProvider;
+
+    @Inject
+    ContactImageProvider contactImageProvider; 
+    @Inject
+    Parser parser; 
+
+    @Inject
+    @AppContext
+    Context context;
+    private AppComponent sAppComponent;
 
 
     @Override
-	public void onCreate() {
-		super.onCreate();
+    public void onCreate() {
+        super.onCreate();
+        sInstance = this;
+
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
@@ -42,53 +76,63 @@ public class App extends Application  {
                 }
             });
         }
-        sAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
-        sAppComponent.preferences().checkFirstStart();
+
+
+
+        preferences.checkFirstStart();
 
         enableForegroundBackgroundDetection();
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
-        sAppComponent.runner().postOnMainHandlerDelayed (new Runnable() {
+        runner.postOnMainHandlerDelayed(new Runnable() {
             @Override
             public void run() {
-                sAppComponent.messageProcessor().initialize();
+                messageProcessor.initialize();
             }
         }, 510);
 
     }
 
-    public static AppComponent getAppComponent() { return sAppComponent; }
+    @Deprecated
+    public static GeocodingProvider getGeocodingProvider() {
+        return App.getInstance().geocodingProvider;
+    }
 
     @Deprecated
-    public static GeocodingProvider getGeocodingProvider() { return sAppComponent.geocodingProvider(); }
+    public static ContactImageProvider getContactImageProvider() {
+        return App.getInstance().contactImageProvider;
+    }
 
     @Deprecated
-    public static ContactImageProvider getContactImageProvider() { return sAppComponent.contactImageProvider(); }
+    public static Parser getParser() {
+        return App.getInstance().parser;
+    }
 
     @Deprecated
-    public static Parser getParser() { return sAppComponent.parser(); }
+    public static Preferences getPreferences() {
+        return App.getInstance().preferences;
+    }
 
     @Deprecated
-    public static Preferences getPreferences() { return sAppComponent.preferences(); }
+    public static Context getContext() {
+        return sInstance.getApplicationContext();
+    }
 
     private void enableForegroundBackgroundDetection() {
         registerActivityLifecycleCallbacks(new LifecycleCallbacks());
         registerScreenOnReceiver();
     }
 
-    public static Context getContext() {
-		return sAppComponent.context();
-	}
 
     private void onEnterForeground() {
         Timber.v("entering foreground");
         inForeground = true;
-        sAppComponent.runner().postOnBackgroundHandler(new Runnable() {
+        runner.postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
-                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
-                sAppComponent.messageProcessor().onEnterForeground();
+                startBackgroundServiceCompat(context, BackgroundService.INTENT_ACTION_CHANGE_BG);
+                messageProcessor.onEnterForeground();
             }
         });
     }
@@ -96,11 +140,11 @@ public class App extends Application  {
     private void onEnterBackground() {
         Timber.v("entering background");
         inForeground = false;
-        sAppComponent.runner().postOnBackgroundHandler(new Runnable() {
+        runner.postOnBackgroundHandler(new Runnable() {
             @Override
             public void run() {
-                startBackgroundServiceCompat(getContext(), BackgroundService.INTENT_ACTION_CHANGE_BG);
-                sAppComponent.messageProcessor().onEnterBackground();
+                startBackgroundServiceCompat(context, BackgroundService.INTENT_ACTION_CHANGE_BG);
+                messageProcessor.onEnterBackground();
             }
         });
     }
@@ -110,31 +154,32 @@ public class App extends Application  {
     }
 
     public static void restart() {
-        Intent intent = new Intent(getContext(), MapActivity.class);
+        Intent intent = new Intent(App.getInstance().getApplicationContext(), MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        App.getInstance().getApplicationContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
     }
 
-    public static void startBackgroundServiceCompat(final @NonNull Context context) {
+    public void startBackgroundServiceCompat(final @NonNull Context context) {
         startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)));
     }
-    public static void startBackgroundServiceCompat(final @NonNull Context context, final @Nullable String action) {
+
+    public void startBackgroundServiceCompat(final @NonNull Context context, final @Nullable String action) {
         startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)).setAction(action));
     }
 
-    public static void startBackgroundServiceCompat(final @NonNull Context context, @NonNull final Intent intent) {
+    public void startBackgroundServiceCompat(final @NonNull Context context, @NonNull final Intent intent) {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent);
                 } else {
                     context.startService(intent);
                 }
             }
         };
-        sAppComponent.runner().postOnBackgroundHandlerDelayed(r, 1000);
+        runner.postOnBackgroundHandlerDelayed(r, 1000);
     }
 
 
@@ -151,16 +196,26 @@ public class App extends Application  {
 
         public void onActivityStopped(Activity activity) {
             runningActivities--;
-            if(currentActivity == activity)  currentActivity = null;
+            if (currentActivity == activity) currentActivity = null;
             if (runningActivities == 0) onEnterBackground();
         }
 
-        public void onActivityResumed(Activity activity) {  }
-        public void onActivityPaused(Activity activity) {  }
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) { }
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) { }
-        public void onActivityDestroyed(Activity activity) { }
+        public void onActivityResumed(Activity activity) {
+        }
+
+        public void onActivityPaused(Activity activity) {
+        }
+
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        }
+
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+
+        public void onActivityDestroyed(Activity activity) {
+        }
     }
+
     private void registerScreenOnReceiver() {
         final IntentFilter theFilter = new IntentFilter();
 
@@ -174,18 +229,22 @@ public class App extends Application  {
             public void onReceive(Context context, Intent intent) {
                 String strAction = intent.getAction();
                 Timber.v("screenOnOffReceiver intent received");
-                if ((Intent.ACTION_SCREEN_OFF.equals(strAction) || Intent.ACTION_SCREEN_ON.equals(strAction)) && isInForeground())
-                {
-                        onEnterBackground();
+                if ((Intent.ACTION_SCREEN_OFF.equals(strAction) || Intent.ACTION_SCREEN_ON.equals(strAction)) && isInForeground()) {
+                    onEnterBackground();
                 }
             }
         };
 
         registerReceiver(screenOnOffReceiver, theFilter);
-
     }
 
-    private void requestLocationUpdates() {
-
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        return DaggerAppComponent
+                .builder()
+                .create(this);
+    }
+    public static App getInstance() {
+        return App.sInstance;
     }
 }

@@ -38,8 +38,8 @@ public class Scheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build();
 
+    @Inject
     public Scheduler() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
     }
 
     public void cancelHttpTasks() {

@@ -15,16 +15,12 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
 import javax.inject.Inject;
 
-public class IntroFragment extends BaseSupportFragment<UiWelcomeIntroBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
-    @Inject
-    public IntroFragment() {
-        if(viewModel == null) { fragmentComponent().inject(this); }
-    }
+import dagger.android.support.AndroidSupportInjection;
 
+public class IntroFragment extends BaseSupportFragment<UiWelcomeIntroBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);}
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_intro, savedInstanceState);
     }
 

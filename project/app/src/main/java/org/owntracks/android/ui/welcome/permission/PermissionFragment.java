@@ -20,13 +20,10 @@ import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
+
 public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
     private final int PERMISSIONS_REQUEST_CODE = 1;
-
-    @Inject
-    public PermissionFragment() {
-        if(viewModel == null) { fragmentComponent().inject(this); }
-    }
 
     @Inject
     EventBus eventBus;
@@ -34,7 +31,6 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);}
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState);
     }
 
