@@ -46,7 +46,7 @@ import timber.log.Timber;
 @PerApplication
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
-    private static final int FACE_DIMENSIONS = (int) (48 * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f));
+    private static final int FACE_DIMENSIONS = (int) (48 * (App.getDisplayDensity() / 160f));
 
 
     public void invalidateCacheLevelCard(String key) {
@@ -110,13 +110,11 @@ public class ContactImageProvider {
     }
 
     @Nullable
-    private static Bitmap getBitmapFromCache(FusedContact contact) {
+    public static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
             return null;
-
-
 
         if(contact.hasCard()) {
             d = memoryCache.getLevelCard(contact.getId());
@@ -154,9 +152,8 @@ public class ContactImageProvider {
     }
 
     @Inject
-    public ContactImageProvider(EventBus eventBus){
+    public ContactImageProvider(){
         memoryCache = new ContactBitmapMemoryCache();
-        eventBus.register(this);
     }
 
     private static class ContactBitmapMemoryCache {
@@ -190,7 +187,7 @@ public class ContactImageProvider {
         }
     }
 
-    private void invalidateCache() {
+    public void invalidateCache() {
         memoryCache.clear();
     }
     private static Bitmap getRoundedShape(Bitmap bitmap) {
@@ -235,10 +232,5 @@ public class ContactImageProvider {
     @BindingAdapter({"imageProvider", "contact"})
     public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
         setImageViewAsync(view, c);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.ModeChanged e) {
-        invalidateCache();
     }
 }

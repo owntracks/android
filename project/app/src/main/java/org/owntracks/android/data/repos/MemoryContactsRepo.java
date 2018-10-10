@@ -72,6 +72,7 @@ public class MemoryContactsRepo implements ContactsRepo {
 
         majorRevision-=MAJOR_STEP;
         revision = 0;
+        contactImageProvider.invalidateCache();
     }
 
     @Override
