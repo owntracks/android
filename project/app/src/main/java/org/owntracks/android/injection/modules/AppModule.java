@@ -32,22 +32,10 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    static Resources provideResources(@AppContext Context context) {
-        return context.getResources();
-    }
-
-    @Provides
-    @PerApplication
     static EventBus provideEventbus() {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
-    @SuppressWarnings("deprecation")
-    @Provides
-    @PerApplication
-    static Locale provideLocale(@AppContext Context context) {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? context.getResources().getConfiguration().getLocales().get(0) : context.getResources().getConfiguration().locale;
-    }
 
     @Provides
     @PerApplication
