@@ -105,11 +105,6 @@ public class App extends DaggerApplication  {
     }
 
     @Deprecated
-    public static Preferences getPreferences() {
-        return App.getInstance().preferences;
-    }
-
-    @Deprecated
     public static Context getContext() {
         return sInstance.getApplicationContext();
     }
@@ -142,6 +137,12 @@ public class App extends DaggerApplication  {
                 messageProcessor.onEnterBackground();
             }
         });
+    }
+
+    public static void onBootComplete() {
+        if (getInstance().preferences.getAutostartOnBoot()) {
+            getInstance().startBackgroundServiceCompat(getInstance().getApplicationContext());
+        }
     }
 
     public static boolean isInForeground() {

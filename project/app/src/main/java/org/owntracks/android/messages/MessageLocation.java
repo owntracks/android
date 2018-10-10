@@ -7,14 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.owntracks.android.App;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -184,7 +182,7 @@ public class MessageLocation extends MessageBase {
     }
 
     public boolean isValidMessage() {
-        return App.getPreferences().getIgnoreStaleLocations() == 0 || (System.currentTimeMillis() - tst * 1000) < TimeUnit.DAYS.toMillis(App.getPreferences().getIgnoreStaleLocations());
+        return tst > 0;
     }
 
     public void setConn(String conn) {
