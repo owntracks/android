@@ -86,7 +86,5 @@ public class AppModule {
     @Provides
     @PerApplication
     static Runner provideRunner(@AppContext Context context) { return new Runner(context); }
-
-    @ContributesAndroidInjector(modules = {ConnectionActivityModule.class})
-
+    
 }
