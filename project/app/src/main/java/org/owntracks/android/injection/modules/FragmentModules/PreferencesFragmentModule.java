@@ -1,6 +1,6 @@
 package org.owntracks.android.injection.modules.FragmentModules;
 
-import org.owntracks.android.injection.modules.FragmentModule;
+import org.owntracks.android.injection.modules.BaseFragmentModule;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragmentMvvm;
@@ -9,7 +9,7 @@ import org.owntracks.android.ui.preferences.PreferencesFragmentViewModel;
 import dagger.Binds;
 import dagger.Module;
 
-@Module(includes = FragmentModule.class)
+@Module(includes = BaseFragmentModule.class)
 public abstract class PreferencesFragmentModule {
 
     @Binds

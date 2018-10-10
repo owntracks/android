@@ -1,6 +1,5 @@
 package org.owntracks.android.injection.components;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
@@ -11,25 +10,19 @@ import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.modules.AndroindBindingModule;
 import org.owntracks.android.injection.modules.AppModule;
-import org.owntracks.android.injection.modules.DataModule;
-import org.owntracks.android.injection.modules.NetModule;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
-import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 
-import javax.inject.Inject;
-
 import dagger.BindsInstance;
 import dagger.Component;
-import dagger.android.AndroidInjectionModule;
 import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;

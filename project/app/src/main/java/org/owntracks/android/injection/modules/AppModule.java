@@ -8,6 +8,9 @@ import android.os.Build;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.LocationRepo;
+import org.owntracks.android.data.repos.MemoryContactsRepo;
+import org.owntracks.android.data.repos.ObjectboxWaypointsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
@@ -23,9 +26,8 @@ import org.owntracks.android.support.Runner;
 import java.util.Locale;
 import dagger.Module;
 import dagger.Provides;
-import dagger.android.support.AndroidSupportInjectionModule;
 
-@Module(includes = {DataModule.class})
+@Module
 public class AppModule {
 
     @Provides
@@ -86,5 +88,26 @@ public class AppModule {
     @Provides
     @PerApplication
     static Runner provideRunner(@AppContext Context context) { return new Runner(context); }
-    
+
+    @Provides
+    @PerApplication
+    static ContactsRepo provideContactsRepo(EventBus eventBus, Runner runner) {
+        return new MemoryContactsRepo(eventBus, runner);
+    }
+
+    @Provides
+    @PerApplication
+    static WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
+        return new ObjectboxWaypointsRepo(context, eventBus, preferences);
+    }
+
+    @Provides
+    @PerApplication
+    static LocationRepo provideLocationRepo(EventBus eventBus) { return new LocationRepo(eventBus); }
+
+
+    @Provides
+    @PerApplication
+    static Preferences providePreferences(@AppContext Context context, EventBus eventBus) { return new Preferences(context, eventBus); }
+
 }

@@ -21,7 +21,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
-import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.injection.modules.BaseActivityModule;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
@@ -52,7 +52,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     protected Navigator navigator;
 
     @Inject
-    @Named(ActivityModule.ACTIVITY_FRAGMENT_MANAGER)
+    @Named(BaseActivityModule.ACTIVITY_FRAGMENT_MANAGER)
     protected FragmentManager fragmentManager;
 
 

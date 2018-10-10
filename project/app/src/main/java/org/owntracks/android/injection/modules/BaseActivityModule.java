@@ -20,8 +20,8 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public abstract class ActivityModule {
-    public static final String ACTIVITY_FRAGMENT_MANAGER = "ActivityModule.activityFragmentManager";
+public abstract class BaseActivityModule {
+    public static final String ACTIVITY_FRAGMENT_MANAGER = "BaseActivityModule.activityFragmentManager";
 
     @Provides
     @PerActivity

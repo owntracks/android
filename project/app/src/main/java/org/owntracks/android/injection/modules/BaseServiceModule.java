@@ -20,7 +20,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public abstract class ServiceModule {
+public abstract class BaseServiceModule {
 
     @Provides
     @PerService

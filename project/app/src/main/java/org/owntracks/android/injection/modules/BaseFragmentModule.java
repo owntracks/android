@@ -11,10 +11,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public abstract class FragmentModule {
+public abstract class BaseFragmentModule {
 
-    public static final String FRAGMENT = "FragmentModule.fragment";
-    public static final String CHILD_FRAGMENT_MANAGER = "FragmentModule.childFragmentManager";
+    public static final String FRAGMENT = "BaseFragmentModule.fragment";
+    public static final String CHILD_FRAGMENT_MANAGER = "BaseFragmentModule.childFragmentManager";
 
     @Binds
     @PerFragment

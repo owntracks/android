@@ -3,7 +3,7 @@ package org.owntracks.android.injection.modules.ActivityModules;
 import android.support.v7.app.AppCompatActivity;
 
 
-import org.owntracks.android.injection.modules.ActivityModule;
+import org.owntracks.android.injection.modules.BaseActivityModule;
 import org.owntracks.android.injection.modules.FragmentModules.FinishFragmentModule;
 import org.owntracks.android.injection.modules.FragmentModules.IntroFragmentModule;
 import org.owntracks.android.injection.modules.FragmentModules.PermissionFragmentModule;
@@ -19,7 +19,7 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
-@Module(includes = ActivityModule.class)
+@Module(includes = BaseActivityModule.class)
 public abstract class WelcomeActivityModule {
 
     @Binds

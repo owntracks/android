@@ -5,26 +5,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.owntracks.android.injection.modules.ActivityModule;
-import org.owntracks.android.injection.modules.FragmentModule;
-import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
+import org.owntracks.android.injection.modules.BaseActivityModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.RequirementsChecker;
-import org.owntracks.android.ui.welcome.finish.FinishFragment;
-import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.permission.PermissionFragment;
-import org.owntracks.android.ui.welcome.play.PlayFragment;
-import org.owntracks.android.ui.welcome.version.VersionFragment;
 
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import dagger.android.AndroidInjection;
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
 @PerActivity
@@ -36,7 +25,7 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter  {
     private RequirementsChecker requirementsChecker;
 
     @Inject
-    WelcomeAdapter(@Named(ActivityModule.ACTIVITY_FRAGMENT_MANAGER) FragmentManager fm, RequirementsChecker requirementsChecker) {
+    WelcomeAdapter(@Named(BaseActivityModule.ACTIVITY_FRAGMENT_MANAGER) FragmentManager fm, RequirementsChecker requirementsChecker) {
         super(fm);
         this.requirementsChecker = requirementsChecker;
 
