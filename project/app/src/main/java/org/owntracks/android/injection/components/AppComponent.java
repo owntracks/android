@@ -30,33 +30,17 @@ import dagger.android.support.DaggerApplication;
 @PerApplication
 @Component(modules={AppModule.class, AndroidSupportInjectionModule.class, AndroindBindingModule.class})
 public interface AppComponent extends AndroidInjector<DaggerApplication>  {
-    @Override
-    void inject(DaggerApplication instance);
-
-    void inject(App app);
 
     @Component.Builder
     interface Builder {
         @BindsInstance
         Builder app(App app);
-
         AppComponent build();
     }
 
-    @AppContext Context context();
-    Resources resources();
-
-    ContactsRepo contactsRepo();
-    WaypointsRepo waypointsRepo();
-    LocationRepo locationRepo();
-    EventBus eventBus();
-    Parser parser();
-    MessageProcessor messageProcessor();
-    ContactImageProvider contactImageProvider();
-    GeocodingProvider geocodingProvider();
-    Preferences preferences();
-    Runner runner();
-
+    @Override
+    void inject(DaggerApplication instance);
+    void inject(App app);
     void inject(MQTTKeepaliveWorker syncWorker);
     void inject(MQTTReconnectWorker syncWorker);
 
