@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Owntracks</string>
+    <string name="preferencesServer">"Conexión"</string>
+    <string name="preferencesHost" translatable="false">"Host"</string>
+    <string name="preferencesPort" translatable="false">"Puerto"</string>
+    <string name="preferencesWebsocket">Usar WebSockets</string>
+    <string name="preferencesUserUsername">"Nombre de Usuario"</string>
+    <string name="preferencesDeviceName" translatable="false">"ID de Dispositivo"</string>
+    <string name="preferencesBrokerAuth">"Autenticación"</string>
+    <string name="preferencesBrokerPassword">"Contraseña"</string>
+
+
+    <string name="preferencesCaCrtPath">Certificado CA</string>
+    <string name="preferencesClientCrtPath">Certificado cliente</string>
+    <string name="preferencesClientCrtPassword">Contraseña del certificado cliente</string>
+
+    <string name="preferencesLicenses">"Librerías"</string>
+    <string name="preferencesLicensesSummary">"Gracias a los autores de las librerías incluidas"</string>
+    <string name="preferencesNotification">Notificaciones</string>
+    <string name="preferencesNotificationEvents">Eventos </string>
+    <string name="preferencesNotificationEventsSummary">Notificar sobre los eventos recientes </string>
+    <string name="preferencesNotificationSummary">"Mostrar una notificación permanente"</string>
+    <string name="preferencesNotificationLocationSummary">"Mostrar la última ubicación y fecha"</string>
+    <string name="preferencesNotificationLocation">"Última ubicación"</string>
+
+    <string name="preferencesAdvanced">"Avanzado"</string>
+    <string name="preferencesVersion">"Versión"</string>
+    <string name="preferencesReporting">"Reportando"</string>
+    <string name="preferencesBackgroundUpdates">Reportando ubicación automática</string>
+    <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
+    <string name="preferencesBackgroundUpdatesSummary">Reportar ubicación automáticamente</string>
+    <string name="preferencesLocatorDisplacement">Locator background displacement</string>
+    <string name="preferencesLocatorDisplacementSummary">Distancia entre ubicaciones</string>
+    <string name="preferencesLocatorInterval">Locator background interval</string>
+    <string name="preferencesLocatorIntervalSummary">Segundos entre actualizaciones de ubicación</string>
+    <string name="preferencesInfo">Información</string>
+    <string name="preferencesRepository">Código fuente</string>
+    <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
+    <string name="preferencesDocumentation">Documentación</string>
+    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet</string>
+    <string name="preferencesTwitter" translatable="false">Twitter</string>
+    <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
+    <string name="preferencesEncryptionKeySummary">Clave simétrica para encriptación del payload </string>
+    <string name="preferencesEncryptionKey">Clave de encriptación</string>
+
+
+
+
+    <string name="na">No disponible</string>
+    <string name="currentLocation">Usar ubicación actual</string>
+    <string name="share">Compartir</string>
+    <string name="save">"Guardar"</string>
+    <string name="cancel">"Cancelar"</string>
+    <string name="preferencesCleanSessionEnabled">Limpiar sesión</string>
+    <string name="publish">Reportar</string>
+    <string name="preferencesPubExtendedDataSummary">Incluir datos adicionales en los reportes de ubicación</string>
+    <string name="preferencesPubExtendedData">Datos adicionales</string>
+    <string name="preferencesAutostartSummary">Arrancar cuando se enciende el dispositivo</string>
+    <string name="preferencesAutostart">Autoarranque</string>
+    <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
+    <string name="preferencesLocatorAccuracyBackgroundSummary">Precisión y consumo en segundo plano</string>
+    <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
+    <string name="preferencesLocatorAccuracyForegroundSummary">Precisión y consumo en primer plano</string>
+    <string name="preferencesRemoteCommand">Comandos remotos</string>
+    <string name="preferencesRemoteCommandSummary">Habilitar comandos remotos</string>
+    <string name="description">Descripción</string>
+    <string name="coordinates">Coordenadas</string>
+    <string name="longitude">Longitud</string>
+    <string name="latitude">Latitud</string>
+    <string name="radius">Radio</string>
+    <string name="addWaypoint">Añadir waypoint</string>
+    <string name="exportConfiguration">Exportar</string>
+    <string name="contactLocationUnknown">Ubicación no disponible</string>
+    <string name="menuContactNavigate">Navegar</string>
+    <string name="menuCurrentLoction">Ubicación actual</string>
+
+    <string name="contactDetailsAccuracy">Precisión</string>
+    <string name="contactDetailsReportedTime">Reportado</string>
+    <string name="contactDetailsTopic">Identificador</string>
+    <string name="waypointListPlaceholder">No hay regiones definidas</string>
+    <string name="waypointRemove">Eliminar</string>
+    <string name="importConfig">Importar</string>
+    <string name="tls" translatable="false">TLS</string>
+    <string name="preferencesSecurity">Seguridad</string>
+    <string name="accept">Aceptar</string>
+    <string name="preferencesIdentification">Identificación</string>
+    <string name="preferencesParameters">Parámetros</string>
+    <string name="preferencesKeepalive" translatable="false">Keepalive</string>
+    <string name="seconds">Segundos</string>
+    <string name="preferencesProfileId">Modo</string>
+
+
+    <string-array name="locatorAccuracy_readable">
+        <item>Alto rendimiento</item>
+        <item>Equilibrador</item>
+        <item>Bajo rendimiento</item>
+        <item>Apagado</item>
+    </string-array>
+
+
+    <string name="mode_mqtt_private_label">MQTT privada</string>
+    <string name="mode_mqtt_public_label">MQTT pública</string>
+
+    <string name="aLocation">a region</string>
+    <string name="events">Eventos</string>
+    <string name="title_activity_regions">Regiones</string>
+    <string name="title_activity_region">Región</string>
+    <string name="title_activity_map">Mapa</string>
+    <string name="title_activity_contacts">Amigos</string>
+    <string name="title_activity_status">Estado</string>
+    <string name="title_activity_preferences">Preferencias</string>
+    <string name="unableToCopyCertificate">No se pudo copiar el certificado al almacenamiento interno</string>
+    <string name="successCopyCertificate">Certificado copiado al almacenamiento interno</string>
+    <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
+    <string name="preferencesCategoryNotificationBackground">Notificaciones en segundo plano</string>
+    <string name="preferencesCategoryAdvancedServices">Servicios</string>
+    <string name="preferencesCategoryAdvancedLocator">Locator</string>
+    <string name="preferencesCategoryAdvancedEncryption">Encriptación</string>
+    <string name="preferencesCategoryAdvancedMisc">Miscelánea</string>
+    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
+    <string name="waypointRemoved">Región eliminada</string>
+
+    <string name="exportWaypointsToEndpoint">Publicar Waypoints</string>
+    <string name="preferencesExportFailed">Fallo al exportar las preferencias</string>
+    <string name="preferencesExportSuccess">Preferencias exportadas</string>
+    <string name="geofenceInactive">Geofence desactivado</string>
+    <string name="geofenceActive">Geofence activado</string>
+
+
+    <string name="welcomeFixIssue">Fix</string>
+    <string name="play_services_now_available">Google Play Services disponibles</string>
+    <string name="play_services_not_available">Google Play Services no disponibles</string>
+    <string name="preferencesUrl" translatable="false">URL</string>
+    <string name="mode_http_private_label">HTTP privada</string>
+
+
+    <string name="preferencesKeyModeId" translatable="false">mode</string>
+    <string name="preferencesKeyHost" translatable="false">host</string>
+    <string name="preferencesKeyIdentification" translatable="false">identification</string>
+    <string name="preferencesKeySecurity" translatable="false">security</string>
+    <string name="preferencesKeyParameters" translatable="false">parameters</string>
+    <string name="transitionEntering">entra</string>
+    <string name="transitionLeaving">sale</string>
+    <string name="errorPreferencesImportFailed">No se pudo importar</string>
+    <string name="welcome_play_heading">Google Play Services</string>
+    <string name="welcome_play_description">Owntracks necesita Google Play Services</string>
+    <string name="icon_description_warning">Alerta</string>
+    <string name="play_services_not_available_general">Google Play Services no disponibles</string>
+    <string name="welcome_heading">Bienvenido</string>
+    <string name="welcome_description">Los siguientes pasos te ayudarán a comenzar con Owntracks</string>
+    <string name="mode_heading">Modo</string>
+    <string name="mode_description">Owntracks puede funcionar en uno de los siguientes modos. Elige el modo que mejor se adapte a ti.</string>
+    <string name="mqtt_public_description">Prueba Owntracks y comparte tu ubicación de manera anónima con otros usuarios</string>
+    <string name="mqtt_private_description">Conecta con tu configuración privada Owntracks y comparte tu ubicación con familia y amigos</string>
+    <string name="permissions_heading">Permisos</string>
+    <string name="permissions_description">Owntracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar.</string>
+    <string name="permissions_granted">Permisos concedidos</string>
+    <string name="icon_description_cloud">Cloud</string>
+    <string name="icon_description_owntracks">Owntracks</string>
+    <string name="enjoy_description">Selecciona las preferencias del menú y configura tu Owntracks antes de empezar a usarlo</string>
+    <string name="done_heading">Hecho</string>
+    <string name="icon_description_done">Hecho</string>
+    <string name="title_activity_load">Importar</string>
+    <string name="errorPreferencesImportFailedParseException">No se puede parsear el fichero</string>
+    <string name="preferencesIgnoreInaccurateLocations">Ubicación imprecisa</string>
+    <string name="preferencesIgnoreInaccurateLocationsSummary">Ignorar ubicaciones imprecisas</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">Ignorar ubicación por encima del umbral</string>
+    <string name="errorPreferencesImportFailedMemory">Tu dispositivo se ha quedado sin memoria</string>
+    <string name="noNavigationApp">No hay aplicaciones compatibles</string>
+    <string name="menuClear">Borrar</string>
+    <string name="configurationManagement">Configuration management</string>
+    <string name="preferencesEditor">Editor</string>
+    <string name="preferencesEditorKeyError">Clave inválida</string>
+    <string name="preferencesEditorValueError">Valor inválido</string>
+    <string name="preferencesEditorDescription">Fija un único valor por cada clave. Algunos cambios pueden necesitar reiniciar la app.</string>
+    <string name="preferencesLoadFailed">No se pudo cargar la configuración</string>
+    <string name="preferencesEditorKey">Clave</string>
+    <string name="preferencesEditorValue">Valor</string>
+    <string name="drawerSwitchReporting">Reportando</string>
+    <string name="drawerSwitchCopy">Copiar</string>
+    <string name="restart">Reiniciar</string>
+    <string name="notificationEventsTitle" formatted="false">%1$d eventos nuevos</string>
+    <string name="ui_fragment_welcome_version_title">Restricciones</string>
+    <string name="ui_fragment_welcome_version_description">Debido a limitaciones del sistema algunas características pueden no funcionar. \n\n Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema. </string>
+    <string name="ui_fragment_welcome_version_learn_more">Aprender más</string>
+    <string name="INITIAL">Inicializando</string>
+    <string name="IDLE">Idle</string>
+    <string name="CONNECTING">Conectando</string>
+    <string name="CONNECTED">Conectado</string>
+    <string name="DISCONNECTING">Desconectando</string>
+    <string name="DISCONNECTED">Desconectado</string>
+    <string name="DISCONNECTED_USERDISCONNECT">Desconectado</string>
+    <string name="ERROR">Error</string>
+    <string name="ERROR_DATADISABLED">Conexión no disponible</string>
+    <string name="ERROR_CONFIGURATION">Configuracion incompleta</string>
+	<string name="notificationChannelOngoing">Ongoing</string>
+	<string name="notificationChannelOngoingDescription">Se requiere para recibir actualizaciones de ubicación en segundo plano</string>
+	<string name="notificationChannelEventsDescription">Transmisiones regionales</string>
+    <string name="timeNow">ahora</string>
+    <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">API key para Geocoder alternativo</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Si se activa, OpenCage se usará para buscar la ubicación en lugar de Google</string>
+    <string name="placePickerNotAvailable">No se pudo abrir el selector de ubicación</string>
+    <string name="region_unknown">Estado desconocido</string>
+    <string name="region_inside">Actualmente dentro</string>
+    <string name="region_outside">Actualmente fuera</string>
+</resources>
