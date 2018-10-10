@@ -30,9 +30,9 @@
     <string name="preferencesBackgroundUpdates">Reportando ubicación automática</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
     <string name="preferencesBackgroundUpdatesSummary">Reportar ubicación automáticamente</string>
-    <string name="preferencesLocatorDisplacement">Locator background displacement</string>
+    <string name="preferencesLocatorDisplacement">Desplazamiento del localizador en segundo plano</string>
     <string name="preferencesLocatorDisplacementSummary">Distancia entre ubicaciones</string>
-    <string name="preferencesLocatorInterval">Locator background interval</string>
+    <string name="preferencesLocatorInterval">Intervalo del localizador en segundo plano</string>
     <string name="preferencesLocatorIntervalSummary">Segundos entre actualizaciones de ubicación</string>
     <string name="preferencesInfo">Información</string>
     <string name="preferencesRepository">Código fuente</string>
@@ -58,9 +58,9 @@
     <string name="preferencesPubExtendedData">Datos adicionales</string>
     <string name="preferencesAutostartSummary">Arrancar cuando se enciende el dispositivo</string>
     <string name="preferencesAutostart">Autoarranque</string>
-    <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
+    <string name="preferencesLocatorAccuracyBackground">Precisión del localizador en segundo plano</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Precisión y consumo en segundo plano</string>
-    <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
+    <string name="preferencesLocatorAccuracyForeground">Precisión del localizador en primer plano</string>
     <string name="preferencesLocatorAccuracyForegroundSummary">Precisión y consumo en primer plano</string>
     <string name="preferencesRemoteCommand">Comandos remotos</string>
     <string name="preferencesRemoteCommandSummary">Habilitar comandos remotos</string>
@@ -99,9 +99,6 @@
     </string-array>
 
 
-    <string name="mode_mqtt_private_label">MQTT privada</string>
-    <string name="mode_mqtt_public_label">MQTT pública</string>
-
     <string name="aLocation">a region</string>
     <string name="events">Eventos</string>
     <string name="title_activity_regions">Regiones</string>
@@ -112,7 +109,7 @@
     <string name="title_activity_preferences">Preferencias</string>
     <string name="unableToCopyCertificate">No se pudo copiar el certificado al almacenamiento interno</string>
     <string name="successCopyCertificate">Certificado copiado al almacenamiento interno</string>
-    <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
+    <string name="preferencesCategoryNotificationOngoing">Notificación en progreso</string>
     <string name="preferencesCategoryNotificationBackground">Notificaciones en segundo plano</string>
     <string name="preferencesCategoryAdvancedServices">Servicios</string>
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
@@ -150,8 +147,6 @@
     <string name="welcome_heading">Bienvenido</string>
     <string name="welcome_description">Los siguientes pasos te ayudarán a comenzar con Owntracks</string>
     <string name="mode_heading">Modo</string>
-    <string name="mode_description">Owntracks puede funcionar en uno de los siguientes modos. Elige el modo que mejor se adapte a ti.</string>
-    <string name="mqtt_public_description">Prueba Owntracks y comparte tu ubicación de manera anónima con otros usuarios</string>
     <string name="mqtt_private_description">Conecta con tu configuración privada Owntracks y comparte tu ubicación con familia y amigos</string>
     <string name="permissions_heading">Permisos</string>
     <string name="permissions_description">Owntracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar.</string>
