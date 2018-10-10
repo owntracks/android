@@ -1,14 +1,13 @@
-package org.owntracks.android.injection.modules.ActivityModules;
+package org.owntracks.android.injection.modules.android.ActivityModules;
 
 import android.support.v7.app.AppCompatActivity;
 
 
-import org.owntracks.android.injection.modules.BaseActivityModule;
-import org.owntracks.android.injection.modules.FragmentModules.FinishFragmentModule;
-import org.owntracks.android.injection.modules.FragmentModules.IntroFragmentModule;
-import org.owntracks.android.injection.modules.FragmentModules.PermissionFragmentModule;
-import org.owntracks.android.injection.modules.FragmentModules.PlayFragmentModule;
-import org.owntracks.android.injection.modules.FragmentModules.VersionFragmentModule;
+import org.owntracks.android.injection.modules.android.FragmentModules.FinishFragmentModule;
+import org.owntracks.android.injection.modules.android.FragmentModules.IntroFragmentModule;
+import org.owntracks.android.injection.modules.android.FragmentModules.PermissionFragmentModule;
+import org.owntracks.android.injection.modules.android.FragmentModules.PlayFragmentModule;
+import org.owntracks.android.injection.modules.android.FragmentModules.VersionFragmentModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.welcome.WelcomeActivity;

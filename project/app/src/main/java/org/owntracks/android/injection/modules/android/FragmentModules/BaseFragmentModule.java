@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules;
+package org.owntracks.android.injection.modules.android.FragmentModules;
 
 import android.app.FragmentManager;
 import org.owntracks.android.injection.qualifier.DefaultFragmentManager;

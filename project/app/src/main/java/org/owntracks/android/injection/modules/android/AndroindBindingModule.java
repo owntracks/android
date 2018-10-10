@@ -1,16 +1,16 @@
-package org.owntracks.android.injection.modules;
+package org.owntracks.android.injection.modules.android;
 
-import org.owntracks.android.injection.modules.ActivityModules.ConnectionActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.ContactsActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.EditorActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.LoadActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.MapActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.PreferencesActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.RegionActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.RegionsActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.StatusActivityModule;
-import org.owntracks.android.injection.modules.ActivityModules.WelcomeActivityModule;
-import org.owntracks.android.injection.modules.ServiceModules.BackgroundServiceModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.ConnectionActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.ContactsActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.EditorActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.LoadActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.MapActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.PreferencesActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.RegionActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.RegionsActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.StatusActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.WelcomeActivityModule;
+import org.owntracks.android.injection.modules.android.ServiceModules.BackgroundServiceModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerService;
 

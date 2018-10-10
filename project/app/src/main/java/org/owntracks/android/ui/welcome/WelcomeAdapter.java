@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.owntracks.android.injection.modules.BaseActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.RequirementsChecker;
 

@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules;
+package org.owntracks.android.injection.modules.android.ServiceModules;
 
 import android.app.Service;
 import android.content.Context;

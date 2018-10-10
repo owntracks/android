@@ -21,7 +21,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
-import org.owntracks.android.injection.modules.BaseActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;

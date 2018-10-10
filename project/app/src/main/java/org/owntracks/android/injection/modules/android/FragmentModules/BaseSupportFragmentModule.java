@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules;
+package org.owntracks.android.injection.modules.android.FragmentModules;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

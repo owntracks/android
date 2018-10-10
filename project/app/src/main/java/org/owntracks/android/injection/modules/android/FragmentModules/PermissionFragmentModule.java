@@ -1,9 +1,8 @@
-package org.owntracks.android.injection.modules.FragmentModules;
+package org.owntracks.android.injection.modules.android.FragmentModules;
 
 
 import android.support.v4.app.Fragment;
 
-import org.owntracks.android.injection.modules.BaseSupportFragmentModule;
 import org.owntracks.android.ui.welcome.permission.PermissionFragment;
 import org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm;
 import org.owntracks.android.ui.welcome.permission.PermissionFragmentViewModel;

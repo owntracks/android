@@ -1,6 +1,5 @@
-package org.owntracks.android.injection.modules.FragmentModules;
+package org.owntracks.android.injection.modules.android.FragmentModules;
 
-import org.owntracks.android.injection.modules.BaseFragmentModule;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragmentMvvm;

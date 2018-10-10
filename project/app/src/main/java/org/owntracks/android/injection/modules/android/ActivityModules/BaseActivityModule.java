@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules;
+package org.owntracks.android.injection.modules.android.ActivityModules;
 
 import android.app.Activity;
 import android.content.Context;
