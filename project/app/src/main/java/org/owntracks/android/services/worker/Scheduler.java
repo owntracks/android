@@ -1,11 +1,5 @@
 package org.owntracks.android.services.worker;
 
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
-
-import org.owntracks.android.App;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
-import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Preferences;
 
 import java.util.List;
@@ -19,7 +13,6 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
-import androidx.work.WorkStatus;
 import timber.log.Timber;
 
 public class Scheduler {
@@ -33,7 +26,7 @@ public class Scheduler {
     private WorkManager workManager = WorkManager.getInstance();
 
     @Inject protected Preferences preferences;
-    @Inject protected MessageProcessor messageProcessor;
+
     private Constraints anyNetworkConstraint = new Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build();

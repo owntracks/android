@@ -52,7 +52,6 @@ import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
@@ -146,7 +145,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onCreate() {
-
+        super.onCreate();
         Timber.v("Preferences instance: %s", preferences);
 
         //preferences = App.getPreferences();

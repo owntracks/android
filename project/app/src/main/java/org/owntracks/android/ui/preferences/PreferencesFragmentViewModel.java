@@ -25,47 +25,23 @@ import timber.log.Timber;
 
 @PerFragment
 public class PreferencesFragmentViewModel extends BaseViewModel<PreferencesFragmentMvvm.View> implements PreferencesFragmentMvvm.ViewModel<PreferencesFragmentMvvm.View> {
-    private final Context context;
     private final Preferences preferences;
 
     @Inject
-    public PreferencesFragmentViewModel(@ActivityContext Context context, Preferences preferences) {
-        this.context = context;
+    public PreferencesFragmentViewModel(Preferences preferences) {
         this.preferences = preferences;
-
     }
 
     public void attachView(@NonNull PreferencesFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
         view.loadRoot();
         view.setVersion();
-        view.setModeSummary(getModeSummary(preferences.getModeId()));
-    }
-
-    @Override
-    public Context getContext() {
-        return context;
+        view.setModeSummary(preferences.getModeId());
     }
 
     @Override
     public Preferences getPreferences() {
         return preferences;
-    }
-
-    private String getModeSummary(int modeId){
-        String mode;
-        switch (modeId) {
-            case MessageProcessorEndpointMqtt.MODE_ID:
-                mode = this.context.getString(R.string.mode_mqtt_private_label);
-                break;
-            case MessageProcessorEndpointHttp.MODE_ID:
-                mode = this.context.getString(R.string.mode_http_private_label);
-                break;
-            default:
-                mode = this.context.getString(R.string.mode_mqtt_private_label);
-                break;
-        }
-        return mode;
     }
 
 }

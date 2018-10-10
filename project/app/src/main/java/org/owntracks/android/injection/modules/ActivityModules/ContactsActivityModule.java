@@ -20,7 +20,7 @@ public abstract class ContactsActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(ContactsActivity a);
+    abstract AppCompatActivity bindActivity(ContactsActivity a);
 
     @Binds abstract ContactsMvvm.ViewModel bindViewModel(ContactsViewModel viewModel);
 }

@@ -18,7 +18,7 @@ public abstract class EditorActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(EditorActivity a);
+    abstract AppCompatActivity bindActivity(EditorActivity a);
 
     @Binds abstract EditorMvvm.ViewModel bindViewModel(EditorViewModel viewModel);
 }

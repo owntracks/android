@@ -19,7 +19,7 @@ public abstract class LoadActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(LoadActivity a);
+    abstract AppCompatActivity bindActivity(LoadActivity a);
 
     @Binds abstract LoadMvvm.ViewModel bindViewModel(LoadViewModel viewModel);
 }

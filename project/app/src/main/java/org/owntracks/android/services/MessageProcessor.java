@@ -18,7 +18,9 @@ import org.owntracks.android.messages.MessageCmd;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.messages.MessageUnknown;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -37,6 +39,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
     private final Preferences preferences;
+    private final Parser parser;
+    private final Scheduler scheduler;
 
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
@@ -47,8 +51,31 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
 
     public void reconnect() {
+        if(endpoint == null)
+            loadOutgoingMessageProcessor();
+
         if(endpoint instanceof StatefulServiceMessageProcessor)
             StatefulServiceMessageProcessor.class.cast(endpoint).reconnect();
+    }
+
+    public boolean statefulSendKeepalive() {
+        if(endpoint == null)
+            loadOutgoingMessageProcessor();
+
+        if(endpoint instanceof MessageProcessorEndpointMqtt)
+            return MessageProcessorEndpointMqtt.class.cast(endpoint).sendKeepalive();
+        else
+            return true;
+    }
+
+    public boolean statefulCheckConnection() {
+        if(endpoint == null)
+            loadOutgoingMessageProcessor();
+
+        if(endpoint instanceof StatefulServiceMessageProcessor)
+            return MessageProcessorEndpointMqtt.class.cast(endpoint).checkConnection();
+        else
+            return true;
     }
 
     public void onEnterForeground() {
@@ -107,11 +134,13 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
-        this.waypointsRepo = waypointsRepo; 
+        this.waypointsRepo = waypointsRepo;
+        this.parser = parser;
+        this.scheduler = scheduler;
 
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
@@ -120,7 +149,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void initialize() {
         onEndpointStateChanged(EndpointState.INITIAL);
-        this.loadOutgoingMessageProcessor();
+        loadOutgoingMessageProcessor();
     }
 
     private void loadOutgoingMessageProcessor(){
@@ -139,11 +168,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
         Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (preferences.getModeId()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = MessageProcessorEndpointHttp.getInstance();
+                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = MessageProcessorEndpointMqtt.getInstance();
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus);
 
         }
         this.endpoint.onCreateFromProcessor();

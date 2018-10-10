@@ -1,8 +1,10 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
 import android.location.Address;
 
 import org.owntracks.android.App;
+import org.owntracks.android.injection.qualifier.AppContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,7 +40,7 @@ public class GeocoderGoogle implements Geocoder {
         }
     }
 
-    GeocoderGoogle(){
-        geocoder = new android.location.Geocoder(App.getContext(), Locale.getDefault());
+    GeocoderGoogle(@AppContext Context context){
+        geocoder = new android.location.Geocoder(context, Locale.getDefault());
     }
 }

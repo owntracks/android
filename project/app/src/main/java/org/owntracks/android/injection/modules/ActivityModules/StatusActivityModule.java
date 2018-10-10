@@ -19,7 +19,7 @@ public abstract class StatusActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(StatusActivity a);
+    abstract AppCompatActivity bindActivity(StatusActivity a);
 
     @Binds abstract StatusMvvm.ViewModel bindViewModel(StatusViewModel viewModel);
 }

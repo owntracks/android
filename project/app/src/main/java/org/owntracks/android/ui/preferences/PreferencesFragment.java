@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.owntracks.android.R;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
@@ -112,7 +114,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     public void loadRoot() {
-        Timber.v("trace");
         getPreferenceManager().setSharedPreferencesName(viewModel.getPreferences().getSharedPreferencesName());
         addPreferencesFromResource(R.xml.preferences_root);
         populatePreferencesScreen(PreferenceScreen.class.cast(findPreference(UI_SCREEN_ROOT)));
@@ -122,16 +123,29 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     public void setVersion() {
         String ver;
         try {
-            PackageManager pm = viewModel.getContext().getPackageManager();
-            ver = pm.getPackageInfo(viewModel.getContext().getPackageName(), 0).versionName + " (" + pm.getPackageInfo(viewModel.getContext().getPackageName(), 0).versionCode+")";
+            PackageManager pm = getActivity().getPackageManager();
+            ver = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName + " (" + pm.getPackageInfo(getActivity().getPackageName(), 0).versionCode+")";
         } catch (PackageManager.NameNotFoundException e) {
-            ver = viewModel.getContext().getString(R.string.na);
+            ver = getString(R.string.na);
         }
         findPreference(UI_SCREEN_VERSION).setSummary(ver);
     }
 
     @Override
-    public void setModeSummary(String mode) {
+    public void setModeSummary(int modeId) {
+        String mode;
+        switch (modeId) {
+            case MessageProcessorEndpointMqtt.MODE_ID:
+                mode = getString(R.string.mode_mqtt_private_label);
+                break;
+            case MessageProcessorEndpointHttp.MODE_ID:
+                mode = getString(R.string.mode_http_private_label);
+                break;
+            default:
+                mode = getString(R.string.mode_mqtt_private_label);
+                break;
+        }
+
         findPreference(UI_SCREEN_CONNECTION).setSummary(mode);
     }
 

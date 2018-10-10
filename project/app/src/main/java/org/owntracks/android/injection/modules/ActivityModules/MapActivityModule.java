@@ -17,7 +17,7 @@ public abstract class MapActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(MapActivity a);
+    abstract AppCompatActivity bindActivity(MapActivity a);
 
     @Binds abstract MapMvvm.ViewModel bindViewModel(MapViewModel viewModel);
 }

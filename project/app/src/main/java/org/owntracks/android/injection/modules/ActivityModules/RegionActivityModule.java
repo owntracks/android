@@ -20,7 +20,7 @@ public abstract class RegionActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(RegionActivity a);
+    abstract AppCompatActivity bindActivity(RegionActivity a);
 
     @Binds abstract RegionMvvm.ViewModel bindViewModel(RegionViewModel viewModel);
 }

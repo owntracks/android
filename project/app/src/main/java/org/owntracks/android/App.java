@@ -1,5 +1,6 @@
 package org.owntracks.android;
 
+import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
@@ -27,7 +28,6 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
 import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
@@ -60,13 +60,13 @@ public class App extends DaggerApplication  {
     @Inject
     @AppContext
     Context context;
-    private AppComponent sAppComponent;
 
 
     @Override
     public void onCreate() {
-        super.onCreate();
         sInstance = this;
+
+        super.onCreate();
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
@@ -102,11 +102,6 @@ public class App extends DaggerApplication  {
     @Deprecated
     public static ContactImageProvider getContactImageProvider() {
         return App.getInstance().contactImageProvider;
-    }
-
-    @Deprecated
-    public static Parser getParser() {
-        return App.getInstance().parser;
     }
 
     @Deprecated
@@ -240,10 +235,12 @@ public class App extends DaggerApplication  {
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-        return DaggerAppComponent
-                .builder()
-                .create(this);
+        AppComponent appComponent = DaggerAppComponent.builder().app(this).build();
+        appComponent.inject(this);
+        AppComponentProvider.setAppComponent(appComponent);
+        return appComponent;
     }
+
     public static App getInstance() {
         return App.sInstance;
     }

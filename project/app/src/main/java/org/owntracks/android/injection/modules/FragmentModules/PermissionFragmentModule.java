@@ -19,8 +19,7 @@ import dagger.Module;
 public abstract class PermissionFragmentModule {
 
     @Binds
-    @PerFragment
-    abstract Fragment appCompatActivity(PermissionFragment f);
+    abstract Fragment bindSupportFragment(PermissionFragment f);
 
-    @Binds abstract PermissionFragmentMvvm.ViewModel bindPlayFragmentViewModel(PermissionFragmentViewModel viewModel);
+    @Binds abstract PermissionFragmentMvvm.ViewModel bindViewModel(PermissionFragmentViewModel viewModel);
 }

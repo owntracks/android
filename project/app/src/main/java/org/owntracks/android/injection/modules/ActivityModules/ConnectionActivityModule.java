@@ -18,7 +18,7 @@ public abstract class ConnectionActivityModule {
 
     @Binds
     @PerActivity
-    abstract AppCompatActivity appCompatActivity(ConnectionActivity a);
+    abstract AppCompatActivity bindActivity(ConnectionActivity a);
 
     @Binds abstract ConnectionMvvm.ViewModel bindViewModel(ConnectionViewModel viewModel);
 }

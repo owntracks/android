@@ -20,8 +20,10 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.databinding.UiPreferencesEditorBinding;
 import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.load.LoadActivity;
@@ -37,7 +39,14 @@ import dagger.android.AndroidInjection;
 import io.objectbox.annotation.Index;
 
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
-    @Inject Preferences preferences;
+    @Inject
+    Preferences preferences;
+
+    @Inject
+    WaypointsRepo waypointsRepo;
+
+    @Inject
+    Parser parser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,6 +176,12 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         Toast.makeText(this, R.string.preferencesEditorValueError, Toast.LENGTH_SHORT).show();
     }
 
+    public String getExportString() throws IOException {
+        MessageConfiguration message = preferences.exportToMessage();
+        message.setWaypoints(waypointsRepo.exportToMessage());
+        return parser.toJsonPlain(message);
+
+    }
 
     public static class ExportTask extends AsyncTask<Void, Void, Boolean> {
         WeakReference<EditorActivity> ref;
@@ -177,9 +192,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         protected Boolean doInBackground(Void... voids) {
             String exportStr;
             try {
-                MessageConfiguration message = App.getPreferences().exportToMessage();
-                message.setWaypoints(App.getAppComponent().waypointsRepo().exportToMessage());
-                exportStr = App.getParser().toJsonPlain(message);
+                exportStr = ref.get().getExportString();
             } catch (IOException e) {
                 return false;
             }

@@ -20,8 +20,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
-import org.owntracks.android.injection.components.DaggerAppComponent;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -47,7 +45,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -59,27 +56,22 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	private String lastConnectionId;
 	private static EndpointState state;
 
-	@Inject
 	protected MessageProcessor messageProcessor;
-
-	@Inject
 	protected Parser parser;
-
-	@Inject
 	protected Preferences preferences;
-
-	@Inject
 	protected Scheduler scheduler;
-
-	@Inject
 	protected EventBus eventBus;
 
-	private MessageProcessorEndpointMqtt() {
-		DaggerAppComponent.
-		DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+	public MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+		super();
+		this.messageProcessor = messageProcessor;
+		this.parser = parser;
+		this.preferences = preferences;
+		this.scheduler = scheduler;
+		this.eventBus = eventBus;
 	}
 	
-	public synchronized boolean sendPing() {
+	public synchronized boolean sendKeepalive() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
 			mqttClient.ping();
@@ -112,13 +104,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped", m.getMessageId());
 			messageProcessor.onMessageDeliveryFailedFinal(messageId);
 		}
-	}
-
-	private static MessageProcessorEndpointMqtt instance;
-	public static MessageProcessorEndpointMqtt getInstance() {
-		if(instance == null)
-			instance = new MessageProcessorEndpointMqtt();
-		return instance;
 	}
 
 	private final MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {

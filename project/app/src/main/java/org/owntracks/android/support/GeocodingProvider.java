@@ -1,10 +1,12 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.CallSuper;
 import android.support.v4.util.LruCache;
 import android.widget.TextView;
 
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.services.BackgroundService;
 
@@ -18,10 +20,10 @@ public class GeocodingProvider {
     private static LruCache<String, String> cache;
     private static Geocoder geocoder;
 
-    public GeocodingProvider(Preferences preferences) {
+    public GeocodingProvider(@AppContext Context context, Preferences preferences) {
         cache = new LruCache<>(40);
         if("".equals(preferences.getOpenCageGeocoderApiKey())) {
-            geocoder = new GeocoderGoogle();
+            geocoder = new GeocoderGoogle(context);
         } else {
             geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
         }

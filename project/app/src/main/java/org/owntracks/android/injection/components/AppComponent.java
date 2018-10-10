@@ -9,12 +9,15 @@ import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.injection.modules.AndroindBindingModule;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.DataModule;
 import org.owntracks.android.injection.modules.NetModule;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
+import org.owntracks.android.services.worker.MQTTReconnectWorker;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
@@ -26,19 +29,26 @@ import javax.inject.Inject;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
 import dagger.android.AndroidInjector;
+import dagger.android.support.AndroidSupportInjectionModule;
+import dagger.android.support.DaggerApplication;
 
 @PerApplication
-@Component(modules={AppModule.class, NetModule.class, DataModule.class})
-public interface AppComponent extends AndroidInjector<App>  {
-    @Component.Builder
-    abstract class Builder extends AndroidInjector.Builder<App> {
-        @Override
-        public AndroidInjector<App> build() {
-            return null;
-        }
-    }
+@Component(modules={AppModule.class, AndroidSupportInjectionModule.class, AndroindBindingModule.class})
+public interface AppComponent extends AndroidInjector<DaggerApplication>  {
+    @Override
+    void inject(DaggerApplication instance);
 
+    void inject(App app);
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        Builder app(App app);
+
+        AppComponent build();
+    }
 
     @AppContext Context context();
     Resources resources();
@@ -47,11 +57,14 @@ public interface AppComponent extends AndroidInjector<App>  {
     WaypointsRepo waypointsRepo();
     LocationRepo locationRepo();
     EventBus eventBus();
-    Scheduler scheduler();
     Parser parser();
     MessageProcessor messageProcessor();
     ContactImageProvider contactImageProvider();
     GeocodingProvider geocodingProvider();
     Preferences preferences();
     Runner runner();
+
+    void inject(MQTTKeepaliveWorker syncWorker);
+    void inject(MQTTReconnectWorker syncWorker);
+
 }

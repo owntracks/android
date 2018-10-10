@@ -24,5 +24,5 @@ public abstract class PlayFragmentModule {
 
     @Binds
     @PerFragment
-    abstract PlayFragmentMvvm.ViewModel bindPlayFragmentViewModel(PlayFragmentViewModel viewModel);
+    abstract PlayFragmentMvvm.ViewModel bindViewModel(PlayFragmentViewModel viewModel);
 }
