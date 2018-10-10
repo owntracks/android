@@ -1,5 +1,6 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,6 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.R;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
@@ -46,7 +48,7 @@ import timber.log.Timber;
 @PerApplication
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
-    private static final int FACE_DIMENSIONS = (int) (48 * (App.getDisplayDensity() / 160f));
+    private static int FACE_DIMENSIONS;
 
 
     public void invalidateCacheLevelCard(String key) {
@@ -110,7 +112,7 @@ public class ContactImageProvider {
     }
 
     @Nullable
-    public static Bitmap getBitmapFromCache(FusedContact contact) {
+    private static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
@@ -152,8 +154,9 @@ public class ContactImageProvider {
     }
 
     @Inject
-    public ContactImageProvider(){
+    public ContactImageProvider(@AppContext Context context){
         memoryCache = new ContactBitmapMemoryCache();
+        FACE_DIMENSIONS = (int)(48 * (context.getResources().getDisplayMetrics().densityDpi / 160f));
     }
 
     private static class ContactBitmapMemoryCache {

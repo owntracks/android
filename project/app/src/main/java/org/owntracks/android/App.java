@@ -54,11 +54,6 @@ public class App extends DaggerApplication  {
     @AppContext
     Context context;
 
-    public static int getDisplayDensity() {
-        return getInstance().getResources().getDisplayMetrics().densityDpi;
-    }
-
-
     @Override
     public void onCreate() {
         sInstance = this;
