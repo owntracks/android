@@ -8,12 +8,15 @@ import android.util.Log;
 
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
+import org.owntracks.android.injection.scopes.PerApplication;
 
+
+import javax.inject.Inject;
 
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
-
+@PerApplication
 public class EncryptionProvider {
     private static final String TAG = "EncryptionProvider";
     private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
@@ -43,6 +46,7 @@ public class EncryptionProvider {
         Log.v(TAG, "SecretBox initialized");
     }
 
+    @Inject
     public EncryptionProvider(Preferences preferences) {
         this.preferences = preferences;
         preferences.registerOnPreferenceChangedListener(new SecretBoxManager());

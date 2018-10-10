@@ -14,6 +14,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.messages.MessageWaypoint;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
@@ -34,9 +35,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
+@PerApplication
 public class Preferences {
     private static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
     private static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
@@ -55,6 +59,7 @@ public class Preferences {
 
     public String getSharedPreferencesName() { return sharedPreferencesName; }
 
+    @Inject
     public Preferences(@AppContext Context c, EventBus eventBus){
         Timber.v("initializing");
         this.context = c;

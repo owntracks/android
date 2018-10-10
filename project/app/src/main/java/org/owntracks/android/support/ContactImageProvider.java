@@ -24,6 +24,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
@@ -34,8 +35,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
+@PerApplication
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
     private static final int FACE_DIMENSIONS = (int) (48 * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f));
@@ -145,6 +149,7 @@ public class ContactImageProvider {
         return d;
     }
 
+    @Inject
     public ContactImageProvider(EventBus eventBus){
         memoryCache = new ContactBitmapMemoryCache();
         eventBus.register(this);

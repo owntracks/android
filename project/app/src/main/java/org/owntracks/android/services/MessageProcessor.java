@@ -11,6 +11,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
@@ -33,7 +34,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-
+@PerApplication
 public class MessageProcessor implements IncomingMessageProcessor {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
