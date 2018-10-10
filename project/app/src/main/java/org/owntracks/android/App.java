@@ -6,8 +6,6 @@ import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
@@ -50,11 +48,6 @@ public class App extends DaggerApplication  {
     MessageProcessor messageProcessor;
 
     @Inject
-    GeocodingProvider geocodingProvider;
-
-    @Inject
-    ContactImageProvider contactImageProvider; 
-    @Inject
     Parser parser; 
 
     @Inject
@@ -77,8 +70,6 @@ public class App extends DaggerApplication  {
             });
         }
 
-
-
         preferences.checkFirstStart();
 
         enableForegroundBackgroundDetection();
@@ -92,16 +83,6 @@ public class App extends DaggerApplication  {
             }
         }, 510);
 
-    }
-
-    @Deprecated
-    public static GeocodingProvider getGeocodingProvider() {
-        return App.getInstance().geocodingProvider;
-    }
-
-    @Deprecated
-    public static ContactImageProvider getContactImageProvider() {
-        return App.getInstance().contactImageProvider;
     }
 
     @Deprecated

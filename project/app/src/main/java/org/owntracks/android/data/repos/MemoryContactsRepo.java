@@ -11,6 +11,7 @@ import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Runner;
 
@@ -28,13 +29,15 @@ public class MemoryContactsRepo implements ContactsRepo {
 
     private final HashMap<String, FusedContact> mMap;
     private final EventBus eventBus;
+    private final ContactImageProvider contactImageProvider;
 
     private long majorRevision = 0;
     private long revision = 0;
 
     @Inject
-    public MemoryContactsRepo(EventBus eventBus, Runner runner) {
+    public MemoryContactsRepo(EventBus eventBus, ContactImageProvider contactImageProvider) {
         this.eventBus = eventBus;
+        this.contactImageProvider = contactImageProvider; 
         mMap = new HashMap<>(LOAD_FACTOR);
         this.eventBus.register(this);
     }
@@ -92,12 +95,16 @@ public class MemoryContactsRepo implements ContactsRepo {
 
         if (c != null) {
             c.setMessageCard(m);
+            contactImageProvider.invalidateCacheLevelCard(c.getId());
+
             revision++;
             eventBus.post(c);
 
         } else {
             c = new FusedContact(id);
             c.setMessageCard(m);
+            contactImageProvider.invalidateCacheLevelCard(c.getId());
+
             put(id, c);
             revision++;
             eventBus.post(new Events.FusedContactAdded(c));

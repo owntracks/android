@@ -1,5 +1,6 @@
 package org.owntracks.android.support;
 
+import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -24,7 +26,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
+import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
@@ -100,7 +104,7 @@ public class ContactImageProvider {
         (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
-    public void setImageViewAsync(ImageView imageView, FusedContact contact) {
+    public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
         //imageView.setImageDrawable(placeholder);
         (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
@@ -228,6 +232,10 @@ public class ContactImageProvider {
         return bitmap;
     }
 
+    @BindingAdapter({"imageProvider", "contact"})
+    public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
+        setImageViewAsync(view, c);
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events.ModeChanged e) {

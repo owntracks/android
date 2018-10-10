@@ -331,6 +331,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
+                    //TODO: Move location sending from service to dedicated component to get rid of intent sending from this class
                     if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
@@ -340,6 +341,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     App.getInstance().startBackgroundServiceCompat(App.getContext(), reportIntent);
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
+                    //TODO: Move location sending from service to dedicated component to get rid of intent sending from this class
                     Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
                     waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_WAYPOINTS);
                     App.getInstance().startBackgroundServiceCompat(App.getContext(), waypointsIntent);
@@ -356,7 +358,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                         waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
                     }
                     break;
-                case MessageCmd.ACTION_REOCONNECT:
+                case MessageCmd.ACTION_RECONNECT:
                     if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
