@@ -156,6 +156,19 @@ public class Preferences {
         }
 
     }
+    //TODO
+    public int getMonitoring() {
+        return getInt("monitoring", R.integer.valMonitoring);
+    }
+
+    public void setMonitoring(int newmode) {
+        if(newmode < 0 || newmode > 2) {
+            Timber.e("invalid monitoring mode specified %s", newmode);
+            return;
+        }
+        setInt("monitoring", newmode);
+        eventBus.post(new Events.MonitoringChanged(newmode));
+    }
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();

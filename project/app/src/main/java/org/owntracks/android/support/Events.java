@@ -30,7 +30,17 @@ public class Events {
         public int getOldModeId() {
             return oldModeId;
         }
+    }
 
+    public static class MonitoringChanged extends E {
+        final int newModeId;
+
+        public MonitoringChanged(int newModeId) {
+            this.newModeId = newModeId;
+        }
+        public int getNewModeId() {
+            return newModeId;
+        }
     }
 
 	public static class WaypointTransition extends E {

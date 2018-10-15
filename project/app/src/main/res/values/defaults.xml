@@ -12,12 +12,10 @@
     <integer name="valLocatorInterval">900</integer>
     <integer name="valLocatorAccuracyBackground">1</integer>
     <integer name="valLocatorAccuracyForeground">0</integer>
-    <integer name="valBeaconBackgroundScanPeriod">30</integer>
-    <integer name="valBeaconForegroundScanPeriod">0</integer>
-    <integer name="valBeaconMode">0</integer>
     <integer name="valIgnoreStaleLocations">0</integer>
     <integer name="valIgnoreInaccurateLocations">0</integer>
     <integer name="valModeId">0</integer>
+    <integer name="valMonitoring">1</integer>
     <integer name="valMqttProtocolLevel">3</integer>
     <integer name="valPing">30</integer>
 
