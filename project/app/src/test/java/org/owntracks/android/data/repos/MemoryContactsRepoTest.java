@@ -1,5 +1,7 @@
 package org.owntracks.android.data.repos;
 
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.util.EventLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,10 +47,14 @@ public class MemoryContactsRepoTest {
     @Before
     public void setup() {
         eventBus = EventBus.getDefault();
-        contactImageProvider = new ContactImageProvider();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        displayMetrics.densityDpi = 160;
+        Resources myResources = mock(Resources.class);
+        when(myResources.getDisplayMetrics()).thenReturn(displayMetrics);
+        when(app.getResources()).thenReturn(myResources);
+        contactImageProvider = new ContactImageProvider(app);
 
         mockStatic(App.class);
-        when(App.getDisplayDensity()).thenReturn(160); // Should return DENSITY_MEDIUM;
 
         messageLocation = new MessageLocation();
         messageLocation.setAcc(10);
