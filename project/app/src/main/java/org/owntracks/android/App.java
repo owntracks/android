@@ -24,6 +24,8 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import androidx.work.Configuration;
+import androidx.work.WorkManager;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.DaggerApplication;
@@ -57,7 +59,7 @@ public class App extends DaggerApplication  {
     @Override
     public void onCreate() {
         sInstance = this;
-
+        WorkManager.initialize(this.getApplicationContext(),new Configuration.Builder().build());
         super.onCreate();
 
         if (BuildConfig.DEBUG) {
