@@ -120,17 +120,17 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
     }
 
     @Override
-    void insert_impl(org.owntracks.android.data.WaypointModel w) {
+    public void insert_impl(org.owntracks.android.data.WaypointModel w) {
         box.put(w);
     }
 
     @Override
-    void update_impl(org.owntracks.android.data.WaypointModel w) {
+    public void update_impl(org.owntracks.android.data.WaypointModel w) {
         box.put(w);
     }
 
     @Override
-    void delete_impl(org.owntracks.android.data.WaypointModel w) {
+    public void delete_impl(org.owntracks.android.data.WaypointModel w) {
         box.remove(w);
     }
 }

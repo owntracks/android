@@ -156,6 +156,8 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
+    testAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
+    testAnnotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.15.0"

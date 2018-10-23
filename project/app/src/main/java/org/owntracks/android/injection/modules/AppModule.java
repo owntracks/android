@@ -27,30 +27,25 @@ public class AppModule {
     @Provides
     @AppContext
     @PerApplication
-    Context provideContext(App app) {
+    protected Context provideContext(App app) {
         return app;
     }
 
     @Provides
     @PerApplication
-    static EventBus provideEventbus() {
+    protected EventBus provideEventbus() {
         return EventBus.builder().addIndex(new org.owntracks.android.EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build();
     }
 
 
     @Provides
     @PerApplication
-    static ContactsRepo provideContactsRepo(EventBus eventBus, ContactImageProvider contactImageProvider) {
+    protected ContactsRepo provideContactsRepo(EventBus eventBus, ContactImageProvider contactImageProvider) {
         return new MemoryContactsRepo(eventBus, contactImageProvider);
     }
 
     @Provides
     @PerApplication
-    static WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
-        return new ObjectboxWaypointsRepo(context, eventBus, preferences);
-    }
-
-    @Provides
-    @PerApplication
-    static LocationRepo provideLocationRepo(EventBus eventBus) { return new LocationRepo(eventBus); }
+    protected LocationRepo provideLocationRepo(EventBus eventBus) { return new LocationRepo(eventBus); }
 }
+

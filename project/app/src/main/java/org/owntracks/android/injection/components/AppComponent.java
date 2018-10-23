@@ -1,25 +1,12 @@
 package org.owntracks.android.injection.components;
 
-import android.content.Context;
-import android.content.res.Resources;
-
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
-import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.data.repos.LocationRepo;
-import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.injection.modules.ObjectboxWaypointsModule;
 import org.owntracks.android.injection.modules.android.AndroindBindingModule;
 import org.owntracks.android.injection.modules.AppModule;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
-import org.owntracks.android.support.ContactImageProvider;
-import org.owntracks.android.support.GeocodingProvider;
-import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Runner;
 
 import dagger.BindsInstance;
 import dagger.Component;
@@ -28,7 +15,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;
 
 @PerApplication
-@Component(modules={AppModule.class, AndroidSupportInjectionModule.class, AndroindBindingModule.class})
+@Component(modules={AppModule.class, ObjectboxWaypointsModule.class, AndroidSupportInjectionModule.class, AndroindBindingModule.class})
 public interface AppComponent extends AndroidInjector<DaggerApplication>  {
 
     @Component.Builder
@@ -36,6 +23,7 @@ public interface AppComponent extends AndroidInjector<DaggerApplication>  {
         @BindsInstance
         Builder app(App app);
         AppComponent build();
+
     }
 
     @Override
