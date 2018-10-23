@@ -3,9 +3,9 @@
 apply plugin: 'com.github.ben-manes.versions'
 buildscript {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0'
