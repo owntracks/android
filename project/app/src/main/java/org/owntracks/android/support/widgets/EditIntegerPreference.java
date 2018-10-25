@@ -20,8 +20,7 @@ public class EditIntegerPreference extends EditStringPreference {
     @Override
     protected boolean persistString(String value) {
         if(value == null || "".equals(value)) {
-            // Todo: improve
-            App.getPreferences().clearKey(getKey());
+            getSharedPreferences().edit().remove(getKey()).apply();
             return true;
         }
         try {
@@ -40,5 +39,4 @@ public class EditIntegerPreference extends EditStringPreference {
             return defaultReturnValue;
         }
     }
-
 }

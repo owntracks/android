@@ -5,11 +5,16 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import org.owntracks.android.injection.qualifier.AppContext;
+import org.owntracks.android.injection.scopes.PerApplication;
 
+import javax.inject.Inject;
+
+@PerApplication
 public class Runner {
     private static Handler mainHandler;
     private static Handler backgroundHandler;
 
+    @Inject
     public Runner(@AppContext Context appContext) {
         HandlerThread mServiceHandlerThread = new HandlerThread("backgroundHandlerThread");
         mServiceHandlerThread.start();

@@ -18,9 +18,13 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageClear;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -34,6 +38,7 @@ import timber.log.Timber;
 @PerActivity
 public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View>, LocationSource, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
     private final ContactsRepo contactsRepo;
+    private final LocationProcessor locationProcessor;
     private FusedContact activeContact;
     private LocationSource.OnLocationChangedListener mListener;
     private MessageProcessor messageProcessor;
@@ -50,10 +55,11 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private MutableLiveData<LatLng> liveCamera = new MutableLiveData<>();
 
     @Inject
-    public MapViewModel(ContactsRepo contactsRepo, MessageProcessor messageProcessor) {
+    public MapViewModel(ContactsRepo contactsRepo, LocationProcessor locationRepo, MessageProcessor messageProcessor) {
         Timber.v("onCreate");
         this.contactsRepo = contactsRepo;
         this.messageProcessor = messageProcessor;
+        this.locationProcessor = locationRepo;
     }
 
     @Override
@@ -107,6 +113,11 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public LiveData<LatLng> getCenter() {
         return liveCamera;
+    }
+
+    @Override
+    public void sendLocation() {
+        locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
     }
 
 
@@ -233,6 +244,12 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         getView().clearMarkers();
         clearActiveContact();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(Events.MonitoringChanged e) {
+        getView().updateMonitoringModeMenu();
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
     public void onEvent(@NonNull Location l) {

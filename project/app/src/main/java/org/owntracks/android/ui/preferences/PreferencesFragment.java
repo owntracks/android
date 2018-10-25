@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,12 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
-import org.owntracks.android.injection.components.DaggerFragmentComponent;
-import org.owntracks.android.injection.components.FragmentComponent;
-import org.owntracks.android.injection.components.SupportFragmentComponent;
-import org.owntracks.android.injection.modules.FragmentModule;
+import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
@@ -38,10 +36,14 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasFragmentInjector;
 import timber.log.Timber;
 
 // Class cannot extend BaseFragement. BaseSupportFragment methods are implemented directly.
-public class PreferencesFragment extends PreferenceFragment implements PreferencesFragmentMvvm.View, Preference.OnPreferenceClickListener {
+public class PreferencesFragment extends PreferenceFragment implements PreferencesFragmentMvvm.View, Preference.OnPreferenceClickListener, HasFragmentInjector {
     private static final String UI_SCREEN_ROOT = "root";
     private static final String UI_SCREEN_CONNECTION = "connectionScreen";
 
@@ -56,17 +58,12 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     @Inject protected PreferencesFragmentViewModel viewModel;
     @Inject protected Navigator navigator;
 
-    private FragmentComponent mFragmentComponent;
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentInjector;
 
-    protected final FragmentComponent fragmentComponent() {
-        if(mFragmentComponent == null) {
-            mFragmentComponent = DaggerFragmentComponent.builder()
-                    .appComponent(App.getAppComponent())
-                    .fragmentModule(new FragmentModule(this))
-                    .build();
-        }
-
-        return mFragmentComponent;
+    @Override
+    public final AndroidInjector<Fragment> fragmentInjector() {
+        return fragmentInjector;
     }
 
     /* Use this method to inflate the content view for your Fragment. This method also handles
@@ -96,15 +93,14 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     @Override
     @CallSuper
     public void onDestroy() {
-        mFragmentComponent = null;
         super.onDestroy();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
 
-        fragmentComponent().inject(this);
         Timber.v("trace");
     }
 
@@ -112,13 +108,12 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.v("trace");
-        if(viewModel == null) { fragmentComponent().inject(this);}
+        //if(viewModel == null) { fragmentComponent().inject(this);}
         setContentView(savedInstanceState);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     public void loadRoot() {
-        Timber.v("trace");
         getPreferenceManager().setSharedPreferencesName(viewModel.getPreferences().getSharedPreferencesName());
         addPreferencesFromResource(R.xml.preferences_root);
         populatePreferencesScreen(PreferenceScreen.class.cast(findPreference(UI_SCREEN_ROOT)));
@@ -128,16 +123,29 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     public void setVersion() {
         String ver;
         try {
-            PackageManager pm = viewModel.getContext().getPackageManager();
-            ver = pm.getPackageInfo(viewModel.getContext().getPackageName(), 0).versionName + " (" + pm.getPackageInfo(viewModel.getContext().getPackageName(), 0).versionCode+")";
+            PackageManager pm = getActivity().getPackageManager();
+            ver = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName + " (" + pm.getPackageInfo(getActivity().getPackageName(), 0).versionCode+")";
         } catch (PackageManager.NameNotFoundException e) {
-            ver = viewModel.getContext().getString(R.string.na);
+            ver = getString(R.string.na);
         }
         findPreference(UI_SCREEN_VERSION).setSummary(ver);
     }
 
     @Override
-    public void setModeSummary(String mode) {
+    public void setModeSummary(int modeId) {
+        String mode;
+        switch (modeId) {
+            case MessageProcessorEndpointMqtt.MODE_ID:
+                mode = getString(R.string.mode_mqtt_private_label);
+                break;
+            case MessageProcessorEndpointHttp.MODE_ID:
+                mode = getString(R.string.mode_http_private_label);
+                break;
+            default:
+                mode = getString(R.string.mode_mqtt_private_label);
+                break;
+        }
+
         findPreference(UI_SCREEN_CONNECTION).setSummary(mode);
     }
 

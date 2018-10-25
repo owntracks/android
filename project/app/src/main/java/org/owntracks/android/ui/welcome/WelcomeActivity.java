@@ -3,6 +3,7 @@ package org.owntracks.android.ui.welcome;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
@@ -12,9 +13,18 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.ui.welcome.finish.FinishFragment;
+import org.owntracks.android.ui.welcome.intro.IntroFragment;
+import org.owntracks.android.ui.welcome.permission.PermissionFragment;
+import org.owntracks.android.ui.welcome.play.PlayFragment;
+import org.owntracks.android.ui.welcome.version.VersionFragment;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
 
@@ -25,7 +35,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
 
         if(requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -36,7 +45,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
 
-        welcomeAdapter.setupFragments();
+        welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), new PlayFragment(), new PermissionFragment(), new FinishFragment());
 
         binding.viewPager.setAdapter(welcomeAdapter);
         binding.viewPager.addOnPageChangeListener(this);

@@ -25,7 +25,7 @@ public interface MapMvvm {
         void removeMarker(FusedContact c);
         void clearMarkers();
         void enableLocationMenus();
-
+        public void updateMonitoringModeMenu();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V>  {
@@ -52,5 +52,6 @@ public interface MapMvvm {
         LiveData<Boolean> getBottomSheetHidden();
         LiveData<LatLng> getCenter();
 
+        void sendLocation();
     }
 }

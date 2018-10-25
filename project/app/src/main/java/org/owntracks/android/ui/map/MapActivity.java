@@ -44,6 +44,7 @@ import java.util.WeakHashMap;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer {
@@ -67,9 +68,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
 
 
         if (!requirementsChecker.areRequirementsMet()) {
@@ -111,7 +110,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         });
         params.setBehavior(behavior);
 
-        App.startBackgroundServiceCompat(this);
+        App.getInstance().startBackgroundServiceCompat(this);
 
         viewModel.getContact().observe(this, this);
         viewModel.getBottomSheetHidden().observe(this, new Observer() {
@@ -282,15 +281,33 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         else
             disableLocationMenus();
 
+        updateMonitoringModeMenu();
+
         return true;
     }
+
+    public void updateMonitoringModeMenu() {
+        MenuItem item = this.mMenu.findItem(R.id.menu_monitoring);
+
+        switch (preferences.getMonitoring()) {
+            case 0:
+                item.setIcon(R.drawable.ic_done);
+                break;
+            case 1:
+                item.setIcon(R.drawable.ic_assignment_late_white_48dp);
+                break;
+            case 2:
+                item.setIcon(R.drawable.ic_close);
+                break;
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_report) {
-
-            App.startBackgroundServiceCompat(this, BackgroundService.INTENT_ACTION_SEND_LOCATION_USER);
+            viewModel.sendLocation();
 
             return true;
         } else if (itemId == R.id.menu_mylocation) {
@@ -299,9 +316,27 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } else if (itemId == android.R.id.home) {
             finish();
             return true;
+        } else if (itemId == R.id.menu_monitoring) {
+            stepMonitoringModeMenu();
         }
-
         return false;
+    }
+
+    private void stepMonitoringModeMenu() {
+        int mode = preferences.getMonitoring();
+        int newmode;
+        if(mode == 0)  {
+            newmode = 1;
+            Toast.makeText(this, "significant location monitoring mode", Toast.LENGTH_SHORT).show();
+        } else if (mode == 1)  {
+            newmode = 2;
+            Toast.makeText(this, "move monitoring mode", Toast.LENGTH_SHORT).show();
+        } else  {
+            newmode = 0;
+            Toast.makeText(this, "manual monitoring mode", Toast.LENGTH_SHORT).show();
+        }
+        Timber.v("setting monitoring mode %s -> %s", mode, newmode);
+        preferences.setMonitoring(newmode);
     }
 
     private void disableLocationMenus() {

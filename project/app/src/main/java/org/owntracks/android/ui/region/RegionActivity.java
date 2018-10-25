@@ -20,6 +20,8 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiRegionBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 
+import dagger.android.AndroidInjection;
+
 public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel> implements RegionMvvm.View{
 
     private static final int REQUEST_PLACE_PICKER = 19283;
@@ -29,7 +31,6 @@ public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.Vie
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityComponent().inject(this);
         setHasEventBus(false);
         bindAndAttachContentView(R.layout.ui_region, savedInstanceState);
         setSupportToolbar(binding.toolbar);

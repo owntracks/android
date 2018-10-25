@@ -1,27 +1,38 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
+import android.databinding.BindingAdapter;
 import android.os.AsyncTask;
 import android.support.annotation.CallSuper;
 import android.support.v4.util.LruCache;
 import android.widget.TextView;
 
+import org.owntracks.android.App;
+import org.owntracks.android.R;
+import org.owntracks.android.injection.qualifier.AppContext;
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
+@PerApplication
 public class GeocodingProvider {
 
     private static LruCache<String, String> cache;
     private static Geocoder geocoder;
 
-    public GeocodingProvider(Preferences preferences) {
+    @Inject
+    public GeocodingProvider(@AppContext Context context, Preferences preferences) {
         cache = new LruCache<>(40);
         if("".equals(preferences.getOpenCageGeocoderApiKey())) {
-            geocoder = new GeocoderGoogle();
+            geocoder = new GeocoderGoogle(context);
         } else {
             geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
         }
@@ -39,7 +50,7 @@ public class GeocodingProvider {
         return String.format(Locale.US,"%.6f-%.6f", m.getLatitude(), m.getLongitude());
     }
 
-    private boolean isCachedGeocoderAvailable(MessageLocation m) {
+    private static boolean isCachedGeocoderAvailable(MessageLocation m) {
         String s = getCache(m);
         Timber.v("cache lookup for %s (hash %s) -> %s", m.getMessageId(), locationHash(m), getCache(m));
 
@@ -51,7 +62,7 @@ public class GeocodingProvider {
         }
     }
 
-    public void resolve(MessageLocation m, TextView tv) {
+    public static void resolve(MessageLocation m, TextView tv) {
         if(m.hasGeocoder()) {
             tv.setText(m.getGeocoder());
             return;
@@ -155,4 +166,13 @@ public class GeocodingProvider {
             }
         }
     }
+
+    @BindingAdapter({"android:text", "messageLocation"})
+    public static void displayFusedLocationInViewAsync(TextView view, FusedContact c, MessageLocation m) {
+        if(m != null)
+            resolve(m, view);
+        else
+            view.setText(R.string.na);
+    }
+
 }

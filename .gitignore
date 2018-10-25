@@ -35,9 +35,6 @@ project/app/*.iml
 log/
 target/
 
-# Private API keys for release builds
-project/app/src/main/res/values-v1/apis.xml
-
 apk/
 project/android.iml
 *.apk

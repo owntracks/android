@@ -6,19 +6,24 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageEncrypted;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
+@PerApplication
 public class Parser {
     private static ObjectMapper defaultMapper;
     private static ObjectMapper arrayCompatMapper;
     private final EncryptionProvider encryptionProvider;
 
+    @Inject
     public Parser(EncryptionProvider encryptionProvider) {
         this.encryptionProvider = encryptionProvider;
         defaultMapper = new ObjectMapper();

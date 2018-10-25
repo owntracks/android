@@ -27,7 +27,7 @@ public class MessageCmd extends MessageBase{
     public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
     public static final String ACTION_SET_CONFIGURATION = "setConfiguration";
     public static final String ACTION_RESTART = "restart";
-    public static final String ACTION_REOCONNECT = "reconnect";
+    public static final String ACTION_RECONNECT = "reconnect";
     public static final String ACTION_WAYPOINTS = "waypoints";
 
     private MessageWaypoints waypoints;

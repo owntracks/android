@@ -5,45 +5,33 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
+import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.RequirementsChecker;
-import org.owntracks.android.ui.welcome.finish.FinishFragment;
-import org.owntracks.android.ui.welcome.intro.IntroFragment;
-import org.owntracks.android.ui.welcome.permission.PermissionFragment;
-import org.owntracks.android.ui.welcome.play.PlayFragment;
-import org.owntracks.android.ui.welcome.version.VersionFragment;
 
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import timber.log.Timber;
 
 @PerActivity
-public class WelcomeAdapter extends FragmentStatePagerAdapter {
+public class WelcomeAdapter extends FragmentStatePagerAdapter  {
 
-    @Inject IntroFragment introFragment;
-
-    @Inject VersionFragment versionFragment;
-
-    @Inject PlayFragment playFragment;
-
-    @Inject PermissionFragment permissionFragment;
-
-    @Inject FinishFragment finishFragment;
 
     private final ArrayList<Fragment> fragments = new ArrayList<>();
 
     private RequirementsChecker requirementsChecker;
 
     @Inject
-    WelcomeAdapter(@ActivityFragmentManager FragmentManager fm, RequirementsChecker requirementsChecker) {
+    WelcomeAdapter(@Named(BaseActivityModule.ACTIVITY_FRAGMENT_MANAGER) FragmentManager fm, RequirementsChecker requirementsChecker) {
         super(fm);
         this.requirementsChecker = requirementsChecker;
+
     }
 
-    public void setupFragments() {
+    public void setupFragments(Fragment introFragment, Fragment versionFragment, Fragment playFragment, Fragment permissionFragment, Fragment finishFragment ) {
         fragments.add(introFragment);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)

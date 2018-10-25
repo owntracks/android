@@ -12,6 +12,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.owntracks.android.support.RequirementsChecker;
+import org.owntracks.android.ui.welcome.finish.FinishFragment;
+import org.owntracks.android.ui.welcome.intro.IntroFragment;
+import org.owntracks.android.ui.welcome.permission.PermissionFragment;
+import org.owntracks.android.ui.welcome.play.PlayFragment;
+import org.owntracks.android.ui.welcome.version.VersionFragment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -73,7 +78,7 @@ public class WelcomeAdapterTest {
         when(requirementsChecker.isInitialSetupCheckPassed()).thenReturn(initialSetupCheckPassed);
         when(requirementsChecker.isPlayCheckPassed()).thenReturn(playCheckPassed);
         when(requirementsChecker.isPermissionCheckPassed()).thenReturn(permissionCheckPassed);
-        welcomeAdapter.setupFragments();
+        welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), new PlayFragment(), new PermissionFragment(), new FinishFragment());
         assertEquals(expectedFragments, welcomeAdapter.getCount());
     }
 

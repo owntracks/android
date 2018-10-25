@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
+import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
@@ -23,6 +24,9 @@ import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.gms.common.ShadowGoogleApiAvailability;
 
+import dagger.android.AndroidInjector;
+import dagger.android.support.DaggerApplication;
+
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
@@ -32,14 +36,30 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.shadows.ShadowView.clickOn;
 
+/**
+ * Objectobject doesn't like being used with Robolectric due to trying to repeatedly load the native
+ * lib and not failing gracefully if it's already loaded. Thus, we have a new App that swaps out the
+ * ObjectboxWaypointsRepo and uses a component that injects a DummyWaypointsRepo instead.
+ */
+class TestApp extends App {
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        AppComponentForTest appComponent = DaggerAppComponentForTest.builder().app(this).build();
+        appComponent.inject(this);
+        return appComponent;
+    }
+}
+
 
 @RunWith(RobolectricTestRunner.class)
-@Config(minSdk = LOLLIPOP, maxSdk = O_MR1, shadows = {ShadowViewPager.class, ShadowGoogleApiAvailability.class})
+@Config(minSdk = LOLLIPOP, maxSdk = O_MR1, application = TestApp.class, shadows = {ShadowViewPager.class, ShadowGoogleApiAvailability.class})
 public class WelcomeActivityTest {
+
     @Spy
     private WelcomeActivity welcomeActivity;
 
     private ShadowApplication application;
+
 
     @Before
     public void setup() {
@@ -52,6 +72,7 @@ public class WelcomeActivityTest {
 
         welcomeActivity = welcomeActivityActivityController.get();
         application = Shadows.shadowOf(welcomeActivity.getApplication());
+
         application.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
         assertNotNull(welcomeActivity);
         welcomeActivityActivityController.setup();

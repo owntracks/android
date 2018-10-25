@@ -1,5 +1,7 @@
 package org.owntracks.android.support;
 
+import android.content.Context;
+import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,9 +13,11 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -23,6 +27,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.App;
+import org.owntracks.android.R;
+import org.owntracks.android.injection.qualifier.AppContext;
+import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
@@ -33,9 +41,14 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import timber.log.Timber;
+
+@PerApplication
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
-    private static final int FACE_DIMENSIONS = (int) (48 * (App.getContext().getResources().getDisplayMetrics().densityDpi / 160f));
+    private static int FACE_DIMENSIONS;
 
 
     public void invalidateCacheLevelCard(String key) {
@@ -93,18 +106,17 @@ public class ContactImageProvider {
         (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
-    public void setImageViewAsync(ImageView imageView, FusedContact contact) {
+    public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
         //imageView.setImageDrawable(placeholder);
         (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
+    @Nullable
     private static Bitmap getBitmapFromCache(FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
             return null;
-
-
 
         if(contact.hasCard()) {
             d = memoryCache.getLevelCard(contact.getId());
@@ -114,9 +126,20 @@ public class ContactImageProvider {
 
             if(contact.getMessageCard().hasFace()) {
                 byte[] imageAsBytes = Base64.decode(contact.getMessageCard().getFace().getBytes(), Base64.DEFAULT);
-                d = getRoundedShape(Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length), FACE_DIMENSIONS, FACE_DIMENSIONS, true));
-                contact.getMessageCard().setFace(null);
-                memoryCache.putLevelCard(contact.getId(), d);
+                Bitmap b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+
+                if(b == null) {
+                    Timber.e("Decoding card bitmap failed");
+                    Bitmap fallbackBitmap = Bitmap.createBitmap(FACE_DIMENSIONS, FACE_DIMENSIONS, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(fallbackBitmap);
+                    Paint paint = new Paint();
+                    paint.setColor(0xFFFFFFFF);
+                    canvas.drawRect(0F, 0F, (float) FACE_DIMENSIONS, (float) FACE_DIMENSIONS, paint);
+                    d = getRoundedShape(fallbackBitmap);
+                } else {
+                    d = getRoundedShape(Bitmap.createScaledBitmap(b, FACE_DIMENSIONS, FACE_DIMENSIONS, true));
+                    memoryCache.putLevelCard(contact.getId(), d);
+                }
                 return d;
             }
         }
@@ -130,9 +153,10 @@ public class ContactImageProvider {
         return d;
     }
 
-    public ContactImageProvider(EventBus eventBus){
+    @Inject
+    public ContactImageProvider(@AppContext Context context){
         memoryCache = new ContactBitmapMemoryCache();
-        eventBus.register(this);
+        FACE_DIMENSIONS = (int)(48 * (context.getResources().getDisplayMetrics().densityDpi / 160f));
     }
 
     private static class ContactBitmapMemoryCache {
@@ -166,7 +190,7 @@ public class ContactImageProvider {
         }
     }
 
-    private void invalidateCache() {
+    public void invalidateCache() {
         memoryCache.clear();
     }
     private static Bitmap getRoundedShape(Bitmap bitmap) {
@@ -208,9 +232,8 @@ public class ContactImageProvider {
         return bitmap;
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(Events.ModeChanged e) {
-        invalidateCache();
+    @BindingAdapter({"imageProvider", "contact"})
+    public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
+        setImageViewAsync(view, c);
     }
 }

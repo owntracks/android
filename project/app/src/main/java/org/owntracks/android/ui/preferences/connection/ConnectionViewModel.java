@@ -104,7 +104,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     @Override
     public ConnectionSecurityViewModel getConnectionSecurityViewModel() {
-        return new ConnectionSecurityViewModel(preferences, navigator.get());
+        return new ConnectionSecurityViewModel(preferences, navigator);
     }
 
     @Override

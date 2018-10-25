@@ -20,18 +20,14 @@ import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
+
 public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1;
-
-    @Inject
-    public PlayFragment() {
-        if(viewModel == null) { fragmentComponent().inject(this); }
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(viewModel == null) { fragmentComponent().inject(this);}
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState);
     }
 

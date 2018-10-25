@@ -78,8 +78,8 @@ public abstract class WaypointsRepo {
         return message;
     }
 
-    abstract void insert_impl(WaypointModel w);
-    abstract void update_impl(WaypointModel w);
-    abstract void delete_impl(WaypointModel w);
+    public abstract void insert_impl(WaypointModel w);
+    public abstract void update_impl(WaypointModel w);
+    public abstract void delete_impl(WaypointModel w);
 
 }

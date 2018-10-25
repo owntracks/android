@@ -5,22 +5,16 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.media.AudioManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -29,7 +23,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.util.LongSparseArray;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -46,13 +39,11 @@ import com.google.android.gms.tasks.Task;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.messages.MessageTransition;
 import org.owntracks.android.model.FusedContact;
@@ -70,9 +61,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import dagger.android.DaggerService;
 import timber.log.Timber;
 
-public class BackgroundService extends Service implements OnCompleteListener<Location> {
+public class BackgroundService extends DaggerService implements OnCompleteListener<Location> {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -110,7 +102,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     private NotificationManager notificationManager;
 
     private NotificationManagerCompat notificationManagerCompat;
-    private LongSparseArray<WaypointModel> waypoints = new LongSparseArray<>();
 
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
@@ -126,7 +117,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     protected Scheduler scheduler;
 
     @Inject
-    protected MessageProcessor messageProcessor;
+    protected LocationProcessor locationProcessor;
 
     @Inject
     protected GeocodingProvider geocodingProvider;
@@ -145,8 +136,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Override
     public void onCreate() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
-
+        super.onCreate();
         Timber.v("Preferences instance: %s", preferences);
 
         //preferences = App.getPreferences();
@@ -196,20 +186,19 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_SEND_LOCATION_PING:
-                    publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
+                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
                     return;
                 case INTENT_ACTION_SEND_LOCATION_USER:
-                    publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
+                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
                     return;
                 case INTENT_ACTION_SEND_EVENT_CIRCULAR:
                     onGeofencingEvent(GeofencingEvent.fromIntent(intent));
                     return;
                 case INTENT_ACTION_SEND_LOCATION_RESPONSE:
-                    Timber.e("INTENT_ACTION_SEND_LOCATION_RESPONSE not implemented");
-                    publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
+                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
                     return;
                 case INTENT_ACTION_SEND_WAYPOINTS:
-                    Timber.e("INTENT_ACTION_SEND_WAYPOINTS not implemented");
+                    locationProcessor.publishWaypointsMessage();
                     return;
                 case INTENT_ACTION_CLEAR_NOTIFICATIONS:
                     clearEventStackNotification();
@@ -411,43 +400,10 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         activeNotifications.clear();
 
     }
-
-
+    // TODO: Move to somewere else
     private void setupLocationPing() {
         scheduler.scheduleLocationPing();
     }
-
-
-    @MainThread
-    private void onWaypointTransition(WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
-        Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getTst(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
-
-        if (ignoreLowAccuracy(l)) {
-            Timber.d("ignoring transition: low accuracy ");
-            return;
-        }
-
-        // Don't send transition if the region is already triggered
-        // If the region status is unknown, send transition only if the device is inside
-        if (((transition == w.getLastTransition()) || (w.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
-            Timber.d("ignoring initial or duplicate transition");
-            w.setLastTransition(transition);
-            waypointsRepo.update(w, false);
-            return;
-        }
-
-        w.setLastTransition(transition);
-        w.setLastTriggeredNow();
-        waypointsRepo.update(w, false);
-
-        publishTransitionMessage(w, l, transition, trigger);
-        if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
-            publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
-        }
-
-        eventBus.postSticky(new Events.WaypointTransition(w, transition));
-    }
-
 
     private void onGeofencingEvent(@Nullable final GeofencingEvent event) {
 
@@ -463,113 +419,22 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         final int transition = event.getGeofenceTransition();
         for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
-            onWaypointTransition(waypoints.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId())), event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
+            WaypointModel w = waypointsRepo.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()));
+            if(w == null) {
+                Timber.e("waypoint id %s not found for geofence event", event.getTriggeringGeofences().get(index).getRequestId());
+                continue;
+            }
+            locationProcessor.onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
         }
     }
 
     public void onLocationChanged(@Nullable Location location) {
-
         if (location != null && location.getTime() > locationRepo.getCurrentLocationTime()) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
 
-            locationRepo.setCurrentLocation(location);
-            publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
+            locationProcessor.onLocationChanged(location);
         }
     }
-
-
-    private boolean ignoreLowAccuracy(@NonNull Location l) {
-        int threshold = preferences.getIgnoreInaccurateLocations();
-        return threshold > 0 && l.getAccuracy() > threshold;
-    }
-
-    private void publishLocationMessage(@Nullable String trigger) {
-        Timber.v("trigger:%s", trigger);
-
-        if (!locationRepo.hasLocation()) {
-            Timber.e("no location available");
-            return;
-        }
-
-        // Automatic updates are discarded if automatic reporting is disabled
-        if ((trigger == null || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub()) {
-            return;
-        }
-
-        if (ignoreLowAccuracy(locationRepo.getCurrentLocation())) {
-            return;
-        }
-        Location lastLocation = locationRepo.getCurrentLocation();
-        // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if(waypoints.size() > 0 && preferences.getFuseRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
-            for(int i = 0; i < waypoints.size(); i++) {
-                WaypointModel waypoint = waypoints.get(waypoints.keyAt(i));
-                onWaypointTransition(waypoint, locationRepo.getCurrentLocation(), lastLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
-            }
-        }
-
-        MessageLocation message = new MessageLocation();
-        message.setLat(lastLocation.getLatitude());
-        message.setLon(lastLocation.getLongitude());
-        message.setAlt(lastLocation.getAltitude());
-        message.setAcc(Math.round(lastLocation.getAccuracy()));
-        if (lastLocation.hasSpeed()) {
-            message.setVelocity(lastLocation.getSpeed() * 3.6); // Convert m/s to km/h
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && lastLocation.hasVerticalAccuracy()) {
-            message.setVac(Math.round(lastLocation.getVerticalAccuracyMeters()));
-        }
-        message.setT(trigger);
-        if(MessageLocation.REPORT_TYPE_PING.equals(trigger)) {
-            message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        } else {
-            message.setTst(TimeUnit.MILLISECONDS.toSeconds(lastLocation.getTime()));
-        }
-
-        message.setTid(preferences.getTrackerId(true));
-        message.setCp(preferences.getCp());
-        message.setInRegions(getInRegions());
-
-        if (preferences.getPubLocationExtendedData()) {
-            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            Intent batteryStatus = registerReceiver(null, ifilter);
-            if (batteryStatus != null) {
-                message.setBatt(batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1));
-            }
-
-            ConnectivityManager cm = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
-            NetworkInfo activeNetwork;
-            if (cm != null && (activeNetwork = cm.getActiveNetworkInfo()) != null) {
-                if (!activeNetwork.isConnected()) {
-                    message.setConn(MessageLocation.CONN_TYPE_OFFLINE);
-                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                    message.setConn(MessageLocation.CONN_TYPE_WIFI);
-                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                    message.setConn(MessageLocation.CONN_TYPE_MOBILE);
-                }
-            }
-        }
-
-        messageProcessor.sendMessage(message);
-
-
-    }
-
-    private void publishTransitionMessage(@NonNull WaypointModel w, @NonNull Location triggeringLocation, int transition, String trigger) {
-        MessageTransition message = new MessageTransition();
-        message.setTransition(transition);
-        message.setTrigger(trigger);
-        message.setTid(preferences.getTrackerId(true));
-        message.setLat(triggeringLocation.getLatitude());
-        message.setLon(triggeringLocation.getLongitude());
-        message.setAcc(triggeringLocation.getAccuracy());
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getTst()));
-        message.setDesc(w.getDescription());
-        messageProcessor.sendMessage(message);
-
-    }
-
 
     @SuppressWarnings("MissingPermission")
     private void setupLocationRequest() {
@@ -583,9 +448,24 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
             Timber.e("mFusedLocationClient not available");
             return;
         }
+        int monitoring = preferences.getMonitoring();
+        Timber.v("requesting location updates for monitoring mode %s",  monitoring);
+
+        LocationRequest request = null;
+        switch (monitoring) {
+
+            case 0:
+            case 1:
+                request = getBackgroundLocationRequest();  // TODO: rename
+                break;
+            case 2:
+                request = getForegroundLocationRequest(); // TODO: rename
+                break;
+
+        }
 
         mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
-        mFusedLocationClient.requestLocationUpdates(App.isInForeground() ? getForegroundLocationRequest() : getBackgroundLocationRequest(), locationCallback,  runner.getBackgroundHandler().getLooper());
+        mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
     }
 
     private PendingIntent getLocationPendingIntent() {
@@ -648,10 +528,8 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         LinkedList<Geofence> geofences = new LinkedList<>();
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
-        waypoints = new LongSparseArray<>(geofences.size());
 
         for (WaypointModel w : loadedWaypoints){
-            waypoints.put(w.getTst(), w);
             Timber.v("desc:%s", w.getDescription());
 
             geofences.add(new Geofence.Builder()
@@ -681,7 +559,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
-        publishWaypointMessage(e.getWaypointModel());
+        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
         if(e.getWaypointModel().hasGeofence()) {
             removeGeofences();
             setupGeofences();
@@ -691,7 +569,7 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointUpdated e) {
-        publishWaypointMessage(e.getWaypointModel());
+        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
         removeGeofences();
         setupGeofences();
     }
@@ -705,16 +583,18 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
         }
     }
 
-    private void publishWaypointMessage(@NonNull WaypointModel e) {
-        messageProcessor.sendMessage(waypointsRepo.fromDaoObject(e));
-    }
-
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.ModeChanged e) {
         removeGeofences();
         setupGeofences();
         sendOngoingNotification();
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(Events.MonitoringChanged e) {
+        setupLocationRequest();
     }
 
     @SuppressWarnings("unused")
@@ -779,15 +659,11 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
         Timber.v("building notification builder");
 
-
         if (notificationBuilderEvents != null)
             return notificationBuilderEvents;
 
         Timber.v("builder not present, lazy building");
-
-
         notificationBuilderEvents = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
-
 
         Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.setAction("android.intent.action.MAIN");
@@ -818,16 +694,6 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     private final IBinder mBinder = new LocalBinder();
 
-    public List<String> getInRegions() {
-        LinkedList<String> l = new LinkedList<>();
-        for(int i = 0; i < waypoints.size(); i++) {
-            WaypointModel w = waypoints.get(waypoints.keyAt(i));
-            if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER )
-                l.add(w.getDescription());
-
-        }
-        return l;
-    }
 
     public class LocalBinder extends Binder {
         public BackgroundService getService() {
@@ -837,25 +703,12 @@ public class BackgroundService extends Service implements OnCompleteListener<Loc
 
     @Override
     public IBinder onBind(Intent intent) {
-        // Called when a client (MainActivity in case of this sample) comes to the foreground
-        // and binds with this service. The service should cease to be a foreground service
-        // when that happens.
         Timber.v("in onBind()");
         return mBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
-        // Called when a client (MainActivity in case of this sample) returns to the foreground
-        // and binds once again with this service. The service should cease to be a foreground
-        // service when that happens.
-        Timber.v("in onRebind()");
-        super.onRebind(intent);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
         Timber.v("Last client unbound from service");
-        return true; // Ensures onRebind() is called when a client re-binds.
     }
 }

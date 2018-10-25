@@ -16,12 +16,10 @@ public interface PreferencesFragmentMvvm {
         void loadRoot();
         void setVersion();
 
-        void setModeSummary(String mode);
+        void setModeSummary(int mode);
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        @ActivityContext
-        Context getContext();
         Preferences getPreferences();
     }
 }

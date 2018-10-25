@@ -23,6 +23,7 @@ import org.owntracks.android.ui.base.BaseActivity;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 
@@ -32,10 +33,8 @@ public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMv
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Timber.v("onCreate");
         super.onCreate(savedInstanceState);
 
-        activityComponent().inject(this);
         mList = new ObservableArrayList<>();
         //mList.addAll(viewModel.getContacts());
         listComparator = new ContactsComparator();

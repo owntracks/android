@@ -5,9 +5,9 @@ import android.util.Base64;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageCmd;
@@ -63,34 +63,24 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private static OkHttpClient mHttpClient;
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
 
-    private static MessageProcessorEndpointHttp instance;
     public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
 
-    @Inject
     protected Preferences preferences;
-
-    @Inject
     protected Parser parser;
-
-    @Inject
     protected Scheduler scheduler;
 
 
-
-    public static MessageProcessorEndpointHttp getInstance() {
-        if(instance == null) {
-            instance = new MessageProcessorEndpointHttp();
-        }
-        return instance;
-    }
-
-
-    private MessageProcessorEndpointHttp() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+        super();
+        this.messageProcessor = messageProcessor;
+        this.parser = parser;
+        this.preferences = preferences;
+        this.scheduler = scheduler;
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
         loadHTTPClient();
+
     }
 
     @Override
@@ -149,22 +139,20 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         URL endpoint;
         try {
             endpoint = new URL(preferences.getUrl());
+
+            this.endpointUserInfo = endpoint.getUserInfo();
+
+            if (this.endpointUserInfo != null && this.endpointUserInfo.length() > 0) {
+                this.endpointUrl = endpoint.toString().replace(endpointUserInfo+"@", "");
+            } else {
+                this.endpointUrl = endpoint.toString();
+            }
+            Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
+
             messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
         } catch (MalformedURLException e) {
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
-            return;
         }
-
-        this.endpointUserInfo = endpoint.getUserInfo();
-
-        if (this.endpointUserInfo != null && this.endpointUserInfo.length() > 0) {
-            this.endpointUrl = endpoint.toString().replace(endpointUserInfo+"@", "");
-        } else {
-            this.endpointUrl = endpoint.toString();
-        }
-        Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
-
-
     }
 
     private void sendMessage(MessageBase message) {

@@ -17,7 +17,7 @@ public class RequirementsChecker {
         this.context = context;
     }
 
-    public boolean areRequirementsMet() {
+    public boolean areRequirementsMet  () {
         return isPlayCheckPassed() && isPermissionCheckPassed() && isInitialSetupCheckPassed();
     }
 

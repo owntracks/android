@@ -57,8 +57,6 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
 
     public void setMessageCard(MessageCard messageCard) {
         this.messageCard = messageCard;
-
-        App.getContactImageProvider().invalidateCacheLevelCard(getId());
         notifyMessageCardPropertyChanged();
     }
 
@@ -97,19 +95,6 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
             return getMessageCard().getName();
         else
             return getTrackerId();
-    }
-
-    @BindingAdapter({"imageProvider", "contact"})
-    public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
-        App.getContactImageProvider().setImageViewAsync(view, c);
-    }
-
-    @BindingAdapter({"android:text", "messageLocation"})
-    public static void displayFusedLocationInViewAsync(TextView view,  FusedContact c, MessageLocation m) {
-        if(m != null)
-            App.getGeocodingProvider().resolve(m, view);
-        else
-            view.setText(R.string.na);
     }
 
     @Bindable

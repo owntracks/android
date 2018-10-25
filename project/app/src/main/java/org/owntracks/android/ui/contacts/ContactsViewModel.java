@@ -50,7 +50,7 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
 
         Bundle b = new Bundle();
         b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, c.getId());
-        navigator.get().startActivity(MapActivity.class, b);
+        navigator.startActivity(MapActivity.class, b);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

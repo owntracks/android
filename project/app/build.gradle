@@ -5,20 +5,21 @@ def versionMajor = 2
 def versionMinor = 1
 def versionPatch = 0
 def versionBuild = 2
+
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.17'
-ext.playLibVersion = '15.0.1'
+ext.playLibVersion = '16.0.0'
 ext.okHttpVersion = '3.11.0'
-ext.supportLibVersion = '27.1.1'
+ext.supportLibVersion = '28.0.0'
 ext.jacksonVersion = '2.9.7'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
@@ -33,21 +34,21 @@ android {
 
     buildTypes {
         release {
-            useProguard false
+            useProguard true
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHOLDER_API_KEY" }"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ? google_maps_api_key : "PLACEHOLDER_API_KEY"}"
         }
 
         debug {
-            useProguard false
+            useProguard true
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ?  google_maps_api_key : "PLACEHOLDER_API_KEY" }"
+            resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ? google_maps_api_key : "PLACEHOLDER_API_KEY"}"
             applicationIdSuffix '.debug'
             testCoverageEnabled true
         }
@@ -77,6 +78,7 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
     }
 
     lintOptions {
@@ -123,8 +125,10 @@ dependencies {
 
     // Utility libraries
     implementation "com.google.dagger:dagger:${daggerVersion}"
-    implementation "org.greenrobot:eventbus:3.1.1"
+    implementation "com.google.dagger:dagger-android-support:${daggerVersion}"
+    implementation "com.google.dagger:dagger-android:${daggerVersion}"
 
+    implementation "org.greenrobot:eventbus:3.1.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${pahoVersion}"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
@@ -133,7 +137,9 @@ dependencies {
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
 
-    implementation "android.arch.work:work-runtime:1.0.0-alpha09"
+    implementation "android.arch.work:work-runtime:1.0.0-alpha10"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
     // Widget libraries
     implementation "com.rengwuxian.materialedittext:library:2.1.4"
@@ -146,15 +152,14 @@ dependencies {
     implementation "com.android.support:design:${supportLibVersion}"
     implementation "com.mikepenz:materialize:1.1.2@aar"
 
-
-    implementation "android.arch.lifecycle:extensions:1.1.1"
-    implementation "android.arch.persistence.room:runtime:1.1.1"
-    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
-    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
-
     // Preprocessors
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
+
+    testAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
+    testAnnotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
+
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"

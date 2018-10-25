@@ -1,11 +1,6 @@
 package org.owntracks.android.services.worker;
 
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
-
-import org.owntracks.android.App;
-import org.owntracks.android.injection.components.DaggerServiceComponent;
-import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
 
 import java.util.List;
@@ -19,9 +14,9 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
-import androidx.work.WorkStatus;
 import timber.log.Timber;
 
+@PerApplication
 public class Scheduler {
     public static final long MIN_PERIODIC_INTERVAL_MILLIS = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS;
     private static final String ONEOFF_TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";
@@ -33,13 +28,13 @@ public class Scheduler {
     private WorkManager workManager = WorkManager.getInstance();
 
     @Inject protected Preferences preferences;
-    @Inject protected MessageProcessor messageProcessor;
+
     private Constraints anyNetworkConstraint = new Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build();
 
+    @Inject
     public Scheduler() {
-        DaggerServiceComponent.builder().appComponent(App.getAppComponent()).build().inject(this);
     }
 
     public void cancelHttpTasks() {

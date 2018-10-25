@@ -1,5 +1,7 @@
 package org.owntracks.android.data.repos;
 
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.util.EventLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -15,29 +17,44 @@ import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Preferences;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({App.class})
 public class MemoryContactsRepoTest {
     @Mock
-    App app;
+        App app;
 
     private MessageLocation messageLocation;
     private ContactsRepo contactsRepo;
     private final static String CONTACT_ID = "abcd1234";
+    private EventBus eventBus;
+    private ContactImageProvider contactImageProvider;
 
-    private AppComponent appComponent;
 
     @Before
     public void setup() {
-        appComponent = DaggerAppComponent.builder().appModule(new AppModule(app)).build();
+        eventBus = EventBus.getDefault();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        displayMetrics.densityDpi = 160;
+        Resources myResources = mock(Resources.class);
+        when(myResources.getDisplayMetrics()).thenReturn(displayMetrics);
+        when(app.getResources()).thenReturn(myResources);
+        contactImageProvider = new ContactImageProvider(app);
+
+        mockStatic(App.class);
 
         messageLocation = new MessageLocation();
         messageLocation.setAcc(10);
@@ -48,12 +65,13 @@ public class MemoryContactsRepoTest {
         messageLocation.setLon(60.2);
         messageLocation.setTst(123456789);
 
-        contactsRepo = appComponent.contactsRepo();
+        contactsRepo = new MemoryContactsRepo(eventBus, contactImageProvider);
+
     }
 
     @Test
     public void repoCorrectlyRegistersToEventBus() {
-        assertTrue(appComponent.eventBus().isRegistered(contactsRepo));
+        assertTrue(eventBus.isRegistered(contactsRepo));
     }
 
     @Test
@@ -75,7 +93,7 @@ public class MemoryContactsRepoTest {
         assertEquals(1, contactsRepo.getRevision());
 
         FusedContact c = contactsRepo.getById(CONTACT_ID);
-        assertEquals(false, c.isDeleted());
+        assertFalse(c.isDeleted());
 
         contactsRepo.remove(CONTACT_ID);
         assertEquals(-MemoryContactsRepo.MAJOR_STEP, contactsRepo.getRevision());
@@ -89,6 +107,7 @@ public class MemoryContactsRepoTest {
         contactsRepo.update(CONTACT_ID, messageLocation);
         MemoryContactsRepo.class.cast(contactsRepo).onEventMainThread(new Events.ModeChanged(0,1));
         assertEquals(0, contactsRepo.getAll().size());
+
     }
 
     @Test
