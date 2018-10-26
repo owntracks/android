@@ -165,7 +165,7 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"
     testImplementation "org.powermock:powermock-api-mockito2:2.0.0-beta.5"
     testImplementation "org.robolectric:robolectric:4.0"
-    testImplementation "org.robolectric:shadows-playservices:3.8"
+    testImplementation "org.robolectric:shadows-playservices:4.0"
 
 }
 
