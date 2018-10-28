@@ -63,8 +63,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	protected EventBus eventBus;
 
 	public MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
-		super();
-		this.messageProcessor = messageProcessor;
+		super(messageProcessor);
 		this.parser = parser;
 		this.preferences = preferences;
 		this.scheduler = scheduler;

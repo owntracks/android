@@ -71,8 +71,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
 
     public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
-        super();
-        this.messageProcessor = messageProcessor;
+        super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
