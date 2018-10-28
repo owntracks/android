@@ -40,6 +40,9 @@
     <!-- To vibrate for debuging in the background -->
     <uses-permission android:name="android.permission.VIBRATE"/>
 
+    <!-- API v28 requires this for foreground services -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
 
     <application
         android:name=".App"
