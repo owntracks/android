@@ -30,14 +30,14 @@ import dagger.android.support.DaggerApplication;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
-import static android.os.Build.VERSION_CODES.O_MR1;
+import static android.os.Build.VERSION_CODES.P;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.shadows.ShadowView.clickOn;
 
 /**
- * Objectobject doesn't like being used with Robolectric due to trying to repeatedly load the native
+ * Objectbox doesn't like being used with Robolectric due to trying to repeatedly load the native
  * lib and not failing gracefully if it's already loaded. Thus, we have a new App that swaps out the
  * ObjectboxWaypointsRepo and uses a component that injects a DummyWaypointsRepo instead.
  */
@@ -52,7 +52,7 @@ class TestApp extends App {
 
 
 @RunWith(RobolectricTestRunner.class)
-@Config(minSdk = LOLLIPOP, maxSdk = O_MR1, application = TestApp.class, shadows = {ShadowViewPager.class, ShadowGoogleApiAvailability.class})
+@Config(minSdk = LOLLIPOP, maxSdk = P, application = TestApp.class, shadows = {ShadowViewPager.class, ShadowGoogleApiAvailability.class})
 public class WelcomeActivityTest {
 
     @Spy

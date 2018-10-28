@@ -69,7 +69,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		this.scheduler = scheduler;
 		this.eventBus = eventBus;
 	}
-	
+
 	public synchronized boolean sendKeepalive() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
@@ -121,7 +121,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		public void connectionLost(Throwable cause) {
 			Timber.e(cause, "connectionLost error");
 			scheduler.cancelMqttPing();
-            scheduler.scheduleMqttReconnect();
+			scheduler.scheduleMqttReconnect();
 			changeState(EndpointState.DISCONNECTED, new Exception(cause));
 		}
 
@@ -171,7 +171,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			}
 
 			String cid = preferences.getClientId();
-            String connectString = prefix + "://" + preferences.getHost() + ":" + preferences.getPort();
+			String connectString = prefix + "://" + preferences.getHost() + ":" + preferences.getPort();
 			Timber.v("mode: %s", preferences.getModeId());
 			Timber.v("client id: %s", cid);
 			Timber.v("connect string: %s", connectString);
@@ -182,15 +182,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			Timber.e(e, "init failed");
 			this.mqttClient = null;
 			changeState(e);
-            return false;
+			return false;
 		}
-        return true;
+		return true;
 	}
 
 	private int sendMessageConnectPressure = 0;
 
 	@WorkerThread
-	private boolean connect() {
+	private synchronized boolean connect() {
 		sendMessageConnectPressure++;
 		boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
 				: Thread.currentThread() == Looper.getMainLooper().getThread();
@@ -230,15 +230,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
 
-        changeState(EndpointState.CONNECTING);
+		changeState(EndpointState.CONNECTING);
 
 		if(!initClient()) {
-            return false;
-        }
+			return false;
+		}
 
 		try {
 			Timber.v("setting up connect options");
-			 connectOptions = new MqttConnectOptions();
+			connectOptions = new MqttConnectOptions();
 			if (preferences.getAuth()) {
 				connectOptions.setPassword(preferences.getPassword().toCharArray());
 				connectOptions.setUserName(preferences.getUsername());
@@ -271,7 +271,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 				connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
 			}
 
-            setWill(connectOptions);
+			setWill(connectOptions);
 			connectOptions.setKeepAliveInterval(preferences.getKeepalive());
 			connectOptions.setConnectionTimeout(30);
 			connectOptions.setCleanSession(preferences.getCleanSession());
@@ -292,13 +292,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	}
 
 	private void setWill(MqttConnectOptions m) {
-        try {
-            JSONObject lwt = new JSONObject();
-            lwt.put("_type", "lwt");
-            lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+		try {
+			JSONObject lwt = new JSONObject();
+			lwt.put("_type", "lwt");
+			lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
-        } catch(JSONException ignored) {}
+			m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
+		} catch(JSONException ignored) {}
 
 	}
 
@@ -341,21 +341,21 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 
 
-    private void subscribe(String[] topics) {
+	private void subscribe(String[] topics) {
 		if(!isConnected()) {
-            Timber.e("subscribe when not connected");
-            return;
-        }
-        for(String s : topics) {
+			Timber.e("subscribe when not connected");
+			return;
+		}
+		for(String s : topics) {
 			Timber.v( "subscribe() - Will subscribe to: %s", s);
-        }
+		}
 		try {
 			int qos[] = getSubTopicsQos(topics);
 			this.mqttClient.subscribe(topics, qos);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 
 	private int[] getSubTopicsQos(String[] topics) {
@@ -380,15 +380,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 
 	private void disconnect(boolean fromUser) {
 
 		Timber.v("disconnect. user:%s", fromUser);
 		if (isConnecting()) {
-            return;
-        }
+			return;
+		}
 
 		try {
 			if (isConnected()) {
@@ -466,12 +466,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			return false;
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
-        if(netInfo != null && netInfo.isAvailable() && netInfo.isConnected()) {
-            return true;
-        } else {
+		if(netInfo != null && netInfo.isAvailable() && netInfo.isConnected()) {
+			return true;
+		} else {
 			Timber.e("isOnline == false. available:%s, connected:%s", netInfo != null && netInfo.isAvailable(), netInfo != null && netInfo.isConnected());
 			return false;
-        }
+		}
 	}
 
 	private boolean isConnected() {
@@ -635,4 +635,3 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		return message;
 	}
 }
-

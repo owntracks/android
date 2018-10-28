@@ -15,6 +15,7 @@ ext.jacksonVersion = '2.9.7'
 
 android {
     compileSdkVersion 28
+    testOptions.unitTests.includeAndroidResources = true
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.owntracks.android"
