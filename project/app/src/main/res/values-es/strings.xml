@@ -200,4 +200,16 @@
     <string name="region_unknown">Estado desconocido</string>
     <string name="region_inside">Actualmente dentro</string>
     <string name="region_outside">Actualmente fuera</string>
+
+    <string name="monitoring_quiet">Modo silencio</string>
+    <string name="monitoring_manual">Modo manual</string>
+    <string name="monitoring_signifficant">Modo de cambio significante</string>
+    <string name="monitoring_move">Modo movimiento</string>
+    <string name="notificationChangeMonitoring">Cambio modo</string>
+
+
+    modo silencio
+    modo manual
+    modo de cambio significante
+    modo movimiento
 </resources>

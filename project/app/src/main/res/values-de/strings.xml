@@ -168,4 +168,10 @@
     <string name="region_inside">Aktuell innerhalb</string>
     <string name="region_outside">Aktuell außerhalb</string>
 
+    <string name="monitoring_quiet">Stiller Modus</string>
+    <string name="monitoring_manual">Manueller Modus</string>
+    <string name="monitoring_signifficant">Signifikante Änderungen Modus</string>
+    <string name="monitoring_move">Bewegungs Modus</string>
+    <string name="notificationChangeMonitoring">Bewegungs Modus</string>
+
 </resources>

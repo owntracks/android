@@ -30,9 +30,9 @@
     <string name="preferencesBackgroundUpdates">Automatic location reporting</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
-    <string name="preferencesLocatorDisplacement">Locator background displacement</string>
+    <string name="preferencesLocatorDisplacement">Locator displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
-    <string name="preferencesLocatorInterval">Locator background interval</string>
+    <string name="preferencesLocatorInterval">Locator interval</string>
     <string name="preferencesLocatorIntervalSummary">Seconds between location updates</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
@@ -58,7 +58,7 @@
     <string name="preferencesPubExtendedData">Extended data</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
-    <string name="preferencesLocatorAccuracyBackground">Locator background accuracy</string>
+    <string name="preferencesLocatorAccuracyBackground">Locator accuracy</string>
     <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
     <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
     <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the foreground</string>
@@ -205,4 +205,9 @@
     <string name="region_unknown">Status unknown</string>
     <string name="region_inside">Currently inside</string>
     <string name="region_outside">Currently outside</string>
+    <string name="monitoring_quiet">Quiet monitoring mode</string>
+    <string name="monitoring_manual">Manual monitoring mode</string>
+    <string name="monitoring_signifficant">Significant changes monitoring mode</string>
+    <string name="monitoring_move">Move monitoring mode</string>
+    <string name="notificationChangeMonitoring">Change Monitoring</string>
 </resources>
