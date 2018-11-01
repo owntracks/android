@@ -8,15 +8,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
-import org.owntracks.android.data.WaypointModel;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageConfiguration;
-import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.services.worker.Scheduler;
@@ -36,7 +35,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
+import dagger.Lazy;
 import timber.log.Timber;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -53,7 +54,7 @@ public class Preferences {
 
     private static int modeId = MessageProcessorEndpointMqtt.MODE_ID;
     private final Context context;
-    private EventBus eventBus;
+    private final EventBus eventBus;
     private String sharedPreferencesName;
     private boolean isFirstStart = false;
 
@@ -156,18 +157,34 @@ public class Preferences {
         }
 
     }
-    //TODO
+
     public int getMonitoring() {
-        return getInt("monitoring", R.integer.valMonitoring);
+        return getInt(Keys.MONITORING, R.integer.valMonitoring);
     }
 
     public void setMonitoring(int newmode) {
-        if(newmode < 0 || newmode > 2) {
+        if(newmode < LocationProcessor.MONITORING_QUIET || newmode > LocationProcessor.MONITORING_MOVE) {
             Timber.e("invalid monitoring mode specified %s", newmode);
             return;
         }
-        setInt("monitoring", newmode);
+        setInt(Keys.MONITORING, newmode);
         eventBus.post(new Events.MonitoringChanged(newmode));
+    }
+
+    public void setMonitoringNext() {
+
+        int mode = getMonitoring();
+        int newmode;
+        if(mode < LocationProcessor.MONITORING_MOVE) {
+            mode++;
+        } else {
+            mode = LocationProcessor.MONITORING_QUIET;
+        }
+
+        Timber.v("setting monitoring mode %s", mode);
+
+        setMonitoring(mode);
+
     }
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
@@ -637,11 +654,6 @@ public class Preferences {
         setBoolean(Keys.PUB_EXTENDED_DATA, aBoolean);
     }
 
-    @Import(key =Keys.PUB)
-    public void setPub(boolean aBoolean) {
-        setBoolean(Keys.PUB, aBoolean);
-    }
-
     @Import(key =Keys.NOTIFICATION_HIGHER_PRIORITY)
     private void setNotificationHigherPriority(boolean aBoolean) {
         setBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, aBoolean);
@@ -666,17 +678,7 @@ public class Preferences {
         setBoolean(Keys.AUTOSTART_ON_BOOT, aBoolean);
 
     }
-    @Import(key =Keys.LOCATOR_ACCURACY_FOREGROUND)
-    private void setLocatorAccuracyForeground(int anInt) {
-        setInt(Keys.LOCATOR_ACCURACY_FOREGROUND, anInt);
 
-    }
-
-    @Import(key =Keys.LOCATOR_ACCURACY_BACKGROUND)
-    private void setLocatorAccuracyBackground(int anInt) {
-        setInt(Keys.LOCATOR_ACCURACY_BACKGROUND, anInt);
-
-    }
     @Import(key =Keys.LOCATOR_INTERVAL)
     private void setLocatorInterval(int anInt) {
         setInt(Keys.LOCATOR_INTERVAL, anInt);
@@ -795,27 +797,10 @@ public class Preferences {
         return getBoolean(Keys.PUB_RETAIN, R.bool.valPubRetain);
     }
 
-    @Export(key =Keys.PUB, exportModeMqttPrivate =true)
-    public boolean getPub() {
-        return getBoolean(Keys.PUB, R.bool.valPub);
-    }
-
-
     @Export(key =Keys.AUTOSTART_ON_BOOT, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public boolean getAutostartOnBoot() {
         return getBoolean(Keys.AUTOSTART_ON_BOOT, R.bool.valAutostartOnBoot);
     }
-
-    @Export(key =Keys.LOCATOR_ACCURACY_FOREGROUND, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
-    public int getLocatorAccuracyForeground() {
-        return getInt(Keys.LOCATOR_ACCURACY_FOREGROUND, R.integer.valLocatorAccuracyForeground);
-    }
-
-    @Export(key =Keys.LOCATOR_ACCURACY_BACKGROUND, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
-    public int getLocatorAccuracyBackground() {
-        return getInt(Keys.LOCATOR_ACCURACY_BACKGROUND, R.integer.valLocatorAccuracyBackground);
-    }
-
 
     public boolean getInfo() {
         return getBoolean(Keys.INFO, R.bool.valInfo);
@@ -936,11 +921,10 @@ public class Preferences {
         public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
         public static final String INFO                             = "info";
         public static final String KEEPALIVE                        = "keepalive";
-        public static final String LOCATOR_ACCURACY_BACKGROUND      = "locatorAccuracyBackground";
-        public static final String LOCATOR_ACCURACY_FOREGROUND      = "locatorAccuracyForeground";
         public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
         public static final String LOCATOR_INTERVAL                 = "locatorInterval";
         public static final String MODE_ID                          = "mode";
+        public static final String MONITORING                       = "monitoring";
         public static final String MQTT_PROTOCOL_LEVEL              = "mqttProtocolLevel";
         public static final String NOTIFICATION                     = "notification";
         public static final String NOTIFICATION_EVENTS              = "notificationEvents";
@@ -950,7 +934,6 @@ public class Preferences {
         public static final String PASSWORD                         = "password";
         public static final String PING                             = "ping";
         public static final String PORT                             = "port";
-        public static final String PUB                              = "pub";
         public static final String PUB_EXTENDED_DATA                = "pubExtendedData";
         public static final String PUB_QOS                          = "pubQos";
         public static final String PUB_RETAIN                       = "pubRetain";
