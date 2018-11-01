@@ -22,9 +22,9 @@
     <string name="preferencesReporting">"Berichte"</string>
     <string name="preferencesBackgroundUpdates">Automatische Standort-Mitteilung</string>
     <string name="preferencesBackgroundUpdatesSummary">Standort automatisch mitteilen</string>
-    <string name="preferencesLocatorDisplacement">Abstand im Hintergrund</string>
+    <string name="preferencesLocatorDisplacement">Positionsabstand</string>
     <string name="preferencesLocatorDisplacementSummary">Entfernung zwischen Standort-Aktualisierungen</string>
-    <string name="preferencesLocatorInterval">Intervall im Hintergrund</string>
+    <string name="preferencesLocatorInterval">Positionsintervall</string>
     <string name="preferencesLocatorIntervalSummary">Sekunden zwischen Standort-Aktualisierungen</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Quelltext</string>
@@ -42,10 +42,6 @@
     <string name="preferencesPubExtendedData">Erweiterte Daten</string>
     <string name="preferencesAutostartSummary">Automatisch beim Geräte-Boot starten</string>
     <string name="preferencesAutostart">Autostart</string>
-    <string name="preferencesLocatorAccuracyBackground">Hintergrund-Genauigkeit</string>
-    <string name="preferencesLocatorAccuracyBackgroundSummary">Genauigkeit und Energieverbrauch im Hintergrund</string>
-    <string name="preferencesLocatorAccuracyForeground">Vordergrund-Genauigkeit</string>
-    <string name="preferencesLocatorAccuracyForegroundSummary">Genauigkeit und Energieverbrauch im Vordergrund</string>
     <string name="preferencesRemoteCommand">Fernkommandos</string>
     <string name="preferencesRemoteCommandSummary">Fernkommandos aktivieren</string>
     <string name="description">Beschreibung</string>

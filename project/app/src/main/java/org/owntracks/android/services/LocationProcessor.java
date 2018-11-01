@@ -36,6 +36,12 @@ public class LocationProcessor {
     private final WaypointsRepo waypointsRepo;
     private final DeviceMetricsProvider deviceMetricsProvider;
 
+
+    public static final int MONITORING_QUIET = -1;
+    public static final int MONITORING_MANUAL = 0;
+    public static final int MONITORING_SIGNIFFICANT = 1;
+    public static final int MONITORING_MOVE = 2;
+
     @Inject
     public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider) {
         this.messageProcessor = messageProcessor;
@@ -61,12 +67,6 @@ public class LocationProcessor {
         Location currentLocation = locationRepo.getCurrentLocation();
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
-        // Automatic updates are discarded if automatic reporting is disabled
-        //TODO: replace getPub with monitoring mode
-        if ((trigger == null || MessageLocation.REPORT_TYPE_PING.equals(trigger)) && !preferences.getPub()) {
-            return;
-        }
-
         assert currentLocation != null;
         if (ignoreLowAccuracy(currentLocation)) {
             return;
@@ -78,6 +78,17 @@ public class LocationProcessor {
                 onWaypointTransition(waypoint, currentLocation, currentLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
             }
         }
+
+
+        if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger) ) {
+            Timber.v("message suppressed by monitoring settings: quiet");
+        }
+
+        if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
+            Timber.v("message suppressed by monitoring settings: manual");
+        }
+
+
 
         MessageLocation message = new MessageLocation();
         message.setLat(currentLocation.getLatitude());
@@ -122,6 +133,7 @@ public class LocationProcessor {
 
     public void onLocationChanged(@NonNull Location l) {
         locationRepo.setCurrentLocation(l);
+
         publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
     }
 
@@ -146,6 +158,10 @@ public class LocationProcessor {
         w.setLastTransition(transition);
         w.setLastTriggeredNow();
         waypointsRepo.update(w, false);
+
+        if(preferences.getMonitoring() ==MONITORING_QUIET) {
+            Timber.v("message suppressed by monitoring settings: %s", preferences.getMonitoring());
+        }
 
         publishTransitionMessage(w, l, transition, trigger);
         if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {

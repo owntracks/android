@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
 import timber.log.Timber;
 
 @PerApplication
@@ -42,6 +43,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final Preferences preferences;
     private final Parser parser;
     private final Scheduler scheduler;
+    private final Lazy<LocationProcessor> locationProcessorLazy;
 
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
@@ -77,14 +79,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return MessageProcessorEndpointMqtt.class.cast(endpoint).checkConnection();
         else
             return true;
-    }
-
-    public void onEnterForeground() {
-        if(endpoint != null)
-            endpoint.onEnterForeground();
-    }
-
-    public void onEnterBackground() {
     }
 
     public boolean isEndpointConfigurationComplete() {
@@ -135,13 +129,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
         this.waypointsRepo = waypointsRepo;
         this.parser = parser;
         this.scheduler = scheduler;
+        this.locationProcessorLazy = locationProcessorLazy;
 
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
@@ -331,20 +326,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
-                    //TODO: Move location sending from service to dedicated component to get rid of intent sending from this class
                     if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
-                    Intent reportIntent = new Intent(App.getContext(), BackgroundService.class);
-                    reportIntent.setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_RESPONSE);
-                    App.getInstance().startBackgroundServiceCompat(App.getContext(), reportIntent);
+                    locationProcessorLazy.get().publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
-                    //TODO: Move location sending from service to dedicated component to get rid of intent sending from this class
-                    Intent waypointsIntent = new Intent(App.getContext(), BackgroundService.class);
-                    waypointsIntent.setAction(BackgroundService.INTENT_ACTION_SEND_WAYPOINTS);
-                    App.getInstance().startBackgroundServiceCompat(App.getContext(), waypointsIntent);
+                    locationProcessorLazy.get().publishWaypointsMessage();
                     break;
                 case MessageCmd.ACTION_SET_WAYPOINTS:
                     if(message.getWaypoints() != null) {

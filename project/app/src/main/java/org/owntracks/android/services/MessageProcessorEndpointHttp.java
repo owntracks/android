@@ -280,10 +280,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public void onEnterForeground() {
-        //NOOP
-    }
-    @Override
     public void onAttachAfterModeChanged() {
         //NOOP
     }

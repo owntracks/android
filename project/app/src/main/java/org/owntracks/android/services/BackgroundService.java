@@ -80,14 +80,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private final String NOTIFICATION_GROUP_EVENTS = "events";
 
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
-    public static final String INTENT_ACTION_CHANGE_BG = "BG";
     public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "C";
     public static final String INTENT_ACTION_SEND_LOCATION_PING = "LP";
     public static final String INTENT_ACTION_SEND_LOCATION_USER = "LU";
-    public static final String INTENT_ACTION_SEND_LOCATION_RESPONSE = "LR";
     public static final String INTENT_ACTION_SEND_WAYPOINTS = "W";
     public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "EC";
     public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "RRLU";
+    public static final String INTENT_ACTION_CHANGE_MONITORING = "CM";
+
 
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
@@ -182,9 +182,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             Timber.v("intent received with action:%s", intent.getAction());
 
             switch (intent.getAction()) {
-                case INTENT_ACTION_CHANGE_BG:
-                    setupLocationRequest();
-                    return;
                 case INTENT_ACTION_SEND_LOCATION_PING:
                     locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
                     return;
@@ -194,17 +191,18 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 case INTENT_ACTION_SEND_EVENT_CIRCULAR:
                     onGeofencingEvent(GeofencingEvent.fromIntent(intent));
                     return;
-                case INTENT_ACTION_SEND_LOCATION_RESPONSE:
-                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
-                    return;
                 case INTENT_ACTION_SEND_WAYPOINTS:
                     locationProcessor.publishWaypointsMessage();
                     return;
                 case INTENT_ACTION_CLEAR_NOTIFICATIONS:
                     clearEventStackNotification();
+                    return;
                 case INTENT_ACTION_REREQUEST_LOCATION_UPDATES:
                     setupLocationRequest();
-
+                    return;
+                case INTENT_ACTION_CHANGE_MONITORING:
+                    preferences.setMonitoringNext();
+                    return;
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
             }
@@ -258,8 +256,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         publishIntent.setAction(INTENT_ACTION_SEND_LOCATION_USER);
         PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent changeMonitoringIntent = new Intent();
+        publishIntent.setAction(INTENT_ACTION_CHANGE_MONITORING);
+        PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        activeNotificationBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent);
+
+        activeNotificationBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent).addAction(R.drawable.ic_report_notification, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
         activeNotificationBuilder.setSmallIcon(R.drawable.ic_notification);
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
@@ -289,10 +291,31 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         builder.setSound(null, AudioManager.STREAM_NOTIFICATION);
-        builder.setContentText(lastEndpointState.getLabel(this));
+
+        // Show monitoring mode if endpoint state is not interesting
+        if(lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
+            builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
+        } else {
+            builder.setContentText( lastEndpointState.getLabel(this));
+        }
+
         startForeground(NOTIFICATION_ID_ONGOING, builder.build());
     }
 
+
+    public String getMonitoringLabel(int mode) {
+        switch (mode) {
+            case LocationProcessor.MONITORING_QUIET:
+                return getString(R.string.monitoring_quiet);
+            case LocationProcessor.MONITORING_MANUAL:
+                return getString(R.string.monitoring_manual);
+            case LocationProcessor.MONITORING_SIGNIFFICANT:
+                return getString(R.string.monitoring_signifficant);
+            case LocationProcessor.MONITORING_MOVE:
+                return getString(R.string.monitoring_move);
+        }
+        return getString(R.string.na);
+    }
 
     private void sendEventNotification(MessageTransition message) {
         NotificationCompat.Builder builder = getEventsNotificationBuilder();
@@ -443,26 +466,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
 
-        Timber.v("updating location request");
         if (mFusedLocationClient == null) {
-            Timber.e("mFusedLocationClient not available");
+            Timber.e("FusedLocationClient not available");
             return;
         }
         int monitoring = preferences.getMonitoring();
         Timber.v("requesting location updates for monitoring mode %s",  monitoring);
 
-        LocationRequest request = null;
-        switch (monitoring) {
-
-            case 0:
-            case 1:
-                request = getBackgroundLocationRequest();  // TODO: rename
-                break;
-            case 2:
-                request = getForegroundLocationRequest(); // TODO: rename
-                break;
-
-        }
+        LocationRequest request = preferences.getMonitoring() == LocationProcessor.MONITORING_MOVE ? getHighPowerLocationRequest() : getBalancedPowerLocationRequest();
 
         mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
@@ -480,41 +491,24 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
 
-    private LocationRequest getBackgroundLocationRequest() {
+    private LocationRequest getBalancedPowerLocationRequest() {
         LocationRequest request = new LocationRequest();
         request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
         request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
         request.setSmallestDisplacement(preferences.getLocatorDisplacement());
-        request.setPriority(getLocationRequestPriority(true));
+        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         return request;
     }
 
-    private LocationRequest getForegroundLocationRequest() {
+    private LocationRequest getHighPowerLocationRequest() {
         LocationRequest request = new LocationRequest();
         request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(10)));
         request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
         request.setSmallestDisplacement(50);
-        request.setPriority(getLocationRequestPriority(false));
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return request;
     }
 
-
-    private int getLocationRequestPriority(boolean background) {
-        Timber.v("request background:%s, acc:%s ", background, preferences.getLocatorAccuracyBackground());
-
-        switch (background ? preferences.getLocatorAccuracyBackground() : preferences.getLocatorAccuracyForeground()) {
-            case 0:
-                return LocationRequest.PRIORITY_HIGH_ACCURACY;
-            case 1:
-                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-            case 2:
-                return LocationRequest.PRIORITY_LOW_POWER;
-            case 3:
-                return LocationRequest.PRIORITY_NO_POWER;
-            default:
-                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-        }
-    }
 
     @SuppressWarnings("MissingPermission")
     private void setupGeofences() {
@@ -595,6 +589,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.MonitoringChanged e) {
         setupLocationRequest();
+        sendOngoingNotification();
     }
 
     @SuppressWarnings("unused")

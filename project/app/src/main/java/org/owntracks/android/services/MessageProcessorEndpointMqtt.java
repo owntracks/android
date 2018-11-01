@@ -423,11 +423,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	}
 
 	@Override
-	public void onEnterForeground() {
-		checkConnection();
-	}
-
-	@Override
 	public boolean isConfigurationComplete() {
 		return !preferences.getHost().trim().equals("") && !preferences.getUsername().trim().equals("") && (!preferences.getAuth() || !preferences.getPassword().trim().equals(""));
 	}
