@@ -42,7 +42,6 @@
     <!-- API v28 requires this for foreground services -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -56,6 +55,9 @@
         android:theme="@style/Theme.Owntracks"
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
+
+        <!-- Maps SDK requires this as of API v28 -->
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
