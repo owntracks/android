@@ -39,7 +39,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         bindAndAttachContentView(R.layout.ui_preferences_load, savedInstanceState);
 
         setHasEventBus(false);
-        setSupportToolbar(binding.toolbar, true, getIntent() != null && getIntent().getBooleanExtra(FLAG_IN_APP, false));
+        setSupportToolbar(binding.toolbar, true, false);
         if(getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_load);
         }
@@ -58,8 +58,8 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
     private void tintMenu() {
         if(saveButton != null) {
-            saveButton.setEnabled(viewModel.getConfigurationPretty() != null);
-            saveButton.setVisible(viewModel.getConfigurationPretty() != null);
+            saveButton.setEnabled(viewModel.hasConfiguration());
+            saveButton.setVisible(viewModel.hasConfiguration());
         }
     }
 
@@ -98,7 +98,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         }
 
 
-        setHasBack(intent.getBooleanExtra(FLAG_IN_APP, false));
+        setHasBack(navigator.getExtrasBundle(getIntent()).getBoolean(FLAG_IN_APP, false));
         Timber.v("inApp %s", intent.getBooleanExtra(FLAG_IN_APP, false));
 
 
@@ -119,7 +119,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 Timber.v("loading picker");
                 startActivityForResult(Intent.createChooser(pickerIntent, "Select a file"), LoadActivity.REQUEST_CODE);
             } catch (android.content.ActivityNotFoundException ex) {
-                // Potentially direct the user to the Market with a Dialog
+                Toast.makeText(this, "No file explorer app found", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -167,7 +167,10 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 total.append(content);
             }
 
-            viewModel.setConfiguration(total.toString());
+            ;
+            binding.effectiveConfiguration.setText(viewModel.setConfiguration(total.toString()));
+            showSaveButton();
+
         } catch (JsonParseException e) {
             Timber.e(e, "parse exception ");
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();

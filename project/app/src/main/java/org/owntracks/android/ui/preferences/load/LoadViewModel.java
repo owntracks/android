@@ -29,8 +29,6 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
     private final Parser parser;
     private final WaypointsRepo waypointsRepo;
 
-    @Bindable
-    private String configurationPretty;
     private MessageConfiguration configuration;
 
     @Inject
@@ -44,22 +42,17 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         super.attachView(view, savedInstanceState);
     }
 
-    @Bindable
-    public String getConfigurationPretty() {
-        return configurationPretty;
-    }
 
-    public void setConfiguration(String json) throws IOException, Parser.EncryptionException {
+    public String setConfiguration(String json) throws IOException, Parser.EncryptionException {
         Timber.v("%s", json);
 
         this.configuration = MessageConfiguration.class.cast(parser.fromJson(json.getBytes()));
-        this.configurationPretty = parser.toJsonPlainPretty(this.configuration);
 
         Timber.v("hasWaypoints: %s / #%s", configuration.hasWaypoints(), configuration.getWaypoints().size());
+        return parser.toJsonPlainPretty(this.configuration);
 
-        notifyPropertyChanged(BR.configurationPretty);
-        getView().showSaveButton();
     }
+
 
 
     public void saveConfiguration() {
@@ -70,5 +63,10 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         }
 
         getView().showFinishDialog();
+    }
+
+    @Override
+    public boolean hasConfiguration() {
+        return this.configuration != null;
     }
 }

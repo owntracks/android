@@ -10,11 +10,12 @@ public interface LoadMvvm {
     interface View extends MvvmView {
         void showFinishDialog();
         void showSaveButton();
+
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void saveConfiguration();
-        void setConfiguration(String configuration) throws IOException, Parser.EncryptionException;
-        String getConfigurationPretty();
+        boolean hasConfiguration();
+        String setConfiguration(String configuration) throws IOException, Parser.EncryptionException;
     }
 }
