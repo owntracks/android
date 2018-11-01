@@ -10,7 +10,9 @@
         android:glEsVersion="0x00020000"
         android:required="true" />
 
-    <uses-feature android:name="android.hardware.location.gps" android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- To access the network -->
@@ -24,12 +26,9 @@
     <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <!-- For BLE beacon detection -->
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove"/>
+    
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- To locate the device -->
@@ -38,7 +37,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <!-- To vibrate for debuging in the background -->
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- API v28 requires this for foreground services -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -46,15 +45,15 @@
 
     <application
         android:name=".App"
-        android:icon="@mipmap/ic_launcher"
-		android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
-        android:hardwareAccelerated="true"
-        android:theme="@style/Theme.Owntracks"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_descriptor"
         android:extractNativeLibs="false"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/Theme.Owntracks"
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
 
@@ -65,23 +64,23 @@
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ui.map.MapActivity" />
+
         <activity
             android:name=".ui.regions.RegionsActivity"
             android:label="Regions"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop"></activity>
         <activity
             android:name=".ui.region.RegionActivity"
             android:label="Region"
             android:launchMode="singleTop">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".ui.regions.RegionsActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.regions.RegionsActivity" />
         </activity>
         <activity
             android:name=".ui.preferences.PreferencesActivity"
-            android:label="@string/title_activity_preferences"
             android:hardwareAccelerated="true"
+            android:label="@string/title_activity_preferences"
             android:parentActivityName=".ui.map.MapActivity" />
 
         <activity
@@ -98,8 +97,8 @@
         <activity
             android:name=".ui.preferences.load.LoadActivity"
             android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
 
             <!-- Support two dots in file name: -->
             <intent-filter>
@@ -183,8 +182,8 @@
 
         <activity
             android:name=".ui.status.StatusActivity"
-            android:label="@string/title_activity_status"
             android:exported="true"
+            android:label="@string/title_activity_status"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.map.MapActivity">
             <meta-data
@@ -195,13 +194,12 @@
             android:name=".ui.contacts.ContactsActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/title_activity_contacts"
-            android:launchMode="singleTask" >
-        </activity>
+            android:launchMode="singleTask"></activity>
         <activity
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -214,16 +212,16 @@
             android:name=".ui.preferences.connection.ConnectionActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/preferencesServer"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
 
         </activity>
 
-        <activity android:name=".ui.welcome.WelcomeActivity"
+        <activity
+            android:name=".ui.welcome.WelcomeActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:screenOrientation="unspecified"
             android:launchMode="singleTask"
-            />
+            android:screenOrientation="unspecified" />
     </application>
 
 </manifest>

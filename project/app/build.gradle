@@ -7,7 +7,7 @@ def versionPatch = 0
 def versionBuild = 2
 
 ext.pahoVersion = "1.2.0"
-ext.daggerVersion = '2.18'
+ext.daggerVersion = '2.19'
 ext.playLibVersion = '16.0.0'
 ext.okHttpVersion = '3.11.0'
 ext.supportLibVersion = '28.0.0'
@@ -162,11 +162,10 @@ dependencies {
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.23.0"
-    testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"
-    testImplementation "org.powermock:powermock-api-mockito2:2.0.0-beta.5"
-    testImplementation "org.robolectric:robolectric:4.0"
-    testImplementation "org.robolectric:shadows-playservices:4.0"
-
+    testImplementation "org.powermock:powermock-module-junit4:2.0.0-RC.1"
+    testImplementation "org.powermock:powermock-api-mockito2:2.0.0-RC.1"
+    testImplementation "org.robolectric:shadows-playservices:4.0.1"
+    testImplementation "org.robolectric:robolectric:4.0.1"
 }
 
 apply from: "coverage.gradle"
