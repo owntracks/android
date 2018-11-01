@@ -72,6 +72,30 @@
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary"/>
 
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                style="@style/ListItemPrimary"/>
+
+            <TextView
+                android:id="@+id/distanceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distance"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                style="@style/ListItemSecondary"/>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

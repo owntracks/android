@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map;
 import android.arch.lifecycle.Observer;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -143,9 +144,23 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 contactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
                 geocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
                 BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
-                binding.acc.setText(c.getFusedLocationAccuracy());
+                binding.acc.setText(c.getFusedLocationAccuracy()+" m");
                 binding.tid.setText(c.getTrackerId());
                 binding.id.setText(c.getId());
+                if(viewModel.hasLocation()) {
+                    binding.distance.setVisibility(View.VISIBLE);
+                    binding.distanceLabel.setVisibility(View.VISIBLE);
+
+                    float[] distance = new float[2];
+                    Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().latitude,c.getLatLng().longitude , distance);
+
+                    binding.distance.setText(Math.round(distance[0])+" m");
+                } else {
+                    binding.distance.setVisibility(View.GONE);
+                    binding.distanceLabel.setVisibility(View.GONE);
+
+                }
+
             } else {
                 binding.contactPeek.location.setText(R.string.na);
                 binding.contactPeek.locationDate.setText(R.string.na);
