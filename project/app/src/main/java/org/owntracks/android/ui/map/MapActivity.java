@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -31,7 +30,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.GeocodingProvider;
@@ -44,7 +43,6 @@ import java.util.WeakHashMap;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer {
@@ -290,14 +288,17 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         MenuItem item = this.mMenu.findItem(R.id.menu_monitoring);
 
         switch (preferences.getMonitoring()) {
-            case 0:
-                item.setIcon(R.drawable.ic_done);
+            case LocationProcessor.MONITORING_QUIET:
+                item.setIcon(R.drawable.ic_stop_white_36dp);
                 break;
-            case 1:
-                item.setIcon(R.drawable.ic_assignment_late_white_48dp);
+            case LocationProcessor.MONITORING_MANUAL:
+                item.setIcon(R.drawable.ic_pause_white_36dp);
                 break;
-            case 2:
-                item.setIcon(R.drawable.ic_close);
+            case LocationProcessor.MONITORING_SIGNIFFICANT:
+                item.setIcon(R.drawable.ic_play_white_36dp);
+                break;
+            case LocationProcessor.MONITORING_MOVE:
+                item.setIcon(R.drawable.ic_step_forward_2_white_36dp);
                 break;
         }
     }
@@ -323,20 +324,19 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
     private void stepMonitoringModeMenu() {
-        int mode = preferences.getMonitoring();
-        int newmode;
-        if(mode == 0)  {
-            newmode = 1;
-            Toast.makeText(this, "significant location monitoring mode", Toast.LENGTH_SHORT).show();
-        } else if (mode == 1)  {
-            newmode = 2;
-            Toast.makeText(this, "move monitoring mode", Toast.LENGTH_SHORT).show();
+        preferences.setMonitoringNext();
+
+        int newmode = preferences.getMonitoring();
+        if(newmode == LocationProcessor.MONITORING_QUIET) {
+            Toast.makeText(this, R.string.monitoring_quiet, Toast.LENGTH_SHORT).show();
+        }else if (newmode == LocationProcessor.MONITORING_MANUAL)  {
+            Toast.makeText(this, R.string.monitoring_manual, Toast.LENGTH_SHORT).show();
+        } else if (newmode == LocationProcessor.MONITORING_SIGNIFFICANT)  {
+            Toast.makeText(this, R.string.monitoring_signifficant, Toast.LENGTH_SHORT).show();
         } else  {
-            newmode = 0;
-            Toast.makeText(this, "manual monitoring mode", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show();
         }
-        Timber.v("setting monitoring mode %s -> %s", mode, newmode);
-        preferences.setMonitoring(newmode);
+
     }
 
     private void disableLocationMenus() {
