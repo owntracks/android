@@ -194,7 +194,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
     private void populateScreenReporting(PreferenceScreen screen) {
         addToolbar(screen);
-        addSwitchPreference(screen, Preferences.Keys.PUB, R.string.preferencesBackgroundUpdates, R.string.preferencesBackgroundUpdatesSummary, R.bool.valPub);
         addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedData, R.string.preferencesPubExtendedDataSummary, R.bool.valPubExtendedData);
     }
 
@@ -206,8 +205,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
         PreferenceCategory locator = getCategory(R.string.preferencesCategoryAdvancedLocator);
         screen.addPreference(locator);
-        addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_FOREGROUND,  R.string.preferencesLocatorAccuracyForeground, R.string.preferencesLocatorAccuracyForegroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
-        addListIntegerPreference(locator, Preferences.Keys.LOCATOR_ACCURACY_BACKGROUND, R.string.preferencesLocatorAccuracyBackground, R.string.preferencesLocatorAccuracyBackgroundSummary, R.array.locatorAccuracy_readable, R.array.locatorAccuracy, R.integer.valLocatorAccuracyForeground);
         addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_DISPLACEMENT, R.string.preferencesLocatorDisplacement, R.integer.valLocatorDisplacement).withPreferencesSummary(R.string.preferencesLocatorDisplacementSummary);
         addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary);
 
