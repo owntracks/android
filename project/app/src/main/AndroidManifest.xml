@@ -162,13 +162,12 @@
 
             <intent-filter>
                 <action android:name="C" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
-                <action android:name="BG" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
                 <action android:name="EC" /> <!-- INTENT_ACTION_SEND_EVENT_CIRCULAR -->
                 <action android:name="LP" /> <!-- INTENT_ACTION_SEND_LOCATION_PING -->
-                <action android:name="LR" /> <!-- INTENT_ACTION_SEND_LOCATION_RESPONSE -->
                 <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
                 <action android:name="W" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
                 <action android:name="RRLU" /> <!-- REREQUEST_LOCATION_UPDATES -->
+                <action android:name="CM" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
             </intent-filter>
         </service>
 
