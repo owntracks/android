@@ -19,7 +19,6 @@ public class MQTTReconnectWorker extends Worker {
 
     public MQTTReconnectWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        AppComponentProvider.getAppComponent().inject(this);
     }
 
 

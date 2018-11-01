@@ -8,6 +8,7 @@ import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
 
+import androidx.work.Worker;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjector;
@@ -29,9 +30,6 @@ public interface AppComponent extends AndroidInjector<DaggerApplication>  {
     @Override
     void inject(DaggerApplication instance);
     void inject(App app);
-
-    // Workers are not yet supported by Dagger Android. Inject them in the old style from inside the constructor.
-    void inject(MQTTKeepaliveWorker syncWorker);
-    void inject(MQTTReconnectWorker syncWorker);
+    void inject(Worker worker);
 
 }

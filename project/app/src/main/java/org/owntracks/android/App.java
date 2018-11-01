@@ -6,6 +6,7 @@ import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.support.DaggerWorkerFactory;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
@@ -56,7 +57,7 @@ public class App extends DaggerApplication  {
     @Override
     public void onCreate() {
         sInstance = this;
-        WorkManager.initialize(this.getApplicationContext(),new Configuration.Builder().build());
+        WorkManager.initialize(this.getApplicationContext(),new Configuration.Builder().setWorkerFactory(new DaggerWorkerFactory()).build());
         super.onCreate();
 
         if (BuildConfig.DEBUG) {
