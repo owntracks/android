@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import org.owntracks.android.App;
 import org.owntracks.android.BR;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -26,14 +27,17 @@ import timber.log.Timber;
 public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadMvvm.ViewModel<LoadMvvm.View> {
     private final Preferences preferences;
     private final Parser parser;
+    private final WaypointsRepo waypointsRepo;
+
     @Bindable
     private String configurationPretty;
     private MessageConfiguration configuration;
 
     @Inject
-    public LoadViewModel(@AppContext Context context, Preferences preferences, Parser parser) {
+    public LoadViewModel(@AppContext Context context, Preferences preferences, Parser parser, WaypointsRepo waypointsRepo) {
         this.preferences = preferences;
         this.parser = parser;
+        this.waypointsRepo = waypointsRepo;
     }
 
     public void attachView(@NonNull LoadMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -47,8 +51,12 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public void setConfiguration(String json) throws IOException, Parser.EncryptionException {
         Timber.v("%s", json);
+
         this.configuration = MessageConfiguration.class.cast(parser.fromJson(json.getBytes()));
         this.configurationPretty = parser.toJsonPlainPretty(this.configuration);
+
+        Timber.v("hasWaypoints: %s / #%s", configuration.hasWaypoints(), configuration.getWaypoints().size());
+
         notifyPropertyChanged(BR.configurationPretty);
         getView().showSaveButton();
     }
@@ -56,6 +64,11 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public void saveConfiguration() {
         preferences.importFromMessage(configuration);
+
+        if(configuration.hasWaypoints()) {
+            waypointsRepo.importFromMessage(configuration.getWaypoints());
+        }
+
         getView().showFinishDialog();
     }
 }

@@ -14,5 +14,7 @@ public interface RegionsMvvm {
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         Query<WaypointModel> getWaypointsList();
         void delete(WaypointModel model);
+
+        void exportWaypoints();
     }
 }

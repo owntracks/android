@@ -53,6 +53,11 @@ public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.
             case R.id.add:
                 navigator.startActivity(RegionActivity.class);
                 return true;
+            case R.id.exportWaypointsService:
+                viewModel.exportWaypoints();
+                return true;
+
+
 
         }
         return super.onOptionsItemSelected(item);

@@ -154,7 +154,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onStart() {
         if (disablesAnimation)
             overridePendingTransition(0, 0);
-        else if (App.isInForeground())
+        else
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
 
 
