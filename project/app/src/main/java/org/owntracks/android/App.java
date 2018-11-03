@@ -6,20 +6,15 @@ import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.DaggerWorkerFactory;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
-import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -57,7 +52,7 @@ public class App extends DaggerApplication  {
     @Override
     public void onCreate() {
         sInstance = this;
-        WorkManager.initialize(this.getApplicationContext(),new Configuration.Builder().setWorkerFactory(new DaggerWorkerFactory()).build());
+        WorkManager.initialize(this.getApplicationContext(),new Configuration.Builder().build());
         super.onCreate();
 
         if (BuildConfig.DEBUG) {

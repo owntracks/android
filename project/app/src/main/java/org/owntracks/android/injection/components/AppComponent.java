@@ -7,6 +7,7 @@ import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
+import org.owntracks.android.services.worker.SendLocationPingWorker;
 
 import androidx.work.Worker;
 import dagger.BindsInstance;
@@ -30,6 +31,8 @@ public interface AppComponent extends AndroidInjector<DaggerApplication>  {
     @Override
     void inject(DaggerApplication instance);
     void inject(App app);
-    void inject(Worker worker);
+    void inject(MQTTKeepaliveWorker worker);
+    void inject(MQTTReconnectWorker worker);
+    void inject(SendLocationPingWorker worker);
 
 }

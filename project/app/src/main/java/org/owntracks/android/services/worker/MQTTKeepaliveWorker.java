@@ -22,6 +22,7 @@ public class MQTTKeepaliveWorker extends Worker {
 
     public MQTTKeepaliveWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        AppComponentProvider.getAppComponent().inject(this);
     }
 
     @NonNull
