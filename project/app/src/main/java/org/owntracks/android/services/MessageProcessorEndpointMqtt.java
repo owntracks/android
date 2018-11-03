@@ -68,6 +68,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		this.preferences = preferences;
 		this.scheduler = scheduler;
 		this.eventBus = eventBus;
+		this.messageProcessor = messageProcessor;
 	}
 
 	public synchronized boolean sendKeepalive() {
