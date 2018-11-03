@@ -109,7 +109,6 @@ public class LocationProcessor {
         }
 
         message.setTid(preferences.getTrackerId(true));
-        message.setCp(preferences.getCp());
         message.setInRegions(calculateInregions(loadedWaypoints));
 
         if (preferences.getPubLocationExtendedData()) {

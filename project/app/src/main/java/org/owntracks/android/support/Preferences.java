@@ -322,22 +322,12 @@ public class Preferences {
 
     @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
     public void setOpenCageGeocoderApiKey(String key) {
-        setString(Keys.CP, key);
+        setString(Keys.OPENCAGE_GEOCODER_API_KEY, key);
     }
 
     @Export(key = Keys.OPENCAGE_GEOCODER_API_KEY, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
     public String getOpenCageGeocoderApiKey() {
         return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.valEmpty);
-    }
-
-    @Import(key = Keys.CP)
-    public void setCp(boolean cp) {
-        setBoolean(Keys.CP, cp);
-    }
-
-    @Export(key = Keys.CP, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
-    public boolean getCp() {
-        return getBoolean(Keys.CP, R.bool.valCp);
     }
 
     @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
@@ -912,8 +902,6 @@ public class Preferences {
         public static final String AUTOSTART_ON_BOOT                = "autostartOnBoot";
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
-        public static final String CP                               = "cp";
-        public static final String DEBUG_VIBRATE                    = "debugVibrate";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
