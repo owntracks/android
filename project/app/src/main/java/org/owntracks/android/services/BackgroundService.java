@@ -201,7 +201,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
-                    preferences.setMonitoringNext();
+                    if(intent.hasExtra(Preferences.Keys.MONITORING)) {
+                        preferences.setMonitoring(intent.getIntExtra(Preferences.Keys.MONITORING, preferences.getMonitoring()));
+                    } else {
+                        // Step monitoring mode if no mode is specified
+                        preferences.setMonitoringNext();
+                    }
                     return;
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
@@ -473,7 +478,29 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         int monitoring = preferences.getMonitoring();
         Timber.v("requesting location updates for monitoring mode %s",  monitoring);
 
-        LocationRequest request = preferences.getMonitoring() == LocationProcessor.MONITORING_MOVE ? getHighPowerLocationRequest() : getBalancedPowerLocationRequest();
+        LocationRequest request = new LocationRequest();
+
+        switch (preferences.getMonitoring()) {
+            case LocationProcessor.MONITORING_QUIET:
+            case LocationProcessor.MONITORING_MANUAL:
+                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
+                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+                request.setSmallestDisplacement(preferences.getLocatorDisplacement());
+                request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+                break;
+            case LocationProcessor.MONITORING_SIGNIFFICANT:
+                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
+                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+                request.setSmallestDisplacement(preferences.getLocatorDisplacement());
+                request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                break;
+            case LocationProcessor.MONITORING_MOVE:
+                request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(10)));
+                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+                request.setSmallestDisplacement(50);
+                request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                break;
+        }
 
         mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
@@ -489,26 +516,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
         return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-
-    private LocationRequest getBalancedPowerLocationRequest() {
-        LocationRequest request = new LocationRequest();
-        request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-        request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
-        request.setSmallestDisplacement(preferences.getLocatorDisplacement());
-        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        return request;
-    }
-
-    private LocationRequest getHighPowerLocationRequest() {
-        LocationRequest request = new LocationRequest();
-        request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(10)));
-        request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
-        request.setSmallestDisplacement(50);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return request;
-    }
-
 
     @SuppressWarnings("MissingPermission")
     private void setupGeofences() {
