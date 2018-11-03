@@ -404,13 +404,13 @@ public class Preferences {
         return getString(Keys.USERNAME, R.string.valEmpty);
     }
 
-    @Export(key =Keys.AUTH, exportModeMqttPrivate =true)
+    @Export(key =Keys.AUTH, exportModeMqttPrivate =true,exportModeHttpPrivate =true)
     public  boolean getAuth() {
         return getBoolean(Keys.AUTH, R.bool.valAuth);
 
     }
 
-    @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true)
+    @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true,exportModeHttpPrivate =true)
     public String getDeviceId() {
         return getDeviceId(true);
     }
@@ -528,7 +528,7 @@ public class Preferences {
     }
 
 
-    @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true)
+    @Export(key =Keys.TRACKER_ID, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public String getTrackerId() {
         return getTrackerId(false);
     }

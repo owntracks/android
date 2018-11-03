@@ -16,29 +16,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/preferencesBrokerAuth"
-                android:textSize="18sp" />
-
-            <Switch
-                android:id="@+id/authentication"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:checked="@={vm.authentication}" />
-        </RelativeLayout>
-
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/username"
             android:layout_width="match_parent"
@@ -57,7 +34,6 @@
             android:hint="@string/preferencesBrokerPassword"
             android:inputType="textPassword"
             android:text="@={vm.password}"
-            android:visibility="@{vm.authentication}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/accent" />

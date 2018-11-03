@@ -7,7 +7,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.BR;
 
 public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
-    boolean authentication;
     private String username;
     private boolean usernameDirty;
     private String password;
@@ -28,7 +27,6 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
 
     @Override
     public void load() {
-        this.authentication = preferences.getAuth();
         this.username = preferences.getUsername();
         this.password = preferences.getPassword();
         this.deviceId = preferences.getDeviceId(false);
@@ -37,8 +35,6 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
 
     @Override
     public void save() {
-        preferences.setAuth(authentication);
-
         if(usernameDirty)
             preferences.setUsername(username);
 
@@ -50,16 +46,6 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
 
         if(trackerIdDirty)
             preferences.setTrackerId(trackerId);
-    }
-
-    @Bindable
-    public boolean getAuthentication() {
-        return authentication;
-    }
-
-    public void setAuthentication(boolean authentication) {
-        this.authentication = authentication;
-        notifyPropertyChanged(BR.authentication);
     }
 
     public String getUsername() {
