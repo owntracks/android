@@ -80,13 +80,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private final String NOTIFICATION_GROUP_EVENTS = "events";
 
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
-    public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "C";
-    public static final String INTENT_ACTION_SEND_LOCATION_PING = "LP";
-    public static final String INTENT_ACTION_SEND_LOCATION_USER = "LU";
-    public static final String INTENT_ACTION_SEND_WAYPOINTS = "W";
-    public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "EC";
-    public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "RRLU";
-    public static final String INTENT_ACTION_CHANGE_MONITORING = "CM";
+    public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS";
+    public static final String INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER";
+    public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
+    public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
+    public static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
 
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -182,17 +180,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             Timber.v("intent received with action:%s", intent.getAction());
 
             switch (intent.getAction()) {
-                case INTENT_ACTION_SEND_LOCATION_PING:
-                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
-                    return;
                 case INTENT_ACTION_SEND_LOCATION_USER:
                     locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
                     return;
                 case INTENT_ACTION_SEND_EVENT_CIRCULAR:
                     onGeofencingEvent(GeofencingEvent.fromIntent(intent));
-                    return;
-                case INTENT_ACTION_SEND_WAYPOINTS:
-                    locationProcessor.publishWaypointsMessage();
                     return;
                 case INTENT_ACTION_CLEAR_NOTIFICATIONS:
                     clearEventStackNotification();
@@ -436,7 +428,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private void onGeofencingEvent(@Nullable final GeofencingEvent event) {
 
         if (event == null) {
-            Timber.e("geofencingEvent null or hasError");
+            Timber.e("geofencingEvent null");
             return;
         }
 
@@ -459,7 +451,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     public void onLocationChanged(@Nullable Location location) {
         if (location != null && location.getTime() > locationRepo.getCurrentLocationTime()) {
             Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
-
             locationProcessor.onLocationChanged(location);
         }
     }

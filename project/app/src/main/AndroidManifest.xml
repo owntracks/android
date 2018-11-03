@@ -162,16 +162,13 @@
             tools:ignore="ExportedService">
 
             <intent-filter>
-                <action android:name="C" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
-                <action android:name="EC" /> <!-- INTENT_ACTION_SEND_EVENT_CIRCULAR -->
-                <action android:name="LP" /> <!-- INTENT_ACTION_SEND_LOCATION_PING -->
-                <action android:name="LU" /> <!-- INTENT_ACTION_SEND_LOCATION_USER-->
-                <action android:name="W" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
-                <action android:name="RRLU" /> <!-- REREQUEST_LOCATION_UPDATES -->
-                <action android:name="CM" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
+                <action android:name="org.owntracks.android.CLEAR_NOTIFICATIONS" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
+                <action android:name="org.owntracks.android.SEND_LOCATION_USER" /> <!-- INTENT_ACTION_SEND_LOCATION_PING -->
+                <action android:name="org.owntracks.android.SEND_EVENT_CIRCULAR" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
+                <action android:name="org.owntracks.android.REREQUEST_LOCATION_UPDATES" /> <!-- REREQUEST_LOCATION_UPDATES -->
+                <action android:name="org.owntracks.android.CHANGE_MONITORING" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
             </intent-filter>
         </service>
-
 
         <!--<receiver
             android:name=".support.receiver.BootCompleteReceiver"
