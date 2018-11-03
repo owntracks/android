@@ -154,8 +154,11 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
         mode = VIEW_DEVICE;
         clearActiveContact();
-        if(hasLocation())
+        if(hasLocation()) {
             liveCamera.postValue(getCurrentLocation());
+        } else {
+            Timber.e("no location available");
+        }
     }
 
 

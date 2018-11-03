@@ -12,7 +12,9 @@ import org.owntracks.android.injection.modules.android.ActivityModules.StatusAct
 import org.owntracks.android.injection.modules.android.ActivityModules.WelcomeActivityModule;
 import org.owntracks.android.injection.modules.android.ServiceModules.BackgroundServiceModule;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
+import org.owntracks.android.support.receiver.BootCompleteReceiver;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -62,5 +64,9 @@ public abstract class AndroindBindingModule {
     @PerService
     @ContributesAndroidInjector(modules = {BackgroundServiceModule.class})
     abstract org.owntracks.android.services.BackgroundService bindBackgroundService();
+
+    @PerReceiver
+    @ContributesAndroidInjector
+    abstract org.owntracks.android.support.receiver.BootCompleteReceiver bindBootCompleteReceiver();
 
 }

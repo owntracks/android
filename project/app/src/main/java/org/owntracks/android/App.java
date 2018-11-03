@@ -12,6 +12,7 @@ import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -29,9 +30,6 @@ import timber.log.Timber;
 
 public class App extends DaggerApplication  {
     private static App sInstance;
-
-    @Inject
-    DispatchingAndroidInjector<Activity> mActivityInjector;
 
     @Inject
     Preferences preferences;
@@ -82,41 +80,12 @@ public class App extends DaggerApplication  {
         return sInstance.getApplicationContext();
     }
 
-    public static void onBootComplete() {
-        if (getInstance().preferences.getAutostartOnBoot()) {
-            getInstance().startBackgroundServiceCompat(getInstance().getApplicationContext());
-        }
-    }
-
     public static void restart() {
         Intent intent = new Intent(App.getInstance().getApplicationContext(), MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         App.getInstance().getApplicationContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
     }
-
-    public void startBackgroundServiceCompat(final @NonNull Context context) {
-        startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)));
-    }
-
-    public void startBackgroundServiceCompat(final @NonNull Context context, final @Nullable String action) {
-        startBackgroundServiceCompat(context, (new Intent(context, BackgroundService.class)).setAction(action));
-    }
-
-    public void startBackgroundServiceCompat(final @NonNull Context context, @NonNull final Intent intent) {
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent);
-                } else {
-                    context.startService(intent);
-                }
-            }
-        };
-        runner.postOnBackgroundHandlerDelayed(r, 1000);
-    }
-
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {

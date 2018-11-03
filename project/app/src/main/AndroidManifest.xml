@@ -70,7 +70,7 @@
         <activity
             android:name=".ui.regions.RegionsActivity"
             android:label="Regions"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop"/>
         <activity
             android:name=".ui.region.RegionActivity"
             android:label="Region"
@@ -170,14 +170,14 @@
             </intent-filter>
         </service>
 
-        <!--<receiver
+        <receiver
             android:name=".support.receiver.BootCompleteReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
 
         <activity
             android:name=".ui.status.StatusActivity"
@@ -193,7 +193,7 @@
             android:name=".ui.contacts.ContactsActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/title_activity_contacts"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask"/>
         <activity
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"
