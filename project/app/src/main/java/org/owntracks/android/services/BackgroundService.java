@@ -137,7 +137,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         super.onCreate();
         Timber.v("Preferences instance: %s", preferences);
 
-        //preferences = App.getPreferences();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         notificationManagerCompat = NotificationManagerCompat.from(this); //getSystemService(Context.NOTIFICATION_SERVICE);
@@ -163,7 +162,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         eventBus.postSticky(new Events.ServiceStarted());
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -176,6 +174,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private void handleIntent(@NonNull Intent intent) {
+
         if (intent.getAction() != null) {
             Timber.v("intent received with action:%s", intent.getAction());
 
@@ -449,8 +448,13 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     public void onLocationChanged(@Nullable Location location) {
-        if (location != null && location.getTime() > locationRepo.getCurrentLocationTime()) {
-            Timber.v("location update received: " + location.getAccuracy() + " lat: " + location.getLatitude() + " lon: " + location.getLongitude());
+        if(location == null) {
+            Timber.e("no location provided");
+            return;
+        }
+        Timber.v("location update received: tst:%s, acc:%s, lat:%s, lon:%s",location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude());
+
+        if (location.getTime() > locationRepo.getCurrentLocationTime()) {
             locationProcessor.onLocationChanged(location);
         }
     }
@@ -486,20 +490,18 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 break;
             case LocationProcessor.MONITORING_MOVE:
-                request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(10)));
+                request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(30)));
                 request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
-                request.setSmallestDisplacement(50);
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-
-        mFusedLocationClient.removeLocationUpdates(getLocationPendingIntent());
+        mFusedLocationClient.removeLocationUpdates(locationCallback);
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
     }
 
     private PendingIntent getLocationPendingIntent() {
         Intent locationIntent = new Intent(getApplicationContext(), BackgroundService.class);
-        return PendingIntent.getBroadcast(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getGeofencePendingIntent() {
