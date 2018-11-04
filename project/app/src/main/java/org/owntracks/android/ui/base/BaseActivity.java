@@ -160,7 +160,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
         super.onStart();
 
-        bindService(new Intent(this, BackgroundService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
+        //bindService(new Intent(this, BackgroundService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
 

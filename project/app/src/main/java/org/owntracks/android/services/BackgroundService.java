@@ -135,7 +135,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.v("Preferences instance: %s", preferences);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
@@ -259,6 +258,9 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         activeNotificationBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent).addAction(R.drawable.ic_report_notification, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
         activeNotificationBuilder.setSmallIcon(R.drawable.ic_notification);
+        activeNotificationBuilder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        activeNotificationBuilder.setSound(null, AudioManager.STREAM_NOTIFICATION);
+
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             activeNotificationBuilder.setColor(getColor(R.color.primary));
@@ -284,9 +286,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         } else {
             builder.setContentTitle(getString(R.string.app_name));
         }
-
-        builder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
-        builder.setSound(null, AudioManager.STREAM_NOTIFICATION);
 
         // Show monitoring mode if endpoint state is not interesting
         if(lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
@@ -323,7 +322,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         FusedContact c = contactsRepo.getById(message.getContactKey());
 
-        long when = message.getTst() * 1000;
+        long when = TimeUnit.SECONDS.toMillis(message.getTst());
         String location = message.getDesc();
 
         if (location == null) {
@@ -341,7 +340,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         notificationBuilderEvents.setContentTitle(title);
         notificationBuilderEvents.setContentText(text);
-        notificationBuilderEvents.setWhen(when);
+        notificationBuilderEvents.setWhen(TimeUnit.SECONDS.toMillis(message.getTst()));
         notificationBuilderEvents.setShowWhen(true);
         notificationBuilderEvents.setGroup(NOTIFICATION_GROUP_EVENTS);
         // Deliver notification
@@ -490,12 +489,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 break;
             case LocationProcessor.MONITORING_MOVE:
-                request.setInterval(TimeUnit.SECONDS.toMillis(TimeUnit.SECONDS.toMillis(30)));
+                request.setInterval(TimeUnit.SECONDS.toMillis(30));
                 request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-        mFusedLocationClient.removeLocationUpdates(locationCallback);
+        //mFusedLocationClient.removeLocationUpdates(locationCallback);
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
     }
 

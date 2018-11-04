@@ -137,7 +137,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             }
         });
 
-
+        Timber.v("starting BackgroundService");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService((new Intent(this, BackgroundService.class)));
         } else {
