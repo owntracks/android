@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.location.LocationRequest;
+
 import org.owntracks.android.data.WaypointModel;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -16,14 +19,16 @@ import timber.log.Timber;
 
 @PerActivity
 public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements RegionMvvm.ViewModel<RegionMvvm.View> {
+    private final LocationRepo locationRepo;
     private WaypointsRepo waypointsRepo;
 
     private WaypointModel waypoint;
 
     @Inject
-    public RegionViewModel(WaypointsRepo waypointsRepo) {
+    public RegionViewModel(WaypointsRepo waypointsRepo, LocationRepo locationRepo) {
         super();
         this.waypointsRepo = waypointsRepo;
+        this.locationRepo = locationRepo; 
     }
 
     public void attachView(@NonNull RegionMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -34,6 +39,13 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
         WaypointModel w = waypointsRepo.get(id);
         if(w == null) {
             w = new WaypointModel();
+            if (locationRepo.hasLocation()) {
+                w.setGeofenceLatitude(locationRepo.getCurrentLocation().getLatitude());
+                w.setGeofenceLongitude(locationRepo.getCurrentLocation().getLongitude());
+            } else {
+                w.setGeofenceLatitude(0);
+                w.setGeofenceLongitude(0);
+            }
         }
         setWaypoint(w);
     }
