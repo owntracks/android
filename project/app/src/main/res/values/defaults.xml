@@ -2,7 +2,7 @@
 <resources>
     <string name="valBeaconLayout" translatable="false">""</string>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
-    <string name="valSubTopic" translatable="false">owntracks/+/+</string>
+    <string name="valSubTopic" translatable="false">owntracks/#</string>
 
     <integer name="valPort">8883</integer>
     <integer name="valPubQos">1</integer>
