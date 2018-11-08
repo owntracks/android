@@ -216,11 +216,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 binding.mapView.onResume();
 
             if (mMap == null) {
+                Timber.v("map not ready. Running initDelayed()");
                 this.isMapReady = false;
                 initMapDelayed();
             } else {
-                viewModel.onMapReady();
+                Timber.v("map ready. Running onMapReady()");
                 this.isMapReady = true;
+                viewModel.onMapReady();
             }
 
         } catch (Exception e) {
@@ -433,9 +435,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     public void updateMarker(@Nullable FusedContact contact) {
-        if (contact == null || !contact.hasLocation() || !isMapReady)
+        if (contact == null || !contact.hasLocation() || !isMapReady) {
+            Timber.v("unable to update marker. null:%s, location:%s, mapReady:%s",contact == null, contact == null || contact.hasLocation(), isMapReady);
             return;
+        }
 
+        Timber.v("updating marker for contact: %s", contact.getId());
         Marker m = mMarkers.get(contact.getId());
 
         if (m != null) {
