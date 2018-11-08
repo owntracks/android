@@ -43,9 +43,9 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
         this.id = (id != null && !id.isEmpty()) ? id : "NOID";
     }
 
-    public void setMessageLocation(MessageLocation messageLocation) {
+    public boolean setMessageLocation(MessageLocation messageLocation) {
         if(tst >= messageLocation.getTst())
-            return;
+            return false;
 
         Timber.v("update contact:%s, tst:%s", id, messageLocation.getTst());
 
@@ -53,6 +53,7 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
         this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
         this.tst = messageLocation.getTst();
         notifyMessageLocationPropertyChanged();
+        return true;
     }
 
     public void setMessageCard(MessageCard messageCard) {

@@ -117,10 +117,11 @@ public class MemoryContactsRepo implements ContactsRepo {
         FusedContact c = getById(id);
 
         if (c != null) {
-            c.setMessageLocation(m);
-            revision++;
-            eventBus.post(c);
-
+            // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
+            if(c.setMessageLocation(m)) {
+                revision++;
+                eventBus.post(c);
+            }
         } else {
             c = new FusedContact(id);
             c.setMessageLocation(m);
