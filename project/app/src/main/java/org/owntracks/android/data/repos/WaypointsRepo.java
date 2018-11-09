@@ -51,6 +51,11 @@ public abstract class WaypointsRepo {
             return;
 
         for (MessageWaypoint m: waypoints) {
+            // Delete existing waypoint if one with the same tst already exists
+            WaypointModel exisiting = get(m.getTst());
+            if(exisiting != null) {
+                delete(exisiting);
+            }
             insert(toDaoObject(m));
         }
     }
