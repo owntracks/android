@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.util.Base64;
@@ -112,7 +113,7 @@ public class ContactImageProvider {
     }
 
     @Nullable
-    private static Bitmap getBitmapFromCache(FusedContact contact) {
+    private static Bitmap getBitmapFromCache(@Nullable FusedContact contact) {
         Bitmap d;
 
         if(contact == null)
@@ -144,13 +145,14 @@ public class ContactImageProvider {
             }
         }
 
-        d = memoryCache.getLevelTid(contact.getId());
-        if(d != null) {
-            return d;
+        TidBitmap td = memoryCache.getLevelTid(contact.getId());
+        // if cache doesn't contain a bitmap for a contact or if the cached bitmap was for an old tid, create a new one and cache it
+        if(td == null || !td.isBitmapFor(contact.getTrackerId())) {
+            td = new TidBitmap(contact.getTrackerId(), drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), TextDrawable.ColorGenerator.MATERIAL.getColor(contact.getId()), FACE_DIMENSIONS)));
+            memoryCache.putLevelTid(contact.getId(), td);
         }
-        d = drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.getTrackerId(), TextDrawable.ColorGenerator.MATERIAL.getColor(contact.getId()), FACE_DIMENSIONS));
-        memoryCache.putLevelTid(contact.getId(), d);
-        return d;
+
+        return td.getBitmap();
     }
 
     @Inject
@@ -161,7 +163,7 @@ public class ContactImageProvider {
 
     private static class ContactBitmapMemoryCache {
         private final ArrayMap<String, Bitmap> cacheLevelCard;
-        private final ArrayMap<String, Bitmap> cacheLevelTid;
+        private final ArrayMap<String, TidBitmap> cacheLevelTid;
 
         ContactBitmapMemoryCache() {
             cacheLevelCard = new ArrayMap<>();
@@ -172,13 +174,13 @@ public class ContactImageProvider {
             cacheLevelCard.put(key, value);
             cacheLevelTid.remove(key);
         }
-        synchronized void putLevelTid(String key, Bitmap value) {
+        synchronized void putLevelTid(String key, TidBitmap value) {
             cacheLevelTid.put(key, value);
         }
         synchronized Bitmap getLevelCard(String key) {
             return cacheLevelCard.get(key);
         }
-        synchronized Bitmap getLevelTid(String key) {
+        synchronized TidBitmap getLevelTid(String key) {
             return cacheLevelTid.get(key);
         }
         public synchronized void clear() {
@@ -188,6 +190,7 @@ public class ContactImageProvider {
         synchronized void clearLevelCard(String key) {
             cacheLevelCard.remove(key);
         }
+
     }
 
     public void invalidateCache() {
