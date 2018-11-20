@@ -474,26 +474,26 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         LocationRequest request = new LocationRequest();
 
+        long interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
         switch (preferences.getMonitoring()) {
             case LocationProcessor.MONITORING_QUIET:
             case LocationProcessor.MONITORING_MANUAL:
-                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
                 break;
             case LocationProcessor.MONITORING_SIGNIFFICANT:
-                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
                 break;
             case LocationProcessor.MONITORING_MOVE:
-                request.setInterval(TimeUnit.SECONDS.toMillis(30));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+                interval = TimeUnit.SECONDS.toMillis(30);
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
+        request.setInterval(interval);
+        request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+        request.setMaxWaitTime(2*interval);
+        
         //mFusedLocationClient.removeLocationUpdates(locationCallback);
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
     }
