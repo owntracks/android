@@ -4,7 +4,7 @@ apply plugin: 'io.objectbox'
 def versionMajor = 2
 def versionMinor = 1
 def versionPatch = 0
-def versionBuild = 3
+def versionBuild = 4
 
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.19'
@@ -138,7 +138,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
 
-    implementation "android.arch.work:work-runtime:1.0.0-alpha10"
+    implementation "android.arch.work:work-runtime:1.0.0-alpha11"
     implementation "android.arch.lifecycle:extensions:1.1.1"
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
