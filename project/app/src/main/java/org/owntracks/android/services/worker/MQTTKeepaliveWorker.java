@@ -11,6 +11,7 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import javax.inject.Inject;
 
+import androidx.work.Result;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
@@ -29,6 +30,6 @@ public class MQTTKeepaliveWorker extends Worker {
     @Override
     public Result doWork() {
         Timber.v("MQTTKeepaliveWorker doing work");
-        return messageProcessor.statefulSendKeepalive() ? Result.SUCCESS : Result.RETRY;
+        return messageProcessor.statefulSendKeepalive() ? Result.success() : Result.retry();
     }
 }

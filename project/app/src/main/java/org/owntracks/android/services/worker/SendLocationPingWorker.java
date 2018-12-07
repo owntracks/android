@@ -12,6 +12,7 @@ import org.owntracks.android.services.LocationProcessor;
 
 import javax.inject.Inject;
 
+import androidx.work.Result;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
@@ -30,6 +31,6 @@ public class SendLocationPingWorker extends Worker {
     public Result doWork() {
         Timber.v("SendLocationPingWorker doing work");
         locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
-        return Result.SUCCESS;
+        return Result.success();
     }
 }

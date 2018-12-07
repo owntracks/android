@@ -9,6 +9,7 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import javax.inject.Inject;
 
+import androidx.work.Result;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
@@ -27,6 +28,6 @@ public class MQTTReconnectWorker extends Worker {
     @Override
     public Result doWork() {
         Timber.i("MQTTReconnectWorker Doing work (%s)",Thread.currentThread());
-        return messageProcessor.statefulCheckConnection() ? Result.SUCCESS : Result.RETRY;
+        return messageProcessor.statefulCheckConnection() ? Result.success() : Result.retry();
     }
 }
