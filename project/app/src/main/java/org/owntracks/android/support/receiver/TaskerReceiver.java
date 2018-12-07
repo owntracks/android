@@ -12,6 +12,6 @@ public final class TaskerReceiver extends BroadcastReceiver
     @Override
     public void onReceive(final Context context, final Intent intent)
     {
-        Timber.v("Receiver", "Fired");
+        Timber.v("Receiver Fired");
     }
 }
