@@ -82,10 +82,12 @@ public class LocationProcessor {
 
         if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger) ) {
             Timber.v("message suppressed by monitoring settings: quiet");
+            return;
         }
 
         if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
             Timber.v("message suppressed by monitoring settings: manual");
+            return; 
         }
 
 
