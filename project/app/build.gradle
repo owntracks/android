@@ -9,7 +9,7 @@ def versionBuild = 4
 ext.pahoVersion = "1.2.0"
 ext.daggerVersion = '2.19'
 ext.playLibVersion = '16.0.0'
-ext.okHttpVersion = '3.11.0'
+ext.okHttpVersion = '3.12.0'
 ext.supportLibVersion = '28.0.0'
 ext.jacksonVersion = '2.9.7'
 
@@ -162,8 +162,8 @@ dependencies {
     testAnnotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
     testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.23.0"
-    testImplementation "org.powermock:powermock-module-junit4:2.0.0-RC.1"
+    testImplementation "org.mockito:mockito-core:2.23.4"
+    testImplementation "org.powermock:powermock-module-junit4:2.0.0-RC.4"
     testImplementation "org.powermock:powermock-api-mockito2:2.0.0-RC.4"
     testImplementation "org.robolectric:shadows-playservices:4.0.2"
     testImplementation "org.robolectric:robolectric:4.0.1"
