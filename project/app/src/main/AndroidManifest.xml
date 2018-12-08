@@ -56,6 +56,14 @@
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
 
+        <!-- Disables default initialization of WorkManager because custom initializer is used in App.onCreate()-->
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            tools:replace="android:authorities"
+            android:authorities="org.owntracks.android.workmanager-init"
+            android:enabled="false"
+            android:exported="false" />
+
         <!-- Maps SDK requires this as of API v28 -->
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
 

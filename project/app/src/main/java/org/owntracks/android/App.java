@@ -50,6 +50,7 @@ public class App extends DaggerApplication  {
     @Override
     public void onCreate() {
         sInstance = this;
+        WorkManager.initialize(this, new Configuration.Builder().build());
 
         super.onCreate();
 
