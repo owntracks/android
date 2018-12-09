@@ -162,6 +162,7 @@ public class LocationProcessor {
 
         if(preferences.getMonitoring() ==MONITORING_QUIET) {
             Timber.v("message suppressed by monitoring settings: %s", preferences.getMonitoring());
+            return;
         }
 
         publishTransitionMessage(w, l, transition, trigger);
