@@ -1,5 +1,6 @@
 package org.owntracks.android;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -23,7 +24,7 @@ import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
 public class App extends DaggerApplication  {
-    private static App sInstance;
+    private static Application sApplication;
 
     @Inject
     Preferences preferences;
@@ -43,7 +44,7 @@ public class App extends DaggerApplication  {
 
     @Override
     public void onCreate() {
-        sInstance = this;
+        sApplication = this;
         WorkManager.initialize(this, new Configuration.Builder().build());
 
         super.onCreate();
@@ -70,15 +71,11 @@ public class App extends DaggerApplication  {
 
     }
 
-    @Deprecated
-    public static Context getContext() {
-        return sInstance.getApplicationContext();
-    }
 
     public static void restart() {
-        Intent intent = new Intent(App.getInstance().getApplicationContext(), MapActivity.class);
+        Intent intent = new Intent(App.getContext(), MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        App.getInstance().getApplicationContext().startActivity(intent);
+        App.getContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
     }
 
@@ -90,7 +87,13 @@ public class App extends DaggerApplication  {
         return appComponent;
     }
 
-    public static App getInstance() {
-        return App.sInstance;
+    public static Application getApplication() {
+        return sApplication;
     }
+
+    @Deprecated
+    public static Context getContext() {
+        return getApplication().getApplicationContext();
+    }
+
 }
