@@ -52,11 +52,7 @@
                     android:text="@={vm.waypoint.description}"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
-                    app:met_primaryColor="@color/accent"
-
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
+                    app:met_primaryColor="@color/accent" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"

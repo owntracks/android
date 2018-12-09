@@ -11,8 +11,7 @@
         android:id="@+id/textview_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_centerVertical="true"
+
         android:padding="16dp"
         android:orientation="vertical">
 
