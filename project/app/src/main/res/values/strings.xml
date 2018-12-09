@@ -32,8 +32,12 @@
     <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
+    <string name="preferencesLocatorDisplacementDialogMessage">Distance in meters between location updates in significant location changes mode. Has precedence over configured interval.</string>
+
     <string name="preferencesLocatorInterval">Locator interval</string>
-    <string name="preferencesLocatorIntervalSummary">Seconds between location updates</string>
+    <string name="preferencesLocatorIntervalSummary">Interval between location updates</string>
+    <string name="preferencesLocatorIntervalDialogMessage">Interval in seconds that the device has to move between location updates in significant location changes mode.</string>
+
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
@@ -43,7 +47,7 @@
     <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
-    <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters</string>
+    <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters.</string>
     <string name="na">Not available</string>
     <string name="currentLocation">Use current location</string>
     <string name="share">Share</string>
