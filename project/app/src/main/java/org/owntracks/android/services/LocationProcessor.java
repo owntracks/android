@@ -95,13 +95,13 @@ public class LocationProcessor {
         MessageLocation message = new MessageLocation();
         message.setLat(currentLocation.getLatitude());
         message.setLon(currentLocation.getLongitude());
-        message.setAlt(currentLocation.getAltitude());
+        message.setAlt((int)currentLocation.getAltitude());
         message.setAcc(Math.round(currentLocation.getAccuracy()));
         if (currentLocation.hasSpeed()) {
-            message.setVelocity(currentLocation.getSpeed() * 3.6); // Convert m/s to km/h
+            message.setVelocity((int)(currentLocation.getSpeed() * 3.6)); // Convert m/s to km/h
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && currentLocation.hasVerticalAccuracy()) {
-            message.setVac(Math.round(currentLocation.getVerticalAccuracyMeters()));
+            message.setVac((int)currentLocation.getVerticalAccuracyMeters());
         }
         message.setT(trigger);
         if(MessageLocation.REPORT_TYPE_PING.equals(trigger)) {

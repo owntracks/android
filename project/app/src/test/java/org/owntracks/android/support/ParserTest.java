@@ -43,7 +43,7 @@ public class ParserTest {
     private
     EncryptionProvider encryptionProvider;
 
-    private String expectedJson = "{\"_type\":\"location\",\"acc\":10,\"alt\":20.0,\"batt\":30,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":0,\"vel\":5.6}";
+    private String expectedJson = "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}";
 
     @Before
     public void setupMessageLocation() {
@@ -58,7 +58,9 @@ public class ParserTest {
         messageLocation.setLat(50.1);
         messageLocation.setLon(60.2);
         messageLocation.setTst(123456789);
-        messageLocation.setVelocity(5.6);
+        messageLocation.setVelocity((int)5.6);
+        messageLocation.setVac((int)1.7);
+
         messageLocation.setInRegions(regions);
 
     }
@@ -123,8 +125,7 @@ public class ParserTest {
         assertEquals(52.3153748, messageLocation.getLatitude(), 0);
         assertEquals(5.0408462, messageLocation.getLongitude(), 0);
         assertEquals("p", messageLocation.getT());
-        assertEquals(0.0, messageLocation.getVac(), 0);
-        assertEquals(0.0, messageLocation.getVac(), 0);
+        assertEquals(0, messageLocation.getVac(), 0);
         assertEquals(2, messageLocation.getInRegions().size());
 
     }

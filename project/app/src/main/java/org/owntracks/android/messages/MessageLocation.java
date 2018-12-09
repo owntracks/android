@@ -35,8 +35,8 @@ public class MessageLocation extends MessageBase {
     private int vac;
     private double lat;
     private double lon;
-    private double alt;
-    private double vel;
+    private int alt;
+    private int vel;
     private long tst;
     private String geocoder;
     private WeakReference<FusedContact> _contact;
@@ -77,11 +77,11 @@ public class MessageLocation extends MessageBase {
     }
 
     @JsonProperty("vel")
-    public double getVelocity() {
+    public int getVelocity() {
         return vel;
     }
 
-    public void setVelocity(double vel) {
+    public void setVelocity(int vel) {
         this.vel = vel;
     }
 
@@ -193,11 +193,11 @@ public class MessageLocation extends MessageBase {
         return this.conn;
     }
 
-    public void setAlt(double alt) {
+    public void setAlt(int alt) {
         this.alt = alt;
     }
 
-    public double getAlt() {
+    public int getAlt() {
         return alt;
     }
 
