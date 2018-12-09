@@ -282,6 +282,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageClear message) {
+
         contactsRepo.remove(message.getContactKey());
     }
 
@@ -326,7 +327,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
-                    if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
+                    if(message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
