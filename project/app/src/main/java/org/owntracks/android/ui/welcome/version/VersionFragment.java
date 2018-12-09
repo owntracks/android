@@ -15,10 +15,6 @@ import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;
 
-import javax.inject.Inject;
-
-import dagger.android.support.AndroidSupportInjection;
-
 public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding, NoOpViewModel> implements WelcomeFragmentMvvm.View, View.OnClickListener {
     @Nullable
     @Override

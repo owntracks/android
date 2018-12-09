@@ -1,13 +1,11 @@
 package org.owntracks.android.data.repos;
 
-import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 

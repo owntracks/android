@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionHostHttpBinding;
@@ -28,8 +27,6 @@ import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewMode
 import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
-
-import dagger.android.AndroidInjection;
 
 
 public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel> implements ConnectionMvvm.View {

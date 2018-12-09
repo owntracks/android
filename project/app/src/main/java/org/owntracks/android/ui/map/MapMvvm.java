@@ -2,7 +2,6 @@ package org.owntracks.android.ui.map;
 
 import android.arch.lifecycle.LiveData;
 import android.databinding.Bindable;
-import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
@@ -25,7 +24,7 @@ public interface MapMvvm {
         void removeMarker(FusedContact c);
         void clearMarkers();
         void enableLocationMenus();
-        public void updateMonitoringModeMenu();
+        void updateMonitoringModeMenu();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V>  {

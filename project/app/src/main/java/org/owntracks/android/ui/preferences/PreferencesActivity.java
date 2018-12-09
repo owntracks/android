@@ -9,7 +9,6 @@ import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 
-import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOpViewModel> implements MvvmView{

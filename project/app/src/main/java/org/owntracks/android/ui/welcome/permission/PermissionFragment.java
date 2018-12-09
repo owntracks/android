@@ -20,8 +20,6 @@ import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
-
 public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissionsBinding, PermissionFragmentMvvm.ViewModel> implements PermissionFragmentMvvm.View {
     private final int PERMISSIONS_REQUEST_CODE = 1;
 

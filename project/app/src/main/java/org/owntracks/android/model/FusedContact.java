@@ -2,20 +2,14 @@ package org.owntracks.android.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 
 import com.google.android.gms.maps.model.LatLng;
 
 
-import org.owntracks.android.App;
 import org.owntracks.android.BR;
-import org.owntracks.android.BuildConfig;
-import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 

@@ -15,8 +15,6 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 @PerApplication
 public class Parser {
     private static ObjectMapper defaultMapper;

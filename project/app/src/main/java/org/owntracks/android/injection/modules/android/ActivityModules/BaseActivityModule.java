@@ -1,12 +1,9 @@
 package org.owntracks.android.injection.modules.android.ActivityModules;
 
-import android.app.Activity;
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
-import org.owntracks.android.injection.qualifier.ActivityFragmentManager;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.DrawerProvider;
@@ -15,7 +12,6 @@ import org.owntracks.android.ui.base.navigator.Navigator;
 
 import javax.inject.Named;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 

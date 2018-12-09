@@ -18,10 +18,6 @@ import org.owntracks.android.databinding.UiWelcomePlayBinding;
 import org.owntracks.android.ui.base.BaseSupportFragment;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 
-import javax.inject.Inject;
-
-import dagger.android.support.AndroidSupportInjection;
-
 public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, PlayFragmentMvvm.ViewModel> implements PlayFragmentMvvm.View {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1;
 

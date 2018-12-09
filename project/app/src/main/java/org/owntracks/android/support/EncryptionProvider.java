@@ -4,7 +4,6 @@ package org.owntracks.android.support;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Base64;
-import android.util.Log;
 
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;

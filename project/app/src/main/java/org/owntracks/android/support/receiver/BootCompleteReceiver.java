@@ -1,10 +1,8 @@
 package org.owntracks.android.support.receiver;
 
-import org.owntracks.android.App;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.Preferences;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;

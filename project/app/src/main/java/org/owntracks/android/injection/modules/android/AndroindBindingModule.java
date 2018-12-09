@@ -14,7 +14,6 @@ import org.owntracks.android.injection.modules.android.ServiceModules.Background
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
-import org.owntracks.android.support.receiver.BootCompleteReceiver;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

@@ -7,7 +7,6 @@ import android.support.annotation.CallSuper;
 import android.support.v4.util.LruCache;
 import android.widget.TextView;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;

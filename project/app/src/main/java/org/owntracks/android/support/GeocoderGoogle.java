@@ -3,7 +3,6 @@ package org.owntracks.android.support;
 import android.content.Context;
 import android.location.Address;
 
-import org.owntracks.android.App;
 import org.owntracks.android.injection.qualifier.AppContext;
 
 import java.io.IOException;

@@ -15,15 +15,11 @@ import com.google.android.gms.maps.model.Marker;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.owntracks.android.App;
-import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;

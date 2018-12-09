@@ -35,9 +35,6 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
-import io.objectbox.annotation.Index;
-
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
     @Inject
     Preferences preferences;

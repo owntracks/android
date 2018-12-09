@@ -4,9 +4,6 @@ import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.gms.maps.model.LatLng;
-
 import org.owntracks.android.ui.base.view.MvvmView;
 
 /* Copyright 2016 Patrick Löwenstein

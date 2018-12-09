@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import javax.inject.Inject;
 

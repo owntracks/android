@@ -142,6 +142,7 @@ public class WaypointModel extends BaseObservable {
         return geofenceRadius > 0;
     }
 
+    @NonNull
     public String toString() {
         return "WaypointModel("+getId()+","+getTst()+","+getDescription()+")";
     }

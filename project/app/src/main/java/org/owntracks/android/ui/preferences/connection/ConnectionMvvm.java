@@ -1,15 +1,7 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import android.view.MenuItem;
-
-import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.owntracks.android.R;
-import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBinding;
-import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionIdentificationViewModel;

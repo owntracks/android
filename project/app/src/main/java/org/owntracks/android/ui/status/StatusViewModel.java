@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.status;
 
-import android.Manifest;
 import android.content.Context;
 import android.databinding.Bindable;
 import android.location.Location;

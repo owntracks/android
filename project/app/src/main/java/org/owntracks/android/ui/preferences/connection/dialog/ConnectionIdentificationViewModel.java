@@ -1,10 +1,8 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
-import android.databinding.Bindable;
 
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.BR;
 
 public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
     private String username;

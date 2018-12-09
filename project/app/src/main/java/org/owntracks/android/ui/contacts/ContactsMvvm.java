@@ -5,7 +5,6 @@ import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import java.util.Collection;
-import java.util.List;
 
 /* Copyright 2016 Patrick Löwenstein
  *

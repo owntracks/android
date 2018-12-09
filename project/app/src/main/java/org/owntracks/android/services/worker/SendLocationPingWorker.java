@@ -3,11 +3,8 @@ package org.owntracks.android.services.worker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.owntracks.android.App;
-import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 
 import javax.inject.Inject;

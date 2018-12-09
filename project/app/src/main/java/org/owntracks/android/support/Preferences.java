@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
-import org.owntracks.android.data.repos.LocationRepo;
-import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageConfiguration;
@@ -35,9 +33,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
-import dagger.Lazy;
 import timber.log.Timber;
 
 @SuppressWarnings({"unused", "WeakerAccess"})

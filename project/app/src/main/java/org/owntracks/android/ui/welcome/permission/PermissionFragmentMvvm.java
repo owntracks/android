@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.welcome.permission;
 
-import android.app.Activity;
 import android.databinding.Bindable;
 
 import org.owntracks.android.ui.base.view.MvvmView;

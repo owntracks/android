@@ -1,8 +1,5 @@
 package org.owntracks.android.ui.base.viewmodel;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.ViewModel;
 import android.databinding.BaseObservable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -13,7 +10,6 @@ import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 public abstract class BaseViewModel<V extends MvvmView> extends BaseObservable implements MvvmViewModel<V> {
 

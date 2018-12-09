@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 

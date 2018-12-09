@@ -32,9 +32,6 @@ public class DrawerProvider  {
 
     private final AppCompatActivity activity;
 
-    private Drawer drawer;
-    private boolean isBuilt;
-
     public DrawerProvider(AppCompatActivity activity) {
         this.activity = activity;
     }
@@ -72,7 +69,7 @@ public class DrawerProvider  {
 
     public void attach(@NonNull Toolbar toolbar) {
 
-        this.drawer = new DrawerBuilder()
+        new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
                 .withStickyFooterShadow(false)
@@ -92,7 +89,7 @@ public class DrawerProvider  {
                         if (drawerItem == null)
                             return false;
 
-                        if(drawerItem instanceof SecondarySwitchDrawerItem)
+                        if (drawerItem instanceof SecondarySwitchDrawerItem)
                             return true;
 
                         Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
@@ -108,10 +105,9 @@ public class DrawerProvider  {
                     }
                 }).withSelectedItem(activity.getClass().hashCode())
                 //.withCloseOnClick(true)
-               // .withDelayDrawerClickEvent(350)
+                // .withDelayDrawerClickEvent(350)
                 //.withDelayOnDrawerClose(0)
                 .build();
-        isBuilt = true;
     }
 
 

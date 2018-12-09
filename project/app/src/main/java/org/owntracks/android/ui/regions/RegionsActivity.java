@@ -15,7 +15,6 @@ import org.owntracks.android.databinding.UiRegionsBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.region.RegionActivity;
 
-import dagger.android.AndroidInjection;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import timber.log.Timber;

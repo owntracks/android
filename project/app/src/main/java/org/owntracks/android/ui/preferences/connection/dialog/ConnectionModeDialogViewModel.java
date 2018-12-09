@@ -1,18 +1,11 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
-import android.view.View;
-import android.widget.RadioGroup;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Preferences;
-
-import timber.log.Timber;
 
 public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
     private int modeResId;

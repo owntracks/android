@@ -33,7 +33,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionPool;

@@ -1,8 +1,6 @@
 package org.owntracks.android.ui.contacts;
 
 import android.content.Context;
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,8 +16,6 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 

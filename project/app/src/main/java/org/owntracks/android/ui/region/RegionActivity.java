@@ -20,8 +20,6 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiRegionBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 
-import dagger.android.AndroidInjection;
-
 public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel> implements RegionMvvm.View{
 
     private static final int REQUEST_PLACE_PICKER = 19283;

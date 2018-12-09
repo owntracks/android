@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.mikepenz.materialize.color.Material;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -25,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {

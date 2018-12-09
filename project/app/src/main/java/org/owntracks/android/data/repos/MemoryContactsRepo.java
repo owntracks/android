@@ -6,14 +6,12 @@ import android.support.annotation.NonNull;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.owntracks.android.App;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Runner;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -337,7 +337,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 		}
 
-		subscribe(topics.toArray(new String[topics.size()]));
+		subscribe(topics.toArray(new String[0]));
 	}
 
 

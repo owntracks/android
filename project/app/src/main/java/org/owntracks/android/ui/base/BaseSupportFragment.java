@@ -38,7 +38,7 @@ public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends M
 
     @Override
     @CallSuper
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if(viewModel != null) { viewModel.saveInstanceState(outState); }
     }

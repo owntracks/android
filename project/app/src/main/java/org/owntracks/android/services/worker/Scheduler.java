@@ -3,7 +3,6 @@ package org.owntracks.android.services.worker;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;

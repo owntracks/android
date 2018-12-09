@@ -1,13 +1,10 @@
 package org.owntracks.android.ui.preferences.load;
 
 import android.content.Context;
-import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.owntracks.android.App;
-import org.owntracks.android.BR;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;

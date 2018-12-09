@@ -1,13 +1,11 @@
 package org.owntracks.android.ui.regions;
 
-import android.databinding.ObservableList;
 import android.support.annotation.NonNull;
 import android.view.View;
 
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
-import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.BaseAdapter;
 import org.owntracks.android.ui.base.BaseAdapterItemView;
 

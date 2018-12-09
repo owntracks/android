@@ -4,9 +4,6 @@ import android.content.Context;
 
 import android.util.AttributeSet;
 
-import org.owntracks.android.App;
-import org.owntracks.android.support.Preferences;
-
 public class EditIntegerPreference extends EditStringPreference {
 
     public EditIntegerPreference(Context context, AttributeSet attrs) {

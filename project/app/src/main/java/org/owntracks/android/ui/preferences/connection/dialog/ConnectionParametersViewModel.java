@@ -1,27 +1,8 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.OpenableColumns;
-import android.support.v7.widget.PopupMenu;
-import android.view.MenuItem;
-import android.view.View;
 
-import org.owntracks.android.App;
-import org.owntracks.android.R;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.widgets.Toasts;
-import org.owntracks.android.ui.base.navigator.Navigator;
-
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
-import timber.log.Timber;
-
-import static android.app.Activity.RESULT_OK;
 
 public class ConnectionParametersViewModel extends BaseDialogViewModel {
 

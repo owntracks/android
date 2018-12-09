@@ -11,14 +11,12 @@ import android.widget.TextView;
 import com.google.android.gms.location.Geofence;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class BindingConversions {

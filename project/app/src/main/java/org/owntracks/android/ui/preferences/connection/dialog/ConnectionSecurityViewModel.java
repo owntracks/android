@@ -9,7 +9,6 @@ import android.provider.OpenableColumns;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Switch;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;

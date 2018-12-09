@@ -1,30 +1,23 @@
 package org.owntracks.android;
 
-import org.owntracks.android.injection.components.AppComponentProvider;
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+
 import org.owntracks.android.injection.components.AppComponent;
+import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.ui.map.MapActivity;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import javax.inject.Inject;
 
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
@@ -57,7 +50,7 @@ public class App extends DaggerApplication  {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
-                protected String createStackElementTag(StackTraceElement element) {
+                protected String createStackElementTag(@NonNull StackTraceElement element) {
                     return super.createStackElementTag(element) + "/" + element.getMethodName() + "/" + element.getLineNumber();
                 }
             });

@@ -2,24 +2,17 @@ package org.owntracks.android.data.repos;
 
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
-import android.util.EventLog;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.EventBusBuilder;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.owntracks.android.App;
-import org.owntracks.android.injection.components.AppComponent;
-import org.owntracks.android.injection.components.DaggerAppComponent;
-import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
