@@ -190,7 +190,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             Response r = mHttpClient.newCall(request.build()).execute();
 
             // Handle delivered message
-            if((r != null) && (r.isSuccessful())) {
+            if((r.isSuccessful())) {
                 Timber.v("request was successful");
                 // Handle response
                 if(r.body() != null ) {
@@ -211,12 +211,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                     }
                 }
             } else {
-                Timber.e("request was not successful");
-                if(r != null)
-                    messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("Response "+r.code() ));
-                else
-                    messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("Response empty" ));
-
+                Timber.e("request was not successful. HTTP code %s", r.code());
+                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP code "+r.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 return;
             }

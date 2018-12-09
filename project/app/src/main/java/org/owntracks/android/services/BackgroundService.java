@@ -290,6 +290,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         // Show monitoring mode if endpoint state is not interesting
         if(lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
+        } else if (lastEndpointState == MessageProcessor.EndpointState.ERROR && lastEndpointState.getMessage() != null) {
+            builder.setContentText(lastEndpointState.getLabel(this) + ": " + lastEndpointState.getMessage());
         } else {
             builder.setContentText( lastEndpointState.getLabel(this));
         }
@@ -619,7 +621,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(MessageProcessor.EndpointState state) {
-        Timber.v("endpoint state changed %s", state.getLabel(this));
+        Timber.v(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
         this.lastEndpointState = state;
         sendOngoingNotification();
     }

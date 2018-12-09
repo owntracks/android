@@ -15,6 +15,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
+import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -123,7 +124,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			Timber.e(cause, "connectionLost error");
 			scheduler.cancelMqttPing();
 			scheduler.scheduleMqttReconnect();
-			changeState(EndpointState.DISCONNECTED, new Exception(cause));
+			changeState(EndpointState.DISCONNECTED, new Exception(cause), cause.getMessage());
 		}
 
 		@Override
@@ -223,12 +224,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			return false;
 		}
 
-		// Check if there is a data connection.
-		if (!isOnline()) {
-			changeState(EndpointState.ERROR_DATADISABLED);
-			return false;
-		}
-
 		Timber.v("connecting on thread %s",  Thread.currentThread().getId());
 
 		changeState(EndpointState.CONNECTING);
@@ -237,7 +232,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			return false;
 		}
 
-		try {
+//		try {
 			Timber.v("setting up connect options");
 			connectOptions = new MqttConnectOptions();
 			if (preferences.getAuth()) {
@@ -247,30 +242,36 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 			connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
 
-			if (preferences.getTls()) {
-				String tlsCaCrt = preferences.getTlsCaCrtName();
-				String tlsClientCrt = preferences.getTlsClientCrtName();
+			try {
+				if (preferences.getTls()) {
+					String tlsCaCrt = preferences.getTlsCaCrtName();
+					String tlsClientCrt = preferences.getTlsClientCrtName();
 
-				SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+					SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
-				if (tlsCaCrt.length() > 0) {
-					try {
-						socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+					if (tlsCaCrt.length() > 0) {
+						try {
+							socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
-				}
 
-				if (tlsClientCrt.length() > 0) {
-					try {
-						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
+					if (tlsClientCrt.length() > 0) {
+						try {
+							socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						}
 					}
-				}
 
-				connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
+					connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
+				}
+			} catch (Exception e) {
+				changeState(EndpointState.ERROR, e , "TLS setup failed");
+				return false;
 			}
+
 
 			setWill(connectOptions);
 			connectOptions.setKeepAliveInterval(preferences.getKeepalive());
@@ -278,18 +279,26 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			connectOptions.setCleanSession(preferences.getCleanSession());
 
 			Timber.v("connecting sync");
-			this.mqttClient.connect(connectOptions).waitForCompletion();
+			try {
+				this.mqttClient.connect(connectOptions).waitForCompletion();
+			} catch (MqttSecurityException e) {
+				changeState(EndpointState.ERROR, e , e.getMessage());
+				return false;
+			} catch (MqttException e) {
+				changeState(EndpointState.ERROR);
+				return false;
+			}
 			scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
 			changeState(EndpointState.CONNECTED);
 
 			sendMessageConnectPressure =0; // allow new connection attempts from sendMessage
 			return true;
 
-		} catch (Exception e) { // Catch paho and socket factory exceptions
-			Timber.e(e);
-			changeState(e);
-			return false;
-		}
+//		} catch (Exception e) { // Catch paho and socket factory exceptions
+//			Timber.e(e);
+//			changeState(e);
+//			return false;
+//		}
 	}
 
 	private void setWill(MqttConnectOptions m) {
@@ -353,7 +362,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		try {
 			int qos[] = getSubTopicsQos(topics);
 			this.mqttClient.subscribe(topics, qos);
-		} catch (Exception e) {
+		} catch (MqttException e) {
+			changeState(EndpointState.ERROR, e, "Subscribe failed");
 			e.printStackTrace();
 		}
 	}
@@ -439,7 +449,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	}
 
 	private void changeState(Exception e) {
-		changeState(EndpointState.ERROR, e);
+		changeState(EndpointState.ERROR, e, null);
 	}
 
 	private void changeState(EndpointState newState) {
@@ -451,9 +461,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		messageProcessor.onEndpointStateChanged(newState);
 	}
 
-	private void changeState(EndpointState newState, Exception e) {
+
+	private void changeState(EndpointState newState, Exception e, String m) {
+		Timber.e(e, "message: %s", m);
 		state = newState;
-		messageProcessor.onEndpointStateChanged(newState.setError(e));
+		messageProcessor.onEndpointStateChanged(newState.setError(e).setMessage(m));
 	}
 
 	private boolean isOnline() {
