@@ -13,6 +13,8 @@ import org.owntracks.android.injection.scopes.PerApplication;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
@@ -33,17 +35,23 @@ public class EncryptionProvider {
 
     private void initializeSecretBox() {
         String encryptionKey = preferences.getEncryptionKey();
+
+
         enabled = encryptionKey != null && encryptionKey.length() > 0;
-        Log.v(TAG, "initializeSecretBox() - encryption enabled: " + enabled);
-        if (!enabled)
+        Timber.v("encryption enabled: %s", enabled);
+        if (!enabled) {
             return;
+        }
 
-
-        byte[] key = new byte[crypto_secretbox_KEYBYTES];
-        System.arraycopy(encryptionKey.getBytes(), 0, key, 0, encryptionKey.length());
-        b = new SecretBox(key);
-        r = new Random();
-        Log.v(TAG, "SecretBox initialized");
+        //byte[] key = new byte[crypto_secretbox_KEYBYTES];
+        //sSystem.arraycopy(encryptionKey.getBytes(), 0, key, 0, encryptionKey.length());
+        try {
+            b = new SecretBox(encryptionKey.getBytes());
+            r = new Random();
+        } catch (NullPointerException e) {
+            Timber.e("unable to load encryptionKey");
+            enabled = false;
+        }
     }
 
     @Inject
