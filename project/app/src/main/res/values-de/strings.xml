@@ -4,7 +4,6 @@
     <string name="preferencesServer">"Verbindung"</string>
     <string name="preferencesWebsocket">WebSockets nutzen</string>
     <string name="preferencesUserUsername">"Benutzername"</string>
-    <string name="preferencesBrokerAuth">"Authentifizierung"</string>
     <string name="preferencesBrokerPassword">"Passwort"</string>
     <string name="preferencesCaCrtPath">CA-Zertifikat</string>
     <string name="preferencesClientCrtPath">Client-Zertifikat</string>
@@ -14,14 +13,11 @@
     <string name="preferencesNotification">Benachrichtigungen</string>
     <string name="preferencesNotificationEvents">Ereignisse</string>
     <string name="preferencesNotificationEventsSummary">Über empfangene Ereignisse benachrichtigen</string>
-    <string name="preferencesNotificationSummary">"Benachrichtigung anzeigen, um nicht automatisch beendet zu werden"</string>
     <string name="preferencesNotificationLocationSummary">"Letzten gemeldeten Standort und Zeitpunkt anzeigen"</string>
     <string name="preferencesNotificationLocation">"Letzter gemeldeter Standort"</string>
     <string name="preferencesAdvanced">"Erweitert"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Berichte"</string>
-    <string name="preferencesBackgroundUpdates">Automatische Standort-Mitteilung</string>
-    <string name="preferencesBackgroundUpdatesSummary">Standort automatisch mitteilen</string>
     <string name="preferencesLocatorDisplacement">Positionsabstand</string>
     <string name="preferencesLocatorDisplacementSummary">Entfernung zwischen Standort-Aktualisierungen</string>
     <string name="preferencesLocatorInterval">Positionsintervall</string>
@@ -55,7 +51,6 @@
     <string name="contactLocationUnknown">Kein Standort verfügbar</string>
     <string name="menuContactNavigate">Navigieren</string>
     <string name="contactDetailsAccuracy">Genauigkeit</string>
-    <string name="contactDetailsReportedTime">Zeitstempel</string>
     <string name="contactDetailsTopic">Kennung</string>
     <string name="waypointListPlaceholder">Keine Orte angelegt</string>
     <string name="waypointRemove">Entfernen</string>
@@ -66,17 +61,8 @@
     <string name="preferencesParameters">Parameter</string>
     <string name="seconds">Sekunden</string>
     <string name="preferencesProfileId">Modus</string>
-    <string-array name="locatorAccuracy_readable">
-        <item>Hoher Energieverbrauch</item>
-        <item>Ausgeglichener Energieverbrauch</item>
-        <item>Geringer Energieverbrauch</item>
-        <item>Kein Energieverbrauch</item>
-    </string-array>
-
     <string name="mode_mqtt_private_label">MQTT Privat</string>
-    <string name="mode_mqtt_public_label">MQTT Öffentlich</string>
     <string name="mode_http_private_label">HTTP Privat</string>
-
     <string name="aLocation">einen Ort</string>
     <string name="events">Ereignisse</string>
     <string name="title_activity_regions">Orte</string>
@@ -115,8 +101,6 @@
     <string name="mqtt_private_description">Owntracks mit deinem eigenen Server verwenden</string>
     <string name="mqtt_public_description">Teste Owntracks und teile Deine Position anonym mit anderen Nutzern</string>
     <string name="mode_heading">Modus</string>
-    <string name="mode_description">Wähle den Modus, in dem du Owntracks betreiben möchtest</string>
-    <string name="icon_description_cloud">Cloud</string>
     <string name="icon_description_owntracks">Owntracks</string>
     <string name="permissions_heading">Berechtigungen</string>
     <string name="permissions_granted">Berechtigungen wurden erteilt</string>
@@ -140,8 +124,6 @@
     <string name="preferencesEditorKey">Schlüssel</string>
     <string name="preferencesEditorValue">Wert</string>
     <string name="exportWaypointsToEndpoint">Orte veröffentlichen</string>
-    <string name="drawerSwitchReporting">Veröffentlichen</string>
-    <string name="drawerSwitchCopy">Kopieren</string>
     <string name="restart">Neu starten</string>
     <string name="notificationEventsTitle" formatted="false">%1$d neue Ereignisse</string>
     <string name="ui_fragment_welcome_version_title">Einschränkungen</string>
@@ -160,7 +142,6 @@
 	<string name="notificationChannelOngoing">Ongoing</string>
     <string name="notificationChannelOngoingDescription">Show a persistent notification to receive location updates in the background</string>
     <string name="notificationChannelEventsDescription">Region transmissions</string>
-    <string name="timeNow">now</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>

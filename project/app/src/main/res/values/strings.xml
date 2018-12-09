@@ -7,7 +7,6 @@
     <string name="preferencesWebsocket">Use WebSockets</string>
     <string name="preferencesUserUsername">"Username"</string>
     <string name="preferencesDeviceName" translatable="false">"Device ID"</string>
-    <string name="preferencesBrokerAuth">"Authentication"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
 
 
@@ -20,16 +19,13 @@
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationEvents">Events </string>
     <string name="preferencesNotificationEventsSummary">Notify about received events </string>
-    <string name="preferencesNotificationSummary">"Display a notification to keep running"</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
 
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
-    <string name="preferencesBackgroundUpdates">Automatic location reporting</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
-    <string name="preferencesBackgroundUpdatesSummary">Report location automatically</string>
     <string name="preferencesLocatorDisplacement">Locator displacement</string>
     <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
     <string name="preferencesLocatorDisplacementDialogMessage">Distance in meters between location updates in significant location changes mode. Has precedence over configured interval.</string>
@@ -73,7 +69,6 @@
     <string name="menuCurrentLoction">Current location</string>
 
     <string name="contactDetailsAccuracy">Accuracy</string>
-    <string name="contactDetailsReportedTime">Reported</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="waypointRemove">Remove</string>
@@ -86,19 +81,7 @@
     <string name="preferencesKeepalive" translatable="false">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
-
-
-    <string-array name="locatorAccuracy_readable">
-        <item>High power</item>
-        <item>Balanced power</item>
-        <item>Low power</item>
-        <item>No power</item>
-    </string-array>
-
-
     <string name="mode_mqtt_private_label">Private MQTT</string>
-    <string name="mode_mqtt_public_label">Public MQTT</string>
-
     <string name="aLocation">a region</string>
     <string name="events">Events</string>
     <string name="title_activity_regions">Regions</string>
@@ -153,7 +136,6 @@
     <string name="permissions_heading">Permissions</string>
     <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
     <string name="permissions_granted">Permissions have been granted</string>
-    <string name="icon_description_cloud">Cloud</string>
     <string name="icon_description_owntracks">Owntracks</string>
     <string name="enjoy_description">Select preferences from the menu and configure OwnTracks for your server before using it</string>
     <string name="done_heading">Done</string>
@@ -174,8 +156,6 @@
     <string name="preferencesLoadFailed">Unable to load effective configuration</string>
     <string name="preferencesEditorKey">Key</string>
     <string name="preferencesEditorValue">Value</string>
-    <string name="drawerSwitchReporting">Reporting</string>
-    <string name="drawerSwitchCopy">Copy</string>
     <string name="restart">Restart</string>
     <string name="notificationEventsTitle" formatted="false">%1$d new events</string>
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
@@ -194,7 +174,6 @@
 	<string name="notificationChannelOngoing">Ongoing</string>
 	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
 	<string name="notificationChannelEventsDescription">Region transmissions</string>
-    <string name="timeNow">now</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google</string>

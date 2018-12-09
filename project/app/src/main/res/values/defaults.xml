@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="valBeaconLayout" translatable="false">""</string>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
 
@@ -10,8 +9,6 @@
     <integer name="valKeepalive">3600</integer>
     <integer name="valLocatorDisplacement">500</integer>
     <integer name="valLocatorInterval">900</integer>
-    <integer name="valLocatorAccuracyBackground">1</integer>
-    <integer name="valLocatorAccuracyForeground">0</integer>
     <integer name="valIgnoreStaleLocations">0</integer>
     <integer name="valIgnoreInaccurateLocations">0</integer>
     <integer name="valModeId">0</integer>
@@ -19,9 +16,7 @@
     <integer name="valMqttProtocolLevel">3</integer>
     <integer name="valPing">30</integer>
 
-    <bool name="valPub">true</bool>
     <bool name="valCleanSession">false</bool>
-    <bool name="valCp">false</bool>
     <bool name="valPubExtendedData">true</bool>
     <bool name="valNotification">true</bool>
     <bool name="valNotificationHigherPriority">false</bool>
@@ -33,7 +28,6 @@
     <bool name="valAuth">true</bool>
     <bool name="valRemoteCommand">true</bool>
     <bool name="valRemoteConfiguration">true</bool>
-    <bool name="valBeaconRangingEnabled">false</bool>
     <bool name="valTls">true</bool>
     <bool name="valWs">false</bool>
     <bool name="valInfo" >true</bool>
@@ -46,13 +40,6 @@
     <string-array name="profileIds_readable">
         <item>@string/mode_http_private_label</item>
         <item>@string/mode_mqtt_private_label</item>
-    </string-array>
-
-    <string-array name="locatorAccuracy" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
     </string-array>
 
     <string name="valEmpty" translatable="false">""</string>
