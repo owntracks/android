@@ -9,11 +9,11 @@ import android.provider.OpenableColumns;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.widgets.Toasts;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.io.FileOutputStream;
@@ -172,8 +172,6 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
 
     private abstract class CopyTask extends AsyncTask<Uri, String, String> {
-        public final Integer STATUS_SUCCESS = 1;
-        public final Integer STATUS_ERROR = 2;
 
         @Override
         protected String doInBackground(Uri... params) {
@@ -214,7 +212,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         @Override
         protected void onCancelled(String s) {
             setTlsCaCrtName(null);
-            Toasts.showUnableToCopyCertificateToast();
+            Toast.makeText(App.getContext(), App.getContext().getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -228,7 +226,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         @Override
         protected void onCancelled(String s) {
             setTlsClientCrtName(null);
-            Toasts.showUnableToCopyCertificateToast();
+            Toast.makeText(App.getContext(), App.getContext().getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -45,7 +45,7 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     }
 
     public void checkPermission() {
-        viewModel.setPermissionGranted(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        viewModel.setPermissionGranted(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
         WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(viewModel.isPermissionGranted());
 
     }
@@ -57,6 +57,6 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
 
     @Override
     public boolean isNextEnabled() {
-        return ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }
