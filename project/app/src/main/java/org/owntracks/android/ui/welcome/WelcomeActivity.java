@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
+import org.owntracks.android.support.widgets.PausableViewPager;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
@@ -58,6 +59,12 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     public void showNextFragment() {
         int currentItem = binding.viewPager.getCurrentItem();
+
+        if(currentItem == welcomeAdapter.getLastItemPosition()) {
+            Timber.e("viewPager is at the end");
+            setNextEnabled(false);
+            return;
+        }
         welcomeAdapter.getFragment(currentItem).onNextClicked();
         showFragment(currentItem + 1);
     }

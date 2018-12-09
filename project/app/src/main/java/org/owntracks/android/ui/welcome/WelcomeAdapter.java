@@ -60,7 +60,7 @@ public class WelcomeAdapter extends FragmentStatePagerAdapter  {
 
     @Override
     public Fragment getItem(final int position) {
-        if (fragments.size() < position) {
+        if (position >= fragments.size()) {
             Timber.e("Welcome position %d is out of bounds for fragment list length %d", position, fragments.size());
             throw new IndexOutOfBoundsException();
         }
