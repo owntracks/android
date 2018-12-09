@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;

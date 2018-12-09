@@ -18,6 +18,7 @@ import javax.inject.Inject;
 
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
+import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 

@@ -92,7 +92,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
 
         @Override
         public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-            if (this.recyclerView != null && && items instanceof ObservableList) {
+            if (this.recyclerView != null && items instanceof ObservableList) {
                 ((ObservableList<T>) items).removeOnListChangedCallback(callback);
             }
             this.recyclerView = null;

@@ -40,7 +40,7 @@
             android:layout_alignParentTop="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textSize="12dp" />
+            android:textSize="12sp" />
     </RelativeLayout>
 
 
