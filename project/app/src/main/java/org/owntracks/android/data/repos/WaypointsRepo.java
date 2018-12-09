@@ -70,7 +70,7 @@ public abstract class WaypointsRepo {
     }
 
     private WaypointModel toDaoObject(@NonNull MessageWaypoint messageWaypoint) {
-        return new WaypointModel(0, messageWaypoint.getTst(),messageWaypoint.getDesc(), messageWaypoint.getLat(), messageWaypoint.getLon(), messageWaypoint.getRad(), 0, 0);
+        return new WaypointModel(0, messageWaypoint.getTst(),messageWaypoint.getDesc(), messageWaypoint.getLat(), messageWaypoint.getLon(), messageWaypoint.getRad() != null ? messageWaypoint.getRad() : 0, 0, 0);
     }
 
     public MessageWaypoint fromDaoObject(@NonNull WaypointModel w) {

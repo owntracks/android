@@ -27,9 +27,6 @@ public class MessageWaypoint extends MessageBase{
 
     // Optional types for optional values
     private Integer rad;
-    private String uuid;
-    private Integer major;
-    private Integer minor;
 
     public String getDesc() {
         return desc;
@@ -79,31 +76,6 @@ public class MessageWaypoint extends MessageBase{
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
         handler.processOutgoingMessage(this);
-    }
-
-
-    public Integer getMinor() {
-        return minor;
-    }
-
-    public void setMinor(Integer minor) {
-        this.minor = minor;
-    }
-
-    public Integer getMajor() {
-        return major;
-    }
-
-    public void setMajor(Integer major) {
-        this.major = major;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     @Override
