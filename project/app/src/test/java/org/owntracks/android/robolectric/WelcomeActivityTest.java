@@ -32,6 +32,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.P;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.shadows.ShadowView.clickOn;
@@ -82,18 +83,23 @@ public class WelcomeActivityTest {
     @Test
     @Config(minSdk = M)
     public void DoneButtonShouldStartMapActivityOnVersionWithBackgroundRestriction() {
+        // Shows welcome
         assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+        assertEquals(View.GONE, welcomeActivity.findViewById(R.id.done).getVisibility());
+        assertTrue(welcomeActivity.findViewById(R.id.btn_next).isEnabled());
         clickOn(welcomeActivity.findViewById(R.id.btn_next));
 
+        // Shows Restrictions
         assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+        assertEquals(View.GONE, welcomeActivity.findViewById(R.id.done).getVisibility());
+        assertTrue(welcomeActivity.findViewById(R.id.btn_next).isEnabled());
         clickOn(welcomeActivity.findViewById(R.id.btn_next));
 
-        assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
-
-        assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
-
-        //Pager is at the end. Next button should be hidden
+        // Shows done
         assertEquals(View.GONE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+        assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
+        assertFalse(welcomeActivity.findViewById(R.id.btn_next).isEnabled());
+        assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
 
         clickOn(welcomeActivity.findViewById(R.id.done));
         Intent expectedIntent = new Intent(welcomeActivity, MapActivity.class);
@@ -104,16 +110,19 @@ public class WelcomeActivityTest {
     @Test
     @Config(maxSdk = LOLLIPOP_MR1)
     public void DoneButtonShouldStartMapActivityOnVersionWithoutBackgroundRestriction() {
+        // Shows welcome
         assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+        assertEquals(View.GONE, welcomeActivity.findViewById(R.id.done).getVisibility());
+        assertTrue(welcomeActivity.findViewById(R.id.btn_next).isEnabled());
         clickOn(welcomeActivity.findViewById(R.id.btn_next));
 
-        assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
-        assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
-
-        //Pager is at the end. Next button should be hidden
+        // Shows Done
         assertEquals(View.GONE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
-
+        assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
+        assertFalse(welcomeActivity.findViewById(R.id.btn_next).isEnabled());
+        assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
         clickOn(welcomeActivity.findViewById(R.id.done));
+
         Intent expectedIntent = new Intent(welcomeActivity, MapActivity.class);
         Intent actualIntent = ShadowApplication.getInstance().getNextStartedActivity();
         assertEquals(expectedIntent.getComponent(), actualIntent.getComponent());

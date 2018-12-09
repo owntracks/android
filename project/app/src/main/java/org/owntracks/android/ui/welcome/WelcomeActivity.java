@@ -98,8 +98,8 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         binding.viewPager.setCurrentItem(position);
 
         welcomeAdapter.getFragment(position).onShowFragment();
-        viewModel.setNextEnabled(welcomeAdapter.getFragment(position).isNextEnabled());
-        viewModel.setDoneEnabled(position == welcomeAdapter.getLastItemPosition());
+        setNextEnabled(welcomeAdapter.getFragment(position).isNextEnabled());
+        setDoneEnabled(position == welcomeAdapter.getLastItemPosition());
     }
 
     private void buildPagerIndicator() {
