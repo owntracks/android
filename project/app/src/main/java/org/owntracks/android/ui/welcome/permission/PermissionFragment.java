@@ -59,4 +59,9 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     public boolean isNextEnabled() {
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
+
+    @Override
+    public void onShowFragment() {
+        checkPermission();
+    }
 }

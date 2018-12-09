@@ -28,4 +28,9 @@ public class IntroFragment extends BaseSupportFragment<UiWelcomeIntroBinding, No
     public boolean isNextEnabled() {
         return true;
     }
+
+    @Override
+    public void onShowFragment() {
+
+    }
 }

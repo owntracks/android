@@ -12,6 +12,8 @@ import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 
 @PerActivity
 public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements WelcomeMvvm.ViewModel<WelcomeMvvm.View> {
@@ -35,11 +37,14 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
 
     @Override
     public void onNextClicked() {
+        Timber.v("onNextClicked next:%s, done:%s", nextEnabled, doneEnabled);
         getView().showNextFragment();
+
     }
 
     @Override
     public void onDoneClicked() {
+        Timber.v("onDoneClicked next:%s, done:%s", nextEnabled, doneEnabled);
         preferences.setSetupCompleted();
         navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }

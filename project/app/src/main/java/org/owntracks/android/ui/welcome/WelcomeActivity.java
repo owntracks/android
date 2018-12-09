@@ -78,6 +78,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
 
     @Override
     public void setNextEnabled(boolean enabled) {
+        Timber.v("setting to %s", enabled);
         viewModel.setNextEnabled(enabled);
         binding.btnNext.setEnabled(enabled);
     }
@@ -86,7 +87,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     public void setDoneEnabled(boolean enabled) {
         viewModel.setDoneEnabled(enabled);
         binding.done.setEnabled(enabled);
-
     }
 
     public void showPreviousFragment() {
@@ -94,7 +94,10 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     }
 
     public void showFragment(int position) {
+        Timber.v("position %s setNextEnabled:%s",position, welcomeAdapter.getFragment(position).isNextEnabled());
         binding.viewPager.setCurrentItem(position);
+
+        welcomeAdapter.getFragment(position).onShowFragment();
         viewModel.setNextEnabled(welcomeAdapter.getFragment(position).isNextEnabled());
         viewModel.setDoneEnabled(position == welcomeAdapter.getLastItemPosition());
     }

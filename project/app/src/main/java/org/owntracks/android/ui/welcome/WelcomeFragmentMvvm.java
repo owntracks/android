@@ -9,6 +9,8 @@ public interface WelcomeFragmentMvvm  {
     interface View extends MvvmView {
         void onNextClicked();
         boolean isNextEnabled();
+
+        void onShowFragment();
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {

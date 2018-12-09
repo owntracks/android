@@ -29,4 +29,9 @@ public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, 
     public boolean isNextEnabled() {
         return false;
     }
+
+    @Override
+    public void onShowFragment() {
+
+    }
 }

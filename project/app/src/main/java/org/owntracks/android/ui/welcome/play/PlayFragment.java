@@ -49,7 +49,6 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
     @Override
     public void onResume() {
         super.onResume();
-        checkAvailability();
     }
 
 
@@ -78,5 +77,10 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
     @Override
     public boolean isNextEnabled() {
         return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.getContext()) == ConnectionResult.SUCCESS;
+    }
+
+    @Override
+    public void onShowFragment() {
+        checkAvailability();
     }
 }

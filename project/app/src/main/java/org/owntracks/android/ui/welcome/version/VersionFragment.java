@@ -41,4 +41,9 @@ public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding
     public boolean isNextEnabled() {
         return true;
     }
+
+    @Override
+    public void onShowFragment() {
+
+    }
 }
