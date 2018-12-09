@@ -85,11 +85,14 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     public void setNextEnabled(boolean enabled) {
         viewModel.setNextEnabled(enabled);
+        binding.btnNext.setEnabled(enabled);
     }
 
     @Override
     public void setDoneEnabled(boolean enabled) {
         viewModel.setDoneEnabled(enabled);
+        binding.done.setEnabled(enabled);
+
     }
 
     public void showPreviousFragment() {

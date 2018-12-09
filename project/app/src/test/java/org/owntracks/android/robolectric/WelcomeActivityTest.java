@@ -32,6 +32,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.P;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.shadows.ShadowView.clickOn;
@@ -89,7 +90,12 @@ public class WelcomeActivityTest {
         clickOn(welcomeActivity.findViewById(R.id.btn_next));
 
         assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
+
         assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
+
+        //Pager is at the end. Next button should be hidden
+        assertEquals(View.GONE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+
         clickOn(welcomeActivity.findViewById(R.id.done));
         Intent expectedIntent = new Intent(welcomeActivity, MapActivity.class);
         Intent actualIntent = ShadowApplication.getInstance().getNextStartedActivity();
@@ -104,6 +110,10 @@ public class WelcomeActivityTest {
 
         assertEquals(View.VISIBLE, welcomeActivity.findViewById(R.id.done).getVisibility());
         assertTrue(welcomeActivity.findViewById(R.id.done).isEnabled());
+
+        //Pager is at the end. Next button should be hidden
+        assertEquals(View.GONE, welcomeActivity.findViewById(R.id.btn_next).getVisibility());
+
         clickOn(welcomeActivity.findViewById(R.id.done));
         Intent expectedIntent = new Intent(welcomeActivity, MapActivity.class);
         Intent actualIntent = ShadowApplication.getInstance().getNextStartedActivity();
