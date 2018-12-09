@@ -31,6 +31,7 @@
     <string name="preferencesDocumentation">Handbuch</string>
     <string name="preferencesEncryptionKeySummary">Symmetrischer Schlüssel für Inhalts-Verschlüsselung</string>
     <string name="preferencesEncryptionKey">Verschlüsselungs-Schlüssel</string>
+    <string name="preferencesEncryptionKeyDialogMessage">Schlüssel wird nach 32 Zeichen abgeschnitten</string>
     <string name="na">Nicht verfügbar</string>
     <string name="currentLocation">Momentanen Standort vewenden</string>
     <string name="share">Teilen</string>

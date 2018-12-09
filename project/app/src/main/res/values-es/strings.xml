@@ -43,10 +43,7 @@
     <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Clave simétrica para encriptación del payload </string>
     <string name="preferencesEncryptionKey">Clave de encriptación</string>
-
-
-
-
+    <string name="preferencesEncryptionKeyDialogMessage">La clave se corta después de 32 caracteres</string>
     <string name="na">No disponible</string>
     <string name="currentLocation">Usar ubicación actual</string>
     <string name="share">Compartir</string>

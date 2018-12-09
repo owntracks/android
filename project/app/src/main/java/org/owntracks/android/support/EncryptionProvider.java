@@ -36,22 +36,29 @@ public class EncryptionProvider {
     private void initializeSecretBox() {
         String encryptionKey = preferences.getEncryptionKey();
 
-
-        enabled = encryptionKey != null && encryptionKey.length() > 0;
+        enabled = encryptionKey != null && !encryptionKey.isEmpty();
         Timber.v("encryption enabled: %s", enabled);
         if (!enabled) {
             return;
         }
 
-        //byte[] key = new byte[crypto_secretbox_KEYBYTES];
-        //sSystem.arraycopy(encryptionKey.getBytes(), 0, key, 0, encryptionKey.length());
-        try {
-            b = new SecretBox(encryptionKey.getBytes());
-            r = new Random();
-        } catch (NullPointerException e) {
-            Timber.e("unable to load encryptionKey");
+        byte[] encryptionKeyBytes = encryptionKey != null ? encryptionKey.getBytes() : new byte[0];
+        byte[] encryptionKeyBytesPadded = new byte[crypto_secretbox_KEYBYTES];
+
+        if (encryptionKeyBytes.length == 0 ) {
+            Timber.e("encryption key is too short or too long. Has %s bytes", encryptionKeyBytes.length);
             enabled = false;
+            return;
         }
+        int copyBytes = encryptionKeyBytes.length;
+        if( copyBytes > crypto_secretbox_KEYBYTES) {
+            copyBytes = crypto_secretbox_KEYBYTES;
+        }
+
+        System.arraycopy(encryptionKeyBytes, 0, encryptionKeyBytesPadded, 0, copyBytes);
+
+        b = new SecretBox(encryptionKeyBytesPadded);
+        r = new Random();
     }
 
     @Inject

@@ -43,10 +43,7 @@
     <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
-
-
-
-
+    <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters</string>
     <string name="na">Not available</string>
     <string name="currentLocation">Use current location</string>
     <string name="share">Share</string>
@@ -58,10 +55,6 @@
     <string name="preferencesPubExtendedData">Extended data</string>
     <string name="preferencesAutostartSummary">Automatically start on device boot</string>
     <string name="preferencesAutostart">Autostart</string>
-    <string name="preferencesLocatorAccuracyBackground">Locator accuracy</string>
-    <string name="preferencesLocatorAccuracyBackgroundSummary">Accuracy and power usage in the background</string>
-    <string name="preferencesLocatorAccuracyForeground">Locator foreground accuracy</string>
-    <string name="preferencesLocatorAccuracyForegroundSummary">Accuracy and power usage in the foreground</string>
     <string name="preferencesRemoteCommand">Remote commands</string>
     <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
     <string name="description">Description</string>

@@ -212,7 +212,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
         PreferenceCategory encryption = getCategory(R.string.preferencesCategoryAdvancedEncryption);
         screen.addPreference(encryption);
-        addEditStringPreference(encryption, Preferences.Keys._ENCRYPTION_KEY, R.string.preferencesEncryptionKey, R.string.preferencesEncryptionKeySummary, R.string.valEmpty);
+        addEditStringPreference(encryption, Preferences.Keys._ENCRYPTION_KEY, R.string.preferencesEncryptionKey, R.string.preferencesEncryptionKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesEncryptionKeyDialogMessage);
 
         PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
         screen.addPreference(misc);
@@ -280,7 +280,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setText(getEditStringPreferenceTextValueWithHintSupport(key));
         p.setHint(getString(defaultValueAllModes));
         p.setPersistent(true);
-
         parent.addPreference(p);
         return p;
     }
