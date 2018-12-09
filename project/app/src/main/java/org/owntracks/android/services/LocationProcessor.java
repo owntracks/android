@@ -184,7 +184,7 @@ public class LocationProcessor {
         message.setLon(triggeringLocation.getLongitude());
         message.setAcc(triggeringLocation.getAccuracy());
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        message.setWtst(TimeUnit.MILLISECONDS.toSeconds(w.getTst()));
+        message.setWtst(w.getTst());
         message.setDesc(w.getDescription());
         messageProcessor.sendMessage(message);
     }
