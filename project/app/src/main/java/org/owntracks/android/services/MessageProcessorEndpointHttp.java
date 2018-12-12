@@ -178,18 +178,25 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((preferences.getUsername()+":"+preferences.getPassword()).getBytes(), Base64.NO_WRAP));
         }
 
-        if(headerUsername != null) {
-            request.header(HEADER_USERNAME, headerUsername);
-        }
-        if(headerDevice != null) {
-            request.header(HEADER_DEVICE, headerDevice);
+        try {
+            if (headerUsername != null) {
+                request.header(HEADER_USERNAME, headerUsername);
+            }
+            if (headerDevice != null) {
+                request.header(HEADER_DEVICE, headerDevice);
+            }
+        } catch (IllegalAccessError e) {
+            Timber.e(e,"invalid header specified");
+            messageProcessor.onMessageDeliveryFailedFinal(messageId);
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("invalid value for user or device header"));
+            return;
         }
 
         try {
             //Send request
             Response r = mHttpClient.newCall(request.build()).execute();
 
-            // Handle delivered message
+            // Message was send. Handle delivered message
             if((r.isSuccessful())) {
                 Timber.v("request was successful");
                 // Handle response
@@ -210,13 +217,14 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                         messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
                 }
+            // Server could be contacted but returned non success HTTP code
             } else {
                 Timber.e("request was not successful. HTTP code %s", r.code());
                 messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP code "+r.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 return;
             }
-
+        // Message was not send
         } catch (Exception e) {
             Timber.e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setError(e));
