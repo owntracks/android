@@ -10,6 +10,7 @@ import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.MessageProcessor;
+import org.owntracks.android.support.DebugFileLogTree;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
@@ -49,7 +50,9 @@ public class App extends DaggerApplication  {
 
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
+        if(preferences.getLogDebug()) {
+            Timber.plant(new DebugFileLogTree(this));
+        } else if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree() {
                 @Override
                 protected String createStackElementTag(@NonNull StackTraceElement element) {
