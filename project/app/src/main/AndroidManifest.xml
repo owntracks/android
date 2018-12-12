@@ -22,22 +22,17 @@
     <!-- To prevent the device from sleeping while handling MQTT traffic -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- To autostart the app once the device boots -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <!-- For BLE beacon detection -->
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <!-- For BLE beacon detection -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
-    
+    <!-- Not actively requested. Has to be enabled manually. Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Not actively requested. Has to be enabled manually. Required to write debug logfiles.  -->
+
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- To locate the device -->
 
     <!-- To access Google Play Services -->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-
-    <!-- To vibrate for debuging in the background -->
-    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- API v28 requires this for foreground services -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

@@ -183,6 +183,7 @@ public class Preferences {
 
     }
 
+
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
     }
@@ -881,6 +882,16 @@ public class Preferences {
         setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean);
     }
 
+    public boolean getLogDebug() {
+        return getBoolean(Keys.DEBUG_LOG, R.bool.valFalse);
+    }
+
+    @Import(key =Keys.DEBUG_LOG)
+    public void setDebugLog(boolean debug) {
+        setBoolean(Keys.DEBUG_LOG, debug);
+    }
+
+
     public boolean isObjectboxMigrated() {
         return isFirstStart || sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
 
@@ -899,6 +910,8 @@ public class Preferences {
         public static final String CLEAN_SESSION                    = "cleanSession";
         public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
+        public static final String DEBUG_LOG                        = "debugLog";
+
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
