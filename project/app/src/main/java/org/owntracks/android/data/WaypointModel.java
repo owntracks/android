@@ -36,11 +36,13 @@ public class WaypointModel extends BaseObservable {
         this.id = id;
         this.tst = tst;
         this.description = description;
-        this.geofenceLatitude = geofenceLatitude;
+        setGeofenceLongitude(geofenceLongitude);
+        setGeofenceLatitude(geofenceLatitude);
         this.geofenceLongitude = geofenceLongitude;
         this.geofenceRadius = geofenceRadius;
         this.lastTransition = lastTransition;
         this.lastTriggered = lastTriggered;
+
     }
 
     public long getId() {

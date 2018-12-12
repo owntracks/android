@@ -106,7 +106,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
 
     @Override
     public List<WaypointModel> getAllWithGeofences() {
-        return this.box.query().greater(WaypointModel_.geofenceRadius,0L).build().find();
+        return this.box.query().greater(WaypointModel_.geofenceRadius,0L).and().between(WaypointModel_.geofenceLatitude,-90, 90).and().between(WaypointModel_.geofenceLongitude,-180, 180).build().find();
     }
 
     @Override
