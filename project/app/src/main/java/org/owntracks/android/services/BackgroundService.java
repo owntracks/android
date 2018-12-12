@@ -209,7 +209,9 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
 
-        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT);
+        // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
+        // User has to actively configure this in the notification channel settings.
+        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT );
         ongoingChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         ongoingChannel.setDescription(getString(R.string.notificationChannelOngoingDescription));
         ongoingChannel.enableLights(false);
@@ -525,14 +527,18 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
 
         for (WaypointModel w : loadedWaypoints){
-            Timber.v("desc:%s", w.getDescription());
+            Timber.v("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
 
-            geofences.add(new Geofence.Builder()
-                    .setRequestId(Long.toString(w.getId()))
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                    .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
+            try {
+                geofences.add(new Geofence.Builder()
+                        .setRequestId(Long.toString(w.getId()))
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
+                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
+            } catch (IllegalArgumentException e) {
+                Timber.e(e, "Invalid geofence parameter");
+            }
         }
 
         if (geofences.size() > 0) {
