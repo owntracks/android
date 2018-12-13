@@ -138,7 +138,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
 
-    implementation "android.arch.work:work-runtime:1.0.0-alpha12"
+    implementation "android.arch.work:work-runtime:1.0.0-alpha13"
     implementation "android.arch.lifecycle:extensions:1.1.1"
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
