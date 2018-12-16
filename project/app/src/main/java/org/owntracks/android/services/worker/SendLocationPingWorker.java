@@ -9,7 +9,6 @@ import org.owntracks.android.services.LocationProcessor;
 
 import javax.inject.Inject;
 
-import androidx.work.Result;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
