@@ -1,7 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.SharedPreferences;
-import android.util.Base64;
+import android.support.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -24,8 +24,7 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +35,9 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionPool;
+import okhttp3.Credentials;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -48,25 +50,30 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     public static final int MODE_ID = 3;
 
     // Headers according to https://github.com/owntracks/recorder#http-mode
-    private static final String HEADER_USERNAME = "X-Limit-U";
-    private static final String HEADER_DEVICE = "X-Limit-D";
+    public static final String HEADER_USERNAME = "X-Limit-U";
+    public static final String HEADER_DEVICE = "X-Limit-D";
+    public static final String HEADER_USERAGENT = "User-Agent";
+    public static final String METHOD = "POST";
 
-    private static final String HEADER_AUTHORIZATION = "Authorization";
+    public static final String HEADER_AUTHORIZATION = "Authorization";
 
-    private static String headerUsername;
-    private static String headerDevice;
+    private static String httpEndpointHeaderUser = "";
+    private static String httpEndpointHeaderDevice = "";
+    private static String httpEndpointHeaderPassword = "";
 
-    private String endpointUrl;
-    private String endpointUserInfo;
+    //private String endpointUrl;
+    //private String endpointUserInfo;
 
     private static OkHttpClient mHttpClient;
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
 
     public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
+    public static final String HTTPTOPIC = "owntracks/http/";
 
     protected Preferences preferences;
     protected Parser parser;
     protected Scheduler scheduler;
+    private HttpUrl httpEndpoint;
 
 
     public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
@@ -86,9 +93,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     }
 
-    private void loadHTTPClient() {
+    @Nullable
+    private SocketFactory getSocketFactory() {
         String tlsCaCrt = preferences.getTlsCaCrtName();
         String tlsClientCrt = preferences.getTlsClientCrtName();
+
+        if(tlsCaCrt.length() == 0 && tlsClientCrt.length() == 0) {
+            return null;
+        }
+
         SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
         if (tlsCaCrt.length() > 0) {
@@ -96,6 +109,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
             } catch (FileNotFoundException e) {
                 Timber.e(e);
+                return null;
             }
         }
 
@@ -104,97 +118,119 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
                 Timber.e(e1);
+                return null;
             }
         }
 
         try {
-            SocketFactory f = new SocketFactory(socketFactoryOptions);
-
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel( HttpLoggingInterceptor.Level.NONE);
-
-            mHttpClient = new OkHttpClient.Builder()
-                    .followRedirects(true)
-                    .followSslRedirects(true)
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    //.dns(new DebugDnsSelector(DebugDnsSelector.Mode.IPV4_FIRST))
-                    .connectionPool(new ConnectionPool())
-                    .sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0])
-                    .addInterceptor(logging).build();
-
-
-
-        } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException | IOException | UnrecoverableKeyException | CertificateException e) {
-            //e.printStackTrace();
-            Timber.e(e);
+            return new SocketFactory(socketFactoryOptions);
+        } catch (Exception e) {
+            return null;
         }
-        headerUsername = preferences.getStringOrNull(Preferences.Keys.USERNAME);
-        headerDevice = preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
+    }
+
+    private void loadHTTPClient() {
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel( HttpLoggingInterceptor.Level.NONE);
+
+        SocketFactory f = getSocketFactory();
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .connectionPool(new ConnectionPool())
+                .addInterceptor(logging);
+
+        if(f != null) {
+            builder.sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]);
+        }
+
+        mHttpClient = builder.build();
     }
 
 
     private void loadEndpointUrl() {
-        URL endpoint;
         try {
-            endpoint = new URL(preferences.getUrl());
+            httpEndpointHeaderUser = preferences.getUsername();
+            httpEndpointHeaderDevice = preferences.getDeviceId();
 
-            this.endpointUserInfo = endpoint.getUserInfo();
+            httpEndpoint = HttpUrl.get(preferences.getUrl());
 
-            if (this.endpointUserInfo != null && this.endpointUserInfo.length() > 0) {
-                this.endpointUrl = endpoint.toString().replace(endpointUserInfo+"@", "");
-            } else {
-                this.endpointUrl = endpoint.toString();
+            if(!httpEndpoint.username().isEmpty() && !httpEndpoint.password().isEmpty()) {
+                httpEndpointHeaderUser = httpEndpoint.username();
+                httpEndpointHeaderPassword = httpEndpoint.password();
+            } else if(preferences.getAuth()) {
+                httpEndpointHeaderPassword = preferences.getPassword();
             }
-            Timber.v("endpointUrl:%s, endpointUserInfo:%s", this.endpointUrl, this.endpointUserInfo );
+
 
             messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
+            httpEndpoint = null;
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
         }
     }
 
-    private void sendMessage(MessageBase message) {
-        long messageId = message.getMessageId();
+    @Nullable
+    public Request getRequest(MessageBase message) {
+        if(!this.isConfigurationComplete()) {
+            return null;
+        }
+        Timber.v("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
+
         String body;
         try {
             body = parser.toJson(message);
-        } catch (IOException | Parser.EncryptionException e) {
-            messageProcessor.onMessageDeliveryFailedFinal(messageId);
-            return;
+        } catch (IOException e) { // Message serialization failed. This shouldn't happen.
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage(e.getMessage()));
+            return null;
         }
 
-        Timber.v("url:%s, userInfo:%s, messageId:%s", this.endpointUrl, this.endpointUserInfo,  messageId);
 
-        if(body == null || this.endpointUrl == null) {
-            Timber.e("body or url null");
-            messageProcessor.onMessageDeliveryFailed(messageId);
-            return;
-        }
-
-        Request.Builder request = new Request.Builder().url(this.endpointUrl).header("User-Agent",USERAGENT).method("POST", RequestBody.create(JSON, body));
-        if(this.endpointUserInfo != null) {
-            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString(this.endpointUserInfo.getBytes(), Base64.NO_WRAP));
-        } else if(preferences.getAuth()) {
-            request.header(HEADER_AUTHORIZATION, "Basic " + android.util.Base64.encodeToString((preferences.getUsername()+":"+preferences.getPassword()).getBytes(), Base64.NO_WRAP));
-        }
-
+        // Any exception here (invalid header value, invalid URL, etc) will persist for all future messages until configuration is fixed.
+        // Setting httpEndpoint to null will make sure no message can be send until the problem is corrected.
         try {
-            if (headerUsername != null) {
-                request.header(HEADER_USERNAME, headerUsername);
+            Request.Builder request = new Request.Builder().url(this.httpEndpoint).header(HEADER_USERAGENT,USERAGENT).method(METHOD, RequestBody.create(JSON, body));
+
+            if(isSet(httpEndpointHeaderUser) && isSet(httpEndpointHeaderPassword)) {
+                request.header(HEADER_AUTHORIZATION, Credentials.basic(httpEndpointHeaderUser, httpEndpointHeaderPassword));
             }
-            if (headerDevice != null) {
-                request.header(HEADER_DEVICE, headerDevice);
+
+            if (isSet(httpEndpointHeaderUser)) {
+                request.header(HEADER_USERNAME, httpEndpointHeaderUser);
             }
-        } catch (IllegalAccessError e) {
+
+            if (isSet(httpEndpointHeaderDevice)) {
+                request.header(HEADER_DEVICE, httpEndpointHeaderDevice);
+            }
+
+            return request.build();
+        } catch (Exception e) {
             Timber.e(e,"invalid header specified");
-            messageProcessor.onMessageDeliveryFailedFinal(messageId);
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("invalid value for user or device header"));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setMessage(e.getMessage()));
+            httpEndpoint = null;
+            return null;
+        }
+    }
+
+
+    public static boolean isSet(String str) {
+        return str != null && str.length() > 0;
+    }
+
+    private void sendMessage(MessageBase message) {
+        long messageId = message.getMessageId();
+        Request request = getRequest(message);
+        if(request == null) {
+            messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
 
         try {
             //Send request
-            Response r = mHttpClient.newCall(request.build()).execute();
+            Response r = mHttpClient.newCall(request).execute();
 
             // Message was send. Handle delivered message
             if((r.isSuccessful())) {
@@ -289,19 +325,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(Preferences.Keys.URL.equals(key))
+        if(Preferences.Keys.URL.equals(key) || Preferences.Keys.USERNAME.equals(key) || Preferences.Keys.PASSWORD.equals(key) || Preferences.Keys.DEVICE_ID.equals(key))
             loadEndpointUrl();
         else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
             loadHTTPClient();
-        else if(Preferences.Keys.USERNAME.equals(key))
-            headerUsername = preferences.getStringOrNull(Preferences.Keys.USERNAME);
-        else if(Preferences.Keys.DEVICE_ID.equals(key))
-            headerDevice = preferences.getStringOrNull(Preferences.Keys.DEVICE_ID);
     }
 
     @Override
     public boolean isConfigurationComplete() {
-        return this.endpointUrl != null;
+        return this.httpEndpoint != null;
     }
 
     @Override
@@ -313,7 +345,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     protected MessageBase onFinalizeMessage(MessageBase message) {
         // Build pseudo topic based on tid
         if(message.hasTid()) {
-            message.setTopic("owntracks/http/" + message.getTid());
+            message.setTopic(HTTPTOPIC + message.getTid());
         }
         return message;
     }
