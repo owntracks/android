@@ -34,7 +34,7 @@ public class GeocoderGoogle implements Geocoder {
             } else {
                 return "not available";
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             return null;
         }
     }
