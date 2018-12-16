@@ -699,6 +699,12 @@ public class Preferences {
             setString(Keys.PASSWORD, password);
     }
 
+
+    @Import(key =Keys.USE_PASSWORD)
+    public void setUsePassword(boolean usePassword) {
+        setBoolean(Keys.USE_PASSWORD, usePassword);
+    }
+
     @Import(key =Keys.DEVICE_ID)
     public void setDeviceId(String deviceId) {
         setString(Keys.DEVICE_ID, deviceId);
@@ -730,15 +736,20 @@ public class Preferences {
     public String getHost() {
         return getString(Keys.HOST, R.string.valEmpty);
     }
+
     @Export(key =Keys.PASSWORD, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public String getPassword() {
         return getString(Keys.PASSWORD, R.string.valEmpty);
     }
 
+    @Export(key =Keys.USE_PASSWORD, exportModeMqttPrivate =true)
+    public boolean getUsePassword() { return getBoolean(Keys.USE_PASSWORD, R.bool.valUsePassword); }
+
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
     public boolean getTls() {
         return getBoolean(Keys.TLS, R.bool.valTls);
     }
+
     @Export(key =Keys.WS, exportModeMqttPrivate =true)
     public boolean getWs() {
         return getBoolean(Keys.WS, R.bool.valWs);
@@ -750,9 +761,7 @@ public class Preferences {
     }
 
     @Export(key =Keys.TLS_CLIENT_CRT, exportModeMqttPrivate =true)
-    public String getTlsClientCrtName() {
-        return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty);
-    }
+    public String getTlsClientCrtName() { return getString(Keys.TLS_CLIENT_CRT, R.string.valEmpty); }
 
     @Export(key =Keys.NOTIFICATION_HIGHER_PRIORITY, exportModeMqttPrivate =true, exportModeHttpPrivate = true)
     public boolean getNotificationHigherPriority() {
@@ -946,6 +955,7 @@ public class Preferences {
         public static final String TLS_CLIENT_CRT_PASSWORD          = "tlsClientCrtPassword";
         public static final String TRACKER_ID                       = "tid";
         public static final String USERNAME                         = "username";
+        public static final String USE_PASSWORD                     = "usePassword";
         public static final String WS                               = "ws";
         public static final String URL                              = "url";
 

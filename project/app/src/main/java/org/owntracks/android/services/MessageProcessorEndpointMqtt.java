@@ -232,73 +232,67 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			return false;
 		}
 
-//		try {
-			Timber.v("setting up connect options");
-			connectOptions = new MqttConnectOptions();
-			if (preferences.getAuth()) {
+		connectOptions = new MqttConnectOptions();
+		if (preferences.getAuth()) {
+			if(preferences.getUsePassword()) {
 				connectOptions.setPassword(preferences.getPassword().toCharArray());
-				connectOptions.setUserName(preferences.getUsername());
 			}
+			connectOptions.setUserName(preferences.getUsername());
+		}
 
-			connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
+		connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
 
-			try {
-				if (preferences.getTls()) {
-					String tlsCaCrt = preferences.getTlsCaCrtName();
-					String tlsClientCrt = preferences.getTlsClientCrtName();
+		try {
+			if (preferences.getTls()) {
+				String tlsCaCrt = preferences.getTlsCaCrtName();
+				String tlsClientCrt = preferences.getTlsClientCrtName();
 
-					SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+				SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
-					if (tlsCaCrt.length() > 0) {
-						try {
-							socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
+				if (tlsCaCrt.length() > 0) {
+					try {
+						socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
 					}
-
-					if (tlsClientCrt.length() > 0) {
-						try {
-							socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
-						} catch (FileNotFoundException e1) {
-							e1.printStackTrace();
-						}
-					}
-
-					connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
 				}
-			} catch (Exception e) {
-				changeState(EndpointState.ERROR, e , "TLS setup failed");
-				return false;
+
+				if (tlsClientCrt.length() > 0) {
+					try {
+						socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}
+
+				connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
 			}
+		} catch (Exception e) {
+			changeState(EndpointState.ERROR, e , "TLS setup failed");
+			return false;
+		}
 
 
-			setWill(connectOptions);
-			connectOptions.setKeepAliveInterval(preferences.getKeepalive());
-			connectOptions.setConnectionTimeout(30);
-			connectOptions.setCleanSession(preferences.getCleanSession());
+		setWill(connectOptions);
+		connectOptions.setKeepAliveInterval(preferences.getKeepalive());
+		connectOptions.setConnectionTimeout(30);
+		connectOptions.setCleanSession(preferences.getCleanSession());
 
+		try {
 			Timber.v("connecting sync");
-			try {
-				this.mqttClient.connect(connectOptions).waitForCompletion();
-			} catch (MqttSecurityException e) {
-				changeState(EndpointState.ERROR, e , e.getMessage());
-				return false;
-			} catch (MqttException e) {
-				changeState(EndpointState.ERROR);
-				return false;
-			}
-			scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
-			changeState(EndpointState.CONNECTED);
+			this.mqttClient.connect(connectOptions).waitForCompletion();
+		} catch (MqttSecurityException e) {
+			changeState(EndpointState.ERROR, e , e.getMessage());
+			return false;
+		} catch (MqttException e) {
+			changeState(EndpointState.ERROR);
+			return false;
+		}
+		scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
+		changeState(EndpointState.CONNECTED);
 
-			sendMessageConnectPressure =0; // allow new connection attempts from sendMessage
-			return true;
-
-//		} catch (Exception e) { // Catch paho and socket factory exceptions
-//			Timber.e(e);
-//			changeState(e);
-//			return false;
-//		}
+		sendMessageConnectPressure =0; // allow new connection attempts from sendMessage
+		return true;
 	}
 
 	private void setWill(MqttConnectOptions m) {
