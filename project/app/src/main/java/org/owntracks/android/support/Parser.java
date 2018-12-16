@@ -45,11 +45,11 @@ public class Parser {
         return defaultMapper.writeValueAsBytes(message);
     }
 
-    public String toJson(@NonNull MessageBase message) throws IOException, EncryptionException {
+    public String toJson(@NonNull MessageBase message) throws IOException {
         return encryptString(toJsonPlain(message));
     }
 
-    public byte[] toJsonBytes(@NonNull MessageBase message) throws IOException, EncryptionException {
+    public byte[] toJsonBytes(@NonNull MessageBase message) throws IOException {
         return encryptBytes(toJsonPlainBytes(message));
     }
 
