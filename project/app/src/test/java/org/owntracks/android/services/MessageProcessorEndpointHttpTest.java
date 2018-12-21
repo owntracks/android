@@ -1,22 +1,12 @@
 package org.owntracks.android.services;
 
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-
-import com.fasterxml.jackson.core.JsonParseException;
-
-import net.lachlanmckee.timberjunit.TimberTestRule;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.Request;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.owntracks.android.App;
-import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.EncryptionProvider;
 import org.owntracks.android.support.Parser;
@@ -25,24 +15,13 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mock;
-
 
 
 @RunWith(PowerMockRunner.class)
@@ -55,7 +34,7 @@ public class MessageProcessorEndpointHttpTest {
     private Preferences testPreferences;
 
     @Mock
-    private MessageProcessor messageProcessor ;
+    private MessageProcessor messageProcessor;
 
     @Mock
     private Scheduler scheduler;
@@ -78,8 +57,8 @@ public class MessageProcessorEndpointHttpTest {
         messageLocation.setLat(50.1);
         messageLocation.setLon(60.2);
         messageLocation.setTst(123456789);
-        messageLocation.setVelocity((int)5.6);
-        messageLocation.setVac((int)1.7);
+        messageLocation.setVelocity((int) 5.6);
+        messageLocation.setVac((int) 1.7);
 
         testPreferences = mock(Preferences.class);
         when(testPreferences.getTlsCaCrtName()).thenReturn("");
@@ -116,7 +95,7 @@ public class MessageProcessorEndpointHttpTest {
         assertNull(request.header(MessageProcessorEndpointHttp.HEADER_USERNAME));
         assertNull(request.header(MessageProcessorEndpointHttp.HEADER_DEVICE));
         assertEquals(MessageProcessorEndpointHttp.METHOD, request.method());
-        assertEquals("http://example.com/owntracks/test", request.url().toString() );
+        assertEquals("http://example.com/owntracks/test", request.url().toString());
 
     }
 
@@ -188,7 +167,7 @@ public class MessageProcessorEndpointHttpTest {
     public void EndpointCorrectlyFailsOnInvalidUrl() {
         String[] urls = {"htt://example.com/owntracks/test", "tt://example", "example.com"};
 
-        for(String url : urls) {
+        for (String url : urls) {
             when(testPreferences.getUrl()).thenReturn(url);
             messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
             assertFalse(messageProcessorEndpointHttp.isConfigurationComplete());
