@@ -76,7 +76,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fadingEdge="horizontal"
-                            android:text="Mode"
+			    android:text="@string/preferencesProfileId"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         <TextView
@@ -125,7 +125,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fadingEdge="horizontal"
-                            android:text="Host"
+			    android:text="@string/preferencesHost"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </RelativeLayout>
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fadingEdge="horizontal"
-                            android:text="Identification"
+			    android:text="@string/preferencesIdentification"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </RelativeLayout>
@@ -203,7 +203,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fadingEdge="horizontal"
-                            android:text="Security"
+			    android:text="@string/preferencesSecurity"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </RelativeLayout>
@@ -243,7 +243,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fadingEdge="horizontal"
-                            android:text="Parameters"
+			    android:text="@string/preferencesParameters"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </RelativeLayout>

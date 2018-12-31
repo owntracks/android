@@ -72,11 +72,11 @@
 
         <activity
             android:name=".ui.regions.RegionsActivity"
-            android:label="Regions"
+	    android:label="@string/title_activity_regions"
             android:launchMode="singleTop"/>
         <activity
             android:name=".ui.region.RegionActivity"
-            android:label="Region"
+	    android:label="@string/title_activity_region"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
