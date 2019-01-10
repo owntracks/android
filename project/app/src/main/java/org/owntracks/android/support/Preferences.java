@@ -891,6 +891,7 @@ public class Preferences {
         setBoolean(Keys.FUSED_REGION_DETECTION, aBoolean);
     }
 
+    @Export(key =Keys.DEBUG_LOG, exportModeMqttPrivate = true, exportModeHttpPrivate =true)
     public boolean getLogDebug() {
         return getBoolean(Keys.DEBUG_LOG, R.bool.valFalse);
     }
