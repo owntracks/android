@@ -7,11 +7,11 @@ def versionPatch = 2
 def versionBuild = 1
 
 ext.pahoVersion = "1.2.0"
-ext.daggerVersion = '2.19'
+ext.daggerVersion = '2.20'
 ext.playLibVersion = '16.0.0'
-ext.okHttpVersion = '3.12.0'
+ext.okHttpVersion = '3.12.1'
 ext.supportLibVersion = '28.0.0'
-ext.jacksonVersion = '2.9.7'
+ext.jacksonVersion = '2.9.8'
 
 android {
     compileSdkVersion 28
@@ -138,7 +138,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
 
-    implementation "android.arch.work:work-runtime:1.0.0-alpha13"
+    implementation "android.arch.work:work-runtime:1.0.0-beta01"
     implementation "android.arch.lifecycle:extensions:1.1.1"
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
@@ -151,7 +151,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
-    implementation "com.mikepenz:materialize:1.1.2@aar"
+    implementation "com.mikepenz:materialize:1.2.0@aar"
 
     // Preprocessors
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
@@ -163,9 +163,9 @@ dependencies {
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.23.4"
-    testImplementation "org.powermock:powermock-module-junit4:2.0.0-RC.4"
-    testImplementation "org.powermock:powermock-api-mockito2:2.0.0-RC.4"
-    testImplementation "org.robolectric:shadows-playservices:4.0.2"
+    testImplementation "org.powermock:powermock-module-junit4:2.0.0"
+    testImplementation "org.powermock:powermock-api-mockito2:2.0.0"
+    testImplementation "org.robolectric:shadows-playservices:4.1"
     testImplementation "org.robolectric:robolectric:4.1"
 }
 
