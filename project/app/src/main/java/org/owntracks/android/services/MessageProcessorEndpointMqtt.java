@@ -273,7 +273,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		}
 
 
-		setWill(connectOptions);
+		if(!setWill(connectOptions)) {
+			return false;
+		}
+
 		connectOptions.setKeepAliveInterval(preferences.getKeepalive());
 		connectOptions.setConnectionTimeout(30);
 		connectOptions.setCleanSession(preferences.getCleanSession());
@@ -295,15 +298,19 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		return true;
 	}
 
-	private void setWill(MqttConnectOptions m) {
+	private boolean setWill(MqttConnectOptions m) {
 		try {
 			JSONObject lwt = new JSONObject();
 			lwt.put("_type", "lwt");
 			lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
 			m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
-		} catch(JSONException ignored) {}
-
+		} catch (JSONException ignored) {
+		} catch (IllegalArgumentException e) {
+			changeState(EndpointState.ERROR_CONFIGURATION, e, "Invalid pubTopic specified");
+			return false;
+		}
+		return true;
 	}
 
 	private String getConnectionId() {
@@ -429,7 +436,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 	@Override
 	public boolean isConfigurationComplete() {
-		return !preferences.getHost().trim().equals("") && !preferences.getUsername().trim().equals("") && (!preferences.getAuth() || !preferences.getPassword().trim().equals(""));
+		return !preferences.getHost().trim().isEmpty() && !preferences.getUsername().trim().isEmpty() && (!preferences.getAuth() || !preferences.getPassword().trim().isEmpty());
 	}
 
 	@WorkerThread
