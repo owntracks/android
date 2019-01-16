@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -64,7 +65,7 @@ import javax.inject.Inject;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
-public class BackgroundService extends DaggerService implements OnCompleteListener<Location> {
+public class BackgroundService extends DaggerService implements OnCompleteListener<Location>,Preferences.OnPreferenceChangedListener {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -159,6 +160,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         eventBus.register(this);
         eventBus.postSticky(new Events.ServiceStarted());
+
+        preferences.registerOnPreferenceChangedListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        preferences.unregisterOnPreferenceChangedListener(this);
+        super.onDestroy();
     }
 
     @Override
@@ -474,11 +483,10 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
         int monitoring = preferences.getMonitoring();
-        Timber.v("requesting location updates for monitoring mode %s",  monitoring);
 
         LocationRequest request = new LocationRequest();
 
-        switch (preferences.getMonitoring()) {
+        switch (monitoring) {
             case LocationProcessor.MONITORING_QUIET:
             case LocationProcessor.MONITORING_MANUAL:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
@@ -498,13 +506,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-        //mFusedLocationClient.removeLocationUpdates(locationCallback);
+        Timber.d("location request params: mode %s, interval:%s, fastestInterval:%s, priority:%s, displacement:%s", monitoring, request.getInterval(), request.getFastestInterval(), request.getPriority(), request.getSmallestDisplacement());
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
-    }
-
-    private PendingIntent getLocationPendingIntent() {
-        Intent locationIntent = new Intent(getApplicationContext(), BackgroundService.class);
-        return PendingIntent.getService(getApplicationContext(), INTENT_REQUEST_CODE_LOCATION, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -589,6 +592,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     public void onEvent(Events.ModeChanged e) {
         removeGeofences();
         setupGeofences();
+        setupLocationRequest();
         sendOngoingNotification();
     }
 
@@ -695,6 +699,18 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private final IBinder mBinder = new LocalBinder();
+
+    @Override
+    public void onAttachAfterModeChanged() {
+        //NOOP. Handled through eventbus
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) || Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key)) {
+            setupLocationRequest();
+        }
+    }
 
 
     public class LocalBinder extends Binder {
