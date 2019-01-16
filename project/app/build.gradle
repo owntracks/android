@@ -151,7 +151,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:support-annotations:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
-    implementation "com.mikepenz:materialize:1.2.0@aar"
+    implementation "com.mikepenz:materialize:1.1.2@aar"
 
     // Preprocessors
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
