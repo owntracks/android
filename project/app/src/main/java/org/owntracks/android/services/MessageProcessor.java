@@ -248,13 +248,19 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     void onMessageDeliveryFailed(Long messageId) {
-        Timber.v("queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
+        Timber.e("queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
 
         MessageBase m = outgoingQueue.get(messageId);
 
          if(m != null) {
              m.clearOutgoingProcessor();
          }
+
+
+        for (int i = 0; i < outgoingQueue.size(); i++) {
+             MessageBase message =  outgoingQueue.get(outgoingQueue.keyAt(i));
+             Timber.v("queued message: %s ",message.getMessageId());
+        }
 
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
