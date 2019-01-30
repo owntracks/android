@@ -141,7 +141,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 .followSslRedirects(true)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool())
-                .addInterceptor(logging);
+                .addInterceptor(logging)
+                .cache(null);
 
         if(f != null) {
             builder.sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]);
