@@ -373,6 +373,11 @@ public class Preferences {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
     }
 
+    @Export(key =Keys.LOCATOR_PRIORITY, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getLocatorPriority() {
+        return getInt(Keys.LOCATOR_PRIORITY, R.integer.valLocatorPriority);
+    }
+
     @Export(key =Keys.PING, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     // Unit is minutes
     public int getPing() {
@@ -677,6 +682,16 @@ public class Preferences {
         setInt(Keys.LOCATOR_DISPLACEMENT, anInt);
 
     }
+    @Import(key =Keys.LOCATOR_PRIORITY)
+    private void setLocatorPriority(int anInt) {
+        if(anInt > 0 && anInt <= 3) {
+            setInt(Keys.LOCATOR_PRIORITY, anInt);
+        } else {
+            Timber.e("invalid locator priority specified %s", anInt);
+        }
+    }
+
+
     @Import(key =Keys.PUB_RETAIN)
     private void setPubRetain(boolean aBoolean) {
         setBoolean(Keys.PUB_RETAIN, aBoolean);
@@ -930,6 +945,7 @@ public class Preferences {
         public static final String KEEPALIVE                        = "keepalive";
         public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
         public static final String LOCATOR_INTERVAL                 = "locatorInterval";
+        public static final String LOCATOR_PRIORITY                 = "locatorPriority";
         public static final String MODE_ID                          = "mode";
         public static final String MONITORING                       = "monitoring";
         public static final String MQTT_PROTOCOL_LEVEL              = "mqttProtocolLevel";

@@ -5,7 +5,7 @@
         android:icon="@drawable/ic_adjust_black_24dp"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:title="@string/monitoring"/>
+        android:title="Monitoring"/>
 
 
 

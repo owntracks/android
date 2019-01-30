@@ -498,7 +498,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
                 request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
-                request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                request.setPriority(getLocationRequestPriority());
+
                 break;
             case LocationProcessor.MONITORING_MOVE:
                 request.setInterval(TimeUnit.SECONDS.toMillis(30));
@@ -506,8 +507,23 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-        Timber.d("location request params: mode %s, interval:%s, fastestInterval:%s, priority:%s, displacement:%s", monitoring, request.getInterval(), request.getFastestInterval(), request.getPriority(), request.getSmallestDisplacement());
+        Timber.d("location request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
         mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
+    }
+
+    private int getLocationRequestPriority() {
+        switch (preferences.getLocatorPriority()) {
+            case 0:
+                return LocationRequest.PRIORITY_NO_POWER;
+            case 1:
+                return LocationRequest.PRIORITY_LOW_POWER;
+            case 2:
+                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+            case 3:
+                return LocationRequest.PRIORITY_HIGH_ACCURACY;
+            default:
+                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+        }
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -614,7 +630,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation m) {
-        Timber.v("MessageLocation received %s, %s, outgoing: %s ", m, lastLocationMessage, m.isOutgoing());
+        Timber.v("MessageLocation received %s, %s, outgoing: %s, delivered: %s ", m, lastLocationMessage, m.isOutgoing(), m.isDelivered());
         if (m.isDelivered() && (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst())) {
             this.lastLocationMessage = m;
             sendOngoingNotification();
@@ -707,7 +723,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) || Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key)) {
+        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) || Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key) || Preferences.Keys.LOCATOR_PRIORITY.equals(key)) {
+            Timber.v("locator preferences changed. Resetting location request.");
             setupLocationRequest();
         }
     }
