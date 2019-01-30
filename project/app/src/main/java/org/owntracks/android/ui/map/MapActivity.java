@@ -317,15 +317,20 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         switch (preferences.getMonitoring()) {
             case LocationProcessor.MONITORING_QUIET:
                 item.setIcon(R.drawable.ic_stop_white_36dp);
+                item.setTitle(R.string.monitoring_quiet);
                 break;
             case LocationProcessor.MONITORING_MANUAL:
                 item.setIcon(R.drawable.ic_pause_white_36dp);
+                item.setTitle(R.string.monitoring_manual);
                 break;
             case LocationProcessor.MONITORING_SIGNIFFICANT:
                 item.setIcon(R.drawable.ic_play_white_36dp);
+                item.setTitle(R.string.monitoring_signifficant);
+
                 break;
             case LocationProcessor.MONITORING_MOVE:
                 item.setIcon(R.drawable.ic_step_forward_2_white_36dp);
+                item.setTitle(R.string.monitoring_move);
                 break;
         }
     }
