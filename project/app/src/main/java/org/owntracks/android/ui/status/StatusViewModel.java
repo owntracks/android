@@ -1,13 +1,13 @@
 package org.owntracks.android.ui.status;
 
 import android.content.Context;
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.App;

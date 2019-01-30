@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.region;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.LocationRepo;

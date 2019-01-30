@@ -1,7 +1,7 @@
 package org.owntracks.android.injection.modules.android.FragmentModules;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import org.owntracks.android.injection.qualifier.DefaultFragmentManager;
 import org.owntracks.android.injection.scopes.PerFragment;

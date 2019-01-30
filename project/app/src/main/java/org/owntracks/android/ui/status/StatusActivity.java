@@ -1,7 +1,7 @@
 package org.owntracks.android.ui.status;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiStatusBinding;

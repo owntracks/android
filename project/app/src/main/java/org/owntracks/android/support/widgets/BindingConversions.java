@@ -1,9 +1,9 @@
 package org.owntracks.android.support.widgets;
 
-import android.databinding.BindingAdapter;
-import android.databinding.BindingConversion;
-import android.databinding.InverseMethod;
-import android.support.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.BindingConversion;
+import androidx.databinding.InverseMethod;
+import androidx.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;

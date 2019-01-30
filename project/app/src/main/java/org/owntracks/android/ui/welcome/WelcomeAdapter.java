@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.welcome;
 
 import android.os.Build;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
 import org.owntracks.android.injection.scopes.PerActivity;

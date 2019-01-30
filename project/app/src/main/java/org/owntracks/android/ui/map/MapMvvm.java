@@ -1,7 +1,7 @@
 package org.owntracks.android.ui.map;
 
-import android.arch.lifecycle.LiveData;
-import android.databinding.Bindable;
+import androidx.lifecycle.LiveData;
+import androidx.databinding.Bindable;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;

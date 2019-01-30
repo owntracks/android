@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.injection.scopes.PerActivity;

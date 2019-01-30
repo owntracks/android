@@ -1,6 +1,6 @@
 package org.owntracks.android.services;
 
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import org.junit.Before;
 import org.junit.Test;

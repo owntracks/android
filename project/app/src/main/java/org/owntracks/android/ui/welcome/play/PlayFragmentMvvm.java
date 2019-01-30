@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.welcome.play;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm;

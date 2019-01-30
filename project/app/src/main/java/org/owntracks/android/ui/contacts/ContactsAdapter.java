@@ -1,7 +1,7 @@
 package org.owntracks.android.ui.contacts;
 
-import android.databinding.ObservableList;
-import android.support.annotation.NonNull;
+import androidx.databinding.ObservableList;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import org.owntracks.android.BR;

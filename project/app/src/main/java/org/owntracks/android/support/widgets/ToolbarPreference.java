@@ -3,7 +3,7 @@ package org.owntracks.android.support.widgets;
 import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;

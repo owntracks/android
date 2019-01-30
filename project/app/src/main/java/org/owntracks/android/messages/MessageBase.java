@@ -1,6 +1,6 @@
 package org.owntracks.android.messages;
-import android.databinding.BaseObservable;
-import android.support.annotation.NonNull;
+import androidx.databinding.BaseObservable;
+import androidx.annotation.NonNull;
 
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;

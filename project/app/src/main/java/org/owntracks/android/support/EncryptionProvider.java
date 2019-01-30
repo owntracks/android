@@ -2,7 +2,7 @@ package org.owntracks.android.support;
 
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Base64;
 
 import org.libsodium.jni.crypto.Random;

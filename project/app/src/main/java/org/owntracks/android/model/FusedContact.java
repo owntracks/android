@@ -1,9 +1,9 @@
 package org.owntracks.android.model;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 
 import com.google.android.gms.maps.model.LatLng;

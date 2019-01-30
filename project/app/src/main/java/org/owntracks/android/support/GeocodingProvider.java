@@ -1,10 +1,10 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.os.AsyncTask;
-import android.support.annotation.CallSuper;
-import android.support.v4.util.LruCache;
+import androidx.annotation.CallSuper;
+import androidx.collection.LruCache;
 import android.widget.TextView;
 
 import org.owntracks.android.R;

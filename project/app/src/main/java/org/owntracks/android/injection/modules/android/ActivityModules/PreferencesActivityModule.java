@@ -1,6 +1,6 @@
 package org.owntracks.android.injection.modules.android.ActivityModules;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.owntracks.android.injection.modules.android.FragmentModules.PreferencesFragmentModule;
 import org.owntracks.android.injection.scopes.PerActivity;

@@ -2,7 +2,7 @@ package org.owntracks.android.support.widgets;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.util.AttributeSet;
 
 import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;

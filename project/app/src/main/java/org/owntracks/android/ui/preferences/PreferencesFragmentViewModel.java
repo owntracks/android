@@ -1,8 +1,8 @@
 package org.owntracks.android.ui.preferences;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.support.Preferences;

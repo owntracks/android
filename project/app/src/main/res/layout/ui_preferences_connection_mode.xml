@@ -17,7 +17,7 @@
 		android:layout_marginBottom="8dp"
 		android:checkedButton="@={vm.mode}">
 
-		<android.support.v7.widget.AppCompatRadioButton
+		<androidx.appcompat.widget.AppCompatRadioButton
 			android:id="@+id/radioModeHttpPrivate"
 			style="@style/RadioGroupItem"
 			android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
 			android:text="@string/mode_http_private_label"
 			android:textSize="@dimen/listitem_textsize"/>
 
-		<android.support.v7.widget.AppCompatRadioButton
+		<androidx.appcompat.widget.AppCompatRadioButton
 			android:id="@+id/radioModeMqttPrivate"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"

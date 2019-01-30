@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.welcome.play;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;

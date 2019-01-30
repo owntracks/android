@@ -3,7 +3,7 @@ package org.owntracks.android;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.AppComponentProvider;

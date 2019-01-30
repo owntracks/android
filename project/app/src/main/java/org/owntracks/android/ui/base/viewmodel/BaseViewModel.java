@@ -1,10 +1,10 @@
 package org.owntracks.android.ui.base.viewmodel;
 
-import android.databinding.BaseObservable;
+import androidx.databinding.BaseObservable;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;

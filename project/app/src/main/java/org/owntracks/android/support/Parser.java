@@ -1,6 +1,6 @@
 package org.owntracks.android.support;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

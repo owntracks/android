@@ -10,18 +10,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:elevation="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-        </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <org.owntracks.android.support.widgets.RecyclerView
             android:id="@+id/recyclerView"

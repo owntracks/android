@@ -1,7 +1,7 @@
 package org.owntracks.android.injection.modules.android.FragmentModules;
 
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;

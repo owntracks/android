@@ -1,7 +1,7 @@
 package org.owntracks.android.injection.modules.android.ActivityModules;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.owntracks.android.injection.qualifier.ActivityContext;
 import org.owntracks.android.injection.scopes.PerActivity;

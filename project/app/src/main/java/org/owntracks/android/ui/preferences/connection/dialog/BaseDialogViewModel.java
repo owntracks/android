@@ -1,8 +1,8 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
-import android.databinding.BaseObservable;
-import android.support.annotation.NonNull;
+import androidx.databinding.BaseObservable;
+import androidx.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;

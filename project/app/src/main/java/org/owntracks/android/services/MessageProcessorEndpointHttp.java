@@ -1,7 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -24,19 +24,12 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
-import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;

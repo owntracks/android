@@ -1,7 +1,7 @@
 package org.owntracks.android.data.repos;
 
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

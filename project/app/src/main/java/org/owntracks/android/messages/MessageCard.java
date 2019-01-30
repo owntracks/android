@@ -1,6 +1,6 @@
 package org.owntracks.android.messages;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

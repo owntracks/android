@@ -2,16 +2,16 @@ package org.owntracks.android.ui.base;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.databinding.DataBindingUtil;
-import android.databinding.ObservableList;
-import android.databinding.OnRebindCallback;
-import android.databinding.ViewDataBinding;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableList;
+import androidx.databinding.OnRebindCallback;
+import androidx.databinding.ViewDataBinding;
 import android.os.Looper;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,7 +194,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
 
         /**
          * Set the item id's for the items. If not null, this will set {@link
-         * android.support.v7.widget.RecyclerView.Adapter#setHasStableIds(boolean)} to true.
+         * RecyclerView.Adapter#setHasStableIds(boolean)} to true.
          */
         public void setItemIds(@Nullable ItemIds<T> itemIds) {
             this.itemIds = itemIds;

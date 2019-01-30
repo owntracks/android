@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.region;
 
-import android.databinding.Bindable;
+import androidx.databinding.Bindable;
 
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.ui.base.view.MvvmView;

@@ -1,8 +1,8 @@
 package org.owntracks.android.ui.base.viewmodel;
 
-import android.databinding.Observable;
+import androidx.databinding.Observable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 

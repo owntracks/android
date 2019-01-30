@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.base;
 
-import android.support.annotation.LayoutRes;
+import androidx.annotation.LayoutRes;
 
 
 public final class BaseAdapterItemView {
