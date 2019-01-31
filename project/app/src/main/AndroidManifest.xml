@@ -4,9 +4,6 @@
     package="org.owntracks.android">
 
     <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="false" />
-    <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
 
@@ -49,13 +46,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.Owntracks"
         tools:ignore="UnusedAttribute"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        >
+
+
 
         <!-- Disables default initialization of WorkManager because custom initializer is used in App.onCreate()-->
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             tools:replace="android:authorities"
-            android:authorities="org.owntracks.android.workmanager-init"
+            android:authorities="${applicationId}.workmanager-init"
             android:enabled="false"
             android:exported="false" />
 
