@@ -3,6 +3,8 @@ package org.owntracks.android;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.StrictMode;
+
 import androidx.annotation.NonNull;
 
 import org.owntracks.android.injection.components.AppComponent;
@@ -60,6 +62,22 @@ public class App extends DaggerApplication  {
                 }
             });
         }
+
+        if(BuildConfig.DEBUG) {
+            Timber.e("StrictMode enabled in DEBUG build");
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .penaltyDialog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .build());
+
+        }
+
 
         preferences.checkFirstStart();
 
