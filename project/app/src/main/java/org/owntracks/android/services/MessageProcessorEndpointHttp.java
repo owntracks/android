@@ -24,6 +24,9 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -33,6 +36,7 @@ import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -135,6 +139,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool())
                 .addInterceptor(logging)
+                .retryOnConnectionFailure(false)
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .cache(null);
 
         if(f != null) {
@@ -221,6 +227,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
+        Timber.d("connectionpool idle count: %s ", mHttpClient.connectionPool().idleConnectionCount());
 
         try {
             //Send request
@@ -246,6 +253,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
                         messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
+
+                    r.close();
                 }
             // Server could be contacted but returned non success HTTP code
             } else {
@@ -259,6 +268,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             Timber.e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
+            mHttpClient.connectionPool().evictAll();
+
+
             return;
         }
 
