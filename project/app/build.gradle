@@ -141,7 +141,7 @@ dependencies {
 
     // Widget libraries
     implementation "com.rengwuxian.materialedittext:library:2.1.4"
-    implementation "com.afollestad.material-dialogs:core:0.9.6.0"
+    implementation "com.afollestad.material-dialogs:core:2.0.1"
     implementation "com.afollestad.material-dialogs:commons:0.9.6.0"
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { transitive = true }
     implementation "com.mikepenz:materialize:1.2.1@aar"
