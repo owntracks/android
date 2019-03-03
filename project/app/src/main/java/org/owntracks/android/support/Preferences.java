@@ -857,7 +857,7 @@ public class Preferences {
 
     boolean getSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
-        return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
+        return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, true);
     }
 
     public void setSetupCompleted() {

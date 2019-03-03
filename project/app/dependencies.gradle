@@ -4,6 +4,7 @@ ext.okHttpVersion = '3.13.1'
 ext.supportLibVersion = '1.0.0'
 ext.jacksonVersion = '2.9.8'
 ext.materialDialogsVersion = '0.9.6.0'
+ext.espressoVersion = '3.0.2'
 
 dependencies {
 
@@ -54,4 +55,9 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito2:2.0.0"
     testImplementation "org.robolectric:shadows-playservices:4.2"
     testImplementation "org.robolectric:robolectric:4.1"
+
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${espressoVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:${espressoVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:${espressoVersion}"
+    androidTestImplementation "androidx.test.ext:junit:1.1.0"
 }

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'io.objectbox'
 
 def versionMajor = 2
@@ -104,3 +106,9 @@ android {
 
 apply from: "dependencies.gradle"
 //apply from: "coverage.gradle"
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}

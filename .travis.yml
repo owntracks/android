@@ -1,13 +1,44 @@
 language: android
-before_script: cd project
 # Workaround to get travis to user Android 27: https://github.com/travis-ci/travis-ci/issues/8874
 before_install:
 - yes | sdkmanager "platforms;android-27"
 - yes | sdkmanager "platforms;android-28"
+
+env:
+  matrix:
+  - API=21 ANDROID_ABI=armeabi-v7a ANDROID_TAG=google_apis
+  global:
+  - ADB_INSTALL_TIMEOUT=14
+  - ANDROID_TARGET_API=28
+  - ANDROID_BUILD_TOOLS=28.0.3
+  - QEMU_AUDIO_DRV=none
+
 android:
-    components:
-        - tools
-        - platform-tools
-        - build-tools-27.0.3
-        - android-27
-        - extra-google-google_play_services
+  components:
+  - tools
+  - platform-tools
+  - build-tools-$ANDROID_BUILD_TOOLS
+  - android-$ANDROID_TARGET_API
+  - extra-google-google_play_services
+
+before_install:
+- echo yes | sdkmanager "tools" "platforms;android-$API"
+- if [ $ANDROID_TAG == "google_apis" ]; then echo yes | sdkmanager "add-ons;addon-google_apis-google-$API"; fi
+- echo yes | sdkmanager "system-images;android-$API;$ANDROID_TAG;$ANDROID_ABI"
+- avdmanager list
+- echo no | avdmanager create avd -f -n test-api$API -k "system-images;android-$API;$ANDROID_TAG;$ANDROID_ABI" -c 600M
+- $ANDROID_HOME/emulator/emulator -memory 1536 -avd test-api$API -no-window -no-audio&      
+
+before_script:
+- cd project
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
