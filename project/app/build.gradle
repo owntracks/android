@@ -102,5 +102,5 @@ android {
     }
 }
 
-apply from: "depnedencies.gradle"
+apply from: "dependencies.gradle"
 apply from: "coverage.gradle"
