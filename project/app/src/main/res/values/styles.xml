@@ -44,6 +44,12 @@
         <item name="android:paddingTop">@dimen/listitem_vertical_margin_choice</item>
     </style>
 
+    <style name="DialogView" >
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop"> 8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
 
 
     <color name="textPrimary">#de000000</color>

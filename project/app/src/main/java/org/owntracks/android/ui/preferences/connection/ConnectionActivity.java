@@ -1,6 +1,8 @@
 package org.owntracks.android.ui.preferences.connection;
 
 import android.content.Intent;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -9,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionBinding;
@@ -49,17 +50,27 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Override
     public void showModeDialog() {
+
         UiPreferencesConnectionModeBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_mode,  null, false);
+
         dialogBinding.setVm(viewModel.getModeDialogViewModel());
         activeDialogViewModel = dialogBinding.getVm();
 
-        new MaterialDialog.Builder(this)
-                .customView(dialogBinding.getRoot(), true)
-                .title(R.string.mode_heading)
-                .positiveText(R.string.accept)
-                .negativeText(R.string.cancel)
-                .onPositive(dialogBinding.getVm())
+
+        new AlertDialog.Builder(this)
+                .setView(dialogBinding.getRoot())
+                .setTitle(R.string.mode_heading)
+                .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                 .show();
+
+        //new MaterialDialog.Builder(this)
+        //         .customView(dialogBinding.getRoot(), true)
+        //         .title(R.string.mode_heading)
+        //         .positiveText(R.string.accept)
+        //         .negativeText(R.string.cancel)
+        //         .onPositive(dialogBinding.getVm())
+        //        .show();
     }
 
     @Override
@@ -69,24 +80,23 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
             dialogBinding.setVm(viewModel.getHostDialogViewModelHttp());
             activeDialogViewModel = dialogBinding.getVm();
 
-            new MaterialDialog.Builder(this)
-                    .customView(dialogBinding.getRoot(), true)
-                    .title(R.string.preferencesHost)
-                    .positiveText(R.string.accept)
-                    .negativeText(R.string.cancel)
-                    .onPositive(dialogBinding.getVm())
+            new AlertDialog.Builder(this)
+                    .setView(dialogBinding.getRoot())
+                    .setTitle(R.string.preferencesHost)
+                    .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                    .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                     .show();
+
         } else {
             UiPreferencesConnectionHostMqttBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_host_mqtt, null, false);
             dialogBinding.setVm(viewModel.getHostDialogViewModelMqtt());
             activeDialogViewModel = dialogBinding.getVm();
 
-            new MaterialDialog.Builder(this)
-                    .customView(dialogBinding.getRoot(), true)
-                    .title(R.string.preferencesHost)
-                    .positiveText(R.string.accept)
-                    .negativeText(R.string.cancel)
-                    .onPositive(dialogBinding.getVm())
+            new AlertDialog.Builder(this)
+                    .setView(dialogBinding.getRoot())
+                    .setTitle(R.string.preferencesHost)
+                    .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                    .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                     .show();
         }
     }
@@ -97,13 +107,14 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         dialogBinding.setVm(viewModel.getIdentificationDialogViewModel());
         activeDialogViewModel = dialogBinding.getVm();
 
-        new MaterialDialog.Builder(this)
-                .customView(dialogBinding.getRoot(), true)
-                .title(R.string.preferencesIdentification)
-                .positiveText(R.string.accept)
-                .negativeText(R.string.cancel)
-                .onPositive(dialogBinding.getVm())
+        new AlertDialog.Builder(this)
+                .setView(dialogBinding.getRoot())
+                .setTitle(R.string.preferencesIdentification)
+                .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                 .show();
+
+
     }
 
     @Override
@@ -112,13 +123,13 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         dialogBinding.setVm(viewModel.getConnectionSecurityViewModel());
         activeDialogViewModel = dialogBinding.getVm();
 
-        new MaterialDialog.Builder(this)
-                .customView(dialogBinding.getRoot(), true)
-                .title(R.string.preferencesSecurity)
-                .positiveText(R.string.accept)
-                .negativeText(R.string.cancel)
-                .onPositive(dialogBinding.getVm())
+        new AlertDialog.Builder(this)
+                .setView(dialogBinding.getRoot())
+                .setTitle(R.string.preferencesSecurity)
+                .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                 .show();
+
 
     }
 
@@ -128,13 +139,14 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         dialogBinding.setVm(viewModel.getConnectionParametersViewModel());
         activeDialogViewModel = dialogBinding.getVm();
 
-        new MaterialDialog.Builder(this)
-                .customView(dialogBinding.getRoot(), true)
-                .title(R.string.preferencesParameters)
-                .positiveText(R.string.accept)
-                .negativeText(R.string.cancel)
-                .onPositive(dialogBinding.getVm())
+        new AlertDialog.Builder(this)
+                .setView(dialogBinding.getRoot())
+                .setTitle(R.string.preferencesParameters)
+                .setPositiveButton(R.string.accept, dialogBinding.getVm())
+                .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                 .show();
+
+
 
     }
 

@@ -3,11 +3,12 @@ package org.owntracks.android.support.widgets;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
+
+import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
-import com.afollestad.materialdialogs.prefs.MaterialEditTextPreference;
 
-public class EditStringPreference extends MaterialEditTextPreference {
+public class EditStringPreference extends EditTextPreference {
     EditStringPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

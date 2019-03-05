@@ -13,7 +13,9 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        style="@style/DialogView"
+        >
 
         <RelativeLayout
             android:id="@+id/tlsWrapper"

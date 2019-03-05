@@ -1,15 +1,12 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.databinding.BaseObservable;
-import androidx.annotation.NonNull;
-
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.owntracks.android.support.Preferences;
 
-public abstract class BaseDialogViewModel extends BaseObservable implements MaterialDialog.SingleButtonCallback{
+public abstract class BaseDialogViewModel extends BaseObservable implements DialogInterface.OnClickListener {
     protected Preferences preferences;
     BaseDialogViewModel(Preferences preferences) {
         this.preferences = preferences;
@@ -17,10 +14,14 @@ public abstract class BaseDialogViewModel extends BaseObservable implements Mate
     }
 
     @Override
-    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-        if(which == DialogAction.POSITIVE) {
+    public void onClick(DialogInterface dialog, int which) {
+        if(which == DialogInterface.BUTTON_POSITIVE) {
             save();
+        } else if(which == DialogInterface.BUTTON_NEGATIVE) {
+            dialog.cancel();
         }
+
+
     }
 
     public abstract void onActivityResult(int requestCode, int resultCode, Intent data);

@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.preferences.load;
 
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.fasterxml.jackson.core.JsonParseException;
 
 import org.owntracks.android.App;
@@ -24,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import androidx.appcompat.app.AlertDialog;
 import timber.log.Timber;
 
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
@@ -187,22 +187,21 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
     @Override
     public void showFinishDialog() {
-        new MaterialDialog.Builder(this)
-                .title("Import successful")
-                .content("It is recommended to restart the app to apply all imported values")
-                .positiveText("Restart")
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
+        (new AlertDialog.Builder(this)
+                .setTitle("Import successfull")
+                .setMessage("It is recommended to restart the app to apply all imported values")
+                .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        finish();
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(DialogInterface dialog, int which) {
                         App.restart();
                     }
-                }).build().show();
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })).show();
     }
 
     @Override

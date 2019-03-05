@@ -12,9 +12,10 @@
 
 
 	<RadioGroup
+		style="@style/DialogView"
+
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
 		android:checkedButton="@={vm.mode}">
 
 		<androidx.appcompat.widget.AppCompatRadioButton
@@ -23,18 +24,15 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/mode_http_private_label"
-			android:textSize="@dimen/listitem_textsize"/>
+			android:textSize="@dimen/listitem_textsize" />
 
 		<androidx.appcompat.widget.AppCompatRadioButton
 			android:id="@+id/radioModeMqttPrivate"
+			style="@style/RadioGroupItem"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:minHeight="@dimen/listitem_height"
-			android:paddingBottom="@dimen/listitem_vertical_margin_choice"
-			android:paddingLeft="@dimen/listitem_control_margin"
-			android:paddingStart="@dimen/listitem_control_margin"
-			android:paddingTop="@dimen/listitem_vertical_margin_choice"
 			android:text="@string/mode_mqtt_private_label"
-			android:textSize="@dimen/listitem_textsize"/>
+			android:textSize="@dimen/listitem_textsize"
+			/>
 	</RadioGroup>
 </layout>

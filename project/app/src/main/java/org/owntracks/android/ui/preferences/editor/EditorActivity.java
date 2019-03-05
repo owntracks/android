@@ -1,20 +1,23 @@
 package org.owntracks.android.ui.preferences.editor;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
+
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -87,22 +90,17 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     }
 
     private void showEditorView() {
-        MaterialDialog d = new MaterialDialog.Builder(this)
-                .customView(R.layout.ui_preferences_editor_dialog, true)
-                .title(R.string.preferencesEditor)
-                .positiveText(R.string.accept)
-                .negativeText(R.string.cancel)
-                .autoDismiss(false)
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        final View layout = inflater.inflate(R.layout.ui_preferences_editor_dialog,null);
+
+        builder.setTitle(R.string.preferencesEditor)
+                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        final MaterialAutoCompleteTextView inputKey = (MaterialAutoCompleteTextView) dialog.findViewById(R.id.inputKey);
-                        final MaterialEditText inputValue = (MaterialEditText) dialog.findViewById(R.id.inputValue);
+                    public void onClick(DialogInterface dialog, int which) {
+                        final MaterialAutoCompleteTextView inputKey = (MaterialAutoCompleteTextView) layout.findViewById(R.id.inputKey);
+                        final MaterialEditText inputValue = (MaterialEditText) layout.findViewById(R.id.inputValue);
 
                         String key = inputKey.getText().toString();
                         String value = inputValue.getText().toString();
@@ -121,8 +119,18 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                         }
 
                     }
-                }).show();
-        MaterialAutoCompleteTextView view = d.getCustomView().findViewById(R.id.inputKey);
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setView(layout);
+        builder.show();
+
+        // Set autocomplete items
+        MaterialAutoCompleteTextView view = layout.findViewById(R.id.inputKey);
         view.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Preferences.getImportKeys()));
     }
 
