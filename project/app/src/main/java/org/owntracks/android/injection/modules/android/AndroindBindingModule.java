@@ -68,4 +68,9 @@ public abstract class AndroindBindingModule {
     @ContributesAndroidInjector
     abstract org.owntracks.android.support.receiver.BootCompleteReceiver bindBootCompleteReceiver();
 
+    @PerReceiver
+    @ContributesAndroidInjector
+    abstract org.owntracks.android.support.receiver.WifiStateReceiver bindWifiStateReceiver();
+
+
 }

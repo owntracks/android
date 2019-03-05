@@ -7,11 +7,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -54,6 +59,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
+import org.owntracks.android.support.receiver.WifiStateReceiver;
 import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.LinkedList;
@@ -162,7 +168,45 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         eventBus.postSticky(new Events.ServiceStarted());
 
         preferences.registerOnPreferenceChangedListener(this);
+
+
+        registerWifiStateReceiver();
     }
+
+    private void registerWifiStateReceiver() {
+        Timber.v("registering broadcast receiver");
+        //IntentFilter intentFilter = new IntentFilter();
+        //intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        //intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        //WifiStateReceiver receiver = new WifiStateReceiver();
+        //registerReceiver(receiver, intentFilter);
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+
+        connectivityManager.registerNetworkCallback(
+                builder.build(),
+                new ConnectivityManager.NetworkCallback() {
+
+                    @Override
+                    public void onAvailable(Network network) {
+                        Timber.v("network available %s", network.toString());
+
+
+                    }
+
+
+                    @Override
+                    public void onLost(Network network) {
+                        Timber.v("network lost %s", network.toString());
+
+
+                    }
+                }
+
+        );    }
 
     @Override
     public void onDestroy() {
