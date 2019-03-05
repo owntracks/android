@@ -24,15 +24,20 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.CacheControl;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
+import okhttp3.Dns;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -81,7 +86,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
-        loadHTTPClient();
 
     }
 
@@ -127,18 +131,30 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     private void loadHTTPClient() {
+        mHttpClient = createHttpClient();
+    }
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel( HttpLoggingInterceptor.Level.NONE);
+    private OkHttpClient getHttpClient() {
+        if(preferences.getDontReuseHTTPClient()) {
+            return createHttpClient();
+        }
 
+        if(mHttpClient == null)
+            mHttpClient = createHttpClient();
+
+        return mHttpClient;
+    }
+
+
+
+    private OkHttpClient createHttpClient() {
+        Timber.v("creating new HTTP client instance");
         SocketFactory f = getSocketFactory();
-
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .connectTimeout(15, TimeUnit.SECONDS)
-                .connectionPool(new ConnectionPool())
-                .addInterceptor(logging)
+                .connectionPool(new ConnectionPool(1, 1, TimeUnit.MICROSECONDS))
                 .retryOnConnectionFailure(false)
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .cache(null);
@@ -147,7 +163,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             builder.sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]);
         }
 
-        mHttpClient = builder.build();
+        return builder.build();
+
     }
 
 
@@ -206,6 +223,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 request.header(HEADER_DEVICE, httpEndpointHeaderDevice);
             }
 
+
+            request.cacheControl(CacheControl.FORCE_NETWORK);
             return request.build();
         } catch (Exception e) {
             Timber.e(e,"invalid header specified");
@@ -227,12 +246,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
-        Timber.d("connectionpool idle count: %s ", mHttpClient.connectionPool().idleConnectionCount());
 
         try {
-            //Send request
-            Response r = mHttpClient.newCall(request).execute();
-
+            Response r = getHttpClient().newCall(request).execute();
             // Message was send. Handle delivered message
             if((r.isSuccessful())) {
                 Timber.v("request was successful");
@@ -254,13 +270,14 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                         messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
 
-                    r.close();
                 }
+                r.close();
             // Server could be contacted but returned non success HTTP code
             } else {
                 Timber.e("request was not successful. HTTP code %s", r.code());
                 messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP code "+r.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
+                r.close();
                 return;
             }
         // Message was not send
@@ -268,12 +285,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             Timber.e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
-            mHttpClient.connectionPool().evictAll();
 
 
             return;
         }
-
         messageProcessor.onMessageDelivered(messageId);
     }
 
@@ -334,7 +349,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         if(Preferences.Keys.URL.equals(key) || Preferences.Keys.USERNAME.equals(key) || Preferences.Keys.PASSWORD.equals(key) || Preferences.Keys.DEVICE_ID.equals(key))
             loadEndpointUrl();
         else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
-            loadHTTPClient();
+            mHttpClient = null;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.owntracks.android.support;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -149,40 +150,10 @@ public class Preferences {
         if(sharedPreferences.getBoolean(Keys._FIRST_START, true)) {
             Timber.v("Initial application launch");
             isFirstStart = true;
-            sharedPreferences.edit().putBoolean(Preferences.Keys._FIRST_START, false).putBoolean(Preferences.Keys._SETUP_NOT_COMPLETED , true).apply();
+            sharedPreferences.edit().putBoolean(Keys._FIRST_START, false).putBoolean(Keys._SETUP_NOT_COMPLETED , true).apply();
         }
 
     }
-
-    public int getMonitoring() {
-        return getInt(Keys.MONITORING, R.integer.valMonitoring);
-    }
-
-    public void setMonitoring(int newmode) {
-        if(newmode < LocationProcessor.MONITORING_QUIET || newmode > LocationProcessor.MONITORING_MOVE) {
-            Timber.e("invalid monitoring mode specified %s", newmode);
-            return;
-        }
-        setInt(Keys.MONITORING, newmode);
-        eventBus.post(new Events.MonitoringChanged(newmode));
-    }
-
-    public void setMonitoringNext() {
-
-        int mode = getMonitoring();
-        int newmode;
-        if(mode < LocationProcessor.MONITORING_MOVE) {
-            mode++;
-        } else {
-            mode = LocationProcessor.MONITORING_QUIET;
-        }
-
-        Timber.v("setting monitoring mode %s", mode);
-
-        setMonitoring(mode);
-
-    }
-
 
     public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
         void onAttachAfterModeChanged();
@@ -316,6 +287,47 @@ public class Preferences {
 
     }
 
+    @Import(key = Keys.MONITORING)
+    public int getMonitoring() {
+        return getInt(Keys.MONITORING, R.integer.valMonitoring);
+    }
+
+    public void setMonitoring(int newmode) {
+        if(newmode < LocationProcessor.MONITORING_QUIET || newmode > LocationProcessor.MONITORING_MOVE) {
+            Timber.e("invalid monitoring mode specified %s", newmode);
+            return;
+        }
+        setInt(Keys.MONITORING, newmode);
+        eventBus.post(new Events.MonitoringChanged(newmode));
+    }
+
+    @Export(key = Keys.MONITORING, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
+    public void setMonitoringNext() {
+
+        int mode = getMonitoring();
+        int newmode;
+        if(mode < LocationProcessor.MONITORING_MOVE) {
+            mode++;
+        } else {
+            mode = LocationProcessor.MONITORING_QUIET;
+        }
+
+        Timber.v("setting monitoring mode %s", mode);
+
+        setMonitoring(mode);
+
+    }
+
+    @Import(key = Keys.DONT_REUSE_HTTP_CLIENT)
+    public boolean getDontReuseHTTPClient() {
+        return getBoolean(Keys.DONT_REUSE_HTTP_CLIENT, R.bool.valFalse);
+    }
+
+    @Export(key = Keys.DONT_REUSE_HTTP_CLIENT, exportModeMqttPrivate = false, exportModeHttpPrivate = true)
+    public void setDontReuseHTTPClient(boolean bool) {
+        setBoolean(Keys.DONT_REUSE_HTTP_CLIENT,bool);
+    }
+
 
     @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
     public void setOpenCageGeocoderApiKey(String key) {
@@ -440,7 +452,7 @@ public class Preferences {
     // Not used on public, as many people might use the same device type
     private String getDeviceIdDefault() {
         // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
-        return android.os.Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
+        return Build.DEVICE.replace(" ", "-").replaceAll("[^a-zA-Z0-9]+", "").toLowerCase();
     }
 
     @Export(key =Keys.CLIENT_ID, exportModeMqttPrivate =true)
@@ -936,7 +948,7 @@ public class Preferences {
         public static final String CLIENT_ID                        = "clientId";
         public static final String DEVICE_ID                        = "deviceId";
         public static final String DEBUG_LOG                        = "debugLog";
-
+        public static final String DONT_REUSE_HTTP_CLIENT           = "dontReuseHttpClient";
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
         public static final String HOST                             = "host";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
