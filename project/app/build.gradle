@@ -6,11 +6,6 @@ def versionMinor = 1
 def versionPatch = 2
 def versionBuild = 1
 
-ext.daggerVersion = '2.21'
-ext.playLibVersion = '16.0.0'
-ext.okHttpVersion = '3.12.1'
-ext.supportLibVersion = '1.0.0-beta01'
-ext.jacksonVersion = '2.9.8'
 
 android {
     compileSdkVersion 28
@@ -107,59 +102,5 @@ android {
     }
 }
 
-dependencies {
-
-    // Support libraries
-    implementation "androidx.legacy:legacy-support-v4:${supportLibVersion}"
-    implementation "androidx.appcompat:appcompat:1.0.2"
-    implementation "androidx.preference:preference:${supportLibVersion}"
-    implementation "androidx.cardview:cardview:${supportLibVersion}"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation "androidx.recyclerview:recyclerview:${supportLibVersion}"
-    implementation "androidx.annotation:annotation:${supportLibVersion}"
-    implementation "com.google.android.material:material:${supportLibVersion}"
-
-    // Play Services libraries
-    implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
-    implementation "com.google.android.gms:play-services-location:${playLibVersion}"
-    implementation "com.google.android.gms:play-services-places:${playLibVersion}"
-
-    // Utility libraries
-    implementation "com.google.dagger:dagger:${daggerVersion}"
-    implementation "com.google.dagger:dagger-android-support:${daggerVersion}"
-    implementation "com.google.dagger:dagger-android:${daggerVersion}"
-    implementation "android.arch.work:work-runtime:1.0.0-beta03"
-    implementation "org.greenrobot:eventbus:3.1.1"
-    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0"
-    implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    implementation "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1"
-
-
-    // Widget libraries
-    implementation "com.rengwuxian.materialedittext:library:2.1.4"
-    implementation "com.afollestad.material-dialogs:core:0.9.6.0"
-    implementation "com.afollestad.material-dialogs:commons:0.9.6.0"
-    implementation("com.mikepenz:materialdrawer:6.1.2@aar") { transitive = true }
-    implementation "com.mikepenz:materialize:1.2.1@aar"
-
-    // Preprocessors
-    annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
-    annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
-
-    testAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
-    testAnnotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
-
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.23.4"
-    testImplementation "org.powermock:powermock-module-junit4:2.0.0"
-    testImplementation "org.powermock:powermock-api-mockito2:2.0.0"
-    testImplementation "org.robolectric:shadows-playservices:4.1"
-    testImplementation "org.robolectric:robolectric:4.1"
-}
-
+apply from: "dependencies.gradle"
 apply from: "coverage.gradle"
