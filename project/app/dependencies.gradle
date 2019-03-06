@@ -26,7 +26,7 @@ dependencies {
     implementation "com.google.dagger:dagger:${daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${daggerVersion}"
     implementation "com.google.dagger:dagger-android:${daggerVersion}"
-    implementation "android.arch.work:work-runtime:1.0.0-rc02"
+    implementation "android.arch.work:work-runtime:1.0.0"
     implementation "org.greenrobot:eventbus:3.1.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.1"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
