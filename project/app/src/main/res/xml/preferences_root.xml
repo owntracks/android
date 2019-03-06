@@ -82,11 +82,7 @@
                 android:title="Mikepenz"
                 android:summary="MaterialDrawer, Materialize" />
             <Preference
-                android:key="afollestad-materialdialogs"
-                android:title="Afollestad"
-                android:summary="Material-Dialogs" />
-            <Preference
-                android:key="afollestad-materialdialogs"
+                android:key="dagger2"
                 android:title="Google"
                 android:summary="Dagger2" />
             <Preference
