@@ -284,11 +284,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		try {
 			Timber.v("connecting sync");
 			this.mqttClient.connect(connectOptions).waitForCompletion();
-		} catch (MqttSecurityException e) {
-			changeState(EndpointState.ERROR, e , e.getMessage());
-			return false;
-		} catch (MqttException e) {
-			changeState(EndpointState.ERROR);
+		} catch (Exception e) {
+			changeState(EndpointState.ERROR, e, e.getMessage());
 			return false;
 		}
 		scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
