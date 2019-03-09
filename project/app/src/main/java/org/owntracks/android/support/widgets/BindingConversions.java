@@ -1,9 +1,5 @@
 package org.owntracks.android.support.widgets;
 
-import androidx.databinding.BindingAdapter;
-import androidx.databinding.BindingConversion;
-import androidx.databinding.InverseMethod;
-import androidx.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -19,6 +15,11 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import java.text.DateFormat;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.BindingConversion;
+import androidx.databinding.InverseMethod;
+
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
 
@@ -27,36 +28,36 @@ public class BindingConversions {
     @BindingConversion
     @InverseMethod("convertToInteger")
     public static String convertToString(@Nullable Integer d) {
-        return  d != null ? d.toString() : EMPTY_STRING;
+        return d != null ? d.toString() : EMPTY_STRING;
     }
 
     @BindingConversion
     @InverseMethod("convertToIntegerZeroIsEmpty")
     public static String convertToStringZeroIsEmpty(@Nullable Integer d) {
-        return  d != null && d > 0 ? d.toString() : EMPTY_STRING;
+        return d != null && d > 0 ? d.toString() : EMPTY_STRING;
     }
 
 
     @BindingConversion
     public static String convertToString(@Nullable Long d) {
-        return  d != null? d.toString() : EMPTY_STRING;
+        return d != null ? d.toString() : EMPTY_STRING;
     }
 
 
     @BindingConversion
     public static String convertToString(boolean d) {
-        return  String.valueOf(d);
+        return String.valueOf(d);
     }
 
     @BindingConversion
     @InverseMethod("convertToDouble")
     public static String convertToString(@Nullable Double d) {
-        return  d != null? d.toString() : EMPTY_STRING;
+        return d != null ? d.toString() : EMPTY_STRING;
     }
 
     @BindingConversion
     public static String convertToString(String s) {
-        return  s != null ? s : EMPTY_STRING;
+        return s != null ? s : EMPTY_STRING;
     }
 
 
@@ -102,7 +103,7 @@ public class BindingConversions {
 
     @BindingAdapter("relativeTimeSpanString")
     public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
-        if(DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
+        if (DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
             view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         } else {
             view.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));

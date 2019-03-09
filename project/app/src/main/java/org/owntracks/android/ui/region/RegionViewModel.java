@@ -1,9 +1,6 @@
 package org.owntracks.android.ui.region;
 
-import androidx.databinding.Bindable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.LocationRepo;
@@ -13,7 +10,9 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.Bindable;
 
 @PerActivity
 public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements RegionMvvm.ViewModel<RegionMvvm.View> {
@@ -46,12 +45,6 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
             }
         }
         setWaypoint(w);
-    }
-
-    public void setLatLng(double lat, double lon) {
-        this.waypoint.setGeofenceLatitude(lat);
-        this.waypoint.setGeofenceLongitude(lon);
-        Timber.v("waypoint coordinates updated");
     }
 
     public boolean canSaveWaypoint() {

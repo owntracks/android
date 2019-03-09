@@ -145,7 +145,6 @@
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
-    <string name="placePickerNotAvailable">Standortauswahl konnte nicht geöffnet werden</string>
     <string name="region_unknown">Status unbekannt</string>
     <string name="region_inside">Aktuell innerhalb</string>
     <string name="region_outside">Aktuell außerhalb</string>
