@@ -56,7 +56,6 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
-
                     android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
@@ -65,10 +64,10 @@
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:enabled="false"
+                    android:enabled="true"
                     android:id="@+id/latitude"
                     android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)}"
-
+                    android:inputType="numberDecimal"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
@@ -81,9 +80,10 @@
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:enabled="false"
+                    android:enabled="true"
                     android:id="@+id/longitude"
                     android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLongitude)}"
+                    android:inputType="numberDecimal"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText

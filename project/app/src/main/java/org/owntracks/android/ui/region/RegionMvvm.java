@@ -1,10 +1,10 @@
 package org.owntracks.android.ui.region;
 
-import androidx.databinding.Bindable;
-
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+
+import androidx.databinding.Bindable;
 
 public interface RegionMvvm {
 
@@ -17,6 +17,5 @@ public interface RegionMvvm {
         @Bindable WaypointModel getWaypoint();
         boolean canSaveWaypoint();
         void saveWaypoint();
-        void setLatLng(double latitude, double longitude);
     }
 }
