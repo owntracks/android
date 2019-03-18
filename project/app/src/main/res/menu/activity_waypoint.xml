@@ -9,11 +9,4 @@
         app:showAsAction="ifRoom"
         android:title="@string/save">
     </item>
-    <item
-        android:id="@+id/pick"
-        android:icon="@drawable/ic_mylocation"
-        android:orderInCategory="97"
-        app:showAsAction="ifRoom"
-        android:title="Select location">
-    </item>
 </menu>

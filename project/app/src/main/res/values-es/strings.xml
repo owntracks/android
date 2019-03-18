@@ -193,7 +193,6 @@
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">API key para Geocoder alternativo</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">Si se activa, OpenCage se usará para buscar la ubicación en lugar de Google</string>
-    <string name="placePickerNotAvailable">No se pudo abrir el selector de ubicación</string>
     <string name="region_unknown">Estado desconocido</string>
     <string name="region_inside">Actualmente dentro</string>
     <string name="region_outside">Actualmente fuera</string>
