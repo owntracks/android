@@ -186,4 +186,6 @@
     <string name="monitoring_signifficant">Significant changes monitoring mode</string>
     <string name="monitoring_move">Move monitoring mode</string>
     <string name="notificationChangeMonitoring">Change Monitoring</string>
+    <string name="preferencesDebugLog">Debug log</string>
+    <string name="preferencesDebugLogSummary">Write extended debug information</string>
 </resources>

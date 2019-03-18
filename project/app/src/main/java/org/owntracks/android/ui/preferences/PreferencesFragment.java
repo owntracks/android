@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
 import org.owntracks.android.support.widgets.ListIntegerPreference;
@@ -36,6 +38,8 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
 import javax.inject.Inject;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
@@ -54,7 +58,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     private static final String UI_SCREEN_CONFIGURATION = "configuration";
 
     public static final int REQUEST_CODE_CONNECTION = 1310 ;
-
+    public static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1311;
     @Inject protected PreferencesFragmentViewModel viewModel;
     @Inject protected Navigator navigator;
 
@@ -147,6 +151,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         }
 
         findPreference(UI_SCREEN_CONNECTION).setSummary(mode);
+
     }
 
     public void attachClickListener() {
@@ -155,6 +160,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         findPreference(UI_SCREEN_TWITTER).setOnPreferenceClickListener(this);
         findPreference(UI_SCREEN_DOCUMENTATION).setOnPreferenceClickListener(this);
         findPreference(UI_SCREEN_CONNECTION).setOnPreferenceClickListener(this);
+
     }
 
     @Override
@@ -213,8 +219,74 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
         PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
         screen.addPreference(misc);
+        SwitchPreference p = addSwitchPreference(misc, Preferences.Keys.DEBUG_LOG, R.string.preferencesDebugLog,  R.string.preferencesDebugLogSummary, R.bool.valFalse);
+        p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                handleDebugLogChange((Boolean)newValue);
+                return true;
+            }
+        });
+
+
         addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
         addEditStringPreference(misc, Preferences.Keys.OPENCAGE_GEOCODER_API_KEY, R.string.preferencesOpencageGeocoderApiKey, R.string.preferencesOpencageGeocoderApiKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesOpencageGeocoderApiKeyDialog);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableDebugLog();
+                } else {
+                    viewModel.getPreferences().setDebugLog(false);
+                }
+            }
+        }
+    }
+
+    private void enableDebugLog() {
+        Timber.v("planting new log file tree");
+        Timber.plant(new TimberLogFileTree(getActivity()));
+    }
+
+    private void handleDebugLogChange(Boolean newValue) {
+        if((Boolean)newValue) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Timber.e("permission not granted");
+                ActivityCompat.requestPermissions( getActivity(), new String[] {  Manifest.permission.WRITE_EXTERNAL_STORAGE  }, REQUEST_CODE_WRITE_EXTERNAL_STORAGE );
+
+
+            } else {
+                Timber.d("permission granted");
+                boolean debugEnabled = false;
+                for(Timber.Tree t : Timber.forest()) {
+                    Timber.v("Planted trees :%s", t);
+                    if(t instanceof  TimberLogFileTree) {
+                        debugEnabled = true;
+                        break;
+                    }
+                }
+                if(!debugEnabled) {
+                    enableDebugLog();
+                }
+
+            }
+        } else {
+            for(Timber.Tree t : Timber.forest()) {
+                Timber.v("Planted trees :%s", t);
+            }
+
+            for(Timber.Tree t : Timber.forest()) {
+                if(t instanceof TimberLogFileTree) {
+                    Timber.v("Removing tree :%s", t);
+                    Timber.uproot(t);
+                }
+            }
+
+        }
 
     }
 
@@ -253,7 +325,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         parent.addPreference(t);
     }
 
-    private boolean addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueAllModes) {
+    private SwitchPreference addSwitchPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @BoolRes int defaultValueAllModes) {
 
         SwitchPreference p = new SwitchPreference(getActivity());
         p.setKey(key);
@@ -263,7 +335,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         p.setChecked(viewModel.getPreferences().getBoolean(key, defaultValueAllModes));
         p.setPersistent(true);
         parent.addPreference(p);
-        return true;
+        return p;
     }
 
     @SuppressWarnings("UnusedReturnValue")

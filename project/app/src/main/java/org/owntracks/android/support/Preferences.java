@@ -18,6 +18,7 @@ import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.services.worker.Scheduler;
+import org.owntracks.android.ui.preferences.PreferencesFragmentViewModel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

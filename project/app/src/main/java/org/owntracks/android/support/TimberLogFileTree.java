@@ -3,7 +3,6 @@ package org.owntracks.android.support;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.io.File;
@@ -13,7 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class TimberLogFileTree extends TimberLogTree {
+import timber.log.Timber;
+
+public class TimberLogFileTree extends Timber.DebugTree {
 
 
     private File file;
@@ -46,7 +47,7 @@ public class TimberLogFileTree extends TimberLogTree {
         @SuppressLint("LogNotTimber")
         @Override
         protected void log(int priority, String tag, String message, Throwable t) {
-                super.log(priority, tag, message, t);
+                //super.log(priority, tag, message, t);
                 try {
 
                     if (file.exists()) {

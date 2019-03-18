@@ -14,7 +14,7 @@ import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
-import org.owntracks.android.support.TimberLogTree;
+import org.owntracks.android.support.TimberDebugLogTree;
 import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
@@ -44,6 +44,8 @@ public class App extends DaggerApplication  {
     @AppContext
     Context context;
 
+
+
     @Override
     public void onCreate() {
         sApplication = this;
@@ -53,11 +55,11 @@ public class App extends DaggerApplication  {
 
         if(preferences.getLogDebug()) {
             Timber.plant(new TimberLogFileTree(this));
-        } else if (BuildConfig.DEBUG) {
-            Timber.plant(new TimberLogTree());
         }
 
         if(BuildConfig.DEBUG) {
+            Timber.plant(new TimberDebugLogTree());
+
             Timber.e("StrictMode enabled in DEBUG build");
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectNetwork()
@@ -71,7 +73,9 @@ public class App extends DaggerApplication  {
                     .build());
 
         }
-
+        for(Timber.Tree t : Timber.forest()) {
+                Timber.v("Planted trees :%s", t);
+        }
 
         preferences.checkFirstStart();
 
