@@ -18,10 +18,6 @@
     <string name="preferencesAdvanced">"Erweitert"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Berichte"</string>
-    <string name="preferencesLocatorDisplacement">Positionsabstand</string>
-    <string name="preferencesLocatorDisplacementSummary">Entfernung zwischen Standort-Aktualisierungen</string>
-    <string name="preferencesLocatorInterval">Positionsintervall</string>
-    <string name="preferencesLocatorIntervalSummary">Sekunden zwischen Standort-Aktualisierungen</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Quelltext</string>
     <string name="preferencesDocumentation">Handbuch</string>
@@ -61,8 +57,8 @@
     <string name="preferencesParameters">Parameter</string>
     <string name="seconds">Sekunden</string>
     <string name="preferencesProfileId">Modus</string>
-    <string name="mode_mqtt_private_label">MQTT Privat</string>
-    <string name="mode_http_private_label">HTTP Privat</string>
+    <string name="mode_mqtt_private_label">MQTT</string>
+    <string name="mode_http_private_label">HTTP</string>
     <string name="aLocation">einen Ort</string>
     <string name="events">Ereignisse</string>
     <string name="title_activity_regions">Orte</string>
@@ -148,11 +144,9 @@
     <string name="region_unknown">Status unbekannt</string>
     <string name="region_inside">Aktuell innerhalb</string>
     <string name="region_outside">Aktuell außerhalb</string>
-
     <string name="monitoring_quiet">Stiller Modus</string>
     <string name="monitoring_manual">Manueller Modus</string>
     <string name="monitoring_signifficant">Signifikante Änderungen Modus</string>
     <string name="monitoring_move">Bewegungs Modus</string>
     <string name="notificationChangeMonitoring">Bewegungs Modus</string>
-
 </resources>

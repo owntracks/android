@@ -8,12 +8,9 @@
     <string name="preferencesUserUsername">"Username"</string>
     <string name="preferencesDeviceName" translatable="false">"Device ID"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
-
-
     <string name="preferencesCaCrtPath">CA certificate</string>
     <string name="preferencesClientCrtPath">Client certificate</string>
     <string name="preferencesClientCrtPassword">Client certificate password</string>
-
     <string name="preferencesLicenses">"Libraries"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
@@ -21,19 +18,10 @@
     <string name="preferencesNotificationEventsSummary">Notify about received events </string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
-
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
-    <string name="preferencesLocatorDisplacement">Locator displacement</string>
-    <string name="preferencesLocatorDisplacementSummary">Distance between location updates</string>
-    <string name="preferencesLocatorDisplacementDialogMessage">Distance in meters between location updates in significant location changes mode. Has precedence over configured interval.</string>
-
-    <string name="preferencesLocatorInterval">Locator interval</string>
-    <string name="preferencesLocatorIntervalSummary">Interval between location updates</string>
-    <string name="preferencesLocatorIntervalDialogMessage">Interval in seconds that the device has to move between location updates in significant location changes mode.</string>
-
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
@@ -81,7 +69,7 @@
     <string name="preferencesKeepalive" translatable="false">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
-    <string name="mode_mqtt_private_label">Private MQTT</string>
+    <string name="mode_mqtt_private_label">MQTT</string>
     <string name="aLocation">a region</string>
     <string name="events">Events</string>
     <string name="title_activity_regions">Regions</string>
@@ -106,15 +94,11 @@
     <string name="preferencesExportSuccess">Export successful</string>
     <string name="geofenceInactive">Geofence disabled</string>
     <string name="geofenceActive">Geofence  enabled</string>
-
-
     <string name="welcomeFixIssue">Fix</string>
     <string name="play_services_now_available">Google Play Services are now available</string>
     <string name="play_services_not_available">Google Play Services are not available</string>
     <string name="preferencesUrl" translatable="false">URL</string>
-    <string name="mode_http_private_label">Private HTTP</string>
-
-
+    <string name="mode_http_private_label">HTTP</string>
     <string name="preferencesKeyModeId" translatable="false">mode</string>
     <string name="preferencesKeyHost" translatable="false">host</string>
     <string name="preferencesKeyIdentification" translatable="false">identification</string>
@@ -130,7 +114,6 @@
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
-    <string name="mode_description">Owntracks can run in one of several modes. Select the mode that best suits your needs.</string>
     <string name="mqtt_public_description">Try out Owntracks and share your location anonymously with other users</string>
     <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
