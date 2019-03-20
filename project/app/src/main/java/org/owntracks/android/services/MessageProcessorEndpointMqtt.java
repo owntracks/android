@@ -140,6 +140,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 				m.setRetained(message.isRetained());
 				m.setQos(message.getQos());
 				onMessageReceived(m);
+			} catch (Parser.EncryptionException e) {
+				Timber.e("%s payload:%s ", e.getMessage(), new String(message.getPayload()));
 			} catch (Exception e) {
 				if (message.getPayload().length == 0) {
 					Timber.v("clear message received: %s", topic);
