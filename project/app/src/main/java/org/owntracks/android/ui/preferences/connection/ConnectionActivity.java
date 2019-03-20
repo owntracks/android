@@ -42,9 +42,9 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setDisablesAnimation(true);
         bindAndAttachContentView(R.layout.ui_preferences_connection, savedInstanceState);
-        setSupportToolbar(binding.toolbar, true, false);
-        setDrawer(binding.toolbar);
+        setSupportToolbar(binding.toolbar, true, true);
         setHasEventBus(true);
     }
 
@@ -116,7 +116,11 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
 
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
     @Override
     public void showSecurityDialog() {
         UiPreferencesConnectionSecurityBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_security,  null, false);

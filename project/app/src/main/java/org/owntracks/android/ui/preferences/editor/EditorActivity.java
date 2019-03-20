@@ -51,10 +51,12 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setDisablesAnimation(true);
         bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState);
 
         setHasEventBus(false);
-        setSupportToolbar(binding.toolbar);
+        setSupportToolbar(binding.toolbar, true, true);
+
     }
 
     @Override
@@ -82,6 +84,13 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                 return false;
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
 
     private void showImportConfigurationFilePickerView() {
         Bundle b = new Bundle();

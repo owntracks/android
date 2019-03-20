@@ -209,4 +209,8 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
                 .add(containerViewId, fragment)
                 .commit();
     }
+
+    protected void setDisablesAnimation(boolean animation) {
+        disablesAnimation = animation;
+    }
 }

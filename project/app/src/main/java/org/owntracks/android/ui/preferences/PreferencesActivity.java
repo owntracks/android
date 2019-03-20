@@ -20,6 +20,7 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
 
         setHasEventBus(false);
         setSupportToolbar(this.binding.toolbar, true, true);
+        setDrawer(binding.toolbar);
 
         navigator.replaceFragment(R.id.content_frame, new PreferencesFragment(), null );
     }
