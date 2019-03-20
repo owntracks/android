@@ -331,7 +331,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
-                    locationProcessorLazy.get().publishLocationMessage(MessageLocation.REPORT_TYPE_RESPONSE);
+                    locationProcessorLazy.get().OnDemandLocationRequest();
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
                     locationProcessorLazy.get().publishWaypointsMessage();

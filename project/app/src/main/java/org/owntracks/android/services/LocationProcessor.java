@@ -42,6 +42,13 @@ public class LocationProcessor {
     public static final int MONITORING_SIGNIFFICANT = 1;
     public static final int MONITORING_MOVE = 2;
 
+    public interface LocationProvider {
+        void OnDemandLocationRequest();
+    }
+
+    LocationProvider m_locationProvider = null;
+
+
     @Inject
     public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider) {
         this.messageProcessor = messageProcessor;
@@ -132,10 +139,10 @@ public class LocationProcessor {
         return l;
     }
 
-    public void onLocationChanged(@NonNull Location l) {
+    public void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
         locationRepo.setCurrentLocation(l);
 
-        publishLocationMessage(MessageLocation.REPORT_TYPE_DEFAULT);
+        publishLocationMessage(reportType);
     }
 
 
@@ -204,5 +211,17 @@ public class LocationProcessor {
         }
         message.setWaypoints(collection);
         messageProcessor.sendMessage(message);
+    }
+
+
+    public void setLocationProvider(LocationProvider provider) {
+        m_locationProvider = provider;
+    }
+
+
+    public void OnDemandLocationRequest() {
+        if (m_locationProvider != null) {
+            m_locationProvider.OnDemandLocationRequest();
+        }
     }
 }

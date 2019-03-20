@@ -71,7 +71,7 @@ import javax.inject.Inject;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
-public class BackgroundService extends DaggerService implements OnCompleteListener<Location>,Preferences.OnPreferenceChangedListener {
+public class BackgroundService extends DaggerService implements OnCompleteListener<Location>,Preferences.OnPreferenceChangedListener,LocationProcessor.LocationProvider {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -98,6 +98,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private GeofencingClient mGeofencingClient;
 
     private LocationCallback locationCallback;
+    private LocationCallback locationCallbackOnDemand;
     private MessageLocation lastLocationMessage;
     private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
 
@@ -152,7 +153,15 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation());
+                onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_DEFAULT);
+            }
+        };
+
+        locationCallbackOnDemand = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
 
@@ -169,6 +178,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         preferences.registerOnPreferenceChangedListener(this);
 
+        locationProcessor.setLocationProvider(this);
 
         registerWifiStateReceiver();
     }
@@ -503,7 +513,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         }
     }
 
-    public void onLocationChanged(@Nullable Location location) {
+    public void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
         if(location == null) {
             Timber.e("no location provided");
             return;
@@ -511,8 +521,25 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         Timber.v("location update received: tst:%s, acc:%s, lat:%s, lon:%s",location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude());
 
         if (location.getTime() > locationRepo.getCurrentLocationTime()) {
-            locationProcessor.onLocationChanged(location);
+            locationProcessor.onLocationChanged(location,reportType);
         }
+    }
+
+    @SuppressWarnings("MissingPermission")
+    public void OnDemandLocationRequest() {
+        if (missingLocationPermission()) {
+            Timber.e("missing location permission");
+            return;
+        }
+
+        LocationRequest request = new LocationRequest();
+
+        request.setNumUpdates(1);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        Timber.d("On demand location request");
+        FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
+        client.requestLocationUpdates(request, locationCallbackOnDemand,  runner.getBackgroundHandler().getLooper());
     }
 
     @SuppressWarnings("MissingPermission")
@@ -755,7 +782,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onComplete(@NonNull Task<Location> task) {
-        onLocationChanged(task.getResult());
+        onLocationChanged(task.getResult(),MessageLocation.REPORT_TYPE_DEFAULT);
     }
 
     private final IBinder mBinder = new LocalBinder();
