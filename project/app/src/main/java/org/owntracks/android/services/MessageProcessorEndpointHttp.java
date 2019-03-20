@@ -91,6 +91,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onCreateFromProcessor() {
+        if(!isConfigurationComplete()) {
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
+        }
 
     }
 

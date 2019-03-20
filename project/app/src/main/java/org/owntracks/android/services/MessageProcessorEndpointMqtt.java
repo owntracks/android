@@ -435,7 +435,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 	@Override
 	public boolean isConfigurationComplete() {
-		return !preferences.getHost().trim().isEmpty() && !preferences.getUsername().trim().isEmpty() && (!preferences.getAuth() || !preferences.getPassword().trim().isEmpty());
+		// Required to connect: host, username (only send when auth is enabled)
+		// When auth is enabled, password (unless usePassword is set to false which only sends username)
+		return !preferences.getHost().trim().isEmpty() && !preferences.getUsername().trim().isEmpty() && (!preferences.getAuth() || (!preferences.getPassword().trim().isEmpty() || !preferences.getUsePassword()));
+
 	}
 
 	@WorkerThread
@@ -566,7 +569,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
 	@Override
 	public void onCreateFromProcessor() {
-		scheduler.scheduleMqttReconnect();
+		if(!isConfigurationComplete()) {
+			changeState(EndpointState.ERROR_CONFIGURATION);
+		} else {
+			scheduler.scheduleMqttReconnect();
+		}
 	}
 
 	private static final class MqttClientMemoryPersistence implements MqttClientPersistence {
