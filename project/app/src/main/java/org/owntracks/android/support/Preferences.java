@@ -288,11 +288,12 @@ public class Preferences {
 
     }
 
-    @Import(key = Keys.MONITORING)
+    @Export(key = Keys.MONITORING, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
     public int getMonitoring() {
         return getInt(Keys.MONITORING, R.integer.valMonitoring);
     }
 
+    @Import(key = Keys.MONITORING)
     public void setMonitoring(int newmode) {
         if(newmode < LocationProcessor.MONITORING_QUIET || newmode > LocationProcessor.MONITORING_MOVE) {
             Timber.e("invalid monitoring mode specified %s", newmode);
@@ -302,7 +303,6 @@ public class Preferences {
         eventBus.post(new Events.MonitoringChanged(newmode));
     }
 
-    @Export(key = Keys.MONITORING, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
     public void setMonitoringNext() {
 
         int mode = getMonitoring();
@@ -319,12 +319,12 @@ public class Preferences {
 
     }
 
-    @Import(key = Keys.DONT_REUSE_HTTP_CLIENT)
+    @Export(key = Keys.DONT_REUSE_HTTP_CLIENT, exportModeMqttPrivate = false, exportModeHttpPrivate = true)
     public boolean getDontReuseHTTPClient() {
         return getBoolean(Keys.DONT_REUSE_HTTP_CLIENT, R.bool.valFalse);
     }
 
-    @Export(key = Keys.DONT_REUSE_HTTP_CLIENT, exportModeMqttPrivate = false, exportModeHttpPrivate = true)
+    @Import(key = Keys.DONT_REUSE_HTTP_CLIENT)
     public void setDontReuseHTTPClient(boolean bool) {
         setBoolean(Keys.DONT_REUSE_HTTP_CLIENT,bool);
     }
