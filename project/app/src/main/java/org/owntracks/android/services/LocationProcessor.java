@@ -42,11 +42,6 @@ public class LocationProcessor {
     public static final int MONITORING_SIGNIFFICANT = 1;
     public static final int MONITORING_MOVE = 2;
 
-    public interface LocationProvider {
-        void OnDemandLocationRequest();
-    }
-
-    LocationProvider m_locationProvider = null;
 
 
     @Inject
@@ -214,14 +209,4 @@ public class LocationProcessor {
     }
 
 
-    public void setLocationProvider(LocationProvider provider) {
-        m_locationProvider = provider;
-    }
-
-
-    public void OnDemandLocationRequest() {
-        if (m_locationProvider != null) {
-            m_locationProvider.OnDemandLocationRequest();
-        }
-    }
 }

@@ -21,6 +21,7 @@ import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -47,6 +48,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
+    private final ServiceBridge serviceBridge;
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
@@ -128,7 +130,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
@@ -136,7 +138,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         this.parser = parser;
         this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
-
+        this.serviceBridge = serviceBridge;
         this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.eventBus.register(this);
@@ -331,7 +333,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
                         Timber.e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
-                    locationProcessorLazy.get().OnDemandLocationRequest();
+                    serviceBridge.requestOnDemandLocationFix();
+
                     break;
                 case MessageCmd.ACTION_WAYPOINTS:
                     locationProcessorLazy.get().publishWaypointsMessage();
