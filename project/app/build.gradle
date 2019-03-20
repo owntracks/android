@@ -4,17 +4,19 @@ apply plugin: 'io.objectbox'
 def versionMajor = 2
 def versionMinor = 1
 def versionPatch = 3
-def versionBuild = 1
+def versionBuild = 2
 
 
 android {
     compileSdkVersion 28
+    //compileSdkVersion 'android-Q'
     testOptions.unitTests.includeAndroidResources = true
-    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
         targetSdkVersion 28
+        //targetSdkVersion 'Q'
+
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 

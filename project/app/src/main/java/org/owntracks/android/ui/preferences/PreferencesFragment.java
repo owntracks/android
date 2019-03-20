@@ -104,14 +104,11 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     public void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-
-        Timber.v("trace");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Timber.v("trace");
         //if(viewModel == null) { fragmentComponent().inject(this);}
         setContentView(savedInstanceState);
         return super.onCreateView(inflater, container, savedInstanceState);
