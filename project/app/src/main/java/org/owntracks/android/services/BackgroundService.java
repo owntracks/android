@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
@@ -16,16 +15,10 @@ import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkRequest;
-import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -60,7 +53,6 @@ import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.support.ServiceBridge;
-import org.owntracks.android.support.receiver.WifiStateReceiver;
 import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.LinkedList;
@@ -69,6 +61,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
@@ -94,7 +91,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     public static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
 
-
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
 
@@ -104,8 +100,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
 
 
-    private NotificationCompat.Builder activeNotificationBuilder;
-    private NotificationCompat.Builder notificationBuilderEvents;
+    private NotificationCompat.Builder activeNotificationCompatBuilder;
+    private NotificationCompat.Builder eventsNotificationCompatBuilder;
     private NotificationManager notificationManager;
 
     private NotificationManagerCompat notificationManagerCompat;
@@ -150,7 +146,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         serviceBridge.bind(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-        notificationManagerCompat = NotificationManagerCompat.from(this); //getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         locationCallback = new LocationCallback() {
@@ -170,7 +166,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         };
 
         setupNotificationChannels();
-        sendOngoingNotification();
+        startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
 
         setupLocationRequest();
         setupLocationPing();
@@ -222,6 +218,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onDestroy() {
+        stopForeground(true);
         preferences.unregisterOnPreferenceChangedListener(this);
         super.onDestroy();
     }
@@ -298,11 +295,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Nullable
     private NotificationCompat.Builder getOngoingNotificationBuilder() {
-        if (activeNotificationBuilder != null)
-            return activeNotificationBuilder;
+        if (activeNotificationCompatBuilder != null)
+            return activeNotificationCompatBuilder;
 
 
-        activeNotificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING);
+        activeNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING);
 
 
         Intent resultIntent = new Intent(this, MapActivity.class);
@@ -310,8 +307,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        activeNotificationBuilder.setContentIntent(resultPendingIntent);
-        activeNotificationBuilder.setSortKey("a");
+        activeNotificationCompatBuilder.setContentIntent(resultPendingIntent);
+        activeNotificationCompatBuilder.setSortKey("a");
 
 
         Intent publishIntent = new Intent();
@@ -323,27 +320,33 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        activeNotificationBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent).addAction(R.drawable.ic_report_notification, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
-        activeNotificationBuilder.setSmallIcon(R.drawable.ic_notification);
-        activeNotificationBuilder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
-        activeNotificationBuilder.setSound(null, AudioManager.STREAM_NOTIFICATION);
+        activeNotificationCompatBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent).addAction(R.drawable.ic_report_notification, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
+        activeNotificationCompatBuilder.setSmallIcon(R.drawable.ic_notification);
+        activeNotificationCompatBuilder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        activeNotificationCompatBuilder.setSound(null, AudioManager.STREAM_NOTIFICATION);
 
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
-            activeNotificationBuilder.setColor(getColor(R.color.primary));
-            activeNotificationBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
-            activeNotificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            activeNotificationCompatBuilder.setColor(getColor(R.color.primary));
+            activeNotificationCompatBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
+            activeNotificationCompatBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
-        activeNotificationBuilder.setOngoing(true);
+        activeNotificationCompatBuilder.setOngoing(true);
 
-        return activeNotificationBuilder;
+        return activeNotificationCompatBuilder;
     }
 
-    private void sendOngoingNotification() {
+
+
+    private void updateOngoingNotification() {
+        notificationManager.notify(NOTIFICATION_ID_ONGOING,getOngoingNotification());
+    }
+
+    private Notification getOngoingNotification() {
         NotificationCompat.Builder builder = getOngoingNotificationBuilder();
 
         if (builder == null)
-            return;
+            return null;
 
 
         if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
@@ -362,8 +365,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         } else {
             builder.setContentText( lastEndpointState.getLabel(this));
         }
-
-        startForeground(NOTIFICATION_ID_ONGOING, builder.build());
+        return builder.build();
     }
 
 
@@ -407,13 +409,13 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         String text = String.format("%s %s", getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving), location);
 
 
-        notificationBuilderEvents.setContentTitle(title);
-        notificationBuilderEvents.setContentText(text);
-        notificationBuilderEvents.setWhen(TimeUnit.SECONDS.toMillis(message.getTst()));
-        notificationBuilderEvents.setShowWhen(true);
-        notificationBuilderEvents.setGroup(NOTIFICATION_GROUP_EVENTS);
+        eventsNotificationCompatBuilder.setContentTitle(title);
+        eventsNotificationCompatBuilder.setContentText(text);
+        eventsNotificationCompatBuilder.setWhen(TimeUnit.SECONDS.toMillis(message.getTst()));
+        eventsNotificationCompatBuilder.setShowWhen(true);
+        eventsNotificationCompatBuilder.setGroup(NOTIFICATION_GROUP_EVENTS);
         // Deliver notification
-        Notification n = notificationBuilderEvents.build();
+        Notification n = eventsNotificationCompatBuilder.build();
 
         Timber.v("sending new transition notification");
         notificationManagerCompat.notify(notificationEventsID++, n);
@@ -485,7 +487,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private void clearEventStackNotification() {
         Timber.v("clearing notification stack");
         activeNotifications.clear();
-
     }
     // TODO: Move to somewere else
     private void setupLocationPing() {
@@ -493,7 +494,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private void onGeofencingEvent(@Nullable final GeofencingEvent event) {
-
         if (event == null) {
             Timber.e("geofencingEvent null");
             return;
@@ -683,14 +683,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         removeGeofences();
         setupGeofences();
         setupLocationRequest();
-        sendOngoingNotification();
+        updateOngoingNotification();
     }
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.MonitoringChanged e) {
         setupLocationRequest();
-        sendOngoingNotification();
+        updateOngoingNotification();
     }
 
     @SuppressWarnings("unused")
@@ -707,14 +707,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         Timber.v("MessageLocation received %s, %s, outgoing: %s, delivered: %s ", m, lastLocationMessage, m.isOutgoing(), m.isDelivered());
         if (m.isDelivered() && (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst())) {
             this.lastLocationMessage = m;
-            sendOngoingNotification();
+            updateOngoingNotification();
             geocodingProvider.resolve(m, this);
         }
     }
 
     public void onGeocodingProviderResult(MessageLocation m) {
         if (m == lastLocationMessage) {
-            sendOngoingNotification();
+            updateOngoingNotification();
         }
     }
 
@@ -723,14 +723,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     public void onEvent(MessageProcessor.EndpointState state) {
         Timber.v(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
         this.lastEndpointState = state;
-        sendOngoingNotification();
+        updateOngoingNotification();
     }
 
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(Events.QueueChanged e) {
         this.lastQueueLength = e.getNewLength();
-        sendOngoingNotification();
+        updateOngoingNotification();
     }
 
     @SuppressWarnings("unused")
@@ -755,11 +755,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         Timber.v("building notification builder");
 
-        if (notificationBuilderEvents != null)
-            return notificationBuilderEvents;
+        if (eventsNotificationCompatBuilder != null)
+            return eventsNotificationCompatBuilder;
 
         Timber.v("builder not present, lazy building");
-        notificationBuilderEvents = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
+        eventsNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
 
         Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.setAction("android.intent.action.MAIN");
@@ -767,19 +767,19 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent openPendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notificationBuilderEvents.setContentIntent(openPendingIntent);
-        //notificationBuilderEvents.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
-        notificationBuilderEvents.setSmallIcon(R.drawable.ic_notification);
-        notificationBuilderEvents.setAutoCancel(true);
-        notificationBuilderEvents.setShowWhen(true);
-        notificationBuilderEvents.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        notificationBuilderEvents.setCategory(NotificationCompat.CATEGORY_SERVICE);
-        notificationBuilderEvents.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        eventsNotificationCompatBuilder.setContentIntent(openPendingIntent);
+        //eventsNotificationCompatBuilder.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
+        eventsNotificationCompatBuilder.setSmallIcon(R.drawable.ic_notification);
+        eventsNotificationCompatBuilder.setAutoCancel(true);
+        eventsNotificationCompatBuilder.setShowWhen(true);
+        eventsNotificationCompatBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        eventsNotificationCompatBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        eventsNotificationCompatBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            notificationBuilderEvents.setColor(getColor(R.color.primary));
+            eventsNotificationCompatBuilder.setColor(getColor(R.color.primary));
         }
 
-        return notificationBuilderEvents;
+        return eventsNotificationCompatBuilder;
     }
 
 
