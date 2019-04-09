@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.services.BackgroundService;
 
 import java.lang.ref.WeakReference;
 
@@ -9,9 +8,10 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
+
 @PerApplication
 public class ServiceBridge {
-    private WeakReference<ServiceBridgeInterface> serviceWeakReference;
+    private WeakReference<ServiceBridgeInterface> serviceWeakReference = new WeakReference<ServiceBridgeInterface>(null);
 
     public interface ServiceBridgeInterface {
         void requestOnDemandLocationUpdate();
@@ -34,3 +34,4 @@ public class ServiceBridge {
 
 
 }
+
