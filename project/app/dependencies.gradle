@@ -1,5 +1,5 @@
-ext.daggerVersion = '2.21'
-ext.playLibVersion = '16.0.0'
+ext.daggerVersion = '2.23'
+ext.playLibVersion = '17.0.0'
 ext.okHttpVersion = '3.13.1'
 ext.supportLibVersion = '1.0.0'
 ext.jacksonVersion = '2.9.8'
@@ -16,6 +16,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:${supportLibVersion}"
     implementation "androidx.annotation:annotation:${supportLibVersion}"
     implementation "com.google.android.material:material:${supportLibVersion}"
+    implementation "androidx.work:work-runtime:2.0.1"
 
     // Play Services libraries
     implementation "com.google.android.gms:play-services-maps:${playLibVersion}"
@@ -25,7 +26,7 @@ dependencies {
     implementation "com.google.dagger:dagger:${daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${daggerVersion}"
     implementation "com.google.dagger:dagger-android:${daggerVersion}"
-    implementation "android.arch.work:work-runtime:1.0.0"
+
     implementation "org.greenrobot:eventbus:3.1.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0"
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
