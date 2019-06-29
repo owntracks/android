@@ -8,10 +8,12 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
+import timber.log.Timber;
+
 
 @PerApplication
 public class ServiceBridge {
-    private WeakReference<ServiceBridgeInterface> serviceWeakReference = new WeakReference<ServiceBridgeInterface>(null);
+    private WeakReference<ServiceBridgeInterface> serviceWeakReference;
 
     public interface ServiceBridgeInterface {
         void requestOnDemandLocationUpdate();
@@ -19,13 +21,19 @@ public class ServiceBridge {
 
     @Inject
     ServiceBridge() {
+        this.serviceWeakReference = new WeakReference<>(null);
     }
 
     public void bind(@NonNull ServiceBridgeInterface service) {
-        this.serviceWeakReference = new WeakReference<ServiceBridgeInterface>(service);
+        this.serviceWeakReference = new WeakReference<>(service);
     }
 
     public void requestOnDemandLocationFix() {
+        if(serviceWeakReference == null) {
+            Timber.e("missing service reference");
+            return;
+        }
+
         ServiceBridgeInterface service = serviceWeakReference.get();
         if(service != null) {
             service.requestOnDemandLocationUpdate();
