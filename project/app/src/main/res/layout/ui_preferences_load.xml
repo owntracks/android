@@ -34,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/default_spacing"
                 android:text="Configuration"
+                      android:textColor="@android:color/black"
                 />
 
         </ScrollView>
