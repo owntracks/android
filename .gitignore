@@ -45,3 +45,5 @@ project/app/release/
 project/app/objectbox-models
 project/app/objectbox-models/default.json
 project/app/objectbox-models/default.json.bak
+
+.gradle

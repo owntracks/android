@@ -29,7 +29,6 @@ android {
 
     buildTypes {
         release {
-            useProguard true
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
@@ -38,7 +37,6 @@ android {
         }
 
         debug {
-            useProguard true
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
@@ -100,7 +98,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    buildToolsVersion = '28.0.3'
+    buildToolsVersion = '29.0.2'
 }
 
 apply from: "dependencies.gradle"
