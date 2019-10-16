@@ -1,4 +1,4 @@
-package org.owntracks.android.data;
+package org.owntracks.android.data;// hey this is for testing 
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
