@@ -29,6 +29,7 @@
                 android:text="@string/tls"
                 android:textSize="18sp" />
 
+            <!--suppress AndroidUnknownAttribute -->
             <Switch
                 android:id="@+id/tls"
                 android:layout_width="wrap_content"
