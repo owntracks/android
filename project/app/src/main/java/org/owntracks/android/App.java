@@ -100,7 +100,7 @@ public class App extends DaggerApplication  {
         return appComponent;
     }
 
-    public static Application getApplication() {
+    private static Application getApplication() {
         return sApplication;
     }
 

@@ -86,11 +86,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private final String NOTIFICATION_GROUP_EVENTS = "events";
 
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
-    public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS";
-    public static final String INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER";
-    public static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
-    public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
-    public static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
+    private static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS";
+    private static final String INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER";
+    private static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
+    private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
+    private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
 
     private FusedLocationProviderClient mFusedLocationClient;
     private GeofencingClient mGeofencingClient;
@@ -115,31 +115,31 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     Preferences preferences;
 
     @Inject
-    protected EventBus eventBus;
+    EventBus eventBus;
 
     @Inject
-    protected Scheduler scheduler;
+    Scheduler scheduler;
 
     @Inject
-    protected LocationProcessor locationProcessor;
+    LocationProcessor locationProcessor;
 
     @Inject
-    protected GeocodingProvider geocodingProvider;
+    GeocodingProvider geocodingProvider;
 
     @Inject
-    protected ContactsRepo contactsRepo;
+    ContactsRepo contactsRepo;
 
     @Inject
     LocationRepo locationRepo;
 
     @Inject
-    protected Runner runner;
+    Runner runner;
 
     @Inject
-    protected WaypointsRepo waypointsRepo;
+    WaypointsRepo waypointsRepo;
 
     @Inject
-    protected ServiceBridge serviceBridge;
+    ServiceBridge serviceBridge;
 
     @Override
     public void onCreate() {
@@ -267,7 +267,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         }
     }
 
-    public void setupNotificationChannels() {
+    private void setupNotificationChannels() {
         if (Build.VERSION.SDK_INT < 26) {
             return;
         }
@@ -370,7 +370,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
 
-    public String getMonitoringLabel(int mode) {
+    private String getMonitoringLabel(int mode) {
         switch (mode) {
             case LocationProcessor.MONITORING_QUIET:
                 return getString(R.string.monitoring_quiet);
@@ -516,7 +516,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         }
     }
 
-    public void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
+    private void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
         if(location == null) {
             Timber.e("no location provided");
             return;
@@ -749,7 +749,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
 
-    public NotificationCompat.Builder getEventsNotificationBuilder() {
+    private NotificationCompat.Builder getEventsNotificationBuilder() {
         if (!preferences.getNotificationEvents())
             return null;
 

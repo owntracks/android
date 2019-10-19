@@ -173,21 +173,21 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         Toast.makeText(this, R.string.preferencesExportSuccess, Toast.LENGTH_SHORT).show();
     }
 
-    public void displayPreferencesValueForKeySetFailedKey() {
+    private void displayPreferencesValueForKeySetFailedKey() {
         Toast.makeText(this, R.string.preferencesEditorKeyError, Toast.LENGTH_SHORT).show();
     }
-    public void displayPreferencesValueForKeySetFailedValue() {
+    private void displayPreferencesValueForKeySetFailedValue() {
         Toast.makeText(this, R.string.preferencesEditorValueError, Toast.LENGTH_SHORT).show();
     }
 
-    public String getExportString() throws IOException {
+    private String getExportString() throws IOException {
         MessageConfiguration message = preferences.exportToMessage();
         message.setWaypoints(waypointsRepo.exportToMessage());
         return parser.toJsonPlain(message);
 
     }
 
-    public static class ExportTask extends AsyncTask<Void, Void, Boolean> {
+    static class ExportTask extends AsyncTask<Void, Void, Boolean> {
         WeakReference<EditorActivity> ref;
         ExportTask(EditorActivity activity) {
             ref = new WeakReference<>(activity);

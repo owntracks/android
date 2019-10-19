@@ -44,7 +44,7 @@ public final class BaseAdapterItemView {
      *
      * @return the {@code BaseAdapterItemView} for chaining
      */
-    public BaseAdapterItemView setBindingVariable(int bindingVariable) {
+    private BaseAdapterItemView setBindingVariable(int bindingVariable) {
         this.bindingVariable = bindingVariable;
         return this;
     }
@@ -54,7 +54,7 @@ public final class BaseAdapterItemView {
      *
      * @return the {@code BaseAdapterItemView} for chaining
      */
-    public BaseAdapterItemView setLayoutRes(@LayoutRes int layoutRes) {
+    private BaseAdapterItemView setLayoutRes(@LayoutRes int layoutRes) {
         this.layoutRes = layoutRes;
         return this;
     }

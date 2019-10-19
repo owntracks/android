@@ -170,7 +170,7 @@ public class ContactImageProvider {
         synchronized TidBitmap getLevelTid(String key) {
             return cacheLevelTid.get(key);
         }
-        public synchronized void clear() {
+        synchronized void clear() {
             cacheLevelCard.clear();
             cacheLevelTid.clear();
         }

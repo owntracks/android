@@ -13,8 +13,8 @@ import dagger.Provides;
 @Module
 public abstract class BaseFragmentModule {
 
-    public static final String FRAGMENT = "BaseFragmentModule.fragment";
-    public static final String CHILD_FRAGMENT_MANAGER = "BaseFragmentModule.childFragmentManager";
+    private static final String FRAGMENT = "BaseFragmentModule.fragment";
+    private static final String CHILD_FRAGMENT_MANAGER = "BaseFragmentModule.childFragmentManager";
 
     @Binds
     @PerFragment

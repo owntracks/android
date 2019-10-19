@@ -12,7 +12,7 @@ import javax.inject.Inject;
 
 @PerActivity
 public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmentMvvm.View> implements PermissionFragmentMvvm.ViewModel<PermissionFragmentMvvm.View> {
-    boolean permissionGranted;
+    private boolean permissionGranted;
 
     @Inject
     PermissionFragmentViewModel() {

@@ -62,7 +62,7 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
         return waypoint;
     }
 
-    public void setWaypoint(WaypointModel waypoint) {
+    private void setWaypoint(WaypointModel waypoint) {
         this.waypoint = waypoint;
     }
 }

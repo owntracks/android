@@ -1,5 +1,12 @@
 package org.owntracks.android.services.worker;
 
+import androidx.work.BackoffPolicy;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
 
@@ -7,12 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import androidx.work.BackoffPolicy;
-import androidx.work.Constraints;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 import timber.log.Timber;
 
 @PerApplication
@@ -26,7 +27,8 @@ public class Scheduler {
 
     private WorkManager workManager = WorkManager.getInstance();
 
-    @Inject protected Preferences preferences;
+    @Inject
+    Preferences preferences;
 
     private Constraints anyNetworkConstraint = new Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

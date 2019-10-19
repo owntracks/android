@@ -51,7 +51,7 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
     }
 
     @Bindable
-    public void setEffectiveConfiguration(String effectiveConfiguration) {
+    private void setEffectiveConfiguration(String effectiveConfiguration) {
         this.effectiveConfiguration = effectiveConfiguration;
         notifyPropertyChanged(BR.effectiveConfiguration);
     }

@@ -53,7 +53,7 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
     }
 
 
-    public void checkAvailability() {
+    private void checkAvailability() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(getActivity());
         switch(result) {

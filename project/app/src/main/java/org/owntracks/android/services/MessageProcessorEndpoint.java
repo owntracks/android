@@ -4,7 +4,7 @@ import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 public abstract class MessageProcessorEndpoint implements OutgoingMessageProcessor {
-    protected MessageProcessor messageProcessor;
+    MessageProcessor messageProcessor;
 
     MessageProcessorEndpoint(MessageProcessor messageProcessor) {
         this.messageProcessor = messageProcessor;

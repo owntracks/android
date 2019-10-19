@@ -56,7 +56,7 @@ public class WaypointModel extends BaseObservable {
     public long getTst() {
         return tst; // unit is seconds
     }
-    public void setTst(long tst) {
+    private void setTst(long tst) {
         this.tst = tst;
     }
 
@@ -150,7 +150,7 @@ public class WaypointModel extends BaseObservable {
         return lastTriggered; // unit is seconds
     }
 
-    public void setLastTriggered(long lastTriggered) {
+    private void setLastTriggered(long lastTriggered) {
         this.lastTriggered = lastTriggered;  // unit is seconds
     }
 

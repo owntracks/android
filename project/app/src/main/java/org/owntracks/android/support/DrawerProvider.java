@@ -34,7 +34,7 @@ public class DrawerProvider  {
         this.activity = activity;
     }
 
-    final AppCompatActivity getActivity() {
+    private AppCompatActivity getActivity() {
         return activity;
     }
 
@@ -106,7 +106,7 @@ public class DrawerProvider  {
     }
 
 
-    public final void startActivity(@NonNull Class<? extends Activity> activityClass) {
+    private void startActivity(@NonNull Class<? extends Activity> activityClass) {
         Activity activity = getActivity();
         Intent intent = new Intent(activity, activityClass);
         activity.startActivity(intent);

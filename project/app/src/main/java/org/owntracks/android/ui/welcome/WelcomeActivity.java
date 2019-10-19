@@ -2,11 +2,12 @@ package org.owntracks.android.ui.welcome;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
@@ -89,11 +90,11 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         binding.done.setEnabled(enabled);
     }
 
-    public void showPreviousFragment() {
+    private void showPreviousFragment() {
         showFragment(binding.viewPager.getCurrentItem() - 1);
     }
 
-    public void showFragment(int position) {
+    private void showFragment(int position) {
         Timber.v("position %s setNextEnabled:%s",position, welcomeAdapter.getFragment(position).isNextEnabled());
         binding.viewPager.setCurrentItem(position);
 

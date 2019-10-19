@@ -57,9 +57,11 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     private static final String UI_SCREEN_CONFIGURATION = "configuration";
 
     public static final int REQUEST_CODE_CONNECTION = 1310 ;
-    public static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1311;
-    @Inject protected PreferencesFragmentViewModel viewModel;
-    @Inject protected Navigator navigator;
+    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1311;
+    @Inject
+    PreferencesFragmentViewModel viewModel;
+    @Inject
+    Navigator navigator;
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
@@ -71,7 +73,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
     /* Use this method to inflate the content view for your Fragment. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
-    protected final void setContentView(Bundle savedInstanceState) {
+    private void setContentView(Bundle savedInstanceState) {
         if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected via fragmentComponent().inject(this)"); }
         viewModel.attachView(this, savedInstanceState);
     }
@@ -147,7 +149,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
     }
 
-    public void attachClickListener() {
+    private void attachClickListener() {
         findPreference(UI_SCREEN_CONFIGURATION).setOnPreferenceClickListener(this);
         findPreference(UI_SCREEN_REPO).setOnPreferenceClickListener(this);
         findPreference(UI_SCREEN_TWITTER).setOnPreferenceClickListener(this);

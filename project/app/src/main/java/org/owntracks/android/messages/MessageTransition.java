@@ -14,9 +14,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageTransition extends MessageBase{
     public static final String TYPE = "transition";
-    public static final String BASETOPIC_SUFFIX = "/event";
-    public static final String EVENT_ENTER = "enter";
-    public static final String EVENT_LEAVE = "leave";
+    private static final String BASETOPIC_SUFFIX = "/event";
+    private static final String EVENT_ENTER = "enter";
+    private static final String EVENT_LEAVE = "leave";
 
     public static final String TRIGGER_CIRCULAR = "c";
     public static final String TRIGGER_LOCATION = "l";

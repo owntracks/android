@@ -36,7 +36,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     Runner runner;
 
     @Inject
-    protected MessageProcessor messageProcessor;
+    MessageProcessor messageProcessor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

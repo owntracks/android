@@ -18,7 +18,7 @@ public abstract class BaseViewModel<V extends MvvmView> extends BaseObservable i
     private V mView;
 
 
-    public V getView() {
+    protected V getView() {
         return mView;
     }
 

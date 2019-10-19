@@ -15,7 +15,7 @@ import dagger.Provides;
 public class DummyWaypointsModule{
     @PerApplication
     @Provides
-    protected WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
+    WaypointsRepo provideWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
         return new DummyWaypointsRepo(eventBus);
     }
 

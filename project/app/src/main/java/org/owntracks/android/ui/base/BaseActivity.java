@@ -3,18 +3,19 @@ package org.owntracks.android.ui.base;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.widget.Toolbar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BR;
@@ -39,9 +40,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     @Inject
     protected V viewModel;
     @Inject
-    protected EventBus eventBus;
+    EventBus eventBus;
     @Inject
-    protected DrawerProvider drawerProvider;
+    DrawerProvider drawerProvider;
     @Inject
     protected Preferences preferences;
     @Inject
@@ -51,7 +52,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
 
     @Inject
     @Named(BaseActivityModule.ACTIVITY_FRAGMENT_MANAGER)
-    protected FragmentManager fragmentManager;
+    FragmentManager fragmentManager;
 
 
     private boolean hasEventBus = true;

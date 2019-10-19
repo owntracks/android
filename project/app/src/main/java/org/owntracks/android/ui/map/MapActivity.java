@@ -53,17 +53,17 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
     private static final long ZOOM_LEVEL_STREET = 15;
 
-    final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
+    private final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
     private GoogleMap mMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private boolean isMapReady = false;
     private Menu mMenu;
 
     @Inject
-    protected Runner runner;
+    Runner runner;
 
     @Inject
-    protected ContactImageProvider contactImageProvider;
+    ContactImageProvider contactImageProvider;
 
     @Inject
     protected GeocodingProvider geocodingProvider;
@@ -268,7 +268,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
     }
 
-    public void initMapDelayed() {
+    private void initMapDelayed() {
         isMapReady = false;
 
         //runner.postOnMainHandlerDelayed();
@@ -399,7 +399,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
 
-    public void updateCamera(@NonNull LatLng latLng) {
+    private void updateCamera(@NonNull LatLng latLng) {
         if(isMapReady)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
     }

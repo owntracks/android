@@ -1,7 +1,8 @@
 package org.owntracks.android.support;
 
-import androidx.annotation.NonNull;
 import android.text.format.DateUtils;
+
+import androidx.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

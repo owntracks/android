@@ -28,10 +28,10 @@ import timber.log.Timber;
 
 @PerActivity
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
-    MessageProcessor.EndpointState endpointState;
-    String endpointMessage;
+    private MessageProcessor.EndpointState endpointState;
+    private String endpointMessage;
 
-    final Context context;
+    private final Context context;
     private Date appStarted;
     private Date serviceStarted;
     private long locationUpdated;
