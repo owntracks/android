@@ -95,12 +95,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     @Override
-    @CallSuper
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
@@ -190,7 +184,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         populateScreenReporting((PreferenceScreen)root.findPreference("reportingScreen"));
         populateScreenNotification((PreferenceScreen)root.findPreference("notificationScreen"));
         populateScreenAdvanced((PreferenceScreen)root.findPreference("advancedScreen"));
-        setupDependencies(root);
     }
 
     private void populateScreenReporting(PreferenceScreen screen) {
@@ -291,9 +284,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         screen.addPreference(background);
         addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
 
-    }
-
-    private void setupDependencies(PreferenceScreen root) {
     }
 
     private PreferenceCategory getCategory(@StringRes int titleRes) {

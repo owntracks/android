@@ -103,27 +103,6 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.permissionLocation)}"
-                android:ellipsize="none"
-                android:visibility="gone"
-                style="@style/ListItemPrimary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Location service permission"
-                android:ellipsize="end"
-                android:visibility="gone"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@{vm.locationUpdated != 0 ? DateFormatter.formatDate(vm.locationUpdated) : @string/na}"
                 android:ellipsize="none"
                 style="@style/ListItemPrimary" />

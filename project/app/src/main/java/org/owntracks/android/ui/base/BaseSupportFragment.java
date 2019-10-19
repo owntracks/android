@@ -1,15 +1,16 @@
 package org.owntracks.android.ui.base;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 
 import org.owntracks.android.BR;
 import org.owntracks.android.ui.base.navigator.Navigator;
@@ -50,12 +51,6 @@ public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends M
         if(viewModel != null) { viewModel.detachView(); }
         binding = null;
         viewModel = null;
-    }
-
-    @Override
-    @CallSuper
-    public void onDestroy() {
-        super.onDestroy();
     }
 
 }

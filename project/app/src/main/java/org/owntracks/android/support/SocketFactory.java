@@ -18,7 +18,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.security.cert.CertificateException;
 
 import timber.log.Timber;
 
@@ -67,9 +66,6 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         boolean hasClientP12Password() {
             return (caClientP12Password != null) && !caClientP12Password.equals("");
         }
-    }
-    public SocketFactory() throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
-        this(new SocketFactoryOptions());
     }
 
 

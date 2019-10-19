@@ -7,21 +7,18 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import androidx.annotation.CallSuper;
-import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
-import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RequirementsChecker;
@@ -77,12 +74,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     }
 
 
-    private BackgroundService mService;
     private boolean mBound;
-
-    protected boolean isBound() {
-        return mBound;
-    }
 
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -90,15 +82,12 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (service != null) {
-                BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
-                mService = binder.getService();
                 mBound = true;
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mService = null;
             mBound = false;
         }
     };
@@ -205,13 +194,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
     }
 
-    protected final void addFragment(@IdRes int containerViewId, Fragment fragment) {
-        fragmentManager.beginTransaction()
-                .add(containerViewId, fragment)
-                .commit();
-    }
-
-    protected void setDisablesAnimation(boolean animation) {
-        disablesAnimation = animation;
+    protected void disablesAnimation() {
+        disablesAnimation = true;
     }
 }

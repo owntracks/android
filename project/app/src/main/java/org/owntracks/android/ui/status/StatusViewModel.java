@@ -31,8 +31,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     private MessageProcessor.EndpointState endpointState;
     private String endpointMessage;
 
-    private final Context context;
-    private Date appStarted;
     private Date serviceStarted;
     private long locationUpdated;
     private boolean locationPermission;
@@ -40,7 +38,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Inject
     public StatusViewModel(@AppContext Context context) {
-        this.context = context;
 
     }
     public void attachView(@NonNull StatusMvvm.View view, @Nullable Bundle savedInstanceState) {
@@ -63,12 +60,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Bindable
     public int getEndpointQueue() {
         return queueLength;
-    }
-
-    @Override
-    @Bindable
-    public boolean getPermissionLocation() {
-        return locationPermission;
     }
 
     @Override
