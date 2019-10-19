@@ -1,8 +1,5 @@
 package org.owntracks.android.support;
 
-import android.util.Log;
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -79,14 +76,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     private TrustManagerFactory tmf;
 
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
-        Log.v(this.toString(), "initializing CustomSocketFactory");
+        Timber.tag(this.toString()).v("initializing CustomSocketFactory");
 
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
 
         if(options.hasCaCrt()) {
-            Log.v(this.toString(), "options.hasCaCrt(): true");
+            Timber.tag(this.toString()).v("options.hasCaCrt(): true");
 
             KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             caKeyStore.load(null, null);
@@ -120,21 +117,21 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         }
 
         if (options.hasClientP12Crt()) {
-            Log.v(this.toString(), "options.hasClientP12Crt(): true");
+            Timber.tag(this.toString()).v("options.hasClientP12Crt(): true");
 
             KeyStore clientKeyStore = KeyStore.getInstance("PKCS12");
 
             clientKeyStore.load(options.getCaClientP12InputStream(), options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
             kmf.init(clientKeyStore, options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
 
-            Log.v(this.toString(), "Client .p12 Keystore content: ");
+            Timber.tag(this.toString()).v("Client .p12 Keystore content: ");
             Enumeration<String> aliasesClientCert = clientKeyStore.aliases();
             for (; aliasesClientCert.hasMoreElements(); ) {
                 String o = aliasesClientCert.nextElement();
                 Timber.v("Alias: %s", o);
             }
         } else {
-            Log.v(this.toString(), "Client .p12 sideload: false, using null client cert");
+            Timber.tag(this.toString()).v("Client .p12 sideload: false, using null client cert");
             kmf.init(null,null);
         }
 
