@@ -50,12 +50,6 @@ public class BindingConversions {
     }
 
     @BindingConversion
-    @InverseMethod("convertToDouble")
-    public static String convertToString(@Nullable Double d) {
-        return d != null ? d.toString() : EMPTY_STRING;
-    }
-
-    @BindingConversion
     public static String convertToString(String s) {
         return s != null ? s : EMPTY_STRING;
     }
@@ -75,15 +69,6 @@ public class BindingConversions {
     public static Integer convertToIntegerZeroIsEmpty(String d) {
         return convertToInteger(d);
     }
-
-
-    // XX to Double
-    @BindingConversion
-    @Nullable
-    public static Double convertToDouble(@Nullable String d) {
-        return d != null ? Double.parseDouble(d) : null;
-    }
-
 
     // Misc
     @BindingAdapter({"android:text"})

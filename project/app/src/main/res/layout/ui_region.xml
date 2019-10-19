@@ -35,12 +35,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginEnd="@dimen/default_spacing"
-                android:layout_marginRight="@dimen/default_spacing">
+                android:layout_marginEnd="@dimen/default_spacing">
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_height="wrap_content"
                     android:hint="@string/description"
@@ -56,34 +54,32 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/latitude"
+                    android:enabled="true"
+                    android:id="@+id/latitude"
+                    android:text="@={vm.waypoint.geofenceLatitudeAsStr}"
+                    android:inputType="numberDecimal|numberSigned"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:enabled="true"
-                    android:id="@+id/latitude"
-                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLatitude)}"
-                    android:inputType="numberDecimal"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/longitude"
+                    android:enabled="true"
+                    android:id="@+id/longitude"
+                    android:text="@={vm.waypoint.geofenceLongitudeAsStr}"
+                    android:inputType="numberDecimal|numberSigned"
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:enabled="true"
-                    android:id="@+id/longitude"
-                    android:text="@={org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.waypoint.geofenceLongitude)}"
-                    android:inputType="numberDecimal"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
