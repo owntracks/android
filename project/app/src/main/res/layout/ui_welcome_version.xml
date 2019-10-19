@@ -41,7 +41,6 @@
 			android:id="@+id/screen_desc"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:layout_alignLeft="@+id/screen_heading"
 			android:layout_alignStart="@+id/screen_heading"
 			android:layout_below="@+id/screen_heading"
 			android:gravity="top|center_horizontal"

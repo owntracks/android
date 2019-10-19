@@ -1,27 +1,24 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_monitoring"
         android:icon="@drawable/ic_adjust_black_24dp"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
-        android:title="Monitoring"/>
-
-
+        android:title="@string/monitoring_mode"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menu_report"
         android:icon="@drawable/ic_report"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
-        android:title="@string/publish"/>
+        android:title="@string/publish"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menu_mylocation"
         android:icon="@drawable/ic_mylocation"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
-        android:title="@string/menuCurrentLoction"/>
-
-
+        android:title="@string/menuCurrentLoction"
+        app:showAsAction="ifRoom" />
 </menu>

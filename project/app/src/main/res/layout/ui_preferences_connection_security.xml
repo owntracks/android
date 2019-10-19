@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <data>
-
         <import type="android.view.View" />
-
         <variable
             name="vm"
             type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel" />
@@ -25,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:orientation="vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -38,10 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:checked="@{vm.tls}"
-                android:onCheckedChanged="@{(view, checked) -> vm.onTlsCheckedChanged(checked)}"
+                android:onCheckedChanged="@{vm::onTlsCheckedChanged}"
                 android:layout_gravity="end" />
         </RelativeLayout>
 
@@ -57,7 +52,7 @@
             android:inputType="textVisiblePassword"
             android:text="@{vm.tlsCaCrtName}"
             android:visibility="@{vm.tls}"
-            android:onClick="@{(view) ->  vm.onTlsCaCrtNameClick(view)}"
+            android:onClick="@{vm::onTlsCaCrtNameClick}"
             android:windowSoftInputMode="stateAlwaysHidden"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"

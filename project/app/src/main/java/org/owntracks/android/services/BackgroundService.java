@@ -23,6 +23,12 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -61,11 +67,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
@@ -441,7 +442,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             if (activeNotifications.size() > 1) {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
-                String summary = getString(R.string.notificationEventsTitle, activeNotifications.size());
+                String summary = getResources().getQuantityString(R.plurals.notificationEventsTitle, activeNotifications.size());
                 builder.setContentTitle(getString(R.string.events));
                 builder.setContentText(summary);
                 builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications

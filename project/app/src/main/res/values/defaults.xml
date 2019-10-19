@@ -19,7 +19,6 @@
 
     <bool name="valCleanSession">false</bool>
     <bool name="valPubExtendedData">true</bool>
-    <bool name="valNotification">true</bool>
     <bool name="valNotificationHigherPriority">false</bool>
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationEvents">true</bool>

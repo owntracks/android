@@ -35,7 +35,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="end"
                 android:checked="@={vm.cleanSession}" />
@@ -47,14 +46,12 @@
             android:nextFocusLeft="@id/keepalive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="0123456789"
             android:hint="@string/preferencesKeepalive"
-            android:inputType="textNoSuggestions"
+            android:inputType="textNoSuggestions|number"
             android:text="@={vm.keepaliveText}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_helperText="@string/seconds"
             app:met_primaryColor="@color/accent" />
-
     </LinearLayout>
 </layout>

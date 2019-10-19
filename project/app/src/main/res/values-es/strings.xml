@@ -1,42 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Owntracks</string>
-    <string name="preferencesServer">"Conexión"</string>
-    <string name="preferencesHost" translatable="false">"Host"</string>
-    <string name="preferencesPort" translatable="false">"Puerto"</string>
+    <string name="preferencesServer">Conexión</string>
+    <string name="preferencesHost" >Host</string>
+    <string name="preferencesPort" >Puerto</string>
     <string name="preferencesWebsocket">Usar WebSockets</string>
-    <string name="preferencesUserUsername">"Nombre de Usuario"</string>
-    <string name="preferencesDeviceName" translatable="false">"ID de Dispositivo"</string>
-    <string name="preferencesBrokerPassword">"Contraseña"</string>
+    <string name="preferencesUserUsername">Nombre de Usuario</string>
+    <string name="preferencesDeviceName" >ID de Dispositivo</string>
+    <string name="preferencesBrokerPassword">Contraseña</string>
     <string name="preferencesCaCrtPath">Certificado CA</string>
     <string name="preferencesClientCrtPath">Certificado cliente</string>
     <string name="preferencesClientCrtPassword">Contraseña del certificado cliente</string>
-    <string name="preferencesLicenses">"Librerías"</string>
-    <string name="preferencesLicensesSummary">"Gracias a los autores de las librerías incluidas"</string>
+    <string name="preferencesLicenses">Librerías</string>
+    <string name="preferencesLicensesSummary">Gracias a los autores de las librerías incluidas</string>
     <string name="preferencesNotification">Notificaciones</string>
     <string name="preferencesNotificationEvents">Eventos </string>
     <string name="preferencesNotificationEventsSummary">Notificar sobre los eventos recientes </string>
-    <string name="preferencesNotificationLocationSummary">"Mostrar la última ubicación y fecha"</string>
-    <string name="preferencesNotificationLocation">"Última ubicación"</string>
-    <string name="preferencesAdvanced">"Avanzado"</string>
-    <string name="preferencesVersion">"Versión"</string>
-    <string name="preferencesReporting">"Reportando"</string>
-    <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
+    <string name="preferencesNotificationLocationSummary">Mostrar la última ubicación y fecha</string>
+    <string name="preferencesNotificationLocation">Última ubicación</string>
+    <string name="preferencesAdvanced">Avanzado</string>
+    <string name="preferencesVersion">Versión</string>
+    <string name="preferencesReporting">Reportando</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesInfo">Información</string>
     <string name="preferencesRepository">Código fuente</string>
-    <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentación</string>
-    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet</string>
-    <string name="preferencesTwitter" translatable="false">Twitter</string>
-    <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Clave simétrica para encriptación del payload </string>
     <string name="preferencesEncryptionKey">Clave de encriptación</string>
     <string name="preferencesEncryptionKeyDialogMessage">La clave se corta después de 32 caracteres</string>
     <string name="na">No disponible</string>
-    <string name="currentLocation">Usar ubicación actual</string>
-    <string name="share">Compartir</string>
-    <string name="save">"Guardar"</string>
-    <string name="cancel">"Cancelar"</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
     <string name="preferencesCleanSessionEnabled">Limpiar sesión</string>
     <string name="publish">Reportar</string>
     <string name="preferencesPubExtendedDataSummary">Incluir datos adicionales en los reportes de ubicación</string>
@@ -60,12 +54,11 @@
     <string name="waypointListPlaceholder">No hay regiones definidas</string>
     <string name="waypointRemove">Eliminar</string>
     <string name="importConfig">Importar</string>
-    <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Seguridad</string>
     <string name="accept">Aceptar</string>
     <string name="preferencesIdentification">Identificación</string>
     <string name="preferencesParameters">Parámetros</string>
-    <string name="preferencesKeepalive" translatable="false">Keepalive</string>
+    <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Segundos</string>
     <string name="preferencesProfileId">Modo</string>
     <string name="aLocation">a region</string>
@@ -84,7 +77,6 @@
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
     <string name="preferencesCategoryAdvancedEncryption">Encriptación</string>
     <string name="preferencesCategoryAdvancedMisc">Miscelánea</string>
-    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
     <string name="waypointRemoved">Región eliminada</string>
     <string name="exportWaypointsToEndpoint">Publicar Waypoints</string>
     <string name="preferencesExportFailed">Fallo al exportar las preferencias</string>
@@ -95,14 +87,8 @@
     <string name="play_services_now_available">Google Play Services disponibles</string>
     <string name="play_services_not_available">Google Play Services no disponibles</string>
     <string name="play_services_update_required">Google Play Services deben actualizarse</string>
-    <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP</string>
     <string name="mode_mqtt_private_label">MQTT</string>
-    <string name="preferencesKeyModeId" translatable="false">mode</string>
-    <string name="preferencesKeyHost" translatable="false">host</string>
-    <string name="preferencesKeyIdentification" translatable="false">identification</string>
-    <string name="preferencesKeySecurity" translatable="false">security</string>
-    <string name="preferencesKeyParameters" translatable="false">parameters</string>
     <string name="transitionEntering">entra</string>
     <string name="transitionLeaving">sale</string>
     <string name="errorPreferencesImportFailed">No se pudo importar</string>
@@ -138,7 +124,10 @@
     <string name="preferencesEditorKey">Clave</string>
     <string name="preferencesEditorValue">Valor</string>
     <string name="restart">Reiniciar</string>
-    <string name="notificationEventsTitle" formatted="false">%1$d eventos nuevos</string>
+    <plurals name="notificationEventsTitle">
+        <item quantity="one">%1$d eventos nuevo</item>
+        <item quantity="other">%1$d eventos nuevos</item>
+    </plurals>
     <string name="ui_fragment_welcome_version_title">Restricciones</string>
     <string name="ui_fragment_welcome_version_description">Debido a limitaciones del sistema algunas características pueden no funcionar. \n\n Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema. </string>
     <string name="ui_fragment_welcome_version_learn_more">Aprender más</string>

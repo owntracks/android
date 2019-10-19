@@ -32,9 +32,7 @@
                 android:id="@+id/effectiveConfiguration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"
-                android:text="Configuration"
-                />
+                android:padding="@dimen/default_spacing"/>
 
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
