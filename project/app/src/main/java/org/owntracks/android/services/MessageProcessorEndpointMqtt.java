@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Looper;
+
 import androidx.annotation.WorkerThread;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -15,7 +16,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -45,7 +45,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 
 import timber.log.Timber;
 
@@ -360,7 +359,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			Timber.v( "subscribe() - Will subscribe to: %s", s);
 		}
 		try {
-			int qos[] = getSubTopicsQos(topics);
+			int[] qos = getSubTopicsQos(topics);
 			this.mqttClient.subscribe(topics, qos);
 		} catch (MqttException e) {
 			changeState(EndpointState.ERROR, e, "Subscribe failed");

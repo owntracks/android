@@ -2,19 +2,17 @@ package org.owntracks.android.support;
 
 import android.app.Activity;
 import android.content.Intent;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.View;
 
-import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.owntracks.android.R;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -83,26 +81,23 @@ public class DrawerProvider  {
                 ).addStickyDrawerItems(
                         secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
                         secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
-                ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                ).withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem == null)
+                        return false;
 
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem == null)
-                            return false;
+                    if (drawerItem instanceof SecondarySwitchDrawerItem)
+                        return true;
 
-                        if (drawerItem instanceof SecondarySwitchDrawerItem)
-                            return true;
-
-                        Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
+                    Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
 
 
-                        if (activity.getClass() == targetclass) {
-                            return false;
-                        }
-
-                        startActivity(targetclass);
-
-                        return false; // return false to enable withCloseOnClick
+                    if (activity.getClass() == targetclass) {
+                        return false;
                     }
+
+                    startActivity(targetclass);
+
+                    return false; // return false to enable withCloseOnClick
                 }).withSelectedItem(activity.getClass().hashCode())
                 //.withCloseOnClick(true)
                 // .withDelayDrawerClickEvent(350)

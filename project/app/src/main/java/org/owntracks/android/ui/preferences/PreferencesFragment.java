@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.ArrayRes;
 import androidx.annotation.BoolRes;
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntegerRes;
@@ -33,7 +32,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
-import org.owntracks.android.support.widgets.ListIntegerPreference;
 import org.owntracks.android.support.widgets.ToolbarPreference;
 import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity;
@@ -217,12 +215,9 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
         screen.addPreference(misc);
         SwitchPreference p = addSwitchPreference(misc, Preferences.Keys.DEBUG_LOG, R.string.preferencesDebugLog,  R.string.preferencesDebugLogSummary, R.bool.valFalse);
-        p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                handleDebugLogChange((Boolean)newValue);
-                return true;
-            }
+        p.setOnPreferenceChangeListener((preference, newValue) -> {
+            handleDebugLogChange((Boolean)newValue);
+            return true;
         });
 
 
@@ -232,14 +227,12 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_WRITE_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableDebugLog();
-                } else {
-                    viewModel.getPreferences().setDebugLog(false);
-                }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableDebugLog();
+            } else {
+                viewModel.getPreferences().setDebugLog(false);
             }
         }
     }
@@ -250,7 +243,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     private void handleDebugLogChange(Boolean newValue) {
-        if((Boolean)newValue) {
+        if(newValue) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 Timber.e("permission not granted");
                 ActivityCompat.requestPermissions( getActivity(), new String[] {  Manifest.permission.WRITE_EXTERNAL_STORAGE  }, REQUEST_CODE_WRITE_EXTERNAL_STORAGE );
@@ -301,13 +294,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     }
 
     private void setupDependencies(PreferenceScreen root) {
-    }
-
-    private void setDependency(PreferenceScreen root, String dependingKey, String dependsOnKey) {
-        try {
-            root.findPreference(dependingKey).setDependency(dependsOnKey);
-        } catch (IllegalStateException e) {
-            Timber.e("Preference dependency could not be setup from: " + dependingKey + " to " + dependsOnKey);}
     }
 
     private PreferenceCategory getCategory(@StringRes int titleRes) {
@@ -377,23 +363,4 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
             return Integer.toString(i);
         }
     }
-
-    @SuppressWarnings("UnusedReturnValue")
-    private boolean addListIntegerPreference(PreferenceGroup parent, String key, @StringRes int titleRes, @StringRes int summaryRes, @ArrayRes int entriesRes, @ArrayRes int entryValuesRes, @IntegerRes int defaultValueAllModes) {
-        ListIntegerPreference p = new ListIntegerPreference(parent.getContext());
-        p.setKey(key);
-        p.setTitle(titleRes);
-        p.setDialogTitle(titleRes);
-        p.setSummary(summaryRes);
-        p.setEntries(entriesRes);
-        p.setEntryValues(entryValuesRes);
-
-        p.setPersistent(false);
-        p.setValueIndex(viewModel.getPreferences().getInt(key, defaultValueAllModes));
-        p.setPersistent(true);
-
-        parent.addPreference(p);
-        return true;
-    }
-
 }

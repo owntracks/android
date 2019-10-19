@@ -5,22 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.StrictMode;
 
+import androidx.work.Configuration;
+import androidx.work.WorkManager;
+
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.injection.components.DaggerAppComponent;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.support.TimberDebugLogTree;
+import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
-import androidx.work.Configuration;
-import androidx.work.WorkManager;
 import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
@@ -43,8 +44,6 @@ public class App extends DaggerApplication  {
     @Inject
     @AppContext
     Context context;
-
-
 
     @Override
     public void onCreate() {
@@ -81,12 +80,7 @@ public class App extends DaggerApplication  {
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
-        runner.postOnMainHandlerDelayed(new Runnable() {
-            @Override
-            public void run() {
-                messageProcessor.initialize();
-            }
-        }, 510);
+        runner.postOnMainHandlerDelayed(() -> messageProcessor.initialize(), 510);
 
     }
 

@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.OpenableColumns;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -109,23 +108,21 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     public void onTlsCaCrtNameClick(final View v) {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.getMenuInflater().inflate(R.menu.picker, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.clear) {
-                    setTlsCaCrtName(null);
-                } else if (item.getItemId() == R.id.select) {
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.clear) {
+                setTlsCaCrtName(null);
+            } else if (item.getItemId() == R.id.select) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
 
-                    try {
-                        navigator.startActivityForResult(Intent.createChooser(intent, "Select a file"), REQUEST_CODE_FILE_CA_CRT);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        // Potentially direct the user to the Market with a Dialog
-                    }
+                try {
+                    navigator.startActivityForResult(Intent.createChooser(intent, "Select a file"), REQUEST_CODE_FILE_CA_CRT);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    // Potentially direct the user to the Market with a Dialog
                 }
-                return true;
             }
+            return true;
         });
         popup.show();
     }
@@ -134,23 +131,21 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
         PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.getMenuInflater().inflate(R.menu.picker, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.clear) {
-                    setTlsClientCrtName(null);
-                } else if (item.getItemId() == R.id.select) {
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.clear) {
+                setTlsClientCrtName(null);
+            } else if (item.getItemId() == R.id.select) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
 
-                    try {
-                        navigator.startActivityForResult(Intent.createChooser(intent, "Select a file"), REQUEST_CODE_FILE_CLIENT_CRT);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        // Potentially direct the user to the Market with a Dialog
-                    }
+                try {
+                    navigator.startActivityForResult(Intent.createChooser(intent, "Select a file"), REQUEST_CODE_FILE_CLIENT_CRT);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    // Potentially direct the user to the Market with a Dialog
                 }
-                return true;
             }
+            return true;
         });
         popup.show();
     }
@@ -237,13 +232,10 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     public String uriToFilename(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = App.getContext().getContentResolver().query(uri, null, null, null, null);
-            try {
+            try (Cursor cursor = App.getContext().getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
-            } finally {
-                cursor.close();
             }
         }
         if (result == null) {

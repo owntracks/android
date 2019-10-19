@@ -1,18 +1,11 @@
 package org.owntracks.android.ui.map;
 
-import androidx.lifecycle.Observer;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.appcompat.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,12 +14,20 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.Observer;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
@@ -41,6 +42,7 @@ import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
 
+import java.util.Locale;
 import java.util.WeakHashMap;
 
 import javax.inject.Inject;
@@ -90,13 +92,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);
         this.binding.contactPeek.contactRow.setOnClickListener(this);
         this.binding.contactPeek.contactRow.setOnLongClickListener(this);
-        this.binding.moreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPopupMenu(v);
-
-            }
-        });
+        this.binding.moreButton.setOnClickListener(this::showPopupMenu);
         setBottomSheetHidden();
 
         AppBarLayout appBarLayout = this.binding.appBarLayout;
@@ -116,22 +112,16 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
 
         viewModel.getContact().observe(this, this);
-        viewModel.getBottomSheetHidden().observe(this, new Observer() {
-            @Override
-            public void onChanged(@Nullable Object o) {
-                if(Boolean.class.cast(o)) {
-                    setBottomSheetHidden();
-                } else {
-                    setBottomSheetCollapsed();
-                }
+        viewModel.getBottomSheetHidden().observe(this, o -> {
+            if(Boolean.class.cast(o)) {
+                setBottomSheetHidden();
+            } else {
+                setBottomSheetCollapsed();
             }
         });
-        viewModel.getCenter().observe(this, new Observer() {
-            @Override
-            public void onChanged(@Nullable Object o) {
-                if(o != null) {
-                    updateCamera(LatLng.class.cast(o));
-                }
+        viewModel.getCenter().observe(this, o -> {
+            if(o != null) {
+                updateCamera(LatLng.class.cast(o));
             }
         });
 
@@ -151,10 +141,10 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
             binding.contactPeek.name.setText(c.getFusedName());
             if(c.hasLocation()) {
-                contactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
-                geocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
+                ContactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
+                GeocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
                 BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
-                binding.acc.setText(c.getFusedLocationAccuracy()+" m");
+                binding.acc.setText(String.format(Locale.getDefault(),"%s m",c.getFusedLocationAccuracy()));
                 binding.tid.setText(c.getTrackerId());
                 binding.id.setText(c.getId());
                 if(viewModel.hasLocation()) {
@@ -164,7 +154,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                     float[] distance = new float[2];
                     Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().latitude,c.getLatLng().longitude , distance);
 
-                    binding.distance.setText(Math.round(distance[0])+" m");
+                    binding.distance.setText(String.format(Locale.getDefault(),"%d m",Math.round(distance[0])));
                 } else {
                     binding.distance.setVisibility(View.GONE);
                     binding.distanceLabel.setVisibility(View.GONE);
@@ -282,12 +272,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         isMapReady = false;
 
         //runner.postOnMainHandlerDelayed();
-        runner.postOnMainHandlerDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initMap();
-            }
-        }, 500);
+        runner.postOnMainHandlerDelayed(this::initMap, 500);
     }
 
     private void initMap() {

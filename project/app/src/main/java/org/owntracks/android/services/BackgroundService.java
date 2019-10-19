@@ -459,7 +459,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
 
                 // Append new notification to existing
-                CharSequence cs[] = null;
+                CharSequence[] cs = null;
 
                 if (stackNotification != null) {
                     cs = (CharSequence[]) stackNotification.extras.get(NotificationCompat.EXTRA_TEXT_LINES);

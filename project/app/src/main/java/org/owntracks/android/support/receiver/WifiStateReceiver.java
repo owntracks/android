@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.telephony.TelephonyManager;
 
-import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.support.Preferences;
 
 import javax.inject.Inject;

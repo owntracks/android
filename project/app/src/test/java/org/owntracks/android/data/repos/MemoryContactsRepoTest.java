@@ -34,7 +34,6 @@ public class MemoryContactsRepoTest {
     private ContactsRepo contactsRepo;
     private final static String CONTACT_ID = "abcd1234";
     private EventBus eventBus;
-    private ContactImageProvider contactImageProvider;
 
 
     @Before
@@ -45,7 +44,7 @@ public class MemoryContactsRepoTest {
         Resources myResources = mock(Resources.class);
         when(myResources.getDisplayMetrics()).thenReturn(displayMetrics);
         when(app.getResources()).thenReturn(myResources);
-        contactImageProvider = new ContactImageProvider(app);
+        ContactImageProvider contactImageProvider = new ContactImageProvider(app);
 
         mockStatic(App.class);
 

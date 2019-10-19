@@ -59,8 +59,6 @@ public class WelcomeActivityTest {
     @Spy
     private WelcomeActivity welcomeActivity;
 
-    private ShadowApplication application;
-
 
     @Before
     public void setup() {
@@ -72,7 +70,7 @@ public class WelcomeActivityTest {
 
 
         welcomeActivity = welcomeActivityActivityController.get();
-        application = Shadows.shadowOf(welcomeActivity.getApplication());
+        ShadowApplication application = Shadows.shadowOf(welcomeActivity.getApplication());
 
         application.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
         assertNotNull(welcomeActivity);
