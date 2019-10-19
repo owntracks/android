@@ -31,6 +31,7 @@
     <PreferenceScreen
         android:key="informationScreen"
         android:title="@string/preferencesInfo" >
+        <!--suppress AndroidElementNotAllowed -->
         <org.owntracks.android.support.widgets.ToolbarPreference
             android:key="information"
             android:title="@string/preferencesInfo" />
@@ -53,6 +54,7 @@
             android:key="licensesScreen"
             android:summary="@string/preferencesLicensesSummary"
             android:title="@string/preferencesLicenses">
+            <!--suppress AndroidElementNotAllowed -->
             <org.owntracks.android.support.widgets.ToolbarPreference
                 android:key="licenses"
                 android:title="@string/preferencesLicenses" />

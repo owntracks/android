@@ -27,6 +27,7 @@
             android:hint="@string/preferencesUrl"
             android:inputType="textUri|textNoSuggestions"
             android:text="@={vm.urlText}"
+            android:importantForAutofill="no"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesUrl"

@@ -12,6 +12,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.annotation.ArrayRes;
 import androidx.annotation.BoolRes;
 import androidx.annotation.CallSuper;
@@ -19,9 +23,8 @@ import androidx.annotation.IntegerRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
@@ -38,8 +41,6 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
 import javax.inject.Inject;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
@@ -74,7 +75,6 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
      * creating the binding, setting the view model on the binding and attaching the view. */
     protected final void setContentView(Bundle savedInstanceState) {
         if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected via fragmentComponent().inject(this)"); }
-        //noinspection unchecked
         viewModel.attachView(this, savedInstanceState);
     }
 

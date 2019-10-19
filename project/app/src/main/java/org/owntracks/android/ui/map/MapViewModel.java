@@ -1,12 +1,13 @@
 package org.owntracks.android.ui.map;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.databinding.Bindable;
 import android.location.Location;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.Bindable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
@@ -259,7 +260,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             this.mListener.onLocationChanged(this.mLocation);
         }
         if(mode == VIEW_DEVICE) {
-            //noinspection ConstantConditions
             liveCamera.postValue(getCurrentLocation());
         }
         getView().enableLocationMenus();
