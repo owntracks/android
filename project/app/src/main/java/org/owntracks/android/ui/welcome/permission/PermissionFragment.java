@@ -3,12 +3,13 @@ package org.owntracks.android.ui.welcome.permission;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
@@ -45,7 +46,7 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
 
     public void checkPermission() {
         viewModel.setPermissionGranted(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(viewModel.isPermissionGranted());
+        ((WelcomeMvvm.View) getActivity()).setNextEnabled(viewModel.isPermissionGranted());
 
     }
 

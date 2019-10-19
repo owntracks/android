@@ -592,10 +592,9 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 return LocationRequest.PRIORITY_NO_POWER;
             case 1:
                 return LocationRequest.PRIORITY_LOW_POWER;
-            case 2:
-                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
             case 3:
                 return LocationRequest.PRIORITY_HIGH_ACCURACY;
+            case 2:
             default:
                 return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
         }

@@ -59,7 +59,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             loadOutgoingMessageProcessor();
 
         if(endpoint instanceof StatefulServiceMessageProcessor)
-            StatefulServiceMessageProcessor.class.cast(endpoint).reconnect();
+            ((StatefulServiceMessageProcessor) endpoint).reconnect();
     }
 
     public boolean statefulSendKeepalive() {
@@ -67,7 +67,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             loadOutgoingMessageProcessor();
 
         if(endpoint instanceof MessageProcessorEndpointMqtt)
-            return MessageProcessorEndpointMqtt.class.cast(endpoint).sendKeepalive();
+            return ((MessageProcessorEndpointMqtt) endpoint).sendKeepalive();
         else
             return true;
     }
@@ -77,7 +77,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             loadOutgoingMessageProcessor();
 
         if(endpoint instanceof StatefulServiceMessageProcessor)
-            return MessageProcessorEndpointMqtt.class.cast(endpoint).checkConnection();
+            return ((MessageProcessorEndpointMqtt) endpoint).checkConnection();
         else
             return true;
     }

@@ -79,7 +79,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     public boolean getDozeWhitelisted() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PowerManager.class.cast(App.getContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(App.getContext().getPackageName());
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ((PowerManager) App.getContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(App.getContext().getPackageName());
     }
 
     @Override
