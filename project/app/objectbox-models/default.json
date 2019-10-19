@@ -10,36 +10,51 @@
       "properties": [
         {
           "id": "1:929438986717480236",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 1
         },
         {
           "id": "2:5694450553046289423",
-          "name": "description"
+          "name": "description",
+          "type": 9
         },
         {
           "id": "3:755045470401208495",
-          "name": "geofenceLatitude"
+          "name": "geofenceLatitude",
+          "type": 8,
+          "flags": 4
         },
         {
           "id": "4:7161580565802719691",
-          "name": "geofenceLongitude"
+          "name": "geofenceLongitude",
+          "type": 8,
+          "flags": 4
         },
         {
           "id": "5:6859279434680052222",
-          "name": "geofenceRadius"
+          "name": "geofenceRadius",
+          "type": 5,
+          "flags": 4
         },
         {
           "id": "6:8939468475374370471",
-          "name": "lastTriggered"
+          "name": "lastTriggered",
+          "type": 6,
+          "flags": 4
         },
         {
           "id": "7:3668132826995978522",
-          "name": "lastTransition"
+          "name": "lastTransition",
+          "type": 5,
+          "flags": 4
         },
         {
           "id": "8:2353765053577762792",
+          "name": "tst",
           "indexId": "1:3621608531039221384",
-          "name": "tst"
+          "type": 6,
+          "flags": 44
         }
       ],
       "relations": []
@@ -49,8 +64,8 @@
   "lastIndexId": "1:3621608531039221384",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
-  "modelVersion": 4,
-  "modelVersionParserMinimum": 4,
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [],

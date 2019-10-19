@@ -94,6 +94,7 @@
     <string name="welcomeFixIssue">Fix</string>
     <string name="play_services_now_available">Google Play Services disponibles</string>
     <string name="play_services_not_available">Google Play Services no disponibles</string>
+    <string name="play_services_update_required">Google Play Services deben actualizarse</string>
     <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP</string>
     <string name="mode_mqtt_private_label">MQTT</string>

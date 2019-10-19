@@ -4,6 +4,11 @@ import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.BindingConversion;
+import androidx.databinding.InverseMethod;
+
 import com.google.android.gms.location.Geofence;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -14,11 +19,6 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
 import java.util.concurrent.TimeUnit;
-
-import androidx.annotation.Nullable;
-import androidx.databinding.BindingAdapter;
-import androidx.databinding.BindingConversion;
-import androidx.databinding.InverseMethod;
 
 public class BindingConversions {
     private static final String EMPTY_STRING = "";

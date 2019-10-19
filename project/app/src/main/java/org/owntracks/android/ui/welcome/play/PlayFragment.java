@@ -3,11 +3,12 @@ package org.owntracks.android.ui.welcome.play;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -55,17 +56,26 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
     public void checkAvailability() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(getActivity());
-        if (result == ConnectionResult.SUCCESS) {
-            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(true);
-            viewModel.setFixAvailable(false);
-            binding.message.setVisibility(View.VISIBLE);
-            binding.message.setText(getString(R.string.play_services_now_available));
-        } else {
-            WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
-            viewModel.setFixAvailable(true);
-            binding.message.setVisibility(View.VISIBLE);
-            binding.message.setText(getString(R.string.play_services_not_available));
-            viewModel.setFixAvailable(googleAPI.isUserResolvableError(result));
+        switch(result) {
+            case ConnectionResult.SUCCESS:
+                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(true);
+                viewModel.setFixAvailable(false);
+                binding.message.setVisibility(View.VISIBLE);
+                binding.message.setText(getString(R.string.play_services_now_available));
+                break;
+            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
+            case ConnectionResult.SERVICE_UPDATING:
+                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
+                viewModel.setFixAvailable(true);
+                binding.message.setText(getString(R.string.play_services_update_required));
+                binding.message.setVisibility(View.VISIBLE);
+                viewModel.setFixAvailable(googleAPI.isUserResolvableError(result));
+            default:
+                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
+                viewModel.setFixAvailable(true);
+                binding.message.setText(getString(R.string.play_services_not_available));
+                binding.message.setVisibility(View.VISIBLE);
+                viewModel.setFixAvailable(googleAPI.isUserResolvableError(result));
         }
     }
 

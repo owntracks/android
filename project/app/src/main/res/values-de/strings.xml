@@ -83,6 +83,7 @@
     <string name="welcomeFixIssue">Korrigieren</string>
     <string name="play_services_now_available">Google Play-Dienste sind jetzt verfügbar</string>
     <string name="play_services_not_available">Google Play-Dienste sind nicht verfügbar</string>
+    <string name="play_services_update_required">Google Play-Dienste muss aktualisiert werden</string>
     <string name="transitionEntering">betritt</string>
     <string name="transitionLeaving">verlässt</string>
     <string name="errorPreferencesImportFailed">Import fehlgeschlagen</string>
