@@ -70,18 +70,48 @@ public class WaypointModel extends BaseObservable {
     }
 
     @Bindable
+    public String getGeofenceLatitudeAsStr() {
+        return String.valueOf(geofenceLatitude);
+    }
+
+    @Bindable
     public double getGeofenceLatitude() {
         return geofenceLatitude;
+    }
+
+    public void setGeofenceLatitudeAsStr(String geofenceLatitudeAsStr) {
+        try {
+            double geofenceLatitude = Double.parseDouble(geofenceLatitudeAsStr);
+            setGeofenceLatitude(geofenceLatitude);
+        } catch (NumberFormatException e) {
+            // User has entered something that can't be converted to a double
+            // TODO: figure out validation feeback
+        }
     }
 
     public void setGeofenceLatitude(double geofenceLatitude) {
         if(geofenceLatitude > 90)
             this.geofenceLatitude = 90;
-        if(geofenceLatitude < -90)
+        else if(geofenceLatitude < -90)
             this.geofenceLatitude = -90;
         else
             this.geofenceLatitude = geofenceLatitude;
         notifyPropertyChanged(BR.geofenceLatitude);
+    }
+
+    @Bindable
+    public String getGeofenceLongitudeAsStr() {
+        return String.valueOf(geofenceLongitude);
+    }
+
+    public void setGeofenceLongitudeAsStr(String geofenceLongitudeAsStr) {
+        try {
+            double geofenceLatitude = Double.parseDouble(geofenceLongitudeAsStr);
+            setGeofenceLongitude(geofenceLatitude);
+        } catch (NumberFormatException e) {
+            // User has entered something that can't be converted to a double
+            // TODO: figure out validation feeback
+        }
     }
 
     @Bindable
@@ -92,7 +122,7 @@ public class WaypointModel extends BaseObservable {
     public void setGeofenceLongitude(double geofenceLongitude) {
         if(geofenceLongitude > 180 )
             this.geofenceLongitude = 180 ;
-        if(geofenceLongitude < -180 )
+        else if(geofenceLongitude < -180 )
             this.geofenceLongitude = -180 ;
         else
             this.geofenceLongitude = geofenceLongitude;
