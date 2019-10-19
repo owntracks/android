@@ -49,7 +49,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setDisablesAnimation(true);
+        disablesAnimation();
         bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState);
 
         setHasEventBus(false);

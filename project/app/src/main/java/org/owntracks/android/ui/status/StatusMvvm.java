@@ -15,7 +15,7 @@ public interface StatusMvvm {
         MessageProcessor.EndpointState getEndpointState();
         String getEndpointMessage();
         int getEndpointQueue();
-        boolean getPermissionLocation();
+
         long getLocationUpdated();
         Date getServiceStarted();
         boolean getDozeWhitelisted();

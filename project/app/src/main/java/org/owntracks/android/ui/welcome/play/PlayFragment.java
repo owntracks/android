@@ -47,12 +47,6 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-
     private void checkAvailability() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(getActivity());

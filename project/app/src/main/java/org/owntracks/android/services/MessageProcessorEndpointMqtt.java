@@ -62,7 +62,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	private Scheduler scheduler;
 	private EventBus eventBus;
 
-	public MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+	MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
 		super(messageProcessor);
 		this.parser = parser;
 		this.preferences = preferences;
@@ -71,7 +71,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		this.messageProcessor = messageProcessor;
 	}
 
-	public synchronized boolean sendKeepalive() {
+	synchronized boolean sendKeepalive() {
 		// Connects if not connected or sends a ping message if aleady connected
 		if(checkConnection() && mqttClient!=null) {
 			mqttClient.ping();
