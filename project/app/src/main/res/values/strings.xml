@@ -44,7 +44,6 @@
     <string name="preferencesRemoteCommand">Remote commands</string>
     <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
     <string name="description">Description</string>
-    <string name="coordinates">Coordinates</string>
     <string name="longitude">Longitude</string>
     <string name="latitude">Latitude</string>
     <string name="radius">Radius</string>
@@ -57,7 +56,6 @@
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
-    <string name="waypointRemove">Remove</string>
     <string name="importConfig">Import</string>
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Security</string>
@@ -77,7 +75,6 @@
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Preferences</string>
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
-    <string name="successCopyCertificate">Certificate copied to internal storage</string>
     <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
     <string name="preferencesCategoryNotificationBackground">Background notifications</string>
     <string name="preferencesCategoryAdvancedServices">Services</string>
@@ -85,13 +82,10 @@
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
     <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
-    <string name="waypointRemoved">Region removed</string>
 
     <string name="exportWaypointsToEndpoint">Publish Waypoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successful</string>
-    <string name="geofenceInactive">Geofence disabled</string>
-    <string name="geofenceActive">Geofence  enabled</string>
     <string name="welcomeFixIssue">Fix</string>
     <string name="play_services_now_available">Google Play Services are now available</string>
     <string name="play_services_not_available">Google Play Services are not available</string>
@@ -104,7 +98,6 @@
     <string name="welcome_play_heading">Google Play Services</string>
     <string name="welcome_play_description">Owntracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
-    <string name="play_services_not_available_general">Google Play Services are not available</string>
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
