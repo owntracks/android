@@ -1,13 +1,13 @@
 package org.owntracks.android.ui.regions;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
@@ -74,17 +74,10 @@ public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.
                     .setTitle("Delete")
                     .setMessage("Do you want to Delete")
 
-                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            viewModel.delete(model);
-                            dialog.dismiss();
-                        }
-
-                    }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
+                    .setPositiveButton("Delete", (dialog, whichButton) -> {
+                        viewModel.delete(model);
+                        dialog.dismiss();
+                    }).setNegativeButton("cancel", (dialog, which) -> dialog.dismiss())
                     .create();
             myQuittingDialogBox.show();
         } else {

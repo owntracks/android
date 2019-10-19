@@ -1,16 +1,15 @@
 package org.owntracks.android.ui.preferences.connection;
 
 import android.content.Intent;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionBinding;
@@ -184,13 +183,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         switch (item.getItemId()) {
             case R.id.connect:
                 if(messageProcessor.isEndpointConfigurationComplete()) {
-                    Runnable r = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            messageProcessor.reconnect();
-                        }
-                    };
+                    Runnable r = () -> messageProcessor.reconnect();
                     runner.postOnBackgroundHandlerDelayed(r, 1);
 
                 } else {

@@ -35,7 +35,7 @@ public class GeocoderOpencage implements Geocoder {
                 .addPathSegment("v1")
                 .addPathSegment("json");
 
-        urlBuilder.addEncodedQueryParameter("q", String.valueOf(latitude)+","+String.valueOf(longitude));
+        urlBuilder.addEncodedQueryParameter("q", String.format("%s,%s", latitude, longitude));
         urlBuilder.addQueryParameter("no_annotations", "1");
         urlBuilder.addQueryParameter("abbrv", "1");
         urlBuilder.addQueryParameter("limit", "1");

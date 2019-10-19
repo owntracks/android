@@ -1,15 +1,15 @@
 package org.owntracks.android.ui.preferences.load;
 
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import androidx.appcompat.app.AlertDialog;
 import timber.log.Timber;
 
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
@@ -128,16 +127,11 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         super.onActivityResult(requestCode, resultCode, resultIntent);
         Timber.v("RequestCode: " + requestCode + " resultCode: " + resultCode);
-        switch(requestCode) {
-            case LoadActivity.REQUEST_CODE: {
-                if(resultCode == RESULT_OK) {
-                    extractPreferences(resultIntent.getData());
-                } else {
-                    finish();
-                }
-
-
-                break;
+        if (requestCode == LoadActivity.REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                extractPreferences(resultIntent.getData());
+            } else {
+                finish();
             }
         }
     }
@@ -165,7 +159,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 total.append(content);
             }
 
-            ;
             binding.effectiveConfiguration.setText(viewModel.setConfiguration(total.toString()));
             showSaveButton();
 
@@ -190,18 +183,8 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         (new AlertDialog.Builder(this)
                 .setTitle("Import successfull")
                 .setMessage("It is recommended to restart the app to apply all imported values")
-                .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        App.restart();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })).show();
+                .setPositiveButton("Restart", (dialog, which) -> App.restart())
+                .setNegativeButton("Cancel", (dialog, which) -> finish())).show();
     }
 
     @Override

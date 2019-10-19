@@ -5,7 +5,6 @@ import android.location.Address;
 
 import org.owntracks.android.injection.qualifier.AppContext;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 

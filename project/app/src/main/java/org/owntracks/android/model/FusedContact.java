@@ -153,6 +153,6 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
 
     @Override
     public int compareTo(@NonNull FusedContact o) {
-        return this.tst > o.tst?-1: this.tst < o.tst ? 1 : 0;
+        return Long.compare(o.tst, this.tst);
     }
 }
