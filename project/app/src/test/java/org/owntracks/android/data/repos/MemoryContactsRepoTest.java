@@ -97,7 +97,7 @@ public class MemoryContactsRepoTest {
     @Test
     public void repoCorrectlyHandlesEventModeChanged() {
         contactsRepo.update(CONTACT_ID, messageLocation);
-        MemoryContactsRepo.class.cast(contactsRepo).onEventMainThread(new Events.ModeChanged(0,1));
+        ((MemoryContactsRepo) contactsRepo).onEventMainThread(new Events.ModeChanged(0,1));
         assertEquals(0, contactsRepo.getAll().size());
 
     }
@@ -105,7 +105,7 @@ public class MemoryContactsRepoTest {
     @Test
     public void repoCorrectlyHandlesEventEndpointChanged() {
         contactsRepo.update(CONTACT_ID, messageLocation);
-        MemoryContactsRepo.class.cast(contactsRepo).onEventMainThread(new Events.EndpointChanged());
+        ((MemoryContactsRepo) contactsRepo).onEventMainThread(new Events.EndpointChanged());
         assertEquals(0, contactsRepo.getAll().size());
 
     }

@@ -115,7 +115,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     public void loadRoot() {
         getPreferenceManager().setSharedPreferencesName(viewModel.getPreferences().getSharedPreferencesName());
         addPreferencesFromResource(R.xml.preferences_root);
-        populatePreferencesScreen(PreferenceScreen.class.cast(findPreference(UI_SCREEN_ROOT)));
+        populatePreferencesScreen((PreferenceScreen) findPreference(UI_SCREEN_ROOT));
         attachClickListener();
     }
 
@@ -134,12 +134,10 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     public void setModeSummary(int modeId) {
         String mode;
         switch (modeId) {
-            case MessageProcessorEndpointMqtt.MODE_ID:
-                mode = getString(R.string.mode_mqtt_private_label);
-                break;
             case MessageProcessorEndpointHttp.MODE_ID:
                 mode = getString(R.string.mode_http_private_label);
                 break;
+            case MessageProcessorEndpointMqtt.MODE_ID:
             default:
                 mode = getString(R.string.mode_mqtt_private_label);
                 break;

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -15,8 +17,6 @@ import java.util.Locale;
 import timber.log.Timber;
 
 public class TimberLogFileTree extends Timber.DebugTree {
-
-
     private File file;
     @SuppressLint("LogNotTimber")
 
@@ -46,7 +46,7 @@ public class TimberLogFileTree extends Timber.DebugTree {
 
         @SuppressLint("LogNotTimber")
         @Override
-        protected void log(int priority, String tag, String message, Throwable t) {
+        protected void log(int priority, String tag, @NonNull String message, Throwable t) {
                 //super.log(priority, tag, message, t);
                 try {
 
@@ -59,7 +59,5 @@ public class TimberLogFileTree extends Timber.DebugTree {
                 } catch (Exception e) {
                     Log.e("TimberLogFileTree", "Error while logging into file : " + e);
                 }
-
          }
-
 }

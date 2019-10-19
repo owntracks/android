@@ -113,7 +113,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
         viewModel.getContact().observe(this, this);
         viewModel.getBottomSheetHidden().observe(this, o -> {
-            if(Boolean.class.cast(o)) {
+            if((Boolean) o) {
                 setBottomSheetHidden();
             } else {
                 setBottomSheetCollapsed();
@@ -121,7 +121,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         });
         viewModel.getCenter().observe(this, o -> {
             if(o != null) {
-                updateCamera(LatLng.class.cast(o));
+                updateCamera((LatLng) o);
             }
         });
 
@@ -136,7 +136,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void onChanged(@Nullable Object activeContact) {
         if (activeContact != null) {
-            FusedContact c = FusedContact.class.cast(activeContact);
+            FusedContact c = (FusedContact) activeContact;
             Timber.v("for contact: %s", c.getId());
 
             binding.contactPeek.name.setText(c.getFusedName());

@@ -58,20 +58,20 @@ public class PlayFragment extends BaseSupportFragment<UiWelcomePlayBinding, Play
         int result = googleAPI.isGooglePlayServicesAvailable(getActivity());
         switch(result) {
             case ConnectionResult.SUCCESS:
-                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(true);
+                ((WelcomeMvvm.View) getActivity()).setNextEnabled(true);
                 viewModel.setFixAvailable(false);
                 binding.message.setVisibility(View.VISIBLE);
                 binding.message.setText(getString(R.string.play_services_now_available));
                 break;
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
             case ConnectionResult.SERVICE_UPDATING:
-                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
+                ((WelcomeMvvm.View) getActivity()).setNextEnabled(false);
                 viewModel.setFixAvailable(true);
                 binding.message.setText(getString(R.string.play_services_update_required));
                 binding.message.setVisibility(View.VISIBLE);
                 viewModel.setFixAvailable(googleAPI.isUserResolvableError(result));
             default:
-                WelcomeMvvm.View.class.cast(getActivity()).setNextEnabled(false);
+                ((WelcomeMvvm.View) getActivity()).setNextEnabled(false);
                 viewModel.setFixAvailable(true);
                 binding.message.setText(getString(R.string.play_services_not_available));
                 binding.message.setVisibility(View.VISIBLE);

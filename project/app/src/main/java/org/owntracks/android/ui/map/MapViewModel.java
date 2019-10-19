@@ -85,7 +85,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onMapReady() {
         for(Object c : contactsRepo.getAllAsList()) {
-            getView().updateMarker(FusedContact.class.cast(c));
+            getView().updateMarker((FusedContact) c);
         }
 
         if(mode == VIEW_CONTACT && activeContact != null)
@@ -290,7 +290,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.getTag() != null) {
-            setViewModeContact(String.class.cast(marker.getTag()), false);
+            setViewModeContact((String) marker.getTag(), false);
         }
         return true;
     }
