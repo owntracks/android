@@ -56,11 +56,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 	private String lastConnectionId;
 	private static EndpointState state;
 
-	protected MessageProcessor messageProcessor;
-	protected Parser parser;
-	protected Preferences preferences;
-	protected Scheduler scheduler;
-	protected EventBus eventBus;
+	private MessageProcessor messageProcessor;
+	private Parser parser;
+	private Preferences preferences;
+	private Scheduler scheduler;
+	private EventBus eventBus;
 
 	public MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
 		super(messageProcessor);
@@ -492,7 +492,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 		return (this.mqttClient != null) && (state == EndpointState.CONNECTING);
 	}
 
-	public static EndpointState getState() {
+	private static EndpointState getState() {
 		return state;
 	}
 

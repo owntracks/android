@@ -8,7 +8,7 @@ import org.owntracks.android.model.FusedContact;
 public class Events {
     public static abstract class E {
         final Date date;
-        public E() {
+        E() {
             this.date = new Date();
         }
         public Date getDate() {
@@ -43,7 +43,7 @@ public class Events {
         }
     }
 
-	public static class WaypointTransition extends E {
+	static class WaypointTransition extends E {
 		final WaypointModel w;
 		final int transition;
         //TODO
@@ -97,7 +97,7 @@ public class Events {
     public static class WaypointEvent extends E {
         private final WaypointModel m;
 
-        public WaypointEvent(WaypointModel m) {
+        WaypointEvent(WaypointModel m) {
             this.m = m;
         }
         public WaypointModel getWaypointModel() {

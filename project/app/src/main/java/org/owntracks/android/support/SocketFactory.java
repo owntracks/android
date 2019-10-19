@@ -44,27 +44,27 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             return this;
         }
 
-        public boolean hasCaCrt() {
+        boolean hasCaCrt() {
             return caCrtInputStream != null;
         }
 
-        public boolean hasClientP12Crt() {
+        boolean hasClientP12Crt() {
             return caClientP12Password != null;
         }
 
-        public InputStream getCaCrtInputStream() {
+        InputStream getCaCrtInputStream() {
             return caCrtInputStream;
         }
 
-        public InputStream getCaClientP12InputStream() {
+        InputStream getCaClientP12InputStream() {
             return caClientP12InputStream;
         }
 
-        public String getCaClientP12Password() {
+        String getCaClientP12Password() {
             return caClientP12Password;
         }
 
-        public boolean hasClientP12Password() {
+        boolean hasClientP12Password() {
             return (caClientP12Password != null) && !caClientP12Password.equals("");
         }
     }

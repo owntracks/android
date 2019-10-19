@@ -21,7 +21,7 @@ public class Navigator {
         this.activity = activity;
     }
 
-    final Activity getActivity() {
+    private Activity getActivity() {
         return activity;
     }
 

@@ -2,15 +2,16 @@ package org.owntracks.android.services.worker;
 
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.services.MessageProcessor;
 
 import javax.inject.Inject;
 
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 import timber.log.Timber;
 
 public class MQTTKeepaliveWorker extends Worker {

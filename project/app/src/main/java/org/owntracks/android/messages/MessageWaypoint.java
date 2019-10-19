@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageWaypoint extends MessageBase{
     static final String TYPE = "waypoint";
-    public static final String BASETOPIC_SUFFIX = "/event";
+    private static final String BASETOPIC_SUFFIX = "/event";
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 

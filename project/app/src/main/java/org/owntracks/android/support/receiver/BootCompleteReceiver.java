@@ -1,11 +1,11 @@
 package org.owntracks.android.support.receiver;
 
-import org.owntracks.android.services.BackgroundService;
-import org.owntracks.android.support.Preferences;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
+import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.support.Preferences;
 
 import javax.inject.Inject;
 
@@ -14,7 +14,7 @@ import timber.log.Timber;
 
 public class BootCompleteReceiver extends DaggerBroadcastReceiver {
 	@Inject
-	Preferences preferences;
+    Preferences preferences;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

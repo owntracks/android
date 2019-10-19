@@ -6,7 +6,7 @@ import android.preference.ListPreference;
 import android.util.AttributeSet;
 
 
-public class ListIntegerPreference extends ListPreference
+class ListIntegerPreference extends ListPreference
 {
     public ListIntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

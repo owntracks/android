@@ -17,7 +17,7 @@ import javax.inject.Named;
 import timber.log.Timber;
 
 @PerActivity
-public class WelcomeAdapter extends FragmentStatePagerAdapter  {
+class WelcomeAdapter extends FragmentStatePagerAdapter  {
 
 
     private final ArrayList<Fragment> fragments = new ArrayList<>();

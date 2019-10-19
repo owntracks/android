@@ -24,12 +24,7 @@ import org.owntracks.android.support.SocketFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -37,7 +32,6 @@ import javax.net.ssl.X509TrustManager;
 import okhttp3.CacheControl;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
-import okhttp3.Dns;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -45,7 +39,6 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
 
 public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements Preferences.OnPreferenceChangedListener {
@@ -54,7 +47,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     // Headers according to https://github.com/owntracks/recorder#http-mode
     public static final String HEADER_USERNAME = "X-Limit-U";
     public static final String HEADER_DEVICE = "X-Limit-D";
-    public static final String HEADER_USERAGENT = "User-Agent";
+    private static final String HEADER_USERAGENT = "User-Agent";
     public static final String METHOD = "POST";
 
     public static final String HEADER_AUTHORIZATION = "Authorization";
@@ -70,11 +63,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
 
     public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
-    public static final String HTTPTOPIC = "owntracks/http/";
+    private static final String HTTPTOPIC = "owntracks/http/";
 
-    protected Preferences preferences;
-    protected Parser parser;
-    protected Scheduler scheduler;
+    private Preferences preferences;
+    private Parser parser;
+    private Scheduler scheduler;
     private HttpUrl httpEndpoint;
 
 
@@ -238,7 +231,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
 
-    public static boolean isSet(String str) {
+    private static boolean isSet(String str) {
         return str != null && str.length() > 0;
     }
 

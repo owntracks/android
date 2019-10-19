@@ -37,7 +37,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
         @Nullable
         private RecyclerView recyclerView;
 
-        public BaseAdapter(@NonNull BaseAdapterItemView arg) {
+        protected BaseAdapter(@NonNull BaseAdapterItemView arg) {
             this.itemViewArg = arg;
         }
 
@@ -46,7 +46,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
             return itemViewArg;
         }
 
-        public void setItems(@Nullable List<T> items) {
+        protected void setItems(@Nullable List<T> items) {
             if (this.items == items) {
                 return;
             }
@@ -64,15 +64,15 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
             notifyDataSetChanged();
         }
 
-        public T getAdapterItem(int position) {
+        private T getAdapterItem(int position) {
             return items.get(position);
         }
 
-        public ViewDataBinding onCreateBinding(LayoutInflater inflater, @LayoutRes int layoutId, ViewGroup viewGroup) {
+        private ViewDataBinding onCreateBinding(LayoutInflater inflater, @LayoutRes int layoutId, ViewGroup viewGroup) {
             return DataBindingUtil.inflate(inflater, layoutId, viewGroup, false);
         }
 
-        public void onBindBinding(ViewDataBinding binding, int bindingVariable, @LayoutRes int layoutRes, int position, T item) {
+        private void onBindBinding(ViewDataBinding binding, int bindingVariable, @LayoutRes int layoutRes, int position, T item) {
             if (bindingVariable != BaseAdapterItemView.BINDING_VARIABLE_NONE) {
                 boolean result = binding.setVariable(bindingVariable, item);
                 if (!result) {

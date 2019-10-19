@@ -38,7 +38,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
 
     private static class LegacyOpenHelper extends SQLiteOpenHelper {
 
-        public LegacyOpenHelper(Context context) {
+        LegacyOpenHelper(Context context) {
             super(context, "org.owntracks.android.db", null, 15);
         }
 

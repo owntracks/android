@@ -24,11 +24,11 @@ import timber.log.Timber;
 import static android.app.Activity.RESULT_OK;
 
 public class ConnectionSecurityViewModel extends BaseDialogViewModel {
-    public static final int REQUEST_CODE_FILE_CA_CRT = 1;
-    public static final int REQUEST_CODE_FILE_CLIENT_CRT = 2;
+    private static final int REQUEST_CODE_FILE_CA_CRT = 1;
+    private static final int REQUEST_CODE_FILE_CLIENT_CRT = 2;
 
     private final Navigator navigator;
-    boolean tls;
+    private boolean tls;
     private String tlsCaCrtName;
     private String tlsClientCrtName;
     private String tlsClientCrtPassword;
@@ -67,7 +67,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         return tls;
     }
 
-    public void setTls(boolean tls) {
+    private void setTls(boolean tls) {
         this.tls = tls;
         notifyChange();
     }
@@ -76,7 +76,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         return tlsCaCrtName;
     }
 
-    public void setTlsCaCrtName(String tlsCaCrtName) {
+    private void setTlsCaCrtName(String tlsCaCrtName) {
         this.tlsCaCrtName = tlsCaCrtName;
         this.tlsCaCrtNameDirty = true;
         notifyChange();
@@ -86,7 +86,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         return tlsClientCrtName;
     }
 
-    public void setTlsClientCrtName(String tlsClientCrtName) {
+    private void setTlsClientCrtName(String tlsClientCrtName) {
         this.tlsClientCrtName = tlsClientCrtName;
         this.tlsClientCrtNameDirty = true;
         notifyChange();
@@ -229,7 +229,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
 
 
-    public String uriToFilename(Uri uri) {
+    private String uriToFilename(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
             try (Cursor cursor = App.getContext().getContentResolver().query(uri, null, null, null, null)) {

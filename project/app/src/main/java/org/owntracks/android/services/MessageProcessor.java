@@ -219,7 +219,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         processQueueHead();
     }
 
-    public synchronized void processQueueHead() {
+    private synchronized void processQueueHead() {
         MessageBase head = outgoingQueue.get(outgoingQueue.keyAt(0));
         if (head == null) {
             Timber.v("queue empty");

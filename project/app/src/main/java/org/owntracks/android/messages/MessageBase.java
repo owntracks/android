@@ -32,9 +32,9 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         static final String TYPE = "base";
 
         @JsonIgnore
-        protected String _topic;
+        String _topic;
         @JsonIgnore
-        protected String _topic_base;
+        private String _topic_base;
 
         @JsonIgnore
         private boolean delivered;
@@ -136,7 +136,7 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         protected abstract void processOutgoingMessage(OutgoingMessageProcessor handler);
 
         @JsonIgnore
-        public abstract String getBaseTopicSuffix();
+        protected abstract String getBaseTopicSuffix();
 
         // Called after deserialization to check if all required attributes are set or not.
         // The message is discarded if false is returned.
@@ -166,12 +166,12 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        public void setTid(String tid) {
+        void setTid(String tid) {
                 this.tid = tid;
         }
 
         @JsonIgnore
-        protected String getBaseTopic(String topic){
+        private String getBaseTopic(String topic){
 
                 if (this.getBaseTopicSuffix() != null && topic.endsWith(this.getBaseTopicSuffix())) {
                         return topic.substring(0, (topic.length() - this.getBaseTopicSuffix().length()));

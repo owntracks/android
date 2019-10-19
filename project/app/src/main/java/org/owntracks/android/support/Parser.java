@@ -41,7 +41,7 @@ public class Parser {
         return defaultMapper.writeValueAsString(message);
     }
 
-    public byte[] toJsonPlainBytes(@NonNull MessageBase message) throws IOException {
+    private byte[] toJsonPlainBytes(@NonNull MessageBase message) throws IOException {
         return defaultMapper.writeValueAsBytes(message);
     }
 

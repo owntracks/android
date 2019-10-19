@@ -6,7 +6,7 @@ import org.owntracks.android.support.Preferences;
 
 public class ConnectionParametersViewModel extends BaseDialogViewModel {
 
-    boolean cleanSession;
+    private boolean cleanSession;
     private String keepaliveText;
     private boolean keepaliveTextDirty;
 

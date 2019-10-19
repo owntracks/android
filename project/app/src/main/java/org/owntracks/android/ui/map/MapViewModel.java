@@ -39,7 +39,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private FusedContact activeContact;
     private LocationSource.OnLocationChangedListener mListener;
     private MessageProcessor messageProcessor;
-    Location mLocation;
+    private Location mLocation;
 
     private static final int VIEW_FREE = 0;
     private static final int VIEW_CONTACT = 1;

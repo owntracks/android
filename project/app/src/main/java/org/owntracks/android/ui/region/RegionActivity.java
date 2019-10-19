@@ -71,7 +71,7 @@ public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.Vie
         }
     }
 
-    public void conditionallyEnableSaveButton() {
+    private void conditionallyEnableSaveButton() {
         if (saveButton != null) {
             saveButton.setEnabled(viewModel.canSaveWaypoint());
             saveButton.getIcon().setAlpha(viewModel.canSaveWaypoint() ? 255 : 130);

@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 import timber.log.Timber;
 
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
-    public static final int REQUEST_CODE = 1;
+    private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
     private MenuItem saveButton;
 

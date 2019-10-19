@@ -15,8 +15,8 @@ import org.owntracks.android.R;
 // This is a prefrence that fakes a toolbar for a preference screen until the Android Support library supports toolbars in preferences_private screens
 public class ToolbarPreference extends Preference {
     private String title;
-    Toolbar toolbar;
-    PreferenceScreen screen;
+    private Toolbar toolbar;
+    private PreferenceScreen screen;
     public ToolbarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -44,7 +44,7 @@ public class ToolbarPreference extends Preference {
         return layout;
     }
 
-    public void goUp() {
+    private void goUp() {
 
         if (screen == null)
             screen= (PreferenceScreen)findPreferenceInHierarchy(getKey()+"Screen") ;

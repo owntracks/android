@@ -16,12 +16,12 @@ import io.objectbox.query.Query;
 
 
 public abstract class WaypointsRepo {
-    protected EventBus eventBus;
-    public WaypointsRepo(EventBus eventBus) {
+    private EventBus eventBus;
+    protected WaypointsRepo(EventBus eventBus) {
         this.eventBus = eventBus;
     }
     public abstract WaypointModel get(long tst);
-    public abstract List<WaypointModel> getAll();
+    protected abstract List<WaypointModel> getAll();
     public abstract List<WaypointModel> getAllWithGeofences();
     public abstract ObjectBoxLiveData<WaypointModel> getAllLive();
     public abstract Query<WaypointModel> getAllQuery();
@@ -81,8 +81,8 @@ public abstract class WaypointsRepo {
         return message;
     }
 
-    public abstract void insert_impl(WaypointModel w);
-    public abstract void update_impl(WaypointModel w);
-    public abstract void delete_impl(WaypointModel w);
+    protected abstract void insert_impl(WaypointModel w);
+    protected abstract void update_impl(WaypointModel w);
+    protected abstract void delete_impl(WaypointModel w);
 
 }

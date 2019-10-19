@@ -2,7 +2,7 @@ package org.owntracks.android.support;
 
 import android.graphics.Bitmap;
 
-public class TidBitmap {
+class TidBitmap {
     private final String tid;
     private Bitmap bitmap;
     TidBitmap(String tid, Bitmap bitmap) {
