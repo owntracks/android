@@ -2,11 +2,11 @@
 <resources>
     <string name="app_name">Owntracks</string>
     <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesHost" translatable="false">"Host"</string>
-    <string name="preferencesPort" translatable="false">"Port"</string>
+    <string name="preferencesHost">"Host"</string>
+    <string name="preferencesPort">"Port"</string>
     <string name="preferencesWebsocket">Use WebSockets</string>
     <string name="preferencesUserUsername">"Username"</string>
-    <string name="preferencesDeviceName" translatable="false">"Device ID"</string>
+    <string name="preferencesDeviceName">"Device ID"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
     <string name="preferencesCaCrtPath">CA certificate</string>
     <string name="preferencesClientCrtPath">Client certificate</string>
@@ -21,7 +21,7 @@
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesVersion">"Version"</string>
     <string name="preferencesReporting">"Reporting"</string>
-    <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
@@ -33,8 +33,6 @@
     <string name="preferencesEncryptionKey">Encryption Key</string>
     <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters.</string>
     <string name="na">Not available</string>
-    <string name="currentLocation">Use current location</string>
-    <string name="share">Share</string>
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
     <string name="preferencesCleanSessionEnabled">Clean Session</string>
@@ -66,7 +64,7 @@
     <string name="accept">Accept</string>
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesParameters">Parameters</string>
-    <string name="preferencesKeepalive" translatable="false">Keepalive</string>
+    <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
     <string name="mode_mqtt_private_label">MQTT</string>
@@ -100,11 +98,6 @@
     <string name="play_services_update_required">Google Play Services update is required</string>
     <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP</string>
-    <string name="preferencesKeyModeId" translatable="false">mode</string>
-    <string name="preferencesKeyHost" translatable="false">host</string>
-    <string name="preferencesKeyIdentification" translatable="false">identification</string>
-    <string name="preferencesKeySecurity" translatable="false">security</string>
-    <string name="preferencesKeyParameters" translatable="false">parameters</string>
     <string name="transitionEntering">enters</string>
     <string name="transitionLeaving">leaves</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
@@ -141,7 +134,10 @@
     <string name="preferencesEditorKey">Key</string>
     <string name="preferencesEditorValue">Value</string>
     <string name="restart">Restart</string>
-    <string name="notificationEventsTitle" formatted="false">%1$d new events</string>
+    <plurals name="notificationEventsTitle">
+        <item quantity="one">%1$d new event</item>
+        <item quantity="other">%1$d new events</item>
+    </plurals>
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
     <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner. \n\n A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences. </string>
     <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
@@ -171,4 +167,6 @@
     <string name="notificationChangeMonitoring">Change Monitoring</string>
     <string name="preferencesDebugLog">Debug log</string>
     <string name="preferencesDebugLogSummary">Write extended debug information</string>
+    <string name="monitoring_mode">Monitoring</string>
+    <string name="distance_label">Distance</string>
 </resources>

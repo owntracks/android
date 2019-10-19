@@ -26,7 +26,7 @@
 
 
 
-        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -35,12 +35,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginEnd="@dimen/default_spacing"
-                android:layout_marginRight="@dimen/default_spacing">
+                android:layout_marginEnd="@dimen/default_spacing">
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_height="wrap_content"
                     android:hint="@string/description"
@@ -56,7 +54,6 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,7 +68,6 @@
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
@@ -88,8 +84,6 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
-
-                    android:layout_marginLeft="@dimen/default_spacing"
                     android:layout_marginStart="@dimen/default_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -101,12 +95,9 @@
                     app:met_floatingLabel="normal"
                     app:met_baseColor="@color/textPrimary"
                     app:met_primaryColor="@color/accent"
-                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}'                    />
-
-
+                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}'
+                    />
             </LinearLayout>
-
         </ScrollView>
-
     </LinearLayout>
 </layout>

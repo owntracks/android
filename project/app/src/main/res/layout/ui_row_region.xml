@@ -25,9 +25,8 @@
                 style="@style/ListItemPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/meta"
+                android:layout_toStartOf="@+id/meta"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="@{waypoint.description}" />
@@ -38,7 +37,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:ellipsize="end"
                 android:singleLine="true"

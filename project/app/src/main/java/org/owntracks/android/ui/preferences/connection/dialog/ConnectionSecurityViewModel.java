@@ -6,10 +6,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.OpenableColumns;
-import androidx.appcompat.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.PopupMenu;
 
 import org.owntracks.android.App;
 import org.owntracks.android.R;
@@ -101,7 +102,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         this.tlsClientCrtPasswortDirty = true;
     }
 
-    public void onTlsCheckedChanged(boolean isChecked) {
+    public void onTlsCheckedChanged(final View v, boolean isChecked) {
         setTls(isChecked);
     }
 

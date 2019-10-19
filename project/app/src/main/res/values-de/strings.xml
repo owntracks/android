@@ -25,8 +25,6 @@
     <string name="preferencesEncryptionKey">Verschlüsselungs-Schlüssel</string>
     <string name="preferencesEncryptionKeyDialogMessage">Schlüssel wird nach 32 Zeichen abgeschnitten</string>
     <string name="na">Nicht verfügbar</string>
-    <string name="currentLocation">Momentanen Standort vewenden</string>
-    <string name="share">Teilen</string>
     <string name="save">"Speichern"</string>
     <string name="cancel">"Abbrechen"</string>
     <string name="preferencesCleanSessionEnabled">Sitzung säubern</string>
@@ -122,7 +120,10 @@
     <string name="preferencesEditorValue">Wert</string>
     <string name="exportWaypointsToEndpoint">Orte veröffentlichen</string>
     <string name="restart">Neu starten</string>
-    <string name="notificationEventsTitle" formatted="false">%1$d neue Ereignisse</string>
+    <plurals name="notificationEventsTitle">
+        <item quantity="one">%1$d neue Ereignis</item>
+        <item quantity="other">%1$d neue Ereignisse</item>
+    </plurals>
     <string name="ui_fragment_welcome_version_title">Einschränkungen</string>
     <string name="ui_fragment_welcome_version_description">Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar</string>
     <string name="ui_fragment_welcome_version_learn_more">Mehr erfahren</string>
@@ -150,4 +151,9 @@
     <string name="monitoring_signifficant">Signifikante Änderungen Modus</string>
     <string name="monitoring_move">Bewegungs Modus</string>
     <string name="notificationChangeMonitoring">Bewegungs Modus</string>
+    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
+    <string name="preferencesPort">Port</string>
+    <string name="preferencesDeviceName">Geräte ID</string>
+    <string name="preferencesHost">Hostnamen</string>
 </resources>

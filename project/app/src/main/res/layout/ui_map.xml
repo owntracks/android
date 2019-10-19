@@ -41,6 +41,7 @@
             android:orientation="vertical"
             app:behavior_hideable="true"
             android:clickable="true"
+            android:focusable="true"
             app:behavior_peekHeight="72dp"
             app:layout_behavior="@string/bottom_sheet_behavior"
             android:elevation="6dp">
@@ -54,8 +55,8 @@
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary"/>
 
@@ -66,8 +67,8 @@
                 android:text="@string/contactDetailsAccuracy"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary"/>
 
@@ -78,8 +79,8 @@
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary"/>
 
@@ -87,18 +88,18 @@
                 android:id="@+id/distanceLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Distance"
+                android:text="@string/distance_label"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
+                android:layout_marginStart="72dp"
                 android:background="#E4E4E4"/>
 
             <TextView
@@ -107,8 +108,8 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary"/>
 
@@ -119,8 +120,8 @@
                 android:text="@string/contactDetailsTrackerId"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary"/>
 
@@ -130,8 +131,8 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 style="@style/ListItemPrimary"/>
 
@@ -142,13 +143,13 @@
                 android:text="@string/contactDetailsTopic"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingStart="72dp"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary"/>
 
             <ImageView
-                android:layout_marginLeft="58dp"
+                android:layout_marginStart="58dp"
                 android:layout_marginBottom="8dp"
 
                 android:id="@+id/moreButton"
