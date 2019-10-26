@@ -29,8 +29,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ? google_maps_api_key : "PLACEHOLDER_API_KEY"}"
