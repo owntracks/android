@@ -158,8 +158,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         }
     }
 
-
-
     @Override
     @Nullable
     public LatLng getCurrentLocation() {
@@ -249,7 +247,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     public void onEvent(Events.MonitoringChanged e) {
         getView().updateMonitoringModeMenu();
     }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
     public void onEvent(@NonNull Location l) {

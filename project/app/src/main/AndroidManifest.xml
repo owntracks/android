@@ -163,6 +163,7 @@
             android:name=".services.BackgroundService"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="location"
             tools:ignore="ExportedService">
 
             <intent-filter>

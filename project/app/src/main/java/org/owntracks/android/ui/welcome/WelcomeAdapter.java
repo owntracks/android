@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.welcome;
 
 import android.os.Build;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -31,7 +32,7 @@ class WelcomeAdapter extends FragmentStatePagerAdapter  {
 
     }
 
-    public void setupFragments(Fragment introFragment, Fragment versionFragment, Fragment playFragment, Fragment permissionFragment, Fragment finishFragment ) {
+    void setupFragments(Fragment introFragment, Fragment versionFragment, Fragment playFragment, Fragment permissionFragment, Fragment finishFragment) {
         fragments.add(introFragment);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -49,12 +50,12 @@ class WelcomeAdapter extends FragmentStatePagerAdapter  {
 
     }
 
-    public int getLastItemPosition() {
+    int getLastItemPosition() {
         return fragments.size() - 1;
     }
 
 
-    public WelcomeFragmentMvvm.View getFragment(int position) {
+    WelcomeFragmentMvvm.View getFragment(int position) {
         return (WelcomeFragmentMvvm.View) getItem(position);
     }
 
