@@ -1,7 +1,11 @@
 package org.owntracks.android.ui.map;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -16,8 +20,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +35,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
@@ -36,6 +43,7 @@ import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Runner;
 import org.owntracks.android.support.widgets.BindingConversions;
@@ -52,6 +60,7 @@ import timber.log.Timber;
 public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> implements MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer {
     public static final String BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID";
     private static final long ZOOM_LEVEL_STREET = 15;
+    private final int PERMISSIONS_REQUEST_CODE = 1;
 
     private final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
     private GoogleMap mMap;
@@ -66,17 +75,20 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     ContactImageProvider contactImageProvider;
 
     @Inject
+    EventBus eventBus;
+
+    @Inject
     protected GeocodingProvider geocodingProvider;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        if (!requirementsChecker.areRequirementsMet()) {
+        if (preferences.isFirstStart()) {
             navigator.startActivity(WelcomeActivity.class);
             finish();
         }
+
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
 
         setSupportToolbar(this.binding.toolbar, false, true);
@@ -106,11 +118,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         });
         params.setBehavior(behavior);
 
-
-
-
-
-
         viewModel.getContact().observe(this, this);
         viewModel.getBottomSheetHidden().observe(this, o -> {
             if((Boolean) o) {
@@ -124,12 +131,30 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 updateCamera((LatLng) o);
             }
         });
-
+        checkAndRequestLocationPermissions();
         Timber.v("starting BackgroundService");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService((new Intent(this, BackgroundService.class)));
         } else {
             startService((new Intent(this, BackgroundService.class)));
+        }
+    }
+
+    private void checkAndRequestLocationPermissions() {
+        if (!requirementsChecker.isPermissionCheckPassed()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Activity currentActivity = this;
+                    new AlertDialog.Builder(this).setCancelable(true).setMessage(R.string.permissions_description).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(currentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
+                        }
+                    }).show();
+                } else {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
+                }
+            }
         }
     }
 
@@ -168,7 +193,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
@@ -178,10 +202,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } catch (Exception ignored) {
             isMapReady = false;
         }
-
     }
-
-
 
     @Override
     public void onDestroy() {
@@ -508,4 +529,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         popupMenu.show();
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            eventBus.postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
+        }
+    }
 }

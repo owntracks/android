@@ -206,7 +206,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 				e.printStackTrace();
 			}
 		} else {
-			Timber.e("Thread: %s", Thread.currentThread());
+			Timber.i("Connecting on non-ui worker thread: %s", Thread.currentThread());
 		}
 
 		if(isConnected()) {
