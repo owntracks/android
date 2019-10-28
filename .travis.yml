@@ -1,13 +1,35 @@
+version: "~> 1.0"
 language: android
-before_script: cd project
-# Workaround to get travis to user Android 27: https://github.com/travis-ci/travis-ci/issues/8874
+jdk:
+- openjdk11
+dist: xenial
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "/home/travis/.rvm/"
 before_install:
-- yes | sdkmanager "platforms;android-27"
-- yes | sdkmanager "platforms;android-28"
+- openssl aes-256-cbc -K $encrypted_711dc5014a8e_key -iv $encrypted_711dc5014a8e_iv
+  -in keystore.jks.enc -out keystore.jks -d
+- rvm install 2.6.5
+- gem install fastlane
 android:
-    components:
-        - tools
-        - platform-tools
-        - build-tools-27.0.3
-        - android-27
-        - extra-google-google_play_services
+  components:
+  - tools
+  - platform-tools
+  - build-tools-29.0.2
+  - android-29
+  - extra-google-google_play_services
+before_script: cd project
+script: "./build_on_travis.sh"
+
+deploy:
+  provider: releases
+  draft: true
+  file: project/app/build/outputs/apk/release/app-release.apk
+  edge: true
+  on:
+    tags: true
