@@ -2,7 +2,8 @@ version: "~> 1.0"
 language: android
 jdk:
 - openjdk8
-before_script: cd project
+dist: bionic
+
 before_install:
 - openssl aes-256-cbc -K $encrypted_711dc5014a8e_key -iv $encrypted_711dc5014a8e_iv
   -in keystore.jks.enc -out keystore.jks -d
@@ -10,6 +11,7 @@ before_install:
 - yes | sdkmanager "platforms;android-28"
 - rvm install 2.6.5
 - gem install fastlane
+
 android:
   components:
   - tools
@@ -17,7 +19,10 @@ android:
   - build-tools-27.0.3
   - android-27
    extra-google-google_play_services
+
+before_script: cd project
 script: "./build_on_travis.sh"
+
 deploy:
   provider: releases
   api_key:
