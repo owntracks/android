@@ -1,7 +1,7 @@
 version: "~> 1.0"
 language: android
 jdk:
-- openjdk8
+- openjdk11
 dist: bionic
 
 before_install:
