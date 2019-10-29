@@ -46,6 +46,8 @@ project/app/objectbox-models
 project/app/objectbox-models/default.json
 project/app/objectbox-models/default.json.bak
 
+project/app/obfuscation
+
 .gradle
 
 *.jks
