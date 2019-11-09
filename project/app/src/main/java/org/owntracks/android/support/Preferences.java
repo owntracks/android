@@ -487,7 +487,7 @@ public class Preferences {
     }
 
     public String getPubTopicWaypointsPart() {
-        return "/waypoint";
+        return "/waypoints";
     }
 
     public String getPubTopicEvents() {
