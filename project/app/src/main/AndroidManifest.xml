@@ -88,7 +88,11 @@
             android:hardwareAccelerated="true"
             android:label="@string/title_activity_preferences"
             android:parentActivityName=".ui.map.MapActivity" />
-
+        <activity
+            android:name=".ui.exit.ExitActivity"
+            android:hardwareAccelerated="true"
+            android:label="@string/title_activity_exit"
+            android:parentActivityName=".ui.map.MapActivity" />
         <activity
             android:name=".ui.preferences.editor.EditorActivity"
             android:configChanges="orientation"

@@ -15,8 +15,10 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 
 import org.owntracks.android.R;
+import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
+import org.owntracks.android.ui.exit.ExitActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
 import org.owntracks.android.ui.regions.RegionsActivity;
@@ -80,13 +82,23 @@ public class DrawerProvider  {
 
                 ).addStickyDrawerItems(
                         secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
-                        secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp)
+                        secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp),
+                        secondaryDrawerItemForClass(activity, ExitActivity.class, R.string.title_activity_exit, R.drawable.ic_poweroff_black_36dp)
                 ).withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     if (drawerItem == null)
                         return false;
 
                     if (drawerItem instanceof SecondarySwitchDrawerItem)
                         return true;
+
+                    // Finish when exit app drawer option selected
+                    if (drawerItem.getTag() == ExitActivity.class) {
+                        // Stop the background service
+                        activity.stopService((new Intent(activity, BackgroundService.class)));
+                        // Finish the activity
+                        activity.finish();
+                        return true;
+                    }
 
                     Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
 
