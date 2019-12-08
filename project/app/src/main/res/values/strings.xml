@@ -74,6 +74,7 @@
     <string name="title_activity_contacts">Friends</string>
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Preferences</string>
+    <string name="title_exit">Exit app</string>
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
     <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
     <string name="preferencesCategoryNotificationBackground">Background notifications</string>
