@@ -81,7 +81,6 @@ public class LocationProcessor {
             }
         }
 
-
         if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger) ) {
             Timber.v("message suppressed by monitoring settings: quiet");
             return;
@@ -89,10 +88,8 @@ public class LocationProcessor {
 
         if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
             Timber.v("message suppressed by monitoring settings: manual");
-            return; 
+            return;
         }
-
-
 
         MessageLocation message = new MessageLocation();
         message.setLat(currentLocation.getLatitude());
@@ -106,11 +103,8 @@ public class LocationProcessor {
             message.setVac((int)currentLocation.getVerticalAccuracyMeters());
         }
         message.setT(trigger);
-        if(MessageLocation.REPORT_TYPE_PING.equals(trigger)) {
-            message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        } else {
-            message.setTst(TimeUnit.MILLISECONDS.toSeconds(currentLocation.getTime()));
-        }
+
+        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
         message.setTid(preferences.getTrackerId(true));
         message.setInRegions(calculateInregions(loadedWaypoints));
