@@ -293,7 +293,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         notificationManager.createNotificationChannel(eventsChannel);
     }
 
-
     @Nullable
     private NotificationCompat.Builder getOngoingNotificationBuilder() {
         if (activeNotificationCompatBuilder != null)
@@ -336,8 +335,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         return activeNotificationCompatBuilder;
     }
-
-
 
     private void updateOngoingNotification() {
         notificationManager.notify(NOTIFICATION_ID_ONGOING,getOngoingNotification());
@@ -565,20 +562,16 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             case LocationProcessor.MONITORING_QUIET:
             case LocationProcessor.MONITORING_MANUAL:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
                 break;
             case LocationProcessor.MONITORING_SIGNIFFICANT:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(getLocationRequestPriority());
-
                 break;
             case LocationProcessor.MONITORING_MOVE:
-                request.setInterval(TimeUnit.SECONDS.toMillis(30));
-                request.setFastestInterval(TimeUnit.SECONDS.toMillis(10));
+                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval()));
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
@@ -748,7 +741,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     }
 
-
     private NotificationCompat.Builder getEventsNotificationBuilder() {
         if (!preferences.getNotificationEvents())
             return null;
@@ -782,7 +774,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         return eventsNotificationCompatBuilder;
     }
 
-
     @Override
     public void onComplete(@NonNull Task<Location> task) {
         onLocationChanged(task.getResult(),MessageLocation.REPORT_TYPE_DEFAULT);
@@ -797,13 +788,15 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) || Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key) || Preferences.Keys.LOCATOR_PRIORITY.equals(key)) {
+        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) ||
+                Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key) ||
+                Preferences.Keys.LOCATOR_PRIORITY.equals(key) ||
+                Preferences.Keys.LOCATOR_INTERVAL_MOVE_MODE.equals(key)
+        ) {
             Timber.v("locator preferences changed. Resetting location request.");
             setupLocationRequest();
         }
     }
-
-
 
     public class LocalBinder extends Binder {
         public BackgroundService getService() {

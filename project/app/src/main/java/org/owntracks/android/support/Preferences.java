@@ -284,8 +284,6 @@ public class Preferences {
         Timber.v("committing to preferences %s", activeSharedPreferences);
 
         activeSharedPreferences.edit().commit();
-
-
     }
 
     @Export(key = Keys.MONITORING, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
@@ -384,6 +382,11 @@ public class Preferences {
     @Export(key =Keys.LOCATOR_INTERVAL, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public int getLocatorInterval() {
         return getInt(Keys.LOCATOR_INTERVAL, R.integer.valLocatorInterval);
+    }
+
+    @Export(key =Keys.LOCATOR_INTERVAL_MOVE_MODE, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+    public int getMoveModeLocatorInterval() {
+        return getInt(Keys.LOCATOR_INTERVAL_MOVE_MODE, R.integer.valMoveModeLocatorInterval);
     }
 
     @Export(key =Keys.LOCATOR_PRIORITY, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
@@ -687,7 +690,6 @@ public class Preferences {
     @Import(key =Keys.LOCATOR_INTERVAL)
     private void setLocatorInterval(int anInt) {
         setInt(Keys.LOCATOR_INTERVAL, anInt);
-
     }
 
     @Import(key =Keys.LOCATOR_DISPLACEMENT)
@@ -795,7 +797,6 @@ public class Preferences {
     public boolean getNotificationHigherPriority() {
         return getBoolean(Keys.NOTIFICATION_HIGHER_PRIORITY, R.bool.valNotificationHigherPriority);
     }
-
 
     @Export(key =Keys.NOTIFICATION_LOCATION, exportModeMqttPrivate =true)
     public  boolean getNotificationLocation() {
@@ -939,8 +940,6 @@ public class Preferences {
         sharedPreferences.edit().putBoolean(Keys._OBJECTBOX_MIGRATED, true).apply();
     }
 
-
-
     @SuppressWarnings("WeakerAccess")
     public static class Keys {
         public static final String AUTH                             = "auth";
@@ -958,6 +957,7 @@ public class Preferences {
         public static final String KEEPALIVE                        = "keepalive";
         public static final String LOCATOR_DISPLACEMENT             = "locatorDisplacement";
         public static final String LOCATOR_INTERVAL                 = "locatorInterval";
+        public static final String LOCATOR_INTERVAL_MOVE_MODE       = "moveModeLocatorInterval";
         public static final String LOCATOR_PRIORITY                 = "locatorPriority";
         public static final String MODE_ID                          = "mode";
         public static final String MONITORING                       = "monitoring";
@@ -994,9 +994,7 @@ public class Preferences {
         public static final String _FIRST_START                     = "firstStart";
         public static final String _SETUP_NOT_COMPLETED             = "setupNotCompleted";
         public static final String _VERSION                         = "_build";
-
-        public static final String _OBJECTBOX_MIGRATED                     = "_objectboxMigrated";
-
+        public static final String _OBJECTBOX_MIGRATED              = "_objectboxMigrated";
     }
 
     @Retention(RetentionPolicy.RUNTIME)

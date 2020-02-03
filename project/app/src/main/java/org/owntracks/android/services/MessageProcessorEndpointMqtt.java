@@ -101,7 +101,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 			messageProcessor.onMessageDeliveryFailed(messageId);
 		} catch (Exception e) {
 			// Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
-			Timber.e(e, "JSON serialization failed for message %m. Message will be dropped", m.getMessageId());
+			Timber.e(e, "JSON serialization failed for message %s. Message will be dropped", m.getMessageId());
 			messageProcessor.onMessageDeliveryFailedFinal(messageId);
 		}
 	}
