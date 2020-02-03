@@ -200,6 +200,8 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         PreferenceCategory locator = getCategory(R.string.preferencesCategoryAdvancedLocator);
         screen.addPreference(locator);
         addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsDialog);
+        addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary).withDialogMessage(R.string.preferencesLocatorIntervalDialog);
+        addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL_MOVE_MODE, R.string.preferencesMoveModeLocatorInterval, R.integer.valMoveModeLocatorInterval).withPreferencesSummary(R.string.preferencesMoveModeLocatorIntervalSummary).withDialogMessage(R.string.preferencesMoveModeLocatorIntervalDialog);
 
         PreferenceCategory encryption = getCategory(R.string.preferencesCategoryAdvancedEncryption);
         screen.addPreference(encryption);

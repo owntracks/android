@@ -1,9 +1,9 @@
 package org.owntracks.android.support;
 
-import java.util.Date;
-
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.model.FusedContact;
+
+import java.util.Date;
 
 public class Events {
     public static abstract class E {
@@ -142,5 +142,4 @@ public class Events {
             return this.fusedContact;
         }
     }
-
 }
