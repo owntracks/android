@@ -94,13 +94,11 @@ public class DrawerProvider  {
         // Add the lower drawer items
         d.addStickyDrawerItems(
                 secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
-                secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp));
+                secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp),
+                secondaryDrawerItemForClass(activity, null, R.string.title_exit, R.drawable.ic_poweroff_black_36dp)
+        );
 
-        // Add an exit option to the lower drawer if we are in Map view
-        if (activity.getClass() == MapActivity.class) {
-            d.addStickyDrawerItems(
-                    secondaryDrawerItemForClass(activity, null, R.string.title_exit, R.drawable.ic_poweroff_black_36dp));
-        }
+
 
         d.withOnDrawerItemClickListener((view, position, drawerItem)  -> {
             if (drawerItem == null)
@@ -114,7 +112,7 @@ public class DrawerProvider  {
                 // Stop the background service
                 activity.stopService((new Intent(activity, BackgroundService.class)));
                 // Finish the activity
-                activity.finish();
+                activity.finishAffinity();
                 return true;
             }
 
