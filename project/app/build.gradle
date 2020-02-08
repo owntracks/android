@@ -1,11 +1,13 @@
-apply plugin: 'com.android.application'
-apply plugin: 'io.objectbox'
+plugins {
+    id("com.github.triplet.play") version "2.6.2"
+    id("com.android.application")
+    id("io.objectbox")
+}
 
 def versionMajor = 2
 def versionMinor = 2
 def versionPatch = 0
 def versionBuild = 1
-
 
 android {
     compileSdkVersion 29
@@ -27,6 +29,21 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
+    signingConfigs {
+        debug {
+            keyAlias 'debug.owntracks.org'
+            keyPassword '__DEBUG__'
+            storeFile file('./debug-keystore.jks')
+            storePassword '__DEBUG__'
+        }
+        release {
+            keyAlias 'debug.owntracks.org'
+            keyPassword '__DEBUG__'
+            storeFile file('./debug-keystore.jks')
+            storePassword '__DEBUG__'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -34,6 +51,7 @@ android {
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ? google_maps_api_key : "PLACEHOLDER_API_KEY"}"
+            signingConfig signingConfigs.release
         }
 
         debug {
@@ -44,6 +62,7 @@ android {
             resValue "string", "GOOGLE_MAPS_API_KEY", "${google_maps_api_key != null ? google_maps_api_key : "PLACEHOLDER_API_KEY"}"
             applicationIdSuffix '.debug'
             testCoverageEnabled true
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -51,14 +70,6 @@ android {
         enabled = true
     }
 
-    signingConfigs {
-        debug {
-            keyAlias 'debug.owntracks.org'
-            keyPassword '__DEBUG__'
-            storeFile file('./debug-keystore.jks')
-            storePassword '__DEBUG__'
-        }
-    }
 
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
@@ -101,5 +112,5 @@ android {
     buildToolsVersion = '29.0.2'
 }
 
+apply from: "publishing.gradle"
 apply from: "dependencies.gradle"
-//apply from: "coverage.gradle"
