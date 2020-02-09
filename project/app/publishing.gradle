@@ -1,5 +1,5 @@
 play {
-    serviceAccountCredentials = file("owntracks-android-426feecc5add.json")
+    serviceAccountCredentials = file("owntracks-android-7a7fe209cba5.json")
     track = "alpha"
     userFraction = 1
 }
