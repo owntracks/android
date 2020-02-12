@@ -468,6 +468,14 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         clearKey(R.string.preferenceKeyKeepalive)
     }
 
+    @get:Export(keyResId = R.string.preferenceKeyDarkMode, exportModeMqtt = true, exportModeHttp = true)
+    @set:Import(keyResId = R.string.preferenceKeyDarkMode)
+    var darkMode: Boolean
+        get() = getBooleanOrDefault(R.string.preferenceKeyDarkMode, R.bool.valDefaultDarkMode)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyDarkMode, newValue)
+        }
+
     @get:Export(keyResId = R.string.preferenceKeyNotificationEvents, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyNotificationEvents)
     var notificationEvents: Boolean

@@ -1,6 +1,8 @@
 package org.owntracks.android.ui.preferences
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.core.app.TaskStackBuilder
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.Binds
@@ -8,6 +10,8 @@ import dagger.Module
 import org.owntracks.android.R
 import org.owntracks.android.injection.modules.android.FragmentModules.BaseFragmentModule
 import org.owntracks.android.injection.scopes.PerFragment
+import org.owntracks.android.ui.map.MapActivity
+
 
 @PerFragment
 class AdvancedFragment : AbstractPreferenceFragment() {
@@ -23,6 +27,13 @@ class AdvancedFragment : AbstractPreferenceFragment() {
                     getString(R.string.preferenceKeyRemoteConfiguration) -> if (newValue) remoteCommandPreference?.isChecked = true
                 }
             }
+            true
+        }
+        findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyDarkMode))?.setOnPreferenceChangeListener { _, _ ->
+            TaskStackBuilder.create(requireActivity())
+                    .addNextIntent(Intent(activity, MapActivity::class.java))
+                    .addNextIntent(requireActivity().intent)
+                    .startActivities()
             true
         }
         remoteConfigurationPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener

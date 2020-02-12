@@ -19,6 +19,7 @@
     <integer name="valLocatorPriority">2</integer>
 
     <bool name="valCleanSession">false</bool>
+    <bool name="valDarkMode">false</bool>
     <bool name="valPubExtendedData">true</bool>
     <bool name="valNotificationHigherPriority">false</bool>
     <bool name="valNotificationLocation">true</bool>
