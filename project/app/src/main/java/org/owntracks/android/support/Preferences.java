@@ -853,6 +853,11 @@ public class Preferences {
         setString(Keys.TLS_CLIENT_CRT_PASSWORD, password);
     }
 
+    @Export(key =Keys.DARK_MODE, exportModeMqttPrivate =true)
+    public boolean getDarkMode() {
+        return getBoolean(Keys.DARK_MODE, R.bool.valDarkMode);
+    }
+
     String getEncryptionKey() {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
@@ -988,6 +993,7 @@ public class Preferences {
         public static final String USE_PASSWORD                     = "usePassword";
         public static final String WS                               = "ws";
         public static final String URL                              = "url";
+        public static final String DARK_MODE                        = "darkMode";
 
         // Internal keys
         public static final String _ENCRYPTION_KEY                  = "encryptionKey";

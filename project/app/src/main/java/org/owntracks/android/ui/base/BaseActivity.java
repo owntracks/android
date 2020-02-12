@@ -124,8 +124,11 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-
         disablesAnimation = (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NO_ANIMATION) != 0;
+
+        if (preferences.getBoolean(Preferences.Keys.DARK_MODE, R.bool.valDarkMode)) {
+            setTheme(R.style.Theme_Owntracks_Dark);
+        }
     }
 
     @Override

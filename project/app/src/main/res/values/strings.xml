@@ -170,4 +170,6 @@
     <string name="preferencesDebugLogSummary">Write extended debug information</string>
     <string name="monitoring_mode">Monitoring</string>
     <string name="distance_label">Distance</string>
+    <string name="preferencesDarkMode" >Enable dark mode</string>
+    <string name="preferencesDarkModeSummary">Switches to a dark theme</string>
 </resources>

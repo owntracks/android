@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 
 import org.owntracks.android.R;
@@ -34,6 +35,7 @@ import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
 import org.owntracks.android.support.widgets.ToolbarPreference;
 import org.owntracks.android.ui.base.navigator.Navigator;
+import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity;
 import org.owntracks.android.ui.preferences.editor.EditorActivity;
 
@@ -196,7 +198,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
         PreferenceCategory services = getCategory(R.string.preferencesCategoryAdvancedServices);
         screen.addPreference(services);
         addSwitchPreference(services, Preferences.Keys.REMOTE_COMMAND, R.string.preferencesRemoteCommand, R.string.preferencesRemoteCommandSummary, R.bool.valRemoteCommand);
-
+        
         PreferenceCategory locator = getCategory(R.string.preferencesCategoryAdvancedLocator);
         screen.addPreference(locator);
         addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsDialog);
@@ -209,12 +211,21 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
         PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
         screen.addPreference(misc);
-        SwitchPreference p = addSwitchPreference(misc, Preferences.Keys.DEBUG_LOG, R.string.preferencesDebugLog,  R.string.preferencesDebugLogSummary, R.bool.valFalse);
-        p.setOnPreferenceChangeListener((preference, newValue) -> {
+
+        SwitchPreference debugLogPreference = addSwitchPreference(misc, Preferences.Keys.DEBUG_LOG, R.string.preferencesDebugLog,  R.string.preferencesDebugLogSummary, R.bool.valFalse);
+
+        debugLogPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             handleDebugLogChange((Boolean)newValue);
             return true;
         });
-
+        SwitchPreference darkModePreference = addSwitchPreference(misc, Preferences.Keys.DARK_MODE, R.string.preferencesDarkMode, R.string.preferencesDarkModeSummary, R.bool.valDarkMode);
+        darkModePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            TaskStackBuilder.create(getActivity())
+                    .addNextIntent(new Intent(getActivity(), MapActivity.class))
+                    .addNextIntent(getActivity().getIntent())
+                    .startActivities();
+            return true;
+        });
 
         addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
         addEditStringPreference(misc, Preferences.Keys.OPENCAGE_GEOCODER_API_KEY, R.string.preferencesOpencageGeocoderApiKey, R.string.preferencesOpencageGeocoderApiKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesOpencageGeocoderApiKeyDialog);
