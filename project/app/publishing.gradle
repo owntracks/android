@@ -2,4 +2,6 @@ play {
     serviceAccountCredentials = file("owntracks-android-7a7fe209cba5.json")
     track = "alpha"
     userFraction = 1
+    releaseStatus = "completed"
+    resolutionStrategy = "auto"
 }
