@@ -51,4 +51,6 @@ project/app/obfuscation
 .gradle
 
 *.jks
+# Google service account credentials
+project/app/owntracks-*.json
 

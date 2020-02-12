@@ -7,7 +7,7 @@ plugins {
 def versionMajor = 2
 def versionMinor = 2
 def versionPatch = 0
-def versionBuild = 1
+def versionBuild = 0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
 
 android {
     compileSdkVersion 29
@@ -37,10 +37,10 @@ android {
             storePassword '__DEBUG__'
         }
         release {
-            keyAlias 'debug.owntracks.org'
-            keyPassword '__DEBUG__'
-            storeFile file('./debug-keystore.jks')
-            storePassword '__DEBUG__'
+            keyAlias 'upload'
+            keyPassword System.getenv("KEYSTORE_PASSPHRASE")
+            storeFile file('../owntracks.release.keystore.jks')
+            storePassword System.getenv("KEYSTORE_PASSPHRASE")
         }
     }
 
