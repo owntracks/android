@@ -1,5 +1,11 @@
+ext.serviceAccountCreds = file("owntracks-android-7a7fe209cba5.json")
 play {
-    serviceAccountCredentials = file("owntracks-android-7a7fe209cba5.json")
+    if (serviceAccountCreds.exists()) {
+        enabled = true
+        serviceAccountCredentials = serviceAccountCreds
+    } else {
+        enabled = false
+    }
     track = "alpha"
     userFraction = 1
     releaseStatus = "completed"
