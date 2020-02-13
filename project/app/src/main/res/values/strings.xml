@@ -184,6 +184,6 @@
     <string name="contact_image">Contact Image</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Enable configuration to be updated remotely (requires remote commands)</string>
-    <string name="preferencesDarkMode" >Enable dark mode</string>
+    <string name="preferencesDarkMode">Enable dark mode</string>
     <string name="preferencesDarkModeSummary">Switches to a dark theme</string>
 </resources>
