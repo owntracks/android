@@ -49,9 +49,9 @@
             android:hint="@string/preferencesKeepalive"
             android:inputType="textNoSuggestions|number"
             android:text="@={vm.keepaliveText}"
-            app:met_baseColor="@color/textPrimary"
+            app:met_baseColor="?attr/android:textColorPrimary"
             app:met_floatingLabel="highlight"
             app:met_helperText="@string/seconds"
-            app:met_primaryColor="@color/accent" />
+            app:met_primaryColor="?attr/colorAccent" />
     </LinearLayout>
 </layout>

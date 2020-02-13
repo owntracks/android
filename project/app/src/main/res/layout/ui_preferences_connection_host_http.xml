@@ -28,10 +28,10 @@
             android:inputType="textUri|textNoSuggestions"
             android:text="@={vm.urlText}"
             android:importantForAutofill="no"
-            app:met_baseColor="@color/textPrimary"
+            app:met_baseColor="?attr/android:textColorPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesUrl"
-            app:met_primaryColor="@color/accent" />
+            app:met_primaryColor="?attr/colorAccent" />
 
     </LinearLayout>
 </layout>

@@ -27,10 +27,10 @@
             android:hint="@string/preferencesHost"
             android:inputType="textVisiblePassword|textNoSuggestions"
             android:text="@={vm.hostText}"
-            app:met_baseColor="@color/textPrimary"
+            app:met_baseColor="?attr/android:textColorPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesHost"
-            app:met_primaryColor="@color/accent" />
+            app:met_primaryColor="?attr/colorAccent"  />
 
         <com.rengwuxian.materialedittext.MaterialEditText
 
@@ -42,9 +42,9 @@
             android:inputType="number|textNoSuggestions"
             android:maxLength="5"
             android:text="@={vm.portText}"
-            app:met_baseColor="@color/textPrimary"
+            app:met_baseColor="?attr/android:textColorPrimary"
             app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent"
+            app:met_primaryColor="?attr/colorAccent"
             />
         <com.rengwuxian.materialedittext.MaterialEditText
 

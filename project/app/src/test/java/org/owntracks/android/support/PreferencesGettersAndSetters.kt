@@ -136,6 +136,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyAutostartOnBoot)) } doReturn "autostartOnBoot"
                 on { getString(eq(R.string.preferenceKeyCleanSession)) } doReturn "cleanSession"
                 on { getString(eq(R.string.preferenceKeyClientId)) } doReturn "clientId"
+                on { getString(eq(R.string.preferenceKeyDarkMode)) } doReturn "darkMode"
                 on { getString(eq(R.string.preferenceKeyDebugLog)) } doReturn "debugLog"
                 on { getString(eq(R.string.preferenceKeyDeviceId)) } doReturn "deviceId"
                 on { getString(eq(R.string.preferenceKeyDontReuseHttpClient)) } doReturn "dontReuseHttpClient"

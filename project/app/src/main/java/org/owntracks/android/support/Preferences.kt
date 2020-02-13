@@ -471,7 +471,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @get:Export(keyResId = R.string.preferenceKeyDarkMode, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyDarkMode)
     var darkMode: Boolean
-        get() = getBooleanOrDefault(R.string.preferenceKeyDarkMode, R.bool.valDefaultDarkMode)
+        get() = getBooleanOrDefault(R.string.preferenceKeyDarkMode, R.bool.valDarkMode)
         set(newValue) {
             setBoolean(R.string.preferenceKeyDarkMode, newValue)
         }

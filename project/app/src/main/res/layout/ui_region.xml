@@ -24,8 +24,6 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginEnd="@dimen/default_spacing">
+
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
@@ -49,8 +48,8 @@
                     android:id="@+id/description"
                     android:text="@={vm.waypoint.description}"
                     app:met_floatingLabel="normal"
-                    app:met_baseColor="@color/textPrimary"
-                    app:met_primaryColor="@color/accent" />
+                    app:met_baseColor="?attr/android:textColorPrimary"
+                    app:met_primaryColor="?attr/colorAccent" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_marginTop="20dp"
@@ -63,8 +62,8 @@
                     android:text="@={vm.waypoint.geofenceLatitudeAsStr}"
                     android:inputType="numberDecimal|numberSigned"
                     app:met_floatingLabel="normal"
-                    app:met_baseColor="@color/textPrimary"
-                    app:met_primaryColor="@color/accent"
+                    app:met_baseColor="?attr/android:textColorPrimary"
+                    app:met_primaryColor="?attr/colorAccent"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
@@ -78,8 +77,8 @@
                     android:text="@={vm.waypoint.geofenceLongitudeAsStr}"
                     android:inputType="numberDecimal|numberSigned"
                     app:met_floatingLabel="normal"
-                    app:met_baseColor="@color/textPrimary"
-                    app:met_primaryColor="@color/accent"
+                    app:met_baseColor="?attr/android:textColorPrimary"
+                    app:met_primaryColor="?attr/colorAccent"
                     />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
@@ -93,8 +92,8 @@
                     android:inputType="numberDecimal"
                     app:met_helperText="Meters"
                     app:met_floatingLabel="normal"
-                    app:met_baseColor="@color/textPrimary"
-                    app:met_primaryColor="@color/accent"
+                    app:met_baseColor="?attr/android:textColorPrimary"
+                    app:met_primaryColor="?attr/colorAccent"
                     android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}'
                     />
             </LinearLayout>

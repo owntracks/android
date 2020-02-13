@@ -2,5 +2,4 @@
 <resources>
     <bool name="valTrue">true</bool>
     <bool name="valFalse">false</bool>
-    <bool name="valDefaultDarkMode">false</bool>
 </resources>

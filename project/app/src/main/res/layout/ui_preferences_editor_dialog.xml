@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     style="@style/DialogView">
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,26 +13,24 @@
     <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
+        app:met_baseColor="?attr/android:textColorPrimary"
+        app:met_primaryColor="?attr/colorAccent"
         android:id="@+id/inputKey"
         android:inputType="textUri|textNoSuggestions"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesEditorKey"
         android:completionThreshold="1"
-        android:hint="@string/preferencesEditorKey"
-         />
+        android:hint="@string/preferencesEditorKey" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
+        app:met_baseColor="?attr/android:textColorPrimary"
+        app:met_primaryColor="?attr/colorAccent"
         android:id="@+id/inputValue"
         android:inputType="textUri|textNoSuggestions"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText="@string/preferencesEditorValue"
-        android:hint="@string/preferencesEditorValue"
-        />
+        android:hint="@string/preferencesEditorValue" />
 
 </LinearLayout>

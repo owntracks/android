@@ -4,6 +4,16 @@
     app:title="@string/preferencesAdvanced">
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        app:title="UI">
+        <SwitchPreferenceCompat
+            app:defaultValue="@bool/valDarkMode"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyDarkMode"
+            app:summary="@string/preferencesDarkModeSummary"
+            app:title="@string/preferencesDarkMode" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedServices">
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
