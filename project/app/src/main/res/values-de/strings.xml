@@ -170,4 +170,6 @@
     <string name="clear_log">Löschen</string>
     <string name="viewLogs">Logs ansehen</string>
     <string name="logViewerActivityTitle">Logs</string>
+    <string name="preferencesDarkMode">Dunkles Design aktivieren</string>
+    <string name="preferencesDarkModeSummary">Wechselt zu einem dunklen Design</string>
 </resources>
