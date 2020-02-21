@@ -170,7 +170,9 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
 
         setupLocationRequest();
-        setupLocationPing();
+
+        scheduler.scheduleLocationPing();
+
 
         setupGeofences();
 
@@ -485,10 +487,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private void clearEventStackNotification() {
         Timber.v("clearing notification stack");
         activeNotifications.clear();
-    }
-    // TODO: Move to somewere else
-    private void setupLocationPing() {
-        scheduler.scheduleLocationPing();
     }
 
     private void onGeofencingEvent(@Nullable final GeofencingEvent event) {

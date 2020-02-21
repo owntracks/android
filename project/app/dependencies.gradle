@@ -15,7 +15,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     implementation "androidx.annotation:annotation:1.1.0"
     implementation "com.google.android.material:material:1.1.0"
-    implementation "androidx.work:work-runtime:2.3.0"
+    implementation "androidx.work:work-runtime:2.3.2"
 
     // Play Services libraries
     implementation "com.google.android.gms:play-services-maps:${playLibVersion}"

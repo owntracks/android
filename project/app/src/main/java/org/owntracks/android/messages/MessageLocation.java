@@ -1,5 +1,7 @@
 package org.owntracks.android.messages;
 
+import androidx.annotation.NonNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
@@ -162,7 +165,7 @@ public class MessageLocation extends MessageBase {
     }
 
     @JsonIgnore
-    public LatLng getLatLng() {
+    private LatLng getLatLng() {
         return point != null ? point : (point = new LatLng(lat, lon));
     }
 
@@ -173,7 +176,7 @@ public class MessageLocation extends MessageBase {
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processOutgoingMessage(this);
+//        handler.processOutgoingMessage(this);
     }
 
     public void setTid(String tid) {
@@ -207,6 +210,21 @@ public class MessageLocation extends MessageBase {
 
     public int getVac() {
         return this.vac;
+    }
+
+    @JsonIgnore
+    @Override
+    @NonNull
+    public String toString() {
+        return String.format("%s: %s",super.toString(), this.getLatLng());
+    }
+
+    @Override
+    public void addMqttPreferences(Preferences preferences) {
+        setTopic(preferences.getPubTopicLocations());
+        setQos(preferences.getPubQosLocations());
+        setRetained(preferences.getPubRetainLocations());
+
     }
 }
 
