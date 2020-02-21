@@ -17,4 +17,6 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
 
     protected abstract MessageBase onFinalizeMessage(MessageBase message);
     abstract int getModeId();
+
+    public abstract Runnable getBackgroundOutgoingRunnable();
 }

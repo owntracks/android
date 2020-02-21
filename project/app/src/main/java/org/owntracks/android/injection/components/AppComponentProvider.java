@@ -1,7 +1,5 @@
 package org.owntracks.android.injection.components;
 
-import org.owntracks.android.injection.components.AppComponent;
-
 public class AppComponentProvider {
     private static AppComponent appComponent;
 

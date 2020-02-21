@@ -1,17 +1,18 @@
 package org.owntracks.android.messages;
-import androidx.databinding.BaseObservable;
 import androidx.annotation.NonNull;
-
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
-
-import java.lang.ref.WeakReference;
+import androidx.databinding.BaseObservable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
+
+import java.lang.ref.WeakReference;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 
@@ -28,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=MessageLwt.class, name=MessageLwt.TYPE),
 })
 @JsonPropertyOrder(alphabetic=true)
-public abstract class MessageBase extends BaseObservable implements Runnable {
+public abstract class MessageBase extends BaseObservable  {
         static final String TYPE = "base";
 
         @JsonIgnore
@@ -103,30 +104,20 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
                 this._topic_base = getBaseTopic(topic); // Normalized topic for all message types
         }
 
-        @Override
-        public void run(){
-                if(_processorIn != null && _processorIn.get() !=  null)
-                        processIncomingMessage(_processorIn.get());
-                if(_processorOut != null && _processorOut.get() !=  null) {
-                        processOutgoingMessage(_processorOut.get());
-                }
-        }
+//        @Override
+//        public void run(){
+//                if(_processorIn != null && _processorIn.get() !=  null)
+//                        processIncomingMessage(_processorIn.get());
+//                if(_processorOut != null && _processorOut.get() !=  null) {
+//                        processOutgoingMessage(_processorOut.get());
+//                }
+//        }
 
 
         @JsonIgnore
         public void setIncomingProcessor(@NonNull IncomingMessageProcessor processor) {
                 this._processorOut = null;
                 this._processorIn = new WeakReference<>(processor);
-        }
-
-        @JsonIgnore
-        public void setOutgoingProcessor(@NonNull OutgoingMessageProcessor processor) {
-                this._processorIn = null;
-                this._processorOut = new WeakReference<>(processor);
-        }
-
-        public void clearOutgoingProcessor() {
-                this._processorOut = null;
         }
 
         @JsonIgnore
@@ -181,11 +172,6 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
         @JsonIgnore
-        public void setDelivered(boolean delivered) {
-                this.delivered = delivered;
-        }
-
-        @JsonIgnore
         public boolean isDelivered() {
                 return delivered;
         }
@@ -202,4 +188,12 @@ public abstract class MessageBase extends BaseObservable implements Runnable {
         }
 
 
+        @JsonIgnore
+        @Override
+        @NonNull
+        public String toString() {
+                return String.format("%s id=%s",this.getClass().getName(), this.getMessageId());
+        }
+
+        public abstract void addMqttPreferences(Preferences preferences);
 }

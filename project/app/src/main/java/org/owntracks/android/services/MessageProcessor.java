@@ -2,7 +2,6 @@ package org.owntracks.android.services;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.LongSparseArray;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -21,11 +20,12 @@ import org.owntracks.android.messages.MessageUnknown;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +52,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
-    private final LongSparseArray<MessageBase> outgoingQueue = new LongSparseArray<>(10);
+    private final LinkedBlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10);
 
     public void reconnect() {
         if(endpoint == null)
@@ -77,7 +77,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             loadOutgoingMessageProcessor();
 
         if(endpoint instanceof StatefulServiceMessageProcessor)
-            return ((MessageProcessorEndpointMqtt) endpoint).checkConnection();
+            return ((StatefulServiceMessageProcessor) endpoint).checkConnection();
         else
             return true;
     }
@@ -150,7 +150,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor(){
-
+        Timber.v("Reloading outgoing message processor");
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
@@ -159,18 +159,20 @@ public class MessageProcessor implements IncomingMessageProcessor {
             endpoint.onDestroy();
         }
 
-        outgoingQueue.clear();
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 
         Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (preferences.getModeId()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus);
+                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus);
-
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue);
+        }
+        Runnable runnable = this.endpoint.getBackgroundOutgoingRunnable();
+        if (runnable != null && this.outgoingMessageProcessorExecutor != null) {
+            this.outgoingMessageProcessorExecutor.execute(runnable);
         }
         this.endpoint.onCreateFromProcessor();
         acceptMessages = true;
@@ -190,82 +192,76 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
 
-    public void sendMessage(MessageBase message) {
-        if(!acceptMessages || !endpoint.isConfigurationComplete()) return;
-
-        outgoingQueue.put(message.getMessageId(), message);
+    public void queueMessageForSending(MessageBase message) {
+        if(!acceptMessages) return;
+        if (!outgoingQueue.offer( message)) {
+            Timber.e("Outoing queue full. Dropping message: %s", message); //TODO maybe drop oldest and queue latest?
+        }
         Timber.v("messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
-        processQueueHead();
     }
 
      void onMessageDelivered(Long messageId) {
-        MessageBase m = outgoingQueue.get(messageId);
-
-
-        if(m != null) {
-            // message will be treated as incoming message.
-            // Set the delivered flag to distinguish it from messages received fro the broker.
-            m.setDelivered(true);
-            Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
-            if(m instanceof MessageLocation) {
-                endpoint.onMessageReceived(m);
-                eventBus.post(m);
-            }
-            dequeue(m.getMessageId());
-
-        } else {
-            Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
-        }
-        processQueueHead();
+        Timber.v("onMessageDelivered in MessageProcessor Noop");
+//        MessageBase m = outgoingQueue.get(messageId);
+//        if(m != null) {
+//            // message will be treated as incoming message.
+//            // Set the delivered flag to distinguish it from messages received fro the broker.
+//            m.setDelivered(true);
+//            Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
+//            if(m instanceof MessageLocation) {
+//                endpoint.onMessageReceived(m);
+//                eventBus.post(m);
+//            }
+//            dequeue(m.getMessageId());
+//
+//        } else {
+//            Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
+//        }
     }
 
-    private synchronized void processQueueHead() {
-        MessageBase head = outgoingQueue.get(outgoingQueue.keyAt(0));
-        if (head == null) {
-            Timber.v("queue empty");
-            eventBus.postSticky(queueEvent.withNewLength(0));
+//    abstract void sendNextMessageInQueue() ;
+//        MessageBase head = outgoingQueue.get(outgoingQueue.keyAt(0));
+//        if (head == null) {
+//            Timber.v("queue empty");
+//            eventBus.postSticky(queueEvent.withNewLength(0));
+//
+//            return;
+//        }
+//        if (head.isOutgoing()) {
+//            Timber.e("queue is already processing");
+//           return;
+//        }
+//        Timber.v("getting first message from queue: %s", head.getMessageId());
+//
+//        head.setOutgoingProcessor(endpoint);
+//        this.outgoingMessageProcessorExecutor.execute(head);
+//    }
 
-            return;
-        }
-        if (head.isOutgoing()) {
-            Timber.e("queue is already processing");
-           return;
-        }
-        Timber.v("getting first message from queue: %s", head.getMessageId());
-
-        head.setOutgoingProcessor(endpoint);
-        this.outgoingMessageProcessorExecutor.execute(head);
-
-    }
-
-    public void onMessageDeliveryFailedFinal(Long messageId) {
+    void onMessageDeliveryFailedFinal(Long messageId) {
         Timber.e(":%s", messageId);
-        dequeue(messageId);
+//        dequeue(messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 
-    private void dequeue(long messageId) {
-        Timber.v("messageId:%s", messageId);
-        outgoingQueue.remove(messageId);
-    }
+//    private void dequeue(long messageId) {
+//        Timber.v("messageId:%s", messageId);
+//        outgoingQueue.remove(messageId);
+//    }
 
     void onMessageDeliveryFailed(Long messageId) {
         Timber.e("queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
-
-        MessageBase m = outgoingQueue.get(messageId);
-
-         if(m != null) {
-             m.clearOutgoingProcessor();
-         }
-
-
+//        MessageBase m = outgoingQueue.get(messageId);
+//
+//         if(m != null) {
+//             m.clearOutgoingProcessor();
+//         }
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 
 
     void onMessageReceived(MessageBase message) {
         message.setIncomingProcessor(this);
-        incomingMessageProcessorExecutor.execute(message);
+//        incomingMessageProcessorExecutor.execute(message); # TODO handle this on a worker
     }
 
     void onEndpointStateChanged(EndpointState newState) {

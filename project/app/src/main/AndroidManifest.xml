@@ -175,6 +175,8 @@
             </intent-filter>
         </service>
 
+        <service android:name="com.ibm.android.service.MqttService" />
+
         <receiver
             android:name=".support.receiver.BootCompleteReceiver"
             android:enabled="true"

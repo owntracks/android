@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
@@ -49,6 +50,11 @@ public class MessageCard extends MessageBase{
 
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
 
+    @Override
+    public void addMqttPreferences(Preferences preferences) {
+
+    }
+
 
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
@@ -57,7 +63,7 @@ public class MessageCard extends MessageBase{
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processOutgoingMessage(this);
+//        handler.processOutgoingMessage(this);
     }
 
 }
