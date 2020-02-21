@@ -80,12 +80,12 @@ public class MessageProcessorEndpointHttpTest {
     @Test
     public void EndpointCorrectlyInitializesSelfWithDefaultSettings() {
         when(testPreferences.getUrl()).thenReturn("");
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
     }
 
     @Test
     public void EndpointCorrectlyInitializesRequestWithoutAuth() {
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
 
         assertTrue(messageProcessorEndpointHttp.isConfigurationComplete());
 
@@ -106,7 +106,7 @@ public class MessageProcessorEndpointHttpTest {
         when(testPreferences.getUsername()).thenReturn("username");
         when(testPreferences.getDeviceId()).thenReturn("device");
 
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
         assertTrue(messageProcessorEndpointHttp.isConfigurationComplete());
         okhttp3.Request request = messageProcessorEndpointHttp.getRequest(messageLocation);
         assertNotNull(request);
@@ -120,7 +120,7 @@ public class MessageProcessorEndpointHttpTest {
         when(testPreferences.getUsername()).thenReturn("username");
         when(testPreferences.getPassword()).thenReturn("password");
 
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
         assertTrue(messageProcessorEndpointHttp.isConfigurationComplete());
         okhttp3.Request request = messageProcessorEndpointHttp.getRequest(messageLocation);
         assertNotNull(request);
@@ -137,7 +137,7 @@ public class MessageProcessorEndpointHttpTest {
         when(testPreferences.getPassword()).thenReturn("password_ignored");
         when(testPreferences.getUrl()).thenReturn("http://username_url:password_url@example.com/owntracks/test");
 
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
         assertTrue(messageProcessorEndpointHttp.isConfigurationComplete());
         okhttp3.Request request = messageProcessorEndpointHttp.getRequest(messageLocation);
         assertNotNull(request);
@@ -153,7 +153,7 @@ public class MessageProcessorEndpointHttpTest {
     @Test
     public void EndpointCorrectlyInitializesRequestWithAuthAndEmptyCredentialsFromPreferences() {
         when(testPreferences.getAuth()).thenReturn(true);
-        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+        messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
 
         assertTrue(messageProcessorEndpointHttp.isConfigurationComplete());
 
@@ -169,7 +169,7 @@ public class MessageProcessorEndpointHttpTest {
 
         for (String url : urls) {
             when(testPreferences.getUrl()).thenReturn(url);
-            messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
+            messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
             assertFalse(messageProcessorEndpointHttp.isConfigurationComplete());
             assertNull(messageProcessorEndpointHttp.getRequest(messageLocation));
         }

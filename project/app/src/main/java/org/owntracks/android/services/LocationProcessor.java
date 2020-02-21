@@ -114,7 +114,7 @@ public class LocationProcessor {
             message.setConn(deviceMetricsProvider.getConnectionType());
         }
 
-        messageProcessor.sendMessage(message);
+        messageProcessor.queueMessageForSending(message);
     }
 
     //TODO: refactor to use ObjectBox query directly
@@ -128,14 +128,13 @@ public class LocationProcessor {
         return l;
     }
 
-    public void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
+    void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
         locationRepo.setCurrentLocation(l);
-
         publishLocationMessage(reportType);
     }
 
 
-    public void onWaypointTransition(@NonNull WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
+    void onWaypointTransition(@NonNull WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
         Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getTst(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
         if (ignoreLowAccuracy(l)) {
@@ -168,7 +167,7 @@ public class LocationProcessor {
     }
 
     public void publishWaypointMessage(@NonNull WaypointModel e) {
-        messageProcessor.sendMessage(waypointsRepo.fromDaoObject(e));
+        messageProcessor.queueMessageForSending(waypointsRepo.fromDaoObject(e));
     }
 
     private void publishTransitionMessage(@NonNull WaypointModel w, @NonNull Location triggeringLocation, int transition, String trigger) {
@@ -182,7 +181,7 @@ public class LocationProcessor {
         message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         message.setWtst(w.getTst());
         message.setDesc(w.getDescription());
-        messageProcessor.sendMessage(message);
+        messageProcessor.queueMessageForSending(message);
     }
 
 
@@ -199,7 +198,7 @@ public class LocationProcessor {
             collection.add(m);
         }
         message.setWaypoints(collection);
-        messageProcessor.sendMessage(message);
+        messageProcessor.queueMessageForSending(message);
     }
 
 

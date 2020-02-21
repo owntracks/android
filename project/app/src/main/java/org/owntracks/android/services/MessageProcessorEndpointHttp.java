@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.content.SharedPreferences;
+
 import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,13 +10,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.messages.MessageBase;
-import org.owntracks.android.messages.MessageClear;
-import org.owntracks.android.messages.MessageCmd;
-import org.owntracks.android.messages.MessageEvent;
-import org.owntracks.android.messages.MessageLocation;
-import org.owntracks.android.messages.MessageTransition;
-import org.owntracks.android.messages.MessageWaypoint;
-import org.owntracks.android.messages.MessageWaypoints;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
@@ -25,6 +19,7 @@ import org.owntracks.android.support.SocketFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -71,7 +66,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private HttpUrl httpEndpoint;
 
 
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, LinkedBlockingDeque<MessageBase> outgoingQueue) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -289,46 +284,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public void processOutgoingMessage(MessageBase message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageCmd message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageEvent message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageLocation message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageTransition message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageWaypoint message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageWaypoints message) {
-        sendMessage(message);
-    }
-
-    @Override
-    public void processOutgoingMessage(MessageClear message) {
-        sendMessage(message);
-    }
-
-    @Override
     public void onDestroy() {
         scheduler.cancelHttpTasks();
         preferences.unregisterOnPreferenceChangedListener(this);
@@ -356,6 +311,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     @Override
     int getModeId() {
         return MODE_ID;
+    }
+
+    @Override
+    public Runnable getBackgroundOutgoingRunnable() {
+        return null;
     }
 
     @Override

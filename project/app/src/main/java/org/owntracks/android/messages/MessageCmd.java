@@ -8,14 +8,14 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -97,7 +97,7 @@ public class MessageCmd extends MessageBase{
 
     @Override
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processOutgoingMessage(this);
+//        handler.processOutgoingMessage(this);
     }
 
     @Override
@@ -106,11 +106,14 @@ public class MessageCmd extends MessageBase{
     }
 
     @Override
+    public void addMqttPreferences(Preferences preferences) {
+        setTopic(preferences.getPubTopicCommands());
+    }
+
+    @Override
     @JsonIgnore
     public void setTopic(String topic) {
         // Full topic is needed instead of the normalized base topic to verify if the message arrived on the correct topic
         this._topic = topic;
     }
-
-
 }

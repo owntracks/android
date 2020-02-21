@@ -4,18 +4,17 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageConfiguration extends MessageBase{
     static final String TYPE = "configuration";
@@ -57,6 +56,11 @@ public class MessageConfiguration extends MessageBase{
         set(Preferences.Keys.TRACKER_ID, tid);
     }
 
+    @Override
+    public void addMqttPreferences(Preferences preferences) {
+
+    }
+
     @JsonIgnore
     public Object get(String key) {
         return map.get(key);
@@ -70,7 +74,7 @@ public class MessageConfiguration extends MessageBase{
     @Override
     @JsonIgnore
     public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-        handler.processOutgoingMessage(this);
+//        handler.processOutgoingMessage(this);
     }
 
     @Override
