@@ -99,16 +99,19 @@ public class MessageProcessor implements IncomingMessageProcessor {
         ERROR_CONFIGURATION;
 
         String message;
-        private Exception error;
+        private Throwable error;
 
         public String getMessage() {
+            if (message == null) {
+                return error.getMessage();
+            }
             return message;
         }
 
-        public Exception getError() {
+        public Throwable getError() {
             return error;
         }
-        public EndpointState setMessage(String message) {
+        public EndpointState withMessage(String message) {
             this.message = message;
             return this;
         }
@@ -123,7 +126,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return (name());
         }
 
-        public EndpointState setError(Exception error) {
+        public EndpointState withError(Throwable error) {
             this.error = error;
             return this;
         }
