@@ -7,5 +7,6 @@ public interface OutgoingMessageProcessor {
     void onCreateFromProcessor();
     void onDestroy();
 
-    boolean isConfigurationComplete();
+    void checkConfigurationComplete() throws ConfigurationIncompleteException;
 }
+
