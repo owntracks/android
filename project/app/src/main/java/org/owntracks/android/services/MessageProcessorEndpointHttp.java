@@ -15,6 +15,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
+import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -79,10 +80,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onCreateFromProcessor() {
-        if(!isConfigurationComplete()) {
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION);
+        try {
+            checkConfigurationComplete();
+        } catch (ConfigurationIncompleteException e) {
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
-
     }
 
     @Nullable
@@ -182,8 +184,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Nullable
-    public Request getRequest(MessageBase message) {
-        if(!this.isConfigurationComplete()) {
+    Request getRequest(MessageBase message) {
+        try {
+            this.checkConfigurationComplete();
+        } catch (ConfigurationIncompleteException e) {
             return null;
         }
         Timber.v("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
@@ -219,7 +223,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             return request.build();
         } catch (Exception e) {
             Timber.e(e,"invalid header specified");
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withMessage(e.getMessage()));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
             httpEndpoint = null;
             return null;
         }
@@ -304,8 +308,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public boolean isConfigurationComplete() {
-        return this.httpEndpoint != null;
+    public void checkConfigurationComplete() throws ConfigurationIncompleteException {
+        if (this.httpEndpoint==null)
+        {
+            throw new ConfigurationIncompleteException("HTTP Endpoint is missing");
+        }
     }
 
     @Override

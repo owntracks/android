@@ -27,6 +27,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
+import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.FileNotFoundException;
@@ -198,8 +199,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             return false;
         }
 
-        if (!isConfigurationComplete()) {
-            changeState(EndpointState.ERROR_CONFIGURATION);
+        try {
+            checkConfigurationComplete();
+        } catch (ConfigurationIncompleteException e) {
+            changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
             return false;
         }
 
@@ -413,11 +416,18 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public boolean isConfigurationComplete() {
+    public void checkConfigurationComplete() throws ConfigurationIncompleteException {
         // Required to connect: host, username (only send when auth is enabled)
         // When auth is enabled, password (unless usePassword is set to false which only sends username)
-        return !preferences.getHost().trim().isEmpty() && !preferences.getUsername().trim().isEmpty() && (!preferences.getAuth() || (!preferences.getPassword().trim().isEmpty() || !preferences.getUsePassword()));
-
+        if (preferences.getHost().trim().isEmpty()) {
+            throw new ConfigurationIncompleteException("Host missing");
+        }
+        if (preferences.getUsername().trim().isEmpty()) {
+            throw new ConfigurationIncompleteException("Username missing");
+        }
+        if (preferences.getAuth() && (preferences.getPassword().trim().isEmpty() && !preferences.getUsePassword())) {
+            throw new ConfigurationIncompleteException("Authentication configured but password missing");
+        }
     }
 
     @WorkerThread
@@ -462,10 +472,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @Override
     public void onCreateFromProcessor() {
-        if (!isConfigurationComplete()) {
-            changeState(EndpointState.ERROR_CONFIGURATION);
-        } else {
+        try {
+            checkConfigurationComplete();
             scheduler.scheduleMqttReconnect();
+        } catch (ConfigurationIncompleteException e) {
+            changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
     }
 

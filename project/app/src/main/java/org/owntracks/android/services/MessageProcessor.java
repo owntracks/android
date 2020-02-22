@@ -22,6 +22,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.ServiceBridge;
+import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
@@ -83,7 +84,15 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     public boolean isEndpointConfigurationComplete() {
-        return this.endpoint != null && this.endpoint.isConfigurationComplete();
+        try {
+            if (this.endpoint != null) {
+                this.endpoint.checkConfigurationComplete();
+                return true;
+            }
+        } catch (ConfigurationIncompleteException e) {
+            return false;
+        }
+        return false;
     }
 
     public enum EndpointState {
@@ -103,7 +112,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         public String getMessage() {
             if (message == null) {
-                return error.getMessage();
+                if (error != null) {
+                    return error.getMessage();
+                } else {
+                    return null;
+                }
             }
             return message;
         }
