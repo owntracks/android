@@ -177,7 +177,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
         } catch (IllegalArgumentException e) {
             httpEndpoint = null;
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setError(e));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
     }
 
@@ -192,7 +192,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         try {
             body = parser.toJson(message);
         } catch (IOException e) { // Message serialization failed. This shouldn't happen.
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage(e.getMessage()));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(e.getMessage()));
             return null;
         }
 
@@ -219,7 +219,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             return request.build();
         } catch (Exception e) {
             Timber.e(e,"invalid header specified");
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.setMessage(e.getMessage()));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withMessage(e.getMessage()));
             httpEndpoint = null;
             return null;
         }
@@ -248,17 +248,17 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                     try {
 
                         MessageBase[] result = parser.fromJson(r.body().byteStream());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("Response " + r.code() + ", " + result.length));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("Response " + r.code() + ", " + result.length));
 
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.setMessage("HTTP " +r.code() + ", JsonParseException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("HTTP " +r.code() + ", JsonParseException"));
                     } catch (Parser.EncryptionException e) {
                         Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP: "+r.code() + ", EncryptionException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP: "+r.code() + ", EncryptionException"));
                     }
 
                 }
@@ -266,7 +266,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             // Server could be contacted but returned non success HTTP code
             } else {
                 Timber.e("request was not successful. HTTP code %s", r.code());
-                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setMessage("HTTP code "+r.code() ));
+                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP code "+r.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 r.close();
                 return;
@@ -274,7 +274,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         // Message was not send
         } catch (Exception e) {
             Timber.e(e,"error:IOException. Delivery failed ");
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.setError(e));
+            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
 
 
