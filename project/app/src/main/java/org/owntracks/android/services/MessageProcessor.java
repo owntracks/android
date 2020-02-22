@@ -26,6 +26,7 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -53,7 +54,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
-    private final LinkedBlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10);
+    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10);
 
     public void reconnect() {
         if(endpoint == null)
@@ -113,7 +114,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         public String getMessage() {
             if (message == null) {
                 if (error != null) {
-                    return error.getMessage();
+                    return error.toString();
                 } else {
                     return null;
                 }
@@ -210,14 +211,21 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void queueMessageForSending(MessageBase message) {
         if(!acceptMessages) return;
-        if (!outgoingQueue.offer( message)) {
-            Timber.e("Outoing queue full. Dropping message: %s", message); //TODO maybe drop oldest and queue latest?
+        Timber.v("Queueing messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
+        synchronized (outgoingQueue) {
+            if (!outgoingQueue.offer(message)) {
+                MessageBase droppedMessage = outgoingQueue.poll();
+                Timber.e("Outoing queue full. Dropping oldest message: %s", droppedMessage);
+                if (!outgoingQueue.offer(message)) {
+                    Timber.e("Still can't put message onto the queue. Dropping: %s", message);
+                }
+            }
         }
-        Timber.v("messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
     }
 
      void onMessageDelivered(Long messageId) {
         Timber.v("onMessageDelivered in MessageProcessor Noop");
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 //        MessageBase m = outgoingQueue.get(messageId);
 //        if(m != null) {
 //            // message will be treated as incoming message.

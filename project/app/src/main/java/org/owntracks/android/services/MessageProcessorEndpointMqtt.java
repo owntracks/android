@@ -31,14 +31,20 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
@@ -47,18 +53,18 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     public static final int MODE_ID = 0;
 
     private CustomMqttClient mqttClient;
-    private MqttConnectOptions connectOptions;
+
     private String lastConnectionId;
     private static EndpointState state;
 
     private MessageProcessor messageProcessor;
-    private final LinkedBlockingDeque<MessageBase> outgoingQueue;
+    private final BlockingDeque<MessageBase> outgoingQueue;
     private Parser parser;
     private Preferences preferences;
     private Scheduler scheduler;
     private EventBus eventBus;
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, LinkedBlockingDeque<MessageBase> outgoingQueue) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, BlockingDeque<MessageBase> outgoingQueue) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -78,14 +84,16 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
     }
 
-    private synchronized boolean sendMessage(MessageBase m) {
+    private synchronized void sendMessage(MessageBase m) throws ConfigurationIncompleteException, MqttConnectionException, MqttException, IOException {
         m.addMqttPreferences(preferences); // TODO send it twice if it's a MessageClear
         long messageId = m.getMessageId();
         sendMessageConnectPressure++;
-        if (!connectToBroker()) {
+        try {
+            connectToBroker();
+        } catch (ConfigurationIncompleteException | MqttConnectionException e) {
             Timber.v("failed connection attempts :%s", sendMessageConnectPressure);
             messageProcessor.onMessageDeliveryFailed(messageId);
-            return false;
+            throw e;
         }
 
         try {
@@ -96,14 +104,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } catch (MqttException e) {
             Timber.e(e,"MQTT Exception delivering message");
             messageProcessor.onMessageDeliveryFailed(messageId);
-            return false;
-        } catch (Exception e) {
+            throw e;
+        } catch (IOException e) {
             // Message will not contain BUNDLE_KEY_ACTION and will be dropped by scheduler
             Timber.e(e, "JSON serialization failed for message %s. Message will be dropped", m.getMessageId());
             messageProcessor.onMessageDeliveryFailedFinal(messageId);
-            return false;
+            throw e;
         }
-        return true;
     }
 
     private final MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
@@ -183,7 +190,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private int sendMessageConnectPressure = 0;
 
     @WorkerThread
-    private synchronized boolean connectToBroker() {
+    private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException {
         sendMessageConnectPressure++;
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();
@@ -191,43 +198,55 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         if (isConnected()) {
             Timber.v("already connected");
             changeState(getState()); // Background service might be restarted and not get the connection state
-            return true;
+            return;
         }
 
         if (isConnecting()) {
             Timber.v("already connecting");
-            return false;
+            return;
         }
 
         try {
             checkConfigurationComplete();
         } catch (ConfigurationIncompleteException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
-            return false;
+            throw e;
         }
 
         if (isUiThread) {
-            try {
-                throw new Exception("BLOCKING CONNECT ON MAIN THREAD");
-            } catch (Exception e) {
-                Timber.e(e);
-                e.printStackTrace();
-            }
+            throw new RuntimeException("BLOCKING CONNECT ON MAIN THREAD");
         } else {
             Timber.v("Connecting on non-ui worker thread: %s", Thread.currentThread());
         }
-        Timber.v("connecting on thread %s", Thread.currentThread().getId());
         changeState(EndpointState.CONNECTING);
-        if (this.mqttClient==null) {
+        if (this.mqttClient == null) {
             try {
                 this.mqttClient = buildMqttClient();
             } catch (URISyntaxException | MqttException e) {
                 Timber.e(e, "Error creating MQTT client");
                 changeState(EndpointState.ERROR.withError(e));
-                return false;
+                throw new MqttConnectionException(e);
             }
         }
-        connectOptions = new MqttConnectOptions();
+        MqttConnectOptions mqttConnectOptions = getMqttConnectOptions();
+
+        try {
+            Timber.v("MQTT connecting synchronously");
+            this.mqttClient.connect(mqttConnectOptions).waitForCompletion();
+        } catch (MqttException e) {
+            changeState(EndpointState.ERROR.withError(e));
+            throw new MqttConnectionException(e);
+        }
+        Timber.v("MQTT Connected success");
+        Timber.v("Queue depth: %s", outgoingQueue.size());
+        scheduler.scheduleMqttPing(mqttConnectOptions.getKeepAliveInterval());
+        changeState(EndpointState.CONNECTED);
+
+        sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
+    }
+
+    private MqttConnectOptions getMqttConnectOptions() throws MqttConnectionException {
+        MqttConnectOptions  connectOptions = new MqttConnectOptions();
         if (preferences.getAuth()) {
             if (preferences.getUsePassword()) {
                 connectOptions.setPassword(preferences.getPassword().toCharArray());
@@ -260,36 +279,21 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
             }
-        } catch (Exception e) {
+
+        } catch (CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException | KeyManagementException | IOException e) {
             changeState(EndpointState.ERROR.withError(e).withMessage("TLS setup failed"));
-            return false;
+            throw new MqttConnectionException(e);
         }
 
-        if (!setWill(connectOptions)) {
-            return false;
-        }
+        setWill(connectOptions);
 
         connectOptions.setKeepAliveInterval(preferences.getKeepalive());
         connectOptions.setConnectionTimeout(30);
         connectOptions.setCleanSession(preferences.getCleanSession());
-
-        try {
-            Timber.v("MQTT connecting synchronously");
-            this.mqttClient.connect(connectOptions).waitForCompletion();
-        } catch (Exception e) {
-            changeState(EndpointState.ERROR.withError(e));
-            return false;
-        }
-        Timber.v("MQTT Connected success");
-        Timber.v("Queue depth: %s", outgoingQueue.size());
-        scheduler.scheduleMqttPing(connectOptions.getKeepAliveInterval());
-        changeState(EndpointState.CONNECTED);
-
-        sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
-        return true;
+        return connectOptions;
     }
 
-    private boolean setWill(MqttConnectOptions m) {
+    private void setWill(MqttConnectOptions m) {
         try {
             JSONObject lwt = new JSONObject();
             lwt.put("_type", "lwt");
@@ -299,13 +303,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } catch (JSONException ignored) {
         } catch (IllegalArgumentException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e).withMessage("Invalid pubTopic specified"));
-            return false;
+            throw e;
         }
-        return true;
     }
 
     private String getConnectionId() {
-        return mqttClient.getCurrentServerURI() + "/" + connectOptions.getUserName();
+        return String.format("%s/%s", mqttClient.getCurrentServerURI(), mqttClient.getClientId());
     }
 
     private void onConnect() {
@@ -350,10 +353,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             this.mqttClient.subscribe(topics, qos);
         } catch (MqttException e) {
             changeState(EndpointState.ERROR.withError(e).withMessage("Subscribe failed"));
-            e.printStackTrace();
         }
     }
-
 
     private int[] getSubTopicsQos(String[] topics) {
         int[] qos = new int[topics.length];
@@ -407,7 +408,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     public void reconnect() {
         disconnect(false);
-        connectToBroker();
+        try {
+            connectToBroker();
+        } catch (MqttConnectionException | ConfigurationIncompleteException e) {
+            Timber.e(e, "Failed to reconnect to MQTT broker");
+        }
     }
 
     @Override
@@ -550,16 +555,28 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private void sendAvailableMessages() {
         Timber.v("Starting outbound message loop");
+        MessageBase lastFailedMessageToBeRetried = null;
         while (true) {
             try {
-                MessageBase messageBase = outgoingQueue.takeFirst();
-                if (!sendMessage(messageBase)) {
+                MessageBase message;
+                if (lastFailedMessageToBeRetried == null) {
+                    message = outgoingQueue.take();
+                } else {
+                    message = lastFailedMessageToBeRetried
+                }
+                try {
+                    sendMessage(message);
+                } catch (MqttException | MqttConnectionException | ConfigurationIncompleteException e) {
                     Timber.w(("Error sending message. Re-queueing"));
-                    outgoingQueue.putFirst(messageBase);
+                    lastFailedMessageToBeRetried = message;
+                } catch (IOException e) {
+                    // Deserialization failure, drop and move on
+                }
+                if (lastFailedMessageToBeRetried != null) {
                     Thread.sleep(15000);
                 }
             } catch (InterruptedException e) {
-                Timber.i("Outgoing message loop interrupted");
+                Timber.i(e, "Outgoing message loop interrupted");
                 break;
             }
         }
@@ -575,5 +592,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     protected MessageBase onFinalizeMessage(MessageBase message) {
         // Not relevant for MQTT mode
         return message;
+    }
+
+
+}
+
+class MqttConnectionException extends Throwable {
+    MqttConnectionException(Exception e) {
+        super(e);
     }
 }
