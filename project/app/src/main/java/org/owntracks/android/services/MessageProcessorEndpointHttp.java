@@ -20,7 +20,7 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -67,7 +67,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private HttpUrl httpEndpoint;
 
 
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, LinkedBlockingDeque<MessageBase> outgoingQueue) {
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, Queue<MessageBase> outgoingQueue) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;

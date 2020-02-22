@@ -104,7 +104,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Subscribe(sticky = true)
     public void onEvent(Events.QueueChanged e) {
-        Timber.e("queue changed %s", e.getNewLength());
+        Timber.v("queue changed %s", e.getNewLength());
         this.queueLength = e.getNewLength();
         notifyPropertyChanged(BR.endpointQueue);
     }
