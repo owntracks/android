@@ -329,7 +329,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 item.setIcon(R.drawable.ic_pause_white_36dp);
                 item.setTitle(R.string.monitoring_manual);
                 break;
-            case LocationProcessor.MONITORING_SIGNIFFICANT:
+            case LocationProcessor.MONITORING_SIGNIFICANT:
                 item.setIcon(R.drawable.ic_play_white_36dp);
                 item.setTitle(R.string.monitoring_signifficant);
 
@@ -369,7 +369,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             Toast.makeText(this, R.string.monitoring_quiet, Toast.LENGTH_SHORT).show();
         }else if (newmode == LocationProcessor.MONITORING_MANUAL)  {
             Toast.makeText(this, R.string.monitoring_manual, Toast.LENGTH_SHORT).show();
-        } else if (newmode == LocationProcessor.MONITORING_SIGNIFFICANT)  {
+        } else if (newmode == LocationProcessor.MONITORING_SIGNIFICANT)  {
             Toast.makeText(this, R.string.monitoring_signifficant, Toast.LENGTH_SHORT).show();
         } else  {
             Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show();
