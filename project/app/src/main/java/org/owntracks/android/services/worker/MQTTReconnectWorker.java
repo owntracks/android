@@ -26,7 +26,7 @@ public class MQTTReconnectWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.i("MQTTReconnectWorker Doing work (%s)",Thread.currentThread());
+        Timber.tag("outgoing").i("MQTTReconnectWorker Doing work. ThreadID: %s", Thread.currentThread().getId());
         if(!messageProcessor.isEndpointConfigurationComplete())
             return Result.failure();
         return messageProcessor.statefulCheckConnection() ? Result.success() : Result.retry();

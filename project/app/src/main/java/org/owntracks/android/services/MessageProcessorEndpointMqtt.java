@@ -554,7 +554,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void sendAvailableMessages() {
-        Timber.v("Starting outbound message loop");
+        Timber.tag("outgoing").v("Starting outbound message loop. ThreadID: %s", Thread.currentThread().getId());
         MessageBase lastFailedMessageToBeRetried = null;
         while (true) {
             try {
@@ -562,12 +562,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 if (lastFailedMessageToBeRetried == null) {
                     message = outgoingQueue.take();
                 } else {
-                    message = lastFailedMessageToBeRetried
+                    message = lastFailedMessageToBeRetried;
                 }
                 try {
                     sendMessage(message);
                 } catch (MqttException | MqttConnectionException | ConfigurationIncompleteException e) {
-                    Timber.w(("Error sending message. Re-queueing"));
+                    Timber.tag("outgoing").w(("Error sending message. Re-queueing"));
                     lastFailedMessageToBeRetried = message;
                 } catch (IOException e) {
                     // Deserialization failure, drop and move on
@@ -576,11 +576,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                     Thread.sleep(15000);
                 }
             } catch (InterruptedException e) {
-                Timber.i(e, "Outgoing message loop interrupted");
+                Timber.tag("outgoing").i(e, "Outgoing message loop interrupted");
                 break;
             }
         }
-        Timber.w("Exiting outgoingmessage loop");
+        Timber.tag("outgoing").w("Exiting outgoingmessage loop");
     }
 
     @Override

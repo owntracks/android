@@ -60,7 +60,7 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
-        Timber.v("trigger:%s", trigger);
+        Timber.v("trigger: %s. ThreadID: %s", trigger, Thread.currentThread().getId());
         if (!locationRepo.hasLocation()) {
             Timber.e("no location available");
             return;
@@ -166,7 +166,7 @@ public class LocationProcessor {
         }
     }
 
-    public void publishWaypointMessage(@NonNull WaypointModel e) {
+    void publishWaypointMessage(@NonNull WaypointModel e) {
         messageProcessor.queueMessageForSending(waypointsRepo.fromDaoObject(e));
     }
 
@@ -200,6 +200,4 @@ public class LocationProcessor {
         message.setWaypoints(collection);
         messageProcessor.queueMessageForSending(message);
     }
-
-
 }
