@@ -167,7 +167,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor(){
-        Timber.v("Reloading outgoing message processor");
+        Timber.tag("outgoing").v("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread().getId());
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
@@ -178,7 +178,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 
-        Timber.v("instantiating new outgoingMessageProcessorExecutor");
         switch (preferences.getModeId()) {
             case MessageProcessorEndpointHttp.MODE_ID:
                 this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue);
@@ -211,7 +210,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void queueMessageForSending(MessageBase message) {
         if(!acceptMessages) return;
-        Timber.v("Queueing messageId:%s, queueLength:%s, queue:%s", message.getMessageId(), outgoingQueue.size(), outgoingQueue);
+        Timber.tag("outgoing").v("Queueing messageId:%s, queueLength:%s, queue:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), outgoingQueue, Thread.currentThread().getId());
         synchronized (outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 MessageBase droppedMessage = outgoingQueue.poll();
@@ -224,7 +223,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
      void onMessageDelivered(Long messageId) {
-        Timber.v("onMessageDelivered in MessageProcessor Noop");
+        Timber.tag("outgoing").v("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread().getId());
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 //        MessageBase m = outgoingQueue.get(messageId);
 //        if(m != null) {
@@ -263,7 +262,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     void onMessageDeliveryFailedFinal(Long messageId) {
         Timber.e(":%s", messageId);
-//        dequeue(messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 

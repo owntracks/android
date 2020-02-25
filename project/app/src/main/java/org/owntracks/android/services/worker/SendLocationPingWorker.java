@@ -26,7 +26,7 @@ public class SendLocationPingWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.v("SendLocationPingWorker doing work");
+        Timber.tag("outgoing").v("SendLocationPingWorker doing work. ThreadID: %s", Thread.currentThread().getId());
         locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING);
         return Result.success();
     }
