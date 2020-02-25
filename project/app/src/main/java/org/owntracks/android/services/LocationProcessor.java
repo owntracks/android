@@ -39,7 +39,7 @@ public class LocationProcessor {
 
     public static final int MONITORING_QUIET = -1;
     public static final int MONITORING_MANUAL = 0;
-    public static final int MONITORING_SIGNIFFICANT = 1;
+    public static final int MONITORING_SIGNIFICANT = 1;
     public static final int MONITORING_MOVE = 2;
 
 

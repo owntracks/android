@@ -375,7 +375,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 return getString(R.string.monitoring_quiet);
             case LocationProcessor.MONITORING_MANUAL:
                 return getString(R.string.monitoring_manual);
-            case LocationProcessor.MONITORING_SIGNIFFICANT:
+            case LocationProcessor.MONITORING_SIGNIFICANT:
                 return getString(R.string.monitoring_signifficant);
             case LocationProcessor.MONITORING_MOVE:
                 return getString(R.string.monitoring_move);
@@ -563,7 +563,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
                 break;
-            case LocationProcessor.MONITORING_SIGNIFFICANT:
+            case LocationProcessor.MONITORING_SIGNIFICANT:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
                 request.setSmallestDisplacement(preferences.getLocatorDisplacement());
                 request.setPriority(getLocationRequestPriority());
