@@ -27,7 +27,7 @@ public class MQTTKeepaliveWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.v("MQTTKeepaliveWorker doing work");
+        Timber.tag("outgoing").v("MQTTKeepaliveWorker doing work. ThreadID: %s", Thread.currentThread().getId());
         return messageProcessor.statefulSendKeepalive() ? Result.success() : Result.retry();
     }
 }

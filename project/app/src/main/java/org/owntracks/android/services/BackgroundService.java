@@ -144,6 +144,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Override
     public void onCreate() {
         super.onCreate();
+        Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread().getId());
         serviceBridge.bind(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
@@ -172,7 +173,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         setupLocationRequest();
 
         scheduler.scheduleLocationPing();
-
 
         setupGeofences();
 
@@ -516,7 +516,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             Timber.e("no location provided");
             return;
         }
-        Timber.v("location update received: tst:%s, acc:%s, lat:%s, lon:%s type:%s",location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude(), reportType);
+        Timber.tag("outgoing").v("location update received: tst:%s, acc:%s, lat:%s, lon:%s type:%s", location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude(), reportType);
 
         if (location.getTime() > locationRepo.getCurrentLocationTime()) {
             locationProcessor.onLocationChanged(location,reportType);
