@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -93,11 +92,6 @@ public class MessageCmd extends MessageBase{
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
-    }
-
-    @Override
-    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-//        handler.processOutgoingMessage(this);
     }
 
     @Override

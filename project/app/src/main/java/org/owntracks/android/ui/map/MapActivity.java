@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -145,7 +146,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } else {
             startService((new Intent(this, BackgroundService.class)));
         }
-        fusedLocationClient = new FusedLocationProviderClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
     private void checkAndRequestLocationPermissions() {
@@ -229,8 +230,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         this.isMapReady = false;
 
         try {
-            if (binding.mapView != null)
-                binding.mapView.onResume();
+            binding.mapView.onResume();
 
             if (mMap == null) {
                 Timber.v("map not ready. Running initDelayed()");
