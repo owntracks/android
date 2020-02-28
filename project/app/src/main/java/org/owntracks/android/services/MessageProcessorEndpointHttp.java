@@ -234,7 +234,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         return str != null && str.length() > 0;
     }
 
-    private void sendMessage(MessageBase message) {
+    void sendMessage(MessageBase message) {
         long messageId = message.getMessageId();
         Request request = getRequest(message);
         if(request == null) {
@@ -280,8 +280,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             Timber.e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
-
-
             return;
         }
         messageProcessor.onMessageDelivered(messageId);

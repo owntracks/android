@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import android.location.Location;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -29,20 +30,16 @@ import timber.log.Timber;
 
 @PerApplication
 public class LocationProcessor {
-
     private final MessageProcessor messageProcessor;
     private final Preferences preferences;
     private final LocationRepo locationRepo;
     private final WaypointsRepo waypointsRepo;
     private final DeviceMetricsProvider deviceMetricsProvider;
 
-
     public static final int MONITORING_QUIET = -1;
     public static final int MONITORING_MANUAL = 0;
     public static final int MONITORING_SIGNIFICANT = 1;
     public static final int MONITORING_MOVE = 2;
-
-
 
     @Inject
     public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider) {
@@ -60,7 +57,7 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
-        Timber.v("trigger: %s. ThreadID: %s", trigger, Thread.currentThread().getId());
+        Timber.v("trigger: %s. ThreadID: %s", trigger, Thread.currentThread());
         if (!locationRepo.hasLocation()) {
             Timber.e("no location available");
             return;

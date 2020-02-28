@@ -54,7 +54,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
-    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10);
+    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(100);
 
     public void reconnect() {
         if(endpoint == null)
@@ -167,7 +167,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor(){
-        Timber.tag("outgoing").v("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread().getId());
+        Timber.tag("outgoing").d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
         if(outgoingMessageProcessorExecutor != null) {
             outgoingMessageProcessorExecutor.purge();
         }
@@ -190,6 +190,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         if (runnable != null && this.outgoingMessageProcessorExecutor != null) {
             this.outgoingMessageProcessorExecutor.execute(runnable);
         }
+
         this.endpoint.onCreateFromProcessor();
         acceptMessages = true;
     }
@@ -210,106 +211,63 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void queueMessageForSending(MessageBase message) {
         if(!acceptMessages) return;
-        Timber.tag("outgoing").v("Queueing messageId:%s, queueLength:%s, queue:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), outgoingQueue, Thread.currentThread().getId());
+        Timber.tag("outgoing").d("Queueing messageId:%s, queueLength:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), Thread.currentThread());
         synchronized (outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 MessageBase droppedMessage = outgoingQueue.poll();
-                Timber.e("Outoing queue full. Dropping oldest message: %s", droppedMessage);
+                Timber.tag("outgoing").e("Outoing queue full. Dropping oldest message: %s", droppedMessage);
                 if (!outgoingQueue.offer(message)) {
-                    Timber.e("Still can't put message onto the queue. Dropping: %s", message);
+                    Timber.tag("outgoing").e("Still can't put message onto the queue. Dropping: %s", message);
                 }
             }
         }
     }
 
      void onMessageDelivered(Long messageId) {
-        Timber.tag("outgoing").v("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread().getId());
+        Timber.tag("outgoing").d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-//        MessageBase m = outgoingQueue.get(messageId);
-//        if(m != null) {
-//            // message will be treated as incoming message.
-//            // Set the delivered flag to distinguish it from messages received fro the broker.
-//            m.setDelivered(true);
-//            Timber.v("messageId:%s, queueLength:%s", messageId, outgoingQueue.size());
-//            if(m instanceof MessageLocation) {
-//                endpoint.onMessageReceived(m);
-//                eventBus.post(m);
-//            }
-//            dequeue(m.getMessageId());
-//
-//        } else {
-//            Timber.e("messageId:%s, queueLength:%s, error: unqueued, queue:%s", messageId, outgoingQueue.size(), outgoingQueue);
-//        }
     }
-
-//    abstract void sendNextMessageInQueue() ;
-//        MessageBase head = outgoingQueue.get(outgoingQueue.keyAt(0));
-//        if (head == null) {
-//            Timber.v("queue empty");
-//            eventBus.postSticky(queueEvent.withNewLength(0));
-//
-//            return;
-//        }
-//        if (head.isOutgoing()) {
-//            Timber.e("queue is already processing");
-//           return;
-//        }
-//        Timber.v("getting first message from queue: %s", head.getMessageId());
-//
-//        head.setOutgoingProcessor(endpoint);
-//        this.outgoingMessageProcessorExecutor.execute(head);
-//    }
 
     void onMessageDeliveryFailedFinal(Long messageId) {
-        Timber.e(":%s", messageId);
+        Timber.tag("outgoing").e("Message delivery failed, not retryable. :%s", messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
-
-//    private void dequeue(long messageId) {
-//        Timber.v("messageId:%s", messageId);
-//        outgoingQueue.remove(messageId);
-//    }
 
     void onMessageDeliveryFailed(Long messageId) {
-        Timber.e("queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
-//        MessageBase m = outgoingQueue.get(messageId);
-//
-//         if(m != null) {
-//             m.clearOutgoingProcessor();
-//         }
+        Timber.tag("outgoing").e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
-
 
     void onMessageReceived(MessageBase message) {
         message.setIncomingProcessor(this);
-//        incomingMessageProcessorExecutor.execute(message); # TODO handle this on a worker
+        if (message instanceof MessageLocation) {
+            processIncomingMessage((MessageLocation)message);
+        }
+        processIncomingMessage(message);
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        Timber.v("message:%s, ", newState.getMessage());
+        Timber.d("message:%s, ", newState.getMessage());
         eventBus.postSticky(newState);
     }
 
     @Override
     public void processIncomingMessage(MessageBase message) {
-        Timber.v("type:base, key:%s", message.getContactKey());
+        Timber.tag("incoming").v("type:base, key:%s", message.getContactKey());
     }
 
     public void processIncomingMessage(MessageUnknown message) {
-        Timber.v("type:unknown, key:%s", message.getContactKey());
+        Timber.tag("incoming").v("type:unknown, key:%s", message.getContactKey());
     }
 
     @Override
     public void processIncomingMessage(MessageClear message) {
-
         contactsRepo.remove(message.getContactKey());
     }
 
-
     @Override
     public void processIncomingMessage(MessageLocation message) {
-        Timber.v("processing location message %s", message.getContactKey());
+        Timber.tag("incoming").d("processing location message %s. ThreadID: %s", message.getContactKey(), Thread.currentThread());
         // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
         if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - (message.getTst() * 1000)) > (preferences.getIgnoreStaleLocations() * 24 * 60 * 60 * 1000)) {
             Timber.e("discarding stale location");
@@ -326,19 +284,18 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Override
     public void processIncomingMessage(MessageCmd message) {
         if(!preferences.getRemoteCommand()) {
-            Timber.e("remote commands are disabled");
+            Timber.tag("incoming").e("remote commands are disabled");
             return;
         }
 
         if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID &&  !preferences.getPubTopicCommands().equals(message.getTopic())) {
-            Timber.e("cmd message received on wrong topic");
+            Timber.tag("incoming").e("cmd message received on wrong topic");
             return;
         }
 
-
         String actions = message.getAction();
         if(actions == null) {
-            Timber.e("no action in cmd message");
+            Timber.tag("incoming").e("no action in cmd message");
             return;
         }
 
@@ -347,7 +304,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             switch (cmd) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
                     if(message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
-                        Timber.e("command not supported in HTTP mode: %s", cmd);
+                        Timber.tag("incoming").e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
                     serviceBridge.requestOnDemandLocationFix();
@@ -370,7 +327,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     break;
                 case MessageCmd.ACTION_RECONNECT:
                     if(message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
-                        Timber.e("command not supported in HTTP mode: %s", cmd);
+                        Timber.tag("incoming").e("command not supported in HTTP mode: %s", cmd);
                         break;
                     }
                     reconnect();
