@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.LatLng;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -172,11 +171,6 @@ public class MessageLocation extends MessageBase {
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
-    }
-
-    @Override
-    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-//        handler.processOutgoingMessage(this);
     }
 
     public void setTid(String tid) {

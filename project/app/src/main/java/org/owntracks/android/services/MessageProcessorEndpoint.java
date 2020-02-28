@@ -20,7 +20,7 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
 
     void onMessageReceived(MessageBase message) {
         message.setModeId(getModeId());
-        messageProcessor.onMessageReceived(onFinalizeMessage(message));
+        onFinalizeMessage(message).processIncomingMessage(messageProcessor);
     }
 
     protected abstract MessageBase onFinalizeMessage(MessageBase message);

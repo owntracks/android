@@ -111,10 +111,7 @@ public abstract class MessageBase extends BaseObservable  {
         }
 
         @JsonIgnore
-        protected abstract void processIncomingMessage(IncomingMessageProcessor handler);
-
-        @JsonIgnore
-        protected abstract void processOutgoingMessage(OutgoingMessageProcessor handler);
+        public abstract void processIncomingMessage(IncomingMessageProcessor handler);
 
         @JsonIgnore
         protected abstract String getBaseTopicSuffix();

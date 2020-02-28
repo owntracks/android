@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 import java.util.Map;
 import java.util.Set;
@@ -73,16 +72,9 @@ public class MessageConfiguration extends MessageBase{
 
     @Override
     @JsonIgnore
-    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-//        handler.processOutgoingMessage(this);
-    }
-
-    @Override
-    @JsonIgnore
     public String getBaseTopicSuffix() {
         return null;
     }
-
 
     @JsonIgnore
     public Set<String> getKeys() {

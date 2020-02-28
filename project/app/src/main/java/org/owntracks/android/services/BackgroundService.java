@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,6 +64,7 @@ import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -92,7 +94,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
 
-    private FusedLocationProviderClient mFusedLocationClient;
+    private FusedLocationProviderClient fusedLocationClient;
     private GeofencingClient mGeofencingClient;
 
     private LocationCallback locationCallback;
@@ -146,7 +148,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         super.onCreate();
         Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -154,6 +156,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Timber.tag("location").i("Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_DEFAULT);
             }
@@ -162,6 +165,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         locationCallbackOnDemand = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Timber.tag("location").i("Ondemand Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_RESPONSE);
             }
@@ -550,7 +554,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
 
-        if (mFusedLocationClient == null) {
+        if (fusedLocationClient == null) {
             Timber.e("FusedLocationClient not available");
             return;
         }
@@ -575,8 +579,16 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-        Timber.d("location request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
-        mFusedLocationClient.requestLocationUpdates(request, locationCallback,  runner.getBackgroundHandler().getLooper());
+        Timber.d("Location update request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
+        try {
+            Tasks.await(fusedLocationClient.flushLocations());
+        } catch (ExecutionException | InterruptedException e) {
+            Timber.e(e, "Interrupted flushing locations");
+        }
+        fusedLocationClient.requestLocationUpdates(request, locationCallback, runner.getBackgroundHandler().getLooper())
+                .addOnSuccessListener(_void -> Timber.d("Location update request success"))
+                .addOnFailureListener(throwable -> Timber.e(throwable, "Location update request failure"))
+                .addOnCanceledListener(() -> Timber.w("Location update request cancelled"));
     }
 
     private int getLocationRequestPriority() {
@@ -735,7 +747,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         try {
             Timber.v("Getting last location");
-            mFusedLocationClient.getLastLocation().addOnCompleteListener(this);
+            fusedLocationClient.getLastLocation().addOnCompleteListener(this);
         } catch (SecurityException ignored) {
         }
 
