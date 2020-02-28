@@ -104,16 +104,6 @@ public abstract class MessageBase extends BaseObservable  {
                 this._topic_base = getBaseTopic(topic); // Normalized topic for all message types
         }
 
-//        @Override
-//        public void run(){
-//                if(_processorIn != null && _processorIn.get() !=  null)
-//                        processIncomingMessage(_processorIn.get());
-//                if(_processorOut != null && _processorOut.get() !=  null) {
-//                        processOutgoingMessage(_processorOut.get());
-//                }
-//        }
-
-
         @JsonIgnore
         public void setIncomingProcessor(@NonNull IncomingMessageProcessor processor) {
                 this._processorOut = null;

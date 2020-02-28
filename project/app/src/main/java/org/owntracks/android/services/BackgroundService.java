@@ -144,7 +144,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread().getId());
+        Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
@@ -520,6 +520,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         if (location.getTime() > locationRepo.getCurrentLocationTime()) {
             locationProcessor.onLocationChanged(location,reportType);
+        } else {
+            Timber.tag("outgoing").v("Not re-sending message with same timestamp as last");
         }
     }
 
