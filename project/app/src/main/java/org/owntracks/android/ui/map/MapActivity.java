@@ -26,6 +26,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,6 +55,7 @@ import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import java.util.Locale;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -67,6 +71,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private boolean isMapReady = false;
     private Menu mMenu;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    LocationCallback doNothingLocationCallback = new LocationCallback();
 
     @Inject
     Runner runner;
@@ -138,6 +145,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } else {
             startService((new Intent(this, BackgroundService.class)));
         }
+        fusedLocationClient = new FusedLocationProviderClient(this);
     }
 
     private void checkAndRequestLocationPermissions() {
@@ -239,6 +247,15 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             isMapReady = false;
         }
         handleIntentExtras(getIntent());
+
+        Timber.i("Requesting foreground location updates");
+        fusedLocationClient.requestLocationUpdates(
+                new LocationRequest()
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setInterval(TimeUnit.SECONDS.toMillis(10)),
+                doNothingLocationCallback,
+                null
+        );
     }
 
     @Override
@@ -250,6 +267,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } catch (Exception e) {
             isMapReady = false;
         }
+        Timber.i("Removing foreground location updates");
+        fusedLocationClient.removeLocationUpdates(doNothingLocationCallback);
     }
 
     private void handleIntentExtras(Intent intent) {
