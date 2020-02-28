@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -55,15 +54,8 @@ public class MessageCard extends MessageBase{
 
     }
 
-
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
     }
-
-    @Override
-    public void processOutgoingMessage(OutgoingMessageProcessor handler) {
-//        handler.processOutgoingMessage(this);
-    }
-
 }

@@ -47,7 +47,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final Scheduler scheduler;
     private final Lazy<LocationProcessor> locationProcessorLazy;
 
-    private final ThreadPoolExecutor incomingMessageProcessorExecutor;
     private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
     private final ServiceBridge serviceBridge;
@@ -156,7 +155,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
         this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
         this.serviceBridge = serviceBridge;
-        this.incomingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.eventBus.register(this);
     }
@@ -208,7 +206,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
         loadOutgoingMessageProcessor();
     }
 
-
     public void queueMessageForSending(MessageBase message) {
         if(!acceptMessages) return;
         Timber.tag("outgoing").d("Queueing messageId:%s, queueLength:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), Thread.currentThread());
@@ -236,14 +233,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
     void onMessageDeliveryFailed(Long messageId) {
         Timber.tag("outgoing").e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size(),messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-    }
-
-    void onMessageReceived(MessageBase message) {
-        message.setIncomingProcessor(this);
-        if (message instanceof MessageLocation) {
-            processIncomingMessage((MessageLocation)message);
-        }
-        processIncomingMessage(message);
     }
 
     void onEndpointStateChanged(EndpointState newState) {
