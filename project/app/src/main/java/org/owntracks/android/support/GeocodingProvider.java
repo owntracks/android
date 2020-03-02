@@ -30,10 +30,12 @@ public class GeocodingProvider {
     @Inject
     public GeocodingProvider(@AppContext Context context, Preferences preferences) {
         cache = new LruCache<>(40);
-        if("".equals(preferences.getOpenCageGeocoderApiKey())) {
-            geocoder = new GeocoderGoogle(context);
-        } else {
-            geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
+        if(true == preferences.getGeocode()) {
+            if ("".equals(preferences.getOpenCageGeocoderApiKey())) {
+                geocoder = new GeocoderGoogle(context);
+            } else {
+                geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
+            }
         }
     }
 
@@ -151,6 +153,10 @@ public class GeocodingProvider {
                 return "Resolve failed";
             }
 
+            if( null == geocoder ) {
+                return m.getGeocoderFallback();
+            }
+
             return geocoder.reverse(m.getLatitude(), m.getLongitude());
         }
 
@@ -159,7 +165,7 @@ public class GeocodingProvider {
         protected void onPostExecute(String result) {
             MessageLocation m = message.get();
             Timber.v("geocoding result: %s", result);
-            if(m!=null && result != null) {
+            if(m != null && result != null) {
                 m.setGeocoder(result);
                 putCache(m, result);
             }

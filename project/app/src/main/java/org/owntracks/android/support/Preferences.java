@@ -940,6 +940,16 @@ public class Preferences {
         sharedPreferences.edit().putBoolean(Keys._OBJECTBOX_MIGRATED, true).apply();
     }
 
+    @Export(key = Keys.GEOCODE, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
+    public boolean getGeocode() {
+        return getBoolean(Keys.GEOCODE, R.bool.valGeocode);
+    }
+
+    @Import(key = Keys.GEOCODE)
+    public void setGeocode(boolean aBoolean) {
+        setBoolean(Keys.GEOCODE, aBoolean);
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class Keys {
         public static final String AUTH                             = "auth";
@@ -950,6 +960,7 @@ public class Preferences {
         public static final String DEBUG_LOG                        = "debugLog";
         public static final String DONT_REUSE_HTTP_CLIENT           = "dontReuseHttpClient";
         public static final String FUSED_REGION_DETECTION           = "fusedRegionDetection";
+        public static final String GEOCODE                          = "geocode";
         public static final String HOST                             = "host";
         public static final String IGNORE_INACCURATE_LOCATIONS      = "ignoreInaccurateLocations";
         public static final String IGNORE_STALE_LOCATIONS           = "ignoreStaleLocations";
