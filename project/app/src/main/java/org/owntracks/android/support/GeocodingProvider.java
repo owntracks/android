@@ -30,12 +30,15 @@ public class GeocodingProvider {
     @Inject
     public GeocodingProvider(@AppContext Context context, Preferences preferences) {
         cache = new LruCache<>(40);
-        if(true == preferences.getGeocode()) {
+        if(true == preferences.getGeocodeEnabled()) {
             if ("".equals(preferences.getOpenCageGeocoderApiKey())) {
                 geocoder = new GeocoderGoogle(context);
             } else {
                 geocoder = new GeocoderOpencage(preferences.getOpenCageGeocoderApiKey());
             }
+        }
+        else {
+            geocoder = new GeocoderNone();
         }
     }
 
@@ -151,10 +154,6 @@ public class GeocodingProvider {
             MessageLocation m = message.get();
             if(m == null) {
                 return "Resolve failed";
-            }
-
-            if( null == geocoder ) {
-                return m.getGeocoderFallback();
             }
 
             return geocoder.reverse(m.getLatitude(), m.getLongitude());

@@ -33,7 +33,7 @@
     <bool name="valWs">false</bool>
     <bool name="valUsePassword">true</bool>
     <bool name="valInfo" >true</bool>
-    <bool name="valGeocode">true</bool>
+    <bool name="valGeocodeEnabled">true</bool>
 
     <string-array name="modeIds" translatable="false">
         <item>3</item>

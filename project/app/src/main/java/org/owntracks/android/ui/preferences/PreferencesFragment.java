@@ -217,7 +217,7 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
 
 
         addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
-        addSwitchPreference(misc, Preferences.Keys.GEOCODE, R.string.preferencesGeocode, R.string.preferencesGeocodeSummary, R.bool.valGeocode);
+        addSwitchPreference(misc, Preferences.Keys.GEOCODE_ENABLED, R.string.preferencesGeocode, R.string.preferencesGeocodeSummary, R.bool.valGeocodeEnabled);
         addEditStringPreference(misc, Preferences.Keys.OPENCAGE_GEOCODER_API_KEY, R.string.preferencesOpencageGeocoderApiKey, R.string.preferencesOpencageGeocoderApiKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesOpencageGeocoderApiKeyDialog);
     }
 
