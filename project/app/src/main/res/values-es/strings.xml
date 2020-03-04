@@ -39,6 +39,8 @@
     <string name="preferencesAutostart">Autoarranque</string>
     <string name="preferencesRemoteCommand">Comandos remotos</string>
     <string name="preferencesRemoteCommandSummary">Habilitar comandos remotos</string>
+    <string name="preferencesGeocode">Geocodificación</string>
+    <string name="preferencesGeocodeSummary">Habilitar geocodificación</string>
     <string name="description">Descripción</string>
     <string name="longitude">Longitud</string>
     <string name="latitude">Latitud</string>
