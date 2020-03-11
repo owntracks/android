@@ -292,7 +292,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Override
     public void processIncomingMessage(MessageLocation message) {
         Timber.v("processing location message %s", message.getContactKey());
-        if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - (message.getTst() * 1000)) > TimeUnit.DAYS.toMillis(preferences.getIgnoreStaleLocations())) {
+        // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
+        if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - (message.getTst() * 1000)) > (preferences.getIgnoreStaleLocations() * 24 * 60 * 60 * 1000)) {
             Timber.e("discarding stale location");
             return;
         }

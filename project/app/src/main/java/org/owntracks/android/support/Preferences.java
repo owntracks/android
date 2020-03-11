@@ -431,13 +431,13 @@ public class Preferences {
     }
 
     @Export(key =Keys.IGNORE_STALE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
-    public int getIgnoreStaleLocations() {
-        return getInt(Keys.IGNORE_STALE_LOCATIONS, R.integer.valIgnoreStaleLocations);
+    public double getIgnoreStaleLocations() {
+        return Double.parseDouble(getString(Keys.IGNORE_STALE_LOCATIONS, R.string.valIgnoreStaleLocations));
     }
 
     @Import(key =Keys.IGNORE_STALE_LOCATIONS )
-    public void setIgnoreSTaleLocations(int days) {
-        setInt(Keys.IGNORE_STALE_LOCATIONS, days);
+    public void setIgnoreSTaleLocations(double days) {
+        setString(Keys.IGNORE_STALE_LOCATIONS, String.valueOf(days));
     }
 
     @Export(key =Keys.IGNORE_INACCURATE_LOCATIONS, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
