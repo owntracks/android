@@ -10,7 +10,7 @@
     <integer name="valLocatorDisplacement">500</integer>
     <integer name="valLocatorInterval">900</integer>
     <integer name="valMoveModeLocatorInterval">10</integer>
-    <integer name="valIgnoreStaleLocations">0</integer>
+    <string name="valIgnoreStaleLocations" translatable="false">0</string>
     <integer name="valIgnoreInaccurateLocations">0</integer>
     <integer name="valModeId">0</integer>
     <integer name="valMonitoring">1</integer>
