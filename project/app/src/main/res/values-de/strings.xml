@@ -36,7 +36,7 @@
     <string name="preferencesRemoteCommand">Fernkommandos</string>
     <string name="preferencesRemoteCommandSummary">Fernkommandos aktivieren</string>
     <string name="preferencesGeocode">Geocodierung</string>
-    <string name="preferencesGeocodeSummary">Geocodierung aktivieren</string>
+    <string name="preferencesGeocodeSummary">Geocodierung aktivieren. Erfordert einen Neustart.</string>
     <string name="description">Beschreibung</string>
     <string name="longitude">Längengrad</string>
     <string name="latitude">Breitengrad</string>
@@ -137,7 +137,7 @@
     <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Schlüssel</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">Alternative Geocoder API Schlüssel</string>
-    <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Nutzt OpenCage zur Auflösung von Adressen statt Google Geocoder. Erfordert einen Neustart.</string>
     <string name="region_unknown">Status unbekannt</string>
     <string name="region_inside">Aktuell innerhalb</string>
     <string name="region_outside">Aktuell außerhalb</string>

@@ -40,7 +40,7 @@
     <string name="preferencesRemoteCommand">Comandos remotos</string>
     <string name="preferencesRemoteCommandSummary">Habilitar comandos remotos</string>
     <string name="preferencesGeocode">Geocodificación</string>
-    <string name="preferencesGeocodeSummary">Habilitar geocodificación</string>
+    <string name="preferencesGeocodeSummary">Habilitar geocodificación. Requiere reiniciar.</string>
     <string name="description">Descripción</string>
     <string name="longitude">Longitud</string>
     <string name="latitude">Latitud</string>
@@ -141,7 +141,7 @@
 	<string name="notificationChannelEventsDescription">Transmisiones regionales</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">API key para Geocoder alternativo</string>
-    <string name="preferencesOpencageGeocoderApiKeyDialog">Si se activa, OpenCage se usará para buscar la ubicación en lugar de Google</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Si se activa, OpenCage se usará para buscar la ubicación en lugar de Google. Requiere reiniciar.</string>
     <string name="region_unknown">Estado desconocido</string>
     <string name="region_inside">Actualmente dentro</string>
     <string name="region_outside">Actualmente fuera</string>
