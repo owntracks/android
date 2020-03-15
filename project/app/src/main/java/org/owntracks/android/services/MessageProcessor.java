@@ -224,9 +224,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
     }
 
-     void onMessageDelivered(Long messageId) {
+     void onMessageDelivered(MessageBase messageBase) {
         Timber.tag("outgoing").d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+        eventBus.post(messageBase);
     }
 
     void onMessageDeliveryFailedFinal(Long messageId) {

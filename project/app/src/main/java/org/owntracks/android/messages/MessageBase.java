@@ -10,9 +10,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
-
-import java.lang.ref.WeakReference;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 
@@ -38,10 +35,10 @@ public abstract class MessageBase extends BaseObservable  {
         private String _topic_base;
 
         @JsonIgnore
-        private boolean delivered;
+        private int modeId;
 
         @JsonIgnore
-        private int modeId;
+        private boolean incoming = false;
 
         @JsonIgnore
         public long getMessageId() {
@@ -78,12 +75,6 @@ public abstract class MessageBase extends BaseObservable  {
         }
 
         @JsonIgnore
-        private WeakReference<IncomingMessageProcessor> _processorIn;
-
-        @JsonIgnore
-        private WeakReference<OutgoingMessageProcessor> _processorOut;
-
-        @JsonIgnore
         @NonNull
         public String getContactKey() {
                 if(_topic_base != null)
@@ -105,9 +96,8 @@ public abstract class MessageBase extends BaseObservable  {
         }
 
         @JsonIgnore
-        public void setIncomingProcessor(@NonNull IncomingMessageProcessor processor) {
-                this._processorOut = null;
-                this._processorIn = new WeakReference<>(processor);
+        public void setIncoming() {
+                this.incoming = true;
         }
 
         @JsonIgnore
@@ -125,12 +115,7 @@ public abstract class MessageBase extends BaseObservable  {
 
         @JsonIgnore
         public boolean isIncoming() {
-                return this._processorIn != null;
-        }
-
-        @JsonIgnore
-        public boolean isOutgoing() {
-                return this._processorOut != null;
+                return this.incoming;
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -157,12 +142,6 @@ public abstract class MessageBase extends BaseObservable  {
                         return topic;
                 }
         }
-
-        @JsonIgnore
-        public boolean isDelivered() {
-                return delivered;
-        }
-
 
         @JsonIgnore
         public void setModeId(int modeId) {
