@@ -25,6 +25,7 @@ import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -219,7 +220,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                     }
                 }
 
-        );    }
+        );
+    }
 
     @Override
     public void onDestroy() {
@@ -419,71 +421,50 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         // Deliver notification
         Notification n = eventsNotificationCompatBuilder.build();
 
-        Timber.v("sending new transition notification");
-        notificationManagerCompat.notify(notificationEventsID++, n);
-        //notificationManagerCompat.notify(NOTIFICATION_TAG_EVENTS_STACK, System.currentTimeMillis() / 1000, n) ;
-        sendEventStackNotification(title, text, when);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            sendEventStackNotification(title, text, when);
+        } else {
+            notificationManagerCompat.notify(notificationEventsID++, n);
+        }
     }
 
-
+    @RequiresApi(23)
     private void sendEventStackNotification(String title, String text, long when) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            Timber.v("SDK_INT >= 23, building stack notification");
+        Timber.v("SDK_INT >= 23, building stack notification");
 
-            String whenStr = DateFormatter.formatDate(TimeUnit.MILLISECONDS.toSeconds((when)));
+        String whenStr = DateFormatter.formatDate(TimeUnit.MILLISECONDS.toSeconds((when)));
 
-            Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
-            newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
+        newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        activeNotifications.push(newLine);
+        Timber.v("groupedNotifications: %s", activeNotifications.size());
+        String summary = getResources().getQuantityString(R.plurals.notificationEventsTitle, activeNotifications.size(), activeNotifications.size());
 
-            activeNotifications.push(newLine);
-            Timber.v("groupedNotifications: %s", activeNotifications.size());
+        NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
+        inbox.setSummaryText(summary);
 
-            // since we assume the most recent notification was delivered just prior to calling this method,
-            // we check that previous notifications in the group include at least 2 notifications
-            if (activeNotifications.size() > 1) {
-
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
-                String summary = getResources().getQuantityString(R.plurals.notificationEventsTitle, activeNotifications.size());
-                builder.setContentTitle(getString(R.string.events));
-                builder.setContentText(summary);
-                builder.setGroup(NOTIFICATION_GROUP_EVENTS); // same as group of single notifications
-                builder.setGroupSummary(true);
-                builder.setColor(getColor(R.color.primary));
-                builder.setAutoCancel(true);
-                builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                builder.setSmallIcon(R.drawable.ic_notification);
-                builder.setDefaults(Notification.DEFAULT_ALL);
-                // for every previously sent notification that met our above requirements,
-                // insert a new line containing its title to the inbox style notification extender
-                NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
-                inbox.setSummaryText(summary);
-
-
-                // Append new notification to existing
-                CharSequence[] cs = null;
-
-                if (stackNotification != null) {
-                    cs = (CharSequence[]) stackNotification.extras.get(NotificationCompat.EXTRA_TEXT_LINES);
-                }
-
-                if (cs == null) {
-                    cs = new CharSequence[0];
-                }
-
-                for (int i = 0; i < cs.length && i < 19; i++) {
-                    inbox.addLine(cs[i]);
-                }
-                inbox.addLine(newLine);
-
-                builder.setNumber(cs.length + 1);
-                builder.setStyle(inbox);
-                builder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), PendingIntent.FLAG_ONE_SHOT));
-                builder.setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
-
-                stackNotification = builder.build();
-                notificationManagerCompat.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
-            }
+        for (Spannable n : activeNotifications) {
+            inbox.addLine(n);
         }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS)
+                .setContentTitle(getString(R.string.events))
+                .setContentText(summary)
+                .setGroup(NOTIFICATION_GROUP_EVENTS) // same as group of single notifications
+                .setGroupSummary(true)
+                .setColor(getColor(R.color.primary))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setNumber(activeNotifications.size())
+                .setStyle(inbox)
+                .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), PendingIntent.FLAG_ONE_SHOT))
+                .setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
+
+        stackNotification = builder.build();
+        notificationManagerCompat.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
+
     }
 
     private void clearEventStackNotification() {
@@ -612,14 +593,14 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
 
-        Timber.v("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
+        Timber.d("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
 
         LinkedList<Geofence> geofences = new LinkedList<>();
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
 
         for (WaypointModel w : loadedWaypoints){
-            Timber.v("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
+            Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
 
             try {
                 geofences.add(new Geofence.Builder()
@@ -695,7 +676,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageTransition message) {
-        Timber.v("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
+        Timber.d("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
         if (message.isIncoming())
             sendEventNotification(message);
     }
@@ -703,7 +684,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation m) {
-        Timber.v("MessageLocation received %s, %s, outgoing: %s", m, lastLocationMessage, !m.isIncoming());
+        Timber.d("MessageLocation received %s, %s, outgoing: %s", m, lastLocationMessage, !m.isIncoming());
         if (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst()) {
             this.lastLocationMessage = m;
             updateOngoingNotification();
@@ -720,7 +701,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(MessageProcessor.EndpointState state) {
-        Timber.v(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
+        Timber.d(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
         this.lastEndpointState = state;
         updateOngoingNotification();
     }
@@ -735,12 +716,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(Events.PermissionGranted event) {
-        Timber.v("location permission granted");
+        Timber.d("location permission granted");
         removeGeofences();
         setupGeofences();
 
         try {
-            Timber.v("Getting last location");
+            Timber.d("Getting last location");
             fusedLocationClient.getLastLocation().addOnCompleteListener(this);
         } catch (SecurityException ignored) {
         }
@@ -751,12 +732,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         if (!preferences.getNotificationEvents())
             return null;
 
-        Timber.v("building notification builder");
+        Timber.d("building notification builder");
 
         if (eventsNotificationCompatBuilder != null)
             return eventsNotificationCompatBuilder;
 
-        Timber.v("builder not present, lazy building");
+        Timber.d("builder not present, lazy building");
         eventsNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
 
         Intent openIntent = new Intent(this, MapActivity.class);
@@ -799,7 +780,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 Preferences.Keys.LOCATOR_PRIORITY.equals(key) ||
                 Preferences.Keys.LOCATOR_INTERVAL_MOVE_MODE.equals(key)
         ) {
-            Timber.v("locator preferences changed. Resetting location request.");
+            Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
         }
     }
