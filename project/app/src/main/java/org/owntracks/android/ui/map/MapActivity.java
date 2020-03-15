@@ -106,7 +106,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         try {
             binding.mapView.onCreate(savedInstanceState);
         } catch (Exception e) {
-            Timber.e("not showing map due to issue   ");
+            Timber.e(e,"Failed to bind map to view.");
             isMapReady = false;
         }
         this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);

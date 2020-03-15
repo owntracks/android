@@ -869,7 +869,7 @@ public class Preferences {
 
     public void setSetupCompleted() {
         sharedPreferences.edit().putBoolean(Keys._SETUP_NOT_COMPLETED , false).apply();
-
+        isFirstStart = false;
     }
 
     // Maybe make this configurable
@@ -938,7 +938,6 @@ public class Preferences {
 
     public boolean isObjectboxMigrated() {
         return isFirstStart || sharedPreferences.getBoolean(Keys._OBJECTBOX_MIGRATED, false);
-
     }
 
     public void setObjectBoxMigrated() {
