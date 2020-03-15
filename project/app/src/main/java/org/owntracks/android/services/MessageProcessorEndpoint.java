@@ -14,6 +14,9 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
     MessageProcessor messageProcessor;
     BlockingDeque<MessageBase> outgoingMessageQueue;
 
+    private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
+    private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
+
     MessageProcessorEndpoint(MessageProcessor messageProcessor) {
         this.messageProcessor = messageProcessor;
     }
@@ -36,6 +39,7 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
     private void sendAvailableMessages() {
         Timber.tag("outgoing").v("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
         MessageBase lastFailedMessageToBeRetried = null;
+        long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
         while (true) {
             try {
                 MessageBase message;
@@ -44,17 +48,21 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
                 } else {
                     message = lastFailedMessageToBeRetried;
                 }
+
                 try {
                     sendMessage(message);
                     lastFailedMessageToBeRetried = null;
+                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
                     Timber.tag("outgoing").w(("Error sending message. Re-queueing"));
                     lastFailedMessageToBeRetried = message;
                 } catch (IOException e) {
+                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                     // Deserialization failure, drop and move on
                 }
                 if (lastFailedMessageToBeRetried != null) {
-                    Thread.sleep(TimeUnit.MINUTES.toMillis(1)); //TODO: better backoff algorithm
+                    Thread.sleep(retryWait);
+                    retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 }
             } catch (InterruptedException e) {
                 Timber.tag("outgoing").i(e, "Outgoing message loop interrupted");
