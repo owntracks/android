@@ -17,7 +17,7 @@ public class GeocoderGoogle implements Geocoder {
     @Override
     public String reverse(double latitude, double longitude) {
         if(!android.location.Geocoder.isPresent()) {
-            Timber.e("geocoder is not present");
+            Timber.e("Geocoder is not present");
             return null;
         }
 

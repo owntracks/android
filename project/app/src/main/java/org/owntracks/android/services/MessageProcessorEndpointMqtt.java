@@ -103,7 +103,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), parser.toJsonBytes(m), m.getQos(), m.getRetained());
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
             Timber.d("message sent: %s", messageId);
-            messageProcessor.onMessageDelivered(messageId);
+            messageProcessor.onMessageDelivered(m);
         } catch (MqttException e) {
             Timber.e(e,"MQTT Exception delivering message");
             messageProcessor.onMessageDeliveryFailed(messageId);

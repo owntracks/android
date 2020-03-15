@@ -703,8 +703,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation m) {
-        Timber.v("MessageLocation received %s, %s, outgoing: %s, delivered: %s ", m, lastLocationMessage, m.isOutgoing(), m.isDelivered());
-        if (m.isDelivered() && (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst())) {
+        Timber.v("MessageLocation received %s, %s, outgoing: %s", m, lastLocationMessage, !m.isIncoming());
+        if (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst()) {
             this.lastLocationMessage = m;
             updateOngoingNotification();
             geocodingProvider.resolve(m, this);
