@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.res.Resources;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -113,7 +114,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
         public String getMessage() {
             if (message == null) {
                 if (error != null) {
-                    return error.toString();
+                    if (error instanceof MqttException && error.getCause() != null)
+                        return String.format("MQTT Error: %s", error.getCause().getMessage());
+                    else
+                        return error.getMessage();
                 } else {
                     return null;
                 }
