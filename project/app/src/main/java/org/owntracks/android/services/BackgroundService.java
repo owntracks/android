@@ -40,7 +40,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -64,7 +63,6 @@ import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -580,11 +578,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 break;
         }
         Timber.d("Location update request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
-        try {
-            Tasks.await(fusedLocationClient.flushLocations());
-        } catch (ExecutionException | InterruptedException e) {
-            Timber.e(e, "Interrupted flushing locations");
-        }
+        fusedLocationClient.flushLocations();
         fusedLocationClient.requestLocationUpdates(request, locationCallback, runner.getBackgroundHandler().getLooper())
                 .addOnSuccessListener(_void -> Timber.d("Location update request success"))
                 .addOnFailureListener(throwable -> Timber.e(throwable, "Location update request failure"))
