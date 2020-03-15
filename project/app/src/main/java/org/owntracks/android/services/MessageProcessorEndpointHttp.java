@@ -282,7 +282,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             messageProcessor.onMessageDeliveryFailed(messageId);
             return;
         }
-        messageProcessor.onMessageDelivered(messageId);
+        messageProcessor.onMessageDelivered(message);
     }
 
     @Override
