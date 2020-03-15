@@ -243,18 +243,19 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             }
 
         } catch (Exception e) {
-            Timber.e("not showing map due to crash in Google Maps library");
+            Timber.e(e,"Not showing map due to crash in Google Maps library");
             isMapReady = false;
         }
         handleIntentExtras(getIntent());
 
-        Timber.i("Requesting foreground location updates");
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                         .setInterval(TimeUnit.SECONDS.toMillis(10)),
                 doNothingLocationCallback,
                 null
+        ).addOnCompleteListener(task ->
+                Timber.i("Requested foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
         );
     }
 
@@ -262,13 +263,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void onPause() {
         super.onPause();
         try {
-            if (binding.mapView != null)
-                binding.mapView.onPause();
+            binding.mapView.onPause();
         } catch (Exception e) {
             isMapReady = false;
         }
-        Timber.i("Removing foreground location updates");
-        fusedLocationClient.removeLocationUpdates(doNothingLocationCallback);
+        fusedLocationClient.removeLocationUpdates(doNothingLocationCallback).addOnCompleteListener(task ->
+                Timber.i("Removed foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
+        );
     }
 
     private void handleIntentExtras(Intent intent) {
@@ -289,8 +290,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void onLowMemory() {
         super.onLowMemory();
         try {
-            if (binding.mapView != null)
-                binding.mapView.onLowMemory();
+            binding.mapView.onLowMemory();
         } catch (Exception ignored) {
             isMapReady = false;
         }
@@ -301,8 +301,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         super.onNewIntent(intent);
         handleIntentExtras(intent);
         try {
-            if (binding.mapView != null)
-                binding.mapView.onLowMemory();
+            binding.mapView.onLowMemory();
         } catch (Exception ignored){
             isMapReady = false;
         }
@@ -414,8 +413,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Timber.v("onMapReady");
-
         this.mMap = googleMap;
         this.mMap.setIndoorEnabled(false);
         this.mMap.setLocationSource(viewModel.getMapLocationSource());
