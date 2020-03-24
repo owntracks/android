@@ -1,11 +1,12 @@
 package org.owntracks.android.ui.welcome.finish;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeFinishBinding;
@@ -22,10 +23,6 @@ public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, 
     }
 
     @Override
-    public void onNextClicked() {
-    }
-
-    @Override
     public boolean isNextEnabled() {
         return false;
     }
@@ -34,4 +31,5 @@ public class FinishFragment extends BaseSupportFragment<UiWelcomeFinishBinding, 
     public void onShowFragment() {
 
     }
+
 }

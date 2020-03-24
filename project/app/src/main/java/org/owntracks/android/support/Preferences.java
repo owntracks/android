@@ -143,10 +143,6 @@ public class Preferences {
         }
     }
 
-    public boolean isFirstStart() {
-        return isFirstStart;
-    }
-
     public void checkFirstStart() {
         if(sharedPreferences.getBoolean(Keys._FIRST_START, true)) {
             Timber.v("Initial application launch");
@@ -862,7 +858,7 @@ public class Preferences {
         return getString(Keys._ENCRYPTION_KEY, R.string.valEmpty);
     }
 
-    boolean getSetupCompleted() {
+    public boolean isSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
         return !sharedPreferences.getBoolean(Keys._SETUP_NOT_COMPLETED, false);
     }
