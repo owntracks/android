@@ -28,6 +28,8 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Inject
     WelcomeAdapter welcomeAdapter;
 
+    private PlayFragment playFragment;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,10 +43,14 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState);
         setHasEventBus(false);
 
-        welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), new PlayFragment(), new PermissionFragment(), new FinishFragment());
+
+        playFragment = new PlayFragment();
+        welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), playFragment, new PermissionFragment(), new FinishFragment());
 
         binding.viewPager.setAdapter(welcomeAdapter);
         binding.viewPager.addOnPageChangeListener(this);
+
+
 
         Timber.v("pager setup with %s fragments", welcomeAdapter.getCount());
         buildPagerIndicator();
@@ -60,7 +66,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
             setNextEnabled(false);
             return;
         }
-        welcomeAdapter.getFragment(currentItem).onNextClicked();
         showFragment(currentItem + 1);
     }
 
@@ -77,17 +82,12 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         }
     }
 
-    @Override
     public void setNextEnabled(boolean enabled) {
-        Timber.v("setting to %s", enabled);
         viewModel.setNextEnabled(enabled);
-        binding.btnNext.setEnabled(enabled);
     }
 
-    @Override
     public void setDoneEnabled(boolean enabled) {
         viewModel.setDoneEnabled(enabled);
-        binding.done.setEnabled(enabled);
     }
 
     private void showPreviousFragment() {
@@ -95,12 +95,15 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     }
 
     private void showFragment(int position) {
-        Timber.v("position %s setNextEnabled:%s",position, welcomeAdapter.getFragment(position).isNextEnabled());
         binding.viewPager.setCurrentItem(position);
+        welcomeAdapter.getFragment(binding.viewPager.getCurrentItem()).onShowFragment();
+        refreshNextDoneButtons();
+    }
 
-        welcomeAdapter.getFragment(position).onShowFragment();
-        setNextEnabled(welcomeAdapter.getFragment(position).isNextEnabled());
-        setDoneEnabled(position == welcomeAdapter.getLastItemPosition());
+    // TODO I really feel like we can replace this to auto refresh when the VM changes. Somehow.
+    public void refreshNextDoneButtons() {
+        setNextEnabled(welcomeAdapter.getFragment(binding.viewPager.getCurrentItem()).isNextEnabled());
+        setDoneEnabled(binding.viewPager.getCurrentItem()  == welcomeAdapter.getLastItemPosition());
     }
 
     private void buildPagerIndicator() {
@@ -138,5 +141,12 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
 
     @Override
     public void onPageScrollStateChanged(int state) {
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PlayFragment.PLAY_SERVICES_RESOLUTION_REQUEST) {
+            playFragment.onPlayServicesResolutionResult();
+        }
     }
 }

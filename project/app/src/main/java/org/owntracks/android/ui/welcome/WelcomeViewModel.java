@@ -49,8 +49,6 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
         navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
-
-
     @Override
     public void setNextEnabled(boolean enabled) {
         this.nextEnabled = enabled;

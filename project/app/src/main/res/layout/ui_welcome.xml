@@ -1,92 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-	<data>
+    <data>
 
-		<import type="android.view.View"/>
+        <import type="android.view.View" />
 
-		<variable
-			name="vm"
-			type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel"/>
-	</data>
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel" />
+    </data>
 
-	<androidx.constraintlayout.widget.ConstraintLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/primary"
-		tools:layout_editor_absoluteX="0dp"
-		tools:layout_editor_absoluteY="0dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
-		<ImageButton
-			android:id="@+id/btn_next"
-			android:layout_width="wrap_content"
-			android:layout_height="48dp"
-			android:layout_margin="0dp"
-			android:layout_marginBottom="0dp"
-			android:layout_marginRight="8dp"
-			android:background="?selectableItemBackgroundBorderless"
-			android:contentDescription="Next"
-			android:gravity="center"
-			android:onClick="@{() -> vm.onNextClicked()}"
-			android:paddingLeft="16dp"
-			android:paddingRight="16dp"
-			android:scaleType="fitCenter"
-			android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
-			android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.GONE}"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintRight_toRightOf="parent"/>
+        <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_margin="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Next"
+            android:gravity="center"
+            android:onClick="@{() -> vm.onNextClicked()}"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
+            android:visibility="@{vm.nextEnabled}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
-		<ImageButton
-			android:id="@+id/done"
-			android:layout_width="wrap_content"
-			android:layout_height="48dp"
-			android:layout_margin="0dp"
-			android:layout_marginBottom="0dp"
-			android:layout_marginRight="8dp"
-			android:background="?selectableItemBackgroundBorderless"
-			android:contentDescription="Done"
-			android:gravity="center"
-			android:onClick="@{() -> vm.onDoneClicked()}"
-			android:paddingLeft="16dp"
-			android:paddingRight="16dp"
-			android:src="@drawable/ic_done_white_24dp"
-			android:textSize="18sp"
-			android:visibility="@{vm.doneEnabled}"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintRight_toRightOf="@+id/btn_next"/>
+        <ImageButton
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_margin="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Done"
+            android:gravity="center"
+            android:onClick="@{() -> vm.onDoneClicked()}"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:src="@drawable/ic_done_white_24dp"
+            android:textSize="18sp"
+            android:visibility="@{vm.doneEnabled}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/btn_next" />
 
 
-		<org.owntracks.android.support.widgets.PausableViewPager
-			android:id="@+id/viewPager"
-			android:layout_width="0dp"
-			android:layout_height="0dp"
-			android:layout_marginBottom="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginRight="8dp"
-			android:layout_marginTop="8dp"
-			app:layout_constraintBottom_toTopOf="@+id/circles"
-			app:layout_constraintHorizontal_bias="0.0"
-			app:layout_constraintLeft_toLeftOf="parent"
-			app:layout_constraintRight_toRightOf="parent"
-			app:layout_constraintTop_toTopOf="parent"
-			app:layout_constraintVertical_bias="0.0"/>
+        <org.owntracks.android.support.widgets.PausableViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/circles"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
-		<LinearLayout
-			android:id="@+id/circles"
-			android:layout_width="wrap_content"
-			android:layout_height="48dp"
-			android:layout_marginBottom="0dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginRight="8dp"
-			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			app:layout_constraintBottom_toBottomOf="parent"
+        <LinearLayout
+            android:id="@+id/circles"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
 
-			app:layout_constraintHorizontal_bias="0.5"
-			app:layout_constraintLeft_toLeftOf="parent"
-			app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
-	</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

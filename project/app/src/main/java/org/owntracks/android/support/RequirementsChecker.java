@@ -30,7 +30,7 @@ public class RequirementsChecker {
     }
 
     public boolean isInitialSetupCheckPassed() {
-        return preferences.getSetupCompleted();
+        return preferences.isSetupCompleted();
     }
 
 }
