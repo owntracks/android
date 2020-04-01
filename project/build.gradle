@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         classpath "org.jacoco:org.jacoco.core:${jacocoVersion}"
         classpath "io.objectbox:objectbox-gradle-plugin:2.5.1"
     }
