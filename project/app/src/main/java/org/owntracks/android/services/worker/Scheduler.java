@@ -53,7 +53,7 @@ public class Scheduler {
         workManager.cancelAllWorkByTag(PERIODIC_TASK_MQTT_RECONNECT);
     }
 
-    public void scheduleMqttPing(long keepAliveSeconds) {
+    public void scheduleMqttKeepalive(long keepAliveSeconds) {
         WorkRequest mqttPingWorkRequest = new PeriodicWorkRequest.Builder(MQTTKeepaliveWorker.class, keepAliveSeconds, TimeUnit.SECONDS)
                 .addTag(PERIODIC_TASK_MQTT_KEEPALIVE)
                 .setConstraints(anyNetworkConstraint)
@@ -65,7 +65,7 @@ public class Scheduler {
     }
 
 
-    public void cancelMqttPing() {
+    public void cancelMqttKeepalive() {
         Timber.v("Cancelling task tag %s", PERIODIC_TASK_MQTT_KEEPALIVE);
         workManager.cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE);
     }
@@ -85,6 +85,7 @@ public class Scheduler {
         WorkRequest mqttReconnectWorkRequest =
                 new PeriodicWorkRequest.Builder(MQTTReconnectWorker.class, MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                         .addTag(PERIODIC_TASK_MQTT_RECONNECT)
+                        .setInitialDelay(30, TimeUnit.SECONDS)
                         .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
                         .setConstraints(anyNetworkConstraint)
                         .build();

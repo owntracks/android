@@ -14,7 +14,7 @@ android {
     testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         applicationId "org.owntracks.android"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 29
 
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
@@ -72,6 +72,8 @@ android {
 
 
     packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/io.netty.versions.properties'
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'

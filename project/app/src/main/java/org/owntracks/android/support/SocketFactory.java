@@ -22,6 +22,17 @@ import javax.net.ssl.TrustManagerFactory;
 import timber.log.Timber;
 
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
+    public KeyManagerFactory getKeyManagerFactory() {
+        return kmf;
+    }
+
+    public TrustManagerFactory getTrustManagerFactory() {
+        return tmf;
+    }
+
+    private final KeyManagerFactory kmf;
+    private final TrustManagerFactory tmf;
+
     private javax.net.ssl.SSLSocketFactory factory;
 
     public static class SocketFactoryOptions {
@@ -69,13 +80,12 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     }
 
 
-    private TrustManagerFactory tmf;
 
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Timber.tag(this.toString()).v("initializing CustomSocketFactory");
 
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
+        kmf = KeyManagerFactory.getInstance("X509");
 
 
         if(options.hasCaCrt()) {
