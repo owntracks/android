@@ -330,7 +330,7 @@ public class Preferences {
 
     @Import(key = Keys.OPENCAGE_GEOCODER_API_KEY)
     public void setOpenCageGeocoderApiKey(String key) {
-        setString(Keys.OPENCAGE_GEOCODER_API_KEY, key);
+        setString(Keys.OPENCAGE_GEOCODER_API_KEY, key.trim());
     }
 
     @Export(key = Keys.OPENCAGE_GEOCODER_API_KEY, exportModeMqttPrivate = true, exportModeHttpPrivate = true)

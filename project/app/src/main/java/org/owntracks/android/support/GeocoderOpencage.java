@@ -27,39 +27,36 @@ public class GeocoderOpencage implements Geocoder {
     }
 
     public String reverse(double latitude, double longitude) {
-
-        HttpUrl.Builder urlBuilder = new HttpUrl.Builder()
+        HttpUrl url = new HttpUrl.Builder()
                 .scheme("http")
                 .host(OPENCAGE_HOST)
                 .addPathSegment("geocode")
                 .addPathSegment("v1")
-                .addPathSegment("json");
+                .addPathSegment("json")
 
-        urlBuilder.addEncodedQueryParameter("q", String.format("%s,%s", latitude, longitude));
-        urlBuilder.addQueryParameter("no_annotations", "1");
-        urlBuilder.addQueryParameter("abbrv", "1");
-        urlBuilder.addQueryParameter("limit", "1");
-        urlBuilder.addQueryParameter("no_dedupe", "1");
-        urlBuilder.addQueryParameter("no_record", "1");
-        urlBuilder.addQueryParameter("key", apiKey);
-
-        HttpUrl url = urlBuilder.build();
+                .addEncodedQueryParameter("q", String.format("%s,%s", latitude, longitude))
+                .addQueryParameter("no_annotations", "1")
+                .addQueryParameter("abbrv", "1")
+                .addQueryParameter("limit", "1")
+                .addQueryParameter("no_dedupe", "1")
+                .addQueryParameter("no_record", "1")
+                .addQueryParameter("key", apiKey)
+                .build();
 
         Request request = new Request.Builder()
                 .url(url)
-                .header("User-Agent",USERAGENT)
+                .header("User-Agent", USERAGENT)
                 .get()
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) throw new IOException("Unexpected code " + response);
-            String rs = null;
-            if (response.body() != null) {
-                rs = response.body().string();
-            }
-            Timber.v(rs);
-
-            return jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
+            if (!response.isSuccessful() || response.body() == null)
+                throw new IOException(String.format("Unexpected code %s", response));
+            String rs = response.body().string();
+            Timber.d(rs);
+            String toot = jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
+            Timber.d(toot);
+            return toot;
         } catch (Exception e) {
             Timber.e(e);
             return null;

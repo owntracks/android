@@ -3,6 +3,7 @@ package org.owntracks.android.support;
 import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +15,8 @@ class OpenCageResponse {
         return results;
     }
 
-    public @Nullable String getFormatted() {
-        return results.size() > 0 ? results.get(0).getFormatted() : null;
+    public @Nullable
+    String getFormatted() {
+        return results != null && results.size() > 0 ? results.get(0).getFormatted() : null;
     }
 }
