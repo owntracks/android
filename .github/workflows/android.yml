@@ -20,6 +20,15 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew test
       working-directory: project
+    - name: Notify Mattermost
+      run: |
+        echo "{\"text\":\"Android Tests: $JOB_STATUS :tada:\"}" > mattermost.json
+      env:
+        JOB_STATUS: ${{ job.status }}
+    - uses: mattermost/action-mattermost-notify@master
+      env:
+        MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK }}
+      if: always()
   publish:
     name: Publish
     runs-on: ubuntu-latest
