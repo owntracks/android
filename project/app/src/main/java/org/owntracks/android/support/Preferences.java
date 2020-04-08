@@ -179,8 +179,13 @@ public class Preferences {
     // If the returned value is an empty string or null, the default id is returned
     // This is a quick fix as an empty string does not return the default value
     private String getStringWithFallback(SharedPreferences preferences, String key, int defId) {
-        String s = preferences.getString(key, "");
-        return ("".equals(s)) ? getStringRessource(defId) : s;
+        try {
+            String s = preferences.getString(key, "");
+            return ("".equals(s)) ? getStringRessource(defId) : s;
+        } catch (ClassCastException e) {
+            Timber.e("Error retriving string preference %s, returning default", key);
+            return getStringRessource(defId);
+        }
     }
 
     public String getString(String key,  int defId) {
