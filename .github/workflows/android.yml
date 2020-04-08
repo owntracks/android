@@ -21,11 +21,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew test
       working-directory: project
-    - name: Notify Mattermost
-      run: |
-        echo "{\"text\":\"Android Tests: $JOB_STATUS :tada:\"}" > mattermost.json
-      env:
-        JOB_STATUS: ${{ job.status }}
+      timeout-minutes: 10
     - uses: growse/xunit-mattermost-reporter@master
       env:
         XUNIT_PATH: "./project/app/build/test-results/testDebugUnitTest/"
@@ -51,6 +47,7 @@ jobs:
             echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-7a7fe209cba5.json
             echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
       - name: Publish play store bundle
+        timeout-minutes: 10
         run: ./gradlew publishBundle
         working-directory: project
         env:
