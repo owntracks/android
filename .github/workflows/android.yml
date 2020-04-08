@@ -10,6 +10,7 @@ on:
 
 jobs:
   test:
+    name: Build & Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,9 +26,10 @@ jobs:
         echo "{\"text\":\"Android Tests: $JOB_STATUS :tada:\"}" > mattermost.json
       env:
         JOB_STATUS: ${{ job.status }}
-    - uses: mattermost/action-mattermost-notify@master
+    - uses: growse/xunit-mattermost-reporter@master
       env:
-        MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK }}
+        XUNIT_PATH: "./project/app/build/test-results/testDebugUnitTest/"
+        MATTERMOST_WEBHOOK: ${{ secrets.MATTERMOST_WEBHOOK }}
       if: always()
   publish:
     name: Publish
