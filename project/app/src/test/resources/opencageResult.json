@@ -1,0 +1,67 @@
+{
+  "documentation": "https://opencagedata.com/api",
+  "licenses": [
+    {
+      "name": "see attribution guide",
+      "url": "https://opencagedata.com/credits"
+    }
+  ],
+  "rate": {
+    "limit": 2500,
+    "remaining": 2368,
+    "reset": 1586736000
+  },
+  "results": [
+    {
+      "bounds": {
+        "northeast": {
+          "lat": 51.9528202,
+          "lng": 7.6325938
+        },
+        "southwest": {
+          "lat": 51.9525445,
+          "lng": 7.6323594
+        }
+      },
+      "components": {
+        "ISO_3166-1_alpha-2": "DE",
+        "ISO_3166-1_alpha-3": "DEU",
+        "_category": "building",
+        "_type": "building",
+        "city": "M\u00fcnster",
+        "city_district": "M\u00fcnster-Mitte",
+        "continent": "Europe",
+        "country": "Germany",
+        "country_code": "de",
+        "county": "M\u00fcnster",
+        "house_number": "7",
+        "neighbourhood": "Josef",
+        "political_union": "European Union",
+        "postcode": "48153",
+        "road": "Friedrich-Ebert-Stra\u00dfe",
+        "state": "North Rhine-Westphalia",
+        "suburb": "Innenstadtring"
+      },
+      "confidence": 10,
+      "formatted": "Friedrich-Ebert-Stra\u00dfe 7, 48153 M\u00fcnster, Germany",
+      "geometry": {
+        "lat": 51.9526599,
+        "lng": 7.632473
+      }
+    }
+  ],
+  "status": {
+    "code": 200,
+    "message": "OK"
+  },
+  "stay_informed": {
+    "blog": "https://blog.opencagedata.com",
+    "twitter": "https://twitter.com/opencagedata"
+  },
+  "thanks": "For using an OpenCage API",
+  "timestamp": {
+    "created_http": "Sun, 12 Apr 2020 20:18:57 GMT",
+    "created_unix": 1586722737
+  },
+  "total_results": 1
+}

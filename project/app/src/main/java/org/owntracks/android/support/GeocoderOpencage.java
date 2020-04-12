@@ -26,6 +26,13 @@ public class GeocoderOpencage implements Geocoder {
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    GeocoderOpencage(String apiKey, OkHttpClient httpClient) {
+        this.apiKey = apiKey;
+        this.httpClient = httpClient;
+        jsonMapper = new ObjectMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
     public String reverse(double latitude, double longitude) {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("http")
