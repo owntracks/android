@@ -20,10 +20,7 @@ public class GeocoderOpencage implements Geocoder {
     private final static String OPENCAGE_HOST = "api.opencagedata.com";
 
     GeocoderOpencage(String apiKey) {
-        this.apiKey = apiKey;
-        httpClient = new OkHttpClient();
-        jsonMapper = new ObjectMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this(apiKey, new OkHttpClient());
     }
 
     GeocoderOpencage(String apiKey, OkHttpClient httpClient) {
@@ -60,12 +57,12 @@ public class GeocoderOpencage implements Geocoder {
             if (!response.isSuccessful() || response.body() == null)
                 throw new IOException(String.format("Unexpected code %s", response));
             String rs = response.body().string();
-            Timber.d(rs);
+            Timber.d("Opencage HTTP response: %s", rs);
             String toot = jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
-            Timber.d(toot);
+            Timber.d("Formatted location: %s", toot);
             return toot;
         } catch (Exception e) {
-            Timber.e(e);
+            Timber.e(e, "Error reverse geocoding from opencage");
             return null;
         }
     }

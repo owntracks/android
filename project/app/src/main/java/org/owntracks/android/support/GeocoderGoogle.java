@@ -11,12 +11,11 @@ import java.util.Locale;
 import timber.log.Timber;
 
 public class GeocoderGoogle implements Geocoder {
-    private static android.location.Geocoder geocoder;
-
+    private android.location.Geocoder geocoder;
 
     @Override
     public String reverse(double latitude, double longitude) {
-        if(!android.location.Geocoder.isPresent()) {
+        if (!geocoderAvailable()) {
             Timber.e("geocoder is not present");
             return null;
         }
@@ -38,7 +37,15 @@ public class GeocoderGoogle implements Geocoder {
         }
     }
 
-    GeocoderGoogle(@AppContext Context context){
+    public boolean geocoderAvailable() {
+        return android.location.Geocoder.isPresent();
+    }
+
+    GeocoderGoogle(@AppContext Context context) {
         geocoder = new android.location.Geocoder(context, Locale.getDefault());
+    }
+
+    GeocoderGoogle(android.location.Geocoder geocoder) {
+        this.geocoder = geocoder;
     }
 }
