@@ -24,11 +24,11 @@
     <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
-    <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
+    <string name="preferencesRepositorySummary" translatable="false">https://github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet</string>
+    <string name="preferencesDocumentationSummary" translatable="false">https://owntracks.org/booklet</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
-    <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
+    <string name="preferencesTwitterSummary" translatable="false">https://twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
     <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters.</string>
