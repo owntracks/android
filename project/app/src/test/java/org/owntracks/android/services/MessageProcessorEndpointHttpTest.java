@@ -164,7 +164,7 @@ public class MessageProcessorEndpointHttpTest {
 
     }
 
-    @Test
+    @Test(expected = ConfigurationIncompleteException.class)
     public void EndpointCorrectlyFailsOnInvalidUrl() throws ConfigurationIncompleteException {
         String[] urls = {"htt://example.com/owntracks/test", "tt://example", "example.com"};
 
@@ -173,8 +173,6 @@ public class MessageProcessorEndpointHttpTest {
             LinkedBlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>();
             messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, outgoingQueue);
             messageProcessorEndpointHttp.checkConfigurationComplete();
-            assertNull(messageProcessorEndpointHttp.getRequest(messageLocation));
         }
     }
-
 }
