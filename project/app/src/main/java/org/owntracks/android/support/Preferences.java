@@ -38,6 +38,10 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1;
+import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1_1;
+import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_DEFAULT;
+
 @SuppressWarnings({"unused", "WeakerAccess"})
 @PerApplication
 public class Preferences {
@@ -622,7 +626,7 @@ public class Preferences {
 
     @Import(key =Keys.MQTT_PROTOCOL_LEVEL)
     public void setMqttProtocolLevel(int value) {
-        if(value != 0 && value != 3 && value != 4)
+        if(value != MQTT_VERSION_DEFAULT && value != MQTT_VERSION_3_1 && value != MQTT_VERSION_3_1_1)
             return;
 
         setInt(Keys.MQTT_PROTOCOL_LEVEL, value);
