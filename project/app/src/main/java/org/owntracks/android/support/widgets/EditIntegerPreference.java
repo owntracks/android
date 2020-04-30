@@ -4,6 +4,8 @@ import android.content.Context;
 
 import android.util.AttributeSet;
 
+import timber.log.Timber;
+
 public class EditIntegerPreference extends EditStringPreference {
 
     public EditIntegerPreference(Context context, AttributeSet attrs) {
@@ -30,8 +32,13 @@ public class EditIntegerPreference extends EditStringPreference {
     @Override
     protected String getPersistedString(String defaultReturnValue) {
         if(getSharedPreferences().contains(getKey())) {
-            int intValue = getPersistedInt(0);
-            return String.valueOf(intValue);
+            try {
+                int intValue = getPersistedInt(0);
+                return String.valueOf(intValue);
+            }  catch (ClassCastException e) {
+                Timber.e("Error retriving string preference %s, returning default", defaultReturnValue);
+                return defaultReturnValue;
+            }
         } else {
             return defaultReturnValue;
         }

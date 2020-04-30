@@ -99,7 +99,6 @@
                 android:value=".ui.preferences.PreferencesActivity" />
         </activity>
 
-
         <activity
             android:name=".ui.preferences.load.LoadActivity"
             android:configChanges="orientation"

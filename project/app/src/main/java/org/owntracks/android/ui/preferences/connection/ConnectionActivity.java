@@ -62,14 +62,6 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
                 .setPositiveButton(R.string.accept, dialogBinding.getVm())
                 .setNegativeButton(R.string.cancel, dialogBinding.getVm())
                 .show();
-
-        //new MaterialDialog.Builder(this)
-        //         .customView(dialogBinding.getRoot(), true)
-        //         .title(R.string.mode_heading)
-        //         .positiveText(R.string.accept)
-        //         .negativeText(R.string.cancel)
-        //         .onPositive(dialogBinding.getVm())
-        //        .show();
     }
 
     @Override

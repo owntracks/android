@@ -1,11 +1,10 @@
 package org.owntracks.android.support.widgets;
 
 import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.StringRes;
-
-import android.preference.EditTextPreference;
 import android.util.AttributeSet;
+
+import androidx.annotation.StringRes;
+import androidx.preference.EditTextPreference;
 
 
 public class EditStringPreference extends EditTextPreference {
@@ -17,11 +16,12 @@ public class EditStringPreference extends EditTextPreference {
         super(context);
     }
 
-    @Override
-    protected void showDialog(Bundle s) {
-        super.showDialog(s);
-        getEditText().setHint(this.hint);
-    }
+//
+//    @Override
+//    protected void showDialog(Bundle s) {
+//        super.showDialog(s);
+//        getEditText().setHint(this.hint);
+//    }
 
         private String hint;
     public void setHint(String hint) {

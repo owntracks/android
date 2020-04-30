@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesInfo">
+    <Preference
+        android:key="documentation"
+        android:summary="@string/preferencesDocumentationSummary"
+        android:title="@string/preferencesDocumentation"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/preferencesDocumentationSummary" />
+    </Preference>
+    <Preference
+        android:key="twitter"
+        android:summary="@string/preferencesTwitterSummary"
+        android:title="@string/preferencesTwitter"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/preferencesTwitterSummary" />
+    </Preference>
+
+    <Preference
+        android:key="repo"
+        android:summary="@string/preferencesRepositorySummary"
+        android:title="@string/preferencesRepository"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/preferencesRepositorySummary" />
+    </Preference>
+
+    <Preference
+        android:key="licensesScreen"
+        android:summary="@string/preferencesLicensesSummary"
+        android:title="@string/preferencesLicenses"
+        app:fragment="org.owntracks.android.ui.preferences.LicenseFragment"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="version"
+        android:title="@string/preferencesVersion"
+        app:iconSpaceReserved="false" />
+</PreferenceScreen>

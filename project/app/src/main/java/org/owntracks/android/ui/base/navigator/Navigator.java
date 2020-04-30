@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 
 public class Navigator {
@@ -74,20 +76,11 @@ public class Navigator {
         intent.setFlags(flags);
         startActivityForResult(intent, requestCode);
     }
-
-    public final void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args) {
+    public void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, Bundle args, AppCompatActivity activity) {
         if(args != null) { fragment.setArguments(args);}
-        //TODO: catch NPE
-        FragmentTransaction ft = fragment.getActivity().getSupportFragmentManager().beginTransaction().replace(containerId, fragment, null);
-        ft.commit();
-        fragment.getFragmentManager().executePendingTransactions();
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(containerId, fragment, null);
+        fragmentTransaction.commit();
+        fragmentManager.executePendingTransactions();
     }
-
-    public void replaceFragment(int containerId, @NonNull android.app.Fragment fragment, Bundle args) {
-        if(args != null) { fragment.setArguments(args);}
-        android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction().replace(containerId, fragment, null);
-        ft.commit();
-        getActivity().getFragmentManager().executePendingTransactions();
-    }
-
 }
