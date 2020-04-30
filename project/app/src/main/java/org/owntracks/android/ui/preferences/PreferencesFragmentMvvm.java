@@ -8,7 +8,6 @@ public interface PreferencesFragmentMvvm {
 
     interface View extends MvvmView {
         void loadRoot();
-        void setVersion();
 
         void setModeSummary(int mode);
     }

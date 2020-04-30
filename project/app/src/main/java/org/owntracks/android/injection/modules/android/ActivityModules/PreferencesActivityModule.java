@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.owntracks.android.injection.modules.android.FragmentModules.PreferencesFragmentModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.ui.preferences.AdvancedFragment;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
+import org.owntracks.android.ui.preferences.ReportingFragment;
 
 import dagger.Binds;
 import dagger.Module;
@@ -21,5 +23,12 @@ public abstract class PreferencesActivityModule {
     @ContributesAndroidInjector(modules = {PreferencesFragmentModule.class})
     @PerFragment
     abstract org.owntracks.android.ui.preferences.PreferencesFragment bindPreferencesFragment();
+
+    @ContributesAndroidInjector(modules = {ReportingFragment.ReportingFragmentModule.class})
+    @PerFragment
+    abstract org.owntracks.android.ui.preferences.ReportingFragment bindReportingPreferencesFragment();
+    @ContributesAndroidInjector(modules = {AdvancedFragment.AdvancedFragmentModule.class})
+    @PerFragment
+    abstract org.owntracks.android.ui.preferences.AdvancedFragment bindAdvancedPreferencesFragment();
 
 }

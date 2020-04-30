@@ -1,5 +1,7 @@
 package org.owntracks.android.injection.modules.android.FragmentModules;
 
+import androidx.fragment.app.Fragment;
+
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.preferences.PreferencesFragmentMvvm;
@@ -13,7 +15,7 @@ public abstract class PreferencesFragmentModule {
 
     @Binds
     @PerFragment
-    abstract android.app.Fragment bindFragment(PreferencesFragment f);
+    abstract Fragment bindFragment(PreferencesFragment f);
 
     @Binds abstract PreferencesFragmentMvvm.ViewModel bindViewModel(PreferencesFragmentViewModel viewModel);
 }

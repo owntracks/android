@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesAdvanced">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryAdvancedServices">
+        <SwitchPreferenceCompat
+            app:defaultValue="@bool/valRemoteCommand"
+            app:iconSpaceReserved="false"
+            app:key="remoteConfiguration"
+            app:summary="@string/preferencesRemoteCommandSummary"
+            app:title="@string/preferencesRemoteCommand" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryAdvancedLocator">
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:digits="0123456789"
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesIgnoreInaccurateLocationsDialog"
+            app:iconSpaceReserved="false"
+
+            app:key="ignoreInaccurateLocations"
+            app:summary="@string/preferencesIgnoreInaccurateLocationsSummary"
+            app:title="@string/preferencesIgnoreInaccurateLocations" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:digits="0123456789"
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesLocatorIntervalDialog"
+            app:iconSpaceReserved="false"
+
+            app:key="locatorInterval"
+            app:summary="@string/preferencesLocatorIntervalSummary"
+            app:title="@string/preferencesLocatorInterval" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:digits="0123456789"
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
+            app:iconSpaceReserved="false"
+
+            app:key="moveModeLocatorInterval"
+            app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
+            app:title="@string/preferencesMoveModeLocatorInterval" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

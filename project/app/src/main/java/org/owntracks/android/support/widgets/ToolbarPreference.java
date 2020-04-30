@@ -1,14 +1,12 @@
 package org.owntracks.android.support.widgets;
 
 import android.content.Context;
-import android.preference.Preference;
-import android.preference.PreferenceScreen;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceScreen;
 
 import org.owntracks.android.R;
 
@@ -23,34 +21,24 @@ public class ToolbarPreference extends Preference {
     public ToolbarPreference(Context context, PreferenceScreen parent) {
         super(context);
         this.screen = parent;
-
-    }
-
-
-
-
-    @Override
-    protected View onCreateView(ViewGroup parent) {
-        super.onCreateView(parent);
-        parent.setPadding(0, 0, 0, 0);
+//        parent.setPadding(0, 0, 0, 0);
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.settings_toolbar, parent, false);
+        this.setLayoutResource(R.layout.settings_toolbar);
+//        View layout = inflater.inflate(R.layout.settings_toolbar, parent, false);
 
-        toolbar = layout.findViewById(R.id.toolbar);
-        toolbar.setTitle(getTitle());
-        toolbar.setNavigationOnClickListener(v -> goUp());
+//        toolbar = layout.findViewById(R.id.toolbar);
+//        toolbar.setTitle(getTitle());
+//        toolbar.setNavigationOnClickListener(v -> goUp());
 
-
-        return layout;
     }
 
     private void goUp() {
 
         if (screen == null)
-            screen= (PreferenceScreen)findPreferenceInHierarchy(getKey()+"Screen") ;
+            screen= findPreferenceInHierarchy(getKey()+"Screen");
 
-        if(screen != null)
-            screen.getDialog().dismiss();
+//        if(screen != null)
+//            screen.getDialog().dismiss();
 
     }
 

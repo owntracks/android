@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -169,7 +169,12 @@ public class Preferences {
     }
 
     public int getInt(String key,  int defId) {
-        return activeSharedPreferences.getInt(key, getIntResource(defId));
+        try {
+            return activeSharedPreferences.getInt(key, getIntResource(defId));
+        }  catch (ClassCastException e) {
+            Timber.e("Error retriving string preference %s, returning default", key);
+            return getIntResource(defId);
+        }
     }
     private int getIntResource(int resId) {
         return context.getResources().getInteger(resId);

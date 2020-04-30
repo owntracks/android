@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesReporting">
+    <SwitchPreferenceCompat
+        app:defaultValue="@bool/valPubExtendedData"
+        app:iconSpaceReserved="false"
+        app:key="pubExtendedData"
+        app:summary="@string/preferencesPubExtendedDataSummary"
+        app:title="@string/preferencesPubExtendedData" />
+</PreferenceScreen>

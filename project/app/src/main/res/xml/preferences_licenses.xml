@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesLicenses">
+
+    <Preference
+        android:key="eclipse-paho"
+        android:summary="Paho MQTTv3.1 Java Client"
+        android:title="Eclipse Foundation"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="greenrobot-eventbus"
+        android:summary="EventBus"
+        android:title="Greenrobot"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="greenrobot-greendao"
+        android:summary="GreenDao"
+        android:title="Greenrobot"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="altbeacon-android-beacon-library"
+        android:summary="Android-Beacon-Library"
+        android:title="AltBeacon"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="rengwuxian-materialedittext"
+        android:summary="MaterialEditText"
+        android:title="Rengwuxian"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="mikepenz-materialdrawer"
+        android:summary="MaterialDrawer, Materialize"
+        android:title="Mikepenz"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="dagger2"
+        android:summary="Dagger2"
+        android:title="Google"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="zxing"
+        android:summary="Zxing Scanner"
+        android:title="Zebra Crossing"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="jackson"
+        android:summary="Jackson"
+        android:title="Fasterxml"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="okhttp"
+        android:summary="Okhttp3"
+        android:title="Squareup"
+        app:iconSpaceReserved="false" />
+    <Preference
+        android:key="timber"
+        android:summary="Timber"
+        android:title="Jacke Wharton"
+        app:iconSpaceReserved="false" />
+</PreferenceScreen>
