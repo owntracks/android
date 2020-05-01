@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesNotification">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryNotificationOngoing">
+        <SwitchPreferenceCompat
+            android:defaultValue="@bool/valNotificationLocation"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyNotificationLocation"
+            app:summary="@string/preferencesNotificationLocationSummary"
+            app:title="@string/preferencesNotificationLocation" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryNotificationBackground">
+        <SwitchPreferenceCompat
+            android:defaultValue="@bool/valNotificationEvents"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyNotificationEvents"
+            app:summary="@string/preferencesNotificationEventsSummary"
+            app:title="@string/preferencesNotificationEvents" />
+    </PreferenceCategory>
+</PreferenceScreen>

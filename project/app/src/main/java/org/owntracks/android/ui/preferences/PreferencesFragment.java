@@ -1,17 +1,12 @@
 package org.owntracks.android.ui.preferences;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.BoolRes;
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntegerRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
@@ -22,7 +17,6 @@ import androidx.preference.SwitchPreference;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
-import org.owntracks.android.support.TimberLogFileTree;
 import org.owntracks.android.support.widgets.EditIntegerPreference;
 import org.owntracks.android.support.widgets.EditStringPreference;
 import org.owntracks.android.support.widgets.ToolbarPreference;
@@ -36,7 +30,6 @@ import dagger.android.DispatchingAndroidInjector;
 
 import dagger.android.HasAndroidInjector;
 import dagger.android.support.AndroidSupportInjection;
-import timber.log.Timber;
 
 import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
@@ -122,139 +115,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Pre
         findPreference(UI_PREFERENCE_SCREEN_CONNECTION).setIntent(new Intent(getContext(), ConnectionActivity.class).addFlags(FLAG_ACTIVITY_NO_ANIMATION));
     }
 
-
-//    @Override
-//    public boolean onPreferenceClick(Preference preference) {
-//        switch (preference.getKey()) {
-//            case UI_SCREEN_CONNECTION:
-//                navigator.startActivityForResult(ConnectionActivity.class, REQUEST_CODE_CONNECTION, Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//                return true;
-//            case UI_SCREEN_CONFIGURATION:
-//                navigator.startActivity(EditorActivity.class, null, Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//                return true;
-//            case UI_SCREEN_REPO:
-//                Intent i3 = new Intent(Intent.ACTION_VIEW);
-//                i3.setData(Uri.parse(getString(R.string.valRepoUrl)));
-//                navigator.startActivity(i3);
-//                return true;
-//            case UI_SCREEN_TWITTER:
-//                Intent i4 = new Intent(Intent.ACTION_VIEW);
-//                i4.setData(Uri.parse(getString(R.string.valTwitterUrl)));
-//                navigator.startActivity(i4);
-//                return true;
-//            case UI_SCREEN_DOCUMENTATION:
-//                Intent i5 = new Intent(Intent.ACTION_VIEW);
-//                i5.setData(Uri.parse(getString(R.string.valDocumentationUrl)));
-//                navigator.startActivity(i5);
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    private void populatePreferencesScreen(PreferenceScreen root) {
-//        populateScreenReporting((PreferenceScreen)root.findPreference("reportingScreen"));
-//        populateScreenNotification((PreferenceScreen)root.findPreference("notificationScreen"));
-//        populateScreenAdvanced((PreferenceScreen)root.findPreference("advancedScreen"));
-//    }
-//
-//    private void populateScreenReporting(PreferenceScreen screen) {
-//        addToolbar(screen);
-//        addSwitchPreference(screen, Preferences.Keys.PUB_EXTENDED_DATA, R.string.preferencesPubExtendedData, R.string.preferencesPubExtendedDataSummary, R.bool.valPubExtendedData);
-//    }
-//
-//    private void populateScreenAdvanced(PreferenceScreen screen) {
-//        addToolbar(screen);
-//        PreferenceCategory services = getCategory(R.string.preferencesCategoryAdvancedServices);
-//        screen.addPreference(services);
-//        addSwitchPreference(services, Preferences.Keys.REMOTE_COMMAND, R.string.preferencesRemoteCommand, R.string.preferencesRemoteCommandSummary, R.bool.valRemoteCommand);
-//
-//        PreferenceCategory locator = getCategory(R.string.preferencesCategoryAdvancedLocator);
-//        screen.addPreference(locator);
-//        addEditIntegerPreference(locator, Preferences.Keys.IGNORE_INACCURATE_LOCATIONS, R.string.preferencesIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations).withPreferencesSummary(R.string.preferencesIgnoreInaccurateLocationsSummary).withDialogMessage(R.string.preferencesIgnoreInaccurateLocationsDialog);
-//        addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL, R.string.preferencesLocatorInterval, R.integer.valLocatorInterval).withPreferencesSummary(R.string.preferencesLocatorIntervalSummary).withDialogMessage(R.string.preferencesLocatorIntervalDialog);
-//        addEditIntegerPreference(locator, Preferences.Keys.LOCATOR_INTERVAL_MOVE_MODE, R.string.preferencesMoveModeLocatorInterval, R.integer.valMoveModeLocatorInterval).withPreferencesSummary(R.string.preferencesMoveModeLocatorIntervalSummary).withDialogMessage(R.string.preferencesMoveModeLocatorIntervalDialog);
-//
-//        PreferenceCategory encryption = getCategory(R.string.preferencesCategoryAdvancedEncryption);
-//        screen.addPreference(encryption);
-//        addEditStringPreference(encryption, Preferences.Keys._ENCRYPTION_KEY, R.string.preferencesEncryptionKey, R.string.preferencesEncryptionKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesEncryptionKeyDialogMessage);
-//
-//        PreferenceCategory misc = getCategory(R.string.preferencesCategoryAdvancedMisc);
-//        screen.addPreference(misc);
-//        SwitchPreference p = addSwitchPreference(misc, Preferences.Keys.DEBUG_LOG, R.string.preferencesDebugLog,  R.string.preferencesDebugLogSummary, R.bool.valFalse);
-//        p.setOnPreferenceChangeListener((preference, newValue) -> {
-//            handleDebugLogChange((Boolean)newValue);
-//            return true;
-//        });
-//
-//
-//        addSwitchPreference(misc, Preferences.Keys.AUTOSTART_ON_BOOT, R.string.preferencesAutostart, R.string.preferencesAutostartSummary, R.bool.valAutostartOnBoot);
-//        addSwitchPreference(misc, Preferences.Keys.GEOCODE_ENABLED, R.string.preferencesGeocode, R.string.preferencesGeocodeSummary, R.bool.valGeocodeEnabled);
-//        addEditStringPreference(misc, Preferences.Keys.OPENCAGE_GEOCODER_API_KEY, R.string.preferencesOpencageGeocoderApiKey, R.string.preferencesOpencageGeocoderApiKeySummary, R.string.valEmpty).withDialogMessage(R.string.preferencesOpencageGeocoderApiKeyDialog);
-//    }
-//private void populateScreenNotification(PreferenceScreen screen) {
-//    addToolbar(screen);
-//
-//    PreferenceCategory ongoing = getCategory(R.string.preferencesCategoryNotificationOngoing);
-//    screen.addPreference(ongoing);
-//    addSwitchPreference(ongoing, Preferences.Keys.NOTIFICATION_LOCATION, R.string.preferencesNotificationLocation, R.string.preferencesNotificationLocationSummary, R.bool.valNotificationLocation);
-//
-//    PreferenceCategory background = getCategory(R.string.preferencesCategoryNotificationBackground);
-//    screen.addPreference(background);
-//    addSwitchPreference(background, Preferences.Keys.NOTIFICATION_EVENTS, R.string.preferencesNotificationEvents, R.string.preferencesNotificationEventsSummary, R.bool.valNotificationEvents);
-//
-//}
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableDebugLog();
-            } else {
-                viewModel.getPreferences().setDebugLog(false);
-            }
-        }
-    }
-
-    private void enableDebugLog() {
-        Timber.v("planting new log file tree");
-        Timber.plant(new TimberLogFileTree(getActivity()));
-    }
-
-    private void handleDebugLogChange(Boolean newValue) {
-        if (newValue) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Timber.e("permission not granted");
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
-
-
-            } else {
-                Timber.d("permission granted");
-                boolean debugEnabled = false;
-                for (Timber.Tree t : Timber.forest()) {
-                    Timber.v("Planted trees :%s", t);
-                    if (t instanceof TimberLogFileTree) {
-                        debugEnabled = true;
-                        break;
-                    }
-                }
-                if (!debugEnabled) {
-                    enableDebugLog();
-                }
-
-            }
-        } else {
-            for (Timber.Tree t : Timber.forest()) {
-                Timber.v("Planted trees :%s", t);
-            }
-
-            for (Timber.Tree t : Timber.forest()) {
-                if (t instanceof TimberLogFileTree) {
-                    Timber.v("Removing tree :%s", t);
-                    Timber.uproot(t);
-                }
-            }
-        }
-    }
 
 
     private PreferenceCategory getCategory(@StringRes int titleRes) {

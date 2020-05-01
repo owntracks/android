@@ -89,7 +89,7 @@ class AdvancedFragment : AbstractPreferenceFragment() {
     }
 
     @Module(includes = [BaseFragmentModule::class])
-    internal abstract class AdvancedFragmentModule {
+    internal abstract class FragmentModule {
         @Binds
         @PerFragment
         abstract fun bindFragment(reportingFragment: AdvancedFragment): AdvancedFragment

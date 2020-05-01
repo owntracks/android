@@ -9,4 +9,6 @@
     <string name="preferenceKeyAutostart">autostartOnBoot</string>
     <string name="preferenceKeyGeocode">geocodeEnabled</string>
     <string name="preferenceKeyOpencageGeocoderApiKey">opencageApiKey</string>
+    <string name="preferenceKeyNotificationLocation">notificationLocation</string>
+    <string name="preferenceKeyNotificationEvents">notificationEvents</string>
 </resources>
