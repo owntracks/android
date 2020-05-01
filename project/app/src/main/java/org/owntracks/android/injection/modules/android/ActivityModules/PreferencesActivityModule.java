@@ -2,12 +2,12 @@ package org.owntracks.android.injection.modules.android.ActivityModules;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.owntracks.android.injection.modules.android.FragmentModules.PreferencesFragmentModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerFragment;
 import org.owntracks.android.ui.preferences.AdvancedFragment;
 import org.owntracks.android.ui.preferences.NotificationFragment;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
+import org.owntracks.android.ui.preferences.PreferencesFragment;
 import org.owntracks.android.ui.preferences.ReportingFragment;
 
 import dagger.Binds;
@@ -21,7 +21,7 @@ public abstract class PreferencesActivityModule {
     @PerActivity
     abstract AppCompatActivity bindActivity(PreferencesActivity a);
 
-    @ContributesAndroidInjector(modules = {PreferencesFragmentModule.class})
+    @ContributesAndroidInjector(modules = {PreferencesFragment.FragmentModule.class})
     @PerFragment
     abstract org.owntracks.android.ui.preferences.PreferencesFragment bindPreferencesFragment();
 
