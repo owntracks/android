@@ -8,7 +8,7 @@
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
             app:iconSpaceReserved="false"
-            app:key="remoteConfiguration"
+            app:key="@string/preferenceKeyRemoteConfiguration"
             app:summary="@string/preferencesRemoteCommandSummary"
             app:title="@string/preferencesRemoteCommand" />
     </PreferenceCategory>
@@ -18,30 +18,67 @@
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
             android:inputType="number"
+            app:defaultValue="@integer/valIgnoreInaccurateLocations"
             app:dialogMessage="@string/preferencesIgnoreInaccurateLocationsDialog"
             app:iconSpaceReserved="false"
-
-            app:key="ignoreInaccurateLocations"
+            app:key="@string/preferenceKeyIgnoreInaccurateLocations"
             app:summary="@string/preferencesIgnoreInaccurateLocationsSummary"
             app:title="@string/preferencesIgnoreInaccurateLocations" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
             android:inputType="number"
+            app:defaultValue="@integer/valLocatorInterval"
             app:dialogMessage="@string/preferencesLocatorIntervalDialog"
             app:iconSpaceReserved="false"
-
-            app:key="locatorInterval"
+            app:key="@string/preferenceKeyLocatorInterval"
             app:summary="@string/preferencesLocatorIntervalSummary"
             app:title="@string/preferencesLocatorInterval" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
             android:inputType="number"
+            app:defaultValue="@integer/valMoveModeLocatorInterval"
             app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
             app:iconSpaceReserved="false"
-
-            app:key="moveModeLocatorInterval"
+            app:key="@string/preferenceKeyMoveModeLocatorInterval"
             app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
             app:title="@string/preferencesMoveModeLocatorInterval" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryAdvancedEncryption">
+        <EditTextPreference
+            app:dialogMessage="@string/preferencesEncryptionKeyDialogMessage"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyEncryptionKey"
+            app:summary="@string/preferencesEncryptionKeySummary"
+            app:title="@string/preferencesEncryptionKey" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryAdvancedMisc">
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyDebugLog"
+            app:summary="@string/preferencesDebugLogSummary"
+            app:title="@string/preferencesDebugLog" />
+        <SwitchPreferenceCompat
+            app:defaultValue="@bool/valAutostartOnBoot"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyAutostart"
+            app:summary="@string/preferencesAutostartSummary"
+            app:title="@string/preferencesAutostart" />
+        <SwitchPreferenceCompat
+            app:defaultValue="@bool/valGeocodeEnabled"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyGeocode"
+            app:summary="@string/preferencesGeocodeSummary"
+            app:title="@string/preferencesGeocode" />
+        <EditTextPreference
+            app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyOpencageGeocoderApiKey"
+            app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
+            app:title="@string/preferencesOpencageGeocoderApiKey" />
     </PreferenceCategory>
 
 </PreferenceScreen>
