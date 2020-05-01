@@ -17,7 +17,7 @@ class ReportingFragment : AbstractPreferenceFragment(){
     }
 
     @Module(includes = [BaseFragmentModule::class])
-    internal abstract class ReportingFragmentModule {
+    internal abstract class FragmentModule {
         @Binds
         @PerFragment
         abstract fun bindFragment(reportingFragment: ReportingFragment): ReportingFragment

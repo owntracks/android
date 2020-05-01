@@ -15,6 +15,7 @@
     <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
+        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
         app:iconSpaceReserved="false" />
     <Preference
         android:key="advancedScreen"
@@ -24,8 +25,7 @@
     <Preference
         android:key="configuration"
         android:title="@string/configurationManagement"
-        app:iconSpaceReserved="false">
-    </Preference>
+        app:iconSpaceReserved="false" />
     <Preference
         android:key="informationScreen"
         android:title="@string/preferencesInfo"
