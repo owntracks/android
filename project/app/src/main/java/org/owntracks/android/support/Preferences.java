@@ -348,9 +348,9 @@ public class Preferences {
         return getString(Keys.OPENCAGE_GEOCODER_API_KEY, R.string.valEmpty);
     }
 
-    @Export(key =Keys.REMOTE_CONFIGURATION, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
+//    @Export(key =context.getString(R.string.preferenceKeyRemoteConfiguration), exportModeMqttPrivate =true, exportModeHttpPrivate =true)
     public boolean getRemoteConfiguration() {
-        return getBoolean(Keys.REMOTE_CONFIGURATION, R.bool.valRemoteConfiguration);
+        return getBoolean(context.getString(R.string.preferenceKeyRemoteConfiguration), R.bool.valRemoteConfiguration);
     }
 
     @Export(key =Keys.REMOTE_COMMAND, exportModeMqttPrivate =true, exportModeHttpPrivate =true)
@@ -358,7 +358,7 @@ public class Preferences {
         return getBoolean(Keys.REMOTE_COMMAND, R.bool.valRemoteCommand);
     }
 
-    @Import(key =Keys.REMOTE_CONFIGURATION )
+//    @Import(key =Keys.REMOTE_CONFIGURATION )
     public void setRemoteConfiguration(boolean aBoolean) {
         setBoolean(Keys.REMOTE_CONFIGURATION, aBoolean);
     }
@@ -1000,6 +1000,7 @@ public class Preferences {
     @SuppressWarnings({"unused", "WeakerAccess"})
     public @interface Export {
         String key();
+        int resId() default 0;
         boolean exportModeMqttPrivate() default false;
         boolean exportModeHttpPrivate() default false;
     }

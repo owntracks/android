@@ -105,6 +105,7 @@
     <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
     <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
+    <string name="external_storage_permissions_description">Owntracks requires access to your external storage in order to save the debug log to your device</string>
     <string name="permissions_granted">Permissions have been granted</string>
     <string name="icon_description_owntracks">Owntracks</string>
     <string name="enjoy_description">Select preferences from the menu and configure OwnTracks for your server before using it</string>
