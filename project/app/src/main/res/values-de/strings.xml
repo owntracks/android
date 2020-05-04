@@ -151,4 +151,5 @@
     <string name="preferencesDeviceName">Geräte ID</string>
     <string name="preferencesHost">Hostnamen</string>
     <string name="distance_label">Abstand</string>
+    <string name="title_exit">App beenden</string>
 </resources>
