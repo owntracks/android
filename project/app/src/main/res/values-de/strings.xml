@@ -89,7 +89,6 @@
     <string name="welcome_heading">Willkommen</string>
     <string name="welcome_description">Die folgenden Schritte werden Dir helfen, Owntracks einzurichten</string>
     <string name="mqtt_private_description">Owntracks mit deinem eigenen Server verwenden</string>
-    <string name="mqtt_public_description">Teste Owntracks und teile Deine Position anonym mit anderen Nutzern</string>
     <string name="mode_heading">Modus</string>
     <string name="icon_description_owntracks">Owntracks</string>
     <string name="permissions_heading">Berechtigungen</string>
