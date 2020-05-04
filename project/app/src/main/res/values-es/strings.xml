@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Owntracks</string>
+    <string name="app_name">OwnTracks</string>
     <string name="preferencesServer">Conexión</string>
     <string name="preferencesHost" >Host</string>
     <string name="preferencesPort" >Puerto</string>
@@ -89,17 +89,17 @@
     <string name="transitionLeaving">sale</string>
     <string name="errorPreferencesImportFailed">No se pudo importar</string>
     <string name="welcome_play_heading">Google Play Services</string>
-    <string name="welcome_play_description">Owntracks necesita Google Play Services</string>
+    <string name="welcome_play_description">OwnTracks necesita Google Play Services</string>
     <string name="icon_description_warning">Alerta</string>
     <string name="welcome_heading">Bienvenido</string>
-    <string name="welcome_description">Los siguientes pasos te ayudarán a comenzar con Owntracks</string>
+    <string name="welcome_description">Los siguientes pasos te ayudarán a comenzar con OwnTracks</string>
     <string name="mode_heading">Modo</string>
-    <string name="mqtt_private_description">Conecta con tu configuración privada Owntracks y comparte tu ubicación con familia y amigos</string>
+    <string name="mqtt_private_description">Conecta con tu configuración privada OwnTracks y comparte tu ubicación con familia y amigos</string>
     <string name="permissions_heading">Permisos</string>
-    <string name="permissions_description">Owntracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar.</string>
+    <string name="permissions_description">OwnTracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar.</string>
     <string name="permissions_granted">Permisos concedidos</string>
-    <string name="icon_description_owntracks">Owntracks</string>
-    <string name="enjoy_description">Selecciona las preferencias del menú y configura tu Owntracks antes de empezar a usarlo</string>
+    <string name="icon_description_owntracks">OwnTracks</string>
+    <string name="enjoy_description">Selecciona las preferencias del menú y configura tu OwnTracks antes de empezar a usarlo</string>
     <string name="done_heading">Hecho</string>
     <string name="icon_description_done">Hecho</string>
     <string name="title_activity_load">Importar</string>
