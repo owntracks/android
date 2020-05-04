@@ -54,7 +54,6 @@
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuCurrentLoction">Current location</string>
-
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
@@ -85,7 +84,6 @@
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
     <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
-
     <string name="exportWaypointsToEndpoint">Publish Waypoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successful</string>
@@ -104,7 +102,6 @@
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
-    <string name="mqtt_public_description">Try out Owntracks and share your location anonymously with other users</string>
     <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
     <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
