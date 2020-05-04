@@ -26,7 +26,7 @@ android {
                 arguments = [eventBusIndex: 'org.owntracks.android.EventBusIndex']
             }
         }
-        resConfigs "en", "de"
+        resConfigs "en", "de", "fr"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
