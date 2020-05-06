@@ -58,9 +58,9 @@ public class GeocoderOpencage implements Geocoder {
                 throw new IOException(String.format("Unexpected code %s", response));
             String rs = response.body().string();
             Timber.d("Opencage HTTP response: %s", rs);
-            String toot = jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
-            Timber.d("Formatted location: %s", toot);
-            return toot;
+            String formattedLocation = jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
+            Timber.d("Formatted location: %s", formattedLocation);
+            return formattedLocation;
         } catch (Exception e) {
             Timber.e(e, "Error reverse geocoding from opencage");
             return null;
