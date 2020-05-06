@@ -80,7 +80,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private static final String NOTIFICATION_CHANNEL_ONGOING = "O";
 
     private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
-    private static final String NOTIFICATION_CHANNEL_EVENTS = "E";
+    public static final String NOTIFICATION_CHANNEL_EVENTS = "E";
 
     private static int notificationEventsID = 3;
 

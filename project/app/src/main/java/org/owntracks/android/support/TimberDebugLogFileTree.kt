@@ -1,7 +1,16 @@
 package org.owntracks.android.support
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import android.os.Environment
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getColor
+import org.owntracks.android.R
+import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.io.File
 import java.text.SimpleDateFormat
@@ -17,16 +26,40 @@ class TimberDebugLogFileTree(context: Context) : DebugTree() {
 
     init {
         val dateformat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        Timber.i("External storage state: %s", Environment.getExternalStorageState())
         val logDir = context.getExternalFilesDir("logs")
         val pattern = File(logDir, String.format("%s-%%u.txt", dateformat))
         val filehandler = FileHandler(pattern.absolutePath, true)
         filehandler.formatter = NoFormatter()
         this.logger.level = Level.ALL
         this.logger.addHandler(filehandler)
+        showDebugEnabledNotification(context, logDir!!.path)
     }
 
-    private fun skipLog(priority: Int, tag: String?, message: String, t: Throwable?): Boolean {
-        return priorityFilter.skipLog(priority, tag, message, t)
+    private fun showDebugEnabledNotification(context: Context, logDir: String) {
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_DEBUG, context.getString(R.string.debugChannelOngoing), NotificationManager.IMPORTANCE_LOW)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        notificationManager.notify(Companion.DEBUG_NOTIFICATION_ID,
+                NotificationCompat.Builder(context, "OwntracksDebugNotificationChannel")
+                        .setColor(getColor(context, R.color.primary))
+                        .setAutoCancel(true)
+                        .setChannelId(NOTIFICATION_CHANNEL_DEBUG)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
+                        .setStyle(NotificationCompat.BigTextStyle().bigText("Writing to %s".format(logDir)))
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle("Debug Logging Enabled")
+                        .build()
+        )
+    }
+
+    private fun skipLog(priority: Int): Boolean {
+        return priorityFilter.skipLog(priority)
     }
 
     private fun format(priority: Int, tag: String?, message: String): String {
@@ -34,7 +67,7 @@ class TimberDebugLogFileTree(context: Context) : DebugTree() {
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (skipLog(priority, tag, message, t)) {
+        if (skipLog(priority)) {
             return
         }
         val formattedMsg = format(priority, tag, message)
@@ -53,6 +86,11 @@ class TimberDebugLogFileTree(context: Context) : DebugTree() {
             Log.ERROR, Log.ASSERT -> Level.SEVERE
             else -> Level.FINEST
         }
+    }
+
+    companion object {
+        const val NOTIFICATION_CHANNEL_DEBUG = "D"
+        const val DEBUG_NOTIFICATION_ID: Int = 100
     }
 }
 
@@ -92,12 +130,8 @@ internal class LogcatFormatter {
 }
 
 internal class PriorityFilter(private val minPriority: Int) {
-    fun skipLog(priority: Int, tag: String?, message: String?, t: Throwable?): Boolean {
+    fun skipLog(priority: Int): Boolean {
         return priority < minPriority
-    }
-
-    fun isLoggable(priority: Int, tag: String?): Boolean {
-        return priority >= minPriority
     }
 
 }
