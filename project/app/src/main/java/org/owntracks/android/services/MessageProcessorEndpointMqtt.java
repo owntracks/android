@@ -180,7 +180,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         String cid = preferences.getClientId();
 
         String connectString = new URI(scheme, null, preferences.getHost(), preferences.getPort(), null, null, null).toString();
-        Timber.v("mode: %s, client id :%s, connect string: %s", preferences.getModeId(), cid, connectString);
+        Timber.d("client id :%s, connect string: %s", cid, connectString);
 
         CustomMqttClient mqttClient = new CustomMqttClient(connectString, cid, new MqttClientMemoryPersistence());
         mqttClient.setCallback(iCallbackClient);
@@ -191,6 +191,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @WorkerThread
     private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException {
+        Timber.d("Connecting to broker");
         sendMessageConnectPressure++;
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();
