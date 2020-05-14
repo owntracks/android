@@ -1,11 +1,13 @@
 package org.owntracks.android.ui.preferences.editor;
 
-import androidx.databinding.Bindable;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.Bindable;
 
 import org.owntracks.android.BR;
+import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
@@ -38,7 +40,7 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
     private void updateEffectiveConfiguration() {
         try {
             MessageConfiguration m = preferences.exportToMessage();
-            m.set(Preferences.Keys.PASSWORD, "********");
+            m.set(preferences.getPreferenceKey(R.string.preferenceKeyPassword), "********");
             setEffectiveConfiguration(parser.toJsonPlainPretty(m));
         } catch (IOException e) {
             getView().displayLoadFailed();

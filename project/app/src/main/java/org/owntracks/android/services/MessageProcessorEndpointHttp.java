@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
+import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
@@ -293,9 +294,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(Preferences.Keys.URL.equals(key) || Preferences.Keys.USERNAME.equals(key) || Preferences.Keys.PASSWORD.equals(key) || Preferences.Keys.DEVICE_ID.equals(key))
+        if (
+                preferences.getPreferenceKey(R.string.preferenceKeyURL).equals(key)
+                        || preferences.getPreferenceKey(R.string.preferenceKeyUsername).equals(key)
+                        || preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key)
+                        || preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key))
             loadEndpointUrl();
-        else if(Preferences.Keys.TLS_CLIENT_CRT.equals(key) || Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||Preferences.Keys.TLS_CA_CRT.equals(key))
+        else if (preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key)
+                || preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrtPassword).equals(key)
+                || preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key))
             mHttpClient = null;
     }
 

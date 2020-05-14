@@ -52,7 +52,7 @@ public class MessageConfiguration extends MessageBase{
     // TID would not be included in map for load otherwise
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public void setTid(String tid) {
-        set(Preferences.Keys.TRACKER_ID, tid);
+        set("tid", tid);
     }
 
     @Override
