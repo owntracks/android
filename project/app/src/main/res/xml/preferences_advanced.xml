@@ -64,13 +64,13 @@
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valAutostartOnBoot"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyAutostart"
+            app:key="@string/preferenceKeyAutostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valGeocodeEnabled"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyGeocode"
+            app:key="@string/preferenceKeyGeocodeEnabled"
             app:summary="@string/preferencesGeocodeSummary"
             app:title="@string/preferencesGeocode" />
         <EditTextPreference

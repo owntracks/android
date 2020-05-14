@@ -260,8 +260,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
-                    if(intent.hasExtra(Preferences.Keys.MONITORING)) {
-                        preferences.setMonitoring(intent.getIntExtra(Preferences.Keys.MONITORING, preferences.getMonitoring()));
+                    if(intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
+                        preferences.setMonitoring(intent.getIntExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring), preferences.getMonitoring()));
                     } else {
                         // Step monitoring mode if no mode is specified
                         preferences.setMonitoringNext();
@@ -775,10 +775,10 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Preferences.Keys.LOCATOR_INTERVAL.equals(key) ||
-                Preferences.Keys.LOCATOR_DISPLACEMENT.equals(key) ||
-                Preferences.Keys.LOCATOR_PRIORITY.equals(key) ||
-                Preferences.Keys.LOCATOR_INTERVAL_MOVE_MODE.equals(key)
+        if (preferences.getPreferenceKey(R.string.preferenceKeyLocatorInterval).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyLocatorDisplacement).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyLocatorPriority).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyMoveModeLocatorInterval).equals(key)
         ) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
