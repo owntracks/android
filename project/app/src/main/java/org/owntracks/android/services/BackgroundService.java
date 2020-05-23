@@ -58,7 +58,7 @@ import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.Runner;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
 
@@ -134,7 +134,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     LocationRepo locationRepo;
 
     @Inject
-    Runner runner;
+    RunThingsOnOtherThreads runThingsOnOtherThreads;
 
     @Inject
     WaypointsRepo waypointsRepo;
@@ -523,7 +523,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         Timber.d("On demand location request");
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
-        client.requestLocationUpdates(request, locationCallbackOnDemand,  runner.getBackgroundHandler().getLooper());
+        client.requestLocationUpdates(request, locationCallbackOnDemand,  runThingsOnOtherThreads.getBackgroundLooper());
     }
 
     @SuppressWarnings("MissingPermission")
@@ -560,7 +560,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         }
         Timber.d("Location update request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
         fusedLocationClient.flushLocations();
-        fusedLocationClient.requestLocationUpdates(request, locationCallback, runner.getBackgroundHandler().getLooper())
+        fusedLocationClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper())
                 .addOnSuccessListener(_void -> Timber.d("Location update request success"))
                 .addOnFailureListener(throwable -> Timber.e(throwable, "Location update request failure"))
                 .addOnCanceledListener(() -> Timber.w("Location update request cancelled"));

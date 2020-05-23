@@ -21,7 +21,7 @@ import org.owntracks.android.databinding.UiPreferencesConnectionParametersBindin
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
-import org.owntracks.android.support.Runner;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
 import org.owntracks.android.ui.status.StatusActivity;
@@ -33,7 +33,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     private BaseDialogViewModel activeDialogViewModel ;
 
     @Inject
-    Runner runner;
+    RunThingsOnOtherThreads runThingsOnOtherThreads;
 
     @Inject
     MessageProcessor messageProcessor;
@@ -183,9 +183,9 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         switch (item.getItemId()) {
             case R.id.connect:
                 if(messageProcessor.isEndpointConfigurationComplete()) {
+                    // TODO work out how to reconnect on the background thread
                     Runnable r = () -> messageProcessor.reconnect();
-                    runner.postOnBackgroundHandlerDelayed(r, 1);
-
+                    runThingsOnOtherThreads.postOnNetworkHandlerDelayed(r, 1);
                 } else {
                     Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();
                 }

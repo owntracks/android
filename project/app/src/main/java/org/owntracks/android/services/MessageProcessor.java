@@ -22,6 +22,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
@@ -48,13 +49,14 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final Scheduler scheduler;
     private final Lazy<LocationProcessor> locationProcessorLazy;
 
-    private final ThreadPoolExecutor outgoingMessageProcessorExecutor;
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
     private final ServiceBridge serviceBridge;
+    private final RunThingsOnOtherThreads runThingsOnOtherThreads;
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages =  false;
     private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(100);
+    private Thread backgroundDequeueThread;
 
     public void reconnect() {
         if(endpoint == null)
@@ -150,7 +152,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     }
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge,RunThingsOnOtherThreads runThingsOnOtherThreads) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
@@ -159,8 +161,8 @@ public class MessageProcessor implements IncomingMessageProcessor {
         this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
         this.serviceBridge = serviceBridge;
-        this.outgoingMessageProcessorExecutor = new ThreadPoolExecutor(2,2,1,  TimeUnit.MINUTES,new LinkedBlockingQueue<>());
         this.eventBus.register(this);
+        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
     }
 
     public void initialize() {
@@ -170,10 +172,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     private void loadOutgoingMessageProcessor(){
         Timber.tag("outgoing").d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
-        if(outgoingMessageProcessorExecutor != null) {
-            outgoingMessageProcessorExecutor.purge();
-        }
-
         if(endpoint != null) {
             endpoint.onDestroy();
         }
@@ -182,15 +180,17 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         switch (preferences.getModeId()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue);
+                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue,runThingsOnOtherThreads);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue,runThingsOnOtherThreads);
         }
-        Runnable runnable = this.endpoint.getBackgroundOutgoingRunnable();
-        if (runnable != null && this.outgoingMessageProcessorExecutor != null) {
-            this.outgoingMessageProcessorExecutor.execute(runnable);
+
+        if (backgroundDequeueThread == null || !backgroundDequeueThread.isAlive()) {
+            // Create the background thread that will handle outbound msgs
+            backgroundDequeueThread = new Thread(this.endpoint.getBackgroundOutgoingRunnable());
+            backgroundDequeueThread.start();
         }
 
         this.endpoint.onCreateFromProcessor();

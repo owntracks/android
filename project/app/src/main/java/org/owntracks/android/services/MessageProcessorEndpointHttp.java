@@ -14,6 +14,7 @@ import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
@@ -41,19 +42,16 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     public static final int MODE_ID = 3;
 
     // Headers according to https://github.com/owntracks/recorder#http-mode
-    public static final String HEADER_USERNAME = "X-Limit-U";
-    public static final String HEADER_DEVICE = "X-Limit-D";
+    static final String HEADER_USERNAME = "X-Limit-U";
+    static final String HEADER_DEVICE = "X-Limit-D";
     private static final String HEADER_USERAGENT = "User-Agent";
-    public static final String METHOD = "POST";
+    static final String METHOD = "POST";
 
-    public static final String HEADER_AUTHORIZATION = "Authorization";
+    static final String HEADER_AUTHORIZATION = "Authorization";
 
     private static String httpEndpointHeaderUser = "";
     private static String httpEndpointHeaderDevice = "";
     private static String httpEndpointHeaderPassword = "";
-
-    //private String endpointUrl;
-    //private String endpointUserInfo;
 
     private static OkHttpClient mHttpClient;
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
@@ -66,9 +64,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private Scheduler scheduler;
     private HttpUrl httpEndpoint;
 
-
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, Queue<MessageBase> outgoingQueue) {
-        super(messageProcessor);
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, Queue<MessageBase> outgoingQueue, RunThingsOnOtherThreads runThingsOnOtherThreads) {
+        super(messageProcessor, runThingsOnOtherThreads);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;

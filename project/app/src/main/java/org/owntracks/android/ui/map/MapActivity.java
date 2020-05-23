@@ -49,7 +49,7 @@ import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.GeocodingProvider;
-import org.owntracks.android.support.Runner;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
@@ -77,7 +77,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     LocationCallback doNothingLocationCallback = new LocationCallback();
 
     @Inject
-    Runner runner;
+    RunThingsOnOtherThreads runThingsOnOtherThreads;
 
     @Inject
     ContactImageProvider contactImageProvider;
@@ -311,9 +311,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     private void initMapDelayed() {
         isMapReady = false;
-
-        //runner.postOnMainHandlerDelayed();
-        runner.postOnMainHandlerDelayed(this::initMap, 500);
+        runThingsOnOtherThreads.postOnMainHandlerDelayed(this::initMap, 500);
     }
 
     private void initMap() {
