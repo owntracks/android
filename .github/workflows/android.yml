@@ -22,7 +22,7 @@ jobs:
       run: ./gradlew test
       working-directory: project
       timeout-minutes: 10
-    - uses: growse/xunit-mattermost-reporter@master
+    - uses: growse/xunit-mattermost-reporter@v1
       with:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/testDebugUnitTest/"
