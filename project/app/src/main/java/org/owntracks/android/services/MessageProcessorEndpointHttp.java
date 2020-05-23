@@ -166,10 +166,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             if(!httpEndpoint.username().isEmpty() && !httpEndpoint.password().isEmpty()) {
                 httpEndpointHeaderUser = httpEndpoint.username();
                 httpEndpointHeaderPassword = httpEndpoint.password();
-            } else if(preferences.getAuth()) {
+            } else if(!preferences.getPassword().trim().equals("")) {
                 httpEndpointHeaderPassword = preferences.getPassword();
             }
-
 
             messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
         } catch (IllegalArgumentException e) {

@@ -63,7 +63,6 @@ public class MessageProcessorEndpointHttpTest {
         when(testPreferences.getTlsCaCrtName()).thenReturn("");
         when(testPreferences.getTlsClientCrtName()).thenReturn("");
 
-        when(testPreferences.getAuth()).thenReturn(false);
         when(testPreferences.getUsername()).thenReturn("");
         when(testPreferences.getDeviceId()).thenReturn("");
         when(testPreferences.getPassword()).thenReturn("");
@@ -97,7 +96,7 @@ public class MessageProcessorEndpointHttpTest {
 
     @Test
     public void EndpointCorrectlyInitializesRequestWithoutAuthAndWithUser() throws ConfigurationIncompleteException {
-        when(testPreferences.getAuth()).thenReturn(false);
+
         when(testPreferences.getUsername()).thenReturn("username");
         when(testPreferences.getDeviceId()).thenReturn("device");
         messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
@@ -110,7 +109,6 @@ public class MessageProcessorEndpointHttpTest {
 
     @Test
     public void EndpointCorrectlyInitializesRequestWithAuth() throws ConfigurationIncompleteException {
-        when(testPreferences.getAuth()).thenReturn(true);
         when(testPreferences.getUsername()).thenReturn("username");
         when(testPreferences.getPassword()).thenReturn("password");
         messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
@@ -124,7 +122,6 @@ public class MessageProcessorEndpointHttpTest {
 
     @Test
     public void EndpointCorrectlyInitializesRequestWithAuthFromUrl() throws ConfigurationIncompleteException {
-        when(testPreferences.getAuth()).thenReturn(false);
         when(testPreferences.getDeviceId()).thenReturn("device_preferences");
         when(testPreferences.getUsername()).thenReturn("username_ignored");
         when(testPreferences.getPassword()).thenReturn("password_ignored");
@@ -144,7 +141,6 @@ public class MessageProcessorEndpointHttpTest {
 
     @Test
     public void EndpointCorrectlyInitializesRequestWithAuthAndEmptyCredentialsFromPreferences() throws ConfigurationIncompleteException {
-        when(testPreferences.getAuth()).thenReturn(true);
         messageProcessorEndpointHttp = new MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null);
 
         messageProcessorEndpointHttp.checkConfigurationComplete();

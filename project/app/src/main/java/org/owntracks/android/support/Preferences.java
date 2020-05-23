@@ -417,12 +417,6 @@ public class Preferences {
         return getString(Keys.USERNAME, R.string.valEmpty);
     }
 
-    @Export(key =Keys.AUTH, exportModeMqttPrivate =true,exportModeHttpPrivate =true)
-    public  boolean getAuth() {
-        return getBoolean(Keys.AUTH, R.bool.valAuth);
-
-    }
-
     @Export(key =Keys.DEVICE_ID, exportModeMqttPrivate =true,exportModeHttpPrivate =true)
     public String getDeviceId() {
         return getDeviceId(true);
@@ -734,21 +728,9 @@ public class Preferences {
             setString(Keys.PASSWORD, password);
     }
 
-
-    @Import(key =Keys.USE_PASSWORD)
-    public void setUsePassword(boolean usePassword) {
-        setBoolean(Keys.USE_PASSWORD, usePassword);
-    }
-
     @Import(key =Keys.DEVICE_ID)
     public void setDeviceId(String deviceId) {
         setString(Keys.DEVICE_ID, deviceId);
-    }
-
-
-    @Import(key =Keys.AUTH)
-    public void setAuth(boolean auth) {
-        setBoolean(Keys.AUTH, auth);
     }
 
     @Import(key =Keys.TLS)
@@ -776,9 +758,6 @@ public class Preferences {
     public String getPassword() {
         return getString(Keys.PASSWORD, R.string.valEmpty);
     }
-
-    @Export(key =Keys.USE_PASSWORD, exportModeMqttPrivate =true)
-    public boolean getUsePassword() { return getBoolean(Keys.USE_PASSWORD, R.bool.valUsePassword); }
 
     @Export(key =Keys.TLS, exportModeMqttPrivate =true)
     public boolean getTls() {

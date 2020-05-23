@@ -245,11 +245,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private MqttConnectOptions getMqttConnectOptions() throws MqttConnectionException {
         MqttConnectOptions connectOptions = new MqttConnectOptions();
-        if (preferences.getAuth()) {
-            if (preferences.getUsePassword()) {
-                connectOptions.setPassword(preferences.getPassword().toCharArray());
-            }
+        if (!preferences.getUsername().trim().equals("")) {
             connectOptions.setUserName(preferences.getUsername());
+        }
+        if (!preferences.getPassword().equals("")) {
+            connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
         connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
         try {
@@ -424,12 +424,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         // When auth is enabled, password (unless usePassword is set to false which only sends username)
         if (preferences.getHost().trim().isEmpty()) {
             throw new ConfigurationIncompleteException("Host missing");
-        }
-        if (preferences.getUsername().trim().isEmpty()) {
-            throw new ConfigurationIncompleteException("Username missing");
-        }
-        if (preferences.getAuth() && (preferences.getPassword().trim().isEmpty() && !preferences.getUsePassword())) {
-            throw new ConfigurationIncompleteException("Authentication configured but password missing");
         }
     }
 
