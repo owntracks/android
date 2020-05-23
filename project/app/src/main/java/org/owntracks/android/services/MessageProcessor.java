@@ -28,10 +28,12 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -57,6 +59,9 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private boolean acceptMessages =  false;
     private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(100);
     private Thread backgroundDequeueThread;
+
+    private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
+    private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
 
     public void reconnect() {
         if(endpoint == null)
@@ -180,34 +185,21 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         switch (preferences.getModeId()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue,runThingsOnOtherThreads);
+                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, outgoingQueue,runThingsOnOtherThreads);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus);
         }
 
         if (backgroundDequeueThread == null || !backgroundDequeueThread.isAlive()) {
             // Create the background thread that will handle outbound msgs
-            backgroundDequeueThread = new Thread(this.endpoint.getBackgroundOutgoingRunnable());
+            backgroundDequeueThread = new Thread(this::sendAvailableMessages);
             backgroundDequeueThread.start();
         }
 
         this.endpoint.onCreateFromProcessor();
         acceptMessages = true;
-    }
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.ModeChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.EndpointChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
     }
 
     public void queueMessageForSending(MessageBase message) {
@@ -222,6 +214,79 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 }
             }
         }
+    }
+
+    // Should be on the background thread here, because we block
+    private void sendAvailableMessages() {
+        Timber.tag("outgoing").d("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
+        MessageBase lastFailedMessageToBeRetried = null;
+        long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+        while (true) {
+            try {
+                MessageBase message;
+                if (lastFailedMessageToBeRetried == null) {
+                    message = this.outgoingQueue.take(); // <--- blocks
+                } else {
+                    message = lastFailedMessageToBeRetried;
+                }
+
+                /*
+                We need to run the actual network sending part on a different thread because the
+                implementation might not be thread-safe. So we wrap `sendMessage()` up in a callable
+                and a FutureTask and then dispatch it off to the network thread, and block on the
+                return, handling any exceptions that might have been thrown.
+                */
+                Callable<Void> sendMessageCallable = () -> {
+                    this.endpoint.sendMessage(message);
+                    return null;
+                };
+                FutureTask<Void> futureTask = new FutureTask<>(sendMessageCallable);
+                runThingsOnOtherThreads.postOnNetworkHandlerDelayed(futureTask,1);
+                try {
+                    try {
+                        futureTask.get();
+                    } catch (ExecutionException e) {
+                        if (e.getCause()!=null) {
+                            throw e.getCause();
+                        } else {
+                            throw new Exception("sendMessage failed, but no exception actually given");
+                        }
+                    }
+                    lastFailedMessageToBeRetried = null;
+                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+                } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
+                    Timber.tag("outgoing").w(("Error sending message. Re-queueing"));
+                    lastFailedMessageToBeRetried = message;
+                } catch (IOException e) {
+                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+                    // Deserialization failure, drop and move on
+                } catch(Throwable e) {
+                    Timber.tag("outgoing").e(e,"Unhandled exception in sending message");
+                }
+                if (lastFailedMessageToBeRetried != null) {
+                    Thread.sleep(retryWait);
+                    retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
+                }
+            } catch (InterruptedException e) {
+                Timber.tag("outgoing").i(e, "Outgoing message loop interrupted");
+                break;
+            }
+        }
+        Timber.tag("outgoing").w("Exiting outgoingmessage loop");
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
+    public void onEvent(Events.ModeChanged event) {
+        acceptMessages = false;
+        loadOutgoingMessageProcessor();
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
+    public void onEvent(Events.EndpointChanged event) {
+        acceptMessages = false;
+        loadOutgoingMessageProcessor();
     }
 
      void onMessageDelivered(MessageBase messageBase) {

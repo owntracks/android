@@ -26,7 +26,6 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -45,10 +44,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -67,14 +63,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private Scheduler scheduler;
     private EventBus eventBus;
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, BlockingDeque<MessageBase> outgoingQueue, RunThingsOnOtherThreads runThingsOnOtherThreads) {
-        super(messageProcessor,runThingsOnOtherThreads);
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+        super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.messageProcessor = messageProcessor;
-        this.outgoingMessageQueue = outgoingQueue;
     }
 
     synchronized boolean sendKeepalive() {
@@ -241,7 +236,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             changeState(EndpointState.ERROR.withError(e));
             throw new MqttConnectionException(e);
         }
-        Timber.tag("outgoing").d("MQTT Connected success. Queue depth: %s", outgoingMessageQueue.size());
+        Timber.tag("outgoing").d("MQTT Connected success.");
         scheduler.scheduleMqttPing(mqttConnectOptions.getKeepAliveInterval());
         changeState(EndpointState.CONNECTED);
 
@@ -384,7 +379,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void disconnect(boolean fromUser) {
-        Timber.v("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
+        Timber.tag("outgoing").v("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
         if (isConnecting()) {
             return;
         }

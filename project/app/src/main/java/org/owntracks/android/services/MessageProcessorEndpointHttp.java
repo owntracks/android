@@ -14,14 +14,12 @@ import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -64,8 +62,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private Scheduler scheduler;
     private HttpUrl httpEndpoint;
 
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, Queue<MessageBase> outgoingQueue, RunThingsOnOtherThreads runThingsOnOtherThreads) {
-        super(messageProcessor, runThingsOnOtherThreads);
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+        super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
@@ -138,7 +136,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
 
     private OkHttpClient createHttpClient() {
-        Timber.v("creating new HTTP client instance");
+        Timber.tag("outgoing").d("creating new HTTP client instance");
         SocketFactory f = getSocketFactory();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .followRedirects(true)
@@ -187,7 +185,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         } catch (ConfigurationIncompleteException e) {
             return null;
         }
-        Timber.v("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
+        Timber.tag("outgoing").d("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
 
         String body;
         try {
@@ -219,7 +217,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             request.cacheControl(CacheControl.FORCE_NETWORK);
             return request.build();
         } catch (Exception e) {
-            Timber.e(e,"invalid header specified");
+            Timber.tag("outgoing").e(e,"invalid header specified");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
             httpEndpoint = null;
             return null;
@@ -240,41 +238,41 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         }
 
         try {
-            Response r = getHttpClient().newCall(request).execute();
+            Response response = getHttpClient().newCall(request).execute();
             // Message was send. Handle delivered message
-            if((r.isSuccessful())) {
-                Timber.v("request was successful");
+            if((response.isSuccessful())) {
+                Timber.tag("outgoing").d("request was successful: %s",response);
                 // Handle response
-                if(r.body() != null ) {
+                if(response.body() != null ) {
                     try {
 
-                        MessageBase[] result = parser.fromJson(r.body().byteStream());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("Response " + r.code() + ", " + result.length));
+                        MessageBase[] result = parser.fromJson(response.body().byteStream());
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("Response " + response.code() + ", " + result.length));
 
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
-                        Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("HTTP " +r.code() + ", JsonParseException"));
+                        Timber.tag("outgoing").e("error:JsonParseException responseCode:%s", response.code());
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("HTTP " +response.code() + ", JsonParseException"));
                     } catch (Parser.EncryptionException e) {
-                        Timber.e("error:JsonParseException responseCode:%s", r.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP: "+r.code() + ", EncryptionException"));
+                        Timber.tag("outgoing").e("error:JsonParseException responseCode:%s", response.code());
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP: "+response.code() + ", EncryptionException"));
                     }
 
                 }
-                r.close();
+                response.close();
             // Server could be contacted but returned non success HTTP code
             } else {
-                Timber.e("request was not successful. HTTP code %s", r.code());
-                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP code "+r.code() ));
+                Timber.tag("outgoing").e("request was not successful. HTTP code %s", response.code());
+                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP code "+response.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
-                r.close();
+                response.close();
                 return;
             }
         // Message was not send
         } catch (Exception e) {
-            Timber.e(e,"error:IOException. Delivery failed ");
+            Timber.tag("outgoing").e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
             return;
@@ -313,11 +311,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     @Override
     int getModeId() {
         return MODE_ID;
-    }
-
-    @Override
-    public Runnable getBackgroundOutgoingRunnable() {
-        return null;
     }
 
     @Override

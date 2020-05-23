@@ -19,17 +19,9 @@ import timber.log.Timber;
 
 public abstract class MessageProcessorEndpoint implements OutgoingMessageProcessor {
     MessageProcessor messageProcessor;
-    BlockingDeque<MessageBase> outgoingMessageQueue;
 
-    private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
-    private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
-
-
-    private RunThingsOnOtherThreads runThingsOnOtherThreads;
-
-    MessageProcessorEndpoint(MessageProcessor messageProcessor,RunThingsOnOtherThreads runThingsOnOtherThreads) {
+    MessageProcessorEndpoint(MessageProcessor messageProcessor) {
         this.messageProcessor = messageProcessor;
-        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
     }
 
     void onMessageReceived(MessageBase message) {
@@ -43,68 +35,6 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
     abstract int getModeId();
 
     abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException;
-
-    public Runnable getBackgroundOutgoingRunnable() {
-        return this::sendAvailableMessages;
-    }
-
-    private void sendAvailableMessages() {
-        Timber.tag("outgoing").d("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
-        MessageBase lastFailedMessageToBeRetried = null;
-        long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
-        while (true) {
-            try {
-                MessageBase message;
-                if (lastFailedMessageToBeRetried == null) {
-                    message = outgoingMessageQueue.take();
-                } else {
-                    message = lastFailedMessageToBeRetried;
-                }
-
-                /*
-                We need to run the actual network sending part on a different thread because the
-                implementation might not be thread-safe. So we wrap `sendMessage()` up in a callable
-                and a FutureTask and then dispatch it off to the network thread, and block on the
-                return, handling any exceptions that might have been thrown.
-                */
-                Callable<Void> sendMessageCallable = () -> {
-                    this.sendMessage(message);
-                    return null;
-                };
-                FutureTask<Void> futureTask = new FutureTask<>(sendMessageCallable);
-                runThingsOnOtherThreads.postOnNetworkHandlerDelayed(futureTask,1);
-                try {
-                    try {
-                        futureTask.get();
-                    } catch (ExecutionException e) {
-                        if (e.getCause()!=null) {
-                            throw e.getCause();
-                        } else {
-                            throw new Exception("sendMessage failed, but no exception actually given");
-                        }
-                    }
-                    lastFailedMessageToBeRetried = null;
-                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
-                } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
-                    Timber.tag("outgoing").w(("Error sending message. Re-queueing"));
-                    lastFailedMessageToBeRetried = message;
-                } catch (IOException e) {
-                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
-                    // Deserialization failure, drop and move on
-                } catch(Throwable e) {
-                    Timber.tag("outgoing").e(e,"Unhandled exception in sending message");
-                }
-                if (lastFailedMessageToBeRetried != null) {
-                    Thread.sleep(retryWait);
-                    retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
-                }
-            } catch (InterruptedException e) {
-                Timber.tag("outgoing").i(e, "Outgoing message loop interrupted");
-                break;
-            }
-        }
-        Timber.tag("outgoing").w("Exiting outgoingmessage loop");
-    }
 }
 
 class OutgoingMessageSendingException extends Exception {
