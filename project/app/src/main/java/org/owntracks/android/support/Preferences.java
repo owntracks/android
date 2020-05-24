@@ -698,7 +698,7 @@ public class Preferences {
     }
     @Import(key =Keys.LOCATOR_PRIORITY)
     private void setLocatorPriority(int anInt) {
-        if(anInt > 0 && anInt <= 3) {
+        if(anInt >= 0 && anInt <= 3) {
             setInt(Keys.LOCATOR_PRIORITY, anInt);
         } else {
             Timber.e("invalid locator priority specified %s", anInt);
