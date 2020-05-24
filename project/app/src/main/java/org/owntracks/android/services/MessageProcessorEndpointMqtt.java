@@ -99,8 +99,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         try {
             IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), parser.toJsonBytes(m), m.getQos(), m.getRetained());
+            long startTime = System.nanoTime();
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
-            Timber.tag("outgoing").d("message sent: %s", messageId);
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime);
+            Timber.tag("outgoing").d("message id %s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
             messageProcessor.onMessageDelivered(m);
         } catch (MqttException e) {
             Timber.tag("outgoing").e(e, "MQTT Exception delivering message");
@@ -189,7 +192,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @WorkerThread
     private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException {
-        Timber.tag("outgoing").d("Connecting to broker. ThreadId: %s",Thread.currentThread());
+        Timber.tag("outgoing").d("Connecting to broker. ThreadId: %s", Thread.currentThread());
         sendMessageConnectPressure++;
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();

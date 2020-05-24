@@ -45,7 +45,19 @@
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/accent"
+            />
+        <com.rengwuxian.materialedittext.MaterialEditText
 
+            android:id="@+id/clientId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/preferencesClientId"
+
+            android:inputType="textNoSuggestions"
+            android:text="@={vm.clientId}"
+            app:met_baseColor="@color/textPrimary"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/accent"
             />
 
         <RelativeLayout

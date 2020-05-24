@@ -467,7 +467,7 @@ public class Preferences {
     }
 
     private String getClientIdDefault() {
-        return (getUsername()+ getDeviceId()).replaceAll("\\W", "").toLowerCase();
+        return (getUsername() + getDeviceId()).replaceAll("\\W", "").toLowerCase();
     }
 
     @Import(key =Keys.CLIENT_ID)

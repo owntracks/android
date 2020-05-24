@@ -122,7 +122,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             if (message == null) {
                 if (error != null) {
                     if (error instanceof MqttException && error.getCause() != null)
-                        return String.format("MQTT Error: %s", error.getCause().getMessage());
+                        return String.format("MQTT Error: %s", error.getMessage());
                     else
                         return error.getMessage();
                 } else {

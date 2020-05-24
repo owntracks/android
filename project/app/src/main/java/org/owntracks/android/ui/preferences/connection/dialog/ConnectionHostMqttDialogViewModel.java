@@ -11,6 +11,8 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
     private boolean portDirty;
     private boolean ws;
     private boolean wsDirty;
+    private String clientId;
+    private boolean clientIdDirty;
 
     public ConnectionHostMqttDialogViewModel(Preferences preferences) {
         super(preferences);
@@ -26,11 +28,12 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
         this.host = preferences.getHost();
         this.port = preferences.getPortWithHintSupport();
         this.ws = preferences.getWs();
+        this.clientId = preferences.getClientId();
     }
 
     @Override
     public void save() {
-        Timber.v("saving host:%s, port:%s, ws:%s", host, port, ws);
+        Timber.v("saving host:%s, port:%s, ws:%s, clientId:%s", host, port, ws, clientId);
         if(hostDirty) {
             preferences.setHost(host);
         }
@@ -45,6 +48,9 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
 
         if(wsDirty) {
             preferences.setWs(ws);
+        }
+        if (clientIdDirty) {
+            preferences.setClientId(clientId);
         }
     }
 
@@ -73,6 +79,14 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
     public void setWs(boolean ws) {
         this.ws = ws;
         this.wsDirty = true;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+        this.clientIdDirty=true;
     }
 }
 
