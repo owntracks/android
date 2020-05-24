@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import dagger.android.DaggerBroadcastReceiver;
 import timber.log.Timber;
 
-public class BootCompleteReceiver extends DaggerBroadcastReceiver {
+public class StartBackgroundServiceReceiver extends DaggerBroadcastReceiver {
 	@Inject
     Preferences preferences;
 

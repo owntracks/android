@@ -14,6 +14,7 @@ import org.owntracks.android.injection.modules.android.ServiceModules.Background
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
+import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -66,7 +67,7 @@ public abstract class AndroindBindingModule {
 
     @PerReceiver
     @ContributesAndroidInjector
-    abstract org.owntracks.android.support.receiver.BootCompleteReceiver bindBootCompleteReceiver();
+    abstract StartBackgroundServiceReceiver bindBackgroundServiceReceiver();
 
     @PerReceiver
     @ContributesAndroidInjector
