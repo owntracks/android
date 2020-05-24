@@ -245,10 +245,16 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private MqttConnectOptions getMqttConnectOptions() throws MqttConnectionException {
         MqttConnectOptions connectOptions = new MqttConnectOptions();
+        /* Even though the MQTT spec supports various different combinations of setting the username
+        & password flags to allow and differentiate between no usernames, empty usernames etc. there's
+        too many permutations of these to usefully expose to the end user. So, to simplify: if the
+        username is not the empty string, send the username and password. If it is empty, then don't
+        send either.
+
+        This might change depending on what users want.
+         */
         if (!preferences.getUsername().trim().equals("")) {
             connectOptions.setUserName(preferences.getUsername());
-        }
-        if (!preferences.getPassword().equals("")) {
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
         connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
