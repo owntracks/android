@@ -19,8 +19,10 @@ jobs:
       with:
         java-version: 11
     - name: Build with Gradle
-      run: ./gradlew test
-      working-directory: project
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
       timeout-minutes: 10
     - uses: growse/xunit-mattermost-reporter@v1
       with:
