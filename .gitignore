@@ -56,4 +56,5 @@ project/app/owntracks-*.json
 
 # Objectbox binaries
 project/app/libobjectbox-*.so
+project/app/libobjectbox-*.dylib
 project/app/objectbox-*.dll
