@@ -2,6 +2,9 @@ plugins {
     id("com.github.triplet.play") version "2.6.2"
     id("com.android.application")
     id("io.objectbox")
+    id("kotlin-android")
+    id("kotlin-android-extensions")
+    id("com.hiya.jacoco-android")
 }
 
 def versionMajor = 2
@@ -119,8 +122,6 @@ android {
 }
 
 apply from: "publishing.gradle"
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply from: "dependencies.gradle"
 
 repositories {
