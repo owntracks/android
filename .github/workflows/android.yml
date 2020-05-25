@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: 11
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew assembleDebug
       working-directory: project
       timeout-minutes: 10
     - name: Test with Gradle on the emulator
@@ -29,7 +29,10 @@ jobs:
         script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
       timeout-minutes: 10
     - name: Gather xunit files into a single dir
-      run: mkdir -p ./project/app/build/test-results/collected/ && cp ./project/app/build/test-results/testDebugUnitTest/*.xml ./project/app/build/test-results/collected/ && cp ./project/app/build/outputs/androidTest-results/connected/*.xml ./project/app/build/test-results/collected/
+      run: | 
+          mkdir -p ./project/app/build/test-results/collected/
+          cp -v ./project/app/build/test-results/testDebugUnitTest/*.xml ./project/app/build/test-results/collected/ || true
+          cp -v ./project/app/build/outputs/androidTest-results/connected/*.xml ./project/app/build/test-results/collected/ || true
       if: always()
     - uses: growse/xunit-mattermost-reporter@v1
       with:
