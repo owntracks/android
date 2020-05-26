@@ -22,18 +22,19 @@ jobs:
       run: ./gradlew assembleDebug
       working-directory: project
       timeout-minutes: 10
+    - name: Run unit tests
+      run: ./gradlew check test
+      working-directory: project
+      timeout-minutes: 10
     - name: Test with Gradle on the emulator api=29
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
+        script: cd project && ./gradlew connectedAndroidTest
       timeout-minutes: 10
-    - name: Test with Gradle on the emulator api=21
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 21
-        script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
-      timeout-minutes: 10
+    - name: Collect coverage reports
+      run: ./gradlew jacocoTestReport
+      working-directory: project
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
