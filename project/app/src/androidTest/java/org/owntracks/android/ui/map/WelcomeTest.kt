@@ -4,6 +4,7 @@ package org.owntracks.android.ui.map
 import android.view.View
 import android.view.ViewGroup
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -21,7 +22,7 @@ import org.owntracks.android.R
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class StartupTest {
+class WelcomeTest {
 
     @Rule
     @JvmField
@@ -29,12 +30,12 @@ class StartupTest {
 
     @Rule
     @JvmField
-    var mGrantPermissionRule =
+    var mGrantPermissionRule: GrantPermissionRule =
             GrantPermissionRule.grant(
                     "android.permission.ACCESS_FINE_LOCATION")
 
     @Test
-    fun startupTest() {
+    fun welcomeTest() {
         val textView = onView(
                 allOf(withId(R.id.screen_heading), withText("Welcome"),
                         childAtPosition(
@@ -43,6 +44,10 @@ class StartupTest {
                                 1),
                         isDisplayed()))
         textView.check(matches(withText("Welcome")))
+        onView(withId(R.id.btn_next)).check(matches(isEnabled()))
+        onView(withId(R.id.btn_next)).perform(click())
+        onView(withId(R.id.btn_next)).perform(click())
+        onView(withId(R.id.done)).check(matches(isEnabled()))
     }
 
     private fun childAtPosition(

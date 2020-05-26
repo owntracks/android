@@ -35,6 +35,13 @@ jobs:
     - name: Collect coverage reports
       run: ./gradlew jacocoTestReport
       working-directory: project
+      if: always()
+    - name: Upload test result artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: project/app/build/test-results/collected
+      if: always()
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
@@ -47,11 +54,6 @@ jobs:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/collected/"
       if: always()
-    - name: Upload test result artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: project/app/build/test-results/collected
   publish:
     name: Publish
     runs-on: ubuntu-latest
