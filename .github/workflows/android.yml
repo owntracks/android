@@ -22,10 +22,16 @@ jobs:
       run: ./gradlew assembleDebug
       working-directory: project
       timeout-minutes: 10
-    - name: Test with Gradle on the emulator
+    - name: Test with Gradle on the emulator api=29
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
+        script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
+      timeout-minutes: 10
+    - name: Test with Gradle on the emulator api=21
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 21
         script: cd project && ./gradlew test connectedAndroidTest check jacocoTestReport
       timeout-minutes: 10
     - name: Gather xunit files into a single dir
@@ -40,7 +46,7 @@ jobs:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/collected/"
       if: always()
-    - name: Upload artifacts
+    - name: Upload test result artifact
       uses: actions/upload-artifact@v2
       with:
         name: test-results
