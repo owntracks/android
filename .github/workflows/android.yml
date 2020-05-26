@@ -34,11 +34,17 @@ jobs:
           cp -v ./project/app/build/test-results/testDebugUnitTest/*.xml ./project/app/build/test-results/collected/ || true
           cp -v ./project/app/build/outputs/androidTest-results/connected/*.xml ./project/app/build/test-results/collected/ || true
       if: always()
-    - uses: growse/xunit-mattermost-reporter@v1
+    - name: Report Test results
+      uses: growse/xunit-mattermost-reporter@v1
       with:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/collected/"
       if: always()
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: project/app/build/test-results/collected
   publish:
     name: Publish
     runs-on: ubuntu-latest
