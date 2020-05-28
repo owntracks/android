@@ -33,7 +33,7 @@ jobs:
         script: cd project && ./gradlew connectedAndroidTest
       timeout-minutes: 10
     - name: Collect coverage reports
-      run: ./gradlew jacocoTestReport
+      run: ./gradlew jacocoCombinedTestReport
       working-directory: project
       if: always()
     - name: Upload test result artifact
