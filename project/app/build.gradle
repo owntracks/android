@@ -16,7 +16,6 @@ def versionBuild = 0 // This value is managed by the gradle publisher plugin. Bu
 android {
     compileSdkVersion 29
     ndkVersion "21.1.6352462" //TODO Remove this once GH actions are fixed
-    testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
@@ -118,6 +117,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildToolsVersion = '29.0.3'
 }

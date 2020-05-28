@@ -55,10 +55,9 @@ public class DrawerProvider  {
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
-    private SecondaryDrawerItem secondaryDrawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleRessource, @DrawableRes int iconResource) {
-
+    private SecondaryDrawerItem secondaryDrawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleResource, @DrawableRes int iconResource) {
         SecondaryDrawerItem sdi = new SecondaryDrawerItem();
-        sdi.withName(activeActivity.getString(targetActivityTitleRessource));
+        sdi.withName(activeActivity.getString(targetActivityTitleResource));
         sdi.withIcon(iconResource);
         sdi.withIconColorRes(COLOR_ICON_SECONDARY);
         sdi.withSelectedIconColorRes(COLOR_ICON_SECONDARY_ACTIVE);
@@ -84,6 +83,7 @@ public class DrawerProvider  {
         d.withToolbar(toolbar);
         d.withStickyFooterShadow(false);
         d.withStickyFooterDivider(true);
+
 
         // Add the top drawer items
         d.addDrawerItems(

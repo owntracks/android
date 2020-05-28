@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -10,9 +11,11 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.not
 import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +28,15 @@ class FirstStartWelcomeNoLocationPermissionTest {
 
     @Rule
     @JvmField
-    var mActivityTestRule = ActivityScenarioRule(MapActivity::class.java)
+    var activityScenarioRule = ActivityScenarioRule(MapActivity::class.java).apply {
+        val context = getInstrumentation().targetContext
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .clear()
+                .putBoolean("firstStart", false)
+                .putBoolean("setupNotCompleted", true)
+                .commit()
+    }
 
     @Test
     fun welcomeTest() {
@@ -40,7 +51,7 @@ class FirstStartWelcomeNoLocationPermissionTest {
         onView(withId(R.id.btn_next)).check(matches(isEnabled()))
         onView(withId(R.id.btn_next)).perform(click())
         onView(withId(R.id.btn_next)).perform(click())
-        onView(withId(R.id.btn_next)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.btn_next)).check(matches(not(isDisplayed())))
         onView(withId(R.id.fix_permissions_button)).check(matches(isDisplayed()))
     }
 

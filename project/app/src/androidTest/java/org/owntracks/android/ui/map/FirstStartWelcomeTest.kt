@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -10,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -26,11 +28,19 @@ class FirstStartWelcomeTest {
 
     @Rule
     @JvmField
-    var mActivityTestRule = ActivityScenarioRule(MapActivity::class.java)
+    var activityScenarioRule = ActivityScenarioRule(MapActivity::class.java).apply {
+        val context = getInstrumentation().targetContext
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .clear()
+                .putBoolean("firstStart", false)
+                .putBoolean("setupNotCompleted", true)
+                .commit()
+    }
 
     @Rule
     @JvmField
-    var mGrantPermissionRule: GrantPermissionRule =
+    var grantPermissionRule: GrantPermissionRule =
             GrantPermissionRule.grant(
                     "android.permission.ACCESS_FINE_LOCATION")
 
