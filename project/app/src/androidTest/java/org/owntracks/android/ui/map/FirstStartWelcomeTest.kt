@@ -45,7 +45,6 @@ class FirstStartWelcomeTest {
     var grantPermissionRule: GrantPermissionRule =
             GrantPermissionRule.grant(
                     "android.permission.ACCESS_FINE_LOCATION")
-
     @Test
     fun welcomeTest() {
         val textView = onView(

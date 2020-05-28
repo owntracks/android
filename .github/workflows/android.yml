@@ -51,8 +51,8 @@ jobs:
     - name: Upload connected test result artifact
       uses: actions/upload-artifact@v2
       with:
-        name: unit-test-results
-        path: project/app/build/outputs/androidTest-results/connected
+        name: connected-test-results
+        path: project/app/build/
       if: always()
     - name: Report Test results
       uses: growse/xunit-mattermost-reporter@v1
