@@ -85,7 +85,7 @@ public class Scheduler {
         WorkRequest mqttReconnectWorkRequest =
                 new PeriodicWorkRequest.Builder(MQTTReconnectWorker.class, MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                         .addTag(PERIODIC_TASK_MQTT_RECONNECT)
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
+                        .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.SECONDS)
                         .setConstraints(anyNetworkConstraint)
                         .build();
 
