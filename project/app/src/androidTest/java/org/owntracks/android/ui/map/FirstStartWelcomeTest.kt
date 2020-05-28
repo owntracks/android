@@ -22,7 +22,7 @@ import org.owntracks.android.R
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class WelcomeTest {
+class FirstStartWelcomeTest {
 
     @Rule
     @JvmField
