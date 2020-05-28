@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map
 
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.preference.PreferenceManager
@@ -36,6 +37,7 @@ class FirstStartWelcomeNoLocationPermissionTest {
                 .putBoolean("firstStart", false)
                 .putBoolean("setupNotCompleted", true)
                 .commit()
+        context.getSharedPreferences("org.owntracks.android.preferences.private", Context.MODE_PRIVATE).edit().clear().apply()
     }
 
     @Test

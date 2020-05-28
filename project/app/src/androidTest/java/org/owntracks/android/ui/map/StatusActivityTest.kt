@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -29,7 +30,8 @@ class StatusActivityTest {
                 .clear()
                 .putBoolean("firstStart", false)
                 .putBoolean("setupNotCompleted", false)
-                .commit()
+                .apply()
+        context.getSharedPreferences("org.owntracks.android.preferences.private", Context.MODE_PRIVATE).edit().clear().apply()
     }
 
     @Rule
@@ -43,6 +45,6 @@ class StatusActivityTest {
         onView(withContentDescription("Open")).check(matches(isDisplayed()))
         onView(withContentDescription("Open")).perform(click())
         onView(withText(R.string.title_activity_status)).perform(click())
-        onView(withId(R.id.connectedStatus)).check(matches(isDisplayed()))
+        onView(withId(R.id.connectedStatus)).check(matches((isDisplayed())))
     }
 }
