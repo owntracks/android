@@ -18,6 +18,7 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.hamcrest.TypeSafeMatcher
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,7 @@ import org.owntracks.android.R
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@Ignore
 class FirstStartWelcomeNoLocationPermissionTest {
 
     @Rule
