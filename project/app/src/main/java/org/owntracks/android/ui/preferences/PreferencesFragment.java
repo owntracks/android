@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.preferences;
 
 import android.Manifest;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -42,11 +41,11 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasFragmentInjector;
+import dagger.android.HasAndroidInjector;
 import timber.log.Timber;
 
 // Class cannot extend BaseFragement. BaseSupportFragment methods are implemented directly.
-public class PreferencesFragment extends PreferenceFragment implements PreferencesFragmentMvvm.View, Preference.OnPreferenceClickListener, HasFragmentInjector {
+public class PreferencesFragment extends PreferenceFragment implements PreferencesFragmentMvvm.View, Preference.OnPreferenceClickListener, HasAndroidInjector {
     private static final String UI_SCREEN_ROOT = "root";
     private static final String UI_SCREEN_CONNECTION = "connectionScreen";
 
@@ -64,10 +63,10 @@ public class PreferencesFragment extends PreferenceFragment implements Preferenc
     Navigator navigator;
 
     @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
+    DispatchingAndroidInjector<Object> fragmentInjector;
 
     @Override
-    public final AndroidInjector<Fragment> fragmentInjector() {
+    public AndroidInjector<Object> androidInjector() {
         return fragmentInjector;
     }
 

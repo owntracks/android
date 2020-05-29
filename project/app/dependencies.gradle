@@ -1,8 +1,9 @@
-ext.daggerVersion = '2.23'
+ext.daggerVersion = '2.27'
 ext.playLibVersion = '17.0.0'
 ext.okHttpVersion = '3.13.1'
-ext.jacksonVersion = '2.9.8'
+ext.jacksonVersion = '2.9.9'
 ext.materialDialogsVersion = '0.9.6.0'
+ext.objectboxVersion = '2.5.1'
 
 dependencies {
 
@@ -40,21 +41,30 @@ dependencies {
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { transitive = true }
     implementation "com.mikepenz:materialize:1.2.1@aar"
 
-    implementation "androidx.core:core-ktx:1.2.0"
+    implementation "androidx.core:core-ktx:1.3.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    implementation "io.objectbox:objectbox-android:$objectboxVersion"
+    kapt "io.objectbox:objectbox-processor:$objectboxVersion"
+    // some useful Kotlin extension functions
+    implementation "io.objectbox:objectbox-kotlin:$objectboxVersion"
+
     // These Java EE libs are no longer included in JDKs, so we include explicitly
+    kapt 'javax.xml.bind:jaxb-api:2.3.1'
+    kapt 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    kapt 'com.sun.xml.bind:jaxb-impl:2.3.2'
     annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
     annotationProcessor 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.2'
 
-    // Preprocessors
-    annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.1.1"
-    annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
-    testAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
-    testAnnotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
+    // Preprocessors
+    kapt "org.greenrobot:eventbus-annotation-processor:3.1.1"
+    kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    kapt "com.google.dagger:dagger-android-processor:${daggerVersion}"
+
+    kaptTest "com.google.dagger:dagger-compiler:${daggerVersion}"
+    kaptTest "com.google.dagger:dagger-android-processor:${daggerVersion}"
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.24.5"
@@ -63,9 +73,9 @@ dependencies {
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-beta02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc01'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0-beta02'
+    androidTestImplementation 'androidx.test:rules:1.3.0-rc01'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test:core-ktx:1.2.0'
 

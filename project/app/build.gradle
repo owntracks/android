@@ -2,9 +2,11 @@
 plugins {
     id("com.github.triplet.play") version "2.6.2"
     id("com.android.application")
+
     id("io.objectbox")
     id("kotlin-android")
     id("kotlin-android-extensions")
+    id("kotlin-kapt")
     id("com.hiya.jacoco-android")
 }
 
