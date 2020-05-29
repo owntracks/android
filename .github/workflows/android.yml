@@ -30,12 +30,8 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: cd project && ./gradlew connectedAndroidTest --info --stacktrace
+        script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport --info
       timeout-minutes: 10
-    - name: Collect coverage reports
-      run: ./gradlew jacocoCombinedTestReport
-      working-directory: project
-      if: always()
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
@@ -52,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: connected-test-results
-        path: project/app/build/
+        path: project/app/build/outputs
       if: always()
     - name: Report Test results
       uses: growse/xunit-mattermost-reporter@v1
