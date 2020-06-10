@@ -17,7 +17,6 @@ def versionBuild = 0 // This value is managed by the gradle publisher plugin. Bu
 
 android {
     compileSdkVersion 29
-    ndkVersion "21.1.6352462" //TODO Remove this once GH actions are fixed
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
