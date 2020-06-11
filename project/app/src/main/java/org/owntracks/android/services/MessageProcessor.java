@@ -260,11 +260,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     @Override
     public void processIncomingMessage(MessageBase message) {
-        Timber.tag("incoming").v("type:base, key:%s", message.getContactKey());
+        Timber.tag("incoming").d("type:base, key:%s", message.getContactKey());
     }
 
     public void processIncomingMessage(MessageUnknown message) {
-        Timber.tag("incoming").v("type:unknown, key:%s", message.getContactKey());
+        Timber.tag("incoming").i("type:unknown, key:%s", message.getContactKey());
     }
 
     @Override
@@ -291,7 +291,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Override
     public void processIncomingMessage(MessageCmd message) {
         if(!preferences.getRemoteCommand()) {
-            Timber.tag("incoming").e("remote commands are disabled");
+            Timber.tag("incoming").w("remote commands are disabled");
             return;
         }
 
@@ -307,8 +307,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
         }
 
         for(String cmd : actions.split(",")) {
-
-            switch (cmd) {
+            switch (cmd.trim()) {
                 case MessageCmd.ACTION_REPORT_LOCATION:
                     if(message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
                         Timber.tag("incoming").e("command not supported in HTTP mode: %s", cmd);
