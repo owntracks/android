@@ -63,6 +63,25 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
     private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
 
+    @Inject
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge,RunThingsOnOtherThreads runThingsOnOtherThreads) {
+        this.preferences = preferences;
+        this.eventBus = eventBus;
+        this.contactsRepo = contactsRepo;
+        this.waypointsRepo = waypointsRepo;
+        this.parser = parser;
+        this.scheduler = scheduler;
+        this.locationProcessorLazy = locationProcessorLazy;
+        this.serviceBridge = serviceBridge;
+        this.eventBus.register(this);
+        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+    }
+
+    public void initialize() {
+        onEndpointStateChanged(EndpointState.INITIAL);
+        runThingsOnOtherThreads.postOnNetworkHandlerDelayed(this::reconnect,0);
+    }
+
     public void reconnect() {
         if(endpoint == null)
             loadOutgoingMessageProcessor();
@@ -103,78 +122,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
         return false;
     }
 
-    public enum EndpointState {
-        INITIAL,
-        IDLE,
-        CONNECTING,
-        CONNECTED,
-        DISCONNECTING,
-        DISCONNECTED,
-        DISCONNECTED_USERDISCONNECT,
-        ERROR,
-        ERROR_DATADISABLED,
-        ERROR_CONFIGURATION;
-
-        String message;
-        private Throwable error;
-
-        public String getMessage() {
-            if (message == null) {
-                if (error != null) {
-                    if (error instanceof MqttException && error.getCause() != null)
-                        return String.format("MQTT Error: %s", error.getMessage());
-                    else
-                        return error.getMessage();
-                } else {
-                    return null;
-                }
-            }
-            return message;
-        }
-
-        public Throwable getError() {
-            return error;
-        }
-        public EndpointState withMessage(String message) {
-            this.message = message;
-            return this;
-        }
-
-
-        public String getLabel(Context context) {
-            Resources res = context.getResources();
-            int resId = res.getIdentifier(this.name(), "string", context.getPackageName());
-            if (0 != resId) {
-                return (res.getString(resId));
-            }
-            return (name());
-        }
-
-        public EndpointState withError(Throwable error) {
-            this.error = error;
-            return this;
-        }
-    }
-
-    @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge,RunThingsOnOtherThreads runThingsOnOtherThreads) {
-        this.preferences = preferences;
-        this.eventBus = eventBus;
-        this.contactsRepo = contactsRepo;
-        this.waypointsRepo = waypointsRepo;
-        this.parser = parser;
-        this.scheduler = scheduler;
-        this.locationProcessorLazy = locationProcessorLazy;
-        this.serviceBridge = serviceBridge;
-        this.eventBus.register(this);
-        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
-    }
-
-    public void initialize() {
-        onEndpointStateChanged(EndpointState.INITIAL);
-        loadOutgoingMessageProcessor();
-    }
-
     private void loadOutgoingMessageProcessor(){
         Timber.tag("outgoing").d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
         if(endpoint != null) {
@@ -190,6 +137,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
                 this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus);
+
         }
 
         if (backgroundDequeueThread == null || !backgroundDequeueThread.isAlive()) {
@@ -403,5 +351,58 @@ public class MessageProcessor implements IncomingMessageProcessor {
     @Override
     public void processIncomingMessage(MessageTransition message) {
         eventBus.post(message);
+    }
+
+    public enum EndpointState {
+        INITIAL,
+        IDLE,
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTING,
+        DISCONNECTED,
+        DISCONNECTED_USERDISCONNECT,
+        ERROR,
+        ERROR_DATADISABLED,
+        ERROR_CONFIGURATION;
+
+        String message;
+        private Throwable error;
+
+        public String getMessage() {
+            if (message == null) {
+                if (error != null) {
+                    if (error instanceof MqttException && error.getCause() != null)
+                        return String.format("MQTT Error: %s", error.getMessage());
+                    else
+                        return error.getMessage();
+                } else {
+                    return null;
+                }
+            }
+            return message;
+        }
+
+        public Throwable getError() {
+            return error;
+        }
+        public EndpointState withMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+
+        public String getLabel(Context context) {
+            Resources res = context.getResources();
+            int resId = res.getIdentifier(this.name(), "string", context.getPackageName());
+            if (0 != resId) {
+                return (res.getString(resId));
+            }
+            return (name());
+        }
+
+        public EndpointState withError(Throwable error) {
+            this.error = error;
+            return this;
+        }
     }
 }
