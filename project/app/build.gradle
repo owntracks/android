@@ -72,10 +72,10 @@ android {
         }
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
     }
-
 
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
