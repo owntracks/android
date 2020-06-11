@@ -183,9 +183,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         switch (item.getItemId()) {
             case R.id.connect:
                 if(messageProcessor.isEndpointConfigurationComplete()) {
-                    // TODO work out how to reconnect on the background thread
-                    Runnable r = () -> messageProcessor.reconnect();
-                    runThingsOnOtherThreads.postOnNetworkHandlerDelayed(r, 1);
+                    messageProcessor.reconnect();
                 } else {
                     Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();
                 }

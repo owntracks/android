@@ -79,7 +79,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     public void initialize() {
         onEndpointStateChanged(EndpointState.INITIAL);
-        runThingsOnOtherThreads.postOnNetworkHandlerDelayed(this::reconnect,0);
+        reconnect();
     }
 
     public void reconnect() {
@@ -136,7 +136,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads);
 
         }
 

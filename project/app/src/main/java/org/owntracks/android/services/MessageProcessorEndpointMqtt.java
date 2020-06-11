@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Looper;
 
@@ -14,7 +15,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
@@ -26,6 +26,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
+import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -48,7 +49,9 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor {
+import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
+
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, Preferences.OnPreferenceChangedListener {
     public static final int MODE_ID = 0;
 
     private CustomMqttClient mqttClient;
@@ -57,19 +60,22 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private static EndpointState state;
 
     private MessageProcessor messageProcessor;
+    private RunThingsOnOtherThreads runThingsOnOtherThreads;
 
     private Parser parser;
     private Preferences preferences;
     private Scheduler scheduler;
     private EventBus eventBus;
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.messageProcessor = messageProcessor;
+        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+        preferences.registerOnPreferenceChangedListener(this);
     }
 
     synchronized boolean sendKeepalive() {
@@ -414,6 +420,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     public void reconnect() {
+        if (!Thread.currentThread().getName().equals(NETWORK_HANDLER_THREAD_NAME)) {
+            runThingsOnOtherThreads.postOnNetworkHandlerDelayed(this::reconnect, 0);
+            return;
+        }
         disconnect(false);
         try {
             connectToBroker();
@@ -462,14 +472,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         return state;
     }
 
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe
-    public void onEvent(Events.EndpointChanged e) {
-        reconnect();
-    }
-
-
     @Override
     public void onDestroy() {
         disconnect(false);
@@ -483,6 +485,34 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             scheduler.scheduleMqttReconnect();
         } catch (ConfigurationIncompleteException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
+        }
+    }
+
+    @Override
+    public void onAttachAfterModeChanged() {
+        //NOOP
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (preferences.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+            return;
+        }
+        if (Preferences.Keys.MQTT_PROTOCOL_LEVEL.equals(key) ||
+                Preferences.Keys.HOST.equals(key) ||
+                Preferences.Keys.PASSWORD.equals(key) ||
+                Preferences.Keys.PORT.equals(key) ||
+                Preferences.Keys.CLIENT_ID.equals(key) ||
+                Preferences.Keys.TLS.equals(key) ||
+                Preferences.Keys.TLS_CA_CRT.equals(key) ||
+                Preferences.Keys.TLS_CLIENT_CRT.equals(key) ||
+                Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||
+                Preferences.Keys.WS.equals(key) ||
+                Preferences.Keys.DEVICE_ID.equals(key)
+
+        ) {
+            Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
+            reconnect();
         }
     }
 

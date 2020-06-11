@@ -561,7 +561,6 @@ public class Preferences {
     @Import(key =Keys.HOST)
     public void setHost(String value) {
         setString(Keys.HOST, value);
-        eventBus.post(new Events.EndpointChanged());
     }
 
     public void setPortDefault() {
