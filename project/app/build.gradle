@@ -17,7 +17,7 @@ def versionBuild = 0 // This value is managed by the gradle publisher plugin. Bu
 
 android {
     compileSdkVersion 29
-    ndkVersion "21.2.6472646" //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
+    ndkVersion "21.3.6528147" //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
