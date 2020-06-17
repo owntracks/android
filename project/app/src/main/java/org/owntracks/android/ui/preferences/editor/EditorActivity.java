@@ -130,7 +130,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
 
         // Set autocomplete items
         MaterialAutoCompleteTextView view = layout.findViewById(R.id.inputKey);
-        view.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Preferences.getImportKeys()));
+        view.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, preferences.getImportKeys()));
     }
 
     @Override
