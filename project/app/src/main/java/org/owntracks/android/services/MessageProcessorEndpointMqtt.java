@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
 import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
@@ -498,18 +499,17 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         if (preferences.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
             return;
         }
-        if (Preferences.Keys.MQTT_PROTOCOL_LEVEL.equals(key) ||
-                Preferences.Keys.HOST.equals(key) ||
-                Preferences.Keys.PASSWORD.equals(key) ||
-                Preferences.Keys.PORT.equals(key) ||
-                Preferences.Keys.CLIENT_ID.equals(key) ||
-                Preferences.Keys.TLS.equals(key) ||
-                Preferences.Keys.TLS_CA_CRT.equals(key) ||
-                Preferences.Keys.TLS_CLIENT_CRT.equals(key) ||
-                Preferences.Keys.TLS_CLIENT_CRT_PASSWORD.equals(key) ||
-                Preferences.Keys.WS.equals(key) ||
-                Preferences.Keys.DEVICE_ID.equals(key)
-
+        if (preferences.getPreferenceKey(R.string.preferenceKeyMqttProtocolLevel).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyHost).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyPort).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyClientId).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyTLS).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrtPassword).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyWS).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)
         ) {
             Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
             reconnect();
