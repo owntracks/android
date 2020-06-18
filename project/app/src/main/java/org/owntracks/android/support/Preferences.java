@@ -2,10 +2,7 @@ package org.owntracks.android.support;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
-
-import androidx.preference.PreferenceManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BuildConfig;
@@ -17,6 +14,8 @@ import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 import org.owntracks.android.services.worker.Scheduler;
+import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
+import org.owntracks.android.support.preferences.PreferencesStore;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,7 +27,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,48 +38,31 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1
 import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1_1;
 import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_DEFAULT;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
 @PerApplication
 public class Preferences {
-    private static final String FILENAME_PRIVATE = "org.owntracks.android.preferences.private";
-    private static final String FILENAME_HTTP = "org.owntracks.android.preferences.http";
-
-    private static SharedPreferences activeSharedPreferences;
-    private static SharedPreferences sharedPreferences;
-
-    private static SharedPreferences privateSharedPreferences;
-    private static SharedPreferences httpSharedPreferences;
-
     private static int modeId = MessageProcessorEndpointMqtt.MODE_ID;
     private final Context context;
     private final EventBus eventBus;
-    private String sharedPreferencesName;
     private boolean isFirstStart = false;
+    private PreferencesStore preferencesStore;
 
     public String getSharedPreferencesName() {
-        return sharedPreferencesName;
+        return preferencesStore.getSharedPreferencesName();
     }
 
     @Inject
-    public Preferences(@AppContext Context c, EventBus eventBus) {
+    public Preferences(@AppContext Context c, EventBus eventBus, PreferencesStore preferencesStore) {
+        this.preferencesStore = preferencesStore;
         Timber.v("initializing");
         this.context = c;
         this.eventBus = eventBus;
-        activeSharedPreferencesChangeListener = new LinkedList<>();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c); // only used for modeId and firstStart keys
-        privateSharedPreferences = c.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE);
-        httpSharedPreferences = c.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE);
 
-        initMode(sharedPreferences.getInt(getPreferenceKey(R.string.preferenceKeyModeId), getIntResource(R.integer.valModeId)));
+        int initMode = preferencesStore.getInitMode(getPreferenceKey(R.string.preferenceKeyModeId), getIntResource(R.integer.valModeId));
+        setMode(initMode, true);
     }
 
     public String getPreferenceKey(int res) {
         return context.getString(res);
-    }
-
-    private void initMode(int active) {
-        // Check for valid mode IDs and fallback to MQTT if an invalid mode is set
-        setMode(active == MessageProcessorEndpointHttp.MODE_ID ? MessageProcessorEndpointHttp.MODE_ID : MessageProcessorEndpointMqtt.MODE_ID, true);
     }
 
     public void setMode(int active) {
@@ -90,35 +71,15 @@ public class Preferences {
 
     public void setMode(int active, boolean init) {
         Timber.v("setMode: %s", active);
-
+        int oldModeId = modeId;
         if (!init && modeId == active) {
             Timber.v("mode is already set to requested mode");
             return;
         }
 
+        preferencesStore.setMode(getPreferenceKey(R.string.preferenceKeyModeId), active);
+
         Timber.v("setting mode to: %s", active);
-
-        detachAllActivePreferenceChangeListeners();
-        int oldModeId = modeId;
-        modeId = active;
-        switch (modeId) {
-            case MessageProcessorEndpointMqtt.MODE_ID:
-                activeSharedPreferences = privateSharedPreferences;
-                sharedPreferencesName = FILENAME_PRIVATE;
-                break;
-            case MessageProcessorEndpointHttp.MODE_ID:
-                activeSharedPreferences = httpSharedPreferences;
-                sharedPreferencesName = FILENAME_HTTP;
-                break;
-
-        }
-        sharedPreferences.edit().putInt(getPreferenceKey(R.string.preferenceKeyModeId), modeId).apply();
-
-        // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
-        privateSharedPreferences.edit().putInt(getPreferenceKey(R.string.preferenceKeyModeId), modeId).apply();
-        httpSharedPreferences.edit().putInt(getPreferenceKey(R.string.preferenceKeyModeId), modeId).apply();
-
-        attachAllActivePreferenceChangeListeners();
 
         if (!init) {
             Timber.v("broadcasting mode change event");
@@ -126,49 +87,28 @@ public class Preferences {
         }
     }
 
-    private static LinkedList<OnPreferenceChangedListener> activeSharedPreferencesChangeListener;
 
-    public void registerOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
-        activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-        activeSharedPreferencesChangeListener.push(listener);
+    public void registerOnPreferenceChangedListener(OnModeChangedPreferenceChangedListener listener) {
+        preferencesStore.registerOnSharedPreferenceChangeListener(listener);
+
     }
 
-    public void unregisterOnPreferenceChangedListener(OnPreferenceChangedListener listener) {
-        activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
-        activeSharedPreferencesChangeListener.remove(listener);
-    }
-
-    private static void detachAllActivePreferenceChangeListeners() {
-        for (SharedPreferences.OnSharedPreferenceChangeListener listener : activeSharedPreferencesChangeListener) {
-            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
-        }
-    }
-
-    private static void attachAllActivePreferenceChangeListeners() {
-        for (OnPreferenceChangedListener listener : activeSharedPreferencesChangeListener) {
-            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-            listener.onAttachAfterModeChanged();
-        }
+    public void unregisterOnPreferenceChangedListener(OnModeChangedPreferenceChangedListener listener) {
+        preferencesStore.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public void checkFirstStart() {
-        if (sharedPreferences.getBoolean(getPreferenceKey(R.string.preferenceKeyFirstStart), true)) {
+        if (preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeyFirstStart), true)) {
             Timber.v("Initial application launch");
             isFirstStart = true;
-            sharedPreferences.edit()
-                    .putBoolean(getPreferenceKey(R.string.preferenceKeyFirstStart), false)
-                    .putBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), true)
-                    .apply();
+            preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyFirstStart), false);
+            preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), true);
         }
 
     }
 
-    public interface OnPreferenceChangedListener extends SharedPreferences.OnSharedPreferenceChangeListener {
-        void onAttachAfterModeChanged();
-    }
-
     public boolean getBooleanOrDefault(int resKeyId, int defId) {
-        return activeSharedPreferences.getBoolean(getPreferenceKey(resKeyId), getBooleanRessource(defId));
+        return preferencesStore.getBoolean(getPreferenceKey(resKeyId), getBooleanRessource(defId));
     }
 
     private boolean getBooleanRessource(int resId) {
@@ -177,7 +117,7 @@ public class Preferences {
 
     public int getIntOrDefault(int resKeyId, int defId) {
         try {
-            return activeSharedPreferences.getInt(getPreferenceKey(resKeyId), getIntResource(defId));
+            return preferencesStore.getInt(getPreferenceKey(resKeyId), getIntResource(defId));
         } catch (ClassCastException e) {
             Timber.e("Error retriving string preference %s, returning default", getPreferenceKey(resKeyId));
             return getIntResource(defId);
@@ -188,12 +128,11 @@ public class Preferences {
         return context.getResources().getInteger(resId);
     }
 
-    // Gets the key from specified preferences
-    // If the returned value is an empty string or null, the default id is returned
-    // This is a quick fix as an empty string does not return the default value
-    private String getStringWithFallback(SharedPreferences preferences, String key, int defId) {
+
+    public String getStringOrDefault(int resKeyId, int defId) {
+        String key = getPreferenceKey(resKeyId);
         try {
-            String s = preferences.getString(key, "");
+            String s = preferencesStore.getString(key, "");
             return ("".equals(s)) ? getStringRessource(defId) : s;
         } catch (ClassCastException e) {
             Timber.e("Error retriving string preference %s, returning default", key);
@@ -201,28 +140,24 @@ public class Preferences {
         }
     }
 
-    public String getStringOrDefault(int resKeyId, int defId) {
-        return getStringWithFallback(activeSharedPreferences, getPreferenceKey(resKeyId), defId);
-    }
-
     private String getStringRessource(int resId) {
         return context.getResources().getString(resId);
     }
 
     private void setString(int resKeyId, String value) {
-        activeSharedPreferences.edit().putString(getPreferenceKey(resKeyId), value).apply();
+        preferencesStore.putString(getPreferenceKey(resKeyId), value);
     }
 
     private void setInt(int resKeyId, int value) {
-        activeSharedPreferences.edit().putInt(getPreferenceKey(resKeyId), value).apply();
+        preferencesStore.putInt(getPreferenceKey(resKeyId), value);
     }
 
     private void setBoolean(int resKeyId, boolean value) {
-        activeSharedPreferences.edit().putBoolean(getPreferenceKey(resKeyId), value).apply();
+        preferencesStore.putBoolean(getPreferenceKey(resKeyId), value);
     }
 
     public void clearKey(String key) {
-        activeSharedPreferences.edit().remove(key).apply();
+        preferencesStore.remove(key);
     }
 
     public void clearKey(int resKeyId) {
@@ -303,10 +238,7 @@ public class Preferences {
                 e.printStackTrace();
             }
         }
-
-        Timber.v("committing to preferences %s", activeSharedPreferences);
-
-        activeSharedPreferences.edit().commit();
+//        activeSharedPreferences.edit().commit();
     }
 
     @Export(keyResId = R.string.preferenceKeyMonitoring, exportModeMqttPrivate = true, exportModeHttpPrivate = true)
@@ -713,7 +645,7 @@ public class Preferences {
 
     @Import(keyResId = R.string.preferenceKeyLocatorPriority)
     private void setLocatorPriority(int anInt) {
-        if(anInt >= 0 && anInt <= 3) {
+        if (anInt >= 0 && anInt <= 3) {
             setInt(R.string.preferenceKeyLocatorPriority, anInt);
         } else {
             Timber.e("invalid locator priority specified %s", anInt);
@@ -863,11 +795,11 @@ public class Preferences {
 
     public boolean isSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
-        return !sharedPreferences.getBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), false);
+        return !preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), false);
     }
 
     public void setSetupCompleted() {
-        sharedPreferences.edit().putBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), false).apply();
+        preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), false);
         isFirstStart = false;
     }
 
@@ -935,11 +867,11 @@ public class Preferences {
 
 
     public boolean isObjectboxMigrated() {
-        return isFirstStart || sharedPreferences.getBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), false);
+        return isFirstStart || preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), false);
     }
 
     public void setObjectBoxMigrated() {
-        sharedPreferences.edit().putBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), true).apply();
+        preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), true);
     }
 
     @Export(keyResId = R.string.preferenceKeyGeocodeEnabled, exportModeMqttPrivate = true, exportModeHttpPrivate = true)

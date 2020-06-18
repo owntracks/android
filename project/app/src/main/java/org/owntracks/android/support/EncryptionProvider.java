@@ -10,6 +10,7 @@ import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerApplication;
+import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import javax.inject.Inject;
 
@@ -93,7 +94,7 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private class SecretBoxManager implements Preferences.OnPreferenceChangedListener {
+    private class SecretBoxManager implements OnModeChangedPreferenceChangedListener {
         SecretBoxManager() {
             preferences.registerOnPreferenceChangedListener(this);
         }

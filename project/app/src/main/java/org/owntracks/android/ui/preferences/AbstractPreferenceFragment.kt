@@ -10,6 +10,7 @@ import javax.inject.Inject
 abstract class AbstractPreferenceFragment: PreferenceFragmentCompat() {
     @Inject
     lateinit var preferences: Preferences
+
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.sharedPreferencesName = preferences.sharedPreferencesName
     }
