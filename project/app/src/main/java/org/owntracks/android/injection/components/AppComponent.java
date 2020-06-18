@@ -8,6 +8,7 @@ import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.services.worker.MQTTKeepaliveWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
 import org.owntracks.android.services.worker.SendLocationPingWorker;
+import org.owntracks.android.support.preferences.SharedPreferencesStoreModule;
 
 import dagger.BindsInstance;
 import dagger.Component;
@@ -16,7 +17,13 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;
 
 @PerApplication
-@Component(modules={AppModule.class, ObjectboxWaypointsModule.class, AndroidSupportInjectionModule.class, AndroindBindingModule.class})
+@Component(modules={
+        AppModule.class,
+        ObjectboxWaypointsModule.class,
+        AndroidSupportInjectionModule.class,
+        AndroindBindingModule.class,
+        SharedPreferencesStoreModule.class}
+        )
 public interface AppComponent extends AndroidInjector<DaggerApplication>  {
 
     @Component.Builder

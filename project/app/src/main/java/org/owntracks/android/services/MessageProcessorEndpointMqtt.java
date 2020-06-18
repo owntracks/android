@@ -31,6 +31,7 @@ import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
+import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,7 +53,7 @@ import timber.log.Timber;
 
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
 
-public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, Preferences.OnPreferenceChangedListener {
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, OnModeChangedPreferenceChangedListener {
     public static final int MODE_ID = 0;
 
     private CustomMqttClient mqttClient;

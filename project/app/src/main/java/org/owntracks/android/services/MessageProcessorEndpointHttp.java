@@ -17,6 +17,7 @@ import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
+import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,7 +38,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements Preferences.OnPreferenceChangedListener {
+public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements OnModeChangedPreferenceChangedListener {
     public static final int MODE_ID = 3;
 
     // Headers according to https://github.com/owntracks/recorder#http-mode
