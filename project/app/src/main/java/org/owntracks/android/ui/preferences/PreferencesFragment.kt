@@ -30,7 +30,7 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     }
 
     private val connectionMode: String
-        get() = when (preferences.modeId) {
+        get() = when (preferences.mode) {
             MessageProcessorEndpointHttp.MODE_ID -> getString(R.string.mode_http_private_label)
             MessageProcessorEndpointMqtt.MODE_ID -> getString(R.string.mode_mqtt_private_label)
             else -> getString(R.string.mode_mqtt_private_label)

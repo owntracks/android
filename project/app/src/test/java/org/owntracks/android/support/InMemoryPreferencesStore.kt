@@ -1,0 +1,55 @@
+package org.owntracks.android.support
+
+import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
+import org.owntracks.android.support.preferences.PreferencesStore
+
+class InMemoryPreferencesStore : PreferencesStore {
+    private val valueMap: MutableMap<String, Any> = HashMap()
+    override fun getSharedPreferencesName(): String {
+        return ""
+    }
+
+    override fun setMode(key: String, mode: Int) {
+        valueMap[key] = mode
+    }
+
+    override fun getInitMode(key: String, default: Int): Int {
+        return getInt(key, default)
+    }
+
+    override fun getBoolean(key: String, default: Boolean): Boolean {
+        return valueMap[key] as Boolean? ?: default
+    }
+
+    override fun putBoolean(key: String, value: Boolean) {
+        valueMap[key] = value
+    }
+
+    override fun putInt(key: String, value: Int) {
+        valueMap[key] = value
+    }
+
+    override fun getInt(key: String, default: Int): Int {
+        return valueMap[key] as Int? ?: default
+    }
+
+    override fun putString(key: String, value: String) {
+        valueMap[key] = value
+    }
+
+    override fun getString(key: String, default: String): String? {
+        return valueMap[key] as String? ?: default
+    }
+
+    override fun remove(key: String) {
+        valueMap.remove(key)
+    }
+
+    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
+        TODO("Not yet implemented")
+    }
+
+    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
+        TODO("Not yet implemented")
+    }
+}

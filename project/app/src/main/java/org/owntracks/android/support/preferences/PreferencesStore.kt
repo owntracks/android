@@ -9,8 +9,8 @@ interface PreferencesStore {
     fun setMode(key: String, mode: Int)
     fun getInitMode(key: String, default: Int): Int
 
-    fun getBoolean(key: String, default: Boolean): Boolean
     fun putBoolean(key: String, value: Boolean)
+    fun getBoolean(key: String, default: Boolean): Boolean
 
     fun putInt(key: String, value: Int)
     fun getInt(key: String, default: Int): Int

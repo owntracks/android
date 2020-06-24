@@ -35,7 +35,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     public void attachView(@NonNull ConnectionMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
-        setModeId(preferences.getModeId());
+        setModeId(preferences.getMode());
     }
 
     @Override

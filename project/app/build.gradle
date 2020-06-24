@@ -126,6 +126,10 @@ android {
     buildToolsVersion = '29.0.3'
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 apply from: "publishing.gradle"
 apply from: "dependencies.gradle"
 

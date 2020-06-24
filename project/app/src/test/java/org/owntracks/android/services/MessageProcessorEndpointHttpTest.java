@@ -60,8 +60,8 @@ public class MessageProcessorEndpointHttpTest {
         messageLocation.setVac((int) 1.7);
 
         testPreferences = mock(Preferences.class);
-        when(testPreferences.getTlsCaCrtName()).thenReturn("");
-        when(testPreferences.getTlsClientCrtName()).thenReturn("");
+        when(testPreferences.getTlsCaCrt()).thenReturn("");
+        when(testPreferences.getTlsClientCrt()).thenReturn("");
 
         when(testPreferences.getUsername()).thenReturn("");
         when(testPreferences.getDeviceId()).thenReturn("");

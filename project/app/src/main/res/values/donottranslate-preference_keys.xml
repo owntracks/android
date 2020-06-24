@@ -34,7 +34,6 @@
     <string name="preferenceKeyPort">port</string>
     <string name="preferenceKeyKeepalive">keepalive</string>
     <string name="preferenceKeyMqttProtocolLevel">mqttProtocolLevel</string>
-    <string name="preferenceKeyNotification">notification</string>
     <string name="preferenceKeyNotificationLocation">notificationLocation</string>
     <string name="preferenceKeyNotificationEvents">notificationEvents</string>
     <string name="preferenceKeyNotificationHigherPriority">notificationHigherPriority</string>

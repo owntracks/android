@@ -21,7 +21,7 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
 
     @Override
     public void load() {
-        this.modeResId = modeToResId(preferences.getModeId());
+        this.modeResId = modeToResId(preferences.getMode());
     }
 
     @Override

@@ -59,7 +59,6 @@ dependencies {
     annotationProcessor 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.2'
 
-
     // Preprocessors
     kapt "org.greenrobot:eventbus-annotation-processor:3.1.1"
     kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
