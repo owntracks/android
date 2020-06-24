@@ -130,7 +130,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
 
-        switch (preferences.getModeId()) {
+        switch (preferences.getMode()) {
             case MessageProcessorEndpointHttp.MODE_ID:
                 this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus);
                 break;

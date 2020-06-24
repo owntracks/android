@@ -17,7 +17,6 @@ import java.util.TreeMap;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 public class MessageConfiguration extends MessageBase{
     static final String TYPE = "configuration";
-    private static final String BASETOPIC_SUFFIX = "/cmd";
     private final Map<String,Object> map = new TreeMap<>();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

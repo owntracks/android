@@ -271,8 +271,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
         try {
             if (preferences.getTls()) {
-                String tlsCaCrt = preferences.getTlsCaCrtName();
-                String tlsClientCrt = preferences.getTlsClientCrtName();
+                String tlsCaCrt = preferences.getTlsCaCrt();
+                String tlsClientCrt = preferences.getTlsClientCrt();
 
                 SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
@@ -497,7 +497,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (preferences.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+        if (preferences.getMode() != MessageProcessorEndpointMqtt.MODE_ID) {
             return;
         }
         if (preferences.getPreferenceKey(R.string.preferenceKeyMqttProtocolLevel).equals(key) ||

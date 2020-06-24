@@ -86,8 +86,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Nullable
     private SocketFactory getSocketFactory() {
-        String tlsCaCrt = preferences.getTlsCaCrtName();
-        String tlsClientCrt = preferences.getTlsClientCrtName();
+        String tlsCaCrt = preferences.getTlsCaCrt();
+        String tlsClientCrt = preferences.getTlsClientCrt();
 
         if(tlsCaCrt.length() == 0 && tlsClientCrt.length() == 0) {
             return null;
@@ -125,7 +125,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     private OkHttpClient getHttpClient() {
-        if(preferences.getDontReuseHTTPClient()) {
+        if(preferences.getDontReuseHttpClient()) {
             return createHttpClient();
         }
 

@@ -540,7 +540,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.START); //new PopupMenu(this, v);
         popupMenu.getMenuInflater().inflate(R.menu.menu_popup_contacts, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-        if (preferences.getModeId() == MessageProcessorEndpointHttp.MODE_ID)
+        if (preferences.getMode() == MessageProcessorEndpointHttp.MODE_ID)
             popupMenu.getMenu().removeItem(R.id.menu_clear);
         popupMenu.show();
     }

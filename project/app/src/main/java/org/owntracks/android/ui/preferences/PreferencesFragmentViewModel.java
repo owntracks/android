@@ -22,7 +22,7 @@ public class PreferencesFragmentViewModel extends BaseViewModel<PreferencesFragm
     public void attachView(@NonNull PreferencesFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
         view.loadRoot();
-        view.setModeSummary(preferences.getModeId());
+        view.setModeSummary(preferences.getMode());
     }
 
     @Override

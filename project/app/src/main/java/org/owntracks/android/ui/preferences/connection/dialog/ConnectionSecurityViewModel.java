@@ -44,8 +44,8 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     @Override
     public void load() {
         this.tls = preferences.getTls();
-        this.tlsCaCrtName = preferences.getTlsCaCrtName();
-        this.tlsClientCrtName = preferences.getTlsClientCrtName();
+        this.tlsCaCrtName = preferences.getTlsCaCrt();
+        this.tlsClientCrtName = preferences.getTlsClientCrt();
         this.tlsClientCrtPassword = preferences.getTlsClientCrtPassword();
     }
 

@@ -51,7 +51,7 @@ public class App extends DaggerApplication  {
         WorkManager.initialize(this, new Configuration.Builder().build());
 
         super.onCreate();
-        if (preferences.getLogDebug()) {
+        if (preferences.getDebugLog()) {
             Timber.plant(new TimberDebugLogFileTree(this.context));
         } else {
             preferences.setDebugLog(false);
