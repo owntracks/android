@@ -922,7 +922,7 @@ public class Preferences {
 
     public boolean isSetupCompleted() {
         // sharedPreferences because the value is independent from the selected mode
-        return !preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), false);
+        return !preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeySetupNotCompleted), true);
     }
 
     public void setSetupCompleted() {
