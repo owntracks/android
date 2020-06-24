@@ -46,7 +46,7 @@ class FirstStartWelcomeTest {
             GrantPermissionRule.grant(
                     "android.permission.ACCESS_FINE_LOCATION")
     @Test
-    fun welcomeTest() {
+    fun onFirstStartTheWelcomeActivityIsLoadedAndCanBeClickedThroughToTheEnd() {
         val textView = onView(
                 allOf(withId(R.id.screen_heading), withText("Welcome"),
                         childAtPosition(
