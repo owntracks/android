@@ -1,5 +1,4 @@
 task jacocoCombinedTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
-
     reports {
         xml.enabled = true
         html.enabled = true

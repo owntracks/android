@@ -14,8 +14,8 @@
     <string name="preferencesLicenses">"Libraries"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
     <string name="preferencesNotification">Notifications</string>
-    <string name="preferencesNotificationEvents">Events </string>
-    <string name="preferencesNotificationEventsSummary">Notify about received events </string>
+    <string name="preferencesNotificationEvents">Events</string>
+    <string name="preferencesNotificationEventsSummary">Notify about received events</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationLocation">"Last reported location"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
@@ -164,7 +164,7 @@
     <string name="region_outside">Currently outside</string>
     <string name="monitoring_quiet">Quiet monitoring mode</string>
     <string name="monitoring_manual">Manual monitoring mode</string>
-    <string name="monitoring_signifficant">Significant changes monitoring mode</string>
+    <string name="monitoring_significant">Significant changes monitoring mode</string>
     <string name="monitoring_move">Move monitoring mode</string>
     <string name="notificationChangeMonitoring">Change Monitoring</string>
     <string name="preferencesDebugLog">Debug log</string>
@@ -172,4 +172,10 @@
     <string name="monitoring_mode">Monitoring</string>
     <string name="distance_label">Distance</string>
     <string name="preferencesClientId">Client ID</string>
+    <string name="status_endpoint_state_hint">Endpoint state</string>
+    <string name="status_endpoint_state_message_hint">Endpoint state message</string>
+    <string name="status_endpoint_queue_hint">Endpoint queue</string>
+    <string name="status_last_background_update_hint">Location service last background update</string>
+    <string name="status_background_service_started_hint">Background service started</string>
+    <string name="status_battery_optimization_whitelisted_hint">Battery optimization whitelisted</string>
 </resources>
