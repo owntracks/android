@@ -32,6 +32,10 @@ android {
         }
         resConfigs "en", "de", "fr", "es"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+/* TODO Get this lot sorted when the orchestrator / coverage / clearPackageData bug gets fixed */
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        testInstrumentationRunnerArguments coverageFilePath: '/sdcard/'
+//        testInstrumentationRunnerArguments coverage: 'true'
     }
 
     signingConfigs {
@@ -113,6 +117,7 @@ android {
                 html.enabled = false
             }
         }
+//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     compileOptions {

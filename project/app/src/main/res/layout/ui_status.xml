@@ -57,7 +57,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Endpoint state"
+                android:text="@string/status_endpoint_state_hint"
                 android:ellipsize="end"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
@@ -77,7 +77,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Endpoint state message"
+                android:text="@string/status_endpoint_state_message_hint"
                 android:ellipsize="end"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:visibility="@{vm.endpointMessage!=null}"
@@ -96,7 +96,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Endpoint queue"
+                android:text="@string/status_endpoint_queue_hint"
                 android:ellipsize="end"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
@@ -115,7 +115,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location service last background update"
+                android:text="@string/status_last_background_update_hint"
                 android:ellipsize="end"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
@@ -134,7 +134,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Background service started"
+                android:text="@string/status_background_service_started_hint"
                 android:ellipsize="end"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 style="@style/ListItemSecondary" />
@@ -160,7 +160,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Battery optimization whitelisted"
+                    android:text="@string/status_battery_optimization_whitelisted_hint"
                     android:ellipsize="end"
                     android:paddingBottom="@dimen/activity_horizontal_margin"
                     style="@style/ListItemSecondary" />

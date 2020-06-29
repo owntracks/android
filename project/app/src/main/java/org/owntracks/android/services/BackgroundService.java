@@ -381,7 +381,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             case LocationProcessor.MONITORING_MANUAL:
                 return getString(R.string.monitoring_manual);
             case LocationProcessor.MONITORING_SIGNIFICANT:
-                return getString(R.string.monitoring_signifficant);
+                return getString(R.string.monitoring_significant);
             case LocationProcessor.MONITORING_MOVE:
                 return getString(R.string.monitoring_move);
         }

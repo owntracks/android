@@ -56,6 +56,10 @@ jobs:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/collected/"
       if: always()
+    - uses: codecov/codecov-action@v1
+      if: always()
+      with:
+        file: ./project/app/build/reports/jacoco/jacocoCombinedTestReport/jacocoCombinedTestReport.xml
   publish:
     name: Publish
     runs-on: ubuntu-latest
