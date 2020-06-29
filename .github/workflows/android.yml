@@ -30,7 +30,8 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport --info
+        script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport
+        target: google_apis
       timeout-minutes: 10
     - name: Gather xunit files into a single dir
       run: | 
