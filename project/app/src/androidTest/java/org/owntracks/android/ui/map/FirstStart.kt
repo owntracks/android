@@ -19,7 +19,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
+import org.owntracks.android.LocationPermissionGranter
 import org.owntracks.android.R
+import org.owntracks.android.ScreenshotTakingRule
 
 
 @LargeTest
@@ -34,6 +36,10 @@ class FirstStart {
     fun setUp() {
         baristaRule.launchActivity()
     }
+
+
+    @get:Rule
+    val screenshotRule = ScreenshotTakingRule()
 
     @Test
     @AllowFlaky(attempts = 1)
@@ -50,6 +56,7 @@ class FirstStart {
         clickOn(R.id.btn_next)
 
         assertNotDisplayed(R.id.btn_next)
+
         assertDisplayed(R.id.fix_permissions_button)
         assertClickable(R.id.fix_permissions_button)
 

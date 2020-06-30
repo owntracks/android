@@ -137,3 +137,4 @@ kapt {
 apply from: "publishing.gradle"
 apply from: "dependencies.gradle"
 apply from: "coverage.gradle"
+apply from: "connectedTestScreenshotTasks.gradle"
