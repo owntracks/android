@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.map
+package org.owntracks.android
 
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
