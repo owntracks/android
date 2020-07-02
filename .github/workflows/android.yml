@@ -32,7 +32,7 @@ jobs:
         api-level: 29
         script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport
         target: google_apis
-      timeout-minutes: 30
+      timeout-minutes: 15
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/

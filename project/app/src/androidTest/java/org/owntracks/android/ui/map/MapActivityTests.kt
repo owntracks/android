@@ -28,7 +28,7 @@ import org.owntracks.android.ScreenshotTakingRule
 @RunWith(AndroidJUnit4::class)
 /* TODO the android orchestrator doesn't work with coverage, so until it does we need to run tests in order */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class FirstStart {
+class MapActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(MapActivity::class.java)
 
