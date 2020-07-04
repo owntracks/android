@@ -89,8 +89,7 @@ class MapActivityTests {
                 R.string.status_battery_optimization_whitelisted_hint,
                 R.string.status_endpoint_queue_hint,
                 R.string.status_background_service_started_hint,
-                R.string.status_endpoint_state_hint,
-                R.string.status_endpoint_state_message_hint
+                R.string.status_endpoint_state_hint
         ).forEach { assertDisplayed(it) }
     }
 
