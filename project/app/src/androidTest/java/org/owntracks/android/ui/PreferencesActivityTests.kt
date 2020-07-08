@@ -25,6 +25,7 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingRule
@@ -36,14 +37,17 @@ class PreferencesActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(PreferencesActivity::class.java)
 
+    private val screenshotRule = ScreenshotTakingRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain
+            .outerRule(baristaRule.activityTestRule)
+            .around(screenshotRule)
 
     @Before
     fun setUp() {
         baristaRule.launchActivity()
     }
-
-    @get:Rule
-    val screenshotRule = ScreenshotTakingRule()
 
     @Test
     @AllowFlaky(attempts = 1)
@@ -136,13 +140,16 @@ class PreferencesActivityTests {
 
         // Barista doesn't yet support androidx PreferenceCompatFragment, so we have to scroll the
         // *espresso* way
-        onView(withId(androidx.preference.R.id.recycler_view))
-                .perform(actionOnItem<RecyclerView.ViewHolder>(
-                        hasDescendant(withText(R.string.preferencesOpencageGeocoderApiKey)), scrollTo()))
-
+        scrollToText(R.string.preferencesDebugLog)
         clickOn(R.string.preferencesDebugLog)
+
+        scrollToText(R.string.preferencesAutostart)
         clickOn(R.string.preferencesAutostart)
+
+        scrollToText(R.string.preferencesGeocode)
         clickOn(R.string.preferencesGeocode)
+
+        scrollToText(R.string.preferencesOpencageGeocoderApiKey)
         clickOn(R.string.preferencesOpencageGeocoderApiKey)
         writeTo(android.R.id.edit, "geocodeAPIKey")
         clickDialogPositiveButton()
@@ -177,7 +184,10 @@ class PreferencesActivityTests {
         assertNotContains(R.id.effectiveConfiguration, "\"subTopic\"")
         assertNotContains(R.id.effectiveConfiguration, "\"pubTopicBase\"")
         assertNotContains(R.id.effectiveConfiguration, "\"clientId\"")
-
-
+    }
+    private fun scrollToText(textResource: Int) {
+        onView(withId(androidx.preference.R.id.recycler_view))
+                .perform(actionOnItem<RecyclerView.ViewHolder>(
+                        hasDescendant(withText(textResource)), scrollTo()))
     }
 }

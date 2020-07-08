@@ -31,6 +31,7 @@ jobs:
       with:
         api-level: 29
         script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport
+        profile: pixel_3a
         target: google_apis
       timeout-minutes: 15
     - name: Gather xunit files into a single dir

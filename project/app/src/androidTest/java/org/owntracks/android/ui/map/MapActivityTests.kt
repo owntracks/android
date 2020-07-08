@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.LocationPermissionGranter
@@ -32,14 +33,18 @@ class MapActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(MapActivity::class.java)
 
+    private val screenshotRule = ScreenshotTakingRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain
+            .outerRule(baristaRule.activityTestRule)
+            .around(screenshotRule)
+
+
     @Before
     fun setUp() {
         baristaRule.launchActivity()
     }
-
-
-    @get:Rule
-    val screenshotRule = ScreenshotTakingRule()
 
     @Test
     @AllowFlaky(attempts = 1)
