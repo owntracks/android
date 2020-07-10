@@ -20,7 +20,6 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.support.preferences.PreferencesStore
 import kotlin.reflect.KClass
 
-
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(
         private val preferenceMethodName: String,
@@ -133,6 +132,7 @@ class PreferencesGettersAndSetters(
 
         fun getMockResources(): Resources {
             return mock {
+                on { getString(eq(R.string.valEmpty)) } doReturn ""
                 on { getString(eq(R.string.preferenceKeyAuth)) } doReturn "auth"
                 on { getString(eq(R.string.preferenceKeyAutostartOnBoot)) } doReturn "autostartOnBoot"
                 on { getString(eq(R.string.preferenceKeyCleanSession)) } doReturn "cleanSession"
@@ -185,6 +185,8 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyVersion)) } doReturn "_build"
                 on { getString(eq(R.string.preferenceKeyWS)) } doReturn "ws"
                 on { getString(eq(R.string.valIgnoreStaleLocations)) } doReturn "0"
+                on { getString(eq(R.string.valSubTopic)) } doReturn "owntracks/+/+"
+                on { getString(eq(R.string.valPubTopic)) } doReturn "owntracks/%u/%d"
                 on { getInteger(any()) } doReturn 0
                 on { getBoolean(any()) } doReturn false
             }
