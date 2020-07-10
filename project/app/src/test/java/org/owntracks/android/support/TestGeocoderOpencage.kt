@@ -24,7 +24,7 @@ class TestGeocoderOpencage {
 
         val httpCall: Call = mock { on { execute() } doReturn httpResponse }
         val httpClient: OkHttpClient = mock { on { newCall(any()) } doReturn httpCall }
-        
+
         val geocoder = GeocoderOpencage("", httpClient)
 
         val response = geocoder.reverse(0.0, 0.0)
