@@ -169,7 +169,11 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                 .filter { methods.containsKey(it) }
                 .forEach {
                     Timber.d("Loading key %s from method: %s", it, methods.getValue(it).name)
-                    methods.getValue(it).invoke(this, messageConfiguration[it])
+                    try {
+                        methods.getValue(it).invoke(this, messageConfiguration[it])
+                    } catch (e: IllegalArgumentException) {
+                        Timber.e("Tried to import %s but value is wrong type. Expected: %s, given %s", it, methods.getValue(it).parameterTypes.first().canonicalName, messageConfiguration[it].javaClass.canonicalName)
+                    }
                 }
     }
 

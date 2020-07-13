@@ -60,11 +60,8 @@ class PreferencesGettersAndSetters(
         val preferences = Preferences(mockContext, null, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration.set(preferenceName, preferenceValue)
-
         preferences.importFromMessage(messageConfiguration)
-
         val getter = Preferences::class.java.getMethod("get$preferenceMethodName")
-
         assertEquals(preferenceValueExpected, getter.invoke(preferences))
     }
 
