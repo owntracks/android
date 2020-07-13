@@ -55,7 +55,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         return cfg
     }
 
-
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
     private val exportMethods: List<Method>
@@ -70,7 +69,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                                     currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
                 }
                 .toList()
-    
+
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
 
@@ -148,7 +147,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @SuppressLint("CommitPrefEdits", "ApplySharedPref")
     fun importFromMessage(messageConfiguration: MessageConfiguration) {
         Timber.v("importing %s keys ", messageConfiguration.keys.size)
-        val methods = importMethods
+
         if (messageConfiguration.containsKey(getPreferenceKey(R.string.preferenceKeyModeId))) {
             Timber.v("setting mode to %s", messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)])
             mode = messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)] as Int
@@ -157,33 +156,24 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
         // Don't show setup if a config has been imported
         setSetupCompleted()
-        for (key in messageConfiguration.keys) {
-            try {
-                val value = messageConfiguration[key]
-                Timber.v("load for key %s:%s", key, value)
-                if (value == null) {
-                    Timber.v("clearing value for key %s", key)
-                    clearKey(key)
-                } else {
-                    Timber.v("method: %s", methods[key]!!.name)
-                    methods[key]!!.invoke(this, messageConfiguration[key])
+
+        messageConfiguration.keys
+                .filter { messageConfiguration[it] == null }
+                .forEach {
+                    Timber.d("clearing value for key %s", it)
+                    clearKey(it)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        //        activeSharedPreferences.edit().commit();
+        val methods = importMethods
+        messageConfiguration.keys
+                .filter { messageConfiguration[it] != null }
+                .filter { methods.containsKey(it) }
+                .forEach {
+                    Timber.d("Loading key %s from method: %s", it, methods.getValue(it).name)
+                    methods.getValue(it).invoke(this, messageConfiguration[it])
+                }
     }
 
-    @get:Export(keyResId = R.string.preferenceKeyModeId, exportModeMqtt = true, exportModeHttp = true)
-    @set:Import(keyResId = R.string.preferenceKeyModeId)
-    var mode: Int
-        get() = currentMode
-        set(active) {
-            setMode(active, false)
-        }
-
-    fun setMode(requestedMode: Int, init: Boolean) {
+    private fun setMode(requestedMode: Int, init: Boolean) {
         Timber.v("setMode: %s", requestedMode)
         if (!(requestedMode == MessageProcessorEndpointMqtt.MODE_ID || requestedMode == MessageProcessorEndpointHttp.MODE_ID)) {
             Timber.v("Invalid mode requested: %s", requestedMode)
@@ -203,6 +193,26 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         }
     }
 
+    fun setMonitoringNext() {
+        var mode = monitoring
+        if (mode < LocationProcessor.MONITORING_MOVE) {
+            mode++
+        } else {
+            mode = LocationProcessor.MONITORING_QUIET
+        }
+        Timber.v("setting monitoring mode %s", mode)
+        monitoring = mode
+    }
+
+    @get:Export(keyResId = R.string.preferenceKeyModeId, exportModeMqtt = true, exportModeHttp = true)
+    @set:Import(keyResId = R.string.preferenceKeyModeId)
+    var mode: Int
+        get() = currentMode
+        set(active) {
+            setMode(active, false)
+        }
+
+
     @get:Export(keyResId = R.string.preferenceKeyMonitoring, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyMonitoring)
     var monitoring: Int
@@ -215,17 +225,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setInt(R.string.preferenceKeyMonitoring, newmode)
             eventBus?.post(MonitoringChanged(newmode))
         }
-
-    fun setMonitoringNext() {
-        var mode = monitoring
-        if (mode < LocationProcessor.MONITORING_MOVE) {
-            mode++
-        } else {
-            mode = LocationProcessor.MONITORING_QUIET
-        }
-        Timber.v("setting monitoring mode %s", mode)
-        monitoring = mode
-    }
 
     @get:Export(keyResId = R.string.preferenceKeyDontReuseHttpClient, exportModeMqtt = false, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyDontReuseHttpClient)
@@ -330,11 +329,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setInt(R.string.preferenceKeyIgnoreInaccurateLocations, meters)
         }// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
 
-    // Not used on public, as many people might use the same device type
-    private val deviceIdDefault: String
-        get() =// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
-            Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")?.toLowerCase(Locale.getDefault())
-                    ?: "unknown"
 
     @get:Export(keyResId = R.string.preferenceKeyClientId, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyClientId)
@@ -347,33 +341,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         set(clientId) {
             setString(R.string.preferenceKeyClientId, clientId)
         }
-
-    private val clientIdDefault: String
-        get() = (username + deviceId).replace("\\W".toRegex(), "").toLowerCase(Locale.getDefault())
-
-    val pubTopicLocations: String
-        get() = pubTopicBase
-
-    val pubTopicWaypoints: String
-        get() = pubTopicBase + pubTopicWaypointsPart
-
-    val pubTopicWaypointsPart: String
-        get() = "/waypoints"
-
-    val pubTopicEvents: String
-        get() = pubTopicBase + pubTopicEventsPart
-
-    val pubTopicEventsPart: String
-        get() = "/event"
-
-    val pubTopicInfoPart: String
-        get() = "/info"
-
-    val pubTopicCommands: String
-        get() = pubTopicBase + pubTopicCommandsPart
-
-    val pubTopicCommandsPart: String
-        get() = "/cmd"
 
     @get:Export(keyResId = R.string.preferenceKeyPubTopicBase, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPubTopicBase)
@@ -650,6 +617,40 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         set(aBoolean) {
             setBoolean(R.string.preferenceKeyGeocodeEnabled, aBoolean)
         }
+
+    // Not used on public, as many people might use the same device type
+    private val deviceIdDefault: String
+        get() =// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
+            Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")?.toLowerCase(Locale.getDefault())
+                    ?: "unknown"
+
+
+    private val clientIdDefault: String
+        get() = (username + deviceId).replace("\\W".toRegex(), "").toLowerCase(Locale.getDefault())
+
+    val pubTopicLocations: String
+        get() = pubTopicBase
+
+    val pubTopicWaypoints: String
+        get() = pubTopicBase + pubTopicWaypointsPart
+
+    val pubTopicWaypointsPart: String
+        get() = "/waypoints"
+
+    val pubTopicEvents: String
+        get() = pubTopicBase + pubTopicEventsPart
+
+    val pubTopicEventsPart: String
+        get() = "/event"
+
+    val pubTopicInfoPart: String
+        get() = "/info"
+
+    val pubTopicCommands: String
+        get() = pubTopicBase + pubTopicCommandsPart
+
+    val pubTopicCommandsPart: String
+        get() = "/cmd"
 
     // Maybe make this configurable
     // For now it makes things easier to change
