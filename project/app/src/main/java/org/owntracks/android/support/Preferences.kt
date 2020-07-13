@@ -55,43 +55,25 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         return cfg
     }
 
+
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
     private val exportMethods: List<Method>
-        get() {
-            val methods: MutableList<Method> = ArrayList()
-            var klass: Class<*>? = Preferences::class.java
-            while (klass != Any::class.java) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-                // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
-                val allMethods = listOf(*klass!!.declaredMethods)
-                for (method in allMethods) {
-                    if (method.isAnnotationPresent(Export::class.java)) {
-                        val annotInstance = method.getAnnotation(Export::class.java)
-                        if (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotInstance.exportModeMqtt || currentMode == MessageProcessorEndpointHttp.MODE_ID && annotInstance.exportModeHttp) {
-                            methods.add(method)
-                        }
-                    }
+        get() = Preferences::class.java
+                .parentClasses()
+                .flatMap { it.declaredMethods.asSequence() }
+                .filter { it.isAnnotationPresent(Export::class.java) }
+                .filter {
+                    val annotation = it.getAnnotation(Export::class.java)
+                    annotation != null &&
+                            (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
+                                    currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
                 }
-                // move to the upper class in the hierarchy in search for more methods
-                klass = klass.superclass
-            }
-            return methods
-        }
-
+                .toList()
+    
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
 
-
-    private fun Class<*>.parentClasses(): Sequence<Class<*>> {
-        var k = this
-        return sequence {
-            yield(k)
-            while (k.superclass != null) {
-                k = k.superclass!!
-                yield(k)
-            }
-        }
-    }
 
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
@@ -103,6 +85,16 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                 .map { Pair(getPreferenceKey(it.getAnnotation(Import::class.java)!!.keyResId), it) }
                 .toMap()
 
+    private fun Class<*>.parentClasses(): Sequence<Class<*>> {
+        var k = this
+        return sequence {
+            yield(k)
+            while (k.superclass != null) {
+                k = k.superclass!!
+                yield(k)
+            }
+        }
+    }
 
     fun registerOnPreferenceChangedListener(listener: OnModeChangedPreferenceChangedListener?) {
         preferencesStore.registerOnSharedPreferenceChangeListener(listener!!)
