@@ -19,8 +19,6 @@ import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.support.preferences.PreferencesStore
 import timber.log.Timber
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -32,6 +30,8 @@ import javax.inject.Inject
 class Preferences @Inject constructor(@AppContext c: Context, private val eventBus: EventBus?, private val preferencesStore: PreferencesStore) {
     private val context: Context = c
     private var isFirstStart = false
+    private var currentMode = MessageProcessorEndpointMqtt.MODE_ID
+
     val sharedPreferencesName: String
         get() = preferencesStore.getSharedPreferencesName()
 
@@ -59,7 +59,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
     private val exportMethods: List<Method>
         get() {
-            val modeId = mode
             val methods: MutableList<Method> = ArrayList()
             var klass: Class<*>? = Preferences::class.java
             while (klass != Any::class.java) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
@@ -68,7 +67,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                 for (method in allMethods) {
                     if (method.isAnnotationPresent(Export::class.java)) {
                         val annotInstance = method.getAnnotation(Export::class.java)
-                        if (modeId == MessageProcessorEndpointMqtt.MODE_ID && annotInstance.exportModeMqtt || modeId == MessageProcessorEndpointHttp.MODE_ID && annotInstance.exportModeHttp) {
+                        if (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotInstance.exportModeMqtt || currentMode == MessageProcessorEndpointHttp.MODE_ID && annotInstance.exportModeHttp) {
                             methods.add(method)
                         }
                     }
@@ -82,25 +81,28 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
 
+
+    private fun Class<*>.parentClasses(): Sequence<Class<*>> {
+        var k = this
+        return sequence {
+            yield(k)
+            while (k.superclass != null) {
+                k = k.superclass!!
+                yield(k)
+            }
+        }
+    }
+
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
-    private val importMethods: HashMap<String, Method>
-        get() {
-            val methods = HashMap<String, Method>()
-            var klass: Class<*>? = Preferences::class.java
-            while (klass != Any::class.java) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
-                // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
-                val allMethods: List<Method> = ArrayList(Arrays.asList(*klass!!.declaredMethods))
-                for (method in allMethods) {
-                    if (method.isAnnotationPresent(Import::class.java)) {
-                        methods[getPreferenceKey(method.getAnnotation(Import::class.java).keyResId)] = method
-                    }
-                }
-                // move to the upper class in the hierarchy in search for more methods
-                klass = klass.superclass
-            }
-            return methods
-        }
+    private val importMethods: Map<String, Method>
+        get() = Preferences::class.java
+                .parentClasses()
+                .flatMap { it.declaredMethods.asSequence() }
+                .filter { it.isAnnotationPresent(Import::class.java) }
+                .map { Pair(getPreferenceKey(it.getAnnotation(Import::class.java)!!.keyResId), it) }
+                .toMap()
+
 
     fun registerOnPreferenceChangedListener(listener: OnModeChangedPreferenceChangedListener?) {
         preferencesStore.registerOnSharedPreferenceChangeListener(listener!!)
@@ -184,7 +186,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @get:Export(keyResId = R.string.preferenceKeyModeId, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyModeId)
     var mode: Int
-        get() = modeId
+        get() = currentMode
         set(active) {
             setMode(active, false)
         }
@@ -195,17 +197,17 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             Timber.v("Invalid mode requested: %s", requestedMode)
             return
         }
-        val oldModeId = modeId
-        if (!init && modeId == requestedMode) {
+        val oldModeId = currentMode
+        if (!init && currentMode == requestedMode) {
             Timber.v("mode is already set to requested mode")
             return
         }
         Timber.v("setting mode to: %s", requestedMode)
         preferencesStore.setMode(getPreferenceKey(R.string.preferenceKeyModeId), requestedMode)
-        modeId = requestedMode
+        currentMode = requestedMode
         if (!init && eventBus != null) {
             Timber.v("broadcasting mode change event")
-            eventBus.post(ModeChanged(oldModeId, modeId))
+            eventBus.post(ModeChanged(oldModeId, currentMode))
         }
     }
 
@@ -339,7 +341,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() =// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
-            Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")?.toLowerCase(Locale.getDefault()) ?: "unknown"
+            Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")?.toLowerCase(Locale.getDefault())
+                    ?: "unknown"
 
     @get:Export(keyResId = R.string.preferenceKeyClientId, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyClientId)
@@ -762,19 +765,15 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         clearKey(getPreferenceKey(resKeyId))
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
+    @Retention(AnnotationRetention.RUNTIME)
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
     annotation class Export(val keyResId: Int = 0, val exportModeMqtt: Boolean = false, val exportModeHttp: Boolean = false)
 
-    @Retention(RetentionPolicy.RUNTIME)
+    @Retention(AnnotationRetention.RUNTIME)
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
     annotation class Import(val keyResId: Int = 0)
 
     fun getPreferenceKey(res: Int): String {
         return getStringResource(res)
-    }
-
-    companion object {
-        private var modeId = MessageProcessorEndpointMqtt.MODE_ID
     }
 }
