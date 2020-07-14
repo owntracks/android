@@ -2,8 +2,10 @@ package org.owntracks.android.ui.map
 
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.schibsted.spain.barista.assertion.BaristaClickableAssertions.assertClickable
 import com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosed
 import com.schibsted.spain.barista.assertion.BaristaEnabledAssertions.assertEnabled
@@ -13,7 +15,6 @@ import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
-import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
@@ -40,15 +41,10 @@ class MapActivityTests {
             .outerRule(baristaRule.activityTestRule)
             .around(screenshotRule)
 
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
     @Test
     @AllowFlaky(attempts = 1)
     fun aaa_onFirstStartTheWelcomeActivityIsLoadedAndCanBeClickedThroughToTheEnd() {
+        baristaRule.launchActivity()
         assertDisplayed(R.string.welcome_heading)
         assertDisplayed(R.string.welcome_description)
 
@@ -81,6 +77,7 @@ class MapActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
+        baristaRule.launchActivity()
         doWelcomeProcess()
         assertDrawerIsClosed()
         openDrawer()
@@ -101,6 +98,7 @@ class MapActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
+        baristaRule.launchActivity()
         doWelcomeProcess()
         assertDrawerIsClosed()
 
@@ -126,11 +124,24 @@ class MapActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun modeButtonOnMapActivityCyclesThroughModes() {
+        baristaRule.launchActivity()
         doWelcomeProcess()
 
         assertDisplayed(R.id.menu_monitoring)
     }
 
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
+                .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
+                .apply()
+        baristaRule.launchActivity()
+        assertDisplayed(R.id.mapView)
+    }
 
     private fun doWelcomeProcess() {
         clickOn(R.id.btn_next)
