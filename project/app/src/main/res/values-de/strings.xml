@@ -146,6 +146,7 @@
     <string name="monitoring_move">Bewegungs Modus</string>
     <string name="notificationChangeMonitoring">Bewegungs Modus</string>
     <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesKeepaliveValidationError" formatted="true">Der minimale Wert für Keepalive ist %d</string>
     <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesPort">Port</string>
     <string name="preferencesDeviceName">Geräte ID</string>
