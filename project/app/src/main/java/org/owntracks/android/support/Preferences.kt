@@ -437,8 +437,12 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     var keepalive: Int
         get() = getIntOrDefault(R.string.preferenceKeyKeepalive, R.integer.valKeepalive).coerceAtLeast(TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt())
         set(value) {
-            if (value < TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)) setKeepaliveDefault() else setInt(R.string.preferenceKeyKeepalive, value)
+            if (keepAliveInRange(value)) setInt(R.string.preferenceKeyKeepalive, value) else setKeepaliveDefault()
         }
+
+    fun keepAliveInRange(i: Int): Boolean = i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
+
+    val minimumKeepalive = TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
 
     val keepaliveWithHintSupport: String
         get() = getIntWithHintSupport(R.string.preferenceKeyKeepalive)

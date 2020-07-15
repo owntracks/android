@@ -64,6 +64,7 @@
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesParameters">Parameters</string>
     <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive should be a minimum of %d</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
     <string name="mode_mqtt_private_label">MQTT</string>
