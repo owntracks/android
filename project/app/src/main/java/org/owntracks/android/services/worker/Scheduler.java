@@ -3,6 +3,7 @@ package org.owntracks.android.services.worker;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
@@ -53,8 +54,8 @@ public class Scheduler {
         workManager.cancelAllWorkByTag(PERIODIC_TASK_MQTT_RECONNECT);
     }
 
-    public void scheduleMqttPing(long keepAliveSeconds) {
-        WorkRequest mqttPingWorkRequest = new PeriodicWorkRequest.Builder(MQTTKeepaliveWorker.class, keepAliveSeconds, TimeUnit.SECONDS)
+    public void scheduleMqttMaybeReconnectAndPing(long keepAliveSeconds) {
+        WorkRequest mqttPingWorkRequest = new PeriodicWorkRequest.Builder(MQTTMaybeReconnectAndPingWorker.class, keepAliveSeconds, TimeUnit.SECONDS)
                 .addTag(PERIODIC_TASK_MQTT_KEEPALIVE)
                 .setConstraints(anyNetworkConstraint)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
@@ -63,7 +64,6 @@ public class Scheduler {
         workManager.cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE);
         workManager.enqueue(mqttPingWorkRequest);
     }
-
 
     public void cancelMqttPing() {
         Timber.v("Cancelling task tag %s", PERIODIC_TASK_MQTT_KEEPALIVE);
@@ -83,7 +83,7 @@ public class Scheduler {
 
     public void scheduleMqttReconnect() {
         WorkRequest mqttReconnectWorkRequest =
-                new PeriodicWorkRequest.Builder(MQTTReconnectWorker.class, MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
+                new OneTimeWorkRequest.Builder(MQTTReconnectWorker.class)
                         .addTag(PERIODIC_TASK_MQTT_RECONNECT)
                         .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.SECONDS)
                         .setConstraints(anyNetworkConstraint)
@@ -93,7 +93,6 @@ public class Scheduler {
         workManager.cancelAllWorkByTag(PERIODIC_TASK_MQTT_RECONNECT);
         workManager.enqueue(mqttReconnectWorkRequest);
     }
-
 
     public void cancelMqttReconnect() {
         Timber.v("Cancelling task tag %s", PERIODIC_TASK_MQTT_RECONNECT);

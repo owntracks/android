@@ -18,8 +18,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.App;
-import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.R;
+import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
 import org.owntracks.android.messages.MessageClear;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
@@ -47,19 +47,19 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
-
 public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, OnModeChangedPreferenceChangedListener {
     public static final int MODE_ID = 0;
 
     private CustomMqttClient mqttClient;
 
     private String lastConnectionId;
-    private static EndpointState state;
+    private static MessageProcessor.EndpointState state;
 
     private MessageProcessor messageProcessor;
     private RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -80,13 +80,22 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         preferences.registerOnPreferenceChangedListener(this);
     }
 
-    synchronized boolean sendKeepalive() {
-        // Connects if not connected or sends a ping message if aleady connected
-        if (checkConnection() && mqttClient != null) {
-            mqttClient.ping();
-            return true;
-        } else {
-            return false;
+    void reconnectAndSendKeepalive(Semaphore completionNotifier) {
+        if (!Thread.currentThread().getName().equals(NETWORK_HANDLER_THREAD_NAME)) {
+            runThingsOnOtherThreads.postOnNetworkHandlerDelayed(() -> reconnectAndSendKeepalive(completionNotifier), 0);
+            return;
+        }
+        try {
+            if (!checkConnection()) {
+                reconnect();
+            }
+            if (checkConnection()) {
+                mqttClient.ping();
+            }
+        } finally {
+            if (completionNotifier != null) {
+                completionNotifier.release();
+            }
         }
     }
 
@@ -141,8 +150,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         public void connectionLost(Throwable cause) {
             Timber.tag("mqttcallback").e(cause, "connectionLost error");
             scheduler.cancelMqttPing();
-            scheduler.scheduleMqttReconnect();
             changeState(EndpointState.DISCONNECTED.withError(cause));
+            scheduler.scheduleMqttReconnect();
         }
 
         @Override
@@ -248,7 +257,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             throw new MqttConnectionException(e);
         }
         Timber.tag("outgoing").d("MQTT Connected success.");
-        scheduler.scheduleMqttPing(mqttConnectOptions.getKeepAliveInterval());
+        scheduler.scheduleMqttMaybeReconnectAndPing(mqttConnectOptions.getKeepAliveInterval());
         changeState(EndpointState.CONNECTED);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
@@ -422,8 +431,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     public void reconnect() {
+        reconnect(null);
+    }
+
+    public void reconnect(Semaphore completionNotifier) {
         if (!Thread.currentThread().getName().equals(NETWORK_HANDLER_THREAD_NAME)) {
-            runThingsOnOtherThreads.postOnNetworkHandlerDelayed(this::reconnect, 0);
+            runThingsOnOtherThreads.postOnNetworkHandlerDelayed(() -> reconnect(completionNotifier), 0);
             return;
         }
         disconnect(false);
@@ -431,6 +444,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectToBroker();
         } catch (MqttConnectionException | ConfigurationIncompleteException e) {
             Timber.e(e, "Failed to reconnect to MQTT broker");
+        } finally {
+            if (completionNotifier != null) {
+                completionNotifier.release();
+            }
         }
     }
 

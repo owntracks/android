@@ -12,9 +12,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.media.AudioManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkRequest;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -185,44 +182,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         preferences.registerOnPreferenceChangedListener(this);
 
-       // registerWifiStateReceiver(); Testing only
     }
 
-    private void registerWifiStateReceiver() {
-        Timber.v("registering broadcast receiver");
-        //IntentFilter intentFilter = new IntentFilter();
-        //intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        //intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        //WifiStateReceiver receiver = new WifiStateReceiver();
-        //registerReceiver(receiver, intentFilter);
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-
-        connectivityManager.registerNetworkCallback(
-                builder.build(),
-                new ConnectivityManager.NetworkCallback() {
-
-                    @Override
-                    public void onAvailable(Network network) {
-                        Timber.v("network available %s", network.toString());
-
-
-                    }
-
-
-                    @Override
-                    public void onLost(Network network) {
-                        Timber.v("network lost %s", network.toString());
-
-
-                    }
-                }
-
-        );
-    }
 
     @Override
     public void onDestroy() {

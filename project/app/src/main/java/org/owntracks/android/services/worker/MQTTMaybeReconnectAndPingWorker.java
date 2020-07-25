@@ -14,12 +14,12 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class MQTTKeepaliveWorker extends Worker {
+public class MQTTMaybeReconnectAndPingWorker extends Worker {
 
     @Inject
     MessageProcessor messageProcessor;
 
-    public MQTTKeepaliveWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public MQTTMaybeReconnectAndPingWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         AppComponentProvider.getAppComponent().inject(this);
     }
@@ -27,7 +27,9 @@ public class MQTTKeepaliveWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.tag("outgoing").v("MQTTKeepaliveWorker doing work. ThreadID: %s", Thread.currentThread());
-        return messageProcessor.statefulSendKeepalive() ? Result.success() : Result.retry();
+        Timber.tag("outgoing").v("MQTTMaybeReconnectAndPingWorker doing work on threadID: %s", Thread.currentThread());
+        if (!messageProcessor.isEndpointConfigurationComplete())
+            return Result.failure();
+        return messageProcessor.statefulReconnectAndSendKeepalive() ? Result.success() : Result.retry();
     }
 }

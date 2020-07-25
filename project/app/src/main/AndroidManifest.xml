@@ -45,21 +45,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.Owntracks"
         tools:ignore="UnusedAttribute"
-        tools:replace="android:allowBackup"
-        >
-
-
+        tools:replace="android:allowBackup">
 
         <!-- Disables default initialization of WorkManager because custom initializer is used in App.onCreate()-->
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
-            tools:replace="android:authorities"
             android:authorities="${applicationId}.workmanager-init"
             android:enabled="false"
-            android:exported="false" />
+            android:exported="false"
+            tools:replace="android:authorities" />
 
         <!-- Maps SDK requires this as of API v28 -->
-        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -69,13 +68,17 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ui.map.MapActivity" />
 
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+
         <activity
             android:name=".ui.regions.RegionsActivity"
-	    android:label="@string/title_activity_regions"
-            android:launchMode="singleTop"/>
+            android:label="@string/title_activity_regions"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.region.RegionActivity"
-	    android:label="@string/title_activity_region"
+            android:label="@string/title_activity_region"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -198,7 +201,7 @@
             android:name=".ui.contacts.ContactsActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/title_activity_contacts"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"

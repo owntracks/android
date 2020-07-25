@@ -68,10 +68,4 @@ public abstract class AndroindBindingModule {
     @PerReceiver
     @ContributesAndroidInjector
     abstract StartBackgroundServiceReceiver bindBackgroundServiceReceiver();
-
-    @PerReceiver
-    @ContributesAndroidInjector
-    abstract org.owntracks.android.support.receiver.WifiStateReceiver bindWifiStateReceiver();
-
-
 }
