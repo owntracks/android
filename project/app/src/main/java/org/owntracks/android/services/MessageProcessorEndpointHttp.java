@@ -138,7 +138,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
 
     private OkHttpClient createHttpClient() {
-        Timber.tag("outgoing").d("creating new HTTP client instance");
+        Timber.d("creating new HTTP client instance");
         SocketFactory f = getSocketFactory();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .followRedirects(true)
@@ -186,7 +186,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         } catch (ConfigurationIncompleteException e) {
             return null;
         }
-        Timber.tag("outgoing").d("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
+        Timber.d("url:%s, messageId:%s", this.httpEndpoint, message.getMessageId());
 
         String body;
         try {
@@ -218,7 +218,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             request.cacheControl(CacheControl.FORCE_NETWORK);
             return request.build();
         } catch (Exception e) {
-            Timber.tag("outgoing").e(e,"invalid header specified");
+            Timber.e(e,"invalid header specified");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
             httpEndpoint = null;
             return null;
@@ -242,7 +242,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             Response response = getHttpClient().newCall(request).execute();
             // Message was send. Handle delivered message
             if((response.isSuccessful())) {
-                Timber.tag("outgoing").d("request was successful: %s",response);
+                Timber.d("request was successful: %s",response);
                 // Handle response
                 if(response.body() != null ) {
                     try {
@@ -254,10 +254,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
-                        Timber.tag("outgoing").e("error:JsonParseException responseCode:%s", response.code());
+                        Timber.e("error:JsonParseException responseCode:%s", response.code());
                         messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("HTTP " +response.code() + ", JsonParseException"));
                     } catch (Parser.EncryptionException e) {
-                        Timber.tag("outgoing").e("error:JsonParseException responseCode:%s", response.code());
+                        Timber.e("error:JsonParseException responseCode:%s", response.code());
                         messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP: "+response.code() + ", EncryptionException"));
                     }
 
@@ -265,7 +265,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 response.close();
             // Server could be contacted but returned non success HTTP code
             } else {
-                Timber.tag("outgoing").e("request was not successful. HTTP code %s", response.code());
+                Timber.e("request was not successful. HTTP code %s", response.code());
                 messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP code "+response.code() ));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 response.close();
@@ -273,7 +273,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             }
         // Message was not send
         } catch (Exception e) {
-            Timber.tag("outgoing").e(e,"error:IOException. Delivery failed ");
+            Timber.e(e,"error:IOException. Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
             return;

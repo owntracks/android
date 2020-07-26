@@ -27,7 +27,7 @@ public class MQTTMaybeReconnectAndPingWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.tag("outgoing").v("MQTTMaybeReconnectAndPingWorker doing work on threadID: %s", Thread.currentThread());
+        Timber.v("MQTTMaybeReconnectAndPingWorker doing work on threadID: %s", Thread.currentThread());
         if (!messageProcessor.isEndpointConfigurationComplete())
             return Result.failure();
         return messageProcessor.statefulReconnectAndSendKeepalive() ? Result.success() : Result.retry();

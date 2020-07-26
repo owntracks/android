@@ -153,7 +153,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Timber.tag("location").i("Locationresult received: %s", locationResult);
+                Timber.i("Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_DEFAULT);
             }
@@ -162,7 +162,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         locationCallbackOnDemand = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Timber.tag("location").i("Ondemand Locationresult received: %s", locationResult);
+                Timber.i("Ondemand Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_RESPONSE);
             }
@@ -461,12 +461,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             Timber.e("no location provided");
             return;
         }
-        Timber.tag("outgoing").v("location update received: tst:%s, acc:%s, lat:%s, lon:%s type:%s", location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude(), reportType);
+        Timber.v("location update received: tst:%s, acc:%s, lat:%s, lon:%s type:%s", location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude(), reportType);
 
         if (location.getTime() > locationRepo.getCurrentLocationTime()) {
             locationProcessor.onLocationChanged(location,reportType);
         } else {
-            Timber.tag("outgoing").v("Not re-sending message with same timestamp as last");
+            Timber.v("Not re-sending message with same timestamp as last");
         }
     }
 

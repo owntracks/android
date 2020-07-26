@@ -27,7 +27,7 @@ public class MQTTReconnectWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Timber.tag("mqtt").i("MQTTReconnectWorker Doing work on threadID: %s", Thread.currentThread());
+        Timber.i("MQTTReconnectWorker Doing work on threadID: %s", Thread.currentThread());
         if (!messageProcessor.isEndpointConfigurationComplete())
             return Result.failure();
         // We're going to try and call messagePrcessor.reconnect() here, which may reinvoke itself on

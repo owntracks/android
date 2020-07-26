@@ -131,10 +131,10 @@ public class LocationProcessor {
     }
 
 
-    void onWaypointTransition(@NonNull WaypointModel w, @NonNull final Location l, final int transition, @NonNull final String trigger) {
+    void onWaypointTransition(@NonNull WaypointModel w, @NonNull final Location location, final int transition, @NonNull final String trigger) {
         Timber.v("geofence %s/%s transition:%s, trigger:%s", w.getTst(), w.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
-        if (ignoreLowAccuracy(l)) {
+        if (ignoreLowAccuracy(location)) {
             Timber.d("ignoring transition: low accuracy ");
             return;
         }
@@ -157,7 +157,7 @@ public class LocationProcessor {
             return;
         }
 
-        publishTransitionMessage(w, l, transition, trigger);
+        publishTransitionMessage(w, location, transition, trigger);
         if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
             publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
         }
