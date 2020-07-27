@@ -73,31 +73,47 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun twitterLinkOpensSite() {
-        Intents.init()
-        clickOn(R.string.preferencesInfo)
-        clickOn(R.string.preferencesTwitter)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesTwitterSummary))))
-        Intents.release()
+        try {
+            Intents.init()
+            clickOn(R.string.preferencesInfo)
+            clickOn(R.string.preferencesTwitter)
+            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesTwitterSummary))))
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun sourceLinkOpensSite() {
-        Intents.init()
-        clickOn(R.string.preferencesInfo)
-        clickOn(R.string.preferencesRepository)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesRepositorySummary))))
-        Intents.release()
+        try {
+            Intents.init()
+            clickOn(R.string.preferencesInfo)
+            clickOn(R.string.preferencesRepository)
+            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesRepositorySummary))))
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun librariesLinkListsLibraries() {
-        Intents.init()
-        clickOn(R.string.preferencesInfo)
-        clickOn(R.string.preferencesLicenses)
-        assertDisplayed(R.string.preferencesLicenses)
-        Intents.release()
+        try {
+            Intents.init()
+            clickOn(R.string.preferencesInfo)
+            clickOn(R.string.preferencesLicenses)
+            assertDisplayed(R.string.preferencesLicenses)
+        } finally {
+            Intents.release()
+        }
+    }
+
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun logViewerContainsMenuWithDebugOption() {
+        clickOn(R.string.viewLogs)
+        assertDisplayed(R.string.logViewerActivityTitle)
     }
 
     @Test
@@ -138,11 +154,6 @@ class PreferencesActivityTests {
         writeTo(android.R.id.edit, "5")
         clickDialogPositiveButton()
 
-        // Barista doesn't yet support androidx PreferenceCompatFragment, so we have to scroll the
-        // *espresso* way
-        scrollToText(R.string.preferencesDebugLog)
-        clickOn(R.string.preferencesDebugLog)
-
         scrollToText(R.string.preferencesAutostart)
         clickOn(R.string.preferencesAutostart)
 
@@ -168,7 +179,6 @@ class PreferencesActivityTests {
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
         assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\" : 5")
         assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : false")
-        assertContains(R.id.effectiveConfiguration, "\"debugLog\" : true")
         assertContains(R.id.effectiveConfiguration, "\"geocodeEnabled\" : false")
         assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
 
@@ -185,6 +195,7 @@ class PreferencesActivityTests {
         assertNotContains(R.id.effectiveConfiguration, "\"pubTopicBase\"")
         assertNotContains(R.id.effectiveConfiguration, "\"clientId\"")
     }
+
     private fun scrollToText(textResource: Int) {
         onView(withId(androidx.preference.R.id.recycler_view))
                 .perform(actionOnItem<RecyclerView.ViewHolder>(

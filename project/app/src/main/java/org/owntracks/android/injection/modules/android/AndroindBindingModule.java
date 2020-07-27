@@ -4,6 +4,7 @@ import org.owntracks.android.injection.modules.android.ActivityModules.Connectio
 import org.owntracks.android.injection.modules.android.ActivityModules.ContactsActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.EditorActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.LoadActivityModule;
+import org.owntracks.android.injection.modules.android.ActivityModules.LogViewerActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.MapActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.PreferencesActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.RegionActivityModule;
@@ -36,6 +37,10 @@ public abstract class AndroindBindingModule {
     @PerActivity
     @ContributesAndroidInjector(modules = {ConnectionActivityModule.class})
     abstract org.owntracks.android.ui.preferences.connection.ConnectionActivity bindConnectionActivity();
+
+    @PerActivity
+    @ContributesAndroidInjector(modules = {LogViewerActivityModule.class})
+    abstract org.owntracks.android.ui.preferences.logs.LogViewerActivity bindLogViewerActivity();
 
     @PerActivity
     @ContributesAndroidInjector(modules = {EditorActivityModule.class})

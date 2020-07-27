@@ -16,7 +16,6 @@ import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
-import org.owntracks.android.support.TimberDebugLogFileTree;
 import org.owntracks.android.support.TimberDebugLogTree;
 import org.owntracks.android.ui.map.MapActivity;
 
@@ -51,12 +50,6 @@ public class App extends DaggerApplication  {
         WorkManager.initialize(this, new Configuration.Builder().build());
 
         super.onCreate();
-        if (preferences.getDebugLog()) {
-            Timber.plant(new TimberDebugLogFileTree(this.context));
-        } else {
-            preferences.setDebugLog(false);
-        }
-
 
         if(BuildConfig.DEBUG) {
             Timber.plant(new TimberDebugLogTree());

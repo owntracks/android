@@ -219,9 +219,13 @@
             android:name=".ui.preferences.connection.ConnectionActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/preferencesServer"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask" />
 
-        </activity>
+        <activity
+            android:name=".ui.preferences.logs.LogViewerActivity"
+            android:clearTaskOnLaunch="true"
+            android:label="@string/logViewerActivityTitle"
+            android:launchMode="singleTask" />
 
         <activity
             android:name=".ui.welcome.WelcomeActivity"
@@ -229,6 +233,12 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="unspecified" />
+
+        <provider
+            android:name=".ui.preferences.logs.LogViewerActivity$ExportedLogContentProvider"
+            android:authorities="${applicationId}.log"
+            android:exported="false"
+            android:grantUriPermissions="true" />
     </application>
 
 </manifest>

@@ -56,11 +56,7 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedMisc">
-        <SwitchPreferenceCompat
-            app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyDebugLog"
-            app:summary="@string/preferencesDebugLogSummary"
-            app:title="@string/preferencesDebugLog" />
+
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valAutostartOnBoot"
             app:iconSpaceReserved="false"

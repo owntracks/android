@@ -179,4 +179,7 @@
     <string name="status_last_background_update_hint">Location service last background update</string>
     <string name="status_background_service_started_hint">Background service started</string>
     <string name="status_battery_optimization_whitelisted_hint">Battery optimization whitelisted</string>
+    <string name="clear_log">Clear</string>
+    <string name="viewLogs">View Logs</string>
+    <string name="logViewerActivityTitle">Logs</string>
 </resources>

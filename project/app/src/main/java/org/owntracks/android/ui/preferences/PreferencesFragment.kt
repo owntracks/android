@@ -12,6 +12,7 @@ import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
+import org.owntracks.android.ui.preferences.logs.LogViewerActivity
 
 class PreferencesFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
@@ -22,6 +23,7 @@ class PreferencesFragment : AbstractPreferenceFragment() {
 
         //TODO move this to a preferences fragment rather than its own activity.
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.intent = Intent(context, ConnectionActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+        findPreference<Preference>(UI_LOGS)!!.intent = Intent(context, LogViewerActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     }
 
     override fun onResume() {
@@ -39,6 +41,7 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     companion object {
         private const val UI_PREFERENCE_SCREEN_CONNECTION = "connectionScreen"
         private const val UI_SCREEN_CONFIGURATION = "configuration"
+        private const val UI_LOGS = "logs"
     }
 
     @Module(includes = [BaseFragmentModule::class])

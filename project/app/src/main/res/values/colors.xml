@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="ic_launcher_background">#3F72B5</color>
+    <color name="log_debug_tag_color">#888888</color>
+    <color name="log_error_tag_color">#aa0000</color>
+    <color name="log_info_tag_color">#00aa00</color>
+    <color name="log_warning_tag_color">#aaaa00</color>
 </resources>

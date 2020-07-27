@@ -1,5 +1,7 @@
 package org.owntracks.android.services.worker;
 
+import android.content.Context;
+
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
@@ -8,6 +10,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.support.Preferences;
 
@@ -25,9 +28,8 @@ public class Scheduler {
     private static final String PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING" ;
     private static final String PERIODIC_TASK_MQTT_KEEPALIVE = "PERIODIC_TASK_MQTT_KEEPALIVE" ;
     private static final String PERIODIC_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT";
-    private static final String PERIODIC_TASK_PROCESS_OUTGOING_MESSAGES = "PERIODIC_TASK_PROCESS_OUTGOING_MESSAGES";
 
-    private WorkManager workManager = WorkManager.getInstance();
+    private WorkManager workManager;
 
     @Inject
     Preferences preferences;
@@ -37,7 +39,8 @@ public class Scheduler {
             .build();
 
     @Inject
-    public Scheduler() {
+    public Scheduler(@AppContext Context context) {
+        workManager = WorkManager.getInstance(context);
     }
 
     public void cancelHttpTasks() {
