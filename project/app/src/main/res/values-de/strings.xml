@@ -146,11 +146,29 @@
     <string name="monitoring_move">Bewegungs Modus</string>
     <string name="notificationChangeMonitoring">Bewegungs Modus</string>
     <string name="preferencesKeepalive">Keepalive</string>
-    <string name="preferencesKeepaliveValidationError" formatted="true">Der minimale Wert für Keepalive ist %d</string>
     <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesPort">Port</string>
     <string name="preferencesDeviceName">Geräte ID</string>
     <string name="preferencesHost">Hostnamen</string>
     <string name="distance_label">Abstand</string>
     <string name="title_exit">App beenden</string>
+    <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive muss mindestens %d sein</string>
+    <string name="preferencesLocatorInterval">Standort Intervall</string>
+    <string name="preferencesLocatorIntervalSummary">Intervall zwischen Standortupdates</string>
+    <string name="preferencesLocatorIntervalDialog">Wie häufig sollen Standorte vom Gerät bezogen werden? (Sekunden)</string>
+    <string name="preferencesMoveModeLocatorInterval">Standort Intervall (Bewegungsmodus)</string>
+    <string name="preferencesMoveModeLocatorIntervalSummary">Intervall zwischen Standortupdates im Bewegungsmodus</string>
+    <string name="preferencesMoveModeLocatorIntervalDialog">Wie häufig sollen Standorte im Bewegungsmodus vom Gerät abgefragt werden (Sekunden)</string>
+    <string name="preferencesDebugLog">Debug Log</string>
+    <string name="monitoring_mode">Monitoring</string>
+    <string name="preferencesClientId">Client ID</string>
+    <string name="status_endpoint_state_hint">Endpunktstatus</string>
+    <string name="status_endpoint_state_message_hint">Endpunkt Statusnachricht</string>
+    <string name="status_endpoint_queue_hint">Endpunktschlange</string>
+    <string name="status_last_background_update_hint">Letzer Update vom Standortservice</string>
+    <string name="status_background_service_started_hint">Standortservice gestartet</string>
+    <string name="status_battery_optimization_whitelisted_hint">Batterieoptimierung ermöglicht</string>
+    <string name="clear_log">Löschen</string>
+    <string name="viewLogs">Logs ansehen</string>
+    <string name="logViewerActivityTitle">Logs</string>
 </resources>

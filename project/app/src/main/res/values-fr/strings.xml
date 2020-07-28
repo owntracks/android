@@ -161,4 +161,5 @@
     <string name="preferencesGeocode">Géocodage</string>
     <string name="preferencesGeocodeSummary">Activer le géocodage. Redémarrage nécessaire.</string>
     <string name="play_services_update_required">Mise à jour des services Google Play est requise.</string>
+    <string name="distance_label">Distance</string>
 </resources>

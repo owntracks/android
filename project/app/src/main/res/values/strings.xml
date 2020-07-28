@@ -106,7 +106,6 @@
     <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
     <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
-    <string name="external_storage_permissions_description">Owntracks requires access to your external storage in order to save the debug log to your device</string>
     <string name="permissions_granted">Permissions have been granted</string>
     <string name="icon_description_owntracks">Owntracks</string>
     <string name="enjoy_description">Select preferences from the menu and configure OwnTracks for your server before using it</string>
@@ -154,7 +153,6 @@
     <string name="ERROR_DATADISABLED">Data connection not available</string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
 	<string name="notificationChannelOngoing">Ongoing</string>
-    <string name="debugChannelOngoing">Debug</string>
 	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
 	<string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
@@ -169,7 +167,6 @@
     <string name="monitoring_move">Move monitoring mode</string>
     <string name="notificationChangeMonitoring">Change Monitoring</string>
     <string name="preferencesDebugLog">Debug log</string>
-    <string name="preferencesDebugLogSummary">Write extended debug information</string>
     <string name="monitoring_mode">Monitoring</string>
     <string name="distance_label">Distance</string>
     <string name="preferencesClientId">Client ID</string>
