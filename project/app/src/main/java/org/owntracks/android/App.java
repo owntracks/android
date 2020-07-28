@@ -53,19 +53,23 @@ public class App extends DaggerApplication  {
 
         if(BuildConfig.DEBUG) {
             Timber.plant(new TimberDebugLogTree());
-
             Timber.e("StrictMode enabled in DEBUG build");
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
                     .detectNetwork()
-                    .penaltyLog()
+                    .penaltyDeath()
                     .penaltyDialog()
                     .build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
-                    .penaltyLog()
+                    .detectFileUriExposure()
+                    .penaltyDeath()
                     .build());
 
+        } else {
+            Timber.plant(new Timber.DebugTree());
         }
         for(Timber.Tree t : Timber.forest()) {
                 Timber.v("Planted trees :%s", t);
