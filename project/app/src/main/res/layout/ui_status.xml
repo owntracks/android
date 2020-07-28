@@ -1,171 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <import type="org.owntracks.android.support.DateFormatter"/>
-        <import type="android.view.View"/>
-        <variable name="vm" type="org.owntracks.android.ui.status.StatusViewModel" />
+
+        <import type="org.owntracks.android.support.DateFormatter" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.status.StatusViewModel" />
     </data>
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/frame"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/frame">
+        android:layout_height="fill_parent">
 
 
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:elevation="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <ScrollView
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <LinearLayout
-            android:orientation="vertical"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_horizontal_margin"
-            android:paddingBottom="@dimen/activity_horizontal_margin">
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-            <TextView
-                android:id="@+id/connectedStatus"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{vm.endpointState, default=Connected}"
-                android:ellipsize="none"
-                style="@style/ListItemPrimary" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_endpoint_state_hint"
-                android:ellipsize="end"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{vm.endpointMessage ?? @string/na, default=@string/na}"
-                android:ellipsize="none"
-                android:visibility="@{vm.endpointMessage!=null}"
-                style="@style/ListItemPrimary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_endpoint_state_message_hint"
-                android:ellipsize="end"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:visibility="@{vm.endpointMessage!=null}"
-                style="@style/ListItemSecondary" />
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.endpointQueue)}"
-                android:ellipsize="none"
-                style="@style/ListItemPrimary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_endpoint_queue_hint"
-                android:ellipsize="end"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{vm.locationUpdated != 0 ? DateFormatter.formatDate(vm.locationUpdated) : @string/na}"
-                android:ellipsize="none"
-                style="@style/ListItemPrimary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_last_background_update_hint"
-                android:ellipsize="end"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{vm.serviceStarted != null ? DateFormatter.formatDate(vm.serviceStarted) : @string/na}"
-                android:ellipsize="none"
-                style="@style/ListItemPrimary" />
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_background_service_started_hint"
-                android:ellipsize="end"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                style="@style/ListItemSecondary" />
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
-                android:id="@+id/dozeWhiteListed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin">
+
 
                 <TextView
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:id="@+id/connectedStatus"
+                    style="@style/ListItemPrimary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{vm.dozeWhitelisted}"
                     android:ellipsize="none"
-                    style="@style/ListItemPrimary" />
-
-                <TextView
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@{vm.endpointState, default=Connected}" />
+
+                <TextView
+                    style="@style/ListItemSecondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/status_battery_optimization_whitelisted_hint"
                     android:ellipsize="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/activity_horizontal_margin"
-                    style="@style/ListItemSecondary" />
+                    android:text="@string/status_endpoint_state_hint" />
+
+                <TextView
+                    style="@style/ListItemPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@{vm.endpointMessage ?? @string/na, default=@string/na}"
+                    android:visibility="@{vm.endpointMessage!=null}" />
+
+                <TextView
+                    style="@style/ListItemSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    android:text="@string/status_endpoint_state_message_hint"
+                    android:visibility="@{vm.endpointMessage!=null}" />
+
+                <TextView
+                    style="@style/ListItemPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.endpointQueue)}" />
+
+                <TextView
+                    style="@style/ListItemSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    android:text="@string/status_endpoint_queue_hint" />
+
+                <TextView
+                    style="@style/ListItemPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@{vm.locationUpdated != 0 ? DateFormatter.formatDate(vm.locationUpdated) : @string/na}" />
+
+                <TextView
+                    style="@style/ListItemSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    android:text="@string/status_last_background_update_hint" />
+
+                <TextView
+                    style="@style/ListItemPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@{vm.serviceStarted != null ? DateFormatter.formatDate(vm.serviceStarted) : @string/na}" />
+
+                <TextView
+                    style="@style/ListItemSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_horizontal_margin"
+                    android:text="@string/status_background_service_started_hint" />
+
+
+                <LinearLayout
+                    android:id="@+id/dozeWhiteListed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ListItemPrimary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="none"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:text="@{vm.dozeWhitelisted}" />
+
+                    <TextView
+                        style="@style/ListItemSecondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_horizontal_margin"
+                        android:text="@string/status_battery_optimization_whitelisted_hint" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/ListItemPrimary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:onClick="@{() -> vm.viewLogs()}"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:text="@string/viewLogs" />
             </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

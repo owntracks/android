@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.status;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
+import org.owntracks.android.ui.preferences.logs.LogViewerActivity;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +31,7 @@ import timber.log.Timber;
 
 @PerActivity
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
+    private final Context context;
     private MessageProcessor.EndpointState endpointState;
     private String endpointMessage;
 
@@ -39,8 +42,9 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Inject
     public StatusViewModel(@AppContext Context context) {
-
+        this.context = context;
     }
+
     public void attachView(@NonNull StatusMvvm.View view, @Nullable Bundle savedInstanceState) {
         super.attachView(view, savedInstanceState);
     }
@@ -54,7 +58,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     @Bindable
     public String getEndpointMessage() {
-        return endpointMessage ;
+        return endpointMessage;
     }
 
     @Override
@@ -108,4 +112,8 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
         notifyPropertyChanged(BR.endpointQueue);
     }
 
+    public void viewLogs() {
+        Intent intent = new Intent(context, LogViewerActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 }

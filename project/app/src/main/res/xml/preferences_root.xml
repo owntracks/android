@@ -23,10 +23,6 @@
         app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
         app:iconSpaceReserved="false" />
     <Preference
-        android:key="logs"
-        android:title="@string/viewLogs"
-        app:iconSpaceReserved="false" />
-    <Preference
         android:key="configuration"
         android:title="@string/configurationManagement"
         app:iconSpaceReserved="false" />
