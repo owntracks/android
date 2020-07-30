@@ -162,9 +162,9 @@
     <string name="preferencesDebugLog">Registro de depuración</string>
     <string name="monitoring_mode">Monitorización</string>
     <string name="preferencesClientId">ID de cliente</string>
-    <string name="status_endpoint_state_hint">Estado del servidor</string>
-    <string name="status_endpoint_state_message_hint">Mensaje de estado del servidor</string>
-    <string name="status_endpoint_queue_hint">Cola del servidor</string>
+    <string name="status_endpoint_state_hint">Estado del punto de conexión</string>
+    <string name="status_endpoint_state_message_hint">Mensaje de estado del punto de conexión</string>
+    <string name="status_endpoint_queue_hint">Cola del punto de conexión</string>
     <string name="status_last_background_update_hint">Ultima actualización en segundo plano del servicio de ubicación</string>
     <string name="status_background_service_started_hint">Servicio en segundo plano activo</string>
     <string name="status_battery_optimization_whitelisted_hint">Lista blanca de optimización de batería</string>
