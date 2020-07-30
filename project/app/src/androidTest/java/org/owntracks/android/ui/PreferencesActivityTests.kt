@@ -110,13 +110,6 @@ class PreferencesActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
-    fun logViewerContainsMenuWithDebugOption() {
-        clickOn(R.string.viewLogs)
-        assertDisplayed(R.string.logViewerActivityTitle)
-    }
-
-    @Test
     @AllowFlaky(attempts = 3)
     fun settingSimpleHTTPConfigSettingsCanBeExported() {
         clickOn(R.string.preferencesServer)
