@@ -8,7 +8,7 @@ import org.junit.runner.Description
 import java.io.File
 import java.io.IOException
 
-class ScreenshotTakingRule : TestWatcher() {
+class ScreenshotTakingOnFailureRule : TestWatcher() {
     override fun failed(e: Throwable?, description: Description) {
         val parentFolderPath = "failures/${description.className}"
         takeScreenshot(parentFolderPath = parentFolderPath, screenShotName = description.methodName)
@@ -28,15 +28,16 @@ class ScreenshotTakingRule : TestWatcher() {
             Log.e("Screenshots", "Could not take the screenshot", ex)
         }
     }
-}
 
-class CustomScreenCaptureProcessor(parentFolderPath: String) : BasicScreenCaptureProcessor() {
-    init {
-        this.mDefaultScreenshotPath = File(
-                "/storage/emulated/0/Pictures",
-                "screenshots/$parentFolderPath"
-        )
+    class CustomScreenCaptureProcessor(parentFolderPath: String) : BasicScreenCaptureProcessor() {
+        init {
+            this.mDefaultScreenshotPath = File(
+                    "/storage/emulated/0/Pictures",
+                    "screenshots/$parentFolderPath"
+            )
+        }
+
+        override fun getFilename(prefix: String): String = prefix
     }
-
-    override fun getFilename(prefix: String): String = prefix
 }
+

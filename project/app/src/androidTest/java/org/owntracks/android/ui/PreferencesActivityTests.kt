@@ -28,7 +28,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingRule
+import org.owntracks.android.ScreenshotTakingOnFailureRule
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
 @LargeTest
@@ -37,7 +37,7 @@ class PreferencesActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(PreferencesActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingRule()
+    private val screenshotRule = ScreenshotTakingOnFailureRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

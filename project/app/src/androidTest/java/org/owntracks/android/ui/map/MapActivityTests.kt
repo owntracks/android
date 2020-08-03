@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.map
 
-
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -23,8 +22,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.LocationPermissionGranter
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingRule
-
+import org.owntracks.android.ScreenshotTakingOnFailureRule
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -34,7 +32,7 @@ class MapActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(MapActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingRule()
+    private val screenshotRule = ScreenshotTakingOnFailureRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

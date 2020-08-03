@@ -23,14 +23,14 @@ jobs:
       working-directory: project
       timeout-minutes: 10
     - name: Run unit tests
-      run: ./gradlew check test
+      run: ./gradlew check jacocoTestDebugUnitTestReport
       working-directory: project
       timeout-minutes: 10
     - name: Test with Gradle on the emulator api=29
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: cd project && ./gradlew connectedAndroidTest jacocoCombinedTestReport
+        script: cd project && ./gradlew createDebugCoverageReport
         profile: pixel_3a
         target: google_apis
       timeout-minutes: 15
@@ -59,9 +59,17 @@ jobs:
         xUnitTestPath: "./project/app/build/test-results/collected/"
       if: always()
     - uses: codecov/codecov-action@v1
+      name: Upload espresso coverage to codecov
       if: always()
       with:
-        file: ./project/app/build/reports/jacoco/jacocoCombinedTestReport/jacocoCombinedTestReport.xml
+        file: ./project/app/build/reports/coverage/debug/report.xml
+        flags: uitests
+    - uses: codecov/codecov-action@v1
+      name: Upload unit coverage to codecov
+      if: always()
+      with:
+        file: ./project/app/build/jacoco/jacoco.xml
+        flags: unittests
   publish:
     name: Publish
     runs-on: ubuntu-latest

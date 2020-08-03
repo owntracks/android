@@ -2,7 +2,8 @@ package org.owntracks.android.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
+import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.junit.Before
@@ -12,13 +13,14 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnFailureRule
-import org.owntracks.android.ui.status.StatusActivity
+import org.owntracks.android.ui.preferences.logs.LogViewerActivity
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class StatusActivityTests {
+class LogViewerActivityTests {
     @get:Rule
-    var baristaRule = BaristaRule.create(StatusActivity::class.java)
+    var baristaRule = BaristaRule.create(LogViewerActivity::class.java)
 
     private val screenshotRule = ScreenshotTakingOnFailureRule()
 
@@ -35,12 +37,8 @@ class StatusActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun statusActivityShowsEndpointState() {
-        assertDisplayed(R.string.status_endpoint_state_hint)
-    }
-
-    @Test
-    @AllowFlaky(attempts = 1)
-    fun statusActivityShowsLogsLauncher() {
-        assertDisplayed(R.string.viewLogs)
+        // Wait for the logviewer coroutine to start
+        sleep(5, TimeUnit.SECONDS)
+        BaristaVisibilityAssertions.assertDisplayed(R.string.logViewerActivityTitle)
     }
 }
