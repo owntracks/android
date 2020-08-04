@@ -58,7 +58,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages = false;
-    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(100);
+    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10000);
     private Thread backgroundDequeueThread;
 
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
