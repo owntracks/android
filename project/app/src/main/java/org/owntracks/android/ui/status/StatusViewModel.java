@@ -19,7 +19,7 @@ import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.preferences.logs.LogViewerActivity;
+import org.owntracks.android.ui.preferences.LogViewerActivity;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +37,6 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     private Date serviceStarted;
     private long locationUpdated;
-    private boolean locationPermission;
     private int queueLength;
 
     @Inject

@@ -16,6 +16,7 @@ import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver;
+import org.owntracks.android.ui.preferences.LogViewerActivity;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -40,7 +41,7 @@ public abstract class AndroindBindingModule {
 
     @PerActivity
     @ContributesAndroidInjector(modules = {LogViewerActivityModule.class})
-    abstract org.owntracks.android.ui.preferences.logs.LogViewerActivity bindLogViewerActivity();
+    abstract LogViewerActivity bindLogViewerActivity();
 
     @PerActivity
     @ContributesAndroidInjector(modules = {EditorActivityModule.class})

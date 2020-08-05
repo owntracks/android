@@ -8,10 +8,6 @@
         <import type="android.view.View" />
 
         <import type="org.owntracks.android.support.widgets.BindingConversions" />
-
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.preferences.logs.LogViewerMvvm.ViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -35,10 +31,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
-            tools:itemCount="20"
-            tools:listitem="@layout/log_viewer_entry"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            tools:itemCount="20"
+            tools:listitem="@layout/log_viewer_entry" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/share_fab"

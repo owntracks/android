@@ -222,7 +222,7 @@
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".ui.preferences.logs.LogViewerActivity"
+            android:name=".ui.preferences.LogViewerActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/logViewerActivityTitle"
             android:launchMode="singleTask" />
@@ -235,7 +235,7 @@
             android:screenOrientation="unspecified" />
 
         <provider
-            android:name=".ui.preferences.logs.LogViewerActivity$ExportedLogContentProvider"
+            android:name=".ui.preferences.LogViewerActivity$ExportedLogContentProvider"
             android:authorities="${applicationId}.log"
             android:exported="false"
             android:grantUriPermissions="true" />

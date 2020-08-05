@@ -11,7 +11,7 @@ Adaptations include:
 * Removing or simplifying  wireguard-specific implementation details
 */
 
-package org.owntracks.android.ui.preferences.logs
+package org.owntracks.android.ui.preferences
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -38,6 +38,8 @@ import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
 import org.owntracks.android.ui.base.BaseActivity
+import org.owntracks.android.ui.base.view.MvvmView
+import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.FileOutputStream
@@ -52,7 +54,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, LogViewerMvvm.ViewModel<*>>(), LogViewerMvvm.View {
+class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(), MvvmView {
     private data class LogLine(val pid: Int, val tid: Int, val time: Date?, val level: String, val tag: String, var msg: String)
 
     private lateinit var logAdapter: LogEntryAdapter
@@ -93,7 +95,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, LogViewerMvvm.V
             val shareIntent = ShareCompat.IntentBuilder.from(this)
                     .setType("text/plain")
                     .setSubject("Owntracks Log File")
-                    .setChooserTitle("Export log file")
+                    .setChooserTitle(R.string.exportLogFilePrompt)
                     .setStream(logExportUri)
                     .createChooserIntent()
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
