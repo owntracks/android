@@ -54,8 +54,9 @@ import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
 
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.WeakHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -67,8 +68,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     private static final long ZOOM_LEVEL_STREET = 15;
     private final int PERMISSIONS_REQUEST_CODE = 1;
 
-    private final WeakHashMap<String, Marker> mMarkers = new WeakHashMap<>();
-    private GoogleMap mMap;
+    private final Map<String, Marker> markers = new HashMap<>();
+    private GoogleMap googleMap;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private boolean isMapReady = false;
     private Menu mMenu;
@@ -208,8 +209,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         try {
-            if (binding.mapView != null)
-                binding.mapView.onSaveInstanceState(bundle);
+            binding.mapView.onSaveInstanceState(bundle);
         } catch (Exception ignored) {
             isMapReady = false;
         }
@@ -218,8 +218,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void onDestroy() {
         try {
-            if (binding.mapView != null)
-                binding.mapView.onDestroy();
+            binding.mapView.onDestroy();
         } catch (Exception ignored) {
             isMapReady = false;
         }
@@ -234,7 +233,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         try {
             binding.mapView.onResume();
 
-            if (mMap == null) {
+            if (googleMap == null) {
                 Timber.v("map not ready. Running initDelayed()");
                 this.isMapReady = false;
                 initMapDelayed();
@@ -413,14 +412,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.mMap = googleMap;
-        this.mMap.setIndoorEnabled(false);
-        this.mMap.setLocationSource(viewModel.getMapLocationSource());
-        this.mMap.setMyLocationEnabled(true);
-        this.mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        this.mMap.setOnMapClickListener(viewModel.getOnMapClickListener());
-        this.mMap.setOnMarkerClickListener(viewModel.getOnMarkerClickListener());
-        this.mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+        this.googleMap = googleMap;
+        this.googleMap.setIndoorEnabled(false);
+        this.googleMap.setLocationSource(viewModel.getMapLocationSource());
+        this.googleMap.setMyLocationEnabled(true);
+        this.googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        this.googleMap.setOnMapClickListener(viewModel.getOnMapClickListener());
+        this.googleMap.setOnMarkerClickListener(viewModel.getOnMarkerClickListener());
+        this.googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
                 return null;
@@ -438,14 +437,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     private void updateCamera(@NonNull LatLng latLng) {
         if(isMapReady)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
     }
 
     @Override
     public void clearMarkers() {
         if (isMapReady)
-            mMap.clear();
-        mMarkers.clear();
+            googleMap.clear();
+        markers.clear();
     }
 
     @Override
@@ -453,7 +452,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         if(contact == null)
             return;
 
-        Marker m = mMarkers.get(contact.getId());
+        Marker m = markers.get(contact.getId());
         if(m != null)
             m.remove();
     }
@@ -466,17 +465,21 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
 
         Timber.v("updating marker for contact: %s", contact.getId());
-        Marker m = mMarkers.get(contact.getId());
+        Marker marker = markers.get(contact.getId());
 
-        if (m != null) {
-            m.setPosition(contact.getLatLng());
+        if (marker != null && marker.getTag() != null) {
+            marker.setPosition(contact.getLatLng());
         } else {
-            m = mMap.addMarker(new MarkerOptions().position(contact.getLatLng()).anchor(0.5f, 0.5f).visible(false));
-            m.setTag(contact.getId());
-            mMarkers.put(contact.getId(), m);
+            // If a marker has been removed, its tag will be null. Doing anything with it will make it explode
+            if (marker != null) {
+                markers.remove(contact.getId());
+            }
+            marker = googleMap.addMarker(new MarkerOptions().position(contact.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            marker.setTag(contact.getId());
+            markers.put(contact.getId(), marker);
         }
 
-        contactImageProvider.setMarkerAsync(m, contact);
+        contactImageProvider.setMarkerAsync(marker, contact);
     }
 
     @Override

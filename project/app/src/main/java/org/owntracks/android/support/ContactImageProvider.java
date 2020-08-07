@@ -1,7 +1,6 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import androidx.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,10 +12,12 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import androidx.annotation.Nullable;
-import androidx.collection.ArrayMap;
 import android.util.Base64;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
+import androidx.databinding.BindingAdapter;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -80,7 +81,6 @@ public class ContactImageProvider {
 
         @Override
         protected void onPostExecute(BitmapDescriptor result) {
-
             Marker marker = target.get();
             if(marker != null) {
                 marker.setIcon(result);

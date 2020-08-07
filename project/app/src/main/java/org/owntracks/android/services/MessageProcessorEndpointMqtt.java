@@ -100,7 +100,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     synchronized void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException {
-        m.addMqttPreferences(preferences); // TODO send it twice if it's a MessageClear
+        m.addMqttPreferences(preferences);
         long messageId = m.getMessageId();
         try {
             connectToBroker();
@@ -115,7 +115,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
 
         try {
-            IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), parser.toJsonBytes(m), m.getQos(), m.getRetained());
+            IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), m.toJsonBytes(parser), m.getQos(), m.getRetained());
             long startTime = System.nanoTime();
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
             long endTime = System.nanoTime();

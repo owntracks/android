@@ -40,8 +40,6 @@ public class MemoryContactsRepo implements ContactsRepo {
         this.eventBus.register(this);
     }
 
-
-
     @Override
     public HashMap<String, FusedContact> getAll() {
         return mMap;

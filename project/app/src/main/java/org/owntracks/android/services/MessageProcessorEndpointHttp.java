@@ -190,7 +190,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         String body;
         try {
-            body = parser.toJson(message);
+            body = message.toJson(parser);
         } catch (IOException e) { // Message serialization failed. This shouldn't happen.
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(e.getMessage()));
             return null;

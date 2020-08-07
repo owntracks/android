@@ -37,9 +37,9 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private final ContactsRepo contactsRepo;
     private final LocationProcessor locationProcessor;
     private FusedContact activeContact;
-    private LocationSource.OnLocationChangedListener mListener;
+    private LocationSource.OnLocationChangedListener onLocationChangedListener;
     private MessageProcessor messageProcessor;
-    private Location mLocation;
+    private Location location;
 
     private static final int VIEW_FREE = 0;
     private static final int VIEW_CONTACT = 1;
@@ -161,7 +161,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     @Nullable
     public LatLng getCurrentLocation() {
-        return mLocation != null ? new LatLng(mLocation.getLatitude(), mLocation.getLongitude()) : null;
+        return location != null ? new LatLng(location.getLatitude(), location.getLongitude()) : null;
     }
 
     @Override
@@ -183,7 +183,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public boolean hasLocation() {
-        return mLocation != null;
+        return location != null;
     }
 
 
@@ -207,7 +207,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onClearContactClicked() {
         MessageClear m = new MessageClear();
-        if(activeContact != null) {
+        if (activeContact != null) {
             m.setTopic(activeContact.getId());
             messageProcessor.queueMessageForSending(m);
         }
@@ -252,9 +252,9 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     public void onEvent(@NonNull Location l) {
         Timber.v("location source updated");
 
-        this.mLocation = l;
-        if (mListener != null) {
-            this.mListener.onLocationChanged(this.mLocation);
+        this.location = l;
+        if (onLocationChangedListener != null) {
+            this.onLocationChangedListener.onLocationChanged(this.location);
         }
         if(mode == VIEW_DEVICE) {
             liveCamera.postValue(getCurrentLocation());
@@ -266,15 +266,15 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
        Timber.v("location source activated");
-       mListener = onLocationChangedListener;
-       if (mLocation != null)
-           this.mListener.onLocationChanged(mLocation);
+       this.onLocationChangedListener = onLocationChangedListener;
+       if (location != null)
+           this.onLocationChangedListener.onLocationChanged(location);
     }
 
     // Map Callback
     @Override
     public void deactivate() {
-        mListener = null;
+        onLocationChangedListener = null;
     }
 
     // Map Callback

@@ -8,8 +8,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+
+import java.io.IOException;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown.class)
 
@@ -162,4 +165,12 @@ public abstract class MessageBase extends BaseObservable  {
         }
 
         public abstract void addMqttPreferences(Preferences preferences);
+
+        public byte[] toJsonBytes(Parser parser) throws IOException {
+                return parser.toJsonBytes(this);
+        }
+
+        public String toJson(Parser parser) throws IOException {
+                return parser.toJson(this);
+        }
 }
