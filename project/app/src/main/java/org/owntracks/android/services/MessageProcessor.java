@@ -180,6 +180,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                 }
             }
         }
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 
     // Should be on the background thread here, because we block

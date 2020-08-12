@@ -225,7 +225,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
             setViewModeFree();
         }
         getView().removeMarker(c.getContact());
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

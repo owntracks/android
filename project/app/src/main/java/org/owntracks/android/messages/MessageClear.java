@@ -21,7 +21,6 @@ public class MessageClear extends MessageBase {
     @Override
     public void addMqttPreferences(Preferences preferences) {
         setRetained(true);
-        setTopic(preferences.getPubTopicBase());
     }
 
     // Clear messages are implemented as empty messages
