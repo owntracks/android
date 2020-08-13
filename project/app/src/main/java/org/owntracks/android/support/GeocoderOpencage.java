@@ -3,8 +3,6 @@ package org.owntracks.android.support;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -54,8 +52,9 @@ public class GeocoderOpencage implements Geocoder {
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null)
-                throw new IOException(String.format("Unexpected code %s", response));
+            if (!response.isSuccessful() || response.body() == null) {
+                Timber.e("Unexpected response from Opencage: %s", response);
+            }
             String rs = response.body().string();
             Timber.d("Opencage HTTP response: %s", rs);
             String formattedLocation = jsonMapper.readValue(rs, OpenCageResponse.class).getFormatted();
