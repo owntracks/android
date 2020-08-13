@@ -1,4 +1,4 @@
-ext.serviceAccountCreds = file("owntracks-android-7a7fe209cba5.json")
+ext.serviceAccountCreds = file("owntracks-android-7a8e1517bde3.json")
 play {
     if (serviceAccountCreds.exists()) {
         enabled = true
