@@ -1,3 +1,0 @@
-Release 2.2.0
-All changes can be found at https://github.com/owntracks/android/releases/tag/Android-v2.2.0-beta01/CHANGLOG.md
-Please report any issues to https://github.com/owntracks/android/issues

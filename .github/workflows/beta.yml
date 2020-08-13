@@ -1,0 +1,24 @@
+name: Android CI
+
+on:
+  push:
+    tags:
+      - Android-v.[0-9]+.[0-9]+.[0-9]+-beta*
+
+jobs:
+  promote:
+    name: Promote Internal to Beta
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Decrypt secrets
+      env:
+          GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}          
+      run: echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-7a8e1517bde3.json
+    - name: Promote play store beta from internal
+      run: ./gradlew promoteArtifact --from-track internal --promote-track beta --release-status completed
+      working-directory: project
