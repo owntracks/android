@@ -32,8 +32,8 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
         this.parser = parser; 
     }
 
-    public void attachView(@NonNull EditorMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull EditorMvvm.View view) {
+        super.attachView(savedInstanceState, view);
         updateEffectiveConfiguration();
     }
 

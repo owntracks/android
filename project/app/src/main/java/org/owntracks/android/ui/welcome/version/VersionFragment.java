@@ -30,7 +30,7 @@ public class VersionFragment extends BaseSupportFragment<UiWelcomeVersionBinding
     @Override
     public void onClick(View view) {
         try {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.valDocumentationUrlAndroid)));
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)));
             startActivity(i);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(getContext(), "No suitable browser installed", Toast.LENGTH_SHORT).show();

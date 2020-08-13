@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.OpenableColumns;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.PopupMenu;
@@ -101,7 +102,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         this.tlsClientCrtPasswortDirty = true;
     }
 
-    public void onTlsCheckedChanged(final View v, boolean isChecked) {
+    public void onTlsCheckedChanged(final CompoundButton ignored, boolean isChecked) {
         setTls(isChecked);
     }
 
@@ -167,6 +168,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     }
 
 
+
     private abstract class CopyTask extends AsyncTask<Uri, String, String> {
 
         @Override
@@ -191,7 +193,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
                 return filename;
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Timber.e(e);
                 this.cancel(true);
                 return null;
             }

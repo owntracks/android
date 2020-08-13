@@ -19,8 +19,8 @@ public class PreferencesFragmentViewModel extends BaseViewModel<PreferencesFragm
         this.preferences = preferences;
     }
 
-    public void attachView(@NonNull PreferencesFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull PreferencesFragmentMvvm.View view) {
+        super.attachView(savedInstanceState, view);
         view.loadRoot();
         view.setModeSummary(preferences.getMode());
     }

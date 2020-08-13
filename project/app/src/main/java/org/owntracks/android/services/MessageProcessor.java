@@ -65,7 +65,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, Lazy<LocationProcessor> locationProcessorLazy, ServiceBridge serviceBridge, RunThingsOnOtherThreads runThingsOnOtherThreads) {
+    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, ServiceBridge serviceBridge, RunThingsOnOtherThreads runThingsOnOtherThreads, Lazy<LocationProcessor> locationProcessorLazy) {
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;

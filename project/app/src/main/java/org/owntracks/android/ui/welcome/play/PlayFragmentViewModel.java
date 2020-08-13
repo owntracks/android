@@ -24,8 +24,8 @@ public class PlayFragmentViewModel extends BaseViewModel<PlayFragmentMvvm.View> 
     }
 
     @Override
-    public void attachView(@NonNull PlayFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull PlayFragmentMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
 

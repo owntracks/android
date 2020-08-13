@@ -26,8 +26,8 @@ public class WelcomeViewModel extends BaseViewModel<WelcomeMvvm.View> implements
     public WelcomeViewModel(Preferences preferences) {
         this.preferences = preferences;
     }
-    public void attachView(@NonNull WelcomeMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull WelcomeMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
     @Override

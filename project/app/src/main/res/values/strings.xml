@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Owntracks</string>
-    <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesHost">"Host"</string>
-    <string name="preferencesPort">"Port"</string>
+    <string name="preferencesServer">Connection</string>
+    <string name="preferencesHost">Host</string>
+    <string name="preferencesPort">Port</string>
     <string name="preferencesWebsocket">Use WebSockets</string>
-    <string name="preferencesUserUsername">"Username"</string>
-    <string name="preferencesDeviceName">"Device ID"</string>
-    <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesUserUsername">Username</string>
+    <string name="preferencesDeviceName">Device ID</string>
+    <string name="preferencesBrokerPassword">Password</string>
     <string name="preferencesCaCrtPath">CA certificate</string>
     <string name="preferencesClientCrtPath">Client certificate</string>
     <string name="preferencesClientCrtPassword">Client certificate password</string>
-    <string name="preferencesLicenses">"Libraries"</string>
-    <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
+    <string name="preferencesLicenses">Libraries</string>
+    <string name="preferencesLicensesSummary">Thanks to the authors of included libraries</string>
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationEvents">Events</string>
     <string name="preferencesNotificationEventsSummary">Notify about received events</string>
-    <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
-    <string name="preferencesNotificationLocation">"Last reported location"</string>
-    <string name="preferencesAdvanced">"Advanced"</string>
-    <string name="preferencesVersion">"Version"</string>
-    <string name="preferencesReporting">"Reporting"</string>
+    <string name="preferencesNotificationLocationSummary">Display last reported location and time</string>
+    <string name="preferencesNotificationLocation">Last reported location</string>
+    <string name="preferencesAdvanced">Advanced</string>
+    <string name="preferencesVersion">Version</string>
+    <string name="preferencesReporting">Reporting</string>
     <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
-    <string name="preferencesRepositorySummary" translatable="false">https://github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary" translatable="false">https://owntracks.org/booklet</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
-    <string name="preferencesTwitterSummary" translatable="false">https://twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Symmetric key for payload encryption </string>
     <string name="preferencesEncryptionKey">Encryption Key</string>
     <string name="preferencesEncryptionKeyDialogMessage">Encryption key is cut off after 32 characters.</string>
     <string name="na">Not available</string>
-    <string name="save">"Save"</string>
-    <string name="cancel">"Cancel"</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
     <string name="preferencesCleanSessionEnabled">Clean Session</string>
     <string name="publish">Report</string>
     <string name="preferencesPubExtendedDataSummary">Include extended data in location reports</string>
@@ -103,7 +100,6 @@
     <string name="welcome_heading">Welcome</string>
     <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
     <string name="mode_heading">Mode</string>
-    <string name="mqtt_private_description">Connect to your own private Owntracks setup and share your location with family or friends</string>
     <string name="permissions_heading">Permissions</string>
     <string name="permissions_description">Owntracks requires access to your location. Please grant this permission before continuing.</string>
     <string name="permissions_granted">Permissions have been granted</string>
@@ -142,21 +138,21 @@
     <string name="ui_fragment_welcome_version_title">Restrictions</string>
     <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner. \n\n A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences. </string>
     <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
-    <string name="INITIAL">"Initializing</string>
-    <string name="IDLE">Idle</string>
-    <string name="CONNECTING">Connecting</string>
-    <string name="CONNECTED">Connected</string>
-    <string name="DISCONNECTING">Disconnecting</string>
-    <string name="DISCONNECTED">Disconnected</string>
-    <string name="DISCONNECTED_USERDISCONNECT">Disconnected</string>
-    <string name="ERROR">Error</string>
-    <string name="ERROR_DATADISABLED">Data connection not available</string>
+    <string name="INITIAL" tools:ignore="UnusedResources">Initializing</string>
+    <string name="IDLE" tools:ignore="UnusedResources">Idle</string>
+    <string name="CONNECTING" tools:ignore="UnusedResources">Connecting</string>
+    <string name="CONNECTED" tools:ignore="UnusedResources">Connected</string>
+    <string name="DISCONNECTING" tools:ignore="UnusedResources">Disconnecting</string>
+    <string name="DISCONNECTED" tools:ignore="UnusedResources">Disconnected</string>
+    <string name="DISCONNECTED_USERDISCONNECT" tools:ignore="UnusedResources">Disconnected</string>
+    <string name="ERROR" tools:ignore="UnusedResources">Error</string>
+    <string name="ERROR_DATADISABLED" tools:ignore="UnusedResources">Data connection not available</string>
     <string name="ERROR_CONFIGURATION">Configuration incomplete</string>
-	<string name="notificationChannelOngoing">Ongoing</string>
-	<string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
-	<string name="notificationChannelEventsDescription">Region transmissions</string>
+    <string name="notificationChannelOngoing">Ongoing</string>
+    <string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
+    <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
-    <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>p
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google. Requires restart.</string>
     <string name="region_unknown">Status unknown</string>
     <string name="region_inside">Currently inside</string>
@@ -180,4 +176,6 @@
     <string name="viewLogs">View Logs</string>
     <string name="logViewerActivityTitle">Logs</string>
     <string name="exportLogFilePrompt">Export log file</string>
+    <string name="show_options">Show options..</string>
+    <string name="divider">Divider</string>
 </resources>

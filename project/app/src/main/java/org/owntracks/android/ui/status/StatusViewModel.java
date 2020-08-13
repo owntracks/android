@@ -44,8 +44,8 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
         this.context = context;
     }
 
-    public void attachView(@NonNull StatusMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull StatusMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
     @Override

@@ -23,27 +23,14 @@
     <bool name="valNotificationHigherPriority">false</bool>
     <bool name="valNotificationLocation">true</bool>
     <bool name="valNotificationEvents">true</bool>
-    <bool name="valSub" >true</bool>
+    <bool name="valSub">true</bool>
     <bool name="valPubRetain">true</bool>
     <bool name="valAutostartOnBoot">true</bool>
-    <bool name="valAuth">true</bool>
     <bool name="valRemoteCommand">true</bool>
-    <bool name="valRemoteConfiguration">true</bool>
     <bool name="valTls">true</bool>
     <bool name="valWs">false</bool>
-    <bool name="valUsePassword">true</bool>
-    <bool name="valInfo" >true</bool>
+    <bool name="valInfo">true</bool>
     <bool name="valGeocodeEnabled">true</bool>
 
-    <string-array name="modeIds" translatable="false">
-        <item>3</item>
-        <item>0</item>
-    </string-array>
-
-    <string-array name="profileIds_readable">
-        <item>@string/mode_http_private_label</item>
-        <item>@string/mode_mqtt_private_label</item>
-    </string-array>
-
-    <string name="valEmpty" translatable="false">""</string>
+    <string name="valEmpty" translatable="false" />
 </resources>

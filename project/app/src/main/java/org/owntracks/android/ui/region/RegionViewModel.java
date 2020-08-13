@@ -28,8 +28,8 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
         this.locationRepo = locationRepo; 
     }
 
-    public void attachView(@NonNull RegionMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull RegionMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
     public void loadWaypoint(long id) {

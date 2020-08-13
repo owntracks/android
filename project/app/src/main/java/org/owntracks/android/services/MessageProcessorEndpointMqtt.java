@@ -289,15 +289,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                     try {
                         socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
                     } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                        Timber.e(e);
                     }
                 }
 
                 if (tlsClientCrt.length() > 0) {
                     try {
                         socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
+                    } catch (FileNotFoundException e) {
+                        Timber.e(e);
                     }
                 }
 
@@ -400,7 +400,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         try {
             mqttClient.unsubscribe(topics);
         } catch (Exception e) {
-            e.printStackTrace();
+            Timber.e(e, "Unable to unsubscribe from topics");
         }
     }
 

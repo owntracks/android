@@ -70,11 +70,15 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         binding.setLifecycleOwner(this);
 
         //noinspection unchecked
-        viewModel.attachView((MvvmView) this, savedInstanceState);
+        viewModel.attachView(savedInstanceState, (MvvmView) this);
     }
 
 
     private boolean mBound;
+
+    void setBound(boolean bound) {
+        mBound = bound;
+    }
 
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -82,13 +86,13 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (service != null) {
-                mBound = true;
+                setBound(true);
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mBound = false;
+            setBound(false);
         }
     };
 

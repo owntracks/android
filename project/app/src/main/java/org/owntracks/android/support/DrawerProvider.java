@@ -23,7 +23,7 @@ import org.owntracks.android.ui.preferences.PreferencesActivity;
 import org.owntracks.android.ui.regions.RegionsActivity;
 import org.owntracks.android.ui.status.StatusActivity;
 
-public class DrawerProvider  {
+public class DrawerProvider {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
     private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;
     private static final int COLOR_ICON_SECONDARY = R.color.md_light_secondary;
@@ -55,6 +55,7 @@ public class DrawerProvider  {
                 .withIdentifier(targetActivityClass.hashCode());
 
     }
+
     private SecondaryDrawerItem secondaryDrawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleResource, @DrawableRes int iconResource) {
         SecondaryDrawerItem sdi = new SecondaryDrawerItem();
         sdi.withName(activeActivity.getString(targetActivityTitleResource));
@@ -76,60 +77,48 @@ public class DrawerProvider  {
     }
 
     public void attach(@NonNull Toolbar toolbar) {
+        new DrawerBuilder()
+                .withActivity(activity)
+                .withToolbar(toolbar)
+                .withStickyFooterShadow(false)
+                .withStickyFooterDivider(true)
+                .addDrawerItems(
+                        drawerItemForClass(activity, MapActivity.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
+                        drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
+                        drawerItemForClass(activity, RegionsActivity.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp))
+                .addStickyDrawerItems(
+                        secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
+                        secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp),
+                        secondaryDrawerItemForClass(activity, null, R.string.title_exit, R.drawable.ic_poweroff_black_36dp)
+                )
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem == null)
+                        return false;
 
-        DrawerBuilder d = new DrawerBuilder();
+                    if (drawerItem instanceof SecondarySwitchDrawerItem)
+                        return true;
 
-        d.withActivity(activity);
-        d.withToolbar(toolbar);
-        d.withStickyFooterShadow(false);
-        d.withStickyFooterDivider(true);
+                    // Finish when exit app drawer option selected
+                    if (drawerItem.getIdentifier() == EXIT_OPERATION_ID) {
+                        // Stop the background service
+                        activity.stopService((new Intent(activity, BackgroundService.class)));
+                        // Finish the activity
+                        activity.finishAffinity();
+                        return true;
+                    }
 
+                    Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
 
-        // Add the top drawer items
-        d.addDrawerItems(
-                drawerItemForClass(activity, MapActivity.class, R.string.title_activity_map, R.drawable.ic_layers_black_24dp),
-                drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_supervisor_account_black_24dp),
-                drawerItemForClass(activity, RegionsActivity.class, R.string.title_activity_regions, R.drawable.ic_adjust_black_24dp));
+                    if (activity.getClass() == targetclass) {
+                        return false;
+                    }
 
-        // Add the lower drawer items
-        d.addStickyDrawerItems(
-                secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_info_black_24dp),
-                secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_settings_black_36dp),
-                secondaryDrawerItemForClass(activity, null, R.string.title_exit, R.drawable.ic_poweroff_black_36dp)
-        );
+                    startActivity(targetclass);
 
-
-
-        d.withOnDrawerItemClickListener((view, position, drawerItem)  -> {
-            if (drawerItem == null)
-                return false;
-
-            if (drawerItem instanceof SecondarySwitchDrawerItem)
-                return true;
-
-            // Finish when exit app drawer option selected
-            if (drawerItem.getIdentifier() == EXIT_OPERATION_ID) {
-                // Stop the background service
-                activity.stopService((new Intent(activity, BackgroundService.class)));
-                // Finish the activity
-                activity.finishAffinity();
-                return true;
-            }
-
-            Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
-
-            if (activity.getClass() == targetclass) {
-                return false;
-            }
-
-            startActivity(targetclass);
-
-            return false; // return false to enable withCloseOnClick
-        });
-
-        d.build();
+                    return false; // return false to enable withCloseOnClick
+                })
+                .build();
     }
-
 
     private void startActivity(@NonNull Class<? extends Activity> activityClass) {
         Activity activity = getActivity();

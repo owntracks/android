@@ -30,8 +30,8 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
         this.contactsRepo = contactsRepo;
     }
 
-    public void attachView(@NonNull ContactsMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull ContactsMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
     @Override

@@ -15,12 +15,12 @@ def versionPatch = 0
 def versionBuild = 0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     ndkVersion "21.3.6528147" //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
 
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"

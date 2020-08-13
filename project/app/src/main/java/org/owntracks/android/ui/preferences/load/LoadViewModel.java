@@ -35,8 +35,8 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         this.waypointsRepo = waypointsRepo;
     }
 
-    public void attachView(@NonNull LoadMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull LoadMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
 

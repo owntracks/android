@@ -24,7 +24,7 @@ public abstract class BaseViewModel<V extends MvvmView> extends BaseObservable i
 
     @Override
     @CallSuper
-    public void attachView(@NonNull V view, @Nullable Bundle savedInstanceState) {
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull V view) {
         mView = view;
         if(savedInstanceState != null) { restoreInstanceState(savedInstanceState); }
     }

@@ -1,43 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Owntracks</string>
-    <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesHost" translatable="false">"Host"</string>
-    <string name="preferencesPort" translatable="false">"Port"</string>
+    <string name="preferencesServer">Connection</string>
+    <string name="preferencesHost">Host</string>
+    <string name="preferencesPort">Port</string>
     <string name="preferencesWebsocket">Utiliser WebSockets</string>
-    <string name="preferencesUserUsername">"Nom d'utilisateur"</string>
-    <string name="preferencesDeviceName" translatable="false">"Device ID"</string>
-    <string name="preferencesBrokerPassword">"Mot de passe"</string>
+    <string name="preferencesUserUsername">Nom d\'utilisateur</string>
+    <string name="preferencesDeviceName">Device ID</string>
+    <string name="preferencesBrokerPassword">Mot de passe</string>
     <string name="preferencesCaCrtPath">Certificat CA</string>
     <string name="preferencesClientCrtPath">Certificat client</string>
     <string name="preferencesClientCrtPassword">Mot de passe du certificat client</string>
-    <string name="preferencesLicenses">"Bibliothèques"</string>
-    <string name="preferencesLicensesSummary">"Merci aux auteurs des bibliothèques"</string>
+    <string name="preferencesLicenses">Bibliothèques</string>
+    <string name="preferencesLicensesSummary">Merci aux auteurs des bibliothèques</string>
     <string name="preferencesNotification">Notifications</string>
     <string name="preferencesNotificationEvents">Événements </string>
     <string name="preferencesNotificationEventsSummary">Alerte des événements reçus </string>
-    <string name="preferencesNotificationLocationSummary">"Afficher le dernier lieu et l'heure signalés"</string>
-    <string name="preferencesNotificationLocation">"Dernier emplacement signalé"</string>
-    <string name="preferencesAdvanced">"Avancé"</string>
-    <string name="preferencesVersion">"Version"</string>
-    <string name="preferencesReporting">"Rapports"</string>
-    <string name="preferencesTrackerId" translatable="false">Tracker ID</string>
+    <string name="preferencesNotificationLocationSummary">Afficher le dernier lieu et l\'heure signalés</string>
+    <string name="preferencesNotificationLocation">Dernier emplacement signalé</string>
+    <string name="preferencesAdvanced">Avancé</string>
+    <string name="preferencesVersion">Version</string>
+    <string name="preferencesReporting">Rapports</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesLocatorInterval">Intervalle de localisation</string>
     <string name="preferencesLocatorIntervalSummary">Intervalle entre les mises à jour de position</string>
     <string name="preferencesLocatorIntervalDialog">Intervalle en secondes pendant lequel l\'appareil doit se déplacer entre les mises à jour d\'emplacement en mode de changements d\'emplacement importants.</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Code Source</string>
-    <string name="preferencesRepositorySummary" translatable="false">github.com/owntracks/android</string>
     <string name="preferencesDocumentation">Documentation</string>
-    <string name="preferencesDocumentationSummary" translatable="false">owntracks.org/booklet</string>
-    <string name="preferencesTwitter" translatable="false">Twitter</string>
-    <string name="preferencesTwitterSummary" translatable="false">twitter.com/owntracks</string>
     <string name="preferencesEncryptionKeySummary">Clé symétrique pour le chiffrement de la charge utile</string>
     <string name="preferencesEncryptionKey">Clé de cryptage</string>
     <string name="preferencesEncryptionKeyDialogMessage">La clé de chiffrement est coupée après 32 caractères.</string>
     <string name="na">Indisponible</string>
-    <string name="save">"Sauvegarder"</string>
-    <string name="cancel">"Annuler"</string>
+    <string name="save">Sauvegarder</string>
+    <string name="cancel">Annuler</string>
     <string name="preferencesCleanSessionEnabled">Vider la session</string>
     <string name="publish">Envoyer</string>
     <string name="preferencesPubExtendedDataSummary">Inclure des données étendues dans les rapports de localisation</string>
@@ -59,12 +55,11 @@
     <string name="contactDetailsTopic">Identifiant</string>
     <string name="waypointListPlaceholder">Aucune région définie</string>
     <string name="importConfig">importer</string>
-    <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Sécurité</string>
     <string name="accept">J\'accepte</string>
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesParameters">Paramètres</string>
-    <string name="preferencesKeepalive" translatable="false">Keepalive</string>
+    <string name="preferencesKeepalive">Keepalive</string>
     <string name="seconds">Secondes</string>
     <string name="preferencesProfileId">Mode</string>
     <string name="mode_mqtt_private_label">MQTT privé</string>
@@ -84,14 +79,12 @@
     <string name="preferencesCategoryAdvancedLocator">Localisateur</string>
     <string name="preferencesCategoryAdvancedEncryption">Chiffrement</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
-    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
     <string name="exportWaypointsToEndpoint">Envoyer POIs</string>
     <string name="preferencesExportFailed">Échec de l\'exportation des préférences</string>
     <string name="preferencesExportSuccess">Exportation réussie</string>
     <string name="welcomeFixIssue">Autoriser</string>
     <string name="play_services_now_available">Les services Google Play sont maintenant disponibles</string>
     <string name="play_services_not_available">Les services Google Play ne sont pas disponibles</string>
-    <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP privé</string>
     <string name="transitionEntering">entré</string>
     <string name="transitionLeaving">sorti</string>
@@ -102,7 +95,6 @@
     <string name="welcome_heading">Bienvenu</string>
     <string name="welcome_description">Les étapes suivantes vous aideront à démarrer avec OwnTracks</string>
     <string name="mode_heading">Mode</string>
-    <string name="mqtt_private_description">Connectez-vous à votre propre configuration OwnTracks privée et partagez votre position avec votre famille ou vos amis</string>
     <string name="permissions_heading">Autorisations</string>
     <string name="permissions_description">OwnTracks nécessite l\'accès à votre position. Veuillez accorder cette autorisation avant de continuer.</string>
     <string name="permissions_granted">Les autorisations ont été accordées</string>
@@ -162,4 +154,20 @@
     <string name="preferencesGeocodeSummary">Activer le géocodage. Redémarrage nécessaire.</string>
     <string name="play_services_update_required">Mise à jour des services Google Play est requise.</string>
     <string name="distance_label">Distance</string>
+    <string name="clear_log">Vider le journal</string>
+    <string name="viewLogs">Voir le journal</string>
+    <string name="logViewerActivityTitle">Journal d\'activité</string>
+    <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive doit être au minimum %d</string>
+    <string name="preferencesMoveModeLocatorInterval">Intervalle de localisation (Mode déplacement)</string>
+    <string name="preferencesMoveModeLocatorIntervalSummary">Intervalle entre les mises à jour de localisation en mode déplacement</string>
+    <string name="preferencesMoveModeLocatorIntervalDialog">À quelle fréquence les localisations doivent-ils être demandés à l\'appareil en mode déplacement (secondes)</string>
+    <string name="preferencesDebugLog">Débogage du journal</string>
+    <string name="monitoring_mode">Monitoring</string>
+    <string name="preferencesClientId">ID Client</string>
+    <string name="status_endpoint_state_hint">Etat du Endpoint</string>
+    <string name="status_endpoint_state_message_hint">Message d\'état du Endpoint</string>
+    <string name="status_endpoint_queue_hint">File d\'attente Endpoint</string>
+    <string name="status_last_background_update_hint">Dernière mise à jour en arrière-plan du service de localisation</string>
+    <string name="status_background_service_started_hint">Service d\'arrière-plan démarré</string>
+    <string name="status_battery_optimization_whitelisted_hint">Optimisation de la batterie en liste blanche</string>
 </resources>

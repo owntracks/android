@@ -107,7 +107,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         try {
             binding.mapView.onCreate(savedInstanceState);
         } catch (Exception e) {
-            Timber.e(e,"Failed to bind map to view.");
+            Timber.e(e, "Failed to bind map to view.");
             isMapReady = false;
         }
         this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.bottomSheetLayout);
@@ -129,14 +129,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
         viewModel.getContact().observe(this, this);
         viewModel.getBottomSheetHidden().observe(this, o -> {
-            if((Boolean) o) {
+            if ((Boolean) o) {
                 setBottomSheetHidden();
             } else {
                 setBottomSheetCollapsed();
             }
         });
         viewModel.getCenter().observe(this, o -> {
-            if(o != null) {
+            if (o != null) {
                 updateCamera((LatLng) o);
             }
         });
@@ -177,21 +177,21 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             Timber.v("for contact: %s", c.getId());
 
             binding.contactPeek.name.setText(c.getFusedName());
-            if(c.hasLocation()) {
+            if (c.hasLocation()) {
                 ContactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
                 GeocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
                 BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
-                binding.acc.setText(String.format(Locale.getDefault(),"%s m",c.getFusedLocationAccuracy()));
+                binding.acc.setText(String.format(Locale.getDefault(), "%s m", c.getFusedLocationAccuracy()));
                 binding.tid.setText(c.getTrackerId());
                 binding.id.setText(c.getId());
-                if(viewModel.hasLocation()) {
+                if (viewModel.hasLocation()) {
                     binding.distance.setVisibility(View.VISIBLE);
                     binding.distanceLabel.setVisibility(View.VISIBLE);
 
                     float[] distance = new float[2];
-                    Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().latitude,c.getLatLng().longitude , distance);
+                    Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().latitude, c.getLatLng().longitude, distance);
 
-                    binding.distance.setText(String.format(Locale.getDefault(),"%d m",Math.round(distance[0])));
+                    binding.distance.setText(String.format(Locale.getDefault(), "%d m", Math.round(distance[0])));
                 } else {
                     binding.distance.setVisibility(View.GONE);
                     binding.distanceLabel.setVisibility(View.GONE);
@@ -244,11 +244,15 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             }
 
         } catch (Exception e) {
-            Timber.e(e,"Not showing map due to crash in Google Maps library");
+            Timber.e(e, "Not showing map due to crash in Google Maps library");
             isMapReady = false;
         }
         handleIntentExtras(getIntent());
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            checkAndRequestLocationPermissions();
+        }
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -548,10 +552,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         popupMenu.show();
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             eventBus.postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
     }

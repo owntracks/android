@@ -165,7 +165,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
         try {
             builder.start()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Timber.e(e, "Unable to start process to clear log")
             return@withContext
         }
 
@@ -184,7 +184,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
         val process = try {
             builder.start()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Timber.e(e, "Unable to start process to stream log")
             return@withContext
         }
         val stdout = BufferedReader(InputStreamReader(process!!.inputStream, StandardCharsets.UTF_8))

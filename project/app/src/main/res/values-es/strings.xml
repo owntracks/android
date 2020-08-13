@@ -94,7 +94,6 @@
     <string name="welcome_heading">Bienvenido</string>
     <string name="welcome_description">Los siguientes pasos te ayudarán a comenzar con OwnTracks</string>
     <string name="mode_heading">Modo</string>
-    <string name="mqtt_private_description">Conecta con tu configuración privada OwnTracks y comparte tu ubicación con familia y amigos</string>
     <string name="permissions_heading">Permisos</string>
     <string name="permissions_description">OwnTracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar.</string>
     <string name="permissions_granted">Permisos concedidos</string>

@@ -20,7 +20,7 @@ import org.owntracks.android.ui.base.view.MvvmView;
  * See the License for the specific language governing permissions and
  * limitations under the License. */
 public interface MvvmViewModel<V extends MvvmView> extends Observable {
-    void attachView(V view, Bundle savedInstanceState);
+    void attachView(Bundle savedInstanceState, V view);
     void detachView();
 
     void saveInstanceState(@NonNull Bundle outState);

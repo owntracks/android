@@ -9,7 +9,8 @@
 
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="true" />
+        android:required="true"
+        tools:ignore="UnsupportedChromeOsHardware" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- To access the network -->

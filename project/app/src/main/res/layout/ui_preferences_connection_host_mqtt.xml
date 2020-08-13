@@ -73,7 +73,7 @@
                 android:text="@string/preferencesWebsocket"
                 android:textSize="18sp" />
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ws"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -171,7 +171,13 @@
                         android:paddingBottom="@dimen/activity_horizontal_margin"
                         android:text="@string/status_battery_optimization_whitelisted_hint" />
                 </LinearLayout>
-
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/divider_horizontal_bright"
+                    android:contentDescription="@string/divider"
+                    android:scaleType="matrix"
+                    android:src="@android:drawable/divider_horizontal_bright" />
                 <TextView
                     style="@style/ListItemPrimary"
                     android:layout_width="match_parent"

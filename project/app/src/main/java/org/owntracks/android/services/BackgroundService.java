@@ -456,7 +456,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         }
     }
 
-    private void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
+    void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
         if(location == null) {
             Timber.e("no location provided");
             return;

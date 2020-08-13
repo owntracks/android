@@ -36,6 +36,8 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
     @Inject
     Preferences preferences;
@@ -102,12 +104,15 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         LayoutInflater inflater = getLayoutInflater();
         final View layout = inflater.inflate(R.layout.ui_preferences_editor_dialog,null);
 
+        // Set autocomplete items
+        MaterialAutoCompleteTextView inputKeyView = layout.findViewById(R.id.inputKey);
+        inputKeyView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, preferences.getImportKeys()));
+
         builder.setTitle(R.string.preferencesEditor)
                 .setPositiveButton(R.string.accept, (dialog, which) -> {
-                    final MaterialAutoCompleteTextView inputKey = layout.findViewById(R.id.inputKey);
                     final MaterialEditText inputValue = layout.findViewById(R.id.inputValue);
 
-                    String key = inputKey.getText().toString();
+                    String key = inputKeyView.getText().toString();
                     String value = inputValue.getText().toString();
 
                     try {
@@ -115,11 +120,11 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                         viewModel.onPreferencesValueForKeySetSuccessful();
                         dialog.dismiss();
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        Timber.w(e);
                         displayPreferencesValueForKeySetFailedKey();
 
                     } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
+                        Timber.w(e);
                         displayPreferencesValueForKeySetFailedValue();
                     }
 
@@ -127,10 +132,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setView(layout);
         builder.show();
-
-        // Set autocomplete items
-        MaterialAutoCompleteTextView view = layout.findViewById(R.id.inputKey);
-        view.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, preferences.getImportKeys()));
     }
 
     @Override

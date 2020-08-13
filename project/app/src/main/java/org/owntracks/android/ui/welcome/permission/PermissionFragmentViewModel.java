@@ -20,8 +20,8 @@ public class PermissionFragmentViewModel extends BaseViewModel<PermissionFragmen
     }
 
     @Override
-    public void attachView(@NonNull PermissionFragmentMvvm.View view, @Nullable Bundle savedInstanceState) {
-        super.attachView(view, savedInstanceState);
+    public void attachView(@Nullable Bundle savedInstanceState, @NonNull PermissionFragmentMvvm.View view) {
+        super.attachView(savedInstanceState, view);
     }
 
     @Override

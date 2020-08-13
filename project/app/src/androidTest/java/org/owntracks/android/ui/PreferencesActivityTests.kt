@@ -66,7 +66,7 @@ class PreferencesActivityTests {
         Intents.init()
         clickOn(R.string.preferencesInfo)
         clickOn(R.string.preferencesDocumentation)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesDocumentationSummary))))
+        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))))
         Intents.release()
     }
 
@@ -77,7 +77,7 @@ class PreferencesActivityTests {
             Intents.init()
             clickOn(R.string.preferencesInfo)
             clickOn(R.string.preferencesTwitter)
-            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesTwitterSummary))))
+            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
         } finally {
             Intents.release()
         }
@@ -90,7 +90,7 @@ class PreferencesActivityTests {
             Intents.init()
             clickOn(R.string.preferencesInfo)
             clickOn(R.string.preferencesRepository)
-            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.preferencesRepositorySummary))))
+            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
         } finally {
             Intents.release()
         }

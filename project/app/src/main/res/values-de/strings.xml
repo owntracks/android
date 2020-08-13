@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_name">OwnTracks</string>
-    <string name="preferencesServer">"Verbindung"</string>
+    <string name="preferencesServer">Verbindung</string>
     <string name="preferencesWebsocket">WebSockets nutzen</string>
-    <string name="preferencesUserUsername">"Benutzername"</string>
-    <string name="preferencesBrokerPassword">"Passwort"</string>
+    <string name="preferencesUserUsername">Benutzername</string>
+    <string name="preferencesBrokerPassword">Passwort</string>
     <string name="preferencesCaCrtPath">CA-Zertifikat</string>
     <string name="preferencesClientCrtPath">Client-Zertifikat</string>
     <string name="preferencesClientCrtPassword">Passwort für Client-Zertifikat</string>
-    <string name="preferencesLicenses">"Danke"</string>
-    <string name="preferencesLicensesSummary">"Danke an die Autoren"</string>
+    <string name="preferencesLicenses">Danke</string>
+    <string name="preferencesLicensesSummary">Danke an die Autoren</string>
     <string name="preferencesNotification">Benachrichtigungen</string>
     <string name="preferencesNotificationEvents">Ereignisse</string>
     <string name="preferencesNotificationEventsSummary">Über empfangene Ereignisse benachrichtigen</string>
-    <string name="preferencesNotificationLocationSummary">"Letzten gemeldeten Standort und Zeitpunkt anzeigen"</string>
-    <string name="preferencesNotificationLocation">"Letzter gemeldeter Standort"</string>
-    <string name="preferencesAdvanced">"Erweitert"</string>
-    <string name="preferencesVersion">"Version"</string>
-    <string name="preferencesReporting">"Berichte"</string>
+    <string name="preferencesNotificationLocationSummary">Letzten gemeldeten Standort und Zeitpunkt anzeigen</string>
+    <string name="preferencesNotificationLocation">Letzter gemeldeter Standort</string>
+    <string name="preferencesAdvanced">Erweitert</string>
+    <string name="preferencesVersion">Version</string>
+    <string name="preferencesReporting">Berichte</string>
     <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Quelltext</string>
     <string name="preferencesDocumentation">Handbuch</string>
@@ -25,8 +25,8 @@
     <string name="preferencesEncryptionKey">Verschlüsselungs-Schlüssel</string>
     <string name="preferencesEncryptionKeyDialogMessage">Schlüssel wird nach 32 Zeichen abgeschnitten</string>
     <string name="na">Nicht verfügbar</string>
-    <string name="save">"Speichern"</string>
-    <string name="cancel">"Abbrechen"</string>
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
     <string name="preferencesCleanSessionEnabled">Sitzung säubern</string>
     <string name="publish">Bericht</string>
     <string name="preferencesPubExtendedDataSummary">Erweiterte Daten in Standort-Berichten einschließen</string>
@@ -88,7 +88,6 @@
     <string name="welcome_play_heading">Google Play-Dienste</string>
     <string name="welcome_heading">Willkommen</string>
     <string name="welcome_description">Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten</string>
-    <string name="mqtt_private_description">OwnTracks mit deinem eigenen Server verwenden</string>
     <string name="mode_heading">Modus</string>
     <string name="icon_description_owntracks">OwnTracks</string>
     <string name="permissions_heading">Berechtigungen</string>

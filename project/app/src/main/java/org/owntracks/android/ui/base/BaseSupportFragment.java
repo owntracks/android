@@ -33,7 +33,7 @@ public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends M
         binding = DataBindingUtil.inflate(inflater, layoutResId, container, false);
         binding.setVariable(BR.vm, viewModel);
         //noinspection unchecked
-        viewModel.attachView((MvvmView) this, savedInstanceState);
+        viewModel.attachView(savedInstanceState, (MvvmView) this);
         return binding.getRoot();
     }
 
