@@ -287,12 +287,12 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         publishIntent.setAction(INTENT_ACTION_CHANGE_MONITORING);
         PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-        activeNotificationCompatBuilder.addAction(R.drawable.ic_report_notification, getString(R.string.publish), publishPendingIntent).addAction(R.drawable.ic_report_notification, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
-        activeNotificationCompatBuilder.setSmallIcon(R.drawable.ic_notification);
+        activeNotificationCompatBuilder
+                .addAction(R.drawable.ic_baseline_cloud_upload_24, getString(R.string.publish), publishPendingIntent)
+                .addAction(R.drawable.ic_owntracks_80, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
+        activeNotificationCompatBuilder.setSmallIcon(R.drawable.ic_owntracks_80);
         activeNotificationCompatBuilder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
         activeNotificationCompatBuilder.setSound(null, AudioManager.STREAM_NOTIFICATION);
-
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             activeNotificationCompatBuilder.setColor(getColor(R.color.primary));
@@ -417,7 +417,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 .setColor(getColor(R.color.primary))
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setLocalOnly(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setNumber(activeNotifications.size())
                 .setStyle(inbox)
@@ -710,7 +711,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         eventsNotificationCompatBuilder.setContentIntent(openPendingIntent);
         //eventsNotificationCompatBuilder.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
-        eventsNotificationCompatBuilder.setSmallIcon(R.drawable.ic_notification);
+        eventsNotificationCompatBuilder.setSmallIcon(R.drawable.ic_baseline_add_24);
         eventsNotificationCompatBuilder.setAutoCancel(true);
         eventsNotificationCompatBuilder.setShowWhen(true);
         eventsNotificationCompatBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);

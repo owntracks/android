@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/add"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_baseline_add_24"
         android:orderInCategory="97"
         app:showAsAction="ifRoom"
         android:title="@string/addWaypoint">

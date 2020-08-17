@@ -31,7 +31,7 @@
             android:contentDescription="@string/icon_description_warning"
 
             android:scaleType="centerInside"
-            android:src="@drawable/ic_assignment_late_white_48dp" />
+            android:src="@drawable/ic_baseline_assignment_late_48" />
 
         <TextView
             android:id="@+id/screen_heading"

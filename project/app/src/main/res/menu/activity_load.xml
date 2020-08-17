@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/save"
-        android:icon="@drawable/ic_done"
+        android:icon="@drawable/ic_baseline_done_24"
         android:title="@string/save"
         android:orderInCategory="97"
         app:showAsAction="ifRoom"/>

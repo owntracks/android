@@ -22,7 +22,7 @@
 			android:layout_marginTop="48dp"
 			android:contentDescription="@string/ui_fragment_welcome_version_title"
 			android:scaleType="centerInside"
-			android:src="@drawable/ic_android_white_48dp"/>
+			android:src="@drawable/ic_baseline_android_48"/>
 
 		<TextView
 			android:id="@+id/screen_heading"

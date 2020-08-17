@@ -176,6 +176,8 @@
     <string name="viewLogs">View Logs</string>
     <string name="logViewerActivityTitle">Logs</string>
     <string name="exportLogFilePrompt">Export log file</string>
-    <string name="show_options">Show options..</string>
+    <string name="show_options">Show options</string>
     <string name="divider">Divider</string>
+    <string name="next">Next</string>
+    <string name="reconnect">Reconnect</string>
 </resources>

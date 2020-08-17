@@ -4,19 +4,15 @@
 
     <item
         android:id="@+id/connect"
-        android:icon="@drawable/ic_autorenew_white_24dp"
+        android:icon="@drawable/ic_baseline_autorenew_24"
         android:orderInCategory="97"
-        app:showAsAction="always"
-        android:title="Reconnect"
-        >
-    </item>
+        android:title="@string/reconnect"
+        app:showAsAction="always" />
     <item
         android:id="@+id/status"
-        android:icon="@drawable/ic_info_outline_white_24dp"
+        android:icon="@drawable/ic_outline_info_24"
         android:orderInCategory="99"
-        app:showAsAction="ifRoom"
-        android:title="Status"
-        >
-    </item>
+        android:title="@string/title_activity_status"
+        app:showAsAction="ifRoom" />
 
 </menu>

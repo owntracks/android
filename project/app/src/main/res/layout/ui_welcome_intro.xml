@@ -1,62 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <data>
-        <import type="org.owntracks.android.App"/>
+
+        <import type="org.owntracks.android.App" />
     </data>
 
     <RelativeLayout
-    android:id="@+id/welcome_fragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:background="@color/primary"
-    >
-
+        android:id="@+id/welcome_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary"
+        android:clipChildren="false">
 
         <ImageView
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp"
-
-
             android:id="@+id/img"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/glyph"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:layout_gravity="center"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:contentDescription="@string/icon_description_owntracks" />
-
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="@string/icon_description_owntracks"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_owntracks_80" />
 
         <TextView
             android:id="@+id/screen_heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textColor="#ffffff"
+            android:layout_below="@+id/img"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="8dp"
             android:gravity="bottom|center_horizontal"
-            android:text="@string/welcome_heading"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@+id/img"
-            android:layout_alignParentStart="true" />
+            android:text="@string/welcome_heading"
+            android:textColor="#ffffff"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/screen_desc"
-            android:text="@string/welcome_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#ffffff"
+            android:layout_below="@+id/screen_heading"
+            android:layout_alignStart="@+id/screen_heading"
+            android:gravity="center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:gravity="center_horizontal"
-            android:layout_below="@+id/screen_heading"
-            android:layout_alignStart="@+id/screen_heading" />
+            android:text="@string/welcome_description"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 </layout>

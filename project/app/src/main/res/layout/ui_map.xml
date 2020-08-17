@@ -167,7 +167,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_more_horiz_black_24dp"
+                android:src="@drawable/ic_baseline_more_horiz_24"
                 android:tintMode="src_in"
                 android:contentDescription="@string/show_options"
                 app:tint="@color/buttonTint" />
