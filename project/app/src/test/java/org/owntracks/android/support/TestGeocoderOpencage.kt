@@ -1,12 +1,14 @@
 package org.owntracks.android.support
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 
 class TestGeocoderOpencage {
     @Test
@@ -15,7 +17,7 @@ class TestGeocoderOpencage {
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
-                .body(ResponseBody.create(MediaType.parse("application/json"), openCageJSON!!))
+                .body(openCageJSON!!.toResponseBody("application/json".toMediaTypeOrNull()))
                 .request(Request.Builder().url("https://example.com").build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
