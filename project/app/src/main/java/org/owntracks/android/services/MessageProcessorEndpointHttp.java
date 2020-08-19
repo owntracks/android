@@ -1,13 +1,12 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.App;
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
@@ -62,13 +61,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private Preferences preferences;
     private Parser parser;
     private Scheduler scheduler;
+    private Context applicationContext;
     private HttpUrl httpEndpoint;
 
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus) {
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, Context applicationContext) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
+        this.applicationContext = applicationContext;
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
@@ -97,7 +98,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         if (tlsCaCrt.length() > 0) {
             try {
-                socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
+                socketFactoryOptions.withCaInputStream(applicationContext.openFileInput(tlsCaCrt));
             } catch (FileNotFoundException e) {
                 Timber.e(e);
                 return null;
@@ -106,7 +107,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         if (tlsClientCrt.length() > 0)	{
             try {
-                socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
+                socketFactoryOptions.withClientP12InputStream(applicationContext.openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
                 Timber.e(e1);
                 return null;
@@ -118,10 +119,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private void loadHTTPClient() {
-        mHttpClient = createHttpClient();
     }
 
     private OkHttpClient getHttpClient() {
@@ -246,7 +243,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 // Handle response
                 if(response.body() != null ) {
                     try {
-
                         MessageBase[] result = parser.fromJson(response.body().byteStream());
                         messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("Response " + response.code() + ", " + result.length));
 

@@ -142,4 +142,6 @@ public class Events {
             return this.fusedContact;
         }
     }
+
+    public static class RestartApp extends E {}
 }

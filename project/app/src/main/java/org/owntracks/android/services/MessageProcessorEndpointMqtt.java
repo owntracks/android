@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Looper;
@@ -17,7 +18,6 @@ import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
@@ -63,13 +63,14 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private MessageProcessor messageProcessor;
     private RunThingsOnOtherThreads runThingsOnOtherThreads;
+    private Context applicationContext;
 
     private Parser parser;
     private Preferences preferences;
     private Scheduler scheduler;
     private EventBus eventBus;
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -77,6 +78,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.eventBus = eventBus;
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+        this.applicationContext = applicationContext;
         preferences.registerOnPreferenceChangedListener(this);
     }
 
@@ -287,7 +289,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 if (tlsCaCrt.length() > 0) {
                     try {
-                        socketFactoryOptions.withCaInputStream(App.getContext().openFileInput(tlsCaCrt));
+                        socketFactoryOptions.withCaInputStream(applicationContext.openFileInput(tlsCaCrt));
                     } catch (FileNotFoundException e) {
                         Timber.e(e);
                     }
@@ -295,7 +297,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 if (tlsClientCrt.length() > 0) {
                     try {
-                        socketFactoryOptions.withClientP12InputStream(App.getContext().openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
+                        socketFactoryOptions.withClientP12InputStream(applicationContext.openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
                     } catch (FileNotFoundException e) {
                         Timber.e(e);
                     }
@@ -386,7 +388,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         return qos;
     }
 
-    @SuppressWarnings("unused")
     private void unsubscribe(String[] topics) {
         if (!isConnected()) {
             Timber.e("subscribe when not connected");
@@ -542,11 +543,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             if (data == null) {
                 data = new Hashtable<>();
             }
-        }
-
-        @SuppressWarnings("unused")
-        private Integer getSize() {
-            return data.size();
         }
 
         @Override

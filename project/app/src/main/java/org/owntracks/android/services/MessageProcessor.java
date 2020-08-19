@@ -7,9 +7,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
 import org.owntracks.android.messages.MessageBase;
 import org.owntracks.android.messages.MessageCard;
@@ -47,6 +47,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
+    private Context applicationContext;
     private final Preferences preferences;
     private final Parser parser;
     private final Scheduler scheduler;
@@ -65,7 +66,19 @@ public class MessageProcessor implements IncomingMessageProcessor {
     private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
 
     @Inject
-    public MessageProcessor(EventBus eventBus, ContactsRepo contactsRepo, Preferences preferences, WaypointsRepo waypointsRepo, Parser parser, Scheduler scheduler, ServiceBridge serviceBridge, RunThingsOnOtherThreads runThingsOnOtherThreads, Lazy<LocationProcessor> locationProcessorLazy) {
+    public MessageProcessor(
+            @AppContext Context applicationContext,
+            EventBus eventBus,
+            ContactsRepo contactsRepo,
+            Preferences preferences,
+            WaypointsRepo waypointsRepo,
+            Parser parser,
+            Scheduler scheduler,
+            ServiceBridge serviceBridge,
+            RunThingsOnOtherThreads runThingsOnOtherThreads,
+            Lazy<LocationProcessor> locationProcessorLazy
+    ) {
+        this.applicationContext = applicationContext;
         this.preferences = preferences;
         this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
@@ -150,11 +163,11 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
         switch (preferences.getMode()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.eventBus);
+                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
 
         }
 
@@ -358,7 +371,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
                     reconnect();
                     break;
                 case MessageCmd.ACTION_RESTART:
-                    App.restart();
+                    eventBus.post(new Events.RestartApp());
                     break;
                 default:
                     break;

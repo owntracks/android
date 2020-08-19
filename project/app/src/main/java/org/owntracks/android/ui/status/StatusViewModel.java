@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.owntracks.android.App;
 import org.owntracks.android.BR;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
@@ -75,7 +74,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     @Override
     public boolean getDozeWhitelisted() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                ((PowerManager) App.getContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(App.getContext().getPackageName());
+                ((PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(context.getApplicationContext().getPackageName());
     }
 
     @Override

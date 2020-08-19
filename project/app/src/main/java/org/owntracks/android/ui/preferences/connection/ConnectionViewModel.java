@@ -1,11 +1,14 @@
 package org.owntracks.android.ui.preferences.connection;
 
-import androidx.databinding.Bindable;
+import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
@@ -25,12 +28,14 @@ import timber.log.Timber;
 public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View> {
 
     private final Preferences preferences;
+    private final Context context;
     private int modeId;
 
 
     @Inject
-    ConnectionViewModel(Preferences preferences) {
+    ConnectionViewModel(Preferences preferences,@AppContext Context context) {
         this.preferences = preferences;
+        this.context = context;
     }
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull ConnectionMvvm.View view) {
@@ -104,7 +109,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     @Override
     public ConnectionSecurityViewModel getConnectionSecurityViewModel() {
-        return new ConnectionSecurityViewModel(preferences, navigator);
+        return new ConnectionSecurityViewModel(preferences, navigator,context);
     }
 
     @Override

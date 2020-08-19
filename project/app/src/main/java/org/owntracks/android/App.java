@@ -1,19 +1,19 @@
 package org.owntracks.android;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 import android.os.StrictMode;
 
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.injection.components.AppComponent;
 import org.owntracks.android.injection.components.AppComponentProvider;
 import org.owntracks.android.injection.components.DaggerAppComponent;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.support.Parser;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.TimberDebugLogTree;
@@ -38,11 +38,7 @@ public class App extends DaggerApplication  {
     MessageProcessor messageProcessor;
 
     @Inject
-    Parser parser; 
-
-    @Inject
-    @AppContext
-    Context context;
+    EventBus eventBus;
 
     @Override
     public void onCreate() {
@@ -79,14 +75,14 @@ public class App extends DaggerApplication  {
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed(() -> messageProcessor.initialize(), 510);
-
+        eventBus.register(this);
     }
 
-
-    public static void restart() {
-        Intent intent = new Intent(App.getContext(), MapActivity.class);
+    @Subscribe
+    public void onEvent(Events.RestartApp e) {
+        Intent intent = new Intent(this.getApplicationContext(), MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        App.getContext().startActivity(intent);
+        this.getApplicationContext().startActivity(intent);
         Runtime.getRuntime().exit(0);
     }
 
@@ -97,14 +93,4 @@ public class App extends DaggerApplication  {
         AppComponentProvider.setAppComponent(appComponent);
         return appComponent;
     }
-
-    private static Application getApplication() {
-        return sApplication;
-    }
-
-    @Deprecated
-    public static Context getContext() {
-        return getApplication().getApplicationContext();
-    }
-
 }

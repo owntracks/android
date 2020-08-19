@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.PopupMenu;
 
-import org.owntracks.android.App;
 import org.owntracks.android.R;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.navigator.Navigator;
@@ -29,6 +28,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     private static final int REQUEST_CODE_FILE_CLIENT_CRT = 2;
 
     private final Navigator navigator;
+    private final Context context;
     private boolean tls;
     private String tlsCaCrtName;
     private String tlsClientCrtName;
@@ -37,9 +37,10 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     private boolean tlsCaCrtNameDirty;
     private boolean tlsClientCrtPasswortDirty;
 
-    public ConnectionSecurityViewModel(Preferences preferences, Navigator navigator) {
+    public ConnectionSecurityViewModel(Preferences preferences, Navigator navigator, Context context) {
         super(preferences);
         this.navigator = navigator;
+        this.context = context;
     }
 
     @Override
@@ -161,15 +162,21 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
             Uri uri = data.getData();
             Timber.v("uri:  %s,", uri.toString());
             if (requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CA_CRT)
-                new CaCrtCopyTask().execute(uri);
+                new CaCrtCopyTask(context).execute(uri);
             else
-                new ClientCrtCopyTask().execute(uri);
+                new ClientCrtCopyTask(context).execute(uri);
         }
     }
 
 
 
     private abstract class CopyTask extends AsyncTask<Uri, String, String> {
+
+        protected final Context context;
+
+        protected CopyTask(Context context) {
+            this.context = context;
+        }
 
         @Override
         protected String doInBackground(Uri... params) {
@@ -178,8 +185,8 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
                 String filename = uriToFilename(params[0]);
                 Timber.v("filename for save is: %s", filename);
 
-                InputStream inputStream = App.getContext().getContentResolver().openInputStream(params[0]);
-                FileOutputStream outputStream = App.getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+                InputStream inputStream = context.getApplicationContext().getContentResolver().openInputStream(params[0]);
+                FileOutputStream outputStream = context.getApplicationContext().openFileOutput(filename, Context.MODE_PRIVATE);
 
                 byte[] buffer = new byte[256];
                 int bytesRead;
@@ -201,6 +208,11 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     }
 
     private class CaCrtCopyTask extends CopyTask {
+
+        protected CaCrtCopyTask(Context context) {
+            super(context);
+        }
+
         @Override
         protected void onPostExecute(String s) {
             Timber.v("crt copied %s",s);
@@ -210,11 +222,15 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         @Override
         protected void onCancelled(String s) {
             setTlsCaCrtName(null);
-            Toast.makeText(App.getContext(), App.getContext().getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(), context.getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
         }
     }
 
     private class ClientCrtCopyTask extends CopyTask {
+
+        protected ClientCrtCopyTask(Context context) {
+            super(context);
+        }
 
         @Override
         protected void onPostExecute(String s) {
@@ -224,17 +240,14 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         @Override
         protected void onCancelled(String s) {
             setTlsClientCrtName(null);
-            Toast.makeText(App.getContext(), App.getContext().getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(), context.getString(R.string.unableToCopyCertificate), Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
 
     private String uriToFilename(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            try (Cursor cursor = App.getContext().getContentResolver().query(uri, null, null, null, null)) {
+            try (Cursor cursor = context.getApplicationContext().getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }

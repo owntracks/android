@@ -19,11 +19,12 @@ import androidx.core.content.FileProvider;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-import org.owntracks.android.App;
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.databinding.UiPreferencesEditorBinding;
 import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -47,6 +48,9 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
 
     @Inject
     Parser parser;
+
+    @Inject
+    EventBus eventBus;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +83,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
                 showEditorView();
                 return true;
             case R.id.restart:
-                App.restart();
+                eventBus.post(new Events.RestartApp());
             default:
                 return false;
         }

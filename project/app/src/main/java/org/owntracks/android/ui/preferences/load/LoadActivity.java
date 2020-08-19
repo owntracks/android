@@ -14,15 +14,18 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
-import org.owntracks.android.App;
+import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesLoadBinding;
+import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -31,6 +34,9 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
     private MenuItem saveButton;
+
+    @Inject
+    EventBus eventBus;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,8 +58,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         setHasBack(false);
         handleIntent(intent);
     }
-
-
 
     private void tintMenu() {
         if(saveButton != null) {
@@ -185,7 +189,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         (new AlertDialog.Builder(this)
                 .setTitle("Import successfull")
                 .setMessage("It is recommended to restart the app to apply all imported values")
-                .setPositiveButton("Restart", (dialog, which) -> App.restart())
+                .setPositiveButton("Restart", (dialog, which) -> eventBus.post(new Events.RestartApp()))
                 .setNegativeButton("Cancel", (dialog, which) -> finish())).show();
     }
 
