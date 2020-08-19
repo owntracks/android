@@ -107,32 +107,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:baselineAligned="false"
                     android:gravity="center_vertical"
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onHostClick()}"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="?android:attr/scrollbarSize"
-                    android:baselineAligned="false">
+                    android:paddingStart="15dp"
+                    android:paddingEnd="?android:attr/scrollbarSize">
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
+
+                    <TextView
+                        android:id="@+id/hostTitle"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginEnd="6dip"
-                        android:layout_marginBottom="6dip"
-                        android:layout_weight="1">
+                        android:ellipsize="marquee"
+                        android:fadingEdge="horizontal"
+                        android:text="@string/preferencesHost"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                        <TextView
-                            android:id="@+id/hostTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="marquee"
-                            android:fadingEdge="horizontal"
-                            android:text="@string/preferencesHost"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <ImageView
@@ -152,27 +144,18 @@
                     android:gravity="center_vertical"
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onIdentificationClick()}"
-                    android:paddingStart="0dp"
+                    android:paddingStart="15dp"
                     android:paddingEnd="?android:attr/scrollbarSize">
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginEnd="6dip"
-                        android:layout_marginBottom="6dip"
-                        android:layout_weight="1">
+                        android:ellipsize="marquee"
+                        android:fadingEdge="horizontal"
+                        android:text="@string/preferencesIdentification"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="marquee"
-                            android:fadingEdge="horizontal"
-                            android:text="@string/preferencesIdentification"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <ImageView
@@ -189,32 +172,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:baselineAligned="false"
                     android:gravity="center_vertical"
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onSecurityClick()}"
-                    android:paddingStart="0dp"
+                    android:paddingStart="15dp"
                     android:paddingEnd="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}"
-                    android:baselineAligned="false">
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginEnd="6dip"
-                        android:layout_marginBottom="6dip"
-                        android:layout_weight="1">
+                        android:ellipsize="marquee"
+                        android:fadingEdge="horizontal"
+                        android:text="@string/preferencesSecurity"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="marquee"
-                            android:fadingEdge="horizontal"
-                            android:text="@string/preferencesSecurity"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <ImageView
@@ -231,32 +205,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:baselineAligned="false"
                     android:gravity="center_vertical"
                     android:minHeight="?android:attr/listPreferredItemHeight"
                     android:onClick="@{() -> vm.onParametersClick()}"
-                    android:paddingStart="0dp"
+                    android:paddingStart="15dp"
                     android:paddingEnd="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}"
-                    android:baselineAligned="false">
+                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginEnd="6dip"
-                        android:layout_marginBottom="6dip"
-                        android:layout_weight="1">
+                        android:ellipsize="marquee"
+                        android:fadingEdge="horizontal"
+                        android:text="@string/preferencesParameters"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="marquee"
-                            android:fadingEdge="horizontal"
-                            android:text="@string/preferencesParameters"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                    </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

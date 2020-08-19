@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences.load;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import java.io.InputStreamReader;
 
 import timber.log.Timber;
 
+@SuppressLint("GoogleAppIndexingApiWarning")
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
     private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";

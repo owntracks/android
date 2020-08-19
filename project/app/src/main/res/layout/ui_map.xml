@@ -66,7 +66,8 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:singleLine="true"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="true" />
 
             <TextView
                 android:id="@+id/accLabel"
@@ -90,7 +91,8 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:singleLine="true"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="true" />
 
             <TextView
                 android:id="@+id/distanceLabel"
@@ -102,7 +104,8 @@
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:singleLine="true"
-                android:text="@string/distance_label" />
+                android:text="@string/distance_label"
+                android:textIsSelectable="true" />
 
             <View
                 android:layout_width="match_parent"

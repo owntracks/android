@@ -180,4 +180,6 @@
     <string name="divider">Divider</string>
     <string name="next">Next</string>
     <string name="reconnect">Reconnect</string>
+    <string name="select">Select</string>
+    <string name="contact_image">Contact Image</string>
 </resources>

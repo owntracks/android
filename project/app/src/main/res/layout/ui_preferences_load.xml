@@ -3,24 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="vm" type="org.owntracks.android.ui.preferences.load.LoadMvvm.ViewModel" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.preferences.load.LoadMvvm.ViewModel" />
     </data>
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/frame"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/frame">
+        android:layout_height="fill_parent">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:elevation="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
@@ -32,7 +36,8 @@
                 android:id="@+id/effectiveConfiguration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"/>
+                android:padding="@dimen/default_spacing"
+                android:textIsSelectable="true" />
 
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

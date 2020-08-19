@@ -1,7 +1,5 @@
 package org.owntracks.android.ui.base;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
+
+import timber.log.Timber;
 
 public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
     static final Object DATA_INVALIDATION = new Object();
@@ -77,7 +74,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
         if (bindingVariable != BaseAdapterItemView.BINDING_VARIABLE_NONE) {
             boolean result = binding.setVariable(bindingVariable, item);
             if (!result) {
-                throwMissingVariable(binding, bindingVariable, layoutRes);
+                Timber.e("Unable to bind %s to %s", bindingVariable, item);
             }
             binding.executePendingBindings();
         }
@@ -92,7 +89,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
     }
 
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         if (this.recyclerView != null && items instanceof ObservableList) {
             ((ObservableList<T>) items).removeOnListChangedCallback(callback);
         }
@@ -100,7 +97,7 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
     }
 
     @Override
-    public final ViewHolder onCreateViewHolder(ViewGroup viewGroup, int layoutId) {
+    public final ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int layoutId) {
         if (inflater == null) {
             inflater = LayoutInflater.from(viewGroup.getContext());
         }
@@ -284,57 +281,6 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
         if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
             throw new IllegalStateException("You must only modify the ObservableList on the main thread.");
         }
-    }
-
-    private static void throwMissingVariable(ViewDataBinding binding, int bindingVariable, @LayoutRes int layoutRes) {
-        Context context = binding.getRoot().getContext();
-        Resources resources = context.getResources();
-        String layoutName = resources.getResourceName(layoutRes);
-        // Yeah reflection is slow, but this only happens when there is a programmer error.
-        String bindingVariableName;
-        try {
-            bindingVariableName = getBindingVariableName(context, bindingVariable);
-        } catch (Resources.NotFoundException e) {
-            // Fall back to int
-            bindingVariableName = "" + bindingVariable;
-        }
-        throw new IllegalStateException("Could not bind variable '" + bindingVariableName + "' in layout '" + layoutName + "'");
-    }
-
-    private static String getBindingVariableName(Context context, int bindingVariable) throws Resources.NotFoundException {
-        try {
-            return getBindingVariableByDataBinderMapper(bindingVariable);
-        } catch (Exception e1) {
-            try {
-                return getBindingVariableByBR(context, bindingVariable);
-            } catch (Exception e2) {
-                throw new Resources.NotFoundException("" + bindingVariable);
-            }
-        }
-    }
-
-    private static String getBindingVariableByDataBinderMapper(int bindingVariable) throws Exception {
-        Class<?> dataBinderMapper = Class.forName("android.databinding.DataBinderMapper");
-        Method convertIdMethod = dataBinderMapper.getDeclaredMethod("convertBrIdToString", int.class);
-        convertIdMethod.setAccessible(true);
-        Constructor constructor = dataBinderMapper.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Object instance = constructor.newInstance();
-        Object result = convertIdMethod.invoke(instance, bindingVariable);
-        return (String) result;
-    }
-
-    private static String getBindingVariableByBR(Context context, int bindingVariable) throws Exception {
-        String packageName = context.getPackageName();
-        Class BRClass = Class.forName(packageName + ".BR");
-        Field[] fields = BRClass.getFields();
-        for (Field field : fields) {
-            int value = field.getInt(null);
-            if (value == bindingVariable) {
-                return field.getName();
-            }
-        }
-        throw new Exception("not found");
     }
 
     public interface ClickListener<T> {
