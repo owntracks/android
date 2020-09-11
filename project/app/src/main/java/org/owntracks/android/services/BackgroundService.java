@@ -266,19 +266,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         if (activeNotificationCompatBuilder != null)
             return activeNotificationCompatBuilder;
 
-
-        activeNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING);
-
-
         Intent resultIntent = new Intent(this, MapActivity.class);
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        activeNotificationCompatBuilder.setContentIntent(resultPendingIntent);
-        activeNotificationCompatBuilder.setSortKey("a");
-
-
         Intent publishIntent = new Intent();
         publishIntent.setAction(INTENT_ACTION_SEND_LOCATION_USER);
         PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -287,19 +279,22 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         publishIntent.setAction(INTENT_ACTION_CHANGE_MONITORING);
         PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        activeNotificationCompatBuilder
-                .addAction(R.drawable.ic_baseline_cloud_upload_24, getString(R.string.publish), publishPendingIntent)
-                .addAction(R.drawable.ic_owntracks_80, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent);
-        activeNotificationCompatBuilder.setSmallIcon(R.drawable.ic_owntracks_80);
-        activeNotificationCompatBuilder.setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
-        activeNotificationCompatBuilder.setSound(null, AudioManager.STREAM_NOTIFICATION);
+
+        activeNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING)
+                .setContentIntent(resultPendingIntent)
+                .setSortKey("a")
+                .addAction(R.drawable.ic_baseline_publish_24, getString(R.string.publish), publishPendingIntent)
+                .addAction(R.drawable.ic_owntracks_80, getString(R.string.notificationChangeMonitoring), changeMonitoringPendingIntent)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN)
+                .setSound(null, AudioManager.STREAM_NOTIFICATION)
+                .setOngoing(true);
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
-            activeNotificationCompatBuilder.setColor(getColor(R.color.primary));
-            activeNotificationCompatBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
-            activeNotificationCompatBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            activeNotificationCompatBuilder.setColor(getColor(R.color.primary))
+                    .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
-        activeNotificationCompatBuilder.setOngoing(true);
 
         return activeNotificationCompatBuilder;
     }
@@ -701,22 +696,19 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return eventsNotificationCompatBuilder;
 
         Timber.d("builder not present, lazy building");
-        eventsNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS);
-
         Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.setAction("android.intent.action.MAIN");
         openIntent.addCategory("android.intent.category.LAUNCHER");
         openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent openPendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        eventsNotificationCompatBuilder.setContentIntent(openPendingIntent);
-        //eventsNotificationCompatBuilder.setDeleteIntent(ServiceProxy.getBroadcastIntentForService(this.context, ServiceProxy.SERVICE_NOTIFICATION, ServiceNotification.INTENT_ACTION_CANCEL_EVENT_NOTIFICATION, null));
-        eventsNotificationCompatBuilder.setSmallIcon(R.drawable.ic_baseline_add_24);
-        eventsNotificationCompatBuilder.setAutoCancel(true);
-        eventsNotificationCompatBuilder.setShowWhen(true);
-        eventsNotificationCompatBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        eventsNotificationCompatBuilder.setCategory(NotificationCompat.CATEGORY_SERVICE);
-        eventsNotificationCompatBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        eventsNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS)
+                .setContentIntent(openPendingIntent)
+                .setSmallIcon(R.drawable.ic_baseline_add_24)
+                .setAutoCancel(true)
+                .setShowWhen(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             eventsNotificationCompatBuilder.setColor(getColor(R.color.primary));
         }

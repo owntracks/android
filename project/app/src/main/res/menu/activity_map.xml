@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/menu_report"
-        android:icon="@drawable/ic_baseline_cloud_upload_24"
+        android:icon="@drawable/ic_baseline_publish_24"
         android:orderInCategory="1"
         android:title="@string/publish"
         app:showAsAction="ifRoom" />
