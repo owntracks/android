@@ -6,10 +6,10 @@ on:
     branches:
       - master
     paths-ignore:
-      - .github/**
-      - !.github/workflows/android.yml
-      - *.md
-      - .dependabot/**
+      - ".github/**"
+      - "!.github/workflows/android.yml"
+      - "*.md"
+      - ".dependabot/**"
   pull_request:
     branches:
       - master
