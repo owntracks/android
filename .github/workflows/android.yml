@@ -1,9 +1,15 @@
+# Builds, tests and publishes the output to the Play store internal track.
 name: Android CI
 
 on:
   push:
     branches:
       - master
+    paths-ignore:
+      - .github/**
+      - !.github/workflows/android.yml
+      - *.md
+      - .dependabot/**
   pull_request:
     branches:
       - master
