@@ -328,7 +328,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_map, menu);
         this.mMenu = menu;
-        if (!viewModel.hasLocation())
+        if (viewModel.hasLocation())
             enableLocationMenus();
         else
             disableLocationMenus();
@@ -394,20 +394,19 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } else  {
             Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void disableLocationMenus() {
         if (this.mMenu != null) {
-            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(130);
-            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(130);
+            this.mMenu.findItem(R.id.menu_mylocation).setEnabled(false).getIcon().setAlpha(128);
+            this.mMenu.findItem(R.id.menu_report).setEnabled(false).getIcon().setAlpha(128);
         }
     }
 
     public void enableLocationMenus() {
         if (this.mMenu != null) {
-            this.mMenu.findItem(R.id.menu_mylocation).getIcon().setAlpha(255);
-            this.mMenu.findItem(R.id.menu_report).getIcon().setAlpha(255);
+            this.mMenu.findItem(R.id.menu_mylocation).setEnabled(true).getIcon().setAlpha(255);
+            this.mMenu.findItem(R.id.menu_report).setEnabled(true).getIcon().setAlpha(255);
         }
     }
 
