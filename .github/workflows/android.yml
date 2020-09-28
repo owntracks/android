@@ -24,6 +24,14 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew assembleDebug
       working-directory: project
@@ -88,6 +96,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-          
       - name: Decrypt secrets
         env:
             GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
