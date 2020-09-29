@@ -2,7 +2,7 @@
 # Crucially, it assumes that whatever is the current internal track build is the correct candidate for sending to beta - it does *not* rebuild and publish. Therefore, if changes
 # are made and a new beta tag created at the same time, those changes will *not* be included in the build that the beta track ends up pointing at. I get around this by 
 # making sure changes are published to internal first, then creating / pushing the beta tag in order to promote. I should also fix this at some point.
-name: Android CI
+name: Android CI Beta release
 
 on:
   push:
