@@ -66,12 +66,12 @@ jobs:
         name: test-reports
         path: project/app/build/reports/
       if: always()
-    - name: Report Test results
+    - name: Report Test results      
       uses: growse/xunit-mattermost-reporter@v1
       with:
         mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
         xUnitTestPath: "./project/app/build/test-results/collected/"
-      if: always()
+      if:  github.repository == 'owntracks/android'
     - uses: codecov/codecov-action@v1
       name: Upload espresso coverage to codecov
       if: always()
