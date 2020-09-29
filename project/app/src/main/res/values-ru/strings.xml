@@ -54,7 +54,7 @@
     <string name="contactDetailsAccuracy">Точность</string>
     <string name="contactDetailsTopic">Идентификатор</string>
     <string name="waypointListPlaceholder">Места еще не определены</string>
-    <string name="importConfig">Испорт</string>
+    <string name="importConfig">Импорт</string>
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Безопасность</string>
     <string name="accept">Сохранить</string>
