@@ -91,7 +91,7 @@
     <string name="play_services_update_required">Необходимо обновить сервисы Google Play</string>
     <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP</string>
-    <string name="transitionEntering">прибыла(а) в</string>
+    <string name="transitionEntering">прибыл(а) в</string>
     <string name="transitionLeaving">покинул(а)</string>
     <string name="errorPreferencesImportFailed">Не удалось импортировать настройки</string>
     <string name="welcome_play_heading">Сервисы Google Play</string>
