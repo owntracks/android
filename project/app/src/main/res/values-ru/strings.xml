@@ -46,7 +46,7 @@
     <string name="longitude">Долгота</string>
     <string name="latitude">Широта</string>
     <string name="radius">Радиус</string>
-    <string name="addWaypoint">Добавить местоположение</string>
+    <string name="addWaypoint">Добавить место</string>
     <string name="exportConfiguration">Экспорт</string>
     <string name="contactLocationUnknown">Местоположение недоступно</string>
     <string name="menuContactNavigate">Перейти</string>
