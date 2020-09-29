@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Owntracks</string>
+    <string name="preferencesServer">Подключение</string>
+    <string name="preferencesHost">Адрес</string>
+    <string name="preferencesPort">Порт</string>
+    <string name="preferencesWebsocket">Использовать WebSockets</string>
+    <string name="preferencesUserUsername">Пользователь</string>
+    <string name="preferencesDeviceName">ID устройства</string>
+    <string name="preferencesBrokerPassword">Пароль</string>
+    <string name="preferencesCaCrtPath">CA сертификат</string>
+    <string name="preferencesClientCrtPath">Сертификат пользователя</string>
+    <string name="preferencesClientCrtPassword">Пароль</string>
+    <string name="preferencesLicenses">Библиотеки</string>
+    <string name="preferencesLicensesSummary">Благодарим авторов используемых библиотек</string>
+    <string name="preferencesNotification">Уведомления</string>
+    <string name="preferencesNotificationEvents">События</string>
+    <string name="preferencesNotificationEventsSummary">Уведомлять о событиях</string>
+    <string name="preferencesNotificationLocationSummary">Показывать последнее известное местоположение и время</string>
+    <string name="preferencesNotificationLocation">Последнее известное местоположение</string>
+    <string name="preferencesAdvanced">Расширенные</string>
+    <string name="preferencesVersion">Версия</string>
+    <string name="preferencesReporting">Отчеты</string>
+    <string name="preferencesTrackerId">Tracker ID</string>
+    <string name="preferencesInfo">Информация</string>
+    <string name="preferencesRepository">Исходный код</string>
+    <string name="preferencesDocumentation">Документация</string>
+    <string name="preferencesTwitter" translatable="false">Twitter</string>
+    <string name="preferencesEncryptionKeySummary">Ключ симметрического шифрования данных</string>
+    <string name="preferencesEncryptionKey">Ключ шифрования</string>
+    <string name="preferencesEncryptionKeyDialogMessage">Ключ шифрования обрезается после 32 символов.</string>
+    <string name="na">Недоступно</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="preferencesCleanSessionEnabled">Чистая сессия</string>
+    <string name="publish">Сообщить местоположение</string>
+    <string name="preferencesPubExtendedDataSummary">Отправлять расширенные сведения</string>
+    <string name="preferencesPubExtendedData">Расширенные сведения</string>
+    <string name="preferencesAutostartSummary">Автозапуск при включении устройства</string>
+    <string name="preferencesAutostart">Автозапуск</string>
+    <string name="preferencesRemoteCommand">Внешние команды</string>
+    <string name="preferencesRemoteCommandSummary">Разрешить внешние команды</string>
+    <string name="preferencesGeocode">Геокодирование</string>
+    <string name="preferencesGeocodeSummary">Резрешить геокодирование. Требуется перезапуск.</string>
+    <string name="description">Описание</string>
+    <string name="longitude">Долгота</string>
+    <string name="latitude">Широта</string>
+    <string name="radius">Радиус</string>
+    <string name="addWaypoint">Добавить место</string>
+    <string name="exportConfiguration">Экспорт</string>
+    <string name="contactLocationUnknown">Местоположение недоступно</string>
+    <string name="menuContactNavigate">Перейти</string>
+    <string name="menuCurrentLoction">Текущее местоположение</string>
+    <string name="contactDetailsAccuracy">Точность</string>
+    <string name="contactDetailsTopic">Идентификатор</string>
+    <string name="waypointListPlaceholder">Места еще не определены</string>
+    <string name="importConfig">Импорт</string>
+    <string name="tls" translatable="false">TLS</string>
+    <string name="preferencesSecurity">Безопасность</string>
+    <string name="accept">Сохранить</string>
+    <string name="preferencesIdentification">Идентификация</string>
+    <string name="preferencesParameters">Параметры</string>
+    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive должен быть минимум %d</string>
+    <string name="seconds">Секунд</string>
+    <string name="preferencesProfileId">Режим</string>
+    <string name="mode_mqtt_private_label">MQTT</string>
+    <string name="aLocation">место</string>
+    <string name="events">События</string>
+    <string name="title_activity_regions">Места</string>
+    <string name="title_activity_region">Место</string>
+    <string name="title_activity_map">Карта</string>
+    <string name="title_activity_contacts">Друзья</string>
+    <string name="title_activity_status">Статус</string>
+    <string name="title_activity_preferences">Настройки</string>
+    <string name="title_exit">Выход</string>
+    <string name="unableToCopyCertificate">Невозможно скопировать сертификат во внутреннее хранилище</string>
+    <string name="preferencesCategoryNotificationOngoing">Постоянное уведомление</string>
+    <string name="preferencesCategoryNotificationBackground">Фоновые уведомления</string>
+    <string name="preferencesCategoryAdvancedServices">Сервисы</string>
+    <string name="preferencesCategoryAdvancedLocator">Локатор</string>
+    <string name="preferencesCategoryAdvancedEncryption">Шифрование</string>
+    <string name="preferencesCategoryAdvancedMisc">Прочее</string>
+    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
+    <string name="exportWaypointsToEndpoint">Опубликовать места</string>
+    <string name="preferencesExportFailed">Не удалось экспортировать настройки</string>
+    <string name="preferencesExportSuccess">Настройки экспортированы</string>
+    <string name="welcomeFixIssue">Исправить</string>
+    <string name="play_services_now_available">Сервисы Google Play доступны</string>
+    <string name="play_services_not_available">Сервисы Google Play недоступны</string>
+    <string name="play_services_update_required">Необходимо обновить сервисы Google Play</string>
+    <string name="preferencesUrl" translatable="false">URL</string>
+    <string name="mode_http_private_label">HTTP</string>
+    <string name="transitionEntering">прибыл(а) в</string>
+    <string name="transitionLeaving">покинул(а)</string>
+    <string name="errorPreferencesImportFailed">Не удалось импортировать настройки</string>
+    <string name="welcome_play_heading">Сервисы Google Play</string>
+    <string name="welcome_play_description">Owntracks необходимы сервисы Google Play</string>
+    <string name="icon_description_warning">Предупреждение</string>
+    <string name="welcome_heading">Добро пожаловать!</string>
+    <string name="welcome_description">Следующие шаги помогут вам начать работу с Owntracks</string>
+    <string name="mode_heading">Режим</string>
+    <string name="permissions_heading">Разрешения</string>
+    <string name="permissions_description">Owntracks необходимо разрешение на определение вашего местоположения. Пожалуйста, предоставьте это разрешение, прежде чем продолжить.</string>
+    <string name="permissions_granted">Разрешения предоставлены</string>
+    <string name="icon_description_owntracks">Owntracks</string>
+    <string name="enjoy_description">Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером</string>
+    <string name="done_heading">Готово</string>
+    <string name="icon_description_done">Готово</string>
+    <string name="title_activity_load">Испорт</string>
+    <string name="errorPreferencesImportFailedParseException">Не удалось прочитать файл</string>
+    <string name="preferencesIgnoreInaccurateLocations">Неточные местоположения</string>
+    <string name="preferencesIgnoreInaccurateLocationsSummary">Игнорировать неточные местоположения</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">Игнорировать местоположение, если неточность его определения превышает указанное количество метров</string>
+    <string name="preferencesLocatorInterval">Интервал определения местоположения</string>
+    <string name="preferencesLocatorIntervalSummary">Интервал между обновлениями местоположения</string>
+    <string name="preferencesLocatorIntervalDialog">Как часто должно запрашиваться текущее местоположение у устройства (в секундах)</string>
+    <string name="preferencesMoveModeLocatorInterval">Интервал определения местоположения (Режим отслеживания перемещения)</string>
+    <string name="preferencesMoveModeLocatorIntervalSummary">Интервал между обновлениями местоположения в режиме отслеживания перемещения</string>
+    <string name="preferencesMoveModeLocatorIntervalDialog">Как часто должно запрашиваться текущее местоположение у устройства в режиме отслеживания перемещения (в секундах)</string>
+
+    <string name="errorPreferencesImportFailedMemory">На вашем устройстве закончилась память</string>
+    <string name="noNavigationApp">подходящее приложение не установлено</string>
+    <string name="menuClear">Очистить</string>
+    <string name="configurationManagement">Управление конфигурацией</string>
+    <string name="preferencesEditor">Редактор</string>
+    <string name="preferencesEditorKeyError">Указан неверный ключ</string>
+    <string name="preferencesEditorValueError">Указано неверное значение</string>
+    <string name="preferencesEditorDescription">Укажите ключ и его значение. Некоторые изменения могут потребовать перезапуск приложения.</string>
+    <string name="preferencesLoadFailed">Не удалось загрузить эффективную конфигурацию</string>
+    <string name="preferencesEditorKey">Ключ</string>
+    <string name="preferencesEditorValue">Значение</string>
+    <string name="restart">Перезапустить</string>
+    <plurals name="notificationEventsTitle">
+        <item quantity="one">%1$d новое событие</item>
+        <item quantity="few">%1$d новых события</item>
+        <item quantity="many">%1$d новых событий</item>
+        <item quantity="other">%1$d новых событий</item>
+    </plurals>
+    <string name="ui_fragment_welcome_version_title">Ограничения</string>
+    <string name="ui_fragment_welcome_version_description">Из-за ограничений ОС некоторые функции могут работать ограниченно.\n\nПостоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений.</string>
+    <string name="ui_fragment_welcome_version_learn_more">Узнайте больше</string>
+    <string name="INITIAL" tools:ignore="UnusedResources">Инициализация</string>
+    <string name="IDLE" tools:ignore="UnusedResources">Простой</string>
+    <string name="CONNECTING" tools:ignore="UnusedResources">Подключение</string>
+    <string name="CONNECTED" tools:ignore="UnusedResources">Подключен</string>
+    <string name="DISCONNECTING" tools:ignore="UnusedResources">Отключение</string>
+    <string name="DISCONNECTED" tools:ignore="UnusedResources">Отключен</string>
+    <string name="DISCONNECTED_USERDISCONNECT" tools:ignore="UnusedResources">Отключен</string>
+    <string name="ERROR" tools:ignore="UnusedResources">Ошибка</string>
+    <string name="ERROR_DATADISABLED" tools:ignore="UnusedResources">Подключение для передачи данных недоступно</string>
+    <string name="ERROR_CONFIGURATION">Конфигурация не завершена</string>
+    <string name="notificationChannelOngoing">Постоянное</string>
+    <string name="notificationChannelOngoingDescription">Необходимо для обновления текущего местоположения в фоновом режиме</string>
+    <string name="notificationChannelEventsDescription">Передача места</string>
+    <string name="preferencesOpencageGeocoderApiKey">Ключ OpenCage Geocoder API</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">Ключ OpenCage Geocoder API использования в качестве альтернативного геокодирования</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">Если установлено, OpenCage используется для разрешения адресов местоположения вместо Google. Требуется перезапуск.</string>
+    <string name="region_unknown">Статус неизвестен</string>
+    <string name="region_inside">Сейчас в этом месте</string>
+    <string name="region_outside">Сейчас вне этого места</string>
+    <string name="monitoring_quiet">Режим тихого отслеживания</string>
+    <string name="monitoring_manual">Режим ручного отслеживания</string>
+    <string name="monitoring_significant">Режим отслеживания существенных изменений местоположения</string>
+    <string name="monitoring_move">Режим отслеживания перемещения</string>
+    <string name="notificationChangeMonitoring">Изменить режим</string>
+    <string name="preferencesDebugLog">Журнал отладки</string>
+    <string name="monitoring_mode">Режим отслеживания</string>
+    <string name="distance_label">Расстояние</string>
+    <string name="preferencesClientId">ID клиента</string>
+    <string name="status_endpoint_state_hint">Состояние конечной точки</string>
+    <string name="status_endpoint_state_message_hint">Сообщение о состоянии конечной точки</string>
+    <string name="status_endpoint_queue_hint">Очередь конечной точки</string>
+    <string name="status_last_background_update_hint">Последнее фоновое обновление местоположения</string>
+    <string name="status_background_service_started_hint">Дата и время запуска фонового процесса</string>
+    <string name="status_battery_optimization_whitelisted_hint">Приложение в исключениях сервиса оптимизации энергопотребления</string>
+    <string name="clear_log">Очистить</string>
+    <string name="viewLogs">Просмотр журнала</string>
+    <string name="logViewerActivityTitle">Журнал</string>
+    <string name="exportLogFilePrompt">Экспорт файла журнала</string>
+    <string name="show_options">Показать настройки</string>
+    <string name="divider">Разделитель</string>
+    <string name="next">Далее</string>
+    <string name="reconnect">Переподключение</string>
+    <string name="select">Выбрать</string>
+    <string name="contact_image">Изображение контакта</string>
+</resources>
