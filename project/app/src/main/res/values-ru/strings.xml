@@ -58,7 +58,7 @@
     <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Безопасность</string>
     <string name="accept">Сохранить</string>
-    <string name="preferencesIdentification">Индентификация</string>
+    <string name="preferencesIdentification">Идентификация</string>
     <string name="preferencesParameters">Параметры</string>
     <string name="preferencesKeepalive">Keepalive</string>
     <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive должен быть минимум %d</string>
