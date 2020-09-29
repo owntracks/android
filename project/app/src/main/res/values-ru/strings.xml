@@ -39,7 +39,7 @@
     <string name="preferencesAutostartSummary">Автозапуск при включении устройства</string>
     <string name="preferencesAutostart">Автозапуск</string>
     <string name="preferencesRemoteCommand">Внешние команды</string>
-    <string name="preferencesRemoteCommandSummary">Расрешить внешние команды</string>
+    <string name="preferencesRemoteCommandSummary">Разрешить внешние команды</string>
     <string name="preferencesGeocode">Геокодирование</string>
     <string name="preferencesGeocodeSummary">Резрешить геокодирование. Требуется перезапуск.</string>
     <string name="description">Описание</string>
