@@ -12,7 +12,7 @@
     <string name="preferencesClientCrtPath">Сертификат пользователя</string>
     <string name="preferencesClientCrtPassword">Пароль</string>
     <string name="preferencesLicenses">Библиотеки</string>
-    <string name="preferencesLicensesSummary">Благодарим авторов использованных библиотек</string>
+    <string name="preferencesLicensesSummary">Благодарим авторов используемых библиотек</string>
     <string name="preferencesNotification">Уведомления</string>
     <string name="preferencesNotificationEvents">События</string>
     <string name="preferencesNotificationEventsSummary">Уведомлять о событиях</string>
