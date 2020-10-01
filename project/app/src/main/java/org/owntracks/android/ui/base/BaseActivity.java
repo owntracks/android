@@ -62,6 +62,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
     protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
+        
         if (viewModel == null) {
             throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
         }
@@ -72,7 +73,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         //noinspection unchecked
         viewModel.attachView(savedInstanceState, (MvvmView) this);
     }
-
 
     private boolean mBound;
 
@@ -111,7 +111,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             getSupportActionBar().setDisplayShowHomeEnabled(showHome);
             getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
         }
-
     }
 
     protected void setSupportToolbarWithDrawer(@NonNull Toolbar toolbar) {
@@ -119,11 +118,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         setDrawer(toolbar);
     }
 
-
     protected void setDrawer(@NonNull Toolbar toolbar) {
         drawerProvider.attach(toolbar);
     }
-
 
     @Override
     protected void onCreate(Bundle b) {
@@ -141,20 +138,17 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         }
     }
 
-
     @Override
     public void onStart() {
+        
         if (disablesAnimation)
             overridePendingTransition(0, 0);
         else
             overridePendingTransition(R.anim.push_up_in, R.anim.none);
-
-
-        super.onStart();
+            super.onStart();
 
         //bindService(new Intent(this, BackgroundService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
     }
-
 
     @Override
     protected void onStop() {
@@ -164,7 +158,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         }
         super.onStop();
     }
-
 
     @Override
     @CallSuper
@@ -176,7 +169,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         binding = null;
         viewModel = null;
     }
-
 
     public void onResume() {
         super.onResume();
