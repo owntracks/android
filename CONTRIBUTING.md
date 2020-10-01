@@ -1,4 +1,6 @@
-## Building 
+## Building OwnsTrack Android Application
+The OwnTracks app runs in the background on your Android or iOS device and waits for the smart 
+phone to tell it that the device has moved, whereupon OwnTracks sends out a message with its current coordinates 
 To build a development version of the app from source, follow the instructions outlined below. 
 
 1. Download and install [Android Studio](http://developer.android.com/sdk/index.html)
