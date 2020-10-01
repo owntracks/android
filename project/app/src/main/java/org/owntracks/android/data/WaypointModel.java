@@ -32,7 +32,9 @@ public class WaypointModel extends BaseObservable {
         setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
 
-    public WaypointModel(long id, long tst, @NonNull String description, double geofenceLatitude, double geofenceLongitude, int geofenceRadius, int lastTransition, long lastTriggered) {
+    public WaypointModel(long id, long tst, @NonNull String description, double geofenceLatitude, double geofenceLongitude,
+                         int geofenceRadius, int lastTransition, long lastTriggered) {
+        
         this.id = id;
         this.tst = tst;
         this.description = description;
@@ -80,6 +82,7 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLatitudeAsStr(String geofenceLatitudeAsStr) {
+        
         try {
             double geofenceLatitude = Double.parseDouble(geofenceLatitudeAsStr);
             setGeofenceLatitude(geofenceLatitude);
@@ -90,6 +93,7 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLatitude(double geofenceLatitude) {
+        
         if(geofenceLatitude > 90)
             this.geofenceLatitude = 90;
         else if(geofenceLatitude < -90)
@@ -105,6 +109,7 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLongitudeAsStr(String geofenceLongitudeAsStr) {
+        
         try {
             double geofenceLatitude = Double.parseDouble(geofenceLongitudeAsStr);
             setGeofenceLongitude(geofenceLatitude);
@@ -120,6 +125,7 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLongitude(double geofenceLongitude) {
+        
         if(geofenceLongitude > 180 )
             this.geofenceLongitude = 180 ;
         else if(geofenceLongitude < -180 )
@@ -139,6 +145,7 @@ public class WaypointModel extends BaseObservable {
 
     @NonNull
     public Location getLocation() {
+        
         Location l= new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
         l.setLongitude(getGeofenceLongitude());
