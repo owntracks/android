@@ -6,10 +6,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MessageEvent extends MessageBase{
+    
     static final String TYPE = "event";
     private static final String BASETOPIC_SUFFIX = "/event";
     public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
