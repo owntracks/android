@@ -201,10 +201,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         String connectString = new URI(scheme, null, preferences.getHost(), preferences.getPort(), null, null, null).toString();
         Timber.d("client id :%s, connect string: %s", cid, connectString);
-
-        CustomMqttClient mqttClient = new CustomMqttClient(connectString, cid, new MqttClientMemoryPersistence());
-        mqttClient.setCallback(iCallbackClient);
-        return mqttClient;
+        try {
+            CustomMqttClient mqttClient = new CustomMqttClient(connectString, cid, new MqttClientMemoryPersistence());
+            mqttClient.setCallback(iCallbackClient);
+            return mqttClient;
+        } catch (IllegalArgumentException e) {
+            throw new URISyntaxException(connectString, "Invalid URL");
+        }
     }
 
     private int sendMessageConnectPressure = 0;
