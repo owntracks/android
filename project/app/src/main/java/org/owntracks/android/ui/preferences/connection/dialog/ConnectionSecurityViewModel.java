@@ -56,13 +56,13 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         preferences.setTls(tls);
 
         if(tlsCaCrtNameDirty)
-            preferences.setTlsCaCrt(tlsCaCrtName);
+            preferences.setTlsCaCrt(tlsCaCrtName == null ? "" : tlsCaCrtName);
 
         if(tlsClientCrtNameDirty)
-            preferences.setTlsClientCrt(tlsClientCrtName);
+            preferences.setTlsClientCrt(tlsClientCrtName == null ? "" : tlsClientCrtName);
 
         if(tlsClientCrtPasswortDirty)
-            preferences.setTlsClientCrtPassword(tlsClientCrtPassword);
+            preferences.setTlsClientCrtPassword(tlsClientCrtPassword == null ? "" : tlsClientCrtPassword);
     }
 
     public boolean isTls() {
