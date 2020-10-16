@@ -85,7 +85,7 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation "androidx.test:core-ktx:${androidxTestVersion}"
-    androidTestImplementation('com.schibsted.spain:barista:3.5.0') {
+    androidTestImplementation('com.schibsted.spain:barista:3.7.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 

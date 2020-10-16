@@ -12,6 +12,7 @@ import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertD
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.junit.FixMethodOrder
@@ -20,7 +21,6 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
-import org.owntracks.android.LocationPermissionGranter
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnFailureRule
 
@@ -60,7 +60,7 @@ class MapActivityTests {
         assertClickable(R.id.fix_permissions_button)
 
         clickOn(R.id.fix_permissions_button)
-        LocationPermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
+        PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.btn_next)
 
         clickOn(R.id.btn_next)
