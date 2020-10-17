@@ -6,8 +6,5 @@ play {
     } else {
         enabled = false
     }
-    track = "internal"
-    userFraction = 1
-    releaseStatus = "completed"
-    resolutionStrategy = "auto"
+    track.set("internal")
 }
