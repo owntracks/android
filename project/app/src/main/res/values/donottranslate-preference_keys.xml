@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="preferenceKeyRemoteConfiguration">remoteConfiguration</string>
     <string name="preferenceKeyIgnoreInaccurateLocations">ignoreInaccurateLocations</string>
     <string name="preferenceKeyLocatorInterval">locatorInterval</string>
     <string name="preferenceKeyMoveModeLocatorInterval">moveModeLocatorInterval</string>

@@ -166,7 +166,6 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPubRetain)) } doReturn "pubRetain"
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"
                 on { getString(eq(R.string.preferenceKeyRemoteCommand)) } doReturn "cmd"
-                on { getString(eq(R.string.preferenceKeyRemoteConfiguration)) } doReturn "remoteConfiguration"
                 on { getString(eq(R.string.preferenceKeySetupNotCompleted)) } doReturn "setupNotCompleted"
                 on { getString(eq(R.string.preferenceKeySub)) } doReturn "sub"
                 on { getString(eq(R.string.preferenceKeySubQos)) } doReturn "subQos"

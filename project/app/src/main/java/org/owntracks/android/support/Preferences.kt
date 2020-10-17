@@ -331,7 +331,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         get() = getIntOrDefault(R.string.preferenceKeyIgnoreInaccurateLocations, R.integer.valIgnoreInaccurateLocations)
         set(meters) {
             setInt(R.string.preferenceKeyIgnoreInaccurateLocations, meters)
-        }// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
+        }
 
 
     @get:Export(keyResId = R.string.preferenceKeyClientId, exportModeMqtt = true)

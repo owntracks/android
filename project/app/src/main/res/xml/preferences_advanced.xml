@@ -8,7 +8,7 @@
         <SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyRemoteConfiguration"
+            app:key="@string/preferenceKeyRemoteCommand"
             app:summary="@string/preferencesRemoteCommandSummary"
             app:title="@string/preferencesRemoteCommand" />
     </PreferenceCategory>
