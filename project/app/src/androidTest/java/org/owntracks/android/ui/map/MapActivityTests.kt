@@ -16,6 +16,7 @@ import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.junit.FixMethodOrder
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -40,6 +41,7 @@ class MapActivityTests {
             .around(screenshotRule)
 
     @Test
+    @Ignore("Waiting for AGP4.1.0 to fix issue in https://issuetracker.google.com/issues/168642903")
     @AllowFlaky(attempts = 1)
     fun aaa_onFirstStartTheWelcomeActivityIsLoadedAndCanBeClickedThroughToTheEnd() {
         baristaRule.launchActivity()
