@@ -51,7 +51,7 @@ public class MessageProcessorEndpointHttpTest {
         messageLocation = new MessageLocation();
         messageLocation.setAcc(10);
         messageLocation.setAlt(20);
-        messageLocation.setBatt(30);
+        messageLocation.setBattery(30);
         messageLocation.setConn("TestConn");
         messageLocation.setLat(50.1);
         messageLocation.setLon(60.2);

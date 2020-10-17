@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.owntracks.android.model.BatteryStatus;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
@@ -32,7 +33,8 @@ public class MessageLocation extends MessageBase {
     public static final String CONN_TYPE_MOBILE = "m";
 
     private String t;
-    private int batt;
+    private int battery;
+    private BatteryStatus batteryStatus;
     private int acc;
     private int vac;
     private double lat;
@@ -95,12 +97,22 @@ public class MessageLocation extends MessageBase {
         this.t = t;
     }
 
-    public int getBatt() {
-        return batt;
+    @JsonProperty("batt")
+    public int getBattery() {
+        return battery;
     }
 
-    public void setBatt(int batt) {
-        this.batt = batt;
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
+    @JsonProperty("bs")
+    public BatteryStatus getBatteryStatus() {
+        return batteryStatus;
+    }
+
+    public void setBatteryStatus(BatteryStatus batteryStatus) {
+        this.batteryStatus = batteryStatus;
     }
 
     public int getAcc() {

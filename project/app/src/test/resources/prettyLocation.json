@@ -3,6 +3,7 @@
   "acc" : 10,
   "alt" : 20,
   "batt" : 30,
+  "bs" : 2,
   "conn" : "TestConn",
   "inregions" : [ "Testregion1", "Testregion2" ],
   "lat" : 50.1,

@@ -12,6 +12,7 @@ import org.mockito.Mockito
 import org.owntracks.android.App
 import org.owntracks.android.messages.MessageLocation
 import org.owntracks.android.messages.MessageUnknown
+import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.support.Parser.EncryptionException
 import org.powermock.core.classloader.annotations.PrepareForTest
 import java.io.BufferedReader
@@ -32,7 +33,7 @@ class ParserTest {
     @Mock
     private lateinit var encryptionProvider: EncryptionProvider
 
-    private val expectedJson = "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}"
+    private val expectedJson = "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}"
 
     @Before
     fun setupMessageLocation() {
@@ -42,7 +43,8 @@ class ParserTest {
         messageLocation = MessageLocation()
         messageLocation!!.acc = 10
         messageLocation!!.alt = 20
-        messageLocation!!.batt = 30
+        messageLocation!!.battery = 30
+        messageLocation!!.batteryStatus=BatteryStatus.CHARGING
         messageLocation!!.conn = "TestConn"
         messageLocation!!.setLat(50.1)
         messageLocation!!.setLon(60.2)
@@ -54,10 +56,10 @@ class ParserTest {
 
     @Before
     fun setupEncryptionProvider() {
-        testPreferences = mock{
+        testPreferences = mock {
             on { encryptionKey } doReturn "testEncryptionKey"
         }
-        encryptionProvider = mock{ on {isPayloadEncryptionEnabled} doReturn true }
+        encryptionProvider = mock { on { isPayloadEncryptionEnabled } doReturn true }
     }
 
     private fun getResourceFileAsString(resourceFileName: String?): String {
@@ -103,7 +105,7 @@ class ParserTest {
     @Throws(Exception::class)
     fun parserReturnsMessageLocationFromValidLocationInput() {
         val parser = Parser(encryptionProvider)
-        val input = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"inregions\":[\"Testregion1\",\"Testregion2\"]}"
+        val input = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":3,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"inregions\":[\"Testregion1\",\"Testregion2\"]}"
         val messageBase = parser.fromJson(input)
         Assert.assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val messageLocation = messageBase as MessageLocation
@@ -111,7 +113,8 @@ class ParserTest {
         Assert.assertEquals("s5", messageLocation.tid)
         Assert.assertEquals(1600, messageLocation.acc.toLong())
         Assert.assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
-        Assert.assertEquals(99, messageLocation.batt.toLong())
+        Assert.assertEquals(99, messageLocation.battery.toLong())
+        Assert.assertEquals(BatteryStatus.FULL, messageLocation.batteryStatus)
         Assert.assertEquals("w", messageLocation.conn)
         Assert.assertEquals(52.3153748, messageLocation.latitude, 0.0)
         Assert.assertEquals(5.0408462, messageLocation.longitude, 0.0)
@@ -124,7 +127,7 @@ class ParserTest {
     @Throws(Exception::class)
     fun parserReturnsMessageLocationFromValidEncryptedLocationInput() {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
-        val messageLocationJSON = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"vel\":2}"
+        val messageLocationJSON = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":1,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"vel\":2}"
         Mockito.`when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"encrypted\",\"data\":\"TestCipherText\"}"
@@ -135,7 +138,7 @@ class ParserTest {
         Assert.assertEquals("s5", messageLocation.tid)
         Assert.assertEquals(1600, messageLocation.acc.toLong())
         Assert.assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
-        Assert.assertEquals(99, messageLocation.batt.toLong())
+        Assert.assertEquals(99, messageLocation.battery.toLong())
         Assert.assertEquals("w", messageLocation.conn)
         Assert.assertEquals(52.3153748, messageLocation.latitude, 0.0)
         Assert.assertEquals(5.0408462, messageLocation.longitude, 0.0)

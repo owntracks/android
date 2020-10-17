@@ -107,7 +107,8 @@ public class LocationProcessor {
         message.setInRegions(calculateInregions(loadedWaypoints));
 
         if (preferences.getPubLocationExtendedData()) {
-            message.setBatt(deviceMetricsProvider.getBatteryLevel());
+            message.setBattery(deviceMetricsProvider.getBatteryLevel());
+            message.setBatteryStatus(deviceMetricsProvider.getBatteryStatus());
             message.setConn(deviceMetricsProvider.getConnectionType());
         }
 
