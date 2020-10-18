@@ -1,7 +1,6 @@
-
 plugins {
-    id("com.github.triplet.play") version "3.0.0"
     id("com.android.application")
+    id("com.github.triplet.play") version "3.0.0"
     id("io.objectbox")
     id("kotlin-android")
     id("kotlin-android-extensions")
@@ -16,7 +15,8 @@ def versionBuild = 0 // This value is managed by the gradle publisher plugin. Bu
 
 android {
     compileSdkVersion 30
-    ndkVersion "21.3.6528147" //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
+    //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
+    ndkVersion "21.3.6528147"
     defaultConfig {
         applicationId "org.owntracks.android"
         minSdkVersion 21
@@ -134,6 +134,20 @@ kapt {
     correctErrorTypes = true
 }
 
-apply from: "publishing.gradle"
+ext.serviceAccountCreds = file("owntracks-android-7a8e1517bde3.json")
+import com.github.triplet.gradle.androidpublisher.ResolutionStrategy
+
+play {
+    if (serviceAccountCreds.exists()) {
+        enabled = true
+        serviceAccountCredentials = serviceAccountCreds
+    } else {
+        enabled = false
+    }
+    track.set("internal")
+
+    resolutionStrategy = ResolutionStrategy.AUTO
+}
+
 apply from: "dependencies.gradle"
 apply from: "connectedTestScreenshotTasks.gradle"
