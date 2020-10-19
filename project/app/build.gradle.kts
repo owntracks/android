@@ -170,7 +170,6 @@ dependencies {
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
     implementation("androidx.core:core-ktx:1.3.2")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${KotlinVersion.CURRENT}")
 
     implementation("io.objectbox:objectbox-android:$objectboxVersion")
     kapt("io.objectbox:objectbox-processor:$objectboxVersion")
