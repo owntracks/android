@@ -153,7 +153,7 @@ dependencies {
     implementation("com.google.dagger:dagger-android-support:${daggerVersion}")
     implementation("com.google.dagger:dagger-android:${daggerVersion}")
 
-    implementation("org.greenrobot:eventbus:3.1.1")
+    implementation("org.greenrobot:eventbus:3.2.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0")
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
@@ -183,7 +183,7 @@ dependencies {
     kapt("com.sun.xml.bind:jaxb-impl:2.3.2")
 
     // Preprocessors
-    kapt("org.greenrobot:eventbus-annotation-processor:3.1.1")
+    kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
     kapt("com.google.dagger:dagger-compiler:${daggerVersion}")
     kapt("com.google.dagger:dagger-android-processor:${daggerVersion}")
 
