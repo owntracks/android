@@ -3,8 +3,8 @@ plugins {
     id("com.github.triplet.play") version "3.0.0"
     id("io.objectbox")
     kotlin("android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
+    kotlin("android.extensions")
+    kotlin("kapt")
     id("com.hiya.jacoco-android")
 }
 
@@ -139,16 +139,8 @@ val androidxTestVersion = "1.3.0"
 val kotlinCoroutinesVersion = "1.3.9"
 
 dependencies {
-    // Support libraries
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-
     implementation("androidx.preference:preference:1.1.1")
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
-    implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
-    implementation("androidx.annotation:annotation:1.1.0")
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.work:work-runtime:2.4.0")
 
