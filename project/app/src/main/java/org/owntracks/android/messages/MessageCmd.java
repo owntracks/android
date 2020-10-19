@@ -3,67 +3,34 @@ package org.owntracks.android.messages;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import org.owntracks.android.model.CommandAction;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
-import java.util.HashMap;
-import java.util.Map;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageCmd extends MessageBase{
+public class MessageCmd extends MessageBase {
     static final String TYPE = "cmd";
     private static final String BASETOPIC_SUFFIX = "/cmd";
-    private String action;
-    public static final String ACTION_REPORT_LOCATION = "reportLocation";
-    public static final String ACTION_SET_WAYPOINTS = "setWaypoints";
-    public static final String ACTION_SET_CONFIGURATION = "setConfiguration";
-    public static final String ACTION_RESTART = "restart";
-    public static final String ACTION_RECONNECT = "reconnect";
-    public static final String ACTION_WAYPOINTS = "waypoints";
+    private CommandAction action;
 
     private MessageWaypoints waypoints;
-    private final Map<String,Object> map = new HashMap<>();
     private MessageConfiguration configuration;
-
-    @JsonAnyGetter
-    public Map<String,Object> any() {
-        return map;
-    }
-
-    @JsonAnySetter
-    public void set(String key, Object value) {
-        if(value instanceof String && ((String) value).isEmpty())
-            return;
-
-        map.put(key, value);
-    }
-
-    @JsonIgnore
-    @Nullable
-    public Object get(String key) {
-        return map.get(key);
-    }
-
-    @JsonIgnore
-    public boolean containsKey(String key) {
-        return map.containsKey(key);
-    }
-
 
     @Override
     @NonNull
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
+    public String getBaseTopicSuffix() {
+        return BASETOPIC_SUFFIX;
+    }
 
     @Nullable
-    public String getAction() {
+    public CommandAction getAction() {
         return action;
     }
 
@@ -85,7 +52,7 @@ public class MessageCmd extends MessageBase{
         return configuration;
     }
 
-    public void setAction(String action) {
+    public void setAction(CommandAction action) {
         this.action = action;
     }
 

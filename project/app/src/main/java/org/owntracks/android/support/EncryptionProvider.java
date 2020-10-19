@@ -21,7 +21,6 @@ import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONC
 
 @PerApplication
 public class EncryptionProvider {
-    private static final String TAG = "EncryptionProvider";
     private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
     private static final int crypto_secretbox_KEYBYTES = XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 

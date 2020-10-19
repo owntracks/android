@@ -332,51 +332,50 @@ public class MessageProcessor implements IncomingMessageProcessor {
             return;
         }
 
-        String actions = message.getAction();
-        if (actions == null) {
-            Timber.e("no action in cmd message");
+        if (!message.isValidMessage()) {
+            Timber.e("Invalid action message received");
             return;
         }
 
-        for (String cmd : actions.split(",")) {
-            switch (cmd.trim()) {
-                case MessageCmd.ACTION_REPORT_LOCATION:
-                    if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
-                        Timber.e("command not supported in HTTP mode: %s", cmd);
-                        break;
-                    }
-                    serviceBridge.requestOnDemandLocationFix();
 
+        switch (message.getAction()) {
+            case REPORT_LOCATION:
+                if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+                    Timber.e("command not supported in HTTP mode: %s", message.getAction());
                     break;
-                case MessageCmd.ACTION_WAYPOINTS:
-                    locationProcessorLazy.get().publishWaypointsMessage();
-                    break;
-                case MessageCmd.ACTION_SET_WAYPOINTS:
-                    if (message.getWaypoints() != null) {
-                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
-                    }
+                }
+                serviceBridge.requestOnDemandLocationFix();
 
+                break;
+            case WAYPOINTS:
+                locationProcessorLazy.get().publishWaypointsMessage();
+                break;
+            case SET_WAYPOINTS:
+                if (message.getWaypoints() != null) {
+                    waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                }
+
+                break;
+            case SET_CONFIGURATION:
+                preferences.importFromMessage(message.getConfiguration());
+                if (message.getWaypoints() != null) {
+                    waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                }
+                break;
+            case RECONNECT:
+                if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
+                    Timber.e("command not supported in HTTP mode: %s", message.getAction());
                     break;
-                case MessageCmd.ACTION_SET_CONFIGURATION:
-                    preferences.importFromMessage(message.getConfiguration());
-                    if (message.getWaypoints() != null) {
-                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
-                    }
-                    break;
-                case MessageCmd.ACTION_RECONNECT:
-                    if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
-                        Timber.e("command not supported in HTTP mode: %s", cmd);
-                        break;
-                    }
-                    reconnect();
-                    break;
-                case MessageCmd.ACTION_RESTART:
-                    eventBus.post(new Events.RestartApp());
-                    break;
-                default:
-                    break;
-            }
+                }
+                reconnect();
+                break;
+            case RESTART:
+                eventBus.post(new Events.RestartApp());
+                break;
+            default:
+                break;
         }
+
     }
 
     @Override
