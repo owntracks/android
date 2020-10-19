@@ -154,7 +154,7 @@ dependencies {
     implementation("com.google.dagger:dagger-android:${daggerVersion}")
 
     implementation("org.greenrobot:eventbus:3.2.0")
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0")
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
     implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
