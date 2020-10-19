@@ -112,6 +112,7 @@ class PreferencesGettersAndSetters(
                     arrayOf("PubRetain", "pubRetain", true, true, Boolean::class, false),
                     arrayOf("PubTopicBaseFormatString", "pubTopicBase", "testDeviceTopic", "testDeviceTopic", String::class, false),
                     arrayOf("RemoteCommand", "cmd", true, true, Boolean::class, false),
+                    arrayOf("RemoteConfiguration", "remoteConfiguration", true, true, Boolean::class, false),
                     arrayOf("Sub", "sub", true, true, Boolean::class, false),
                     arrayOf("SubQos", "subQos", 1, 1, Int::class, false),
                     arrayOf("SubTopic", "subTopic", "testSubTopic", "testSubTopic", String::class, false),
@@ -166,6 +167,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPubRetain)) } doReturn "pubRetain"
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"
                 on { getString(eq(R.string.preferenceKeyRemoteCommand)) } doReturn "cmd"
+                on { getString(eq(R.string.preferenceKeyRemoteConfiguration)) } doReturn "remoteConfiguration"
                 on { getString(eq(R.string.preferenceKeySetupNotCompleted)) } doReturn "setupNotCompleted"
                 on { getString(eq(R.string.preferenceKeySub)) } doReturn "sub"
                 on { getString(eq(R.string.preferenceKeySubQos)) } doReturn "subQos"

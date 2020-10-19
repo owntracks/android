@@ -618,6 +618,14 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setBoolean(R.string.preferenceKeyDebugLog, debug)
         }
 
+    @get:Export(keyResId = R.string.preferenceKeyRemoteConfiguration, exportModeMqtt = true, exportModeHttp = true)
+    @set:Import(keyResId = R.string.preferenceKeyRemoteConfiguration)
+    var remoteConfiguration: Boolean
+        get() = getBooleanOrDefault(R.string.preferenceKeyRemoteConfiguration, R.bool.valFalse)
+        set(debug) {
+            setBoolean(R.string.preferenceKeyRemoteConfiguration, debug)
+        }
+
     @get:Export(keyResId = R.string.preferenceKeyGeocodeEnabled, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
     var geocodeEnabled: Boolean
@@ -628,7 +636,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
-        get() =// Use device name (Mako, Surnia, etc. and strip all non alpha digits)
+        get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")?.toLowerCase(Locale.getDefault())
                     ?: "unknown"
 

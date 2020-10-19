@@ -182,4 +182,6 @@
     <string name="reconnect">Reconnect</string>
     <string name="select">Select</string>
     <string name="contact_image">Contact Image</string>
+    <string name="preferencesRemoteConfiguration">Remote configuration</string>
+    <string name="preferencesRemoteConfigurationSummary">Enable configuration to be updated remotely (requires remote commands)</string>
 </resources>

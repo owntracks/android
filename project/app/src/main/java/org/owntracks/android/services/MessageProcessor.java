@@ -357,6 +357,10 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
                 break;
             case SET_CONFIGURATION:
+                if (!preferences.getRemoteConfiguration()) {
+                    Timber.w("Received a remote configuration command but remote config setting is disabled");
+                    break;
+                }
                 preferences.importFromMessage(message.getConfiguration());
                 if (message.getWaypoints() != null) {
                     waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
