@@ -42,15 +42,9 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public String setConfiguration(String json) throws IOException, Parser.EncryptionException {
         Timber.v("%s", json);
-
         this.configuration = (MessageConfiguration) parser.fromJson(json.getBytes());
-
-        Timber.v("hasWaypoints: %s / #%s", configuration.hasWaypoints(), configuration.getWaypoints().size());
         return parser.toJsonPlainPretty(this.configuration);
-
     }
-
-
 
     public void saveConfiguration() {
         preferences.importFromMessage(configuration);
