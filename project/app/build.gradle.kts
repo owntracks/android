@@ -160,7 +160,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1")
+    implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
 
