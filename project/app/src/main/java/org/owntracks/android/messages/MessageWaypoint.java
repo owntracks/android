@@ -10,19 +10,19 @@ import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageWaypoint extends MessageBase{
+public class MessageWaypoint extends MessageBase {
     static final String TYPE = "waypoint";
     private static final String BASETOPIC_SUFFIX = "/event";
-
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
-
     private String desc;
     private double lon;
     private double lat;
     private long tst;
-
     // Optional types for optional values
     private Integer rad;
+
+    public String getBaseTopicSuffix() {
+        return BASETOPIC_SUFFIX;
+    }
 
     public String getDesc() {
         return desc;

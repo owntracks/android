@@ -9,23 +9,19 @@ import com.google.android.gms.location.Geofence;
 
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageTransition extends MessageBase{
+public class MessageTransition extends MessageBase {
     public static final String TYPE = "transition";
+    public static final String TRIGGER_CIRCULAR = "c";
+    public static final String TRIGGER_LOCATION = "l";
     private static final String BASETOPIC_SUFFIX = "/event";
     private static final String EVENT_ENTER = "enter";
     private static final String EVENT_LEAVE = "leave";
-
-    public static final String TRIGGER_CIRCULAR = "c";
-    public static final String TRIGGER_LOCATION = "l";
-
-
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
     @JsonIgnore
-    private int  transition = 0;
-
+    private int transition = 0;
     private String desc;
     private String tid;
     private String trigger;
@@ -36,9 +32,30 @@ public class MessageTransition extends MessageBase{
     private double lon;
     private double lat;
 
+    public String getBaseTopicSuffix() {
+        return BASETOPIC_SUFFIX;
+    }
+
     @JsonIgnore
     public int getTransition() {
         return transition;
+    }
+
+    @JsonIgnore
+    public void setTransition(int transition) {
+        this.transition = transition;
+        switch (transition) {
+            case Geofence.GEOFENCE_TRANSITION_ENTER:
+            case Geofence.GEOFENCE_TRANSITION_DWELL:
+                event = EVENT_ENTER;
+                break;
+            case Geofence.GEOFENCE_TRANSITION_EXIT:
+                event = EVENT_LEAVE;
+                break;
+            default:
+                event = null;
+
+        }
     }
 
     public String getDesc() {
@@ -93,23 +110,6 @@ public class MessageTransition extends MessageBase{
         }
     }
 
-    @JsonIgnore
-    public void setTransition(int transition) {
-        this.transition = transition;
-        switch (transition) {
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-            case Geofence.GEOFENCE_TRANSITION_DWELL:
-                event = EVENT_ENTER;
-                break;
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                event = EVENT_LEAVE;
-                break;
-            default:
-                event = null;
-
-        }
-    }
-
     public long getTst() {
         return tst;
     }
@@ -131,28 +131,28 @@ public class MessageTransition extends MessageBase{
         handler.processIncomingMessage(this);
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
+    public float getAcc() {
+        return acc;
     }
 
     public void setAcc(float acc) {
         this.acc = acc;
     }
 
-    public float getAcc() {
-        return acc;
-    }
-
     public double getLon() {
         return lon;
     }
 
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
     public double getLat() {
         return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
     }
 
 }

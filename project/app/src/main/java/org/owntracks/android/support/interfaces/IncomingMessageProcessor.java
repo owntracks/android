@@ -10,11 +10,16 @@ import org.owntracks.android.messages.MessageUnknown;
 
 public interface IncomingMessageProcessor {
     void processIncomingMessage(MessageBase message);
-    void processIncomingMessage(MessageLocation message);
-    void processIncomingMessage(MessageCard message);
-    void processIncomingMessage(MessageCmd message);
-    void processIncomingMessage(MessageTransition message);
-    void processIncomingMessage(MessageUnknown message);
-    void processIncomingMessage(MessageClear message);
 
+    void processIncomingMessage(MessageLocation message);
+
+    void processIncomingMessage(MessageCard message);
+
+    void processIncomingMessage(MessageCmd message);
+
+    void processIncomingMessage(MessageTransition message);
+
+    void processIncomingMessage(MessageUnknown message);
+
+    void processIncomingMessage(MessageClear message);
 }

@@ -34,12 +34,8 @@ public class MessageCmd extends MessageBase {
         return action;
     }
 
-    public void setWaypoints(MessageWaypoints m) {
-        this.waypoints = m;
-    }
-
-    public void setConfiguration(MessageConfiguration m) {
-        this.configuration = m;
+    public void setAction(CommandAction action) {
+        this.action = action;
     }
 
     @Nullable
@@ -47,13 +43,17 @@ public class MessageCmd extends MessageBase {
         return waypoints;
     }
 
+    public void setWaypoints(MessageWaypoints m) {
+        this.waypoints = m;
+    }
+
     @Nullable
     public MessageConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setAction(CommandAction action) {
-        this.action = action;
+    public void setConfiguration(MessageConfiguration m) {
+        this.configuration = m;
     }
 
     @Override

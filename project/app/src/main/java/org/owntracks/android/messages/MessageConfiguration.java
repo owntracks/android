@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-public class MessageConfiguration extends MessageBase{
+public class MessageConfiguration extends MessageBase {
     static final String TYPE = "configuration";
-    private final Map<String,Object> map = new TreeMap<>();
+    private final Map<String, Object> map = new TreeMap<>();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MessageWaypointCollection waypoints;
@@ -36,14 +36,14 @@ public class MessageConfiguration extends MessageBase{
     }
 
     @JsonAnyGetter
-    @JsonPropertyOrder(alphabetic=true)
-    public Map<String,Object> any() {
+    @JsonPropertyOrder(alphabetic = true)
+    public Map<String, Object> any() {
         return map;
     }
 
     @JsonAnySetter
     public void set(String key, Object value) {
-        if(value instanceof String && "".equals(value))
+        if (value instanceof String && "".equals(value))
             return;
         map.put(key, value);
     }
@@ -54,11 +54,6 @@ public class MessageConfiguration extends MessageBase{
         set("tid", tid);
     }
 
-    @Override
-    public void addMqttPreferences(Preferences preferences) {
-
-    }
-
     @JsonIgnore
     public Object get(String key) {
         return map.get(key);
@@ -67,12 +62,6 @@ public class MessageConfiguration extends MessageBase{
     @JsonIgnore
     public boolean containsKey(String key) {
         return map.containsKey(key);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getBaseTopicSuffix() {
-        return null;
     }
 
     @JsonIgnore

@@ -1,7 +1,5 @@
 package org.owntracks.android.messages;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
@@ -10,12 +8,6 @@ public class MessageClear extends MessageBase {
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getBaseTopicSuffix() {
-        return null;
     }
 
     @Override

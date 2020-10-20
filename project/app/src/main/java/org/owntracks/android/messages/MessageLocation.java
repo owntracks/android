@@ -145,6 +145,12 @@ public class MessageLocation extends MessageBase {
     }
 
     @JsonIgnore
+    public void setGeocoder(String geocoder) {
+        this.geocoder = geocoder;
+        notifyContactPropertyChanged();
+    }
+
+    @JsonIgnore
     public String getGeocoderFallback() {
         return (getLatitude() + " : " + getLongitude());
     }
@@ -152,17 +158,6 @@ public class MessageLocation extends MessageBase {
     @JsonIgnore
     public boolean hasGeocoder() {
         return geocoder != null;
-    }
-
-    @JsonIgnore
-    public void setGeocoder(String geocoder) {
-        this.geocoder = geocoder;
-        notifyContactPropertyChanged();
-    }
-
-    @JsonIgnore
-    public String getBaseTopicSuffix() {
-        return null;
     }
 
     public void setContact(FusedContact contact) {
@@ -189,28 +184,28 @@ public class MessageLocation extends MessageBase {
         return tst > 0;
     }
 
-    public void setConn(String conn) {
-        this.conn = conn;
-    }
-
     public String getConn() {
         return this.conn;
     }
 
-    public void setAlt(int alt) {
-        this.alt = alt;
+    public void setConn(String conn) {
+        this.conn = conn;
     }
 
     public int getAlt() {
         return alt;
     }
 
-    public void setVac(int vac) {
-        this.vac = vac;
+    public void setAlt(int alt) {
+        this.alt = alt;
     }
 
     public int getVac() {
         return this.vac;
+    }
+
+    public void setVac(int vac) {
+        this.vac = vac;
     }
 
     @JsonIgnore

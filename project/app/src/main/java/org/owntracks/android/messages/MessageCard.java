@@ -7,15 +7,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MessageCard extends MessageBase{
-    static final String TYPE = "card";
+public class MessageCard extends MessageBase {
     public static final String BASETOPIC_SUFFIX = "/info";
+    static final String TYPE = "card";
     private String name;
     private String face;
 
@@ -27,7 +26,6 @@ public class MessageCard extends MessageBase{
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getFace() {
         return face;
@@ -46,11 +44,8 @@ public class MessageCard extends MessageBase{
         return this.name != null;
     }
 
-    public String getBaseTopicSuffix() {  return BASETOPIC_SUFFIX; }
-
-    @Override
-    public void addMqttPreferences(Preferences preferences) {
-
+    public String getBaseTopicSuffix() {
+        return BASETOPIC_SUFFIX;
     }
 
     @Override
