@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -62,11 +61,6 @@ public class MessageWaypoint extends MessageBase {
 
     public void setTst(long tst) {
         this.tst = tst;
-    }
-
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
     }
 
     @Override

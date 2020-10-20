@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,11 +20,6 @@ public class MessageConfiguration extends MessageBase {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MessageWaypointCollection waypoints;
-
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
-    }
 
     public MessageWaypointCollection getWaypoints() {
         return waypoints;

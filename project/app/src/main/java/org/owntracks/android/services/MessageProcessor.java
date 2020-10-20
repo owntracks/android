@@ -25,7 +25,6 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
@@ -43,7 +42,7 @@ import dagger.Lazy;
 import timber.log.Timber;
 
 @PerApplication
-public class MessageProcessor implements IncomingMessageProcessor {
+public class MessageProcessor {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
@@ -290,38 +289,46 @@ public class MessageProcessor implements IncomingMessageProcessor {
         eventBus.postSticky(newState);
     }
 
-    @Override
     public void processIncomingMessage(MessageBase message) {
-        Timber.d("type:base, key:%s", message.getContactKey());
+        Timber.d("Received incoming message: %s on %s", message.getClass().getSimpleName(), message.getContactKey());
+        if (message instanceof MessageClear) {
+            processIncomingMessage((MessageClear) message);
+        } else if (message instanceof MessageLocation) {
+            processIncomingMessage((MessageLocation) message);
+        } else if (message instanceof MessageCard) {
+            processIncomingMessage((MessageCard) message);
+        } else if (message instanceof MessageCmd) {
+            processIncomingMessage((MessageCmd) message);
+        } else if (message instanceof MessageTransition) {
+            processIncomingMessage((MessageTransition) message);
+        } else if (message instanceof MessageUnknown) {
+            processIncomingMessage((MessageUnknown) message);
+        }
     }
 
-    public void processIncomingMessage(MessageUnknown message) {
-        Timber.i("type:unknown, key:%s", message.getContactKey());
+    private void processIncomingMessage(MessageUnknown message) {
+        Timber.i("Unknown message received on %s", message.getContactKey());
     }
 
-    @Override
-    public void processIncomingMessage(MessageClear message) {
+    private void processIncomingMessage(MessageClear message) {
         contactsRepo.remove(message.getContactKey());
     }
 
-    @Override
-    public void processIncomingMessage(MessageLocation message) {
+    private void processIncomingMessage(MessageLocation message) {
         Timber.d("processing location message %s. ThreadID: %s", message.getContactKey(), Thread.currentThread());
         // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
-        if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - (message.getTst() * 1000)) > (preferences.getIgnoreStaleLocations() * 24 * 60 * 60 * 1000)) {
+        if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - ((message).getTst() * 1000)) > (preferences.getIgnoreStaleLocations() * 24 * 60 * 60 * 1000)) {
             Timber.e("discarding stale location");
             return;
         }
         contactsRepo.update(message.getContactKey(), message);
     }
 
-    @Override
-    public void processIncomingMessage(MessageCard message) {
+    private void processIncomingMessage(MessageCard message) {
         contactsRepo.update(message.getContactKey(), message);
     }
 
-    @Override
-    public void processIncomingMessage(MessageCmd message) {
+    private void processIncomingMessage(MessageCmd message) {
         if (!preferences.getRemoteCommand()) {
             Timber.w("remote commands are disabled");
             return;
@@ -336,7 +343,6 @@ public class MessageProcessor implements IncomingMessageProcessor {
             Timber.e("Invalid action message received");
             return;
         }
-
 
         switch (message.getAction()) {
             case REPORT_LOCATION:
@@ -382,8 +388,7 @@ public class MessageProcessor implements IncomingMessageProcessor {
 
     }
 
-    @Override
-    public void processIncomingMessage(MessageTransition message) {
+    private void processIncomingMessage(MessageTransition message) {
         eventBus.post(message);
     }
 

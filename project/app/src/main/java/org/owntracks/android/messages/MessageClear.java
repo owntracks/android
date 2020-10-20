@@ -2,14 +2,8 @@ package org.owntracks.android.messages;
 
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 public class MessageClear extends MessageBase {
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
-    }
-
     @Override
     public void addMqttPreferences(Preferences preferences) {
         setRetained(true);

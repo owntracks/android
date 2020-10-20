@@ -95,7 +95,7 @@ public class Parser {
     private String encryptString(@NonNull String input) throws IOException {
         if (encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
-            m.setdata(encryptionProvider.encrypt(input));
+            m.setData(encryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsString(m);
         }
         return input;
@@ -104,7 +104,7 @@ public class Parser {
     private byte[] encryptBytes(@NonNull byte[] input) throws IOException {
         if (encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
-            m.setdata(encryptionProvider.encrypt(input));
+            m.setData(encryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsBytes(m);
         }
         return input;

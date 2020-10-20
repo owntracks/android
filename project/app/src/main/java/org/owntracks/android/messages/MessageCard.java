@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -46,10 +44,5 @@ public class MessageCard extends MessageBase {
 
     public String getBaseTopicSuffix() {
         return BASETOPIC_SUFFIX;
-    }
-
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
     }
 }

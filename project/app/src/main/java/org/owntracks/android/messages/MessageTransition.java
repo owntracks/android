@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.android.gms.location.Geofence;
 
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -124,11 +123,6 @@ public class MessageTransition extends MessageBase {
 
     public void setWtst(long wtst) {
         this.wtst = wtst;
-    }
-
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
     }
 
     public float getAcc() {

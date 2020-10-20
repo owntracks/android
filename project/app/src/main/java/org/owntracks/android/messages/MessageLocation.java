@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.LatLng;
 import org.owntracks.android.model.BatteryStatus;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -168,11 +167,6 @@ public class MessageLocation extends MessageBase {
         if (_contact != null && _contact.get() != null)
             this._contact.get().notifyMessageLocationPropertyChanged();
 
-    }
-
-    @Override
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
     }
 
     public void setTid(String tid) {

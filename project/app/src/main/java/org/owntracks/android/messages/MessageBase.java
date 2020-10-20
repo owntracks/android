@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.interfaces.IncomingMessageProcessor;
 
 import java.io.IOException;
 
@@ -96,11 +95,6 @@ public abstract class MessageBase extends BaseObservable {
     @JsonIgnore
     public void setIncoming() {
         this.incoming = true;
-    }
-
-    @JsonIgnore
-    public void processIncomingMessage(IncomingMessageProcessor handler) {
-        handler.processIncomingMessage(this);
     }
 
     @JsonIgnore
