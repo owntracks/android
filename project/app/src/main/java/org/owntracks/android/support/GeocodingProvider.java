@@ -10,7 +10,7 @@ import android.widget.TextView;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 

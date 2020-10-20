@@ -7,7 +7,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import org.owntracks.android.injection.components.AppComponentProvider;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.services.LocationProcessor;
 
 import javax.inject.Inject;

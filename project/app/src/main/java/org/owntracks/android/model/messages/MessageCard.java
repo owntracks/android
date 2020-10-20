@@ -1,4 +1,4 @@
-package org.owntracks.android.messages;
+package org.owntracks.android.model.messages;
 
 import androidx.databinding.Bindable;
 

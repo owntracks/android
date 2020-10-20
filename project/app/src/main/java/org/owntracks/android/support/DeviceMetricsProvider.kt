@@ -8,7 +8,7 @@ import android.net.NetworkInfo
 import android.os.BatteryManager
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.injection.scopes.PerApplication
-import org.owntracks.android.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.BatteryStatus
 import javax.inject.Inject
 

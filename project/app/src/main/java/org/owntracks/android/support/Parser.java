@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.messages.MessageBase;
-import org.owntracks.android.messages.MessageEncrypted;
+import org.owntracks.android.model.messages.MessageBase;
+import org.owntracks.android.model.messages.MessageEncrypted;
 
 import java.io.IOException;
 import java.io.InputStream;

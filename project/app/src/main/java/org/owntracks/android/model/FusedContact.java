@@ -10,8 +10,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 import org.owntracks.android.BR;
-import org.owntracks.android.messages.MessageCard;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.messages.MessageCard;
+import org.owntracks.android.model.messages.MessageLocation;
 
 import timber.log.Timber;
 

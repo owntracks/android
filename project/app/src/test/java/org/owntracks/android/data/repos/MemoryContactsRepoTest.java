@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.owntracks.android.App;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;

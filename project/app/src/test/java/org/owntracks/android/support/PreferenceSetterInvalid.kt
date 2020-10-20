@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.owntracks.android.messages.MessageConfiguration
+import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.support.preferences.PreferencesStore
 
 class PreferenceSetterInvalid {

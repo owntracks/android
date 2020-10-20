@@ -59,7 +59,7 @@ public static java.lang.String TABLENAME;
  -dontwarn com.fasterxml.jackson.databind.**
  -keep class org.codehaus.** { *; }
 
--keep public class org.owntracks.android.messages.** {
+-keep public class org.owntracks.android.model.messages.** {
  *;
  }
 

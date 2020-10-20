@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.owntracks.android.messages.*
+import org.owntracks.android.model.messages.*
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.support.Parser.EncryptionException

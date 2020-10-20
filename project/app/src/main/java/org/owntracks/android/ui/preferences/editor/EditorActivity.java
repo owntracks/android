@@ -23,7 +23,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.databinding.UiPreferencesEditorBinding;
-import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;

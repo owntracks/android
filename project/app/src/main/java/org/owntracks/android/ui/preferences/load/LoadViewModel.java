@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;

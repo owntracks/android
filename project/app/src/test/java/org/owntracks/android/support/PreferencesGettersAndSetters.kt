@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.owntracks.android.R
-import org.owntracks.android.messages.MessageConfiguration
+import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.support.preferences.PreferencesStore

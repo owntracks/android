@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
-import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;

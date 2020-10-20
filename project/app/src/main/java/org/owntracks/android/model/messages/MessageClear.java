@@ -1,4 +1,4 @@
-package org.owntracks.android.messages;
+package org.owntracks.android.model.messages;
 
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;

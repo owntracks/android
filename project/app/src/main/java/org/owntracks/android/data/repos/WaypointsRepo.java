@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.WaypointModel;
-import org.owntracks.android.messages.MessageWaypoint;
+import org.owntracks.android.model.messages.MessageWaypoint;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MessageWaypointCollection;
 

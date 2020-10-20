@@ -1,6 +1,6 @@
 package org.owntracks.android.services;
 
-import org.owntracks.android.messages.MessageBase;
+import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 

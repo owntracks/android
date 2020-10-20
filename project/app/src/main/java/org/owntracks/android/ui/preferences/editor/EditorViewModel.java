@@ -9,7 +9,7 @@ import androidx.databinding.Bindable;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.messages.MessageConfiguration;
+import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;

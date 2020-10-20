@@ -1,7 +1,7 @@
 package org.owntracks.android.data.repos;
 
-import org.owntracks.android.messages.MessageCard;
-import org.owntracks.android.messages.MessageLocation;
+import org.owntracks.android.model.messages.MessageCard;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
 
 import java.util.Collection;

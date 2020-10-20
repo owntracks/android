@@ -9,7 +9,7 @@ import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.injection.scopes.PerApplication
-import org.owntracks.android.messages.MessageConfiguration
+import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
