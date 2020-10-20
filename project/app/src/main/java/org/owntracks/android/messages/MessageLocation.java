@@ -175,11 +175,6 @@ public class MessageLocation extends MessageBase {
 
     }
 
-    @JsonIgnore
-    private LatLng getLatLng() {
-        return point != null ? point : (point = new LatLng(lat, lon));
-    }
-
     @Override
     public void processIncomingMessage(IncomingMessageProcessor handler) {
         handler.processIncomingMessage(this);
@@ -222,7 +217,7 @@ public class MessageLocation extends MessageBase {
     @Override
     @NonNull
     public String toString() {
-        return String.format("%s: %s",super.toString(), this.getLatLng());
+        return String.format("Location id=%s: (%s,%s)", this.getMessageId(), this.getLatitude(), this.getLongitude());
     }
 
     @Override

@@ -182,7 +182,6 @@ public class LocationProcessor {
         messageProcessor.queueMessageForSending(message);
     }
 
-
     public void publishWaypointsMessage() {
         MessageWaypoints message = new MessageWaypoints();
         MessageWaypointCollection collection = new MessageWaypointCollection();

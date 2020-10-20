@@ -19,7 +19,6 @@ import java.io.IOException;
 @JsonSubTypes({
         @JsonSubTypes.Type(value=MessageLocation.class, name=MessageLocation.TYPE),
         @JsonSubTypes.Type(value=MessageTransition.class, name=MessageTransition.TYPE),
-        @JsonSubTypes.Type(value=MessageEvent.class, name=MessageEvent.TYPE),
         @JsonSubTypes.Type(value=MessageCard.class, name=MessageCard.TYPE),
         @JsonSubTypes.Type(value=MessageCmd.class, name=MessageCmd.TYPE),
         @JsonSubTypes.Type(value=MessageConfiguration.class, name=MessageConfiguration.TYPE),

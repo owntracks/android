@@ -18,7 +18,6 @@ public class MessageCard extends MessageBase{
     public static final String BASETOPIC_SUFFIX = "/info";
     private String name;
     private String face;
-    private boolean hasCachedFace;
 
     @Bindable
     public String getName() {

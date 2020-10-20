@@ -28,6 +28,7 @@ public class MessageClear extends MessageBase {
     public byte[] toJsonBytes(Parser parser) {
         return new byte[0];
     }
+
     @Override
     public String toJson(Parser parser) {
         return "";
