@@ -8,12 +8,12 @@ import org.owntracks.android.injection.modules.android.FragmentModules.BaseFragm
 import org.owntracks.android.injection.scopes.PerFragment
 
 @PerFragment
-class NotificationFragment:AbstractPreferenceFragment() {
+class NotificationFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferencesFix(savedInstanceState, rootKey)
-
         setPreferencesFromResource(R.xml.preferences_notification, rootKey)
     }
+
     @Module(includes = [BaseFragmentModule::class])
     internal abstract class FragmentModule {
         @Binds

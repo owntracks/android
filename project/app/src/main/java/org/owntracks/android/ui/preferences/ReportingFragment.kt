@@ -9,10 +9,9 @@ import org.owntracks.android.injection.scopes.PerFragment
 
 
 @PerFragment
-class ReportingFragment : AbstractPreferenceFragment(){
+class ReportingFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferencesFix(savedInstanceState, rootKey)
-
         setPreferencesFromResource(R.xml.preferences_reporting, rootKey)
     }
 
@@ -22,5 +21,4 @@ class ReportingFragment : AbstractPreferenceFragment(){
         @PerFragment
         abstract fun bindFragment(reportingFragment: ReportingFragment): ReportingFragment
     }
-
 }

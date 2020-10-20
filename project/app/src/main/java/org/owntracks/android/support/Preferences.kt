@@ -221,21 +221,21 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyMonitoring)
     var monitoring: Int
         get() = getIntOrDefault(R.string.preferenceKeyMonitoring, R.integer.valMonitoring)
-        set(newmode) {
-            if (newmode < LocationProcessor.MONITORING_QUIET || newmode > LocationProcessor.MONITORING_MOVE) {
-                Timber.e("invalid monitoring mode specified %s", newmode)
+        set(newMode) {
+            if (newMode < LocationProcessor.MONITORING_QUIET || newMode > LocationProcessor.MONITORING_MOVE) {
+                Timber.e("invalid monitoring mode specified %s", newMode)
                 return
             }
-            setInt(R.string.preferenceKeyMonitoring, newmode)
-            eventBus?.post(MonitoringChanged(newmode))
+            setInt(R.string.preferenceKeyMonitoring, newMode)
+            eventBus?.post(MonitoringChanged(newMode))
         }
 
     @get:Export(keyResId = R.string.preferenceKeyDontReuseHttpClient, exportModeMqtt = false, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyDontReuseHttpClient)
     var dontReuseHttpClient: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyDontReuseHttpClient, R.bool.valFalse)
-        set(bool) {
-            setBoolean(R.string.preferenceKeyDontReuseHttpClient, bool)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyDontReuseHttpClient, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyOpencageGeocoderApiKey, exportModeMqtt = true, exportModeHttp = true)
@@ -250,24 +250,24 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyRemoteCommand)
     var remoteCommand: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyRemoteCommand, R.bool.valRemoteCommand)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyRemoteCommand, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyRemoteCommand, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyCleanSession, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyCleanSession)
     var cleanSession: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyCleanSession, R.bool.valCleanSession)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyCleanSession, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyCleanSession, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyPublishExtendedData, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyPublishExtendedData)
     var pubLocationExtendedData: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyPublishExtendedData, R.bool.valPubExtendedData)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyPublishExtendedData, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyPublishExtendedData, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyLocatorInterval, exportModeMqtt = true, exportModeHttp = true)
@@ -532,16 +532,16 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyNotificationHigherPriority)
     var notificationHigherPriority: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyNotificationHigherPriority, R.bool.valNotificationHigherPriority)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyNotificationHigherPriority, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyNotificationHigherPriority, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyNotificationLocation, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyNotificationLocation)
     var notificationLocation: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyNotificationLocation, R.bool.valNotificationLocation)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyNotificationLocation, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyNotificationLocation, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyPubQos, exportModeMqtt = true)
@@ -557,8 +557,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyPubRetain)
     var pubRetain: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyPubRetain, R.bool.valPubRetain)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyPubRetain, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyPubRetain, newValue)
         }
 
 
@@ -574,8 +574,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyAutostartOnBoot)
     var autostartOnBoot: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyAutostartOnBoot, R.bool.valAutostartOnBoot)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyAutostartOnBoot, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyAutostartOnBoot, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyInfo, exportModeMqtt = true)
@@ -606,8 +606,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyFusedRegionDetection)
     var fusedRegionDetection: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyFusedRegionDetection, R.bool.valTrue)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyFusedRegionDetection, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyFusedRegionDetection, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyDebugLog, exportModeMqtt = true, exportModeHttp = true)
@@ -622,16 +622,16 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @set:Import(keyResId = R.string.preferenceKeyRemoteConfiguration)
     var remoteConfiguration: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyRemoteConfiguration, R.bool.valFalse)
-        set(debug) {
-            setBoolean(R.string.preferenceKeyRemoteConfiguration, debug)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyRemoteConfiguration, newValue)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyGeocodeEnabled, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
     var geocodeEnabled: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyGeocodeEnabled, R.bool.valGeocodeEnabled)
-        set(aBoolean) {
-            setBoolean(R.string.preferenceKeyGeocodeEnabled, aBoolean)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyGeocodeEnabled, newValue)
         }
 
     // Not used on public, as many people might use the same device type

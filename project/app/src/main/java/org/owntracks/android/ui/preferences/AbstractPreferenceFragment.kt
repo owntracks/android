@@ -13,6 +13,7 @@ abstract class AbstractPreferenceFragment: PreferenceFragmentCompat() {
 
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.sharedPreferencesName = preferences.sharedPreferencesName
+        
     }
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
