@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -79,14 +80,14 @@ class ParserTest {
               "vel" : 5
             }
         """.trimIndent()
-        Assert.assertEquals(expected, parser.toJsonPlainPretty(messageLocation!!))
+        assertEquals(expected, parser.toJsonPlainPretty(messageLocation!!))
     }
 
     @Test
     @Throws(Exception::class)
     fun parserCorrectlyConvertsLocationToPlainJSON() {
         val parser = Parser(null)
-        Assert.assertEquals(locationWithRegionsJSON, parser.toJsonPlain(messageLocation!!))
+        assertEquals(locationWithRegionsJSON, parser.toJsonPlain(messageLocation!!))
     }
 
     @Test
@@ -95,7 +96,7 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.encrypt(ArgumentMatchers.anyString())).thenReturn("TestCipherText")
         val parser = Parser(encryptionProvider)
         val expected = "{\"_type\":\"encrypted\",\"data\":\"TestCipherText\"}"
-        Assert.assertEquals(expected, parser.toJson(messageLocation!!))
+        assertEquals(expected, parser.toJson(messageLocation!!))
     }
 
     @Test
@@ -104,53 +105,72 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         Mockito.`when`(encryptionProvider.encrypt(ArgumentMatchers.anyString())).thenReturn("TestCipherText")
         val parser = Parser(encryptionProvider)
-        Assert.assertEquals(locationWithRegionsJSON, parser.toJson(messageLocation!!))
+        assertEquals(locationWithRegionsJSON, parser.toJson(messageLocation!!))
     }
 
     @Test
-    @Throws(Exception::class)
-    fun parserReturnsMessageLocationFromValidLocationInput() {
+    fun parserCanDeserializeLocationMessage() {
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":3,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"inregions\":[\"Testregion1\",\"Testregion2\"]}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageLocation::class.java, messageBase.javaClass)
+        assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val messageLocation = messageBase as MessageLocation
-        Assert.assertEquals(1514455575L, messageLocation.tst)
-        Assert.assertEquals("s5", messageLocation.tid)
-        Assert.assertEquals(1600, messageLocation.acc.toLong())
-        Assert.assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
-        Assert.assertEquals(99, messageLocation.battery.toLong())
-        Assert.assertEquals(BatteryStatus.FULL, messageLocation.batteryStatus)
-        Assert.assertEquals("w", messageLocation.conn)
-        Assert.assertEquals(52.3153748, messageLocation.latitude, 0.0)
-        Assert.assertEquals(5.0408462, messageLocation.longitude, 0.0)
-        Assert.assertEquals("p", messageLocation.t)
-        Assert.assertEquals(0f, messageLocation.vac.toFloat(), 0f)
-        Assert.assertEquals(2, messageLocation.inRegions.size.toLong())
+        assertEquals(1514455575L, messageLocation.tst)
+        assertEquals("s5", messageLocation.tid)
+        assertEquals(1600, messageLocation.acc.toLong())
+        assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
+        assertEquals(99, messageLocation.battery.toLong())
+        assertEquals(BatteryStatus.FULL, messageLocation.batteryStatus)
+        assertEquals("w", messageLocation.conn)
+        assertEquals(52.3153748, messageLocation.latitude, 0.0)
+        assertEquals(5.0408462, messageLocation.longitude, 0.0)
+        assertEquals("p", messageLocation.t)
+        assertEquals(0f, messageLocation.vac.toFloat(), 0f)
+        assertEquals(2, messageLocation.inRegions.size.toLong())
     }
 
     @Test
-    @Throws(Exception::class)
-    fun parserReturnsMessageLocationFromValidEncryptedLocationInput() {
+    fun parserCanSerializeLocationMessage() {
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+        val parser = Parser(encryptionProvider)
+        val input = messageLocation
+        val serialized = parser.toJson(input!!)
+        assertEquals(locationWithRegionsJSON, serialized)
+    }
+
+    @Test
+    fun parserCanDeserializeEncryptedLocationMessage() {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
         val messageLocationJSON = "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":1,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"vel\":2}"
         Mockito.`when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"encrypted\",\"data\":\"TestCipherText\"}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageLocation::class.java, messageBase.javaClass)
+        assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val messageLocation = messageBase as MessageLocation
-        Assert.assertEquals(1514455575L, messageLocation.tst)
-        Assert.assertEquals("s5", messageLocation.tid)
-        Assert.assertEquals(1600, messageLocation.acc.toLong())
-        Assert.assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
-        Assert.assertEquals(99, messageLocation.battery.toLong())
-        Assert.assertEquals("w", messageLocation.conn)
-        Assert.assertEquals(52.3153748, messageLocation.latitude, 0.0)
-        Assert.assertEquals(5.0408462, messageLocation.longitude, 0.0)
-        Assert.assertEquals("p", messageLocation.t)
-        Assert.assertEquals(0f, messageLocation.vac.toFloat(), 0f)
-        Assert.assertEquals(2f, messageLocation.velocity.toFloat(), 0f)
+        assertEquals(1514455575L, messageLocation.tst)
+        assertEquals("s5", messageLocation.tid)
+        assertEquals(1600, messageLocation.acc.toLong())
+        assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
+        assertEquals(99, messageLocation.battery.toLong())
+        assertEquals("w", messageLocation.conn)
+        assertEquals(52.3153748, messageLocation.latitude, 0.0)
+        assertEquals(5.0408462, messageLocation.longitude, 0.0)
+        assertEquals("p", messageLocation.t)
+        assertEquals(0f, messageLocation.vac.toFloat(), 0f)
+        assertEquals(2f, messageLocation.velocity.toFloat(), 0f)
+    }
+
+    @Test
+    fun parserCanSerializeEncryptedLocationMessage() {
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
+        Mockito.`when`(encryptionProvider.encrypt(locationWithRegionsJSON)).thenReturn("TestCipherText")
+        val parser = Parser(encryptionProvider)
+        val input = messageLocation
+        val serialized = parser.toJson(input!!)
+        val expected = """{"_type":"encrypted","data":"TestCipherText"}"""
+        assertEquals(expected, serialized)
     }
 
     @Test(expected = EncryptionException::class)
@@ -169,14 +189,14 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val byteArrayInputStream = ByteArrayInputStream(multipleMessageLocationJSON.toByteArray())
         val messages = parser.fromJson(byteArrayInputStream)
-        Assert.assertEquals(2, messages.size.toLong())
+        assertEquals(2, messages.size.toLong())
         for (messageBase in messages) {
-            Assert.assertEquals(MessageLocation::class.java, messageBase.javaClass)
+            assertEquals(MessageLocation::class.java, messageBase.javaClass)
         }
         val firstMessageLocation = messages[0] as MessageLocation
-        Assert.assertEquals(1514455575L, firstMessageLocation.tst)
+        assertEquals(1514455575L, firstMessageLocation.tst)
         val secondMessageLocation = messages[1] as MessageLocation
-        Assert.assertEquals(1514455579L, secondMessageLocation.tst)
+        assertEquals(1514455579L, secondMessageLocation.tst)
     }
 
     @Test
@@ -185,10 +205,10 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"cmd\", \"action\":\"reportLocation\"}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageCmd::class.java, messageBase.javaClass)
+        assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
         Assert.assertTrue(messageCmd.isValidMessage)
-        Assert.assertEquals(CommandAction.REPORT_LOCATION, messageCmd.action)
+        assertEquals(CommandAction.REPORT_LOCATION, messageCmd.action)
     }
 
     @Test
@@ -197,10 +217,10 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"cmd\", \"action\":\"restart\"}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageCmd::class.java, messageBase.javaClass)
+        assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
         Assert.assertTrue(messageCmd.isValidMessage)
-        Assert.assertEquals(CommandAction.RESTART, messageCmd.action)
+        assertEquals(CommandAction.RESTART, messageCmd.action)
     }
 
     @Test
@@ -209,11 +229,11 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"cmd\",\"action\":\"setWaypoints\",\"waypoints\":{\"_type\":\"waypoints\",\"waypoints\":[]}}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageCmd::class.java, messageBase.javaClass)
+        assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
         Assert.assertTrue(messageCmd.isValidMessage)
-        Assert.assertEquals(CommandAction.SET_WAYPOINTS, messageCmd.action)
-        Assert.assertEquals(0, messageCmd.waypoints!!.waypoints!!.size)
+        assertEquals(CommandAction.SET_WAYPOINTS, messageCmd.action)
+        assertEquals(0, messageCmd.waypoints!!.waypoints!!.size)
     }
 
     @Test
@@ -222,11 +242,11 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"cmd\",\"action\":\"setConfiguration\",\"configuration\":{\"_type\":\"configuration\",\"host\":\"newHost\"}}"
         val messageBase = parser.fromJson(input)
-        Assert.assertEquals(MessageCmd::class.java, messageBase.javaClass)
+        assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
         Assert.assertTrue(messageCmd.isValidMessage)
-        Assert.assertEquals(CommandAction.SET_CONFIGURATION, messageCmd.action)
-        Assert.assertEquals("newHost", messageCmd.configuration!!["host"])
+        assertEquals(CommandAction.SET_CONFIGURATION, messageCmd.action)
+        assertEquals("newHost", messageCmd.configuration!!["host"])
     }
 
     @Test(expected = InvalidFormatException::class)
@@ -251,7 +271,7 @@ class ParserTest {
     fun parserReturnsMessageUnknownOnValidOtherJSON() {
         val parser = Parser(encryptionProvider)
         val message = parser.fromJson("{\"some\":\"invalid message\"}")
-        Assert.assertEquals(MessageUnknown::class.java, message.javaClass)
+        assertEquals(MessageUnknown::class.java, message.javaClass)
     }
 
     @Test(expected = JsonParseException::class)
