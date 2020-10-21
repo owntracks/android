@@ -49,15 +49,15 @@ public class MessageProcessorEndpointHttpTest {
     @Before
     public void setup() {
         messageLocation = new MessageLocation();
-        messageLocation.setAcc(10);
-        messageLocation.setAlt(20);
+        messageLocation.setAccuracy(10);
+        messageLocation.setAltitude(20);
         messageLocation.setBattery(30);
         messageLocation.setConn("TestConn");
-        messageLocation.setLat(50.1);
-        messageLocation.setLon(60.2);
-        messageLocation.setTst(123456789);
+        messageLocation.setLatitude(50.1);
+        messageLocation.setLongitude(60.2);
+        messageLocation.setTimestamp(123456789);
         messageLocation.setVelocity((int) 5.6);
-        messageLocation.setVac((int) 1.7);
+        messageLocation.setVerticalAccuracy((int) 1.7);
 
         testPreferences = mock(Preferences.class);
         when(testPreferences.getTlsCaCrt()).thenReturn("");

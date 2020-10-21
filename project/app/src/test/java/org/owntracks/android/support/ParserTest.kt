@@ -2,17 +2,17 @@ package org.owntracks.android.support
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.google.android.gms.location.Geofence
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.owntracks.android.model.messages.*
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
+import org.owntracks.android.model.messages.*
 import org.owntracks.android.support.Parser.EncryptionException
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -37,17 +37,17 @@ class ParserTest {
         regions.add("Testregion1")
         regions.add("Testregion2")
         messageLocation = MessageLocation()
-        messageLocation!!.acc = 10
-        messageLocation!!.alt = 20
+        messageLocation!!.accuracy = 10
+        messageLocation!!.altitude = 20
         messageLocation!!.battery = 30
         messageLocation!!.batteryStatus = BatteryStatus.CHARGING
         messageLocation!!.conn = "TestConn"
-        messageLocation!!.setLat(50.1)
-        messageLocation!!.setLon(60.2)
-        messageLocation!!.tst = 123456789
+        messageLocation!!.latitude = 50.1
+        messageLocation!!.longitude = 60.2
+        messageLocation!!.timestamp = 123456789
         messageLocation!!.velocity = 5.6.toInt()
-        messageLocation!!.vac = 1.7.toInt()
-        messageLocation!!.inRegions = regions
+        messageLocation!!.verticalAccuracy = 1.7.toInt()
+        messageLocation!!.inregions = regions
     }
 
     @Before
@@ -88,18 +88,18 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val message = messageBase as MessageLocation
-        assertEquals(1514455575L, message.tst)
-        assertEquals("s5", message.tid)
-        assertEquals(1600, message.acc.toLong())
-        assertEquals(0.0, message.alt.toDouble(), 0.0)
+        assertEquals(1514455575L, message.timestamp)
+        assertEquals("s5", message.trackerId)
+        assertEquals(1600, message.accuracy.toLong())
+        assertEquals(0.0, message.altitude.toDouble(), 0.0)
         assertEquals(99, message.battery.toLong())
         assertEquals(BatteryStatus.FULL, message.batteryStatus)
         assertEquals("w", message.conn)
         assertEquals(52.3153748, message.latitude, 0.0)
         assertEquals(5.0408462, message.longitude, 0.0)
-        assertEquals("p", message.t)
-        assertEquals(0f, message.vac.toFloat(), 0f)
-        assertEquals(2, message.inRegions.size.toLong())
+        assertEquals("p", message.trigger)
+        assertEquals(0f, message.verticalAccuracy.toFloat(), 0f)
+        assertEquals(2, message.inregions?.size)
     }
 
     @Test
@@ -121,16 +121,16 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val messageLocation = messageBase as MessageLocation
-        assertEquals(1514455575L, messageLocation.tst)
-        assertEquals("s5", messageLocation.tid)
-        assertEquals(1600, messageLocation.acc.toLong())
-        assertEquals(0.0, messageLocation.alt.toDouble(), 0.0)
+        assertEquals(1514455575L, messageLocation.timestamp)
+        assertEquals("s5", messageLocation.trackerId)
+        assertEquals(1600, messageLocation.accuracy.toLong())
+        assertEquals(0.0, messageLocation.altitude.toDouble(), 0.0)
         assertEquals(99, messageLocation.battery.toLong())
         assertEquals("w", messageLocation.conn)
         assertEquals(52.3153748, messageLocation.latitude, 0.0)
         assertEquals(5.0408462, messageLocation.longitude, 0.0)
-        assertEquals("p", messageLocation.t)
-        assertEquals(0f, messageLocation.vac.toFloat(), 0f)
+        assertEquals("p", messageLocation.trigger)
+        assertEquals(0f, messageLocation.verticalAccuracy.toFloat(), 0f)
         assertEquals(2f, messageLocation.velocity.toFloat(), 0f)
     }
 
@@ -164,9 +164,9 @@ class ParserTest {
             assertEquals(MessageLocation::class.java, messageBase.javaClass)
         }
         val firstMessageLocation = messages[0] as MessageLocation
-        assertEquals(1514455575L, firstMessageLocation.tst)
+        assertEquals(1514455575L, firstMessageLocation.timestamp)
         val secondMessageLocation = messages[1] as MessageLocation
-        assertEquals(1514455579L, secondMessageLocation.tst)
+        assertEquals(1514455579L, secondMessageLocation.timestamp)
     }
     //endregion
 
@@ -235,14 +235,14 @@ class ParserTest {
         assertEquals(MessageTransition::class.java, messageBase.javaClass)
         val message = messageBase as MessageTransition
         assertTrue(message.isValidMessage)
-        assertEquals(2, message.transition)
-        assertEquals(3.075f, message.acc, 0f)
-        assertEquals("myregion", message.desc)
-        assertEquals(52.71234, message.lat, 0.0)
-        assertEquals(-1.61234123, message.lon, 0.0)
-        assertEquals(1603209966, message.tst)
-        assertEquals(1558351273, message.wtst)
-        assertEquals("ce", message.tid)
+        assertEquals(2, message.getTransition())
+        assertEquals(3.075f, message.accuracy, 0f)
+        assertEquals("myregion", message.description)
+        assertEquals(52.71234, message.latitude, 0.0)
+        assertEquals(-1.61234123, message.longitude, 0.0)
+        assertEquals(1603209966, message.timestamp)
+        assertEquals(1558351273, message.waypointTimestamp)
+        assertEquals("ce", message.trackerId)
         assertEquals("l", message.trigger)
     }
 
@@ -251,17 +251,55 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
         val message = MessageTransition()
-        message.lat = 52.71234
-        message.lon = -1.61234123
-        message.desc = "myregion"
-        message.transition = 2
-        message.acc = 3.075f
-        message.tst = 1603209966
-        message.wtst = 1558351273
-        message.tid = "ce"
+        message.latitude = 52.71234
+        message.longitude = -1.61234123
+        message.description = "myregion"
+        message.setTransition(Geofence.GEOFENCE_TRANSITION_EXIT)
+        message.accuracy = 3.075f
+        message.timestamp = 1603209966
+        message.waypointTimestamp = 1558351273
+        message.trackerId = "ce"
         message.trigger = "l"
         val serialized = message.toJson(parser)
         val expected = "{\"_type\":\"transition\",\"acc\":3.075,\"desc\":\"myregion\",\"event\":\"leave\",\"lat\":52.71234,\"lon\":-1.61234123,\"t\":\"l\",\"tid\":\"ce\",\"tst\":1603209966,\"wtst\":1558351273}"
+        assertEquals(expected, serialized)
+    }
+    //endregion
+
+    //region Configuration messages
+    @Test
+    fun `Parser can deserialize a configuration message`() {
+        val parser = Parser(encryptionProvider)
+        val input = "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"work\",\"lat\":51.504778900000005,\"lon\":-0.023851299999999995,\"rad\":150,\"tst\":1505910709000},{\"_type\":\"waypoint\",\"desc\":\"home\",\"lat\":53.6776261,\"lon\":-1.58268,\"rad\":100,\"tst\":1558351273}],\"auth\":true,\"autostartOnBoot\":true,\"cleanSession\":false,\"clientId\":\"emulator\",\"cmd\":true,\"debugLog\":true,\"deviceId\":\"testdevice\",\"fusedRegionDetection\":true,\"geocodeEnabled\":true,\"host\":\"127.0.0.1\",\"ignoreInaccurateLocations\":150,\"ignoreStaleLocations\":0.0,\"keepalive\":900,\"locatorDisplacement\":5,\"locatorInterval\":60,\"locatorPriority\":2,\"mode\":0,\"monitoring\":1,\"moveModeLocatorInterval\":10,\"mqttProtocolLevel\":3,\"notificationHigherPriority\":false,\"notificationLocation\":true,\"opencageApiKey\":\"testkey\",\"password\":\"testpassword\",\"ping\":30,\"port\":1883,\"pubExtendedData\":true,\"pubQos\":1,\"pubRetain\":true,\"pubTopicBase\":\"owntracks/%u/%d\",\"remoteConfiguration\":true,\"sub\":true,\"subQos\":2,\"subTopic\":\"owntracks/+/+\",\"tls\":false,\"usePassword\":true,\"username\":\"testusername\",\"ws\":false}"
+        val messageBase = parser.fromJson(input)
+        assertEquals(MessageConfiguration::class.java, messageBase.javaClass)
+        val message = messageBase as MessageConfiguration
+        assertTrue(message.isValidMessage)
+        assertFalse(message.waypoints.isEmpty())
+        assertEquals(2, message.waypoints?.size)
+        assertFalse(message.hasTrackerId())
+        assertEquals(true, message.get("autostartOnBoot"))
+        assertEquals(5, message.get("locatorDisplacement"))
+    }
+
+    @Test
+    fun `Parser can serialize a configuration message`() {
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+        val parser = Parser(encryptionProvider)
+        val message = MessageConfiguration()
+        message.set("TestBoolKey", true)
+        message.set("TestStringKey", "testString")
+        message.set("TestIntKey", 13487)
+        message.set("TestFloatKey", 13487f)
+        val waypoint = MessageWaypoint()
+        waypoint.latitude = 51.0
+        waypoint.longitude = -20.0
+        waypoint.description = "Test waypoint"
+        waypoint.radius = 45
+        waypoint.timestamp = 123456789
+        message.waypoints.add(waypoint)
+        val serialized = message.toJson(parser)
+        val expected = "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"Test waypoint\",\"lat\":51.0,\"lon\":-20.0,\"rad\":45,\"tst\":123456789}],\"TestBoolKey\":true,\"TestFloatKey\":13487.0,\"TestIntKey\":13487,\"TestStringKey\":\"testString\"}"
         assertEquals(expected, serialized)
     }
     //endregion
@@ -275,11 +313,11 @@ class ParserTest {
         assertEquals(MessageWaypoint::class.java, messageBase.javaClass)
         val message = messageBase as MessageWaypoint
         assertTrue(message.isValidMessage)
-        assertEquals("mypoint", message.desc)
-        assertEquals(52.0027789, message.lat, 0.0)
-        assertEquals(-1.0829312, message.lon, 0.0)
-        assertEquals(150, message.rad)
-        assertEquals(1558351273, message.tst)
+        assertEquals("mypoint", message.description)
+        assertEquals(52.0027789, message.latitude, 0.0)
+        assertEquals(-1.0829312, message.longitude, 0.0)
+        assertEquals(150, message.radius)
+        assertEquals(1558351273, message.timestamp)
     }
 
     @Test
@@ -287,11 +325,11 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
         val message = MessageWaypoint()
-        message.lat = 52.0027789
-        message.lon = -1.0829312
-        message.desc = "mypoint"
-        message.rad = 150
-        message.tst = 1558351273
+        message.latitude = 52.0027789
+        message.longitude = -1.0829312
+        message.description = "mypoint"
+        message.radius = 150
+        message.timestamp = 1558351273
         val serialized = message.toJson(parser)
         val expected = "{\"_type\":\"waypoint\",\"desc\":\"mypoint\",\"lat\":52.0027789,\"lon\":-1.0829312,\"rad\":150,\"tst\":1558351273}"
         assertEquals(expected, serialized)

@@ -89,22 +89,22 @@ public class LocationProcessor {
         }
 
         MessageLocation message = new MessageLocation();
-        message.setLat(currentLocation.getLatitude());
-        message.setLon(currentLocation.getLongitude());
-        message.setAlt((int)currentLocation.getAltitude());
-        message.setAcc(Math.round(currentLocation.getAccuracy()));
+        message.setLatitude(currentLocation.getLatitude());
+        message.setLongitude(currentLocation.getLongitude());
+        message.setAltitude((int)currentLocation.getAltitude());
+        message.setAccuracy(Math.round(currentLocation.getAccuracy()));
         if (currentLocation.hasSpeed()) {
             message.setVelocity((int)(currentLocation.getSpeed() * 3.6)); // Convert m/s to km/h
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && currentLocation.hasVerticalAccuracy()) {
-            message.setVac((int)currentLocation.getVerticalAccuracyMeters());
+            message.setVerticalAccuracy((int)currentLocation.getVerticalAccuracyMeters());
         }
-        message.setT(trigger);
+        message.setTrigger(trigger);
 
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        message.setTimestamp(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-        message.setTid(preferences.getTrackerId(true));
-        message.setInRegions(calculateInregions(loadedWaypoints));
+        message.setTrackerId(preferences.getTrackerId(true));
+        message.setInregions(calculateInregions(loadedWaypoints));
 
         if (preferences.getPubLocationExtendedData()) {
             message.setBattery(deviceMetricsProvider.getBatteryLevel());
@@ -172,13 +172,13 @@ public class LocationProcessor {
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(trigger);
-        message.setTid(preferences.getTrackerId(true));
-        message.setLat(triggeringLocation.getLatitude());
-        message.setLon(triggeringLocation.getLongitude());
-        message.setAcc(triggeringLocation.getAccuracy());
-        message.setTst(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        message.setWtst(w.getTst());
-        message.setDesc(w.getDescription());
+        message.setTrackerId(preferences.getTrackerId(true));
+        message.setLatitude(triggeringLocation.getLatitude());
+        message.setLongitude(triggeringLocation.getLongitude());
+        message.setAccuracy(triggeringLocation.getAccuracy());
+        message.setTimestamp(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        message.setWaypointTimestamp(w.getTst());
+        message.setDescription(w.getDescription());
         messageProcessor.queueMessageForSending(message);
     }
 
@@ -187,11 +187,11 @@ public class LocationProcessor {
         MessageWaypointCollection collection = new MessageWaypointCollection();
         for(WaypointModel w : waypointsRepo.getAllWithGeofences()) {
             MessageWaypoint m = new MessageWaypoint();
-            m.setDesc(w.getDescription());
-            m.setLat(w.getGeofenceLatitude());
-            m.setLon(w.getGeofenceLongitude());
-            m.setRad(w.getGeofenceRadius());
-            m.setTst(w.getTst());
+            m.setDescription(w.getDescription());
+            m.setLatitude(w.getGeofenceLatitude());
+            m.setLongitude(w.getGeofenceLongitude());
+            m.setRadius(w.getGeofenceRadius());
+            m.setTimestamp(w.getTst());
             collection.add(m);
         }
         message.setWaypoints(collection);

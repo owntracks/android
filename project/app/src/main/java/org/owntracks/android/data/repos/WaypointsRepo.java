@@ -50,7 +50,7 @@ public abstract class WaypointsRepo {
 
         for (MessageWaypoint m: waypoints) {
             // Delete existing waypoint if one with the same tst already exists
-            WaypointModel exisiting = get(m.getTst());
+            WaypointModel exisiting = get(m.getTimestamp());
             if(exisiting != null) {
                 delete(exisiting);
             }
@@ -68,16 +68,16 @@ public abstract class WaypointsRepo {
     }
 
     private WaypointModel toDaoObject(@NonNull MessageWaypoint messageWaypoint) {
-        return new WaypointModel(0, messageWaypoint.getTst(),messageWaypoint.getDesc(), messageWaypoint.getLat(), messageWaypoint.getLon(), messageWaypoint.getRad() != null ? messageWaypoint.getRad() : 0, 0, 0);
+        return new WaypointModel(0, messageWaypoint.getTimestamp(),messageWaypoint.getDescription(), messageWaypoint.getLatitude(), messageWaypoint.getLongitude(), messageWaypoint.getRadius() != null ? messageWaypoint.getRadius() : 0, 0, 0);
     }
 
     public MessageWaypoint fromDaoObject(@NonNull WaypointModel w) {
         MessageWaypoint message = new MessageWaypoint();
-        message.setDesc(w.getDescription());
-        message.setLat(w.getGeofenceLatitude());
-        message.setLon(w.getGeofenceLongitude());
-        message.setRad(w.getGeofenceRadius());
-        message.setTst(w.getTst());
+        message.setDescription(w.getDescription());
+        message.setLatitude(w.getGeofenceLatitude());
+        message.setLongitude(w.getGeofenceLongitude());
+        message.setRadius(w.getGeofenceRadius());
+        message.setTimestamp(w.getTst());
         return message;
     }
 

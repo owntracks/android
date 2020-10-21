@@ -38,14 +38,14 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     }
 
     public boolean setMessageLocation(MessageLocation messageLocation) {
-        if(tst >= messageLocation.getTst())
+        if(tst >= messageLocation.getTimestamp())
             return false;
 
-        Timber.v("update contact:%s, tst:%s", id, messageLocation.getTst());
+        Timber.v("update contact:%s, tst:%s", id, messageLocation.getTimestamp());
 
         this.messageLocation = messageLocation;
         this.messageLocation.setContact(this); // Allows to update fusedLocation if geocoder of messageLocation changed
-        this.tst = messageLocation.getTst();
+        this.tst = messageLocation.getTimestamp();
         notifyMessageLocationPropertyChanged();
         return true;
     }
@@ -94,12 +94,12 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
 
     @Bindable
     public long getFusedLocationDate() {
-        return this.hasLocation() ? messageLocation.getTst() : 0;
+        return this.hasLocation() ? messageLocation.getTimestamp() : 0;
     }
 
     @Bindable
     public String getFusedLocationAccuracy() {
-        return Integer.toString(this.hasLocation() ? messageLocation.getAcc() : 0);
+        return Integer.toString(this.hasLocation() ? messageLocation.getAccuracy() : 0);
     }
 
     public boolean hasLocation() {
@@ -114,8 +114,8 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     @Bindable
     @NonNull
     public String getTrackerId() {
-        if(hasLocation() && getMessageLocation().hasTid())
-            return getMessageLocation().getTid();
+        if(hasLocation() && getMessageLocation().hasTrackerId())
+            return getMessageLocation().getTrackerId();
         else {
             String id = getId().replace("/","");
             if(id.length() > 2) {

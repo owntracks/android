@@ -5,6 +5,7 @@ import androidx.databinding.BaseObservable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -44,7 +45,7 @@ public abstract class MessageBase extends BaseObservable {
     private int _mqtt_qos;
     @JsonIgnore
     private boolean _mqtt_retained;
-    private String tid;
+    private String trackerId;
 
     @JsonIgnore
     public long getMessageId() {
@@ -76,8 +77,8 @@ public abstract class MessageBase extends BaseObservable {
     public String getContactKey() {
         if (_topic_base != null)
             return _topic_base;
-        if (tid != null)
-            return tid;
+        if (trackerId != null)
+            return trackerId;
         return
                 "NOKEY";
     }
@@ -115,18 +116,19 @@ public abstract class MessageBase extends BaseObservable {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public String getTid() {
-        return tid;
+    @JsonProperty("tid")
+    public String getTrackerId() {
+        return trackerId;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    void setTid(String tid) {
-        this.tid = tid;
+    void setTrackerId(String trackerId) {
+        this.trackerId = trackerId;
     }
 
     @JsonIgnore
-    public boolean hasTid() {
-        return getTid() != null;
+    public boolean hasTrackerId() {
+        return getTrackerId() != null;
     }
 
     @JsonIgnore

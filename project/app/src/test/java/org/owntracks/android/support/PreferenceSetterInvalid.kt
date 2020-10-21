@@ -29,7 +29,7 @@ class PreferenceSetterInvalid {
     fun `when given an import value of null, the config value should be cleared`() {
         val preferences = Preferences(mockContext, null, preferencesStore)
         val messageConfiguration = MessageConfiguration()
-        messageConfiguration.set("host", null)
+        messageConfiguration["host"] = null
         preferences.host = "testHost"
         preferences.importFromMessage(messageConfiguration)
         Assert.assertEquals("", preferences.host)
@@ -39,7 +39,7 @@ class PreferenceSetterInvalid {
     fun `when given an invalid preference key, it should be ignored`() {
         val preferences = Preferences(mockContext, null, preferencesStore)
         val messageConfiguration = MessageConfiguration()
-        messageConfiguration.set("Invalid", "invalid")
+        messageConfiguration["Invalid"] = "invalid"
         preferences.importFromMessage(messageConfiguration)
         Assert.assertFalse(preferences.exportToMessage().keys.contains("Invalid"))
     }
@@ -48,7 +48,7 @@ class PreferenceSetterInvalid {
     fun `when given an import value of the wrong type, it should be ignored`() {
         val preferences = Preferences(mockContext, null, preferencesStore)
         val messageConfiguration = MessageConfiguration()
-        messageConfiguration.set("host", 4)
+        messageConfiguration["host"] = 4
         preferences.importFromMessage(messageConfiguration)
         Assert.assertEquals("", preferences.host)
     }

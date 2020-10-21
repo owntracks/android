@@ -312,7 +312,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
             builder.setContentTitle(this.lastLocationMessage.getGeocoder());
-            builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTst()));
+            builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTimestamp()));
             builder.setNumber(lastQueueLength);
         } else {
             builder.setContentTitle(getString(R.string.app_name));
@@ -354,13 +354,13 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         FusedContact c = contactsRepo.getById(message.getContactKey());
 
-        long when = TimeUnit.SECONDS.toMillis(message.getTst());
-        String location = message.getDesc();
+        long when = TimeUnit.SECONDS.toMillis(message.getTimestamp());
+        String location = message.getDescription();
 
         if (location == null) {
             location = getString(R.string.aLocation);
         }
-        String title = message.getTid();
+        String title = message.getTrackerId();
         if (c != null)
             title = c.getFusedName();
         else if (title == null) {
@@ -372,7 +372,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         eventsNotificationCompatBuilder.setContentTitle(title);
         eventsNotificationCompatBuilder.setContentText(text);
-        eventsNotificationCompatBuilder.setWhen(TimeUnit.SECONDS.toMillis(message.getTst()));
+        eventsNotificationCompatBuilder.setWhen(TimeUnit.SECONDS.toMillis(message.getTimestamp()));
         eventsNotificationCompatBuilder.setShowWhen(true);
         eventsNotificationCompatBuilder.setGroup(NOTIFICATION_GROUP_EVENTS);
         // Deliver notification
@@ -643,7 +643,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation m) {
         Timber.d("MessageLocation received %s, %s, outgoing: %s", m, lastLocationMessage, !m.isIncoming());
-        if (lastLocationMessage == null || lastLocationMessage.getTst() <= m.getTst()) {
+        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() <= m.getTimestamp()) {
             this.lastLocationMessage = m;
             updateOngoingNotification();
             geocodingProvider.resolve(m, this);

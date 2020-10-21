@@ -49,13 +49,13 @@ public class MemoryContactsRepoTest {
         mockStatic(App.class);
 
         messageLocation = new MessageLocation();
-        messageLocation.setAcc(10);
-        messageLocation.setAlt(20);
+        messageLocation.setAccuracy(10);
+        messageLocation.setAltitude(20);
         messageLocation.setBattery(30);
         messageLocation.setConn("TestConn");
-        messageLocation.setLat(50.1);
-        messageLocation.setLon(60.2);
-        messageLocation.setTst(123456789);
+        messageLocation.setLatitude(50.1);
+        messageLocation.setLongitude(60.2);
+        messageLocation.setTimestamp(123456789);
 
         contactsRepo = new MemoryContactsRepo(eventBus, contactImageProvider);
 
@@ -74,7 +74,7 @@ public class MemoryContactsRepoTest {
 
         FusedContact c = contactsRepo.getById(CONTACT_ID);
         assertEquals(messageLocation, c.getMessageLocation());
-        assertEquals(messageLocation.getTst(), c.getTst());
+        assertEquals(messageLocation.getTimestamp(), c.getTst());
         assertEquals(CONTACT_ID, c.getId());
     }
 

@@ -2,6 +2,7 @@ package org.owntracks.android.ui.preferences.load;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -48,8 +49,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     public void saveConfiguration() {
         preferences.importFromMessage(configuration);
-
-        if(configuration.hasWaypoints()) {
+        if (!configuration.getWaypoints().isEmpty()) {
             waypointsRepo.importFromMessage(configuration.getWaypoints());
         }
 

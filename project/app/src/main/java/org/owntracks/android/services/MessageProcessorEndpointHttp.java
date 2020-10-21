@@ -319,8 +319,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     @Override
     protected MessageBase onFinalizeMessage(MessageBase message) {
         // Build pseudo topic based on tid
-        if(message.hasTid()) {
-            message.setTopic(HTTPTOPIC + message.getTid());
+        if(message.hasTrackerId()) {
+            message.setTopic(HTTPTOPIC + message.getTrackerId());
         }
         return message;
     }
