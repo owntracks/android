@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import android.net.NetworkCapabilities
 import android.os.BatteryManager
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.injection.scopes.PerApplication
-import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.BatteryStatus
+import org.owntracks.android.model.messages.MessageLocation
 import javax.inject.Inject
 
 @PerApplication
@@ -21,30 +21,45 @@ class DeviceMetricsProvider @Inject internal constructor(@param:AppContext priva
             return batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, 0) ?: 0
         }
     val batteryStatus: BatteryStatus
-    get() {
-        val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        val batteryStatus = context.registerReceiver(null, intentFilter)
-        return when(batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, 0)) {
-            BatteryManager.BATTERY_STATUS_FULL ->  BatteryStatus.FULL
-            BatteryManager.BATTERY_STATUS_CHARGING -> BatteryStatus.CHARGING
-            BatteryManager.BATTERY_STATUS_DISCHARGING -> BatteryStatus.UNPLUGGED
-            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> BatteryStatus.UNKNOWN
-            else -> BatteryStatus.UNKNOWN
+        get() {
+            val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+            val batteryStatus = context.registerReceiver(null, intentFilter)
+            return when (batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, 0)) {
+                BatteryManager.BATTERY_STATUS_FULL -> BatteryStatus.FULL
+                BatteryManager.BATTERY_STATUS_CHARGING -> BatteryStatus.CHARGING
+                BatteryManager.BATTERY_STATUS_DISCHARGING -> BatteryStatus.UNPLUGGED
+                BatteryManager.BATTERY_STATUS_NOT_CHARGING -> BatteryStatus.UNKNOWN
+                else -> BatteryStatus.UNKNOWN
+            }
         }
-    }
     val connectionType: String?
         get() {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            var activeNetwork: NetworkInfo
-            if (cm.activeNetworkInfo.also { activeNetwork = it!! } != null) {
-                if (!activeNetwork.isConnected) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                cm.run {
+                    cm.getNetworkCapabilities(cm.activeNetwork)?.run {
+                        if (!hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                            return MessageLocation.CONN_TYPE_OFFLINE
+                        }
+                        if (hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                            return MessageLocation.CONN_TYPE_MOBILE
+                        }
+                        if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                            return MessageLocation.CONN_TYPE_WIFI
+                        }
+                    }
+                }
+                return null
+            } else {
+                val activeNetworkInfo = cm.activeNetworkInfo ?: return null
+                if (!activeNetworkInfo.isConnected) {
                     return MessageLocation.CONN_TYPE_OFFLINE
-                } else if (activeNetwork.type == ConnectivityManager.TYPE_WIFI) {
-                    return MessageLocation.CONN_TYPE_WIFI
-                } else if (activeNetwork.type == ConnectivityManager.TYPE_MOBILE) {
-                    return MessageLocation.CONN_TYPE_MOBILE
+                }
+                return when (activeNetworkInfo.type) {
+                    ConnectivityManager.TYPE_WIFI -> MessageLocation.CONN_TYPE_WIFI
+                    ConnectivityManager.TYPE_MOBILE -> MessageLocation.CONN_TYPE_MOBILE
+                    else -> null
                 }
             }
-            return null
         }
 }
