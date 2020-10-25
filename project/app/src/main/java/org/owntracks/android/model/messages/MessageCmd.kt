@@ -14,11 +14,8 @@ class MessageCmd : MessageBase() {
     var action: CommandAction? = null
     var waypoints: MessageWaypoints? = null
     var configuration: MessageConfiguration? = null
-    public override fun getBaseTopicSuffix(): String {
-        return BASETOPIC_SUFFIX
-    }
 
-    override fun isValidMessage(): Boolean {
+    public override fun isValidMessage(): Boolean {
         return super.isValidMessage() && action != null
     }
 
@@ -27,10 +24,9 @@ class MessageCmd : MessageBase() {
     }
 
     @JsonIgnore
-    override fun setTopic(topic: String) {
-        // Full topic is needed instead of the normalized base topic to verify if the message arrived on the correct topic
-        _topic = topic
-    }
+    // Full topic is needed instead of the normalized base topic to verify if the message arrived on the correct topic
+    override var topic: String = ""
+
 
     companion object {
         const val TYPE = "cmd"

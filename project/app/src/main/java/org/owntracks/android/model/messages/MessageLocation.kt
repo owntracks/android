@@ -45,6 +45,7 @@ class MessageLocation : MessageBase() {
 
     @JsonProperty("inregions")
     var inregions: List<String>? = null
+
     @JsonIgnore
     fun getGeocoder(): String? {
         return if (hasGeocoder()) geocoder else geocoderFallback
@@ -73,10 +74,14 @@ class MessageLocation : MessageBase() {
         if (_contact != null && _contact!!.get() != null) _contact!!.get()!!.notifyMessageLocationPropertyChanged()
     }
 
-    public override fun setTrackerId(trackerId: String) {
-        super.setTrackerId(trackerId)
-        notifyContactPropertyChanged()
-    }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("tid")
+    override var trackerId: String? = null
+        set(value) {
+            field = value
+            notifyContactPropertyChanged()
+        }
+
 
     override fun isValidMessage(): Boolean {
         return timestamp > 0
@@ -99,6 +104,7 @@ class MessageLocation : MessageBase() {
         const val REPORT_TYPE_RESPONSE = "r"
         const val REPORT_TYPE_CIRCULAR = "c"
         const val REPORT_TYPE_PING = "p"
+
         @JvmField
         val REPORT_TYPE_DEFAULT: String? = null
         const val CONN_TYPE_OFFLINE = "o"

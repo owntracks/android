@@ -31,7 +31,7 @@ class MessageTransition : MessageBase() {
     var description: String? = null
 
     @JsonProperty("tid")
-    private var trackerId: String? = null
+    override var trackerId: String? = null
 
     @JsonProperty("t")
     var trigger: String? = null
@@ -51,17 +51,6 @@ class MessageTransition : MessageBase() {
 
     @JsonProperty("lat")
     var latitude = 0.0
-    public override fun getBaseTopicSuffix(): String {
-        return BASETOPIC_SUFFIX
-    }
-
-    override fun getTrackerId(): String {
-        return trackerId!!
-    }
-
-    public override fun setTrackerId(trackerId: String) {
-        this.trackerId = trackerId
-    }
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicEvents

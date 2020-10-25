@@ -25,11 +25,7 @@ class MessageWaypoint : MessageBase() {
     // Optional types for optional values
     @JsonProperty("rad")
     var radius: Int? = null
-
-    public override fun getBaseTopicSuffix(): String {
-        return BASETOPIC_SUFFIX
-    }
-
+    
     override fun isValidMessage(): Boolean {
         return super.isValidMessage() && description != null
     }

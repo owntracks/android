@@ -178,7 +178,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
-        assertTrue(messageCmd.isValidMessage)
+        assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.REPORT_LOCATION, messageCmd.action)
     }
 
@@ -189,7 +189,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
-        assertTrue(messageCmd.isValidMessage)
+        assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.RESTART, messageCmd.action)
     }
 
@@ -200,7 +200,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
-        assertTrue(messageCmd.isValidMessage)
+        assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.SET_WAYPOINTS, messageCmd.action)
         assertEquals(0, messageCmd.waypoints!!.waypoints!!.size)
     }
@@ -212,7 +212,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
-        assertTrue(messageCmd.isValidMessage)
+        assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.SET_CONFIGURATION, messageCmd.action)
         assertEquals("newHost", messageCmd.configuration!!["host"])
     }
@@ -234,7 +234,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageTransition::class.java, messageBase.javaClass)
         val message = messageBase as MessageTransition
-        assertTrue(message.isValidMessage)
+        assertTrue(message.isValidMessage())
         assertEquals(2, message.getTransition())
         assertEquals(3.075f, message.accuracy, 0f)
         assertEquals("myregion", message.description)
@@ -274,7 +274,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageConfiguration::class.java, messageBase.javaClass)
         val message = messageBase as MessageConfiguration
-        assertTrue(message.isValidMessage)
+        assertTrue(message.isValidMessage())
         assertFalse(message.waypoints.isEmpty())
         assertEquals(2, message.waypoints?.size)
         assertFalse(message.hasTrackerId())
@@ -312,7 +312,7 @@ class ParserTest {
         val messageBase = parser.fromJson(input)
         assertEquals(MessageWaypoint::class.java, messageBase.javaClass)
         val message = messageBase as MessageWaypoint
-        assertTrue(message.isValidMessage)
+        assertTrue(message.isValidMessage())
         assertEquals("mypoint", message.description)
         assertEquals(52.0027789, message.latitude, 0.0)
         assertEquals(-1.0829312, message.longitude, 0.0)
