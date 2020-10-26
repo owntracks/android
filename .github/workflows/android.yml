@@ -46,6 +46,7 @@ jobs:
         api-level: 30
         working-directory: project
         script: |
+            adb emu geo fix 0 51
             adb logcat -c
             adb logcat *:E &
             ./gradlew createDebugCoverageReport
