@@ -295,5 +295,4 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     public void onBottomSheetLongClick() {
         setViewModeContact(activeContact.getId(), true);
     }
-
 }

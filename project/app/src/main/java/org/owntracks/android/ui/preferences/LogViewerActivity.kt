@@ -109,10 +109,12 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
         clearButton = menu?.findItem(R.id.clear_log)
         return true
     }
+
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.findItem(R.id.show_debug_logs).isChecked = preferences.debugLog
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -317,7 +319,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
     class ExportedLogContentProvider : ContentProvider() {
         private fun logForUri(uri: Uri): ByteArray? = LOGS[uri.pathSegments.lastOrNull()]
         override fun insert(uri: Uri, values: ContentValues?): Uri? {
-            TODO("Not yet implemented")
+            return null
         }
 
         override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? =
@@ -331,11 +333,11 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
         override fun onCreate(): Boolean = true
 
         override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
-            TODO("Not yet implemented")
+            return 0
         }
 
         override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
-            TODO("Not yet implemented")
+            return 0
         }
 
         override fun getType(uri: Uri): String? = "text/plain"
@@ -346,7 +348,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
                 try {
                     FileOutputStream(output.fileDescriptor).write(l!!)
                 } catch (e: Exception) {
-                    Timber.e(e,"Can't write logs to output")
+                    Timber.e(e, "Can't write logs to output")
                 }
             }
         }

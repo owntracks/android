@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,6 +42,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
@@ -75,7 +77,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     private Menu mMenu;
 
     private FusedLocationProviderClient fusedLocationClient;
-    LocationCallback doNothingLocationCallback = new LocationCallback();
+    LocationCallback locationRepoUpdaterCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Timber.i("Foreground location result received: %s", locationResult);
+            locationRepo.setCurrentLocation(locationResult.getLastLocation());
+            super.onLocationResult(locationResult);
+        }
+    };
 
     @Inject
     RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -88,6 +97,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Inject
     protected GeocodingProvider geocodingProvider;
+
+    @Inject
+    LocationRepo locationRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -253,11 +265,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkAndRequestLocationPermissions();
         }
+
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(TimeUnit.SECONDS.toMillis(10)),
-                doNothingLocationCallback,
+                        .setInterval(TimeUnit.SECONDS.toMillis(2)),
+                locationRepoUpdaterCallback,
                 null
         ).addOnCompleteListener(task ->
                 Timber.i("Requested foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
@@ -272,7 +285,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         } catch (Exception e) {
             isMapReady = false;
         }
-        fusedLocationClient.removeLocationUpdates(doNothingLocationCallback).addOnCompleteListener(task ->
+        fusedLocationClient.removeLocationUpdates(locationRepoUpdaterCallback).addOnCompleteListener(task ->
                 Timber.i("Removed foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
         );
     }
@@ -307,7 +320,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         handleIntentExtras(intent);
         try {
             binding.mapView.onLowMemory();
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
             isMapReady = false;
         }
     }
@@ -321,7 +334,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         isMapReady = false;
         try {
             binding.mapView.getMapAsync(this);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -385,13 +399,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         preferences.setMonitoringNext();
 
         int newmode = preferences.getMonitoring();
-        if(newmode == LocationProcessor.MONITORING_QUIET) {
+        if (newmode == LocationProcessor.MONITORING_QUIET) {
             Toast.makeText(this, R.string.monitoring_quiet, Toast.LENGTH_SHORT).show();
-        }else if (newmode == LocationProcessor.MONITORING_MANUAL)  {
+        } else if (newmode == LocationProcessor.MONITORING_MANUAL) {
             Toast.makeText(this, R.string.monitoring_manual, Toast.LENGTH_SHORT).show();
-        } else if (newmode == LocationProcessor.MONITORING_SIGNIFICANT)  {
+        } else if (newmode == LocationProcessor.MONITORING_SIGNIFICANT) {
             Toast.makeText(this, R.string.monitoring_significant, Toast.LENGTH_SHORT).show();
-        } else  {
+        } else {
             Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show();
         }
     }
@@ -438,7 +452,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
 
     private void updateCamera(@NonNull LatLng latLng) {
-        if(isMapReady)
+        if (isMapReady)
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET));
     }
 
@@ -451,18 +465,18 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Override
     public void removeMarker(@Nullable FusedContact contact) {
-        if(contact == null)
+        if (contact == null)
             return;
 
         Marker m = markers.get(contact.getId());
-        if(m != null)
+        if (m != null)
             m.remove();
     }
 
     @Override
     public void updateMarker(@Nullable FusedContact contact) {
         if (contact == null || !contact.hasLocation() || !isMapReady) {
-            Timber.v("unable to update marker. null:%s, location:%s, mapReady:%s",contact == null, contact == null || contact.hasLocation(), isMapReady);
+            Timber.v("unable to update marker. null:%s, location:%s, mapReady:%s", contact == null, contact == null || contact.hasLocation(), isMapReady);
             return;
         }
 
@@ -537,7 +551,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @Override
     public void setBottomSheetHidden() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        if(mMenu != null)
+        if (mMenu != null)
             mMenu.close();
     }
 
