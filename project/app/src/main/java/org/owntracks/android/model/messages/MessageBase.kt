@@ -17,7 +17,7 @@ abstract class MessageBase : BaseObservable() {
     @JsonIgnore
     open var topic: String = ""
         set(value) {
-            field = topic
+            field = value
             topicBase = getBaseTopic(value) // Normalized topic for all message types
         }
 

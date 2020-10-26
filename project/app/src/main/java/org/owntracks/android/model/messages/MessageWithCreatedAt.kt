@@ -13,6 +13,6 @@ interface Clock {
 }
 
 class RealClock : Clock {
-    override val time: Long = System.currentTimeMillis() / 1000L
+    override val time: Long = java.util.concurrent.TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
 }
 

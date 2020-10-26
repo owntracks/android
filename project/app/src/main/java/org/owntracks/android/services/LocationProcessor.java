@@ -22,7 +22,6 @@ import org.owntracks.android.support.Preferences;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -101,7 +100,7 @@ public class LocationProcessor {
         }
         message.setTrigger(trigger);
 
-        message.setTimestamp(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        message.setTimestamp(currentLocation.getTime());
 
         message.setTrackerId(preferences.getTrackerId(true));
         message.setInregions(calculateInregions(loadedWaypoints));
@@ -176,7 +175,7 @@ public class LocationProcessor {
         message.setLatitude(triggeringLocation.getLatitude());
         message.setLongitude(triggeringLocation.getLongitude());
         message.setAccuracy(triggeringLocation.getAccuracy());
-        message.setTimestamp(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        message.setTimestamp(triggeringLocation.getTime());
         message.setWaypointTimestamp(w.getTst());
         message.setDescription(w.getDescription());
         messageProcessor.queueMessageForSending(message);
