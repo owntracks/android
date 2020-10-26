@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageLocation : MessageBase() {
+open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) : MessageBase(), MessageWithCreatedAt by dep {
     @JsonProperty("t")
     var trigger: String? = null
 

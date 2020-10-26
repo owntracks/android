@@ -18,6 +18,10 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
 
+class FakeClock : Clock {
+    override val time: Long = 25
+}
+
 class ParserTest {
     private var messageLocation: MessageLocation? = null
 
@@ -29,14 +33,14 @@ class ParserTest {
     private lateinit var encryptionProvider: EncryptionProvider
 
     //region Location Messages
-    private val locationWithRegionsJSON = "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}"
+    private val locationWithRegionsJSON = "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"created_at\":25,\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}"
 
     @Before
     fun setupMessageLocation() {
         val regions: MutableList<String> = LinkedList()
         regions.add("Testregion1")
         regions.add("Testregion2")
-        messageLocation = MessageLocation()
+        messageLocation = MessageLocation(MessageCreatedAtNow(FakeClock()))
         messageLocation!!.accuracy = 10
         messageLocation!!.altitude = 20
         messageLocation!!.battery = 30
@@ -69,6 +73,7 @@ class ParserTest {
               "batt" : 30,
               "bs" : 2,
               "conn" : "TestConn",
+              "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
