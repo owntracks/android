@@ -43,8 +43,12 @@ jobs:
     - name: Test with Gradle on the emulator api=29
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
-        script: cd project && ./gradlew createDebugCoverageReport
+        api-level: 30
+        working-directory: project
+        script: |
+            adb logcat -c
+            adb logcat *:E &
+            ./gradlew createDebugCoverageReport
         profile: pixel_3a
         target: google_apis
       timeout-minutes: 15
