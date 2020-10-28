@@ -14,6 +14,11 @@ class ScreenshotTakingOnFailureRule : TestWatcher() {
         takeScreenshot(parentFolderPath = parentFolderPath, screenShotName = description.methodName)
     }
 
+    override fun finished(description: Description?) {
+        failed(null, description!!)
+        super.finished(description)
+    }
+
     private fun takeScreenshot(parentFolderPath: String = "", screenShotName: String) {
         Log.d("Screenshots", "Taking screenshot of '$screenShotName'")
         val screenCapture = Screenshot.capture()

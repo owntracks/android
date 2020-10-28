@@ -224,3 +224,72 @@ play {
 
     resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
 }
+
+// Espresso test  screenshot gathering
+val reportsDirectory = File("$buildDir/reports/androidTests/connected/flavors/debugAndroidTest")
+val screenshotsDeviceFolder = "/storage/emulated/0/Pictures/screenshots"
+
+val createScreenshotDirectoryTask = tasks.register<Exec>("createScreenshotDirectory") {
+    group = "reporting"
+    description = "Creates screenshot directory on connected device"
+    executable = "${android.adbExecutable}"
+    args(mutableListOf("shell", "mkdir", "-p", screenshotsDeviceFolder))
+}
+
+val embedScreenshotsTask = tasks.register("embedScreenshots") {
+    group = "reporting"
+    description = "Embeds the screenshots in the test report"
+    doFirst {
+        val failureScreenshotsDirectory = File(reportsDirectory, "screenshots/failures")
+        if (!failureScreenshotsDirectory.exists()) {
+            println("Could not find screenshot failures. Skipping...")
+            return@doFirst
+        }
+        failureScreenshotsDirectory
+                .listFiles()
+                .forEach { failedTestClassDirectory ->
+                    val failedTestClassName = failedTestClassDirectory.name
+                    failedTestClassDirectory.listFiles().forEach failedFile@{
+                        val failedTestName = it.name
+                        val failedTestNameWithoutExtension = it.nameWithoutExtension
+                        val failedTestClassJunitReportFile = File(reportsDirectory, "${failedTestClassName}.html")
+                        if (!failedTestClassJunitReportFile.exists()) {
+                            println("Could not find JUnit report file for test class '${failedTestClassJunitReportFile}'")
+                            return@failedFile
+                        }
+                        val failedTestJunitReportContent = failedTestClassJunitReportFile.readText()
+
+                        val patternToFind = "<h3 class=\"failures\">${failedTestNameWithoutExtension}</h3>"
+                        println(patternToFind)
+                        val patternToReplace = "$patternToFind <img src=\"screenshots/failures/${failedTestClassName}/${failedTestName}\" width =\"360\" />"
+                        failedTestClassJunitReportFile.writeText(failedTestJunitReportContent.replace(patternToFind, patternToReplace))
+                    }
+                }
+    }
+}
+
+
+val fetchScreenshotsTask = tasks.register<Exec>("fetchScreenshots") {
+    group = "reporting"
+    description = "Fetches espresso screenshots from the device"
+    executable = "${android.adbExecutable}"
+    args("pull", screenshotsDeviceFolder, reportsDirectory.toString())
+    finalizedBy(clearScreenshotsTask)
+    dependsOn(createScreenshotDirectoryTask)
+    doFirst {
+        reportsDirectory.mkdirs()
+    }
+}
+val clearScreenshotsTask = tasks.register<Exec>("clearScreenshots") {
+    group = "reporting"
+    description = "Removes screenshots from connected device"
+    executable = "${android.adbExecutable}"
+    args("shell", "rm", "-rf", screenshotsDeviceFolder)
+    finalizedBy(embedScreenshotsTask)
+}
+
+tasks.whenTaskAdded {
+    if (name == "connectedDebugAndroidTest") {
+        finalizedBy(fetchScreenshotsTask)
+    }
+}

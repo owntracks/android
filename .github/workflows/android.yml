@@ -47,10 +47,7 @@ jobs:
         working-directory: project
         script: |
             adb emu geo fix 0 51
-            adb shell screenrecord /data/user_de/0/com.android.shell/files/capture.mpg &
             ./gradlew createDebugCoverageReport
-            adb shell pkill -INT screenrecord
-            cd app/build/reports/ && adb pull /data/user_de/0/com.android.shell/files/capture.mpg
         profile: pixel_3a
         target: google_apis
       timeout-minutes: 15
