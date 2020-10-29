@@ -162,6 +162,8 @@ class PreferencesActivityTests {
         clickDialogPositiveButton()
         sleep(1000)
         clickBack()
+        sleep(1000)
+
 
         clickOn(R.string.configurationManagement)
 

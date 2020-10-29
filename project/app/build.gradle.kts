@@ -248,10 +248,8 @@ val embedScreenshotsTask = tasks.register("embedScreenshots") {
         screenshotsDirectory
                 .listFiles()!!
                 .forEach { testClassDirectory ->
-                    println ("Screenshot class directory: $testClassDirectory")
                     val testClassName = testClassDirectory.name
                     testClassDirectory.listFiles()?.forEach failedFile@{
-                        println("Test name $it")
                         val testName = it.name
                         val testNameWithoutExtension = it.nameWithoutExtension
                         val testClassJunitReportFile = File(reportsDirectory, "${testClassName}.html")
