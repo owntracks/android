@@ -11,7 +11,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingOnFailureRule
+import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.status.StatusActivity
 
 @LargeTest
@@ -20,7 +20,7 @@ class StatusActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(StatusActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingOnFailureRule()
+    private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

@@ -7,15 +7,17 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import java.io.File
 import java.io.IOException
+import java.util.*
 
-class ScreenshotTakingOnFailureRule : TestWatcher() {
-    override fun failed(e: Throwable?, description: Description) {
-        val parentFolderPath = "failures/${description.className}"
-        takeScreenshot(parentFolderPath = parentFolderPath, screenShotName = description.methodName)
-    }
-
+class ScreenshotTakingOnTestEndRule : TestWatcher() {
     override fun finished(description: Description?) {
-        failed(null, description!!)
+        description?.run {
+            takeScreenshot(parentFolderPath = description.className, screenShotName = description.methodName)
+        } ?: run {
+            val uuid = UUID.randomUUID()
+            println("Test finished but no description provided. Capturing under $uuid")
+            takeScreenshot(parentFolderPath = uuid.toString(), screenShotName = uuid.toString())
+        }
         super.finished(description)
     }
 

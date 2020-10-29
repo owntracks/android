@@ -2,15 +2,12 @@ package org.owntracks.android.ui
 
 
 import android.content.Intent.*
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.BundleMatchers.hasEntry
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
@@ -24,7 +21,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingOnFailureRule
+import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.LogViewerActivity
 import java.util.concurrent.TimeUnit
 
@@ -34,7 +31,7 @@ class LogViewerActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(LogViewerActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingOnFailureRule()
+    private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

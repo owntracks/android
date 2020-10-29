@@ -240,29 +240,37 @@ val embedScreenshotsTask = tasks.register("embedScreenshots") {
     group = "reporting"
     description = "Embeds the screenshots in the test report"
     doFirst {
-        val failureScreenshotsDirectory = File(reportsDirectory, "screenshots/failures")
-        if (!failureScreenshotsDirectory.exists()) {
-            println("Could not find screenshot failures. Skipping...")
+        val screenshotsDirectory = File(reportsDirectory, "screenshots/")
+        if (!screenshotsDirectory.exists()) {
+            println("Could not find screenshots. Skipping...")
             return@doFirst
         }
-        failureScreenshotsDirectory
-                .listFiles()
-                .forEach { failedTestClassDirectory ->
-                    val failedTestClassName = failedTestClassDirectory.name
-                    failedTestClassDirectory.listFiles().forEach failedFile@{
-                        val failedTestName = it.name
-                        val failedTestNameWithoutExtension = it.nameWithoutExtension
-                        val failedTestClassJunitReportFile = File(reportsDirectory, "${failedTestClassName}.html")
-                        if (!failedTestClassJunitReportFile.exists()) {
-                            println("Could not find JUnit report file for test class '${failedTestClassJunitReportFile}'")
+        screenshotsDirectory
+                .listFiles()!!
+                .forEach { testClassDirectory ->
+                    println ("Screenshot class directory: $testClassDirectory")
+                    val testClassName = testClassDirectory.name
+                    testClassDirectory.listFiles()?.forEach failedFile@{
+                        println("Test name $it")
+                        val testName = it.name
+                        val testNameWithoutExtension = it.nameWithoutExtension
+                        val testClassJunitReportFile = File(reportsDirectory, "${testClassName}.html")
+                        if (!testClassJunitReportFile.exists()) {
+                            println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
                             return@failedFile
                         }
-                        val failedTestJunitReportContent = failedTestClassJunitReportFile.readText()
+                        val testJunitReportContent = testClassJunitReportFile.readText()
 
-                        val patternToFind = "<h3 class=\"failures\">${failedTestNameWithoutExtension}</h3>"
-                        println(patternToFind)
-                        val patternToReplace = "$patternToFind <img src=\"screenshots/failures/${failedTestClassName}/${failedTestName}\" width =\"360\" />"
-                        failedTestClassJunitReportFile.writeText(failedTestJunitReportContent.replace(patternToFind, patternToReplace))
+                        val failedHeaderPatternToFind = "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
+
+                        val failedPatternToReplace = "$failedHeaderPatternToFind <img src=\"screenshots/${testClassName}/${testName}\" width =\"360\" />"
+                        val successRecordPatternToFind = "<td>${testNameWithoutExtension}</td>"
+                        val successPatternToReplace = "<td>${testNameWithoutExtension} <a href=\"screenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
+
+                        testClassJunitReportFile.writeText(testJunitReportContent
+                                .replace(failedHeaderPatternToFind, failedPatternToReplace)
+                                .replace(successRecordPatternToFind, successPatternToReplace)
+                        )
                     }
                 }
     }

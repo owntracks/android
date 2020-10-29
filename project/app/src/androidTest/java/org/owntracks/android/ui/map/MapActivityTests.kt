@@ -23,7 +23,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingOnFailureRule
+import org.owntracks.android.ScreenshotTakingOnTestEndRule
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -33,7 +33,7 @@ class MapActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(MapActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingOnFailureRule()
+    private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

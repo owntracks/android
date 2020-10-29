@@ -19,6 +19,7 @@ import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBac
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.allOf
@@ -28,7 +29,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingOnFailureRule
+import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
 @LargeTest
@@ -37,7 +38,7 @@ class PreferencesActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(PreferencesActivity::class.java)
 
-    private val screenshotRule = ScreenshotTakingOnFailureRule()
+    private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
@@ -48,6 +49,8 @@ class PreferencesActivityTests {
     fun setUp() {
         baristaRule.launchActivity()
     }
+
+
 
     @Test
     @AllowFlaky(attempts = 1)
@@ -157,6 +160,7 @@ class PreferencesActivityTests {
         clickOn(R.string.preferencesOpencageGeocoderApiKey)
         writeTo(android.R.id.edit, "geocodeAPIKey")
         clickDialogPositiveButton()
+        sleep(1000)
         clickBack()
 
         clickOn(R.string.configurationManagement)
