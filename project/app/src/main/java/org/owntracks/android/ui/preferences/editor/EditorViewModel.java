@@ -8,6 +8,7 @@ import androidx.databinding.Bindable;
 
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
+import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
@@ -25,7 +26,10 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
     private final Preferences preferences;
     @Bindable
     private String effectiveConfiguration;
-    
+
+    @Inject
+    WaypointsRepo waypointsRepo;
+
     @Inject
     public EditorViewModel(Preferences preferences, Parser parser) {
         this.preferences = preferences;
@@ -39,9 +43,10 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
 
     private void updateEffectiveConfiguration() {
         try {
-            MessageConfiguration m = preferences.exportToMessage();
-            m.set(preferences.getPreferenceKey(R.string.preferenceKeyPassword), "********");
-            setEffectiveConfiguration(parser.toJsonPlainPretty(m));
+            MessageConfiguration message = preferences.exportToMessage();
+            message.setWaypoints(waypointsRepo.exportToMessage());
+            message.set(preferences.getPreferenceKey(R.string.preferenceKeyPassword), "********");
+            setEffectiveConfiguration(parser.toJsonPlainPretty(message));
         } catch (IOException e) {
             getView().displayLoadFailed();
         }

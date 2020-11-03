@@ -40,7 +40,7 @@ jobs:
       run: ./gradlew check jacocoTestDebugUnitTestReport
       working-directory: project
       timeout-minutes: 10
-    - name: Test with Gradle on the emulator api=30
+    - name: Test with Gradle on the emulator
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29

@@ -32,6 +32,7 @@ class DeviceMetricsProvider @Inject internal constructor(@param:AppContext priva
                 else -> BatteryStatus.UNKNOWN
             }
         }
+    @Suppress("DEPRECATION")
     val connectionType: String?
         get() {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -51,6 +52,7 @@ class DeviceMetricsProvider @Inject internal constructor(@param:AppContext priva
                 }
                 return null
             } else {
+
                 val activeNetworkInfo = cm.activeNetworkInfo ?: return null
                 if (!activeNetworkInfo.isConnected) {
                     return MessageLocation.CONN_TYPE_OFFLINE

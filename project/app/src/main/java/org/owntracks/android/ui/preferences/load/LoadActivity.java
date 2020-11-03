@@ -143,7 +143,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     }
 
     private void extractPreferences(Uri uri){
-
         try {
             BufferedReader r;
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {

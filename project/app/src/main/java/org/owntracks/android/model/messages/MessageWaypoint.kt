@@ -25,7 +25,7 @@ class MessageWaypoint : MessageBase() {
     // Optional types for optional values
     @JsonProperty("rad")
     var radius: Int? = null
-    
+
     override fun isValidMessage(): Boolean {
         return super.isValidMessage() && description != null
     }

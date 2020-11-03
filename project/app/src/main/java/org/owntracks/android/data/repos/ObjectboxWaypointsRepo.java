@@ -32,7 +32,6 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
         this.preferences = preferences;
         if(!preferences.isObjectboxMigrated()) {
             migrateLegacyData(context);
-
         }
     }
 

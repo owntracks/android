@@ -309,7 +309,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         if (builder == null)
             return null;
 
-
         if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
             builder.setContentTitle(this.lastLocationMessage.getGeocoder());
             builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTimestamp()));

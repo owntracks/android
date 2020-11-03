@@ -46,7 +46,7 @@ class InMemoryPreferencesStore : PreferencesStore {
     }
 
     override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        TODO("Not yet implemented")
+
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {

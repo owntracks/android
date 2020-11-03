@@ -536,7 +536,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setBoolean(R.string.preferenceKeyNotificationHigherPriority, newValue)
         }
 
-    @get:Export(keyResId = R.string.preferenceKeyNotificationLocation, exportModeMqtt = true)
+    @get:Export(keyResId = R.string.preferenceKeyNotificationLocation, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyNotificationLocation)
     var notificationLocation: Boolean
         get() = getBooleanOrDefault(R.string.preferenceKeyNotificationLocation, R.bool.valNotificationLocation)
@@ -586,7 +586,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setBoolean(R.string.preferenceKeyInfo, info)
         }
 
-    @get:Export(keyResId = R.string.preferenceKeyTLSClientCrtPassword, exportModeHttp = true, exportModeMqtt = true)
+    @get:Export(keyResId = R.string.preferenceKeyTLSClientCrtPassword, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyTLSClientCrtPassword)
     var tlsClientCrtPassword: String
         get() = getStringOrDefault(R.string.preferenceKeyTLSClientCrtPassword, R.string.valEmpty)

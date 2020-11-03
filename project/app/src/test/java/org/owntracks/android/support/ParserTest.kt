@@ -18,9 +18,6 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
 
-class FakeClock : Clock {
-    override val time: Long = 25
-}
 
 class ParserTest {
     private var messageLocation: MessageLocation? = null
@@ -381,5 +378,10 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         parser.fromJson("not JSON")
     }
+
     //endregion
+
+    inner class FakeClock : Clock {
+        override val time: Long = 25
+    }
 }

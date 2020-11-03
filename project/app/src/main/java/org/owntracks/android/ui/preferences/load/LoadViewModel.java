@@ -18,8 +18,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 
 @PerActivity
 public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadMvvm.ViewModel<LoadMvvm.View> {
@@ -40,9 +38,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         super.attachView(savedInstanceState, view);
     }
 
-
     public String setConfiguration(String json) throws IOException, Parser.EncryptionException {
-        Timber.v("%s", json);
         this.configuration = (MessageConfiguration) parser.fromJson(json.getBytes());
         return parser.toJsonPlainPretty(this.configuration);
     }

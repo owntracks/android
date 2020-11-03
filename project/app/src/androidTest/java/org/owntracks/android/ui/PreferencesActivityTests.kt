@@ -51,7 +51,6 @@ class PreferencesActivityTests {
     }
 
 
-
     @Test
     @AllowFlaky(attempts = 1)
     fun initialViewShowsTopLevelMenu() {
@@ -176,8 +175,10 @@ class PreferencesActivityTests {
         clickBack()
         sleep(100)
 
-
         clickOn(R.string.configurationManagement)
+
+        assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
+        assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")
 
         assertContains(R.id.effectiveConfiguration, "\"url\" : \"https://www.example.com:8080/\"")
         assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
@@ -194,13 +195,13 @@ class PreferencesActivityTests {
         assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
 
         // Make sure that the MQTT-specific settings aren't present
-        assertNotContains(R.id.effectiveConfiguration, "\"notificationLocation\"")
         assertNotContains(R.id.effectiveConfiguration, "\"host\"")
         assertNotContains(R.id.effectiveConfiguration, "\"port\"")
         assertNotContains(R.id.effectiveConfiguration, "\"pubQos\"")
         assertNotContains(R.id.effectiveConfiguration, "\"subQos\"")
         assertNotContains(R.id.effectiveConfiguration, "\"info\"")
         assertNotContains(R.id.effectiveConfiguration, "\"tlsCaCrt\"")
+        assertNotContains(R.id.effectiveConfiguration, "\"tls\"")
         assertNotContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\"")
         assertNotContains(R.id.effectiveConfiguration, "\"subTopic\"")
         assertNotContains(R.id.effectiveConfiguration, "\"pubTopicBase\"")

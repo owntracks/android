@@ -60,7 +60,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar, true, true);
-
     }
 
     @Override
@@ -94,7 +93,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         onBackPressed();
         return true;
     }
-
 
     private void showImportConfigurationFilePickerView() {
         Bundle b = new Bundle();
@@ -189,7 +187,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         MessageConfiguration message = preferences.exportToMessage();
         message.setWaypoints(waypointsRepo.exportToMessage());
         return parser.toJsonPlain(message);
-
     }
 
     static class ExportTask extends AsyncTask<Void, Void, Boolean> {
@@ -213,11 +210,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
         @Override
         protected void onPostExecute(Boolean success) {
             if(ref.get() != null) {
-                if (success) {
-                    ref.get().displayExportToFileSuccessful();
-                } else {
-                    ref.get().displayExportToFileSuccessful();
-                }
+                ref.get().displayExportToFileSuccessful();
             }
         }
     }
