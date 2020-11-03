@@ -300,7 +300,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private void updateOngoingNotification() {
-        notificationManager.notify(NOTIFICATION_ID_ONGOING,getOngoingNotification());
+        notificationManager.notify(NOTIFICATION_ID_ONGOING, getOngoingNotification());
     }
 
     private Notification getOngoingNotification() {

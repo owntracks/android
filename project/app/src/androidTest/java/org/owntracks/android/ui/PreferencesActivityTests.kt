@@ -136,29 +136,30 @@ class PreferencesActivityTests {
         clickOn(R.string.preferencesNotification)
         clickOn(R.string.preferencesNotificationEvents)
         clickBack()
-
+        
         // This is an ugly hack, but there's some race conditions on underpowered hardware
         // causing the test to move on before the view has been fully built/rendered.
+        val sleepBetweenMillis = 1000L
         clickOn(R.string.preferencesAdvanced)
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickOn(R.string.preferencesRemoteCommand)
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickOn(R.string.preferencesIgnoreInaccurateLocations)
-        sleep(100)
+        sleep(sleepBetweenMillis)
         writeTo(android.R.id.edit, "950")
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickDialogPositiveButton()
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickOn(R.string.preferencesLocatorInterval)
-        sleep(100)
+        sleep(sleepBetweenMillis)
         writeTo(android.R.id.edit, "123")
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickDialogPositiveButton()
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickOn(R.string.preferencesMoveModeLocatorInterval)
-        sleep(100)
+        sleep(sleepBetweenMillis)
         writeTo(android.R.id.edit, "5")
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickDialogPositiveButton()
 
         scrollToText(R.string.preferencesAutostart)
@@ -171,9 +172,9 @@ class PreferencesActivityTests {
         clickOn(R.string.preferencesOpencageGeocoderApiKey)
         writeTo(android.R.id.edit, "geocodeAPIKey")
         clickDialogPositiveButton()
-        sleep(100)
+        sleep(sleepBetweenMillis)
         clickBack()
-        sleep(100)
+        sleep(sleepBetweenMillis)
 
         clickOn(R.string.configurationManagement)
 

@@ -1,17 +1,18 @@
 package org.owntracks.android.support;
 
 import android.content.Context;
-import androidx.databinding.BindingAdapter;
 import android.os.AsyncTask;
+import android.widget.TextView;
+
 import androidx.annotation.CallSuper;
 import androidx.collection.LruCache;
-import android.widget.TextView;
+import androidx.databinding.BindingAdapter;
 
 import org.owntracks.android.R;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerApplication;
-import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.services.BackgroundService;
 
 import java.lang.ref.WeakReference;
@@ -110,10 +111,10 @@ public class GeocodingProvider {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            MessageLocation m = this.message.get();
-            BackgroundService s = this.service.get();
-            if(m!=null && s!=null) {
-                s.onGeocodingProviderResult(m);
+            MessageLocation messageLocation = this.message.get();
+            BackgroundService backgroundService = this.service.get();
+            if (messageLocation != null && backgroundService != null) {
+                backgroundService.onGeocodingProviderResult(messageLocation);
             }
         }
     }
@@ -136,9 +137,9 @@ public class GeocodingProvider {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            TextView s = this.textView.get();
-            if(s!=null && result != null) {
-                s.setText(result);
+            TextView textView = this.textView.get();
+            if (textView != null && result != null) {
+                textView.setText(result);
             }
         }
     }
