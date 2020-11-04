@@ -23,6 +23,7 @@ import timber.log.Timber;
 
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     private javax.net.ssl.SSLSocketFactory factory;
+    private String[] protocols=new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
 
     public static class SocketFactoryOptions {
 
@@ -155,14 +156,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     @Override
     public Socket createSocket() throws IOException{
         SSLSocket r = (SSLSocket)this.factory.createSocket();
-        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
-        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 
@@ -170,28 +171,28 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     public Socket createSocket(String host, int port) throws IOException {
 
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
-        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(new String[]{ "TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
         SSLSocket r = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
-        r.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+        r.setEnabledProtocols(protocols);
         return r;
     }
 }
