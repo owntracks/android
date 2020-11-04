@@ -42,9 +42,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
-import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
@@ -81,10 +81,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Timber.i("Foreground location result received: %s", locationResult);
-            locationRepo.setCurrentLocation(locationResult.getLastLocation());
+            locationProcessor.onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             super.onLocationResult(locationResult);
         }
     };
+
+
 
     @Inject
     RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -99,7 +101,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     protected GeocodingProvider geocodingProvider;
 
     @Inject
-    LocationRepo locationRepo;
+    LocationProcessor locationProcessor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

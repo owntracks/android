@@ -126,7 +126,7 @@ public class LocationProcessor {
         return l;
     }
 
-    void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
+    public void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
         locationRepo.setCurrentLocation(l);
         publishLocationMessage(reportType);
     }

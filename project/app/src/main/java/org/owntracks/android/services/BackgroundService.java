@@ -181,7 +181,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         eventBus.postSticky(new Events.ServiceStarted());
 
         preferences.registerOnPreferenceChangedListener(this);
-
     }
 
 
