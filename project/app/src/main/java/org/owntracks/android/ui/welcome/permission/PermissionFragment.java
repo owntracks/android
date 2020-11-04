@@ -75,7 +75,11 @@ public class PermissionFragment extends BaseSupportFragment<UiWelcomePermissions
     @Override
     public boolean isNextEnabled() {
         checkPermission();
-        return viewModel.isPermissionGranted();
+        if (viewModel != null) {
+            return viewModel.isPermissionGranted();
+        } else {
+            return false;
+        }
     }
 
     @Override

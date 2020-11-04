@@ -86,8 +86,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         }
     };
 
-
-
     @Inject
     RunThingsOnOtherThreads runThingsOnOtherThreads;
 
