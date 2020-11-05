@@ -21,6 +21,7 @@ import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedL
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.X509TrustManager;
@@ -244,17 +245,16 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 if(response.body() != null ) {
                     try {
                         MessageBase[] result = parser.fromJson(response.body().byteStream());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("Response " + response.code() + ", " + result.length));
-
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"Response %d, %d", response.code(), result.length)));
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
                         Timber.e("error:JsonParseException responseCode:%s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage("HTTP " +response.code() + ", JsonParseException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"HTTP %d, JsonParseException", response.code())));
                     } catch (Parser.EncryptionException e) {
                         Timber.e("error:JsonParseException responseCode:%s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP: "+response.code() + ", EncryptionException"));
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT,"HTTP: %d, EncryptionException", response.code())));
                     }
 
                 }
@@ -262,7 +262,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             // Server could be contacted but returned non success HTTP code
             } else {
                 Timber.e("request was not successful. HTTP code %s", response.code());
-                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage("HTTP code "+response.code() ));
+                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format("HTTP code %d", response.code())));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 response.close();
                 return;

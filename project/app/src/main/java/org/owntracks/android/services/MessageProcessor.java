@@ -28,6 +28,7 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -417,6 +418,8 @@ public class MessageProcessor {
                 } else {
                     return null;
                 }
+            } else if (error != null) {
+                return String.format(Locale.ROOT, "%s: %s", message, error.getMessage());
             }
             return message;
         }
