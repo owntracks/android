@@ -226,8 +226,10 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                 Timber.e("invalid monitoring mode specified %s", newMode)
                 return
             }
-            setInt(R.string.preferenceKeyMonitoring, newMode)
-            eventBus?.post(MonitoringChanged(newMode))
+            if (newMode != this.monitoring) {
+                setInt(R.string.preferenceKeyMonitoring, newMode)
+                eventBus?.post(MonitoringChanged(newMode))
+            }
         }
 
     @get:Export(keyResId = R.string.preferenceKeyDontReuseHttpClient, exportModeMqtt = false, exportModeHttp = true)

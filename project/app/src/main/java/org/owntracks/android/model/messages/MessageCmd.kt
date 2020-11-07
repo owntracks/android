@@ -15,7 +15,7 @@ class MessageCmd : MessageBase() {
     var waypoints: MessageWaypoints? = null
     var configuration: MessageConfiguration? = null
 
-    public override fun isValidMessage(): Boolean {
+    override fun isValidMessage(): Boolean {
         return super.isValidMessage() && action != null
     }
 

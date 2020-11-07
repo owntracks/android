@@ -74,7 +74,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
-
     }
 
     @Override
@@ -150,9 +149,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         if(f != null) {
             builder.sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]);
         }
-
         return builder.build();
-
     }
 
 
@@ -262,7 +259,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             // Server could be contacted but returned non success HTTP code
             } else {
                 Timber.e("request was not successful. HTTP code %s", response.code());
-                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format("HTTP code %d", response.code())));
+                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP code %d", response.code())));
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 response.close();
                 return;
