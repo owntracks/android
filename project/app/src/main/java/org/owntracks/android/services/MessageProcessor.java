@@ -411,13 +411,15 @@ public class MessageProcessor {
         public String getMessage() {
             if (message == null) {
                 if (error != null) {
-                    if (error instanceof MqttException && error.getCause() != null)
+                    if (error instanceof MqttException && error.getCause() != null) {
+                        if (error.getMessage()!=null && error.getMessage().equals("MqttException")) {
+                            return String.format("MQTT Error: %s", error.getCause().getMessage());
+                        }
                         return String.format("MQTT Error: %s", error.getMessage());
-                    else
-                        return error.getMessage();
-                } else {
-                    return null;
+                    }
+                    return error.getMessage();
                 }
+                return null;
             } else if (error != null) {
                 return String.format(Locale.ROOT, "%s: %s", message, error.getMessage());
             }

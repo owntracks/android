@@ -39,7 +39,8 @@ class GeocoderOpencage @JvmOverloads internal constructor(private val apiKey: St
                 Timber.d("Opencage HTTP response: %s", rs)
                 val deserializedOpenCageResponse = jsonMapper.readValue(rs, OpenCageResponse::class.java)
                 if (deserializedOpenCageResponse.formatted == null) {
-                    Timber.w("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}, First result: ${deserializedOpenCageResponse.results?.get(0)?.formatted}")
+                    Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}, First result: ${deserializedOpenCageResponse.results?.get(0)?.formatted}")
+                    return ""
                 }
                 val formattedLocation = deserializedOpenCageResponse.formatted!!
                 Timber.d("Formatted location: %s", formattedLocation)
