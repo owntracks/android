@@ -275,6 +275,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         ).addOnCompleteListener(task ->
                 Timber.i("Requested foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
         );
+        updateMonitoringModeMenu();
     }
 
     @Override
@@ -353,6 +354,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     }
 
     public void updateMonitoringModeMenu() {
+        if (this.mMenu == null) {
+            return;
+        }
         MenuItem item = this.mMenu.findItem(R.id.menu_monitoring);
 
         switch (preferences.getMonitoring()) {
