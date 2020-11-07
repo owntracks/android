@@ -335,7 +335,9 @@ public class MessageProcessor {
             return;
         }
 
-        if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID && !preferences.getPubTopicCommands().equals(message.getTopic())) {
+        if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID &&
+                !preferences.getPubTopicCommands().equals(message.getTopic())
+        ) {
             Timber.e("cmd message received on wrong topic");
             return;
         }
@@ -412,7 +414,7 @@ public class MessageProcessor {
             if (message == null) {
                 if (error != null) {
                     if (error instanceof MqttException && error.getCause() != null) {
-                        if (error.getMessage()!=null && error.getMessage().equals("MqttException")) {
+                        if (error.getMessage() != null && error.getMessage().equals("MqttException")) {
                             return String.format("MQTT Error: %s", error.getCause().getMessage());
                         }
                         return String.format("MQTT Error: %s", error.getMessage());

@@ -1,6 +1,5 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -23,10 +22,8 @@ class MessageCmd : MessageBase() {
         topic = preferences.pubTopicCommands
     }
 
-    @JsonIgnore
-    // Full topic is needed instead of the normalized base topic to verify if the message arrived on the correct topic
-    override var topic: String = ""
-
+    override val baseTopicSuffix: String?
+        get() = BASETOPIC_SUFFIX
 
     companion object {
         const val TYPE = "cmd"

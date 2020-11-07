@@ -58,6 +58,9 @@ class MessageTransition : MessageBase() {
         retained = preferences.pubRetainEvents
     }
 
+    override val baseTopicSuffix: String?
+        get() = BASETOPIC_SUFFIX
+
     companion object {
         const val TYPE = "transition"
         const val TRIGGER_CIRCULAR = "c"

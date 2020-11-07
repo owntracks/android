@@ -23,6 +23,9 @@ class MessageCard : MessageBase() {
         return name != null
     }
 
+    override val baseTopicSuffix: String?
+        get() = BASETOPIC_SUFFIX
+
     companion object {
         const val BASETOPIC_SUFFIX = "/info"
         const val TYPE = "card"

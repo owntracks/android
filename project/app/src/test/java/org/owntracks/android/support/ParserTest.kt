@@ -178,10 +178,12 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"cmd\", \"action\":\"reportLocation\"}"
         val messageBase = parser.fromJson(input)
+        messageBase.topic = "owntracks/username/device/cmd"
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
         assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.REPORT_LOCATION, messageCmd.action)
+        assertEquals("owntracks/username/device", messageCmd.contactKey)
     }
 
     @Test
@@ -234,6 +236,7 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"transition\",\"acc\":3.075,\"desc\":\"myregion\",\"event\":\"leave\",\"lat\":52.71234,\"lon\":-1.61234123,\"t\":\"l\",\"tid\":\"ce\",\"tst\":1603209966,\"wtst\":1558351273}"
         val messageBase = parser.fromJson(input)
+        messageBase.topic = "owntracks/username/device/event"
         assertEquals(MessageTransition::class.java, messageBase.javaClass)
         val message = messageBase as MessageTransition
         assertTrue(message.isValidMessage())
@@ -246,6 +249,7 @@ class ParserTest {
         assertEquals(1558351273, message.waypointTimestamp)
         assertEquals("ce", message.trackerId)
         assertEquals("l", message.trigger)
+        assertEquals("owntracks/username/device", message.contactKey)
     }
 
     @Test
@@ -358,6 +362,21 @@ class ParserTest {
     }
     //endregion
 
+    // Card Messages
+    @Test
+    fun `Parser can deserialize a MessageCard`() {
+        val parser = Parser(encryptionProvider)
+        val input = "{\"_type\": \"card\",\"face\": \"iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABIElEQVRYhe2XsQ2DMBBFvQkrUNEihvEOTMEU9IzAAuxAwxz3UxCIIxw58n0LC/lXURI/Xs65MxhkHnO3QChFUJvnCxpjLq9FRIv9MDWLx3H0Q42hSUYLhgTcymoSTamqivKdUKIF/6nQuq6x+M91ohcWwfd1YheGmkREKJ2sarWu635+tiyLBn1GPQu2bYO1FsBeNWttPoPaDVPKDVWQNZzd0IiHXN/3LOTOpYESVA8gCYoI5nlmoC6h/uyjUZjVpJCGYWBgvKEINk0DEUHbtud70zQx0Nwt9t1dq5lqgCPiNsrtd9ReWM6DGsDXf5CV5z92XoDkbabRUmwvkOAsFhHUdc3C8gTdEZPdUZcyyQSzOup8MtkcdalTBLUpgtq8ACxgjcQLy0DfAAAAAElFTkSuQmCC\", \"name\":\"MyName!\"}"
+        val messageBase = parser.fromJson(input)
+        messageBase.topic = "owntracks/user/device/info"
+        assertEquals(MessageCard::class.java, messageBase.javaClass)
+        val messageCard = messageBase as MessageCard
+        assertTrue(messageCard.isValidMessage())
+        assertEquals("MyName!", messageCard.name)
+        assertEquals("owntracks/user/device", messageCard.contactKey)
+    }
+    //endregion
+
     //region  Invalid messages
     @Test(expected = IOException::class)
     fun `Parser should throw exception given an empty array`() {
@@ -378,7 +397,6 @@ class ParserTest {
         val parser = Parser(encryptionProvider)
         parser.fromJson("not JSON")
     }
-
     //endregion
 
     inner class FakeClock : Clock {

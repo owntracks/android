@@ -36,6 +36,9 @@ class MessageWaypoint : MessageBase() {
         retained = preferences.pubRetainWaypoints
     }
 
+    override val baseTopicSuffix: String?
+        get() = BASETOPIC_SUFFIX
+
     companion object {
         const val TYPE = "waypoint"
         private const val BASETOPIC_SUFFIX = "/event"
