@@ -7,6 +7,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
+import org.conscrypt.Conscrypt
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.owntracks.android.injection.components.AppComponentProvider
@@ -19,6 +20,7 @@ import org.owntracks.android.support.TimberDebugLogTree
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.security.Security
 import javax.inject.Inject
 
 class App : DaggerApplication() {
@@ -39,6 +41,7 @@ class App : DaggerApplication() {
     var eventBus: EventBus? = null
     override fun onCreate() {
         WorkManager.initialize(this, Configuration.Builder().build())
+        Security.insertProviderAt(Conscrypt.newProvider(), 1)
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugLogTree())
