@@ -4,7 +4,20 @@
 
 ### New features
 
+* Russian translation!
+* TLSv1.3 support
+* Location messages now include the batteryStatus in line with iOS (#841)
+* Added explicit remote configuration preference toggle
+* Reverted the `tst` field of location/waypoint/transition messages to mean the time that the event occurred. Added a new `created_at` field to these types with the timestamp of the message creation.
+
 ### Bug fixes
+
+* Prevent crash when a user inputs an invalid MQTT URL (#852)
+* Fix an issue related to remoteCommands not being received or handled correctly (#842)
+* Config import no longer crashes when waypoints are absent (#818)
+* Map now correctly updates the blue dot when in foreground
+* Configuration management screen now shows waypoints that will be exported
+* Monitoring mode button should now be correct when Map activity is resumed
 
 ## Version 2.2.0
 
@@ -20,7 +33,6 @@
 * Users can specify the MQTT client ID explicitly
 * Removed confusion around MQTT auth (no username vs anonymous). Now, not supplying a username = anonymous auth
 * Added French translations
-
 
 ### Bug fixes
 
