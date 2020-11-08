@@ -269,7 +269,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(TimeUnit.SECONDS.toMillis(2)),
+                        .setInterval(TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval())),
                 locationRepoUpdaterCallback,
                 null
         ).addOnCompleteListener(task ->
