@@ -242,7 +242,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 if(response.body() != null ) {
                     try {
                         MessageBase[] result = parser.fromJson(response.body().byteStream());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"Response %d, %d", response.code(), result.length)));
+                        //TODO apply i18n here
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"Response %d, (%d msgs received)", response.code(), result.length)));
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
