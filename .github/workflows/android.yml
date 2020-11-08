@@ -13,6 +13,11 @@ on:
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/android.yml"
+      - "*.md"
+      - ".dependabot/**"
 
 jobs:
   test:
