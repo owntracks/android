@@ -3,7 +3,6 @@ package org.owntracks.android.ui.map;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -42,9 +41,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
+import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.databinding.UiMapBinding;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
@@ -80,11 +79,14 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     LocationCallback locationRepoUpdaterCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            Timber.i("Foreground location result received: %s", locationResult);
-            locationProcessor.onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
+            Timber.d("Foreground location result received: %s", locationResult);
+            locationRepo.setCurrentLocation(locationResult.getLastLocation());
             super.onLocationResult(locationResult);
         }
     };
+
+    @Inject
+    LocationRepo locationRepo;
 
     @Inject
     RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -94,12 +96,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Inject
     EventBus eventBus;
-
-    @Inject
-    protected GeocodingProvider geocodingProvider;
-
-    @Inject
-    LocationProcessor locationProcessor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,12 +163,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Activity currentActivity = this;
-                    new AlertDialog.Builder(this).setCancelable(true).setMessage(R.string.permissions_description).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(currentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
-                        }
-                    }).show();
+                    new AlertDialog.Builder(this)
+                            .setCancelable(true)
+                            .setMessage(R.string.permissions_description)
+                            .setPositiveButton("OK", (dialog, which) ->
+                                    ActivityCompat.requestPermissions(currentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE)
+                            )
+                            .show();
                 } else {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
                 }
@@ -269,7 +266,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval())),
+                        .setInterval(TimeUnit.SECONDS.toMillis(5)),
                 locationRepoUpdaterCallback,
                 null
         ).addOnCompleteListener(task ->

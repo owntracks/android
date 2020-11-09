@@ -18,9 +18,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.model.messages.MessageLocation;
-import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
@@ -84,11 +84,11 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void onMapReady() {
-        for(Object c : contactsRepo.getAllAsList()) {
+        for (Object c : contactsRepo.getAllAsList()) {
             getView().updateMarker((FusedContact) c);
         }
 
-        if(mode == VIEW_CONTACT && activeContact != null)
+        if (mode == VIEW_CONTACT && activeContact != null)
             setViewModeContact(activeContact, true);
         else if (mode == VIEW_FREE) {
             setViewModeFree();
@@ -120,7 +120,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     private void setViewModeContact(@NonNull String contactId, boolean center) {
         FusedContact c = contactsRepo.getById(contactId);
-        if(c != null)
+        if (c != null)
             setViewModeContact(c, center);
         else
             Timber.e("contact not found %s, ", contactId);
@@ -135,7 +135,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         liveContact.postValue(c);
         liveBottomSheetHidden.postValue(false);
 
-        if(center)
+        if (center)
             liveCamera.postValue(c.getLatLng());
 
     }
@@ -151,7 +151,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
         mode = VIEW_DEVICE;
         clearActiveContact();
-        if(hasLocation()) {
+        if (hasLocation()) {
             liveCamera.postValue(getCurrentLocation());
         } else {
             Timber.e("no location available");
@@ -220,7 +220,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.FusedContactRemoved c) {
-        if(c.getContact() == activeContact) {
+        if (c.getContact() == activeContact) {
             clearActiveContact();
             setViewModeFree();
         }
@@ -230,7 +230,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FusedContact c) {
         getView().updateMarker(c);
-        if(c == activeContact) {
+        if (c == activeContact) {
             liveContact.postValue(c);
             liveCamera.postValue(c.getLatLng());
         }
@@ -248,26 +248,25 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
-    public void onEvent(@NonNull Location l) {
+    public void onEvent(@NonNull Location location) {
         Timber.v("location source updated");
-
-        this.location = l;
+        this.location = location;
+        getView().enableLocationMenus();
+        if (mode == VIEW_DEVICE) {
+            liveCamera.postValue(getCurrentLocation());
+        }
         if (onLocationChangedListener != null) {
             this.onLocationChangedListener.onLocationChanged(this.location);
         }
-        if(mode == VIEW_DEVICE) {
-            liveCamera.postValue(getCurrentLocation());
-        }
-        getView().enableLocationMenus();
     }
 
     // Map Callback
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
-       Timber.v("location source activated");
-       this.onLocationChangedListener = onLocationChangedListener;
-       if (location != null)
-           this.onLocationChangedListener.onLocationChanged(location);
+        Timber.v("location source activated");
+        this.onLocationChangedListener = onLocationChangedListener;
+        if (location != null)
+            this.onLocationChangedListener.onLocationChanged(location);
     }
 
     // Map Callback

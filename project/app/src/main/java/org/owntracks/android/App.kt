@@ -41,6 +41,7 @@ class App : DaggerApplication() {
     var eventBus: EventBus? = null
     override fun onCreate() {
         WorkManager.initialize(this, Configuration.Builder().build())
+        // Make sure we use Conscrypt for advanced TLS features on all devices
         Security.insertProviderAt(Conscrypt.newProvider(), 1)
         super.onCreate()
         if (BuildConfig.DEBUG) {
