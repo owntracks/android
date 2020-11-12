@@ -8,6 +8,7 @@
     <string name="preferenceKeyDeviceId">deviceId</string>
     <string name="preferenceKeyDontReuseHttpClient">dontReuseHttpClient</string>
     <string name="preferenceKeyEncryptionKey">encryptionKey</string>
+    <string name="preferenceKeyExperimentalFeatures">experimentalFeatures</string>
     <string name="preferenceKeyFirstStart">firstStart</string>
     <string name="preferenceKeyFusedRegionDetection">fusedRegionDetection</string>
     <string name="preferenceKeyGeocodeEnabled">geocodeEnabled</string>

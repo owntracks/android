@@ -52,14 +52,14 @@ class PreferencesGettersAndSetters(
         }
         setter.invoke(preferences, preferenceValue)
         val messageConfiguration = preferences.exportToMessage()
-        assertEquals(preferenceValueExpected, messageConfiguration.get(preferenceName))
+        assertEquals(preferenceValueExpected, messageConfiguration[preferenceName])
     }
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
         val preferences = Preferences(mockContext, null, preferencesStore)
         val messageConfiguration = MessageConfiguration()
-        messageConfiguration.set(preferenceName, preferenceValue)
+        messageConfiguration[preferenceName] = preferenceValue
         preferences.importFromMessage(messageConfiguration)
         val getter = Preferences::class.java.getMethod("get$preferenceMethodName")
         assertEquals(preferenceValueExpected, getter.invoke(preferences))
@@ -76,6 +76,7 @@ class PreferencesGettersAndSetters(
                     arrayOf("DebugLog", "debugLog", true, true, Boolean::class, false),
                     arrayOf("DeviceId", "deviceId", "deviceId", "deviceId", String::class, false),
                     arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
+                    arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Set::class, false),
                     arrayOf("FusedRegionDetection", "fusedRegionDetection", true, true, Boolean::class, false),
                     arrayOf("GeocodeEnabled", "geocodeEnabled", true, true, Boolean::class, false),
                     arrayOf("Host", "host", "testHost", "testHost", String::class, false),
@@ -139,6 +140,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyDeviceId)) } doReturn "deviceId"
                 on { getString(eq(R.string.preferenceKeyDontReuseHttpClient)) } doReturn "dontReuseHttpClient"
                 on { getString(eq(R.string.preferenceKeyEncryptionKey)) } doReturn "encryptionKey"
+                on { getString(eq(R.string.preferenceKeyExperimentalFeatures)) } doReturn "experimentalFeatures"
                 on { getString(eq(R.string.preferenceKeyFirstStart)) } doReturn "firstStart"
                 on { getString(eq(R.string.preferenceKeyFusedRegionDetection)) } doReturn "fusedRegionDetection"
                 on { getString(eq(R.string.preferenceKeyGeocodeEnabled)) } doReturn "geocodeEnabled"

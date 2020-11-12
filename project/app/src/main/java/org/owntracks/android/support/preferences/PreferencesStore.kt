@@ -18,8 +18,12 @@ interface PreferencesStore {
     fun putString(key: String, value: String)
     fun getString(key: String, default: String): String?
 
+    fun putStringSet(key: String, values: Set<String>)
+    fun getStringSet(key: String): Set<String>
+
     fun remove(key: String)
 
     fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
     fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
+
 }

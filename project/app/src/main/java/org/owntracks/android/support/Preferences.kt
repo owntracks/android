@@ -21,6 +21,7 @@ import org.owntracks.android.support.preferences.PreferencesStore
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -141,6 +142,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
+        if (t is ParameterizedType && Set::class.java.isAssignableFrom(t.rawType as Class<*>)) return value.split(",").map { it.trim() }.toSortedSet()
         return value
     }
 
@@ -636,6 +638,15 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setBoolean(R.string.preferenceKeyGeocodeEnabled, newValue)
         }
 
+    @get:Export(keyResId = R.string.preferenceKeyExperimentalFeatures, exportModeMqtt = true, exportModeHttp = true)
+    @set:Import(keyResId = R.string.preferenceKeyExperimentalFeatures)
+    var experimentalFeatures: SortedSet<String>
+        get() = getStringSet(R.string.preferenceKeyExperimentalFeatures).toSortedSet()
+        set(value) {
+            setStringSet(R.string.preferenceKeyExperimentalFeatures, value)
+        }
+
+
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
@@ -766,6 +777,14 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     private fun setBoolean(resKeyId: Int, value: Boolean) {
         preferencesStore.putBoolean(getPreferenceKey(resKeyId), value)
+    }
+
+    private fun setStringSet(resKeyId: Int, value: Set<String>) {
+        preferencesStore.putStringSet(getPreferenceKey(resKeyId), value)
+    }
+
+    private fun getStringSet(resKeyId: Int): Set<String> {
+        return preferencesStore.getStringSet(getPreferenceKey(resKeyId))
     }
 
     private fun clearKey(key: String?) {

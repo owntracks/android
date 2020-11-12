@@ -3,6 +3,7 @@ package org.owntracks.android.ui
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
@@ -113,6 +114,44 @@ class PreferencesActivityTests {
 
     @Test
     @AllowFlaky(attempts = 3)
+    fun configurationManagementCanEditASetType() {
+        clickOn(R.string.configurationManagement)
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyExperimentalFeatures))
+        writeTo(R.id.inputValue, "this, that,    other")
+        clickDialogPositiveButton()
+        assertContains(R.id.effectiveConfiguration, "\"experimentalFeatures\" : [ \"other\", \"that\", \"this\" ]")
+    }
+
+    @Test
+    @AllowFlaky(attempts = 3)
+    fun configurationManagementCanEditAStringType() {
+        clickOn(R.string.configurationManagement)
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyHost))
+        writeTo(R.id.inputValue, "example.com")
+        clickDialogPositiveButton()
+
+        assertContains(R.id.effectiveConfiguration, "\"host\" : \"example.com\"")
+    }
+
+    @Test
+    @AllowFlaky(attempts = 3)
+    fun configurationManagementCanEditABooleanType() {
+        clickOn(R.string.configurationManagement)
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyRemoteCommand))
+        writeTo(R.id.inputValue, "false")
+        clickDialogPositiveButton()
+
+        assertContains(R.id.effectiveConfiguration, "\"cmd\" : false")
+    }
+
+    @Test
+    @AllowFlaky(attempts = 3)
     fun settingSimpleHTTPConfigSettingsCanBeExported() {
         clickOn(R.string.preferencesServer)
         clickOn(R.string.mode_heading)
@@ -136,7 +175,7 @@ class PreferencesActivityTests {
         clickOn(R.string.preferencesNotification)
         clickOn(R.string.preferencesNotificationEvents)
         clickBack()
-        
+
         // This is an ugly hack, but there's some race conditions on underpowered hardware
         // causing the test to move on before the view has been fully built/rendered.
         val sleepBetweenMillis = 1000L
