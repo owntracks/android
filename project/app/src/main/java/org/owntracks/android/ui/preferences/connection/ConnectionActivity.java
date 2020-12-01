@@ -25,9 +25,11 @@ import org.owntracks.android.databinding.UiPreferencesConnectionParametersBindin
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
+import org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel;
 import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
@@ -127,10 +129,13 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
                 .show();
     }
 
+    ConnectionParametersViewModel connectionParametersViewModel;
+
     @Override
     public void showParametersDialog() {
         UiPreferencesConnectionParametersBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.ui_preferences_connection_parameters, null, false);
-        dialogBinding.setVm(viewModel.getConnectionParametersViewModel());
+        connectionParametersViewModel = viewModel.getConnectionParametersViewModel();
+        dialogBinding.setVm(connectionParametersViewModel);
         activeDialogViewModel = dialogBinding.getVm();
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -139,11 +144,12 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
                 .setPositiveButton(R.string.accept, dialogBinding.getVm())
                 .setNegativeButton(R.string.cancel, dialogBinding.getVm()).create();
         MaterialEditText keepAliveEditText = dialogBinding.getRoot().findViewById(R.id.keepalive);
-        keepAliveEditText.addValidator(new METValidator(getString(R.string.preferencesKeepaliveValidationError, preferences.getMinimumKeepalive())) {
+        keepAliveEditText.addValidator(new METValidator(getString(R.string.preferencesKeepaliveValidationError, preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) ? 1 : preferences.getMinimumKeepalive())) {
             @Override
             public boolean isValid(@NonNull CharSequence text, boolean isEmpty) {
                 try {
-                    return isEmpty || preferences.keepAliveInRange(Integer.parseInt(text.toString()));
+                    int intValue = Integer.parseInt(text.toString());
+                    return isEmpty || preferences.keepAliveInRange(intValue) || (preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) && intValue >= 1);
                 } catch (NumberFormatException e) {
                     return false;
                 }
@@ -153,6 +159,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         dialog.show();
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             if (keepAliveEditText.validate()) {
+                connectionParametersViewModel.save();
                 dialog.dismiss();
             }
         });

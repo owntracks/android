@@ -142,7 +142,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
-        if (t is ParameterizedType && Set::class.java.isAssignableFrom(t.rawType as Class<*>)) return value.split(",").map { it.trim() }.toSortedSet()
+        if (t is ParameterizedType && Set::class.java.isAssignableFrom(t.rawType as Class<*>))
+            return value.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSortedSet()
         return value
     }
 
@@ -439,9 +440,20 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @get:Export(keyResId = R.string.preferenceKeyKeepalive, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyKeepalive)
     var keepalive: Int
-        get() = getIntOrDefault(R.string.preferenceKeyKeepalive, R.integer.valKeepalive).coerceAtLeast(TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt())
+        get() {
+            if (isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE)) {
+                return getIntOrDefault(R.string.preferenceKeyKeepalive, R.integer.valKeepalive).coerceAtLeast(1)
+            }
+            return getIntOrDefault(R.string.preferenceKeyKeepalive, R.integer.valKeepalive).coerceAtLeast(TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt())
+        }
         set(value) {
-            if (keepAliveInRange(value)) setInt(R.string.preferenceKeyKeepalive, value) else setKeepaliveDefault()
+            when {
+                isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) -> {
+                    setInt(R.string.preferenceKeyKeepalive, value.coerceAtLeast(1))
+                }
+                keepAliveInRange(value) -> setInt(R.string.preferenceKeyKeepalive, value)
+                else -> setKeepaliveDefault()
+            }
         }
 
     fun keepAliveInRange(i: Int): Boolean = i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
@@ -640,7 +652,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     @get:Export(keyResId = R.string.preferenceKeyExperimentalFeatures, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyExperimentalFeatures)
-    var experimentalFeatures: SortedSet<String>
+    var experimentalFeatures: Set<String>
         get() = getStringSet(R.string.preferenceKeyExperimentalFeatures).toSortedSet()
         set(value) {
             setStringSet(R.string.preferenceKeyExperimentalFeatures, value)
@@ -795,6 +807,12 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         clearKey(getPreferenceKey(resKeyId))
     }
 
+    fun isExperimentalFeatureEnabled(feature: String): Boolean {
+        return when {
+            else -> experimentalFeatures.contains(feature)
+        }
+    }
+
     @Retention(AnnotationRetention.RUNTIME)
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
     annotation class Export(val keyResId: Int = 0, val exportModeMqtt: Boolean = false, val exportModeHttp: Boolean = false)
@@ -805,5 +823,9 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     fun getPreferenceKey(res: Int): String {
         return getStringResource(res)
+    }
+
+    companion object {
+        const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
     }
 }
