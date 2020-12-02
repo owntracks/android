@@ -10,7 +10,7 @@ import org.owntracks.android.R
 class InfoFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_info, rootKey)
-        findPreference<Preference>(Companion.UI_PREFERENCE_VERSION)?.setSummaryProvider { _ ->
+        findPreference<Preference>(UI_PREFERENCE_VERSION)?.setSummaryProvider { _ ->
             try {
                 val pm = requireActivity().packageManager
                 @Suppress("DEPRECATION")

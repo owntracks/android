@@ -2,60 +2,112 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesLicenses">
-
+    <Preference
+        android:key="dagger"
+        android:title="Dagger"
+        android:summary="Google"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/google/dagger" />
+    </Preference>
     <Preference
         android:key="eclipse-paho"
-        android:summary="Paho MQTTv3.1 Java Client"
-        android:title="Eclipse Foundation"
-        app:iconSpaceReserved="false" />
+        android:title="Paho MQTTv3.1 Java Client"
+        android:summary="Eclipse Foundation"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/eclipse/paho.mqtt.java" />
+    </Preference>
     <Preference
         android:key="greenrobot-eventbus"
-        android:summary="EventBus"
-        android:title="Greenrobot"
-        app:iconSpaceReserved="false" />
+        android:title="EventBus"
+        android:summary="Greenrobot"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/greenrobot/EventBus" />
+    </Preference>
     <Preference
         android:key="greenrobot-greendao"
-        android:summary="GreenDao"
-        android:title="Greenrobot"
-        app:iconSpaceReserved="false" />
-    <Preference
-        android:key="altbeacon-android-beacon-library"
-        android:summary="Android-Beacon-Library"
-        android:title="AltBeacon"
-        app:iconSpaceReserved="false" />
-    <Preference
-        android:key="rengwuxian-materialedittext"
-        android:summary="MaterialEditText"
-        android:title="Rengwuxian"
-        app:iconSpaceReserved="false" />
-    <Preference
-        android:key="mikepenz-materialdrawer"
-        android:summary="MaterialDrawer, Materialize"
-        android:title="Mikepenz"
-        app:iconSpaceReserved="false" />
-    <Preference
-        android:key="dagger2"
-        android:summary="Dagger2"
-        android:title="Google"
-        app:iconSpaceReserved="false" />
-    <Preference
-        android:key="zxing"
-        android:summary="Zxing Scanner"
-        android:title="Zebra Crossing"
-        app:iconSpaceReserved="false" />
+        android:title="GreenDao"
+        android:summary="Greenrobot"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/greenrobot/greenDAO" />
+    </Preference>
     <Preference
         android:key="jackson"
-        android:summary="Jackson"
-        android:title="Fasterxml"
-        app:iconSpaceReserved="false" />
+        android:title="Jackson"
+        android:summary="Fasterxml"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/FasterXML/jackson" />
+    </Preference>
+    <Preference
+        android:key="libsodium-jno"
+        android:title="Libsodium cryptography library JNI bindings"
+        android:summary="joshjdevl"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/joshjdevl/libsodium-jni" />
+    </Preference>
+    <Preference
+        android:key="mikepenz-materialdrawer"
+        android:title="MaterialDrawer"
+        android:summary="Mikepenz"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/mikepenz/MaterialDrawer" />
+    </Preference>
+    <Preference
+        android:key="mikepenz-materialize"
+        android:title="Materialize"
+        android:summary="Mikepenz"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/mikepenz/Materialize" />
+    </Preference>
+    <Preference
+        android:key="objectbox"
+        android:title="ObjectBox"
+        android:summary="ObjectBox"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/objectbox/objectbox-java" />
+    </Preference>
     <Preference
         android:key="okhttp"
-        android:summary="Okhttp3"
-        android:title="Squareup"
-        app:iconSpaceReserved="false" />
+        android:title="Okhttp3"
+        android:summary="Square"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/square/okhttp" />
+    </Preference>
+    <Preference
+        android:key="rengwuxian-materialedittext"
+        android:title="MaterialEditText"
+        android:summary="Rengwuxian"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/rengwuxian/MaterialEditText" />
+    </Preference>
     <Preference
         android:key="timber"
-        android:summary="Timber"
         android:title="Jacke Wharton"
-        app:iconSpaceReserved="false" />
+        android:summary="Timber"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/JakeWharton/timber" />
+    </Preference>
 </PreferenceScreen>
