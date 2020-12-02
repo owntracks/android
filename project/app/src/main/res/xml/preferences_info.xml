@@ -41,6 +41,7 @@
     <Preference
         android:key="version"
         android:title="@string/preferencesVersion"
-        app:iconSpaceReserved="false" />
-
+        app:iconSpaceReserved="false"
+        app:selectable="false" />
+    
 </PreferenceScreen>
