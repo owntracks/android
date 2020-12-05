@@ -1,3 +1,3 @@
-Release 2.2.0
-All changes can be found at https://github.com/owntracks/android/releases/tag/Android-v2.2.0/CHANGELOG.md
+Release 2.2.1
+All changes can be found at https://github.com/owntracks/android/releases/tag/Android-v2.2.1/CHANGELOG.md
 Please report any issues to https://github.com/owntracks/android/issues
