@@ -1,6 +1,8 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
+import androidx.preference.DropDownPreference
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.Binds
@@ -8,6 +10,7 @@ import dagger.Module
 import org.owntracks.android.R
 import org.owntracks.android.injection.modules.android.FragmentModules.BaseFragmentModule
 import org.owntracks.android.injection.scopes.PerFragment
+import org.owntracks.android.support.Preferences
 
 @PerFragment
 class AdvancedFragment : AbstractPreferenceFragment() {
@@ -27,6 +30,18 @@ class AdvancedFragment : AbstractPreferenceFragment() {
         }
         remoteConfigurationPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
         remoteCommandPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
+
+        val geocoderDropDownPreference = findPreference<DropDownPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))
+        geocoderDropDownPreference?.setOnPreferenceChangeListener { _, newValue ->
+            preferences.reverseGeocodeProvider = newValue.toString()
+            setOpenCageAPIKeyPreferenceVisibility()
+            true
+        }
+        setOpenCageAPIKeyPreferenceVisibility()
+    }
+
+    private fun setOpenCageAPIKeyPreferenceVisibility() {
+        findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.isVisible = preferences.reverseGeocodeProvider == Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE
     }
 
     @Module(includes = [BaseFragmentModule::class])

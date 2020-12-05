@@ -12,6 +12,7 @@
     <string name="preferenceKeyFirstStart">firstStart</string>
     <string name="preferenceKeyFusedRegionDetection">fusedRegionDetection</string>
     <string name="preferenceKeyGeocodeEnabled">geocodeEnabled</string>
+    <string name="preferenceKeyReverseGeocodeProvider">reverseGeocodeProvider</string>
     <string name="preferenceKeyHost">host</string>
     <string name="preferenceKeyIgnoreInaccurateLocations">ignoreInaccurateLocations</string>
     <string name="preferenceKeyIgnoreStaleLocations">ignoreStaleLocations</string>

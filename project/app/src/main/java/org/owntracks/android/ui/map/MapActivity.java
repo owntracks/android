@@ -49,7 +49,7 @@ import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -96,6 +96,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Inject
     EventBus eventBus;
+
+    @Inject
+    GeocoderProvider geocoderProvider;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -188,7 +191,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             binding.contactPeek.name.setText(c.getFusedName());
             if (c.hasLocation()) {
                 ContactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
-                GeocodingProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
+                geocoderProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
                 BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
                 binding.acc.setText(String.format(Locale.getDefault(), "%s m", c.getFusedLocationAccuracy()));
                 binding.tid.setText(c.getTrackerId());

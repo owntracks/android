@@ -204,8 +204,8 @@ class PreferencesActivityTests {
         scrollToText(R.string.preferencesAutostart)
         clickOn(R.string.preferencesAutostart)
 
-        scrollToText(R.string.preferencesGeocode)
-        clickOn(R.string.preferencesGeocode)
+        scrollToText(R.string.preferencesReverseGeocodeProvider)
+        clickOn(R.string.preferencesReverseGeocodeProvider)
 
         scrollToText(R.string.preferencesOpencageGeocoderApiKey)
         clickOn(R.string.preferencesOpencageGeocoderApiKey)

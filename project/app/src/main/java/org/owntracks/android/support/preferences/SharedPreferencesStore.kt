@@ -72,6 +72,10 @@ class SharedPreferencesStore @Inject constructor(@AppContext context: Context) :
         return activeSharedPreferences.getStringSet(key, setOf()) ?: setOf()
     }
 
+    override fun hasKey(key: String): Boolean {
+        return activeSharedPreferences.contains(key)
+    }
+
     override fun getInitMode(key: String, default: Int): Int = commonSharedPreferences.getInt(key, default)
 
     override fun setMode(key: String, mode: Int) {

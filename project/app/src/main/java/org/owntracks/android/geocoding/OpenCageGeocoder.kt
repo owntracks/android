@@ -1,5 +1,6 @@
-package org.owntracks.android.support
+package org.owntracks.android.geocoding
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.HttpUrl
@@ -8,9 +9,9 @@ import okhttp3.Request
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import timber.log.Timber
 
-class GeocoderOpencage @JvmOverloads internal constructor(private val apiKey: String, private val httpClient: OkHttpClient = OkHttpClient()) : Geocoder {
+class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: String, private val httpClient: OkHttpClient = OkHttpClient()) : CachingGeocoder() {
     private val jsonMapper: ObjectMapper = ObjectMapper()
-    override fun reverse(latitude: Double, longitude: Double): String {
+    override fun doLookup(latitude: Double, longitude: Double): String? {
         val url = HttpUrl.Builder()
                 .scheme("http")
                 .host(OPENCAGE_HOST)
@@ -39,8 +40,8 @@ class GeocoderOpencage @JvmOverloads internal constructor(private val apiKey: St
                 Timber.d("Opencage HTTP response: %s", rs)
                 val deserializedOpenCageResponse = jsonMapper.readValue(rs, OpenCageResponse::class.java)
                 if (deserializedOpenCageResponse.formatted == null) {
-                    Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}, First result: ${deserializedOpenCageResponse.results?.get(0)?.formatted}")
-                    return ""
+                    Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}")
+                    return null
                 }
                 val formattedLocation = deserializedOpenCageResponse.formatted!!
                 Timber.d("Formatted location: %s", formattedLocation)
@@ -48,7 +49,7 @@ class GeocoderOpencage @JvmOverloads internal constructor(private val apiKey: St
             }
         } catch (e: Exception) {
             Timber.e(e, "Error reverse geocoding from opencage")
-            return ""
+            return null
         }
     }
 
@@ -58,5 +59,16 @@ class GeocoderOpencage @JvmOverloads internal constructor(private val apiKey: St
 
     init {
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
+
+    internal class OpenCageResult {
+        val formatted: String? = null
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    internal class OpenCageResponse {
+        val results: List<OpenCageResult>? = null
+        val formatted: String?
+            get() = if (results != null && results.isNotEmpty()) results[0].formatted else null
     }
 }

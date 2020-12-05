@@ -36,29 +36,9 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     val sharedPreferencesName: String
         get() = preferencesStore.getSharedPreferencesName()
 
-    init {
-        val modePreferenceKey = getPreferenceKey(R.string.preferenceKeyModeId)
-        val initMode = preferencesStore.getInitMode(
-                modePreferenceKey,
-                getIntResource(R.integer.valModeId))
-        setMode(initMode, true)
-    }
-
-    fun exportToMessage(): MessageConfiguration {
-        val cfg = MessageConfiguration()
-        cfg[getPreferenceKey(R.string.preferenceKeyVersion)] = BuildConfig.VERSION_CODE
-        exportMethods.forEach {
-            val annotation = it.getAnnotation(Export::class.java)
-            if (annotation != null) {
-                cfg[getPreferenceKey(annotation.keyResId)] = it.invoke(this)
-            }
-        }
-        return cfg
-    }
-
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
-    private val exportMethods: List<Method>
+    private val exportMethods: Map<String, Method>
         get() = Preferences::class.java
                 .parentClasses()
                 .flatMap { it.declaredMethods.asSequence() }
@@ -69,7 +49,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
                             (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
                                     currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
                 }
-                .toList()
+                .map { Pair(getPreferenceKey(it.getAnnotation(Export::class.java)!!.keyResId), it) }
+                .toMap()
 
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
@@ -145,6 +126,15 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         if (t is ParameterizedType && Set::class.java.isAssignableFrom(t.rawType as Class<*>))
             return value.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSortedSet()
         return value
+    }
+
+    fun exportToMessage(): MessageConfiguration {
+        val cfg = MessageConfiguration()
+        cfg[getPreferenceKey(R.string.preferenceKeyVersion)] = BuildConfig.VERSION_CODE
+        exportMethods.forEach {
+            cfg[it.key] = it.value.invoke(this)
+        }
+        return cfg
     }
 
     @SuppressLint("CommitPrefEdits", "ApplySharedPref")
@@ -642,13 +632,23 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             setBoolean(R.string.preferenceKeyRemoteConfiguration, newValue)
         }
 
-    @get:Export(keyResId = R.string.preferenceKeyGeocodeEnabled, exportModeMqtt = true, exportModeHttp = true)
-    @set:Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
-    var geocodeEnabled: Boolean
-        get() = getBooleanOrDefault(R.string.preferenceKeyGeocodeEnabled, R.bool.valGeocodeEnabled)
+    @Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
+    fun setGeocodeEnabled(newValue: Boolean) {
+        reverseGeocodeProvider = if (newValue) REVERSE_GEOCODE_PROVIDER_GOOGLE else REVERSE_GEOCODE_PROVIDER_NONE
+    }
+
+    @get:Export(keyResId = R.string.preferenceKeyReverseGeocodeProvider, exportModeMqtt = true, exportModeHttp = true)
+    @set:Import(keyResId = R.string.preferenceKeyReverseGeocodeProvider)
+    var reverseGeocodeProvider: String
+        get() = getStringOrDefault(R.string.preferenceKeyReverseGeocodeProvider, R.string.valDefaultGeocoder)
         set(newValue) {
-            setBoolean(R.string.preferenceKeyGeocodeEnabled, newValue)
+            if (REVERSE_GEOCODE_PROVIDERS.contains(newValue)) {
+                setString(R.string.preferenceKeyReverseGeocodeProvider, newValue)
+            } else {
+                setString(R.string.preferenceKeyReverseGeocodeProvider, REVERSE_GEOCODE_PROVIDER_NONE)
+            }
         }
+
 
     @get:Export(keyResId = R.string.preferenceKeyExperimentalFeatures, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyExperimentalFeatures)
@@ -825,7 +825,35 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         return getStringResource(res)
     }
 
+    init {
+        val modePreferenceKey = getPreferenceKey(R.string.preferenceKeyModeId)
+        val initMode = preferencesStore.getInitMode(
+                modePreferenceKey,
+                getIntResource(R.integer.valModeId))
+        setMode(initMode, true)
+
+        // Migrations
+        if (preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
+            val oldEnabledValue = preferencesStore.getBoolean(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled), false)
+
+            val opencageApiKey = preferencesStore.getString(getPreferenceKey(R.string.preferenceKeyOpencageGeocoderApiKey), "")
+
+            reverseGeocodeProvider = if (oldEnabledValue && opencageApiKey.isNullOrBlank()) {
+                REVERSE_GEOCODE_PROVIDER_GOOGLE
+            } else if (oldEnabledValue && !opencageApiKey.isNullOrBlank()) {
+                REVERSE_GEOCODE_PROVIDER_OPENCAGE
+            } else {
+                REVERSE_GEOCODE_PROVIDER_NONE
+            }
+            preferencesStore.remove(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))
+        }
+    }
+
     companion object {
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
+        const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
+        const val REVERSE_GEOCODE_PROVIDER_GOOGLE = "Google"
+        const val REVERSE_GEOCODE_PROVIDER_OPENCAGE = "OpenCage"
+        val REVERSE_GEOCODE_PROVIDERS = listOf(REVERSE_GEOCODE_PROVIDER_NONE, REVERSE_GEOCODE_PROVIDER_GOOGLE, REVERSE_GEOCODE_PROVIDER_OPENCAGE)
     }
 }

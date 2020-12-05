@@ -39,8 +39,7 @@
     <string name="preferencesAutostart">Autoarranque</string>
     <string name="preferencesRemoteCommand">Comandos remotos</string>
     <string name="preferencesRemoteCommandSummary">Habilitar comandos remotos</string>
-    <string name="preferencesGeocode">Geocodificación</string>
-    <string name="preferencesGeocodeSummary">Habilitar geocodificación. Requiere reiniciar.</string>
+    <string name="preferencesReverseGeocodeProvider">Geocodificación</string>
     <string name="description">Descripción</string>
     <string name="longitude">Longitud</string>
     <string name="latitude">Latitud</string>
@@ -49,7 +48,7 @@
     <string name="exportConfiguration">Exportar</string>
     <string name="contactLocationUnknown">Ubicación no disponible</string>
     <string name="menuContactNavigate">Navegar</string>
-    <string name="menuCurrentLoction">Ubicación actual</string>
+    <string name="menuCurrentLocation">Ubicación actual</string>
     <string name="contactDetailsAccuracy">Precisión</string>
     <string name="contactDetailsTopic">Identificador</string>
     <string name="waypointListPlaceholder">No hay regiones definidas</string>

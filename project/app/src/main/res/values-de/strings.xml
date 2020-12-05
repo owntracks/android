@@ -35,8 +35,7 @@
     <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesRemoteCommand">Fernkommandos</string>
     <string name="preferencesRemoteCommandSummary">Fernkommandos aktivieren</string>
-    <string name="preferencesGeocode">Geocodierung</string>
-    <string name="preferencesGeocodeSummary">Geocodierung aktivieren. Erfordert einen Neustart.</string>
+    <string name="preferencesReverseGeocodeProvider">Geocodierung</string>
     <string name="description">Beschreibung</string>
     <string name="longitude">Längengrad</string>
     <string name="latitude">Breitengrad</string>
@@ -97,7 +96,7 @@
     <string name="enjoy_description">Viel Spaß mit OwnTracks</string>
     <string name="icon_description_done">Fertig</string>
     <string name="title_activity_load">Konfigurations import</string>
-    <string name="menuCurrentLoction">Aktuelle position</string>
+    <string name="menuCurrentLocation">Aktuelle position</string>
     <string name="preferencesIgnoreInaccurateLocations">Ungenaue Positionen</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ungenaue Positionen ignorieren</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">Ungenaue Position ignorierne wenn sie ungenauer als die angegebenen Meter ist</string>

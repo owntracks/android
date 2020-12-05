@@ -21,6 +21,8 @@ interface PreferencesStore {
     fun putStringSet(key: String, values: Set<String>)
     fun getStringSet(key: String): Set<String>
 
+    fun hasKey(key:String):Boolean
+
     fun remove(key: String)
 
     fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)

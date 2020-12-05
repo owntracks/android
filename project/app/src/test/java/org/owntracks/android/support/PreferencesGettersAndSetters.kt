@@ -78,7 +78,10 @@ class PreferencesGettersAndSetters(
                     arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
                     arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Set::class, false),
                     arrayOf("FusedRegionDetection", "fusedRegionDetection", true, true, Boolean::class, false),
-                    arrayOf("GeocodeEnabled", "geocodeEnabled", true, true, Boolean::class, false),
+                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Google", "Google", String::class, false),
+                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "OpenCage", "OpenCage", String::class, false),
+                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "None", "None", String::class, false),
+                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Nonsense", "None", String::class, false),
                     arrayOf("Host", "host", "testHost", "testHost", String::class, false),
                     arrayOf("IgnoreInaccurateLocations", "ignoreInaccurateLocations", 123, 123, Int::class, false),
                     arrayOf("IgnoreStaleLocations", "ignoreStaleLocations", 456.0, 456.0, Double::class, false),
@@ -131,6 +134,7 @@ class PreferencesGettersAndSetters(
 
         fun getMockResources(): Resources {
             return mock {
+                on { getString(any()) } doReturn ""
                 on { getString(eq(R.string.valEmpty)) } doReturn ""
                 on { getString(eq(R.string.preferenceKeyAuth)) } doReturn "auth"
                 on { getString(eq(R.string.preferenceKeyAutostartOnBoot)) } doReturn "autostartOnBoot"
@@ -170,6 +174,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"
                 on { getString(eq(R.string.preferenceKeyRemoteCommand)) } doReturn "cmd"
                 on { getString(eq(R.string.preferenceKeyRemoteConfiguration)) } doReturn "remoteConfiguration"
+                on { getString(eq(R.string.preferenceKeyReverseGeocodeProvider)) } doReturn "reverseGeocodeProvider"
                 on { getString(eq(R.string.preferenceKeySetupNotCompleted)) } doReturn "setupNotCompleted"
                 on { getString(eq(R.string.preferenceKeySub)) } doReturn "sub"
                 on { getString(eq(R.string.preferenceKeySubQos)) } doReturn "subQos"

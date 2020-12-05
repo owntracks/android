@@ -69,18 +69,22 @@
             app:key="@string/preferenceKeyAutostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
-        <SwitchPreferenceCompat
-            app:defaultValue="@bool/valGeocodeEnabled"
+        <DropDownPreference
+            app:key="@string/preferenceKeyReverseGeocodeProvider"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyGeocodeEnabled"
-            app:summary="@string/preferencesGeocodeSummary"
-            app:title="@string/preferencesGeocode" />
+            app:title="@string/preferencesReverseGeocodeProvider"
+            app:defaultValue="None"
+            app:entries="@array/geocoders"
+            app:entryValues="@array/geocoders"
+            app:useSimpleSummaryProvider="true"
+            />
         <EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyOpencageGeocoderApiKey"
             app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
-            app:title="@string/preferencesOpencageGeocoderApiKey" />
+            app:title="@string/preferencesOpencageGeocoderApiKey"
+            app:isPreferenceVisible="false"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

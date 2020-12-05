@@ -40,8 +40,7 @@
     <string name="preferencesAutostart">Автозапуск</string>
     <string name="preferencesRemoteCommand">Внешние команды</string>
     <string name="preferencesRemoteCommandSummary">Разрешить внешние команды</string>
-    <string name="preferencesGeocode">Геокодирование</string>
-    <string name="preferencesGeocodeSummary">Резрешить геокодирование. Требуется перезапуск.</string>
+    <string name="preferencesReverseGeocodeProvider">Геокодирование</string>
     <string name="description">Описание</string>
     <string name="longitude">Долгота</string>
     <string name="latitude">Широта</string>
@@ -50,7 +49,7 @@
     <string name="exportConfiguration">Экспорт</string>
     <string name="contactLocationUnknown">Местоположение недоступно</string>
     <string name="menuContactNavigate">Перейти</string>
-    <string name="menuCurrentLoction">Текущее местоположение</string>
+    <string name="menuCurrentLocation">Текущее местоположение</string>
     <string name="contactDetailsAccuracy">Точность</string>
     <string name="contactDetailsTopic">Идентификатор</string>
     <string name="waypointListPlaceholder">Места еще не определены</string>

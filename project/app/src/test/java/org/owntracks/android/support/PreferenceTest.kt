@@ -68,7 +68,7 @@ class PreferenceTest {
         assertEquals("", preferences.host)
     }
 
-    private val preferenceKeys = listOf("autostartOnBoot", "cleanSession", "debugLog", "deviceId", "fusedRegionDetection", "geocodeEnabled", "ignoreInaccurateLocations", "ignoreStaleLocations", "locatorDisplacement", "locatorInterval", "locatorPriority", "mode", "monitoring", "moveModeLocatorInterval", "notificationEvents", "notificationHigherPriority", "notificationLocation", "opencageApiKey", "password", "ping", "pubExtendedData", "cmd", "remoteConfiguration", "tid", "username", "_build")
+    private val preferenceKeys = listOf("autostartOnBoot", "cleanSession", "debugLog", "deviceId", "fusedRegionDetection", "reverseGeocodeProvider", "ignoreInaccurateLocations", "ignoreStaleLocations", "locatorDisplacement", "locatorInterval", "locatorPriority", "mode", "monitoring", "moveModeLocatorInterval", "notificationEvents", "notificationHigherPriority", "notificationLocation", "opencageApiKey", "password", "ping", "pubExtendedData", "cmd", "remoteConfiguration", "tid", "username", "_build")
     private val httpOnlyPreferenceKeys = listOf("dontReuseHttpClient", "url")
     private val mqttOnlyPreferenceKeys = listOf("clientId", "host", "info", "keepalive", "mqttProtocolLevel", "pubQos", "pubRetain", "sub", "subQos", "subTopic", "port", "pubTopicBase", "tls", "tlsCaCrt", "tlsClientCrt", "tlsClientCrtPassword")
 

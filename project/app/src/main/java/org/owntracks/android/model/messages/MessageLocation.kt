@@ -39,31 +39,29 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     @JsonProperty("tst")
     var timestamp: Long = 0
-    private var geocoder: String? = null
+
     private var _contact: WeakReference<FusedContact?>? = null
     var conn: String? = null
 
     @JsonProperty("inregions")
     var inregions: List<String>? = null
 
-    @JsonIgnore
-    fun getGeocoder(): String? {
-        return if (hasGeocoder()) geocoder else geocoderFallback
-    }
-
-    @JsonIgnore
-    fun setGeocoder(geocoder: String?) {
-        this.geocoder = geocoder
-        notifyContactPropertyChanged()
-    }
+    @set:JsonIgnore
+    @get:JsonIgnore
+    var geocode: String? = null
+        get() = field ?: fallbackGeocode
+        set(value) {
+            field = value
+            notifyContactPropertyChanged()
+        }
 
     @get:JsonIgnore
-    val geocoderFallback: String
+    internal val fallbackGeocode: String
         get() = "$latitude : $longitude"
 
     @JsonIgnore
     fun hasGeocoder(): Boolean {
-        return geocoder != null
+        return geocode != null
     }
 
     fun setContact(contact: FusedContact?) {
