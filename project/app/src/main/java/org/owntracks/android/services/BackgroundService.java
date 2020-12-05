@@ -53,7 +53,7 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.GeocodingProvider;
+import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
@@ -123,7 +123,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     LocationProcessor locationProcessor;
 
     @Inject
-    GeocodingProvider geocodingProvider;
+    GeocoderProvider geocoderProvider;
 
     @Inject
     ContactsRepo contactsRepo;
@@ -309,7 +309,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return null;
 
         if (this.lastLocationMessage != null && preferences.getNotificationLocation()) {
-            builder.setContentTitle(this.lastLocationMessage.getGeocoder());
+            builder.setContentTitle(this.lastLocationMessage.getGeocode());
             builder.setWhen(TimeUnit.SECONDS.toMillis(this.lastLocationMessage.getTimestamp()));
             builder.setNumber(lastQueueLength);
         } else {
@@ -644,7 +644,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         if (lastLocationMessage == null || lastLocationMessage.getTimestamp() <= m.getTimestamp()) {
             this.lastLocationMessage = m;
             updateOngoingNotification();
-            geocodingProvider.resolve(m, this);
+            geocoderProvider.resolve(m, this);
         }
     }
 

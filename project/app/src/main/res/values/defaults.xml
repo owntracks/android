@@ -2,6 +2,7 @@
 <resources>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="valSubTopic" translatable="false">owntracks/+/+</string>
+    <string name="valDefaultGeocoder" translatable="false">Google</string>
 
     <integer name="valPort">8883</integer>
     <integer name="valPubQos">1</integer>
@@ -30,7 +31,6 @@
     <bool name="valTls">true</bool>
     <bool name="valWs">false</bool>
     <bool name="valInfo">true</bool>
-    <bool name="valGeocodeEnabled">true</bool>
     <bool name="valRemoteConfiguration">false</bool>
 
     <string name="valEmpty" translatable="false" />

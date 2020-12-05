@@ -50,7 +50,7 @@
     <string name="exportConfiguration">Exporter</string>
     <string name="contactLocationUnknown">Aucun emplacement n\'est disponible</string>
     <string name="menuContactNavigate">Naviguer</string>
-    <string name="menuCurrentLoction">Localisation actuelle</string>
+    <string name="menuCurrentLocation">Localisation actuelle</string>
     <string name="contactDetailsAccuracy">Précision</string>
     <string name="contactDetailsTopic">Identifiant</string>
     <string name="waypointListPlaceholder">Aucune région définie</string>
@@ -150,8 +150,7 @@
     <string name="monitoring_significant">Modifications importantes du mode de surveillance</string>
     <string name="monitoring_move">Déplacer le mode de surveillance</string>
     <string name="notificationChangeMonitoring">Changer mode de surveillance</string>
-    <string name="preferencesGeocode">Géocodage</string>
-    <string name="preferencesGeocodeSummary">Activer le géocodage. Redémarrage nécessaire.</string>
+    <string name="preferencesReverseGeocodeProvider">Géocodage</string>
     <string name="play_services_update_required">Mise à jour des services Google Play est requise.</string>
     <string name="distance_label">Distance</string>
     <string name="clear_log">Vider le journal</string>

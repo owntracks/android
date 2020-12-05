@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.geocoding
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -10,7 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 
-class TestGeocoderOpencage {
+class TestOpenCageGeocoder {
     @Test
     fun testResultIsDeserializedCorrectly() {
         val openCageJSON = this.javaClass.getResource("/opencageResult.json")?.readText()
@@ -27,7 +27,7 @@ class TestGeocoderOpencage {
         val httpCall: Call = mock { on { execute() } doReturn httpResponse }
         val httpClient: OkHttpClient = mock { on { newCall(any()) } doReturn httpCall }
 
-        val geocoder = GeocoderOpencage("", httpClient)
+        val geocoder = OpenCageGeocoder("", httpClient)
 
         val response = geocoder.reverse(0.0, 0.0)
         assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", response)

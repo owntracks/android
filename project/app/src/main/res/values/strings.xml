@@ -40,8 +40,7 @@
     <string name="preferencesAutostart">Autostart</string>
     <string name="preferencesRemoteCommand">Remote commands</string>
     <string name="preferencesRemoteCommandSummary">Enable remote commands</string>
-    <string name="preferencesGeocode">Geocode</string>
-    <string name="preferencesGeocodeSummary">Enable geocoding. Requires restart.</string>
+    <string name="preferencesReverseGeocodeProvider">Reverse Geocode Provider</string>
     <string name="description">Description</string>
     <string name="longitude">Longitude</string>
     <string name="latitude">Latitude</string>
@@ -50,7 +49,7 @@
     <string name="exportConfiguration">Export</string>
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
-    <string name="menuCurrentLoction">Current location</string>
+    <string name="menuCurrentLocation">Current location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
@@ -152,7 +151,7 @@
     <string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
     <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
-    <string name="preferencesOpencageGeocoderApiKeySummary">API key for alternative Geocoder</string>p
+    <string name="preferencesOpencageGeocoderApiKeySummary">API key for OpenCage Reverse Geocoder</string>p
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google. Requires restart.</string>
     <string name="region_unknown">Status unknown</string>
     <string name="region_inside">Currently inside</string>
