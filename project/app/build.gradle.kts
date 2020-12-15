@@ -193,7 +193,7 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:${daggerVersion}")
     kaptTest("com.google.dagger:dagger-android-processor:${daggerVersion}")
 
-    testImplementation("org.powermock:powermock-module-junit4:2.0.7")
+    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
     testImplementation("org.powermock:powermock-api-mockito2:2.0.7")
     testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
