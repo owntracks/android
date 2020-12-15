@@ -136,7 +136,7 @@ val materialDialogsVersion = "0.9.6.0"
 val objectboxVersion = "2.7.1"
 val espressoVersion = "3.3.0"
 val androidxTestVersion = "1.3.0"
-val kotlinCoroutinesVersion = "1.4.1"
+val kotlinCoroutinesVersion = "1.4.2-native-mt"
 
 dependencies {
     implementation("androidx.preference:preference:1.1.1")
