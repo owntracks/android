@@ -8,7 +8,7 @@ buildscript {
         maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.0")
+        classpath("com.android.tools.build:gradle:4.1.1")
         classpath("com.hiya:jacoco-android:0.2")
         classpath("io.objectbox:objectbox-gradle-plugin:2.8.1")
         //noinspection DifferentKotlinGradleVersion
