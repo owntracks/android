@@ -1,0 +1,22 @@
+name: Test workflow
+
+on:
+  push:
+    tags:
+      - Test-v.[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+  release:
+    name: Create GH release and promote Play store beta to release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2      
+    - uses: octokit/request-action@v2
+      id: get_latest_release
+      with:
+        route: GET /repos/{owner}/{repo}/git/matching-refs/tags/{ref}
+        owner: octokit
+        repo: request-action
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: "echo tags matching: ${{ steps.get_latest_release.outputs.data }}"
