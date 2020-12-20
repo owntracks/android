@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.2.2
+
+### Bug fixes
+
+* Fixed a crash caused by a race condition on some devices where certain things are used before init (#890)
+
 ## Version 2.2.1
 
 ### New features
