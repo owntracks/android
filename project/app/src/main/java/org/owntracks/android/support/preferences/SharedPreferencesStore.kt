@@ -95,12 +95,16 @@ class SharedPreferencesStore @Inject constructor(@AppContext context: Context) :
     }
 
     override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        activeSharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
+        if (this::activeSharedPreferences.isInitialized) {
+            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
+        }
         activeSharedPreferencesChangeListener.push(listenerModeChanged)
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
+        if (this::activeSharedPreferences.isInitialized) {
+            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
+        }
         activeSharedPreferencesChangeListener.remove(listenerModeChanged)
     }
 
