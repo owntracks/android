@@ -13,6 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2      
+    - uses: octokit/request-action@v2.x
+      name: Find beta tags
+      id: get_beta_tags
+      with:
+        route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref }}-beta
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get number of matching tags
+      id: tagCount
+      env:
+        labels: ${{ steps.get_beta_tags.outputs.data }}
+      run: |
+        echo $labels
+        export LENGTH=$(echo $labels | jq '. | length')
+        echo $LENGTH
+        echo "::set-output name=beta_tag_count::$LENGTH"
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
@@ -61,3 +77,8 @@ jobs:
     - name: Promote play store production from beta
       run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status completed
       working-directory: project
+      if: ${{ steps.tagCount.outputs.beta_tag_count > 0 }}
+    - name: Promote play store production from internal
+      run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status completed
+      working-directory: project
+      if: ${{ steps.tagCount.outputs.beta_tag_count == 0 }}
