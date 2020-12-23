@@ -35,14 +35,6 @@ jobs:
           ~/.gradle/caches
           ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-${{ github.repo }}-${{ hashFiles('**/*.gradle*') }}
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
-      working-directory: project
-      timeout-minutes: 10
-    - name: Run unit tests
-      run: ./gradlew check jacocoTestDebugUnitTestReport
-      working-directory: project
-      timeout-minutes: 10
     - name: Test with Gradle on the emulator
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -51,8 +43,8 @@ jobs:
         script: |
             adb emu geo fix 0 51
             ./gradlew createDebugCoverageReport
-        profile: pixel_3a
-        target: google_apis_playstore
+        profile: pixel_4a
+        target: google_apis
       timeout-minutes: 15
     - name: Gather xunit files into a single dir
       run: | 
