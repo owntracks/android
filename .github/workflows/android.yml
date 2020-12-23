@@ -46,7 +46,7 @@ jobs:
     - name: Test with Gradle on the emulator
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 28
         working-directory: project
         script: |
             adb emu geo fix 0 51

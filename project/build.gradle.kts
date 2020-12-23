@@ -13,6 +13,7 @@ buildscript {
         classpath("io.objectbox:objectbox-gradle-plugin:2.8.1")
         //noinspection DifferentKotlinGradleVersion
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${KotlinVersion.CURRENT}")
+        classpath("firebase.test.lab:plugin:2.6.1")
     }
 }
 

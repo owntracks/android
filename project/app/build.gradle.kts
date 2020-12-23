@@ -6,6 +6,7 @@ plugins {
     kotlin("android.extensions")
     kotlin("kapt")
     id("com.hiya.jacoco-android")
+    id("firebase.test.lab")
 }
 
 val versionMajor = 2
