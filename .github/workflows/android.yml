@@ -38,14 +38,13 @@ jobs:
     - name: Test with Gradle on the emulator
       uses: reactivecircus/android-emulator-runner@v2.12.0
       with:
-        api-level: 28
+        api-level: 29
         working-directory: project
         script: |
             adb emu geo fix 0 51
             ./gradlew createDebugCoverageReport
         profile: pixel_3a
         target: google_apis
-      timeout-minutes: 90
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
