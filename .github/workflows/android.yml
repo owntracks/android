@@ -45,7 +45,7 @@ jobs:
             ./gradlew createDebugCoverageReport
         profile: pixel_4a
         target: google_apis
-      timeout-minutes: 15
+      timeout-minutes: 90
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
