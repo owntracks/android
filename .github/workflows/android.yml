@@ -43,7 +43,7 @@ jobs:
         script: |
             adb emu geo fix 0 51
             ./gradlew createDebugCoverageReport
-        profile: pixel_4a
+        profile: pixel_3a
         target: google_apis
       timeout-minutes: 90
     - name: Gather xunit files into a single dir
