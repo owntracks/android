@@ -225,7 +225,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         return str != null && str.length() > 0;
     }
 
-    void sendMessage(MessageBase message) {
+    void sendMessage(MessageBase message) throws OutgoingMessageSendingException {
         long messageId = message.getMessageId();
         Request request = getRequest(message);
         if(request == null) {
@@ -233,8 +233,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             return;
         }
 
-        try {
-            Response response = getHttpClient().newCall(request).execute();
+        try(Response response = getHttpClient().newCall(request).execute()) {
             // Message was send. Handle delivered message
             if((response.isSuccessful())) {
                 Timber.d("request was successful: %s",response);
@@ -248,29 +247,27 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e ) {
-                        Timber.e("error:JsonParseException responseCode:%s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"HTTP %d, JsonParseException", response.code())));
+                        Timber.e("JsonParseException HTTP status: %s", response.code());
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"HTTP status %d, JsonParseException", response.code())));
                     } catch (Parser.EncryptionException e) {
-                        Timber.e("error:JsonParseException responseCode:%s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT,"HTTP: %d, EncryptionException", response.code())));
+                        Timber.e("JsonParseException HTTP status: %s", response.code());
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT,"HTTP status: %d, EncryptionException", response.code())));
                     }
-
                 }
-                response.close();
             // Server could be contacted but returned non success HTTP code
             } else {
-                Timber.e("request was not successful. HTTP code %s", response.code());
+                Exception httpException = new Exception(String.format("HTTP request failed. Status: %s", response.code()));
+                Timber.e(httpException);
                 messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP code %d", response.code())));
                 messageProcessor.onMessageDeliveryFailed(messageId);
-                response.close();
-                return;
+                throw new OutgoingMessageSendingException(httpException);
             }
         // Message was not send
-        } catch (Exception e) {
-            Timber.e(e,"error:IOException. Delivery failed ");
+        } catch (IOException e) {
+            Timber.e(e, "HTTP Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
             messageProcessor.onMessageDeliveryFailed(messageId);
-            return;
+            throw new OutgoingMessageSendingException(e);
         }
         messageProcessor.onMessageDelivered(message);
     }
