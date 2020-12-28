@@ -16,12 +16,15 @@ import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 
 import org.owntracks.android.R;
 import org.owntracks.android.services.BackgroundService;
+import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
 import org.owntracks.android.ui.regions.RegionsActivity;
 import org.owntracks.android.ui.status.StatusActivity;
+
+import javax.inject.Inject;
 
 public class DrawerProvider {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
@@ -32,9 +35,12 @@ public class DrawerProvider {
     private static final int EXIT_OPERATION_ID = 88296;
 
     private final AppCompatActivity activity;
+    private final Scheduler scheduler;
 
-    public DrawerProvider(AppCompatActivity activity) {
+    @Inject
+    public DrawerProvider(AppCompatActivity activity, Scheduler scheduler) {
         this.activity = activity;
+        this.scheduler = scheduler;
     }
 
     private AppCompatActivity getActivity() {
@@ -104,6 +110,9 @@ public class DrawerProvider {
                         activity.stopService((new Intent(activity, BackgroundService.class)));
                         // Finish the activity
                         activity.finishAffinity();
+                        // Kill scheduled tasks
+                        scheduler.cancelHttpTasks();
+                        scheduler.cancelMqttTasks();
                         return true;
                     }
 

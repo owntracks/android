@@ -41,6 +41,9 @@ public class Scheduler {
     @Inject
     public Scheduler(@AppContext Context context) {
         workManager = WorkManager.getInstance(context);
+        // There may be lingering tasks from previous restarts. Kill all by tag to reset state.
+        cancelMqttTasks();
+        cancelHttpTasks();
     }
 
     public void cancelHttpTasks() {
