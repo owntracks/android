@@ -226,7 +226,7 @@ play {
     }
     track.set("internal")
 
-    resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
+    resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
 }
 
 // Espresso test  screenshot gathering
