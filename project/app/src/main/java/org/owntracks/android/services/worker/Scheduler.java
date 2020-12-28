@@ -42,8 +42,13 @@ public class Scheduler {
     public Scheduler(@AppContext Context context) {
         workManager = WorkManager.getInstance(context);
         // There may be lingering tasks from previous restarts. Kill all by tag to reset state.
+        cancelAllTasks();
+    }
+
+    public void cancelAllTasks() {
         cancelMqttTasks();
         cancelHttpTasks();
+        workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING);
     }
 
     public void cancelHttpTasks() {

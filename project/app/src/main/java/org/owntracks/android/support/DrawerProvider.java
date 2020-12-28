@@ -111,8 +111,7 @@ public class DrawerProvider {
                         // Finish the activity
                         activity.finishAffinity();
                         // Kill scheduled tasks
-                        scheduler.cancelHttpTasks();
-                        scheduler.cancelMqttTasks();
+                        scheduler.cancelAllTasks();
                         return true;
                     }
 
