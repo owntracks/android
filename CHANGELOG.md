@@ -9,6 +9,8 @@
 ### Bug fixes
 
 * Fixed a crash caused by a race condition on some devices where certain things are used before init (#890)
+* Fixed playstore links (#894)
+* Fixed bug where exiting the app didn't cancel background tasks (#899)
 
 ## Version 2.2.1
 
