@@ -34,7 +34,7 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ github.repo }}-${{ hashFiles('**/*.gradle*') }}
+        key: ${{ runner.os }}-gradle-${{ github.repository }}-${{ hashFiles('**/*.gradle*') }}
     - name: Build with Gradle
       run: ./gradlew assembleDebug
       working-directory: project
@@ -106,7 +106,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ github.repo }}-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ github.repository }}-${{ hashFiles('**/*.gradle*') }}
       - name: Decrypt secrets
         env:
             GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
