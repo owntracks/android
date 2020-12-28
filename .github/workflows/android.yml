@@ -52,7 +52,7 @@ jobs:
             adb emu geo fix 0 51
             ./gradlew createDebugCoverageReport --no-build-cache
         profile: pixel_3a
-        target: google_apis_playstore
+        target: google_apis
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
