@@ -103,8 +103,8 @@
     </Preference>
     <Preference
         android:key="timber"
-        android:title="Jacke Wharton"
-        android:summary="Timber"
+        android:title="Timber"
+        android:summary="Jacke Wharton"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
