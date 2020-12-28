@@ -2,6 +2,10 @@
 
 ## Version 2.2.2
 
+### Breaking changes
+
+* TLS hostname verification now no longer considers the CN field in the server certificate. This is in line with the deprecation of using CN for host verification as of RFC2818 (2000) and RFC6125 (2011). Instead, hostnames will be validated against the list of subjectAltNames (SANs) in the server certificate. If you were previously relying on the CN field in your certificate and didn't have any SANs listed, or the SAN list doesn't contain the hostname you're connecting to, TLS connections may now fail. The suggested course of action is to regenerate the cert ensuring that the SAN list is correct.
+
 ### Bug fixes
 
 * Fixed a crash caused by a race condition on some devices where certain things are used before init (#890)

@@ -35,6 +35,7 @@ import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedL
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
@@ -286,6 +287,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
         connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
+        InputStream clientCaInputStream = null;
+        InputStream clientCertInputStream = null;
         try {
             if (preferences.getTls()) {
                 String tlsCaCrt = preferences.getTlsCaCrt();
@@ -295,7 +298,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 if (tlsCaCrt.length() > 0) {
                     try {
-                        socketFactoryOptions.withCaInputStream(applicationContext.openFileInput(tlsCaCrt));
+                         clientCaInputStream= applicationContext.openFileInput(tlsCaCrt);
+                        socketFactoryOptions.withCaInputStream(clientCaInputStream);
                     } catch (FileNotFoundException e) {
                         Timber.e(e);
                     }
@@ -303,7 +307,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 if (tlsClientCrt.length() > 0) {
                     try {
-                        socketFactoryOptions.withClientP12InputStream(applicationContext.openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
+                        clientCertInputStream = applicationContext.openFileInput(tlsClientCrt);
+                        socketFactoryOptions.withClientP12InputStream(clientCertInputStream).withClientP12Password(preferences.getTlsClientCrtPassword());
                     } catch (FileNotFoundException e) {
                         Timber.e(e);
                     }
@@ -315,6 +320,18 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } catch (CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException | KeyManagementException | IOException e) {
             changeState(EndpointState.ERROR.withError(e).withMessage("TLS setup failed"));
             throw new MqttConnectionException(e);
+        } finally {
+            try {
+                if (clientCaInputStream != null) {
+                    clientCaInputStream.close();
+                }
+                if (clientCertInputStream != null) {
+                    clientCertInputStream.close();
+                }
+            } catch (IOException e) {
+                Timber.e(e);
+            }
+
         }
 
         setWill(connectOptions);

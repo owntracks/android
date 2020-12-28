@@ -1,6 +1,7 @@
 package org.owntracks.android
 
 import android.content.Intent
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import androidx.work.Configuration
@@ -41,8 +42,14 @@ class App : DaggerApplication() {
     var eventBus: EventBus? = null
     override fun onCreate() {
         WorkManager.initialize(this, Configuration.Builder().build())
-        // Make sure we use Conscrypt for advanced TLS features on all devices
-        Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        // Make sure we use Conscrypt for advanced TLS features on all devices.
+        // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1)
+        } else {
+            Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1)
+        }
+
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugLogTree())

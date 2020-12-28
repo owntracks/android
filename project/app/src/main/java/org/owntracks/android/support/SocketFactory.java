@@ -70,14 +70,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     }
 
 
-    private TrustManagerFactory tmf;
+    private final TrustManagerFactory tmf;
 
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Timber.tag(this.toString()).v("initializing CustomSocketFactory");
 
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
         if(options.hasCaCrt()) {
             Timber.tag(this.toString()).v("options.hasCaCrt(): true");
@@ -99,13 +99,10 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             Timber.v("Certificate Version: %s", ca.getVersion());
             Timber.v("Certificate OID: %s", ca.getSigAlgOID());
             Enumeration<String> aliasesCA = caKeyStore.aliases();
-            for (; aliasesCA.hasMoreElements(); ) {
+            while (aliasesCA.hasMoreElements()) {
                 String o = aliasesCA.nextElement();
                 Timber.v("Alias: %s isKeyEntry:%s isCertificateEntry:%s", o, caKeyStore.isKeyEntry(o), caKeyStore.isCertificateEntry(o));
             }
-
-
-
         } else {
             Timber.v("CA sideload: false, using system keystore");
             KeyStore keyStore = KeyStore.getInstance("AndroidCAStore");
@@ -123,7 +120,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
             Timber.tag(this.toString()).v("Client .p12 Keystore content: ");
             Enumeration<String> aliasesClientCert = clientKeyStore.aliases();
-            for (; aliasesClientCert.hasMoreElements(); ) {
+            while (aliasesClientCert.hasMoreElements()) {
                 String o = aliasesClientCert.nextElement();
                 Timber.v("Alias: %s", o);
             }
@@ -133,10 +130,9 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         }
 
         // Create an SSLContext that uses our TrustManager
-        SSLContext context = SSLContext.getInstance("TLSv1.2");
+        SSLContext context = SSLContext.getInstance("TLS");
         context.init(kmf.getKeyManagers(), getTrustManagers(), null);
         this.factory= context.getSocketFactory();
-
     }
 
     public TrustManager[] getTrustManagers() {
