@@ -9,6 +9,7 @@
 ### Bug fixes
 
 * Fixed a crash caused by a race condition on some devices where certain things are used before init (#890)
+* Fixed issue with HTTP send failures not being re-tried (#893)
 * Fixed playstore links (#894)
 * Fixed bug where exiting the app didn't cancel background tasks (#899)
 
