@@ -16,6 +16,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
@@ -46,11 +47,11 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +85,9 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
-        preferences.registerOnPreferenceChangedListener(this);
+        if (preferences!=null) {
+            preferences.registerOnPreferenceChangedListener(this);
+        }
     }
 
     void reconnectAndSendKeepalive(Semaphore completionNotifier) {
@@ -392,23 +395,41 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.v("lastConnectionId changed to: %s", lastConnectionId);
         }
 
-        List<String> topics = new ArrayList<>();
-        String subTopicBase = preferences.getSubTopic();
-
         if (!preferences.getSub()) // Don't subscribe if base topic is invalid
             return;
-        else if (subTopicBase.endsWith("#")) { // wildcard sub will match everything anyway
-            topics.add(subTopicBase);
-        } else {
-            topics.add(subTopicBase);
-            if (preferences.getInfo())
-                topics.add(subTopicBase + preferences.getPubTopicInfoPart());
 
-            topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
-            topics.add(subTopicBase + preferences.getPubTopicEventsPart());
-            topics.add(subTopicBase + preferences.getPubTopicWaypointsPart());
-        }
+        Set<String> topics = getTopicsToSubscribeTo(
+                preferences.getSubTopic(),
+                preferences.getInfo(),
+                preferences.getPubTopicInfoPart(),
+                preferences.getPubTopicEventsPart(),
+                preferences.getPubTopicWaypointsPart()
+        );
+        // Receive commands for us
+        topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
+
         subscribe(topics.toArray(new String[0]));
+    }
+
+    @NotNull
+    Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
+        Set<String> topics = new TreeSet<>();
+
+        // This can contain multiple and is space-delimited
+        for (String subTopic : subTopics.split(" ")) {
+            if (subTopic.endsWith("#")) { // wildcard sub will match everything anyway
+                topics.add(subTopic);
+            } else {
+                topics.add(subTopic);
+                if (subscribeToInfo) {
+                    topics.add(subTopic + infoTopicSuffix);
+                }
+                topics.add(subTopic + eventsTopicSuffix);
+                topics.add(subTopic + waypointsTopicSuffix);
+            }
+        }
+
+        return topics;
     }
 
     private void subscribe(String[] topics) {
