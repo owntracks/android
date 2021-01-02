@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("com.github.triplet.play") version "3.0.0"
+    id("com.github.triplet.play") version "3.1.0"
     id("io.objectbox")
     kotlin("android")
     kotlin("android.extensions")
