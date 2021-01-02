@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 2.2.3
+
+### Bug fixes
+
 ## Version 2.2.2
 
 ### Breaking changes
