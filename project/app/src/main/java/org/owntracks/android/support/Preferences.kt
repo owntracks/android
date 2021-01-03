@@ -851,6 +851,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     companion object {
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
+        const val EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER = "useAospLocationProvider"
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
         const val REVERSE_GEOCODE_PROVIDER_GOOGLE = "Google"
         const val REVERSE_GEOCODE_PROVIDER_OPENCAGE = "OpenCage"
