@@ -13,7 +13,7 @@ import org.junit.Test
 class TestOpenCageGeocoder {
     @Test
     fun testResultIsDeserializedCorrectly() {
-        val openCageJSON = this.javaClass.getResource("/opencageResult.json")?.readText()
+        val openCageJSON = this.javaClass.getResource("/opencageResult.json")!!.readText()
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
