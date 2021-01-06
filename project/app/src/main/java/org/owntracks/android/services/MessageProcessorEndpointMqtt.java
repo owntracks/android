@@ -33,6 +33,7 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -286,6 +289,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectOptions.setUserName(preferences.getUsername());
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
+
         connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
         InputStream clientCaInputStream = null;
         InputStream clientCertInputStream = null;
@@ -298,8 +302,24 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
                 if (tlsCaCrt.length() > 0) {
                     try {
-                         clientCaInputStream= applicationContext.openFileInput(tlsCaCrt);
+                        clientCaInputStream = applicationContext.openFileInput(tlsCaCrt);
                         socketFactoryOptions.withCaInputStream(clientCaInputStream);
+
+                        /* The default for paho is to validate hostnames as per the HTTPS spec. However, this causes
+                        a bit of a breakage for some users using self-signed certificates, where the verification of
+                        the hostname is unnecessary under certain circumstances. Specifically when the fingerprint of
+                        the server leaf certificate is the same as the certificate supplied as the CA (as would be the
+                        case using self-signed certs.
+
+                        So we turn off HTTPS behaviour and supply our own hostnameverifier that knows about the self-signed
+                        case.
+                         */
+
+                        connectOptions.setHttpsHostnameVerificationEnabled(false);
+                        try (FileInputStream caFileInputStream = applicationContext.openFileInput(tlsCaCrt)) {
+                            X509Certificate ca = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(caFileInputStream);
+                            connectOptions.setSSLHostnameVerifier(new MqttHostnameVerifier(ca));
+                        }
                     } catch (FileNotFoundException e) {
                         Timber.e(e);
                     }
