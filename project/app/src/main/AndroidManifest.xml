@@ -129,6 +129,18 @@
                     android:pathPattern=".*\\..*\\..*\\.otrc"
                     android:scheme="content" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host=""
+                    android:path="/config"
+                    android:scheme="owntracks"
+                    tools:ignore="AppLinkUrlError" />
+            </intent-filter>
             <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
