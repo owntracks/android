@@ -207,6 +207,7 @@ dependencies {
     androidTestImplementation("com.schibsted.spain:barista:3.7.0") {
         exclude("org.jetbrains.kotlin")
     }
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
 
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")

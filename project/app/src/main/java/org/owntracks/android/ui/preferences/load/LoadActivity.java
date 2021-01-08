@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesLoadBinding;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.Parser;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import java.io.BufferedReader;
@@ -27,10 +28,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import timber.log.Timber;
 
 @SuppressLint("GoogleAppIndexingApiWarning")
@@ -163,6 +171,35 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 if (configQueryParam.size() == 1) {
                     byte[] config = Base64.decode(configQueryParam.get(0), Base64.DEFAULT);
                     r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(config)));
+                } else if (urlQueryParam.size() == 1) {
+                    URL remoteConfigUrl = new URL(urlQueryParam.get(0));
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(remoteConfigUrl)
+                            .build();
+
+                    client.newCall(request).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            somethingException(new Exception("Failure fetching config from remote URL", e));
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            try (ResponseBody responseBody = response.body()) {
+                                if (!response.isSuccessful()) {
+                                    somethingException(new IOException("Unexpected code " + response));
+                                    return;
+                                }
+
+                                binding.effectiveConfiguration.setText(viewModel.setConfiguration(responseBody.string()));
+                                showSaveButton();
+                            } catch (Parser.EncryptionException e) {
+                                somethingException(e);
+                            }
+                        }
+                    });
+                    return;
                 } else {
                     throw new IOException("Invalid config URL");
                 }
@@ -194,11 +231,14 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Timber.e(e, "load exception");
-            finish();
-            Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
+            somethingException(e);
         }
+    }
 
+    private void somethingException(Exception e) {
+        Timber.e(e, "load exception");
+        finish();
+        Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
     }
 
     @Override
