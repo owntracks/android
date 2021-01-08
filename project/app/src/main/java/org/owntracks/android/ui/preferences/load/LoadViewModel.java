@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
+import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
@@ -39,8 +40,13 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
     }
 
     public String setConfiguration(String json) throws IOException, Parser.EncryptionException {
-        this.configuration = (MessageConfiguration) parser.fromJson(json.getBytes());
-        return parser.toJsonPlainPretty(this.configuration);
+        MessageBase message = parser.fromJson(json.getBytes());
+        if (message instanceof MessageConfiguration) {
+            this.configuration = (MessageConfiguration) parser.fromJson(json.getBytes());
+            return parser.toJsonPlainPretty(this.configuration);
+        } else {
+            throw new IOException("Message is not a valid configuration message");
+        }
     }
 
     public void saveConfiguration() {

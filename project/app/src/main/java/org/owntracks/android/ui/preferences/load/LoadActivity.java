@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -21,9 +22,12 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -45,7 +49,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
         setHasEventBus(false);
         setSupportToolbar(binding.toolbar, true, false);
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_load);
         }
 
@@ -60,7 +64,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     }
 
     private void tintMenu() {
-        if(saveButton != null) {
+        if (saveButton != null) {
             saveButton.setEnabled(viewModel.hasConfiguration());
             saveButton.setVisible(viewModel.hasConfiguration());
         }
@@ -80,8 +84,9 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         }
 
     }
+
     private void setHasBack(boolean hasBackArrow) {
-        if(getSupportActionBar() != null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(hasBackArrow);
     }
 
@@ -95,7 +100,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     }
 
     private void handleIntent(@Nullable Intent intent) {
-        if(intent == null) {
+        if (intent == null) {
             Timber.e("no intent provided");
             return;
         }
@@ -142,7 +147,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         }
     }
 
-    private void extractPreferences(Uri uri){
+    private void extractPreferences(Uri uri) {
         try {
             BufferedReader r;
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
@@ -150,11 +155,24 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
                 Timber.v("using file:// uri");
                 r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
-            } else {
+            } else if ("owntracks".equals(uri.getScheme()) && "/config".equals(uri.getPath())) {
+                Timber.v("Importing config using owntracks: scheme");
+
+                List<String> urlQueryParam = uri.getQueryParameters("url");
+                List<String> configQueryParam = uri.getQueryParameters("inline");
+                if (configQueryParam.size() == 1) {
+                    byte[] config = Base64.decode(configQueryParam.get(0), Base64.DEFAULT);
+                    r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(config)));
+                } else {
+                    throw new IOException("Invalid config URL");
+                }
+            } else if ("content".equals(uri.getScheme())) {
                 Timber.v("using content:// uri");
                 InputStream stream = getContentResolver().openInputStream(uri);
 
                 r = new BufferedReader(new InputStreamReader(stream));
+            } else {
+                throw new IOException("Invalid config URL");
             }
 
             StringBuilder total = new StringBuilder();
@@ -171,15 +189,15 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             Timber.e(e, "parse exception ");
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
             finish();
-        } catch(OutOfMemoryError e){
+        } catch (OutOfMemoryError e) {
             Timber.e(e, "load exception oom");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
-        } catch(Exception e) {
+        } catch (Exception e) {
             Timber.e(e, "load exception");
             finish();
             Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
-        } 
+        }
 
     }
 
