@@ -151,7 +151,7 @@ class PreferencesActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky(attempts = 3)
     fun settingSimpleHTTPConfigSettingsCanBeExported() {
         clickOn(R.string.preferencesServer)
         clickOn(R.string.mode_heading)
