@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.load.LoadActivity
+import java.io.File
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -42,7 +44,7 @@ class LoadActivityTests {
     }
 
 
-    val expectedConfig = """
+    private val expectedConfig = """
 {
   "_type" : "configuration",
   "waypoints" : [ {
@@ -99,7 +101,8 @@ class LoadActivityTests {
   "username" : "username",
   "ws" : false
 }""".trimIndent()
-    val servedConfig = "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"work\",\"lat\":51.5,\"lon\":-0.02,\"rad\":150,\"tst\":1505910709000},{\"_type\":\"waypoint\",\"desc\":\"home\",\"lat\":53.6,\"lon\":-1.5,\"rad\":100,\"tst\":1558351273}],\"auth\":true,\"autostartOnBoot\":true,\"cleanSession\":false,\"clientId\":\"emulator\",\"cmd\":true,\"debugLog\":true,\"deviceId\":\"testdevice\",\"fusedRegionDetection\":true,\"geocodeEnabled\":true,\"host\":\"testhost.example.com\",\"ignoreInaccurateLocations\":150,\"ignoreStaleLocations\":0,\"keepalive\":900,\"locatorDisplacement\":5,\"locatorInterval\":60,\"locatorPriority\":2,\"mode\":0,\"monitoring\":1,\"moveModeLocatorInterval\":10,\"mqttProtocolLevel\":3,\"notificationHigherPriority\":false,\"notificationLocation\":true,\"opencageApiKey\":\"\",\"password\":\"password\",\"ping\":30,\"port\":1883,\"pubExtendedData\":true,\"pubQos\":1,\"pubRetain\":true,\"pubTopicBase\":\"owntracks/%u/%d\",\"remoteConfiguration\":true,\"sub\":true,\"subQos\":2,\"subTopic\":\"owntracks/+/+\",\"tls\":false,\"usePassword\":true,\"username\":\"username\",\"ws\":false}"
+
+    private val servedConfig = "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"work\",\"lat\":51.5,\"lon\":-0.02,\"rad\":150,\"tst\":1505910709000},{\"_type\":\"waypoint\",\"desc\":\"home\",\"lat\":53.6,\"lon\":-1.5,\"rad\":100,\"tst\":1558351273}],\"auth\":true,\"autostartOnBoot\":true,\"cleanSession\":false,\"clientId\":\"emulator\",\"cmd\":true,\"debugLog\":true,\"deviceId\":\"testdevice\",\"fusedRegionDetection\":true,\"geocodeEnabled\":true,\"host\":\"testhost.example.com\",\"ignoreInaccurateLocations\":150,\"ignoreStaleLocations\":0,\"keepalive\":900,\"locatorDisplacement\":5,\"locatorInterval\":60,\"locatorPriority\":2,\"mode\":0,\"monitoring\":1,\"moveModeLocatorInterval\":10,\"mqttProtocolLevel\":3,\"notificationHigherPriority\":false,\"notificationLocation\":true,\"opencageApiKey\":\"\",\"password\":\"password\",\"ping\":30,\"port\":1883,\"pubExtendedData\":true,\"pubQos\":1,\"pubRetain\":true,\"pubTopicBase\":\"owntracks/%u/%d\",\"remoteConfiguration\":true,\"sub\":true,\"subQos\":2,\"subTopic\":\"owntracks/+/+\",\"tls\":false,\"usePassword\":true,\"username\":\"username\",\"ws\":false}"
 
     @Test
     @AllowFlaky(attempts = 1)
@@ -116,6 +119,15 @@ class LoadActivityTests {
 
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")))
         sleep(1000)
+        assertContains(R.id.effectiveConfiguration, expectedConfig)
+    }
+
+    @Test
+    fun loadActivityCanLoadConfigFromFileURL() {
+        val dir = InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)
+        val localConfig = File(dir, "espresso-testconfig.otrc")
+        localConfig.writeText(servedConfig)
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("file://${localConfig.absoluteFile}")))
         assertContains(R.id.effectiveConfiguration, expectedConfig)
     }
 
