@@ -2,9 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/close"
+        android:icon="@drawable/ic_baseline_close_24"
+        android:title="@string/material_drawer_close"
+        android:visible="false"
+        android:orderInCategory="97"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/save"
         android:icon="@drawable/ic_baseline_done_24"
         android:title="@string/save"
+        android:visible="false"
         android:orderInCategory="97"
         app:showAsAction="ifRoom"/>
 
