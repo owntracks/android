@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Observer;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
@@ -61,6 +63,10 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             getSupportActionBar().setTitle(R.string.title_activity_load);
         }
 
+        viewModel.formattedEffectiveConfiguration().observe(this, (Observer<String>) configuration -> {
+            ((TextView)findViewById(R.id.effectiveConfiguration)).setText(configuration);
+        });
+
         handleIntent(getIntent());
     }
 
@@ -69,13 +75,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         super.onNewIntent(intent);
         setHasBack(false);
         handleIntent(intent);
-    }
-
-    private void tintMenu() {
-        if (saveButton != null) {
-            saveButton.setEnabled(viewModel.hasConfiguration());
-            saveButton.setVisible(viewModel.hasConfiguration());
-        }
     }
 
     @Override
@@ -103,7 +102,10 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         getMenuInflater().inflate(R.menu.activity_load, menu);
 
         saveButton = menu.findItem(R.id.save);
-        tintMenu();
+        viewModel.hasConfiguration().observe(this, (Observer<Boolean>) aBoolean -> {
+            saveButton.setEnabled(aBoolean);
+            saveButton.setVisible(aBoolean);
+        });
         return true;
     }
 
@@ -112,7 +114,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             Timber.e("no intent provided");
             return;
         }
-
 
         setHasBack(navigator.getExtrasBundle(getIntent()).getBoolean(FLAG_IN_APP, false));
         Timber.v("inApp %s", intent.getBooleanExtra(FLAG_IN_APP, false));
@@ -181,24 +182,24 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                     client.newCall(request).enqueue(new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
-                            somethingException(new Exception("Failure fetching config from remote URL", e));
+                            importFailureException(new Exception("Failure fetching config from remote URL", e), getString(R.string.errorPreferencesImportFailed));
                         }
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             try (ResponseBody responseBody = response.body()) {
                                 if (!response.isSuccessful()) {
-                                    somethingException(new IOException("Unexpected code " + response));
+                                    importFailureException(new IOException(String.format("Unexpected status code: %s", response)), getString(R.string.errorPreferencesImportFailed));
                                     return;
                                 }
 
-                                binding.effectiveConfiguration.setText(viewModel.setConfiguration(responseBody.string()));
-                                showSaveButton();
+                                viewModel.setConfiguration(responseBody.string());
                             } catch (Parser.EncryptionException e) {
-                                somethingException(e);
+                                importFailureException(e, getString(R.string.errorPreferencesImportFailed));
                             }
                         }
                     });
+                    // This is async, so result handled on the callback
                     return;
                 } else {
                     throw new IOException("Invalid config URL");
@@ -206,7 +207,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             } else if ("content".equals(uri.getScheme())) {
                 Timber.v("using content:// uri");
                 InputStream stream = getContentResolver().openInputStream(uri);
-
                 r = new BufferedReader(new InputStreamReader(stream));
             } else {
                 throw new IOException("Invalid config URL");
@@ -219,39 +219,28 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 total.append(content);
             }
 
-            binding.effectiveConfiguration.setText(viewModel.setConfiguration(total.toString()));
-            showSaveButton();
-
+            viewModel.setConfiguration(total.toString());
         } catch (JsonParseException e) {
-            Timber.e(e, "parse exception ");
-            Toast.makeText(this, getString(R.string.errorPreferencesImportFailedParseException), Toast.LENGTH_SHORT).show();
-            finish();
+            importFailureException(e, getString(R.string.errorPreferencesImportFailedParseException));
         } catch (OutOfMemoryError e) {
-            Timber.e(e, "load exception oom");
-            finish();
-            Toast.makeText(this, getString(R.string.errorPreferencesImportFailedMemory), Toast.LENGTH_SHORT).show();
+            importFailureException(e, getString(R.string.errorPreferencesImportFailedMemory));
         } catch (Exception e) {
-            somethingException(e);
+            importFailureException(e, getString(R.string.errorPreferencesImportFailed));
         }
     }
 
-    private void somethingException(Exception e) {
-        Timber.e(e, "load exception");
+    private void importFailureException(Throwable throwable, String toastContent) {
+        Timber.e(throwable);
         finish();
-        Toast.makeText(this, getString(R.string.errorPreferencesImportFailed), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, toastContent, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showFinishDialog() {
         (new AlertDialog.Builder(this)
-                .setTitle("Import successfull")
+                .setTitle("Import successful")
                 .setMessage("It is recommended to restart the app to apply all imported values")
                 .setPositiveButton("Restart", (dialog, which) -> eventBus.post(new Events.RestartApp()))
                 .setNegativeButton("Cancel", (dialog, which) -> finish())).show();
-    }
-
-    @Override
-    public void showSaveButton() {
-        tintMenu();
     }
 }
