@@ -10,9 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import com.fasterxml.jackson.core.JsonParseException;
-
-import org.owntracks.android.R;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
@@ -59,7 +56,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         this.preferences = preferences;
         this.parser = parser;
         this.waypointsRepo = waypointsRepo;
-        this.context=context;
+        this.context = context;
     }
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull LoadMvvm.View view) {
@@ -118,6 +115,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                 List<String> urlQueryParam = uri.getQueryParameters("url");
                 List<String> configQueryParam = uri.getQueryParameters("inline");
                 if (configQueryParam.size() == 1) {
+
                     byte[] config = Base64.decode(configQueryParam.get(0), Base64.DEFAULT);
                     r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(config)));
                 } else if (urlQueryParam.size() == 1) {
@@ -140,9 +138,8 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                                     importFailure.postValue(new IOException(String.format("Unexpected status code: %s", response)));
                                     return;
                                 }
-                                Thread.sleep(5000);
-                                setConfiguration(responseBody.string());
-                            } catch (Parser.EncryptionException | InterruptedException e) {
+                                setConfiguration(responseBody != null ? responseBody.string() : "");
+                            } catch (Parser.EncryptionException e) {
                                 importFailure.postValue(e);
                             }
                         }
@@ -167,7 +164,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                 total.append(content);
             }
             setConfiguration(total.toString());
-        } catch (OutOfMemoryError | IOException | Parser.EncryptionException e) {
+        } catch (OutOfMemoryError | IOException | Parser.EncryptionException | IllegalArgumentException e) {
             importFailure.postValue(e);
         }
     }

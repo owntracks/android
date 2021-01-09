@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
+import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
@@ -109,6 +111,26 @@ class LoadActivityTests {
     fun loadActivityCanLoadConfigFromOwntracksInlineConfigURL() {
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJ3YXlwb2ludHMiOlt7Il90eXBlIjoid2F5cG9pbnQiLCJkZXNjIjoid29yayIsImxhdCI6NTEuNSwibG9uIjotMC4wMiwicmFkIjoxNTAsInRzdCI6MTUwNTkxMDcwOTAwMH0seyJfdHlwZSI6IndheXBvaW50IiwiZGVzYyI6ImhvbWUiLCJsYXQiOjUzLjYsImxvbiI6LTEuNSwicmFkIjoxMDAsInRzdCI6MTU1ODM1MTI3M31dLCJhdXRoIjp0cnVlLCJhdXRvc3RhcnRPbkJvb3QiOnRydWUsImNsZWFuU2Vzc2lvbiI6ZmFsc2UsImNsaWVudElkIjoiZW11bGF0b3IiLCJjbWQiOnRydWUsImRlYnVnTG9nIjp0cnVlLCJkZXZpY2VJZCI6InRlc3RkZXZpY2UiLCJmdXNlZFJlZ2lvbkRldGVjdGlvbiI6dHJ1ZSwiZ2VvY29kZUVuYWJsZWQiOnRydWUsImhvc3QiOiJ0ZXN0aG9zdC5leGFtcGxlLmNvbSIsImlnbm9yZUluYWNjdXJhdGVMb2NhdGlvbnMiOjE1MCwiaWdub3JlU3RhbGVMb2NhdGlvbnMiOjAsImtlZXBhbGl2ZSI6OTAwLCJsb2NhdG9yRGlzcGxhY2VtZW50Ijo1LCJsb2NhdG9ySW50ZXJ2YWwiOjYwLCJsb2NhdG9yUHJpb3JpdHkiOjIsIm1vZGUiOjAsIm1vbml0b3JpbmciOjEsIm1vdmVNb2RlTG9jYXRvckludGVydmFsIjoxMCwibXF0dFByb3RvY29sTGV2ZWwiOjMsIm5vdGlmaWNhdGlvbkhpZ2hlclByaW9yaXR5IjpmYWxzZSwibm90aWZpY2F0aW9uTG9jYXRpb24iOnRydWUsIm9wZW5jYWdlQXBpS2V5IjoiIiwicGFzc3dvcmQiOiJwYXNzd29yZCIsInBpbmciOjMwLCJwb3J0IjoxODgzLCJwdWJFeHRlbmRlZERhdGEiOnRydWUsInB1YlFvcyI6MSwicHViUmV0YWluIjp0cnVlLCJwdWJUb3BpY0Jhc2UiOiJvd250cmFja3MvJXUvJWQiLCJyZW1vdGVDb25maWd1cmF0aW9uIjp0cnVlLCJzdWIiOnRydWUsInN1YlFvcyI6Miwic3ViVG9waWMiOiJvd250cmFja3MvKy8rIiwidGxzIjpmYWxzZSwidXNlUGFzc3dvcmQiOnRydWUsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ3cyI6ZmFsc2V9Cg==")))
         assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(R.id.save)
+        assertDisplayed(R.id.close)
+    }
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun loadActivityShowsErrorWhenLoadingFromInlineConfigURLContaninigInvalidJSON() {
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=e30k")))
+        assertContains(R.id.effectiveConfiguration,R.string.errorPreferencesImportFailed)
+        assertNotExist(R.id.save)
+        assertDisplayed(R.id.close)
+
+    }
+
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun loadActivityShowsErrorWhenLoadingFromInlineConfigURLContaninigInvalidBase64() {
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa")))
+        assertContains(R.id.effectiveConfiguration, R.string.errorPreferencesImportFailed)
+        assertNotExist(R.id.save)
+        assertDisplayed(R.id.close)
     }
 
     @Test
@@ -120,6 +142,21 @@ class LoadActivityTests {
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")))
         sleep(1000)
         assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(R.id.save)
+        assertDisplayed(R.id.close)
+    }
+
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun loadActivityShowsErrorTryingToLoadNotFoundRemoteUrl() {
+        mockWebServer.start(8080)
+        mockWebServer.dispatcher = MockWebserverConfigDispatcher(servedConfig)
+
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound")))
+        sleep(1000)
+        assertContains(R.id.effectiveConfiguration, "Unexpected status code")
+        assertNotExist(R.id.save)
+        assertDisplayed(R.id.close)
     }
 
     @Test
@@ -129,6 +166,8 @@ class LoadActivityTests {
         localConfig.writeText(servedConfig)
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("file://${localConfig.absoluteFile}")))
         assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(R.id.save)
+        assertDisplayed(R.id.close)
     }
 
     class MockWebserverConfigDispatcher(private val config: String) : Dispatcher() {
