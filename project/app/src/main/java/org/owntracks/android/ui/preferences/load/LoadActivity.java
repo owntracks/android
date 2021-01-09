@@ -53,7 +53,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                     ((TextView) findViewById(R.id.effectiveConfiguration)).setText(errorMessage);
                     findViewById(R.id.spinner).setVisibility(View.INVISIBLE);
                     ((TextView) findViewById(R.id.effectiveConfiguration)).setVisibility(View.VISIBLE);
-//                    findViewById(R.id.close).setVisibility(View.VISIBLE);
                 }
         );
 
@@ -74,7 +73,6 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                 viewModel.saveConfiguration();
                 return true;
             case R.id.close:
-                return true;
             case android.R.id.home:
                 finish();
                 return true;
@@ -92,9 +90,15 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_load, menu);
+        MenuItem saveButton = menu.findItem(R.id.save);
+        MenuItem closeButton = menu.findItem(R.id.close);
         viewModel.formattedEffectiveConfiguration().observe(this, (Observer<String>) configuration -> {
-            findViewById(R.id.save).setVisibility(View.VISIBLE);
-            findViewById(R.id.close).setVisibility(View.VISIBLE);
+            saveButton.setVisible(true);
+            closeButton.setVisible(true);
+        });
+        viewModel.importFailure().observe(this,(Observer<Throwable>) throwable -> {
+            saveButton.setVisible(false);
+            closeButton.setVisible(true);
         });
         return true;
     }
