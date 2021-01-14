@@ -1,11 +1,10 @@
 package org.owntracks.android.ui.preferences.load;
 
-import android.net.Uri;
-
-import androidx.lifecycle.MutableLiveData;
 
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+
+import java.net.URI;
 
 public interface LoadMvvm {
 
@@ -14,12 +13,14 @@ public interface LoadMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        void extractPreferences(Uri uri);
+        void extractPreferences(URI uri);
+
+        void extractPreferences(byte[] content);
 
         void saveConfiguration();
 
-        MutableLiveData<Throwable> importFailure();
+        String getDisplayedConfiguration();
 
-        MutableLiveData<String> formattedEffectiveConfiguration();
+        ImportStatus getConfigurationImportStatus();
     }
 }
