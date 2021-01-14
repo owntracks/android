@@ -1,17 +1,15 @@
 package org.owntracks.android.ui.preferences.load;
 
 import android.content.ContentResolver;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.MutableLiveData;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.net.URLEncodedUtils;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageConfiguration;
@@ -20,12 +18,13 @@ import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -46,17 +45,14 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
     private final WaypointsRepo waypointsRepo;
 
     private MessageConfiguration configuration;
-    private final MutableLiveData<String> formattedEffectiveConfiguration = new MutableLiveData<>();
-    private final MutableLiveData<Throwable> importFailure = new MutableLiveData<>();
-    private Context context;
-
+    private String displayedConfiguration;
+    private ImportStatus importStatus = ImportStatus.LOADING;
 
     @Inject
-    public LoadViewModel(@AppContext Context context, Preferences preferences, Parser parser, WaypointsRepo waypointsRepo) {
+    public LoadViewModel(Preferences preferences, Parser parser, WaypointsRepo waypointsRepo) {
         this.preferences = preferences;
         this.parser = parser;
         this.waypointsRepo = waypointsRepo;
-        this.context = context;
     }
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull LoadMvvm.View view) {
@@ -74,7 +70,9 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                 Timber.e(e);
                 prettyConfiguration = "Unable to parse configuration";
             }
-            formattedEffectiveConfiguration.postValue(prettyConfiguration);
+            displayedConfiguration = prettyConfiguration;
+            importStatus = ImportStatus.SUCCESS;
+            notifyChange();
         } else {
             throw new IOException("Message is not a valid configuration message");
         }
@@ -90,34 +88,49 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         getView().showFinishDialog();
     }
 
-    @Override
-    public MutableLiveData<String> formattedEffectiveConfiguration() {
-        return formattedEffectiveConfiguration;
-    }
 
     @Override
-    public MutableLiveData<Throwable> importFailure() {
-        return importFailure;
-    }
-
-    @Override
-    public void extractPreferences(Uri uri) {
+    public void extractPreferences(byte[] content) {
         try {
-            BufferedReader r;
+            setConfiguration(new String(content, StandardCharsets.UTF_8));
+        } catch (IOException | Parser.EncryptionException e) {
+            configurationImportFailed(e);
+        }
+    }
+
+    @Override
+    public void extractPreferences(URI uri) {
+        try {
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
                 // Note: left here to avoid breaking compatibility.  May be removed
                 // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
                 Timber.v("using file:// uri");
-                r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
+                BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
+                StringBuilder total = new StringBuilder();
+
+                String content;
+                while ((content = r.readLine()) != null) {
+                    total.append(content);
+                }
+                setConfiguration(total.toString());
             } else if ("owntracks".equals(uri.getScheme()) && "/config".equals(uri.getPath())) {
                 Timber.v("Importing config using owntracks: scheme");
 
-                List<String> urlQueryParam = uri.getQueryParameters("url");
-                List<String> configQueryParam = uri.getQueryParameters("inline");
+                List<NameValuePair> queryParams = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8);
+                List<String> urlQueryParam = new ArrayList<>();
+                List<String> configQueryParam = new ArrayList<>();
+                for (NameValuePair queryParam : queryParams) {
+                    if (queryParam.getName().equals("url")) {
+                        urlQueryParam.add(queryParam.getValue());
+                    }
+                    if (queryParam.getName().equals("inline")) {
+                        configQueryParam.add(queryParam.getValue());
+                    }
+                }
                 if (configQueryParam.size() == 1) {
 
-                    byte[] config = Base64.decode(configQueryParam.get(0), Base64.DEFAULT);
-                    r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(config)));
+                    byte[] config = new Base64().decodeBase64(configQueryParam.get(0).getBytes());
+                    setConfiguration(new String(config, StandardCharsets.UTF_8));
                 } else if (urlQueryParam.size() == 1) {
                     URL remoteConfigUrl = new URL(urlQueryParam.get(0));
                     OkHttpClient client = new OkHttpClient();
@@ -128,44 +141,50 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                     client.newCall(request).enqueue(new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
-                            importFailure.postValue(new Exception("Failure fetching config from remote URL", e));
+                            configurationImportFailed(new Exception("Failure fetching config from remote URL", e));
                         }
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             try (ResponseBody responseBody = response.body()) {
                                 if (!response.isSuccessful()) {
-                                    importFailure.postValue(new IOException(String.format("Unexpected status code: %s", response)));
+                                    configurationImportFailed(new IOException(String.format("Unexpected status code: %s", response)));
                                     return;
                                 }
                                 setConfiguration(responseBody != null ? responseBody.string() : "");
                             } catch (Parser.EncryptionException e) {
-                                importFailure.postValue(e);
+                                configurationImportFailed(e);
                             }
                         }
                     });
                     // This is async, so result handled on the callback
-                    return;
                 } else {
                     throw new IOException("Invalid config URL");
                 }
-            } else if ("content".equals(uri.getScheme())) {
-                Timber.v("using content:// uri");
-                InputStream stream = this.context.getContentResolver().openInputStream(uri);
-                r = new BufferedReader(new InputStreamReader(stream));
             } else {
                 throw new IOException("Invalid config URL");
             }
 
-            StringBuilder total = new StringBuilder();
-
-            String content;
-            while ((content = r.readLine()) != null) {
-                total.append(content);
-            }
-            setConfiguration(total.toString());
         } catch (OutOfMemoryError | IOException | Parser.EncryptionException | IllegalArgumentException e) {
-            importFailure.postValue(e);
+            configurationImportFailed(e);
         }
     }
+
+    @Override
+    public String getDisplayedConfiguration() {
+        return displayedConfiguration;
+    }
+
+    @Override
+    public ImportStatus getConfigurationImportStatus() {
+        return importStatus;
+    }
+
+    private void configurationImportFailed(Throwable e) {
+        Timber.e(e);
+        displayedConfiguration = String.format("Import failed: %s",e.getMessage());
+        importStatus = ImportStatus.FAILED;
+        notifyChange();
+    }
 }
+

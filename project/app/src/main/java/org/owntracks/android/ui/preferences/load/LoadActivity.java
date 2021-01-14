@@ -6,19 +6,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.Observer;
+import androidx.databinding.Observable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesLoadBinding;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
@@ -42,20 +45,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_load);
         }
-
-        viewModel.formattedEffectiveConfiguration().observe(this, (Observer<String>) configuration -> {
-            ((TextView) findViewById(R.id.effectiveConfiguration)).setText(configuration);
-            findViewById(R.id.spinner).setVisibility(View.INVISIBLE);
-            ((TextView) findViewById(R.id.effectiveConfiguration)).setVisibility(View.VISIBLE);
-        });
-        viewModel.importFailure().observe(this, (Observer<Throwable>) exception -> {
-                    String errorMessage = String.format("%s\n%s", getString(R.string.errorPreferencesImportFailed), exception.getMessage());
-                    ((TextView) findViewById(R.id.effectiveConfiguration)).setText(errorMessage);
-                    findViewById(R.id.spinner).setVisibility(View.INVISIBLE);
-                    ((TextView) findViewById(R.id.effectiveConfiguration)).setVisibility(View.VISIBLE);
-                }
-        );
-
+        binding.getVm().addOnPropertyChangedCallback(propertyChangedCallback);
         handleIntent(getIntent());
     }
 
@@ -90,18 +80,22 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_load, menu);
-        MenuItem saveButton = menu.findItem(R.id.save);
-        MenuItem closeButton = menu.findItem(R.id.close);
-        viewModel.formattedEffectiveConfiguration().observe(this, (Observer<String>) configuration -> {
-            saveButton.setVisible(true);
-            closeButton.setVisible(true);
-        });
-        viewModel.importFailure().observe(this,(Observer<Throwable>) throwable -> {
-            saveButton.setVisible(false);
-            closeButton.setVisible(true);
-        });
         return true;
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.close).setVisible(viewModel.getConfigurationImportStatus() != ImportStatus.LOADING);
+        menu.findItem(R.id.save).setVisible(viewModel.getConfigurationImportStatus() == ImportStatus.SUCCESS);
+        return true;
+    }
+
+    private final Observable.OnPropertyChangedCallback propertyChangedCallback = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable observable, int i) {
+            invalidateOptionsMenu();
+        }
+    };
 
     private void handleIntent(@Nullable Intent intent) {
         if (intent == null) {
@@ -119,7 +113,11 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
             Uri uri = intent.getData();
             Timber.v("uri: %s", uri);
             if (uri != null) {
-                viewModel.extractPreferences(uri);
+                try {
+                    viewModel.extractPreferences(new URI(uri.toString()));
+                } catch (URISyntaxException e) {
+                    Timber.e(e, "Error parsing intent URI");
+                }
             }
         } else {
             Intent pickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -143,13 +141,19 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         Timber.v("RequestCode: %s resultCode: %s", requestCode, resultCode);
         if (requestCode == LoadActivity.REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                viewModel.extractPreferences(resultIntent.getData());
+                try {
+                    InputStream stream = getContentResolver().openInputStream(resultIntent.getData());
+                    byte[] output = new byte[stream.available()];
+                    stream.read(output);
+                    viewModel.extractPreferences(output);
+                } catch (IOException e) {
+                    Timber.e(e, "Error reading content");
+                }
             } else {
                 finish();
             }
         }
     }
-
 
     @Override
     public void showFinishDialog() {
