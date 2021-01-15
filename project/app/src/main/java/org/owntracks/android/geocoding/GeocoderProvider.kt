@@ -37,7 +37,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
     }
 
     fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
-        if (messageLocation.hasGeocoder()) {
+        if (!messageLocation.hasGeocoder()) {
             backgroundService.onGeocodingProviderResult(messageLocation)
             return
         }
