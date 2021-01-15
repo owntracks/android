@@ -49,7 +49,9 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     @set:JsonIgnore
     @get:JsonIgnore
     var geocode: String? = null
-        get() = field ?: fallbackGeocode
+        get() {
+            return field ?: fallbackGeocode
+        }
         set(value) {
             field = value
             notifyContactPropertyChanged()
@@ -69,7 +71,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     private fun notifyContactPropertyChanged() {
-        if (_contact != null && _contact!!.get() != null) _contact!!.get()!!.notifyMessageLocationPropertyChanged()
+        _contact?.get()?.notifyMessageLocationPropertyChanged()
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

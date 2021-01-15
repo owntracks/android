@@ -65,7 +65,7 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     public void notifyMessageLocationPropertyChanged() {
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.messageLocation);
-        this.notifyPropertyChanged(BR.fusedLocationDate);
+        this.notifyPropertyChanged(BR.geocodedLocation);
         this.notifyPropertyChanged(BR.fusedLocationAccuracy);
         this.notifyPropertyChanged(BR.tst);
         this.notifyPropertyChanged(BR.trackerId);
@@ -93,13 +93,13 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     }
 
     @Bindable
-    public long getFusedLocationDate() {
-        return this.hasLocation() ? messageLocation.getTimestamp() : 0;
+    public String getFusedLocationAccuracy() {
+        return Integer.toString(this.hasLocation() ? messageLocation.getAccuracy() : 0);
     }
 
     @Bindable
-    public String getFusedLocationAccuracy() {
-        return Integer.toString(this.hasLocation() ? messageLocation.getAccuracy() : 0);
+    public String getGeocodedLocation() {
+        return this.messageLocation.getGeocode();
     }
 
     public boolean hasLocation() {
