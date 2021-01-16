@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Address
 import org.owntracks.android.injection.qualifier.AppContext
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.*
 
 class GoogleGeocoder internal constructor(@AppContext context: Context?) : CachingGeocoder() {
@@ -14,13 +15,13 @@ class GoogleGeocoder internal constructor(@AppContext context: Context?) : Cachi
             Timber.e("geocoder is not present")
             return null
         }
-        return this.cache[Pair(latitude, longitude)]
+        return super.reverse(latitude, longitude)
     }
 
-    override fun doLookup(latitude: Double, longitude: Double): String? {
+    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): String? {
         val addresses: List<Address>?
         return try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            addresses = geocoder.getFromLocation(latitude.toDouble(), longitude.toDouble(), 1)
             if (addresses != null && addresses.isNotEmpty()) {
                 val g = StringBuilder()
                 val a = addresses[0]

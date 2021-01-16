@@ -43,7 +43,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode=result
+            messageLocation.geocode = result
             backgroundService.onGeocodingProviderResult(messageLocation)
         }
     }
@@ -56,7 +56,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         textView.text = messageLocation.fallbackGeocode // will print lat : lon until GeocodingProvider is available
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode=result
+            messageLocation.geocode = result
             textView.text = messageLocation.geocode
         }
     }

@@ -8,10 +8,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import timber.log.Timber
+import java.math.BigDecimal
 
 class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: String, private val httpClient: OkHttpClient = OkHttpClient()) : CachingGeocoder() {
     private val jsonMapper: ObjectMapper = ObjectMapper()
-    override fun doLookup(latitude: Double, longitude: Double): String? {
+    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): String? {
         val url = HttpUrl.Builder()
                 .scheme("http")
                 .host(OPENCAGE_HOST)
