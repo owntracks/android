@@ -38,7 +38,7 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     }
 
     public boolean setMessageLocation(MessageLocation messageLocation) {
-        if(tst >= messageLocation.getTimestamp())
+        if(tst > messageLocation.getTimestamp())
             return false;
 
         Timber.v("update contact:%s, tst:%s", id, messageLocation.getTimestamp());
