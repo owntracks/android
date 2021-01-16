@@ -2,8 +2,7 @@ package org.owntracks.android.ui.map
 
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.LatLng
 import org.owntracks.android.model.FusedContact
@@ -24,9 +23,9 @@ interface MapMvvm {
 
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
         val currentLocation: LatLng?
-
         @get:Bindable
         val activeContact: FusedContact?
+
         val contacts: Collection<FusedContact?>?
         fun onBottomSheetLongClick()
         fun onBottomSheetClick()
@@ -36,8 +35,9 @@ interface MapMvvm {
         fun hasLocation(): Boolean
         fun onMapReady()
         val mapLocationSource: LocationSource?
-        val onMapClickListener: OnMapClickListener?
-        val onMarkerClickListener: OnMarkerClickListener?
+        val onMapClickListener: GoogleMap.OnMapClickListener?
+        val onMarkerClickListener: GoogleMap.OnMarkerClickListener?
+        val onMapCameraMoveStartedListener: GoogleMap.OnCameraMoveStartedListener?
         val contact: LiveData<FusedContact?>?
         val bottomSheetHidden: LiveData<Boolean?>?
         val center: LiveData<LatLng?>?

@@ -438,6 +438,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         this.googleMap.setMyLocationEnabled(true);
         this.googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         this.googleMap.setOnMapClickListener(viewModel.getOnMapClickListener());
+        this.googleMap.setOnCameraMoveStartedListener(viewModel.getOnMapCameraMoveStartedListener());
         this.googleMap.setOnMarkerClickListener(viewModel.getOnMarkerClickListener());
         this.googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override

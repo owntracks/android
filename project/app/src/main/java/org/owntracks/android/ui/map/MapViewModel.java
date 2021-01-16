@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 @PerActivity
-public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View>, LocationSource, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
+public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm.ViewModel<MapMvvm.View>, LocationSource, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraMoveStartedListener {
     private final ContactsRepo contactsRepo;
     private final LocationProcessor locationProcessor;
     private FusedContact activeContact;
@@ -293,5 +293,17 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     @Override
     public void onBottomSheetLongClick() {
         setViewModeContact(activeContact.getId(), true);
+    }
+
+    @Override
+    public GoogleMap.OnCameraMoveStartedListener getOnMapCameraMoveStartedListener() {
+        return this;
+    }
+
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        if (reason == REASON_GESTURE) {
+            setViewModeFree();
+        }
     }
 }
