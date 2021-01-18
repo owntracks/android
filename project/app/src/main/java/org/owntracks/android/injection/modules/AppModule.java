@@ -39,6 +39,8 @@ public class AppModule {
 
     @Provides
     @PerApplication
-    protected LocationRepo provideLocationRepo(EventBus eventBus) { return new LocationRepo(eventBus); }
+    protected LocationRepo provideLocationRepo(EventBus eventBus) {
+        return new LocationRepo(eventBus);
+    }
 }
 

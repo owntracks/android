@@ -26,7 +26,6 @@ interface MapMvvm {
         @get:Bindable
         val activeContact: FusedContact?
 
-        val contacts: Collection<FusedContact?>?
         fun onBottomSheetLongClick()
         fun onBottomSheetClick()
         fun onMenuCenterDeviceClicked()

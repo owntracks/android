@@ -54,6 +54,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         }
         set(value) {
             field = value
+            hasGeocode = true
             notifyContactPropertyChanged()
         }
 
@@ -61,10 +62,11 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     internal val fallbackGeocode: String
         get() = "$latitude, $longitude"
 
-    @JsonIgnore
-    fun hasGeocoder(): Boolean {
-        return geocode != null
-    }
+
+    @get:JsonIgnore
+    var hasGeocode: Boolean = false
+        private set
+
 
     fun setContact(contact: FusedContact?) {
         _contact = WeakReference(contact)

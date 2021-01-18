@@ -199,6 +199,7 @@ dependencies {
     testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
     testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("android.arch.core:core-testing:1.1.1")
 
     androidTestImplementation("androidx.test.espresso:espresso-core:${espressoVersion}")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:${espressoVersion}")

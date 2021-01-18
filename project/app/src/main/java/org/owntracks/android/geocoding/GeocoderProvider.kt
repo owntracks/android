@@ -36,8 +36,18 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
     }
 
+    fun resolve(messageLocation: MessageLocation) {
+        if (messageLocation.hasGeocode) {
+            return
+        }
+        GlobalScope.launch {
+            val result = geocoderResolve(messageLocation)
+            messageLocation.geocode = result
+        }
+    }
+
     fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
-        if (!messageLocation.hasGeocoder()) {
+        if (messageLocation.hasGeocode) {
             backgroundService.onGeocodingProviderResult(messageLocation)
             return
         }
@@ -49,11 +59,11 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
     }
 
     fun resolve(messageLocation: MessageLocation, textView: TextView) {
-        if (!messageLocation.hasGeocoder()) {
+        if (messageLocation.hasGeocode) {
             textView.text = messageLocation.geocode
             return
         }
-        textView.text = messageLocation.fallbackGeocode // will print lat : lon until GeocodingProvider is available
+        textView.text = messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
             messageLocation.geocode = result
