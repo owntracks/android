@@ -26,7 +26,7 @@ public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMv
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasEventBus(false);
         bindAndAttachContentView(R.layout.ui_contacts, savedInstanceState);
         setSupportToolbar(binding.toolbar);
         setDrawer(binding.toolbar);

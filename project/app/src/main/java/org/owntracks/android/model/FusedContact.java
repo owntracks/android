@@ -107,7 +107,7 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     }
 
     public boolean hasLocation() {
-        return this.messageLocation != null;
+        return this.messageLocation.getValue() != null;
     }
 
     public boolean hasCard() {

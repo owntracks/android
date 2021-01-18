@@ -1,19 +1,14 @@
 package org.owntracks.android.ui.contacts;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.repos.ContactsRepo;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
 
@@ -28,7 +23,7 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
     private final ContactsRepo contactsRepo;
 
     @Inject
-    public ContactsViewModel(@AppContext Context context, ContactsRepo contactsRepo) {
+    public ContactsViewModel(ContactsRepo contactsRepo) {
         this.contactsRepo = contactsRepo;
     }
 
@@ -50,20 +45,4 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
         b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, c.getId());
         navigator.startActivity(MapActivity.class, b);
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(Events.FusedContactAdded c) {
-        //TODO: insert, sort
-        notifyChange();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(Events.FusedContactRemoved c) {
-        notifyChange();
-    }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(FusedContact c) {
-        notifyChange();
-    }
-
 }
