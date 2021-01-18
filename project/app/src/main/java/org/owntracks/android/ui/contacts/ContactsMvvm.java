@@ -27,8 +27,6 @@ public interface ContactsMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-
         MutableLiveData<Map<String, FusedContact>> getContacts();
-        void onContactClick(FusedContact contact);
     }
 }

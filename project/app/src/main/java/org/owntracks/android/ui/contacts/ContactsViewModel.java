@@ -10,7 +10,6 @@ import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.Map;
 
@@ -34,15 +33,5 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
     @Override
     public MutableLiveData<Map<String, FusedContact>> getContacts() {
         return contactsRepo.getAll();
-    }
-
-    @Override
-    public void onContactClick(FusedContact c) {
-        if(!c.hasLocation())
-            return;
-
-        Bundle b = new Bundle();
-        b.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, c.getId());
-        navigator.startActivity(MapActivity.class, b);
     }
 }
