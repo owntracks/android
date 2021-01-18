@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.contacts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -13,6 +14,7 @@ import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.base.BaseAdapter;
+import org.owntracks.android.ui.map.MapActivity;
 
 import javax.inject.Inject;
 
@@ -42,7 +44,11 @@ public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMv
     }
 
     @Override
-    public void onClick(@NonNull FusedContact object, @NonNull View view, boolean longClick) {
-        viewModel.onContactClick(object);
+    public void onClick(@NonNull FusedContact fusedContact, @NonNull View view, boolean longClick) {
+        Bundle bundle = new Bundle();
+        bundle.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, fusedContact.getId());
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.putExtra("_args", bundle);
+        startActivity(intent);
     }
 }
