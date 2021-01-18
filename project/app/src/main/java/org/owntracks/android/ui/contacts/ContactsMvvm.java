@@ -24,9 +24,6 @@ import java.util.Map;
 public interface ContactsMvvm {
 
     interface View extends MvvmView {
-//        void removeContact(FusedContact c);
-//        void addContact(FusedContact c);
-//        void updateContact(FusedContact c);
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {

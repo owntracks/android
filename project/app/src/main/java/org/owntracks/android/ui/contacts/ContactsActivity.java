@@ -12,13 +12,13 @@ import org.owntracks.android.databinding.UiContactsBinding;
 import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.BaseAdapter;
 
 import javax.inject.Inject;
 
 
-public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMvvm.ViewModel> implements ContactsMvvm.View, org.owntracks.android.ui.contacts.ContactsAdapter.ClickListener {
-    @Inject
-    ContactsAdapter contactsAdapter;
+public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMvvm.ViewModel> implements ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact> {
+    private final ContactsAdapter contactsAdapter = new ContactsAdapter(this);
 
     @Inject
     GeocoderProvider geocoderProvider;
@@ -45,6 +45,4 @@ public class ContactsActivity extends BaseActivity<UiContactsBinding, ContactsMv
     public void onClick(@NonNull FusedContact object, @NonNull View view, boolean longClick) {
         viewModel.onContactClick(object);
     }
-
-
 }
