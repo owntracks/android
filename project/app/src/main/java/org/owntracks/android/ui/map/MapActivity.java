@@ -191,7 +191,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             binding.contactPeek.name.setText(c.getFusedName());
             if (c.hasLocation()) {
                 ContactImageProvider.setImageViewAsync(binding.contactPeek.image, c);
-                geocoderProvider.resolve(c.getMessageLocation(), binding.contactPeek.location);
+                geocoderProvider.resolve(c.getMessageLocation().getValue(), binding.contactPeek.location);
                 BindingConversions.setRelativeTimeSpanString(binding.contactPeek.locationDate, c.getTst());
                 binding.acc.setText(String.format(Locale.getDefault(), "%s m", c.getFusedLocationAccuracy()));
                 binding.tid.setText(c.getTrackerId());

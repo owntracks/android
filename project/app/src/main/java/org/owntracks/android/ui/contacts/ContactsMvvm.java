@@ -1,10 +1,12 @@
 package org.owntracks.android.ui.contacts;
 
+import androidx.lifecycle.MutableLiveData;
+
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
-import java.util.Collection;
+import java.util.Map;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -22,14 +24,14 @@ import java.util.Collection;
 public interface ContactsMvvm {
 
     interface View extends MvvmView {
-        void removeContact(FusedContact c);
-        void addContact(FusedContact c);
-        void updateContact(FusedContact c);
+//        void removeContact(FusedContact c);
+//        void addContact(FusedContact c);
+//        void updateContact(FusedContact c);
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
 
-        Collection<FusedContact> getContacts();
+        MutableLiveData<Map<String, FusedContact>> getContacts();
         void onContactClick(FusedContact contact);
     }
 }

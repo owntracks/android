@@ -2,8 +2,10 @@ package org.owntracks.android.ui.contacts;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.MutableLiveData;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -15,7 +17,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.map.MapActivity;
 
-import java.util.Collection;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -35,8 +37,8 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
     }
 
     @Override
-    public Collection<FusedContact> getContacts() {
-        return contactsRepo.getAllAsList();
+    public MutableLiveData<Map<String, FusedContact>> getContacts() {
+        return contactsRepo.getAll();
     }
 
     @Override
@@ -52,15 +54,16 @@ public class ContactsViewModel extends BaseViewModel<ContactsMvvm.View> implemen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.FusedContactAdded c) {
         //TODO: insert, sort
+        notifyChange();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(Events.FusedContactRemoved c) {
-        //TODO: remove
+        notifyChange();
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FusedContact c) {
-        //TODO: Sort
+        notifyChange();
     }
 
 }

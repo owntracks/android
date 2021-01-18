@@ -84,7 +84,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Override
     public void onMapReady() {
-        for (Object c : contactsRepo.getAllAsList()) {
+        for (Object c : contactsRepo.getAll().getValue().values()) {
             getView().updateMarker((FusedContact) c);
         }
 
@@ -170,10 +170,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         return activeContact;
     }
 
-    @Override
-    public Collection<FusedContact> getContacts() {
-        return this.contactsRepo.getAllAsList();
-    }
 
     @Override
     public void restore(@NonNull String contactId) {

@@ -1,16 +1,16 @@
 package org.owntracks.android.data.repos;
 
+import androidx.lifecycle.MutableLiveData;
+
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageLocation;
-import org.owntracks.android.model.FusedContact;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 
 
 public interface ContactsRepo {
-    HashMap<String, FusedContact> getAll();
-    Collection<FusedContact> getAllAsList();
+    MutableLiveData<Map<String, FusedContact>> getAll();
 
     FusedContact getById(String id);
 

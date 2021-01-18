@@ -3,14 +3,17 @@ package org.owntracks.android.data.repos;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
 import org.greenrobot.eventbus.EventBus;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.owntracks.android.App;
-import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.FusedContact;
+import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -30,10 +33,14 @@ public class MemoryContactsRepoTest {
     @Mock
         App app;
 
+    @Rule
+    InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
+
     private MessageLocation messageLocation;
     private ContactsRepo contactsRepo;
     private final static String CONTACT_ID = "abcd1234";
     private EventBus eventBus;
+
 
 
     @Before
@@ -73,7 +80,7 @@ public class MemoryContactsRepoTest {
         assertEquals(1, contactsRepo.getRevision());
 
         FusedContact c = contactsRepo.getById(CONTACT_ID);
-        assertEquals(messageLocation, c.getMessageLocation());
+        assertEquals(messageLocation, c.getMessageLocation().getValue());
         assertEquals(messageLocation.getTimestamp(), c.getTst());
         assertEquals(CONTACT_ID, c.getId());
     }
@@ -98,7 +105,7 @@ public class MemoryContactsRepoTest {
     public void repoCorrectlyHandlesEventModeChanged() {
         contactsRepo.update(CONTACT_ID, messageLocation);
         ((MemoryContactsRepo) contactsRepo).onEventMainThread(new Events.ModeChanged(0,1));
-        assertEquals(0, contactsRepo.getAll().size());
+        assertTrue( contactsRepo.getAll().getValue().isEmpty());
 
     }
 
@@ -106,9 +113,6 @@ public class MemoryContactsRepoTest {
     public void repoCorrectlyHandlesEventEndpointChanged() {
         contactsRepo.update(CONTACT_ID, messageLocation);
         ((MemoryContactsRepo) contactsRepo).onEventMainThread(new Events.EndpointChanged());
-        assertEquals(0, contactsRepo.getAll().size());
-
+        assertTrue( contactsRepo.getAll().getValue().isEmpty());
     }
-
-
 }
