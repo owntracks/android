@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.contacts;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -18,15 +17,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 
 class ContactsAdapter extends RecyclerView.Adapter<FusedContactViewHolder> {
-    @Inject
-    public ContactsAdapter() {
-    }
-
+    private final BaseAdapter.ClickListener<FusedContact> clickListener;
     List<FusedContact> contactList;
+
+    public ContactsAdapter(BaseAdapter.ClickListener<FusedContact> clickListener) {
+        this.clickListener = clickListener;
+    }
 
     @NonNull
     @Override
@@ -37,7 +35,7 @@ class ContactsAdapter extends RecyclerView.Adapter<FusedContactViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull FusedContactViewHolder holder, int position) {
-        holder.bind(contactList.get(position));
+        holder.bind(contactList.get(position),this.clickListener);
 
     }
 
@@ -47,14 +45,10 @@ class ContactsAdapter extends RecyclerView.Adapter<FusedContactViewHolder> {
     }
 
     public void setContactList(Collection<FusedContact> contacts) {
-        contactList=new ArrayList<>(contacts);
+        contactList = new ArrayList<>(contacts);
         this.notifyDataSetChanged();
     }
 
-
-    interface ClickListener extends BaseAdapter.ClickListener<FusedContact> {
-        void onClick(@NonNull FusedContact object, @NonNull View view, boolean longClick);
-    }
 }
 
 class FusedContactViewHolder extends RecyclerView.ViewHolder {
@@ -65,8 +59,9 @@ class FusedContactViewHolder extends RecyclerView.ViewHolder {
         this.binding = binding;
     }
 
-    public void bind(FusedContact fusedContact) {
+    public void bind(FusedContact fusedContact, BaseAdapter.ClickListener<FusedContact> clickListener) {
         binding.setVariable(BR.contact, fusedContact);
+        binding.getRoot().setOnClickListener(v -> clickListener.onClick(fusedContact,binding.getRoot(),false));
         binding.executePendingBindings();
     }
 }

@@ -65,7 +65,9 @@ public class FusedContact extends BaseObservable implements Comparable<FusedCont
     }
 
     public void notifyMessageLocationPropertyChanged() {
-        Timber.d("Geocode location updated for %s: %s", this.id, this.messageLocation.getValue().getGeocode());
+        if (this.messageLocation.getValue() != null) {
+            Timber.d("Geocode location updated for %s: %s", this.id, this.messageLocation.getValue().getGeocode());
+        }
         this.notifyPropertyChanged(BR.fusedName);
         this.notifyPropertyChanged(BR.messageLocation);
         this.notifyPropertyChanged(BR.geocodedLocation);
