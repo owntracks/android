@@ -167,7 +167,7 @@ dependencies {
     implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.0")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.0.3")
     implementation("commons-codec:commons-codec:1.15")
 
     // Widget libraries
