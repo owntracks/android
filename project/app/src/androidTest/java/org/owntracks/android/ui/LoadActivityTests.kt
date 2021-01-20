@@ -178,8 +178,10 @@ class LoadActivityTests {
     @AllowFlaky(attempts = 1)
     fun loadActivityCanLoadConfigFromContentURL() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val configFilename = "espresso-testconfig.otrc"
+        context.contentResolver.delete(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), "${MediaStore.Downloads.DISPLAY_NAME}=?", arrayOf(configFilename))
         val contentValues = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, "espresso-testconfig.otrc")
+            put(MediaStore.Downloads.DISPLAY_NAME, configFilename)
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
         val contentUri = context.contentResolver.insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), contentValues)

@@ -81,7 +81,7 @@ class App : DaggerApplication() {
     }
 
     @Subscribe
-    fun onEvent(e: RestartApp?) {
+    fun onEvent(@Suppress("UNUSED_PARAMETER") e: RestartApp?) {
         val intent = Intent(this.applicationContext, MapActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         this.applicationContext.startActivity(intent)

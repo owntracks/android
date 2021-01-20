@@ -234,7 +234,7 @@ play {
 
 // Espresso test  screenshot gathering
 val reportsDirectory = File("$buildDir/reports/androidTests/connected/flavors/debugAndroidTest")
-val screenshotsDeviceFolder = "/storage/emulated/0/Pictures/screenshots"
+val screenshotsDeviceFolder = "/storage/emulated/0/Download/testscreenshots"
 
 val createScreenshotDirectoryTask = tasks.register<Exec>("createScreenshotDirectory") {
     group = "reporting"
@@ -247,7 +247,7 @@ val embedScreenshotsTask = tasks.register("embedScreenshots") {
     group = "reporting"
     description = "Embeds the screenshots in the test report"
     doFirst {
-        val screenshotsDirectory = File(reportsDirectory, "screenshots/")
+        val screenshotsDirectory = File(reportsDirectory, "testscreenshots/")
         if (!screenshotsDirectory.exists()) {
             println("Could not find screenshots. Skipping...")
             return@doFirst
@@ -268,9 +268,9 @@ val embedScreenshotsTask = tasks.register("embedScreenshots") {
 
                         val failedHeaderPatternToFind = "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
 
-                        val failedPatternToReplace = "$failedHeaderPatternToFind <img src=\"screenshots/${testClassName}/${testName}\" width =\"360\" />"
+                        val failedPatternToReplace = "$failedHeaderPatternToFind <img src=\"testscreenshots/${testClassName}/${testName}\" width =\"360\" />"
                         val successRecordPatternToFind = "<td>${testNameWithoutExtension}</td>"
-                        val successPatternToReplace = "<td>${testNameWithoutExtension} <a href=\"screenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
+                        val successPatternToReplace = "<td>${testNameWithoutExtension} <a href=\"testscreenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
 
                         testClassJunitReportFile.writeText(testJunitReportContent
                                 .replace(failedHeaderPatternToFind, failedPatternToReplace)
