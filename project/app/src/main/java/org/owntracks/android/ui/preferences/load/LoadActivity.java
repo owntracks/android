@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.preferences.load;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -111,13 +112,24 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
         if (Intent.ACTION_VIEW.equals(action)) {
             Uri uri = intent.getData();
-            Timber.v("uri: %s", uri);
             if (uri != null) {
-                try {
-                    viewModel.extractPreferences(new URI(uri.toString()));
-                } catch (URISyntaxException e) {
-                    Timber.e(e, "Error parsing intent URI");
+                Timber.v("uri: %s", uri);
+                if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+                    try {
+                        viewModel.extractPreferences(getContentFromURI(uri));
+                    } catch (IOException e) {
+                        Timber.e(e, "Could not extract content from %s", uri);
+                    }
+                } else {
+                    try {
+                        viewModel.extractPreferences(new URI(uri.toString()));
+                    } catch (URISyntaxException e) {
+                        Timber.e(e, "Error parsing intent URI");
+                    }
+
                 }
+            } else {
+                Timber.e("No URI given for importing configuration");
             }
         } else {
             Intent pickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -141,18 +153,25 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         Timber.v("RequestCode: %s resultCode: %s", requestCode, resultCode);
         if (requestCode == LoadActivity.REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                byte[] content = new byte[0];
                 try {
-                    InputStream stream = getContentResolver().openInputStream(resultIntent.getData());
-                    byte[] output = new byte[stream.available()];
-                    stream.read(output);
-                    viewModel.extractPreferences(output);
+                    content = getContentFromURI(resultIntent.getData());
                 } catch (IOException e) {
-                    Timber.e(e, "Error reading content");
+                    Timber.e(e, "Could not extract content from %s", resultIntent);
                 }
+                viewModel.extractPreferences(content);
             } else {
                 finish();
             }
         }
+    }
+
+    private byte[] getContentFromURI(Uri uri) throws IOException {
+        InputStream stream = getContentResolver().openInputStream(uri);
+        byte[] output = new byte[stream.available()];
+        int bytesRead = stream.read(output);
+        Timber.d("Read %d bytes from content URI", bytesRead);
+        return output;
     }
 
     @Override

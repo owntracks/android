@@ -1,7 +1,10 @@
 package org.owntracks.android.ui
 
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -114,11 +117,12 @@ class LoadActivityTests {
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
+
     @Test
     @AllowFlaky(attempts = 1)
     fun loadActivityShowsErrorWhenLoadingFromInlineConfigURLContaninigInvalidJSON() {
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=e30k")))
-        assertContains(R.id.effectiveConfiguration,R.string.errorPreferencesImportFailed)
+        assertContains(R.id.effectiveConfiguration, R.string.errorPreferencesImportFailed)
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
 
@@ -165,6 +169,30 @@ class LoadActivityTests {
         val localConfig = File(dir, "espresso-testconfig.otrc")
         localConfig.writeText(servedConfig)
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.parse("file://${localConfig.absoluteFile}")))
+        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(R.id.save)
+        assertDisplayed(R.id.close)
+    }
+
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun loadActivityCanLoadConfigFromContentURL() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, "espresso-testconfig.otrc")
+            put(MediaStore.Downloads.IS_PENDING, 1)
+        }
+        val contentUri = context.contentResolver.insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), contentValues)
+        contentUri?.let {
+            context.contentResolver.openFileDescriptor(it, "w").use { parcelFileDescriptor ->
+                ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor).write(servedConfig.toByteArray())
+            }
+            contentValues.clear()
+            contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+            context.contentResolver.update(it, contentValues, null, null)
+        }
+
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, contentUri))
         assertContains(R.id.effectiveConfiguration, expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
