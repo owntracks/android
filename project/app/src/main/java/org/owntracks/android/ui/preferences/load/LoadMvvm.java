@@ -22,5 +22,7 @@ public interface LoadMvvm {
         String getDisplayedConfiguration();
 
         ImportStatus getConfigurationImportStatus();
+
+        void setError(Throwable e);
     }
 }

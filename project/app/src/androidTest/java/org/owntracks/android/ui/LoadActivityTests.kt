@@ -200,6 +200,15 @@ class LoadActivityTests {
         assertDisplayed(R.id.close)
     }
 
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun loadActivityErrorsCorrectlyFromInvalidContentURL() {
+        baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, null))
+        assertContains(R.id.effectiveConfiguration, "Import failed: No URI given for importing configuration")
+        assertNotExist(R.id.save)
+        assertDisplayed(R.id.close)
+    }
+
     class MockWebserverConfigDispatcher(private val config: String) : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
             val errorResponse = MockResponse().setResponseCode(404)

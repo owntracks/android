@@ -118,18 +118,24 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                     try {
                         viewModel.extractPreferences(getContentFromURI(uri));
                     } catch (IOException e) {
-                        Timber.e(e, "Could not extract content from %s", uri);
+                        String msg = String.format("Could not extract content from %s", uri);
+                        viewModel.setError(new Exception(msg, e));
+                        Timber.e(e, msg);
                     }
                 } else {
                     try {
                         viewModel.extractPreferences(new URI(uri.toString()));
                     } catch (URISyntaxException e) {
-                        Timber.e(e, "Error parsing intent URI");
+                        String msg = "Error parsing intent URI";
+                        viewModel.setError(new Exception(msg, e));
+                        Timber.e(e, msg);
                     }
 
                 }
             } else {
-                Timber.e("No URI given for importing configuration");
+                String msg = "No URI given for importing configuration";
+                viewModel.setError(new Exception(msg));
+                Timber.e(msg);
             }
         } else {
             Intent pickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
