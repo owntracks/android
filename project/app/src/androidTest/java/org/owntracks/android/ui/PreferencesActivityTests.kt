@@ -129,6 +129,13 @@ class PreferencesActivityTests {
     fun configurationManagementCanEditAStringType() {
         clickOn(R.string.configurationManagement)
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+
+        clickOn(R.string.preferencesEditor)
+        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyModeId))
+        writeTo(R.id.inputValue, "0")
+        clickDialogPositiveButton()
+
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
         writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyHost))
         writeTo(R.id.inputValue, "example.com")
