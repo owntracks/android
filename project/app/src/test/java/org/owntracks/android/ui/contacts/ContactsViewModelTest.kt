@@ -9,8 +9,8 @@ import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.model.FusedContact
 
 class ContactsViewModelTest {
-    private val testContacts: MutableLiveData<Map<String, FusedContact>> = MutableLiveData(
-            mapOf(
+    private val testContacts = MutableLiveData(
+            mutableMapOf(
                     Pair("testContact1", FusedContact("testContact1")),
                     Pair("testContact2", FusedContact("testContact2")),
                     Pair("testContact3", FusedContact("testContact3")),
