@@ -1,12 +1,9 @@
-package org.owntracks.android.ui.contacts;
+package org.owntracks.android.ui.contacts
 
-import androidx.lifecycle.MutableLiveData;
-
-import org.owntracks.android.model.FusedContact;
-import org.owntracks.android.ui.base.view.MvvmView;
-import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
-
-import java.util.Map;
+import androidx.lifecycle.MutableLiveData
+import org.owntracks.android.model.FusedContact
+import org.owntracks.android.ui.base.view.MvvmView
+import org.owntracks.android.ui.base.viewmodel.MvvmViewModel
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -21,12 +18,9 @@ import java.util.Map;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public interface ContactsMvvm {
-
-    interface View extends MvvmView {
-    }
-
-    interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        MutableLiveData<Map<String, FusedContact>> getContacts();
+interface ContactsMvvm {
+    interface View : MvvmView
+    interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
+        val contacts: MutableLiveData<MutableMap<String, FusedContact>>
     }
 }
