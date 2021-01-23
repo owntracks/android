@@ -79,13 +79,11 @@ jobs:
       if:  github.repository == 'owntracks/android'
     - uses: codecov/codecov-action@v1
       name: Upload espresso coverage to codecov
-      if: always()
       with:
         file: ./project/app/build/reports/coverage/debug/report.xml
         flags: uitests
     - uses: codecov/codecov-action@v1
       name: Upload unit coverage to codecov
-      if: always()
       with:
         file: ./project/app/build/jacoco/jacoco.xml
         flags: unittests
