@@ -3,7 +3,6 @@ plugins {
     id("com.github.triplet.play") version "3.1.0"
     id("io.objectbox")
     kotlin("android")
-    kotlin("android.extensions")
     kotlin("kapt")
     id("com.hiya.jacoco-android")
 }
