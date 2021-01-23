@@ -20,8 +20,10 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.contacts.ContactsActivity
 
 @LargeTest
@@ -29,6 +31,13 @@ import org.owntracks.android.ui.contacts.ContactsActivity
 class ContactActivityTests {
     @get:Rule
     var baristaRule = BaristaRule.create(ContactsActivity::class.java)
+
+    private val screenshotRule = ScreenshotTakingOnTestEndRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain
+            .outerRule(baristaRule.activityTestRule)
+            .around(screenshotRule)
 
     private var mockWebServer = MockWebServer()
 
@@ -77,7 +86,7 @@ class ContactActivityTests {
         clickOn("aa")
         assertDisplayed(R.id.bottomSheetLayout)
         assertDisplayed(R.id.contactPeek)
-        assertContains(R.id.name,"aa")
+        assertContains(R.id.name, "aa")
     }
 
     class MockWebserverLocationDispatcher(private val config: String) : Dispatcher() {
