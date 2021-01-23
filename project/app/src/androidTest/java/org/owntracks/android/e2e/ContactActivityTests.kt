@@ -77,6 +77,7 @@ class ContactActivityTests {
 //        LocationPermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         clickOn(R.id.btn_next)
         clickOn(R.id.done)
+        sleep(30000) // Wait for location to come in.
         clickOn(R.id.menu_report)
         openDrawer()
         clickOn(R.string.title_activity_contacts)
