@@ -4,14 +4,10 @@ import android.content.Context
 import android.content.res.Resources
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import io.objectbox.android.ObjectBoxLiveData
-import io.objectbox.query.Query
 import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.owntracks.android.data.WaypointModel
-import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.support.InMemoryPreferencesStore
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
@@ -47,37 +43,3 @@ class LoadViewModelTest {
     }
 }
 
-class InMemoryWaypointsRepo(eventBus: EventBus?) : WaypointsRepo(eventBus) {
-    override fun get(tst: Long): WaypointModel {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAll(): MutableList<WaypointModel> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllWithGeofences(): MutableList<WaypointModel> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllLive(): ObjectBoxLiveData<WaypointModel> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllQuery(): Query<WaypointModel> {
-        TODO("Not yet implemented")
-    }
-
-    override fun insert_impl(w: WaypointModel?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun update_impl(w: WaypointModel?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun delete_impl(w: WaypointModel?) {
-        TODO("Not yet implemented")
-    }
-
-}
