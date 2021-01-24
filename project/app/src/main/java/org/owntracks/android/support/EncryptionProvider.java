@@ -29,7 +29,7 @@ public class EncryptionProvider {
     private static boolean enabled;
     private final Preferences preferences;
 
-    boolean isPayloadEncryptionEnabled() {
+    public boolean isPayloadEncryptionEnabled() {
         return enabled;
     }
 

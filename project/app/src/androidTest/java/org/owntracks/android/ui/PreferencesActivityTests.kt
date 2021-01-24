@@ -160,6 +160,7 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 3)
     fun settingSimpleHTTPConfigSettingsCanBeExported() {
+        val sleepBetweenMillis = 1000L
         clickOn(R.string.preferencesServer)
         clickOn(R.string.mode_heading)
         clickOn(R.string.mode_http_private_label)
@@ -174,6 +175,7 @@ class PreferencesActivityTests {
         writeTo(R.id.trackerId, "t1")
         clickDialogPositiveButton()
         clickBack()
+        sleep(sleepBetweenMillis)
 
         clickOn(R.string.preferencesReporting)
         clickOn(R.string.preferencesPubExtendedData)
@@ -185,7 +187,7 @@ class PreferencesActivityTests {
 
         // This is an ugly hack, but there's some race conditions on underpowered hardware
         // causing the test to move on before the view has been fully built/rendered.
-        val sleepBetweenMillis = 1000L
+
         clickOn(R.string.preferencesAdvanced)
         sleep(sleepBetweenMillis)
         clickOn(R.string.preferencesRemoteCommand)
