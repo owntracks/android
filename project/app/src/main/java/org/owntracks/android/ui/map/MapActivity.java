@@ -19,11 +19,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
+import androidx.test.espresso.IdlingResource;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -43,13 +45,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.databinding.UiMapBinding;
+import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -265,7 +267,6 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkAndRequestLocationPermissions();
         }
-
         fusedLocationClient.requestLocationUpdates(
                 new LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -574,5 +575,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             eventBus.postSticky(new Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION));
         }
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getLocationIdlingResource() {
+        return binding.getVm().getLocationIdlingResource();
     }
 }

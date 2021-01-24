@@ -1,5 +1,6 @@
 package org.owntracks.android.e2e
 
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
@@ -18,19 +19,20 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
-import org.owntracks.android.ui.contacts.ContactsActivity
+import org.owntracks.android.ui.map.MapActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ContactActivityTests {
     @get:Rule
-    var baristaRule = BaristaRule.create(ContactsActivity::class.java)
+    var baristaRule = BaristaRule.create(MapActivity::class.java) // We always start e2e at the main entrypoint
 
     private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
@@ -41,9 +43,20 @@ class ContactActivityTests {
 
     private var mockWebServer = MockWebServer()
 
+    @Before
+    fun startMockWebserver() {
+        mockWebServer.start()
+        mockWebServer.dispatcher = MockWebserverLocationDispatcher(locationResponse)
+    }
+
     @After
     fun stopMockWebserver() {
         mockWebServer.shutdown()
+    }
+
+    @After
+    fun unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
     }
 
     private val locationResponse = """
@@ -53,10 +66,11 @@ class ContactActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun testClickingOnContactLoadsContactOnMap() {
-        mockWebServer.start()
-        mockWebServer.dispatcher = MockWebserverLocationDispatcher(locationResponse)
-        val httpPort = mockWebServer.port
         baristaRule.launchActivity()
+
+        val httpPort = mockWebServer.port
+        doWelcomeProcess()
+
         openDrawer()
         clickOn(R.string.title_activity_preferences)
         clickOn(R.string.preferencesServer)
@@ -70,6 +84,23 @@ class ContactActivityTests {
 
         openDrawer()
         clickOn(R.string.title_activity_map)
+
+        val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
+        IdlingRegistry.getInstance().register(locationIdlingResource)
+
+        clickOn(R.id.menu_report)
+        openDrawer()
+        clickOn(R.string.title_activity_contacts)
+        sleep(5000)
+        assertRecyclerViewItemCount(R.id.recycler_view, 1)
+
+        clickOn("aa")
+        assertDisplayed(R.id.bottomSheetLayout)
+        assertDisplayed(R.id.contactPeek)
+        assertContains(R.id.name, "aa")
+    }
+
+    private fun doWelcomeProcess() {
         clickOn(R.id.btn_next)
 /* TODO Once test isolation is possible we'll have to grant the priv each test */
 //        clickOn(R.id.btn_next)
@@ -77,17 +108,6 @@ class ContactActivityTests {
 //        LocationPermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         clickOn(R.id.btn_next)
         clickOn(R.id.done)
-        sleep(30000) // Wait for location to come in.
-        clickOn(R.id.menu_report)
-        openDrawer()
-        clickOn(R.string.title_activity_contacts)
-        sleep(5000) // Wait for the HTTP req/response
-        assertRecyclerViewItemCount(R.id.recycler_view, 1)
-
-        clickOn("aa")
-        assertDisplayed(R.id.bottomSheetLayout)
-        assertDisplayed(R.id.contactPeek)
-        assertContains(R.id.name, "aa")
     }
 
     class MockWebserverLocationDispatcher(private val config: String) : Dispatcher() {

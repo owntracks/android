@@ -24,9 +24,8 @@ import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.SimpleIdlingResource;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-
-import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -50,6 +49,8 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
     private MutableLiveData<FusedContact> liveContact = new MutableLiveData<>();
     private MutableLiveData<Boolean> liveBottomSheetHidden = new MutableLiveData<>();
     private MutableLiveData<LatLng> liveCamera = new MutableLiveData<>();
+
+    private final SimpleIdlingResource locationIdlingResource = new SimpleIdlingResource("locationIdlingResource", false);
 
     @Inject
     public MapViewModel(ContactsRepo contactsRepo, LocationProcessor locationRepo, MessageProcessor messageProcessor) {
@@ -248,6 +249,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         Timber.v("location source updated");
         this.location = location;
         getView().enableLocationMenus();
+        locationIdlingResource.setIdleState(true);
         if (mode == VIEW_DEVICE) {
             liveCamera.postValue(getCurrentLocation());
         }
@@ -301,5 +303,9 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         if (reason == REASON_GESTURE) {
             setViewModeFree();
         }
+    }
+
+    public SimpleIdlingResource getLocationIdlingResource() {
+        return locationIdlingResource;
     }
 }

@@ -181,6 +181,8 @@ dependencies {
     // some useful Kotlin extension functions
     implementation("io.objectbox:objectbox-kotlin:$objectboxVersion")
 
+    implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
+
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
     kapt("com.sun.xml.bind:jaxb-core:2.3.0.1")
