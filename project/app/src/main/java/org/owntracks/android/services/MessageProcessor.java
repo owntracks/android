@@ -3,6 +3,8 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.res.Resources;
 
+import androidx.test.espresso.idling.CountingIdlingResource;
+
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,6 +57,7 @@ public class MessageProcessor {
 
     private final Events.QueueChanged queueEvent = new Events.QueueChanged();
     private final ServiceBridge serviceBridge;
+    private final CountingIdlingResource outgoingQueueIdlingResource;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
     private MessageProcessorEndpoint endpoint;
 
@@ -76,7 +79,8 @@ public class MessageProcessor {
             Scheduler scheduler,
             ServiceBridge serviceBridge,
             RunThingsOnOtherThreads runThingsOnOtherThreads,
-            Lazy<LocationProcessor> locationProcessorLazy
+            Lazy<LocationProcessor> locationProcessorLazy,
+            CountingIdlingResource outgoingQueueIdlingResource
     ) {
         this.applicationContext = applicationContext;
         this.preferences = preferences;
@@ -87,8 +91,10 @@ public class MessageProcessor {
         this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
         this.serviceBridge = serviceBridge;
+        this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
         this.eventBus.register(this);
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+
     }
 
     public void initialize() {
@@ -187,6 +193,7 @@ public class MessageProcessor {
 
     public void queueMessageForSending(MessageBase message) {
         if (!acceptMessages) return;
+        outgoingQueueIdlingResource.increment();
         Timber.d("Queueing messageId:%s, queueLength:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), Thread.currentThread());
         synchronized (outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
@@ -237,6 +244,7 @@ public class MessageProcessor {
                         }
                     }
                     lastFailedMessageToBeRetried = null;
+
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
                     Timber.w(("Error sending message. Re-queueing"));
@@ -250,6 +258,8 @@ public class MessageProcessor {
                 if (lastFailedMessageToBeRetried != null) {
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
+                } else {
+                    outgoingQueueIdlingResource.decrement();
                 }
             } catch (InterruptedException e) {
                 Timber.i(e, "Outgoing message loop interrupted");

@@ -26,6 +26,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.idling.CountingIdlingResource;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -101,6 +102,9 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
 
     @Inject
     GeocoderProvider geocoderProvider;
+
+    @Inject
+    CountingIdlingResource countingIdlingResource;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -581,5 +585,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
     @NonNull
     public IdlingResource getLocationIdlingResource() {
         return binding.getVm().getLocationIdlingResource();
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getOutgoingQueueIdlingResource() {
+        return countingIdlingResource;
     }
 }

@@ -232,7 +232,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
-
         try(Response response = getHttpClient().newCall(request).execute()) {
             // Message was send. Handle delivered message
             if((response.isSuccessful())) {

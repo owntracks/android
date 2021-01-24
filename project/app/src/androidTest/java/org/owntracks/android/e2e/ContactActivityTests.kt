@@ -11,7 +11,6 @@ import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
@@ -27,6 +26,7 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.map.MapActivity
+import timber.log.Timber
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -57,6 +57,7 @@ class ContactActivityTests {
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
+        IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
     }
 
     private val locationResponse = """
@@ -89,9 +90,13 @@ class ContactActivityTests {
         IdlingRegistry.getInstance().register(locationIdlingResource)
 
         clickOn(R.id.menu_report)
+
+        val networkIdlingResource = baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
+        IdlingRegistry.getInstance().register(networkIdlingResource)
+
         openDrawer()
         clickOn(R.string.title_activity_contacts)
-        sleep(5000)
+        Timber.tag("parp").e("PROCEED: %s", networkIdlingResource)
         assertRecyclerViewItemCount(R.id.recycler_view, 1)
 
         clickOn("aa")
