@@ -50,7 +50,7 @@ jobs:
         working-directory: project
         script: |
             adb emu geo fix 0 51
-            ./gradlew createDebugCoverageReport --no-build-cache --stacktrace
+            ./gradlew createDebugCoverageReport --no-build-cache
         profile: pixel_3a
         target: google_apis
     - name: Gather xunit files into a single dir
