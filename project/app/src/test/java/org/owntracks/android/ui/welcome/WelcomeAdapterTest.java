@@ -79,7 +79,7 @@ public class WelcomeAdapterTest {
         when(requirementsChecker.isPlayCheckPassed()).thenReturn(playCheckPassed);
         when(requirementsChecker.isPermissionCheckPassed()).thenReturn(permissionCheckPassed);
         welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), new PlayFragment(), new PermissionFragment(), new FinishFragment());
-        assertEquals(expectedFragments, welcomeAdapter.getCount());
+        assertEquals(expectedFragments, welcomeAdapter.getItemCount());
     }
 
     /**

@@ -9,8 +9,7 @@ import org.owntracks.android.support.RequirementsChecker
 import timber.log.Timber
 import java.util.*
 
-@PerActivity
-internal class WelcomeAdapter constructor(@ActivityContext welcomeActivity: WelcomeActivity, private val requirementsChecker: RequirementsChecker) : FragmentStateAdapter(welcomeActivity) {
+@PerActivity class WelcomeAdapter constructor(@ActivityContext welcomeActivity: WelcomeActivity, private val requirementsChecker: RequirementsChecker) : FragmentStateAdapter(welcomeActivity) {
     private val fragments = ArrayList<Fragment>()
     fun setupFragments(introFragment: Fragment, versionFragment: Fragment, playFragment: Fragment, permissionFragment: Fragment, finishFragment: Fragment) {
         fragments.add(introFragment)

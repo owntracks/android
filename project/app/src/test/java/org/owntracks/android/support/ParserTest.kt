@@ -282,7 +282,7 @@ class ParserTest {
         val message = messageBase as MessageConfiguration
         assertTrue(message.isValidMessage())
         assertFalse(message.waypoints.isEmpty())
-        assertEquals(2, message.waypoints?.size)
+        assertEquals(2, message.waypoints.size)
         assertFalse(message.hasTrackerId())
         assertEquals(true, message.get("autostartOnBoot"))
         assertEquals(5, message.get("locatorDisplacement"))

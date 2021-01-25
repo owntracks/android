@@ -457,6 +457,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel> i
             }
         });
         this.isMapReady = true;
+        viewModel.onMenuCenterDeviceClicked();
         viewModel.onMapReady();
     }
 
