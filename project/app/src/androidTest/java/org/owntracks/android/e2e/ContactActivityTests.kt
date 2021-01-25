@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.map.MapActivity
-import timber.log.Timber
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -96,7 +95,6 @@ class ContactActivityTests {
 
         openDrawer()
         clickOn(R.string.title_activity_contacts)
-        Timber.tag("parp").e("PROCEED: %s", networkIdlingResource)
         assertRecyclerViewItemCount(R.id.recycler_view, 1)
 
         clickOn("aa")

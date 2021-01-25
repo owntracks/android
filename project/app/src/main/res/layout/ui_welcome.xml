@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.welcome.WelcomeMvvm.ViewModel" />
+            type="org.owntracks.android.ui.welcome.WelcomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,7 +58,7 @@
             app:layout_constraintRight_toRightOf="@+id/btn_next" />
 
 
-        <org.owntracks.android.support.widgets.PausableViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -71,7 +71,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            />
 
         <LinearLayout
             android:id="@+id/circles"
