@@ -355,7 +355,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @get:Export(keyResId = R.string.preferenceKeySubTopic, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubTopic)
     var subTopic: String
-        get() = getStringOrDefault(R.string.preferenceKeySubTopic, R.string.valSubTopic)
+        get() = getStringOrDefault(R.string.preferenceKeySubTopic, R.string.defaultSubTopic)
         set(string) {
             setString(R.string.preferenceKeySubTopic, string)
         }
