@@ -29,7 +29,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:contentDescription="@string/next"
             android:gravity="center"
-            android:onClick="@{() -> vm.onNextClicked()}"
+            android:onClick="@{() -> vm.moveNext()}"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:scaleType="fitCenter"

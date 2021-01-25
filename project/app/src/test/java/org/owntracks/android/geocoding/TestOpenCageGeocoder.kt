@@ -17,7 +17,7 @@ class TestOpenCageGeocoder {
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
-                .body(openCageJSON!!.toResponseBody("application/json".toMediaTypeOrNull()))
+                .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
                 .request(Request.Builder().url("https://example.com").build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
