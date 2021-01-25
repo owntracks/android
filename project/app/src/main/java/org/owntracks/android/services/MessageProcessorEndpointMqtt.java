@@ -85,7 +85,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
-        if (preferences!=null) {
+        if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
     }
@@ -415,18 +415,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
         Set<String> topics = new TreeSet<>();
 
-        // This can contain multiple and is space-delimited
-        for (String subTopic : subTopics.split(" ")) {
-            if (subTopic.endsWith("#")) { // wildcard sub will match everything anyway
-                topics.add(subTopic);
-            } else {
-                topics.add(subTopic);
-                if (subscribeToInfo) {
-                    topics.add(subTopic + infoTopicSuffix);
-                }
-                topics.add(subTopic + eventsTopicSuffix);
-                topics.add(subTopic + waypointsTopicSuffix);
+        if (subTopics.equals(applicationContext.getString(R.string.defaultSubTopic))) {
+            topics.add(subTopics);
+            if (subscribeToInfo) {
+                topics.add(subTopics + infoTopicSuffix);
             }
+            topics.add(subTopics + eventsTopicSuffix);
+            topics.add(subTopics + waypointsTopicSuffix);
+        } else {
+            topics.addAll(Arrays.asList(subTopics.split(" ")));
         }
 
         return topics;

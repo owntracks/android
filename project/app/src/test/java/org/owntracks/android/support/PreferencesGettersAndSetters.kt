@@ -190,7 +190,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyVersion)) } doReturn "_build"
                 on { getString(eq(R.string.preferenceKeyWS)) } doReturn "ws"
                 on { getString(eq(R.string.valIgnoreStaleLocations)) } doReturn "0"
-                on { getString(eq(R.string.valSubTopic)) } doReturn "owntracks/+/+"
+                on { getString(eq(R.string.defaultSubTopic)) } doReturn "owntracks/+/+"
                 on { getString(eq(R.string.valPubTopic)) } doReturn "owntracks/%u/%d"
                 on { getInteger(any()) } doReturn 0
                 on { getBoolean(any()) } doReturn false

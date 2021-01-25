@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
-    <string name="valSubTopic" translatable="false">owntracks/+/+</string>
+    <string name="defaultSubTopic" translatable="false">owntracks/+/+</string>
     <string name="valDefaultGeocoder" translatable="false">Google</string>
 
     <integer name="valPort">8883</integer>
