@@ -2,7 +2,6 @@ package org.owntracks.android.injection.modules.android.ActivityModules;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import org.owntracks.android.injection.modules.android.FragmentModules.FinishFragmentModule;
 import org.owntracks.android.injection.modules.android.FragmentModules.IntroFragmentModule;
 import org.owntracks.android.injection.modules.android.FragmentModules.PermissionFragmentModule;
@@ -10,6 +9,7 @@ import org.owntracks.android.injection.modules.android.FragmentModules.PlayFragm
 import org.owntracks.android.injection.modules.android.FragmentModules.VersionFragmentModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerFragment;
+import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
 import org.owntracks.android.ui.welcome.WelcomeMvvm;
 import org.owntracks.android.ui.welcome.WelcomeViewModel;
@@ -27,7 +27,7 @@ public abstract class WelcomeActivityModule {
 
     @Binds
     @PerActivity
-    abstract WelcomeMvvm.ViewModel bindViewModel(WelcomeViewModel viewModel);
+    abstract BaseViewModel<WelcomeMvvm.View> bindViewModel(WelcomeViewModel viewModel);
 
 
     @ContributesAndroidInjector(modules = {PlayFragmentModule.class})

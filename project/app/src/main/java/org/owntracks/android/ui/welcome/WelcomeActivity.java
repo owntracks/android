@@ -7,10 +7,10 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiWelcomeBinding;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.welcome.finish.FinishFragment;
@@ -24,8 +24,9 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 
-public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.ViewModel> implements WelcomeMvvm.View, ViewPager.OnPageChangeListener {
+public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeViewModel> implements WelcomeMvvm.View {
     @Inject
+    RequirementsChecker requirementsChecker;
     WelcomeAdapter welcomeAdapter;
 
     private PlayFragment playFragment;
@@ -33,8 +34,8 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if(requirementsChecker.areRequirementsMet()) {
+        welcomeAdapter = new WelcomeAdapter(this, requirementsChecker);
+        if (requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(MapActivity.class, null, Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             finish();
             return;
@@ -47,12 +48,10 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         playFragment = new PlayFragment();
         welcomeAdapter.setupFragments(new IntroFragment(), new VersionFragment(), playFragment, new PermissionFragment(), new FinishFragment());
 
+        binding.viewPager.setUserInputEnabled(false);
         binding.viewPager.setAdapter(welcomeAdapter);
-        binding.viewPager.addOnPageChangeListener(this);
 
-
-
-        Timber.v("pager setup with %s fragments", welcomeAdapter.getCount());
+        Timber.v("pager setup with %s fragments", welcomeAdapter.getItemCount());
         buildPagerIndicator();
         showFragment(0);
     }
@@ -61,7 +60,7 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     public void showNextFragment() {
         int currentItem = binding.viewPager.getCurrentItem();
 
-        if(currentItem == welcomeAdapter.getLastItemPosition()) {
+        if (currentItem == welcomeAdapter.getLastItemPosition()) {
             Timber.e("viewPager is at the end");
             setNextEnabled(false);
             return;
@@ -70,8 +69,8 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
     }
 
     public void setPagerIndicator(int index) {
-        if (index < welcomeAdapter.getCount()) {
-            for (int i = 0; i < welcomeAdapter.getCount(); i++) {
+        if (index < welcomeAdapter.getItemCount()) {
+            for (int i = 0; i < welcomeAdapter.getItemCount(); i++) {
                 ImageView circle = (ImageView) binding.circles.getChildAt(i);
                 if (i == index) {
                     circle.setAlpha(1f);
@@ -98,19 +97,20 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         binding.viewPager.setCurrentItem(position);
         welcomeAdapter.getFragment(binding.viewPager.getCurrentItem()).onShowFragment();
         refreshNextDoneButtons();
+        setPagerIndicator(position);
     }
 
     // TODO I really feel like we can replace this to auto refresh when the VM changes. Somehow.
     public void refreshNextDoneButtons() {
         setNextEnabled(welcomeAdapter.getFragment(binding.viewPager.getCurrentItem()).isNextEnabled());
-        setDoneEnabled(binding.viewPager.getCurrentItem()  == welcomeAdapter.getLastItemPosition());
+        setDoneEnabled(binding.viewPager.getCurrentItem() == welcomeAdapter.getLastItemPosition());
     }
 
     private void buildPagerIndicator() {
         float scale = getResources().getDisplayMetrics().density;
         int padding = (int) (5 * scale + 0.5f);
 
-        for (int i = 0; i < welcomeAdapter.getCount(); i++) {
+        for (int i = 0; i < welcomeAdapter.getItemCount(); i++) {
             ImageView circle = new ImageView(this);
             circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_baseline_fiber_manual_record_24));
             circle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -130,18 +130,6 @@ public class WelcomeActivity extends BaseActivity<UiWelcomeBinding, WelcomeMvvm.
         }
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        viewModel.onAdapterPageSelected(position);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
