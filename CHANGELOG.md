@@ -1,8 +1,19 @@
 # Changelog
 
-## Version 2.2.3
+## Version 2.3.0
+
+* Dependency updates
+
+### New features
+
+* Config can now be loaded by the app using an `owntracks:///` URI, either pointing at a remote config location or encoded inline in base64.
 
 ### Bug fixes
+
+* Fix bug relating to geocoding handling where the displayed value was not correctly updated.
+* Geocoder now only considers first 4dp of location lat/lng to prevent too many requests resulting from tiny location drift
+* Background location permission no longer needed, so removed
+* Fix for regression introduced in 2.2 where self-signed certificates supplied as the CA were doing more restrictive hostname checking (#896). Hostnames are no longer matched if the CA cert is the same as the MQTT leaf cert.
 
 ## Version 2.2.2
 
