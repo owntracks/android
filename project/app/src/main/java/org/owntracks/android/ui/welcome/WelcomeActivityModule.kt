@@ -1,21 +1,22 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
-
+package org.owntracks.android.ui.welcome
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import org.owntracks.android.injection.modules.android.FragmentModules.*
+import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
-import org.owntracks.android.ui.welcome.WelcomeActivity
-import org.owntracks.android.ui.welcome.WelcomeMvvm
-import org.owntracks.android.ui.welcome.WelcomeViewModel
 import org.owntracks.android.ui.welcome.finish.FinishFragment
+import org.owntracks.android.ui.welcome.finish.FinishFragmentModule
 import org.owntracks.android.ui.welcome.intro.IntroFragment
+import org.owntracks.android.ui.welcome.intro.IntroFragmentModule
 import org.owntracks.android.ui.welcome.permission.PermissionFragment
+import org.owntracks.android.ui.welcome.permission.PermissionFragmentModule
 import org.owntracks.android.ui.welcome.play.PlayFragment
+import org.owntracks.android.ui.welcome.play.PlayFragmentModule
 import org.owntracks.android.ui.welcome.version.VersionFragment
+import org.owntracks.android.ui.welcome.version.VersionFragmentModule
 
 @Module(includes = [BaseActivityModule::class])
 abstract class WelcomeActivityModule {

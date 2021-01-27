@@ -3,7 +3,7 @@
 	<data>
 		<variable
 			name="vm"
-			type="org.owntracks.android.ui.welcome.permission.PermissionFragmentMvvm.ViewModel"/>
+			type="org.owntracks.android.ui.welcome.permission.PermissionFragmentViewModel"/>
 		<import type="android.view.View"/>
 	</data>
 

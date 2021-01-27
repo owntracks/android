@@ -10,13 +10,13 @@ import org.owntracks.android.injection.modules.android.ActivityModules.Preferenc
 import org.owntracks.android.injection.modules.android.ActivityModules.RegionActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.RegionsActivityModule;
 import org.owntracks.android.injection.modules.android.ActivityModules.StatusActivityModule;
-import org.owntracks.android.injection.modules.android.ActivityModules.WelcomeActivityModule;
 import org.owntracks.android.injection.modules.android.ServiceModules.BackgroundServiceModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver;
 import org.owntracks.android.ui.preferences.LogViewerActivity;
+import org.owntracks.android.ui.welcome.WelcomeActivityModule;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

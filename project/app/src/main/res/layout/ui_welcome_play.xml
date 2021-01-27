@@ -6,7 +6,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.welcome.play.PlayFragmentMvvm.ViewModel" />
+            type="org.owntracks.android.ui.welcome.play.PlayFragmentViewModel" />
 
         <import type="android.view.View" />
     </data>
