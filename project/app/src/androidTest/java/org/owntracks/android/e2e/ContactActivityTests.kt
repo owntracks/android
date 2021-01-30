@@ -1,6 +1,10 @@
 package org.owntracks.android.e2e
 
+import android.view.View
+import android.view.animation.Animation
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource.ResourceCallback
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
@@ -26,6 +30,8 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.preferences.clickOnAndWait
+
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -72,32 +78,32 @@ class ContactActivityTests {
         doWelcomeProcess()
 
         openDrawer()
-        clickOn(R.string.title_activity_preferences)
-        clickOn(R.string.preferencesServer)
-        clickOn(R.string.mode_heading)
-        clickOn(R.string.mode_http_private_label)
+        clickOnAndWait(R.string.title_activity_preferences)
+        clickOnAndWait(R.string.preferencesServer)
+        clickOnAndWait(R.string.mode_heading)
+        clickOnAndWait(R.string.mode_http_private_label)
         clickDialogPositiveButton()
-        clickOn(R.string.preferencesHost)
+        clickOnAndWait(R.string.preferencesHost)
         writeTo(R.id.url, "http://localhost:${httpPort}/")
         clickDialogPositiveButton()
         clickBack()
 
         openDrawer()
-        clickOn(R.string.title_activity_map)
+        clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
         IdlingRegistry.getInstance().register(locationIdlingResource)
 
-        clickOn(R.id.menu_report)
+        clickOnAndWait(R.id.menu_report)
 
         val networkIdlingResource = baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
         IdlingRegistry.getInstance().register(networkIdlingResource)
 
         openDrawer()
-        clickOn(R.string.title_activity_contacts)
+        clickOnAndWait(R.string.title_activity_contacts)
         assertRecyclerViewItemCount(R.id.recycler_view, 1)
 
-        clickOn("aa")
+        clickOnAndWait("aa")
         assertDisplayed(R.id.bottomSheetLayout)
         assertDisplayed(R.id.contactPeek)
         assertContains(R.id.name, "aa")
@@ -120,6 +126,36 @@ class ContactActivityTests {
                 MockResponse().setResponseCode(200).setHeader("Content-type", "application/json").setBody(config)
             } else {
                 errorResponse
+            }
+        }
+    }
+
+    class AnimationIdlingResource(view: View) : IdlingResource {
+        private var callback: ResourceCallback? = null
+        override fun getName(): String {
+            return AnimationIdlingResource::class.java.name
+        }
+
+        override fun isIdleNow(): Boolean {
+            return true
+        }
+
+        override fun registerIdleTransitionCallback(callback: ResourceCallback) {
+            this.callback = callback
+        }
+
+        init {
+            if (view.animation == null) {
+                callback!!.onTransitionToIdle()
+            } else {
+                view.animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {}
+                    override fun onAnimationEnd(animation: Animation) {
+                        callback!!.onTransitionToIdle()
+                    }
+
+                    override fun onAnimationRepeat(animation: Animation) {}
+                })
             }
         }
     }

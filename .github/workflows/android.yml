@@ -53,6 +53,8 @@ jobs:
             ./gradlew createDebugCoverageReport --no-build-cache
         profile: pixel_3a
         target: google_apis
+        disable-animations: true
+        arch: x86_64
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/

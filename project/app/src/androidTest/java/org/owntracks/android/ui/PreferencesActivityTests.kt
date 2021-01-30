@@ -19,10 +19,10 @@ import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBac
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.allOf
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,6 +31,8 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.PreferencesActivity
+import org.owntracks.android.ui.preferences.clickOnAndWait
+
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -50,6 +52,15 @@ class PreferencesActivityTests {
         baristaRule.launchActivity()
     }
 
+    @Before
+    fun initIntents() {
+        Intents.init()
+    }
+
+    @After
+    fun releaseIntents() {
+        Intents.release()
+    }
 
     @Test
     @AllowFlaky(attempts = 1)
@@ -65,50 +76,33 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun documentationLinkOpensSite() {
-        Intents.init()
         clickOn(R.string.preferencesInfo)
         clickOn(R.string.preferencesDocumentation)
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))))
-        Intents.release()
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun twitterLinkOpensSite() {
-        try {
-            Intents.init()
-            clickOn(R.string.preferencesInfo)
-            clickOn(R.string.preferencesTwitter)
-            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
-        } finally {
-            Intents.release()
-        }
+        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.preferencesTwitter)
+        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun sourceLinkOpensSite() {
-        try {
-            Intents.init()
-            clickOn(R.string.preferencesInfo)
-            clickOn(R.string.preferencesRepository)
-            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
-        } finally {
-            Intents.release()
-        }
+        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.preferencesRepository)
+        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun librariesLinkListsLibraries() {
-        try {
-            Intents.init()
-            clickOn(R.string.preferencesInfo)
-            clickOn(R.string.preferencesLicenses)
-            assertDisplayed(R.string.preferencesLicenses)
-        } finally {
-            Intents.release()
-        }
+        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.preferencesLicenses)
+        assertDisplayed(R.string.preferencesLicenses)
     }
 
     @Test
@@ -159,77 +153,74 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 3)
     fun settingSimpleHTTPConfigSettingsCanBeExported() {
-        val sleepBetweenMillis = 1000L
-        clickOn(R.string.preferencesServer)
-        clickOn(R.string.mode_heading)
-        clickOn(R.string.mode_http_private_label)
+
+        clickOnAndWait(R.string.preferencesServer)
+        clickOnAndWait(R.string.mode_heading)
+        clickOnAndWait(R.string.mode_http_private_label)
         clickDialogPositiveButton()
-        clickOn(R.string.preferencesHost)
+        clickOnAndWait(R.string.preferencesHost)
         writeTo(R.id.url, "https://www.example.com:8080/")
         clickDialogPositiveButton()
-        clickOn(R.string.preferencesIdentification)
+        clickOnAndWait(R.string.preferencesIdentification)
         writeTo(R.id.username, "testUsername")
         writeTo(R.id.password, "testPassword")
         writeTo(R.id.deviceId, "testDeviceId")
         writeTo(R.id.trackerId, "t1")
         clickDialogPositiveButton()
         clickBack()
-        sleep(sleepBetweenMillis)
 
-        clickOn(R.string.preferencesReporting)
-        clickOn(R.string.preferencesPubExtendedData)
+
+        clickOnAndWait(R.string.preferencesReporting)
+        clickOnAndWait(R.string.preferencesPubExtendedData)
         clickBack()
 
-        clickOn(R.string.preferencesNotification)
-        clickOn(R.string.preferencesNotificationEvents)
+        clickOnAndWait(R.string.preferencesNotification)
+        clickOnAndWait(R.string.preferencesNotificationEvents)
         clickBack()
 
         // This is an ugly hack, but there's some race conditions on underpowered hardware
         // causing the test to move on before the view has been fully built/rendered.
 
-        clickOn(R.string.preferencesAdvanced)
-        sleep(sleepBetweenMillis)
-        clickOn(R.string.preferencesRemoteCommand)
-        sleep(sleepBetweenMillis)
-        clickOn(R.string.preferencesIgnoreInaccurateLocations)
-        sleep(sleepBetweenMillis)
+        clickOnAndWait(R.string.preferencesAdvanced)
+        clickOnAndWait(R.string.preferencesRemoteCommand)
+        clickOnAndWait(R.string.preferencesIgnoreInaccurateLocations)
+
         writeTo(android.R.id.edit, "950")
-        sleep(sleepBetweenMillis)
+
         clickDialogPositiveButton()
         closeSoftKeyboard()
-        sleep(sleepBetweenMillis)
-        clickOn(R.string.preferencesLocatorInterval)
-        sleep(sleepBetweenMillis)
+
+        clickOnAndWait(R.string.preferencesLocatorInterval)
+
         writeTo(android.R.id.edit, "123")
-        sleep(sleepBetweenMillis)
+
         clickDialogPositiveButton()
         closeSoftKeyboard()
-        sleep(sleepBetweenMillis)
-        clickOn(R.string.preferencesMoveModeLocatorInterval)
-        sleep(sleepBetweenMillis)
+
+        clickOnAndWait(R.string.preferencesMoveModeLocatorInterval)
+
         writeTo(android.R.id.edit, "5")
-        sleep(sleepBetweenMillis)
+
         clickDialogPositiveButton()
         closeSoftKeyboard()
         scrollToText(R.string.preferencesAutostart)
-        clickOn(R.string.preferencesAutostart)
+        clickOnAndWait(R.string.preferencesAutostart)
 
         /* TODO: Espresso doesn't work with dropdowns. Which is a bit silly. Restore this section once fixed */
 //        scrollToText(R.string.preferencesReverseGeocodeProvider)
-//        clickOn(R.string.preferencesReverseGeocodeProvider)
+//        clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
 //        val something = onView(allOf(withId(android.R.id.text1), withText("OpenCage")))
 //
 //        something.perform(longClick())
 //
 //        scrollToText(R.string.preferencesOpencageGeocoderApiKey)
-//        clickOn(R.string.preferencesOpencageGeocoderApiKey)
+//        clickOnAndWait(R.string.preferencesOpencageGeocoderApiKey)
 //        writeTo(android.R.id.edit, "geocodeAPIKey")
 //        clickDialogPositiveButton()
-        sleep(sleepBetweenMillis)
-        clickBack()
-        sleep(sleepBetweenMillis)
 
-        clickOn(R.string.configurationManagement)
+        clickBack()
+
+        clickOnAndWait(R.string.configurationManagement)
 
         assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
         assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")
