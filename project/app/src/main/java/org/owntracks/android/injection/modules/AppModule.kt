@@ -8,7 +8,6 @@ import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.App
 import org.owntracks.android.EventBusIndex
 import org.owntracks.android.data.repos.ContactsRepo
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.injection.scopes.PerApplication
@@ -33,12 +32,6 @@ class AppModule {
     @PerApplication
     fun provideContactsRepo(eventBus: EventBus?, contactImageProvider: ContactImageProvider?): ContactsRepo {
         return MemoryContactsRepo(eventBus!!, contactImageProvider!!)
-    }
-
-    @Provides
-    @PerApplication
-    fun provideLocationRepo(eventBus: EventBus?): LocationRepo {
-        return LocationRepo(eventBus)
     }
 
     @Provides
