@@ -140,6 +140,9 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     @Inject
     ServiceBridge serviceBridge;
 
+    @Inject
+    MessageProcessor messageProcessor;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -179,6 +182,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         eventBus.register(this);
         eventBus.postSticky(new Events.ServiceStarted());
+
+        messageProcessor.initialize();
 
         preferences.registerOnPreferenceChangedListener(this);
     }

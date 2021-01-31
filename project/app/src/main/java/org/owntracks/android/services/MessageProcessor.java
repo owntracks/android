@@ -68,6 +68,8 @@ public class MessageProcessor {
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
     private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(1);
 
+    private boolean initialized = false;
+
     @Inject
     public MessageProcessor(
             @AppContext Context applicationContext,
@@ -97,9 +99,13 @@ public class MessageProcessor {
 
     }
 
-    public void initialize() {
-        onEndpointStateChanged(EndpointState.INITIAL);
-        reconnect();
+    synchronized public void initialize() {
+        if (!initialized) {
+            Timber.d("Initializing MessageProcessor");
+            onEndpointStateChanged(EndpointState.INITIAL);
+            reconnect();
+            initialized = true;
+        }
     }
 
     public void reconnect() {
