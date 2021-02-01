@@ -5,6 +5,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.hiya.jacoco-android")
+    id("scabbard.gradle") version "0.4.0"
 }
 
 val versionMajor = 2
@@ -305,4 +306,8 @@ tasks.whenTaskAdded {
     if (name == "connectedDebugAndroidTest") {
         finalizedBy(fetchScreenshotsTask)
     }
+}
+
+scabbard {
+    enabled = true
 }
