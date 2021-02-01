@@ -1,6 +1,6 @@
 package org.owntracks.android.support;
 
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 
 import java.lang.ref.WeakReference;
 
@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 
-@PerApplication
+@Singleton
 public class ServiceBridge {
     private WeakReference<ServiceBridgeInterface> serviceWeakReference;
 

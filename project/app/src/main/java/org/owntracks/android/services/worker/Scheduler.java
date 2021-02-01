@@ -11,7 +11,7 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-@PerApplication
+@Singleton
 public class Scheduler {
     public static final long MIN_PERIODIC_INTERVAL_MILLIS = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS;
     private static final String ONEOFF_TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP";

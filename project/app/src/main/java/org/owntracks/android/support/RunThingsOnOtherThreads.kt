@@ -5,10 +5,10 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
+import javax.inject.Singleton
 import javax.inject.Inject
 
-@PerApplication
+@Singleton
 class RunThingsOnOtherThreads @Inject constructor(@AppContext appContext: Context) {
     private val backgroundHandler: Handler
     private val mainHandler: Handler

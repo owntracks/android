@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageEncrypted;
 
@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
-@PerApplication
+@Singleton
 public class Parser {
     private static ObjectMapper defaultMapper;
     private static ObjectMapper arrayCompatMapper;

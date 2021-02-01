@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
+import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
@@ -17,7 +17,7 @@ import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedL
 import timber.log.Timber
 import javax.inject.Inject
 
-@PerApplication
+@Singleton
 class GeocoderProvider @Inject constructor(@AppContext val context: Context, val preferences: Preferences) {
     private lateinit var geocoder: Geocoder
 

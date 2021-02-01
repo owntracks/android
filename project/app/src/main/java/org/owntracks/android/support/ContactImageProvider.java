@@ -24,7 +24,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
 import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-@PerApplication
+@Singleton
 public class ContactImageProvider {
     private static ContactBitmapMemoryCache memoryCache;
     private static int FACE_DIMENSIONS;

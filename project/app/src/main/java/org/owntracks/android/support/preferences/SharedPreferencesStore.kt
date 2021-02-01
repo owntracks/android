@@ -7,7 +7,7 @@ import dagger.Binds
 import dagger.Module
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
+import javax.inject.Singleton
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import java.util.*
@@ -19,7 +19,7 @@ private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
 /***
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
  */
-@PerApplication
+@Singleton
 class SharedPreferencesStore @Inject constructor(@AppContext context: Context) : PreferencesStore {
     private lateinit var sharedPreferencesName: String
     private val activeSharedPreferencesChangeListener = LinkedList<OnModeChangedPreferenceChangedListener>()

@@ -11,7 +11,7 @@ import com.google.android.gms.location.Geofence;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.model.messages.MessageWaypoint;
@@ -28,7 +28,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-@PerApplication
+@Singleton
 public class LocationProcessor {
     private final MessageProcessor messageProcessor;
     private final Preferences preferences;

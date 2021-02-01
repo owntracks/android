@@ -7,12 +7,12 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
+import javax.inject.Singleton
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageLocation
 import javax.inject.Inject
 
-@PerApplication
+@Singleton
 class DeviceMetricsProvider @Inject internal constructor(@param:AppContext private val context: Context) {
     val batteryLevel: Int
         get() {

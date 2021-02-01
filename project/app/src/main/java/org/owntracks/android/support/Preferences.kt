@@ -8,7 +8,7 @@ import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
+import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
@@ -27,7 +27,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@PerApplication
+@Singleton
 class Preferences @Inject constructor(@AppContext c: Context, private val eventBus: EventBus?, private val preferencesStore: PreferencesStore) {
     private val context: Context = c
     private var isFirstStart = false

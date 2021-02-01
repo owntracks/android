@@ -5,11 +5,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 
 import javax.inject.Inject;
 
-@PerApplication
+@Singleton
 public class LocationRepo {
     private final EventBus eventBus;
     private Location currentLocation;

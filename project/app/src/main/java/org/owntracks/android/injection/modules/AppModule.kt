@@ -10,33 +10,33 @@ import org.owntracks.android.EventBusIndex
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
 import org.owntracks.android.injection.qualifier.AppContext
-import org.owntracks.android.injection.scopes.PerApplication
 import org.owntracks.android.support.ContactImageProvider
+import javax.inject.Singleton
 
 @Module
 class AppModule {
     @Provides
     @AppContext
-    @PerApplication
+    @Singleton
     fun provideContext(app: App): Context {
         return app
     }
 
     @Provides
-    @PerApplication
+    @Singleton
     fun provideEventbus(): EventBus {
         return EventBus.builder().addIndex(EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build()
     }
 
     @Provides
-    @PerApplication
+    @Singleton
     fun provideContactsRepo(eventBus: EventBus?, contactImageProvider: ContactImageProvider?): ContactsRepo {
         return MemoryContactsRepo(eventBus!!, contactImageProvider!!)
     }
 
     @Provides
-    @PerApplication
+    @Singleton
     fun provideOutgoingQueueIdlingResource(): CountingIdlingResource {
-        return CountingIdlingResource("outgoingQueueIdlingResource",true)
+        return CountingIdlingResource("outgoingQueueIdlingResource", true)
     }
 }

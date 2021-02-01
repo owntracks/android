@@ -4,7 +4,7 @@ import org.owntracks.android.App;
 import org.owntracks.android.injection.modules.AppModule;
 import org.owntracks.android.injection.modules.ObjectboxWaypointsModule;
 import org.owntracks.android.injection.modules.android.AndroindBindingModule;
-import org.owntracks.android.injection.scopes.PerApplication;
+import javax.inject.Singleton;
 import org.owntracks.android.services.worker.MQTTMaybeReconnectAndPingWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
 import org.owntracks.android.services.worker.SendLocationPingWorker;
@@ -16,7 +16,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;
 
-@PerApplication
+@Singleton
 @Component(modules={
         AppModule.class,
         ObjectboxWaypointsModule.class,
