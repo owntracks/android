@@ -1,14 +1,15 @@
 package org.owntracks.android.injection.components;
 
 import org.owntracks.android.App;
+import org.owntracks.android.data.repos.ObjectboxWaypointsModule;
 import org.owntracks.android.injection.modules.AppModule;
-import org.owntracks.android.injection.modules.ObjectboxWaypointsModule;
 import org.owntracks.android.injection.modules.android.AndroindBindingModule;
-import javax.inject.Singleton;
 import org.owntracks.android.services.worker.MQTTMaybeReconnectAndPingWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
 import org.owntracks.android.services.worker.SendLocationPingWorker;
 import org.owntracks.android.support.preferences.SharedPreferencesStoreModule;
+
+import javax.inject.Singleton;
 
 import dagger.BindsInstance;
 import dagger.Component;

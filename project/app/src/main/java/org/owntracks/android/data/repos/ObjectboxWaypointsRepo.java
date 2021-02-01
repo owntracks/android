@@ -14,6 +14,9 @@ import org.owntracks.android.support.Preferences;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import io.objectbox.android.ObjectBoxLiveData;
@@ -21,10 +24,12 @@ import io.objectbox.exception.UniqueViolationException;
 import io.objectbox.query.Query;
 import timber.log.Timber;
 
+@Singleton
 public class ObjectboxWaypointsRepo extends WaypointsRepo  {
     private final Preferences preferences;
     private Box<org.owntracks.android.data.WaypointModel> box;
 
+    @Inject
     public ObjectboxWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
         super(eventBus);
         BoxStore boxStore = MyObjectBox.builder().androidContext(context).build();
@@ -132,4 +137,6 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
     public void delete_impl(org.owntracks.android.data.WaypointModel w) {
         box.remove(w);
     }
+
+
 }
