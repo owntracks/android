@@ -14,7 +14,7 @@ import org.owntracks.android.support.ContactImageProvider
 import javax.inject.Singleton
 
 @Module
-class AppModule {
+class SingletonModule {
     @Provides
     @AppContext
     @Singleton

@@ -2,7 +2,7 @@ package org.owntracks.android.injection.components;
 
 import org.owntracks.android.App;
 import org.owntracks.android.data.repos.ObjectboxWaypointsModule;
-import org.owntracks.android.injection.modules.AppModule;
+import org.owntracks.android.injection.modules.SingletonModule;
 import org.owntracks.android.injection.modules.android.AndroindBindingModule;
 import org.owntracks.android.services.worker.MQTTMaybeReconnectAndPingWorker;
 import org.owntracks.android.services.worker.MQTTReconnectWorker;
@@ -18,28 +18,33 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;
 
 @Singleton
-@Component(modules={
-        AppModule.class,
+@Component(modules = {
+        SingletonModule.class,
         ObjectboxWaypointsModule.class,
         AndroidSupportInjectionModule.class,
         AndroindBindingModule.class,
         SharedPreferencesStoreModule.class}
-        )
-public interface AppComponent extends AndroidInjector<DaggerApplication>  {
+)
+public interface AppComponent extends AndroidInjector<DaggerApplication> {
 
     @Component.Builder
     interface Builder {
         @BindsInstance
         Builder app(App app);
+
         AppComponent build();
 
     }
 
     @Override
     void inject(DaggerApplication instance);
+
     void inject(App app);
+
     void inject(MQTTMaybeReconnectAndPingWorker worker);
+
     void inject(MQTTReconnectWorker worker);
+
     void inject(SendLocationPingWorker worker);
 
 }
