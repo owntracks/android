@@ -6,14 +6,15 @@ import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import androidx.work.WorkerFactory
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import org.conscrypt.Conscrypt
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import org.owntracks.android.injection.components.AppComponentProvider
 import org.owntracks.android.injection.components.DaggerAppComponent
 import org.owntracks.android.services.MessageProcessor
+import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.RestartApp
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -25,23 +26,25 @@ import java.security.Security
 import javax.inject.Inject
 
 class App : DaggerApplication() {
-    @JvmField
     @Inject
-    var preferences: Preferences? = null
+    lateinit var preferences: Preferences
 
-    @JvmField
     @Inject
-    var runThingsOnOtherThreads: RunThingsOnOtherThreads? = null
+    lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
 
-    @JvmField
     @Inject
-    var messageProcessor: MessageProcessor? = null
+    lateinit var messageProcessor: MessageProcessor
 
-    @JvmField
     @Inject
-    var eventBus: EventBus? = null
+    lateinit var eventBus: EventBus
+
+    @Inject
+    lateinit var workerFactory: WorkerFactory
+
+    @Inject
+    lateinit var scheduler: Scheduler
+
     override fun onCreate() {
-        WorkManager.initialize(this, Configuration.Builder().build())
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -51,6 +54,8 @@ class App : DaggerApplication() {
         }
 
         super.onCreate()
+        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
+        scheduler.cancelAllTasks()
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugLogTree())
             Timber.e("StrictMode enabled in DEBUG build")
@@ -72,12 +77,12 @@ class App : DaggerApplication() {
         for (t in Timber.forest()) {
             Timber.v("Planted trees :%s", t)
         }
-        preferences!!.checkFirstStart()
+        preferences.checkFirstStart()
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
-        runThingsOnOtherThreads!!.postOnMainHandlerDelayed(Runnable { messageProcessor!!.initialize() }, 510)
-        eventBus!!.register(this)
+        runThingsOnOtherThreads.postOnMainHandlerDelayed(Runnable { messageProcessor.initialize() }, 510)
+        eventBus.register(this)
     }
 
     @Subscribe
@@ -91,7 +96,6 @@ class App : DaggerApplication() {
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
         val appComponent = DaggerAppComponent.builder().app(this).build()
         appComponent.inject(this)
-        AppComponentProvider.setAppComponent(appComponent)
         return appComponent
     }
 }

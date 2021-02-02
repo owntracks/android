@@ -310,4 +310,6 @@ tasks.whenTaskAdded {
 
 scabbard {
     enabled = true
+    fullBindingGraphValidation = true
+    failOnError = true
 }
