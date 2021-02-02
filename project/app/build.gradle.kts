@@ -309,7 +309,8 @@ tasks.whenTaskAdded {
 }
 
 scabbard {
-    enabled = true
+    enabled = !gradle.startParameter.toString().contains("assembleRelease")
     fullBindingGraphValidation = true
     failOnError = true
+    outputFormat = "svg"
 }

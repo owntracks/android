@@ -94,7 +94,7 @@ class App : DaggerApplication() {
     }
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        val appComponent = DaggerAppComponent.builder().app(this).build()
+        val appComponent =  DaggerAppComponent.builder().app(this).build()
         appComponent.inject(this)
         return appComponent
     }

@@ -8,7 +8,6 @@ import org.owntracks.android.injection.scopes.PerFragment;
 
 import javax.inject.Named;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 
@@ -16,10 +15,6 @@ import dagger.Provides;
 public abstract class BaseSupportFragmentModule {
     private static final String FRAGMENT = "BaseSupportFragmentModule.fragment";
     private static final String CHILD_FRAGMENT_MANAGER = "BaseSupportFragmentModule.childFragmentManager";
-
-    @Binds
-    @PerFragment
-    abstract Fragment bindSupportFragment(Fragment f);
 
     @Provides
     @PerFragment
