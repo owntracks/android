@@ -9,6 +9,4 @@ import org.owntracks.android.injection.modules.android.FragmentModules.BaseSuppo
 abstract class PermissionFragmentModule {
     @Binds
     abstract fun bindSupportFragment(f: PermissionFragment?): Fragment?
-//    @Binds
-//    abstract fun bindViewModel(viewModel: PermissionFragmentViewModel?): PermissionFragmentViewModel?
 }

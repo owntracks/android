@@ -11,7 +11,4 @@ abstract class PlayFragmentModule {
     @Binds
     @PerFragment
     abstract fun bindSupportFragment(f: PlayFragment?): Fragment?
-//    @Binds
-//    @PerFragment
-//    abstract fun bindViewModel(viewModel: PlayFragmentViewModel?): BaseViewModel<*>?
 }

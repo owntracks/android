@@ -3,11 +3,7 @@ package org.owntracks.android.ui.preferences
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
-import dagger.Binds
-import dagger.Module
 import org.owntracks.android.R
-import org.owntracks.android.injection.modules.android.FragmentModules.BaseFragmentModule
-import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity
@@ -39,13 +35,5 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     companion object {
         private const val UI_PREFERENCE_SCREEN_CONNECTION = "connectionScreen"
         private const val UI_SCREEN_CONFIGURATION = "configuration"
-        private const val UI_LOGS = "logs"
-    }
-
-    @Module(includes = [BaseFragmentModule::class])
-    internal abstract class FragmentModule {
-        @Binds
-        @PerFragment
-        abstract fun bindFragment(reportingFragment: PreferencesFragment): PreferencesFragment
     }
 }

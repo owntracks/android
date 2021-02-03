@@ -8,7 +8,7 @@ import dagger.android.support.DaggerApplication
 import org.owntracks.android.App
 import org.owntracks.android.data.repos.ObjectboxWaypointsModule
 import org.owntracks.android.injection.modules.SingletonModule
-import org.owntracks.android.injection.modules.android.AndroindBindingModule
+import org.owntracks.android.injection.modules.android.AndroidBindingModule
 import org.owntracks.android.services.worker.WorkerModule
 import org.owntracks.android.support.preferences.SharedPreferencesStoreModule
 import javax.inject.Singleton
@@ -19,7 +19,7 @@ import javax.inject.Singleton
     SingletonModule::class,
     ObjectboxWaypointsModule::class,
     AndroidSupportInjectionModule::class,
-    AndroindBindingModule::class,
+    AndroidBindingModule::class,
     SharedPreferencesStoreModule::class,
     WorkerModule::class
 ])

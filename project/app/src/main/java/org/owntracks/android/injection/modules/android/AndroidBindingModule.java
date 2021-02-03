@@ -22,7 +22,7 @@ import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
 @Module
-public abstract class AndroindBindingModule {
+public abstract class AndroidBindingModule {
     @PerActivity
     @ContributesAndroidInjector(modules = {ContactsActivityModule.class})
     abstract org.owntracks.android.ui.contacts.ContactsActivity bindContactsActivity();
