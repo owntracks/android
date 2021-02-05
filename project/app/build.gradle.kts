@@ -141,7 +141,7 @@ val kotlinCoroutinesVersion = "1.4.1"
 dependencies {
     implementation("androidx.preference:preference:1.1.1")
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
-    implementation("com.google.android.material:material:1.2.1")
+    implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.work:work-runtime:2.5.0")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
