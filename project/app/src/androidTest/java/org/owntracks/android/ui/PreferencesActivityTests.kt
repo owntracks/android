@@ -2,7 +2,8 @@ package org.owntracks.android.ui
 
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
@@ -188,21 +189,20 @@ class PreferencesActivityTests {
         writeTo(android.R.id.edit, "950")
 
         clickDialogPositiveButton()
-        closeSoftKeyboard()
 
         clickOnAndWait(R.string.preferencesLocatorInterval)
 
         writeTo(android.R.id.edit, "123")
 
         clickDialogPositiveButton()
-        closeSoftKeyboard()
 
+        scrollToText(R.string.preferencesMoveModeLocatorInterval)
         clickOnAndWait(R.string.preferencesMoveModeLocatorInterval)
 
         writeTo(android.R.id.edit, "5")
 
         clickDialogPositiveButton()
-        closeSoftKeyboard()
+
         scrollToText(R.string.preferencesAutostart)
         clickOnAndWait(R.string.preferencesAutostart)
 

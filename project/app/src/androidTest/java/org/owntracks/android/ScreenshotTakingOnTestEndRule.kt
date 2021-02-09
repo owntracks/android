@@ -87,10 +87,15 @@ class ScreenshotTakingOnTestEndRule : TestWatcher() {
             parentFolderPath: String,
             bitmap: Bitmap
     ) {
-        @Suppress("DEPRECATION") val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + parentFolderPath).toString())
+        @Suppress("DEPRECATION") val directory = File("${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/$parentFolderPath")
 
         if (!directory.exists()) {
-            directory.mkdirs()
+            val createSuccess = directory.mkdirs()
+            if (!createSuccess) {
+                Timber.e("unable to create directory tree at ${directory}. Skipping screenshot saving.")
+                return
+            }
+
         }
 
         val file = File(directory, "$screenshotName.jpeg")
