@@ -6,13 +6,13 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.Nullable;
+
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiRegionBinding;
 import org.owntracks.android.ui.base.BaseActivity;
 
-import androidx.annotation.Nullable;
-
-public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel> implements RegionMvvm.View {
+public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel<RegionMvvm.View>> implements RegionMvvm.View {
 
     private MenuItem saveButton;
 

@@ -14,5 +14,5 @@ abstract class StatusActivityModule {
     @PerActivity
     abstract fun bindActivity(a: StatusActivity?): AppCompatActivity?
     @Binds
-    abstract fun bindViewModel(viewModel: StatusViewModel?): StatusMvvm.ViewModel<*>?
+    abstract fun bindViewModel(viewModel: StatusViewModel): StatusMvvm.ViewModel<StatusMvvm.View>
 }

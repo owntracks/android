@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 @SuppressLint("GoogleAppIndexingApiWarning")
-public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel> implements LoadMvvm.View {
+public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel<LoadMvvm.View>> implements LoadMvvm.View {
     private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
 

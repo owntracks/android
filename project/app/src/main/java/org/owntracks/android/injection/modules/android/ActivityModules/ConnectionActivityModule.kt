@@ -14,5 +14,5 @@ abstract class ConnectionActivityModule {
     @PerActivity
     abstract fun bindActivity(a: ConnectionActivity?): AppCompatActivity?
     @Binds
-    abstract fun bindViewModel(viewModel: ConnectionViewModel?): ConnectionMvvm.ViewModel<*>?
+    abstract fun bindViewModel(viewModel: ConnectionViewModel): ConnectionMvvm.ViewModel<ConnectionMvvm.View>
 }

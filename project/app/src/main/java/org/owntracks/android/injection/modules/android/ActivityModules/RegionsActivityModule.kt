@@ -14,5 +14,5 @@ abstract class RegionsActivityModule {
     @PerActivity
     abstract fun bindActivity(a: RegionsActivity?): AppCompatActivity?
     @Binds
-    abstract fun bindViewModel(viewModel: RegionsViewModel?): RegionsMvvm.ViewModel<*>?
+    abstract fun bindViewModel(viewModel: RegionsViewModel): RegionsMvvm.ViewModel<RegionsMvvm.View>
 }

@@ -34,7 +34,7 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
 
-public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel> implements ConnectionMvvm.View {
+public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBinding, ConnectionMvvm.ViewModel<ConnectionMvvm.View>> implements ConnectionMvvm.View {
     private BaseDialogViewModel activeDialogViewModel;
 
     @Inject

@@ -39,7 +39,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel> implements EditorMvvm.View {
+public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, EditorMvvm.ViewModel<EditorMvvm.View>> implements EditorMvvm.View {
     @Inject
     Preferences preferences;
 

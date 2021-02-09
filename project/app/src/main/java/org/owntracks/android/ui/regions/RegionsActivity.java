@@ -19,7 +19,7 @@ import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import timber.log.Timber;
 
-public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.ViewModel> implements RegionsMvvm.View, RegionsAdapter.ClickListener {
+public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.ViewModel<RegionsMvvm.View>> implements RegionsMvvm.View, RegionsAdapter.ClickListener {
 
     private RegionsAdapter recyclerViewAdapter;
     private DataSubscription subscription;
