@@ -8,7 +8,7 @@ import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.ui.preferences.*
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class PreferencesActivityModule {
     @Binds
     @PerActivity

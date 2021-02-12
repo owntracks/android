@@ -15,6 +15,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 
 import org.owntracks.android.R;
+import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.ui.base.BaseActivity;
@@ -26,6 +27,7 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
 
+@PerActivity
 public class DrawerProvider {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
     private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;

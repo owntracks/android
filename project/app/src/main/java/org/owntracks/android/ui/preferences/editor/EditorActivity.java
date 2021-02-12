@@ -28,6 +28,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.preferences.load.LoadActivity;
 
 import java.io.File;
@@ -51,6 +52,9 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
 
     @Inject
     EventBus eventBus;
+
+    @Inject
+    Navigator navigator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

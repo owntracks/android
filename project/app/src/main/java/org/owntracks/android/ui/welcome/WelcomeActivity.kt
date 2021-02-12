@@ -9,6 +9,7 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.base.BaseActivity
+import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.finish.FinishFragment
 import org.owntracks.android.ui.welcome.intro.IntroFragment
@@ -19,11 +20,16 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), WelcomeMvvm.View {
-    @JvmField
+
     @Inject
-    var requirementsChecker: RequirementsChecker? = null
-    var welcomeAdapter: WelcomeAdapter? = null
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var requirementsChecker: RequirementsChecker
+
+    private var welcomeAdapter: WelcomeAdapter? = null
     private var playFragment: PlayFragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         welcomeAdapter = WelcomeAdapter(this, requirementsChecker)

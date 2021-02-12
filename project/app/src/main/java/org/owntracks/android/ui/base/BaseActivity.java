@@ -13,21 +13,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
-import androidx.fragment.app.FragmentManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
-import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule;
 import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
-import org.owntracks.android.support.RequirementsChecker;
-import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import dagger.android.support.DaggerAppCompatActivity;
 
@@ -42,15 +37,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     DrawerProvider drawerProvider;
     @Inject
     protected Preferences preferences;
-    @Inject
-    protected RequirementsChecker requirementsChecker;
-    @Inject
-    protected Navigator navigator;
-
-    @Inject
-    @Named(BaseActivityModule.ACTIVITY_FRAGMENT_MANAGER)
-    FragmentManager fragmentManager;
-
 
     private boolean hasEventBus = true;
     private boolean disablesAnimation = false;

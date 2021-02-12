@@ -11,8 +11,13 @@ import androidx.annotation.Nullable;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiRegionBinding;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.navigator.Navigator;
+
+import javax.inject.Inject;
 
 public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel<RegionMvvm.View>> implements RegionMvvm.View {
+    @Inject
+    Navigator navigator;
 
     private MenuItem saveButton;
 

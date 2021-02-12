@@ -3,7 +3,6 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import org.owntracks.android.injection.modules.android.ActivityModules.BaseActivityModule
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
@@ -18,7 +17,7 @@ import org.owntracks.android.ui.welcome.play.PlayFragmentModule
 import org.owntracks.android.ui.welcome.version.VersionFragment
 import org.owntracks.android.ui.welcome.version.VersionFragmentModule
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class WelcomeActivityModule {
     @Binds
     @PerActivity

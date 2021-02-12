@@ -8,7 +8,7 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity
 import org.owntracks.android.ui.preferences.editor.EditorMvvm
 import org.owntracks.android.ui.preferences.editor.EditorViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class EditorActivityModule {
     @Binds
     @PerActivity

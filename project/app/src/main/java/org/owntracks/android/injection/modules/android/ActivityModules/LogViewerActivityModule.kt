@@ -6,7 +6,7 @@ import dagger.Module
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.ui.preferences.LogViewerActivity
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class LogViewerActivityModule {
     @Binds
     @PerActivity

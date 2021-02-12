@@ -53,9 +53,11 @@ import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.support.ContactImageProvider;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.widgets.BindingConversions;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.welcome.WelcomeActivity;
 
 import java.util.HashMap;
@@ -105,6 +107,12 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
 
     @Inject
     CountingIdlingResource countingIdlingResource;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    RequirementsChecker requirementsChecker;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

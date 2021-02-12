@@ -8,7 +8,7 @@ import org.owntracks.android.ui.regions.RegionsActivity
 import org.owntracks.android.ui.regions.RegionsMvvm
 import org.owntracks.android.ui.regions.RegionsViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class RegionsActivityModule {
     @Binds
     @PerActivity

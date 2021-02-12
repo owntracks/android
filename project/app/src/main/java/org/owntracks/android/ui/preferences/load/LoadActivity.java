@@ -18,6 +18,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesLoadBinding;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,9 @@ import timber.log.Timber;
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel<LoadMvvm.View>> implements LoadMvvm.View {
     private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
+
+    @Inject
+    Navigator navigator;
 
     @Inject
     EventBus eventBus;

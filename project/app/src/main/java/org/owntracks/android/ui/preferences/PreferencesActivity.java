@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -32,7 +33,10 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
                     }
                 }
         );
-        navigator.replaceFragment(R.id.content_frame, new PreferencesFragment(), null, this);
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new PreferencesFragment(), null);
+        fragmentTransaction.commit();
+        getSupportFragmentManager().executePendingTransactions();
     }
 
     private void setToolbarTitle(CharSequence text) {

@@ -8,7 +8,7 @@ import org.owntracks.android.ui.status.StatusActivity
 import org.owntracks.android.ui.status.StatusMvvm
 import org.owntracks.android.ui.status.StatusViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class StatusActivityModule {
     @Binds
     @PerActivity

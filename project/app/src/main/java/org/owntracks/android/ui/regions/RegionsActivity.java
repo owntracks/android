@@ -13,13 +13,19 @@ import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.databinding.UiRegionsBinding;
 import org.owntracks.android.ui.base.BaseActivity;
+import org.owntracks.android.ui.base.navigator.Navigator;
 import org.owntracks.android.ui.region.RegionActivity;
+
+import javax.inject.Inject;
 
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import timber.log.Timber;
 
 public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.ViewModel<RegionsMvvm.View>> implements RegionsMvvm.View, RegionsAdapter.ClickListener {
+
+    @Inject
+    Navigator navigator;
 
     private RegionsAdapter recyclerViewAdapter;
     private DataSubscription subscription;

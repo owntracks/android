@@ -8,7 +8,7 @@ import org.owntracks.android.ui.contacts.ContactsActivity
 import org.owntracks.android.ui.contacts.ContactsMvvm
 import org.owntracks.android.ui.contacts.ContactsViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class ContactsActivityModule {
     @Binds
     @PerActivity

@@ -8,7 +8,7 @@ import org.owntracks.android.ui.preferences.connection.ConnectionActivity
 import org.owntracks.android.ui.preferences.connection.ConnectionMvvm
 import org.owntracks.android.ui.preferences.connection.ConnectionViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class ConnectionActivityModule {
     @Binds
     @PerActivity

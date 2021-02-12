@@ -8,7 +8,7 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapMvvm
 import org.owntracks.android.ui.map.MapViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class MapActivityModule {
     @Binds
     @PerActivity

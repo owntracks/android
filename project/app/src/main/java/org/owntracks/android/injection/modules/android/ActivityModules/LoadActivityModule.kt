@@ -8,7 +8,7 @@ import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.preferences.load.LoadMvvm
 import org.owntracks.android.ui.preferences.load.LoadViewModel
 
-@Module(includes = [BaseActivityModule::class])
+@Module
 abstract class LoadActivityModule {
     @Binds
     @PerActivity
