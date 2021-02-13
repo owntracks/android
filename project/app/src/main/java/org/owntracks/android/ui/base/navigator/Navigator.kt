@@ -10,8 +10,7 @@ import org.owntracks.android.injection.scopes.PerActivity
 import javax.inject.Inject
 
 @PerActivity
-class Navigator @Inject constructor(activity: AppCompatActivity) {
-    private val activity: Activity
+class Navigator @Inject constructor(private val activity: AppCompatActivity) {
     fun startActivity(intent: Intent) {
         activity.startActivity(intent)
     }
@@ -24,8 +23,11 @@ class Navigator @Inject constructor(activity: AppCompatActivity) {
         activity.startActivity(Intent(action, uri))
     }
 
-    @JvmOverloads
-    fun startActivity(activityClass: Class<out Activity?>, args: Bundle? = null, flags: Int = 0) {
+    fun startActivity(activityClass: Class<out Activity?>) {
+        startActivity(activityClass, null, 0)
+    }
+
+    fun startActivity(activityClass: Class<out Activity?>, args: Bundle?, flags: Int) {
         val activity = activity
         val intent = Intent(activity, activityClass)
         intent.flags = flags
@@ -54,9 +56,5 @@ class Navigator @Inject constructor(activity: AppCompatActivity) {
 
     companion object {
         private const val EXTRA_ARGS = "_args"
-    }
-
-    init {
-        this.activity = activity
     }
 }
