@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.preferences
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
@@ -6,7 +6,6 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.injection.scopes.PerFragment
-import org.owntracks.android.ui.preferences.*
 
 @Module
 abstract class PreferencesActivityModule {

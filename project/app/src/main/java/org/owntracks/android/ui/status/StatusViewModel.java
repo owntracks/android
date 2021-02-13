@@ -18,7 +18,6 @@ import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-import org.owntracks.android.ui.preferences.LogViewerActivity;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;

@@ -22,7 +22,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
-import org.owntracks.android.ui.preferences.LogViewerActivity
+import org.owntracks.android.ui.status.LogViewerActivity
 import java.util.concurrent.TimeUnit
 
 @LargeTest

@@ -1,4 +1,4 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.welcome
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds

@@ -11,7 +11,7 @@ Adaptations include:
 * Removing or simplifying  wireguard-specific implementation details
 */
 
-package org.owntracks.android.ui.preferences
+package org.owntracks.android.ui.status
 
 import android.content.ContentProvider
 import android.content.ContentValues

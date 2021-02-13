@@ -1,12 +1,9 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.regions
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.ui.regions.RegionsActivity
-import org.owntracks.android.ui.regions.RegionsMvvm
-import org.owntracks.android.ui.regions.RegionsViewModel
 
 @Module
 abstract class RegionsActivityModule {

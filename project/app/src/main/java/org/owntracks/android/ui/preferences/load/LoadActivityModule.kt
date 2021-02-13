@@ -1,12 +1,9 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.preferences.load
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.ui.preferences.load.LoadActivity
-import org.owntracks.android.ui.preferences.load.LoadMvvm
-import org.owntracks.android.ui.preferences.load.LoadViewModel
 
 @Module
 abstract class LoadActivityModule {

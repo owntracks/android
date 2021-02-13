@@ -1,5 +1,6 @@
 package org.owntracks.android
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
@@ -7,12 +8,15 @@ import android.os.StrictMode.VmPolicy
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
+import dagger.Binds
+import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import org.conscrypt.Conscrypt
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.owntracks.android.injection.components.DaggerAppComponent
+import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.RestartApp
@@ -24,6 +28,7 @@ import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.security.Security
 import javax.inject.Inject
+import javax.inject.Singleton
 
 class App : DaggerApplication() {
     @Inject
@@ -94,8 +99,16 @@ class App : DaggerApplication() {
     }
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        val appComponent =  DaggerAppComponent.builder().app(this).build()
+        val appComponent = DaggerAppComponent.builder().app(this).build()
         appComponent.inject(this)
         return appComponent
     }
+}
+
+@Module
+abstract class AppContextModule {
+    @Binds
+    @AppContext
+    @Singleton
+    abstract fun provideContext(app: App): Context
 }

@@ -1,12 +1,9 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.contacts
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.ui.contacts.ContactsActivity
-import org.owntracks.android.ui.contacts.ContactsMvvm
-import org.owntracks.android.ui.contacts.ContactsViewModel
 
 @Module
 abstract class ContactsActivityModule {

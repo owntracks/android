@@ -1,12 +1,9 @@
-package org.owntracks.android.injection.modules.android.ActivityModules
+package org.owntracks.android.ui.map
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
 import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.map.MapMvvm
-import org.owntracks.android.ui.map.MapViewModel
 
 @Module
 abstract class MapActivityModule {
