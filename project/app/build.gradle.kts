@@ -17,8 +17,6 @@ val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOL
 
 android {
     compileSdkVersion(30)
-    //TODO wait for google to fix bug in AGP 4.0.0: https://issuetracker.google.com/issues/144111441
-    ndkVersion = "21.3.6528147"
 
     defaultConfig {
         applicationId = "org.owntracks.android"
