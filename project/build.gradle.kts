@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.2")
         classpath("com.hiya:jacoco-android:0.2")
-        classpath("io.objectbox:objectbox-gradle-plugin:2.8.1")
+        classpath("io.objectbox:objectbox-gradle-plugin:2.9.0")
         //noinspection DifferentKotlinGradleVersion
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
     }
