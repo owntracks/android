@@ -23,8 +23,8 @@ class PlayFragment : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentView
 
     override fun requestFix() {
         val googleAPI = GoogleApiAvailability.getInstance()
-        val result = googleAPI.isGooglePlayServicesAvailable(activity)
-        if (!googleAPI.showErrorDialogFragment(activity, result, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+        val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
+        if (!googleAPI.showErrorDialogFragment(requireActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST)) {
             Toast.makeText(this.context, "Unable to update Google Play Services", Toast.LENGTH_SHORT).show()
         }
         checkAvailability()
@@ -33,7 +33,7 @@ class PlayFragment : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentView
     private var canProceed = false
     private fun checkAvailability() {
         val googleAPI = GoogleApiAvailability.getInstance()
-        val result = googleAPI.isGooglePlayServicesAvailable(activity)
+        val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
         var fixAvailable = false
         val playServicesStatusMessage: String
         when (result) {
