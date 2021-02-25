@@ -1,19 +1,14 @@
 package org.owntracks.android.e2e
 
-import android.view.View
-import android.view.animation.Animation
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.IdlingResource.ResourceCallback
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
-import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
+import com.schibsted.spain.barista.interaction.BaristaDialogInteractions
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
@@ -30,11 +25,11 @@ import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.preferences.clickOnAndWait
-
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ContactActivityTests {
+class LocationMessageRetryTest {
     @get:Rule
     var baristaRule = BaristaRule.create(MapActivity::class.java) // We always start e2e at the main entrypoint
 
@@ -60,8 +55,15 @@ class ContactActivityTests {
 
     @After
     fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
-        IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
+        try {
+            IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
+        } catch (_: NullPointerException) {
+            // Happens when the vm is already gone from the MapActivity
+        }
+        try {
+            IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
+        } catch (_: NullPointerException) {
+        }
     }
 
     private val locationResponse = """
@@ -81,70 +83,42 @@ class ContactActivityTests {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
+        BaristaDialogInteractions.clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:${httpPort}/")
-        clickDialogPositiveButton()
+        BaristaEditTextInteractions.writeTo(R.id.url, "http://localhost:${httpPort}/")
+        BaristaDialogInteractions.clickDialogPositiveButton()
         clickBack()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
+        IdlingPolicies.setIdlingResourceTimeout(2,TimeUnit.MINUTES)
         IdlingRegistry.getInstance().register(locationIdlingResource)
-
         clickOnAndWait(R.id.menu_report)
 
         val networkIdlingResource = baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
         IdlingRegistry.getInstance().register(networkIdlingResource)
 
         openDrawer()
-        clickOnAndWait(R.string.title_activity_contacts)
-        assertRecyclerViewItemCount(R.id.recycler_view, 1)
+        clickOnAndWait(R.string.title_activity_status)
 
-        clickOnAndWait("aa")
-        assertDisplayed(R.id.bottomSheetLayout)
-        assertDisplayed(R.id.contactPeek)
-        assertContains(R.id.name, "aa")
+        assertContains(R.id.connectedStatusMessage, "Response 200")
     }
 
     class MockWebserverLocationDispatcher(private val config: String) : Dispatcher() {
+        private var requestCounter = 0
         override fun dispatch(request: RecordedRequest): MockResponse {
             val errorResponse = MockResponse().setResponseCode(404)
             return if (request.path == "/") {
-                MockResponse().setResponseCode(200).setHeader("Content-type", "application/json").setBody(config)
+                requestCounter += 1
+                if (requestCounter >= 3) {
+                    MockResponse().setResponseCode(200).setHeader("Content-type", "application/json").setBody(config)
+                } else {
+                    errorResponse
+                }
             } else {
                 errorResponse
-            }
-        }
-    }
-
-    class AnimationIdlingResource(view: View) : IdlingResource {
-        private var callback: ResourceCallback? = null
-        override fun getName(): String {
-            return AnimationIdlingResource::class.java.name
-        }
-
-        override fun isIdleNow(): Boolean {
-            return true
-        }
-
-        override fun registerIdleTransitionCallback(callback: ResourceCallback) {
-            this.callback = callback
-        }
-
-        init {
-            if (view.animation == null) {
-                callback!!.onTransitionToIdle()
-            } else {
-                view.animation.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation) {}
-                    override fun onAnimationEnd(animation: Animation) {
-                        callback!!.onTransitionToIdle()
-                    }
-
-                    override fun onAnimationRepeat(animation: Animation) {}
-                })
             }
         }
     }
