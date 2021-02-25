@@ -12,7 +12,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.injection.qualifier.AppContext;
-import javax.inject.Singleton;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
@@ -40,6 +39,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import dagger.Lazy;
 import timber.log.Timber;
@@ -217,12 +217,14 @@ public class MessageProcessor {
     private void sendAvailableMessages() {
         Timber.d("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
         MessageBase lastFailedMessageToBeRetried = null;
+        int retriesToGo = 0;
         long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
         while (true) {
             try {
                 MessageBase message;
                 if (lastFailedMessageToBeRetried == null) {
                     message = this.outgoingQueue.take(); // <--- blocks
+                    retriesToGo = message.getNumberOfRetries();
                 } else {
                     message = lastFailedMessageToBeRetried;
                 }
@@ -250,17 +252,24 @@ public class MessageProcessor {
                         }
                     }
                     lastFailedMessageToBeRetried = null;
-
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
                     Timber.w(("Error sending message. Re-queueing"));
                     lastFailedMessageToBeRetried = message;
+                    retriesToGo -= 1;
                 } catch (IOException e) {
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+                    lastFailedMessageToBeRetried = null;
                     // Deserialization failure, drop and move on
                 } catch (Throwable e) {
                     Timber.e(e, "Unhandled exception in sending message");
+                    lastFailedMessageToBeRetried = null;
                 }
+
+                if (lastFailedMessageToBeRetried != null && retriesToGo <= 0) {
+                    lastFailedMessageToBeRetried = null;
+                }
+
                 if (lastFailedMessageToBeRetried != null) {
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);

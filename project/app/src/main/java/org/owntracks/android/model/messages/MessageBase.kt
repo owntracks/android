@@ -10,6 +10,9 @@ import java.io.IOException
 @JsonSubTypes(JsonSubTypes.Type(value = MessageLocation::class, name = MessageLocation.TYPE), JsonSubTypes.Type(value = MessageTransition::class, name = MessageTransition.TYPE), JsonSubTypes.Type(value = MessageCard::class, name = MessageCard.TYPE), JsonSubTypes.Type(value = MessageCmd::class, name = MessageCmd.TYPE), JsonSubTypes.Type(value = MessageConfiguration::class, name = MessageConfiguration.TYPE), JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE), JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE), JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE), JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE))
 @JsonPropertyOrder(alphabetic = true)
 abstract class MessageBase : BaseObservable() {
+    @JsonIgnore
+    open val numberOfRetries: Int = 10
+
     @get:JsonIgnore
     @JsonIgnore
     val messageId = System.currentTimeMillis()
