@@ -10,6 +10,9 @@ import java.lang.ref.WeakReference
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) : MessageBase(), MessageWithCreatedAt by dep {
+    @JsonIgnore
+    override val numberOfRetries: Int = 10000 // This should last a week at 1 attempt per minute
+
     @JsonProperty("t")
     var trigger: String? = null
 
