@@ -1,9 +1,9 @@
 plugins {
     id("com.android.application")
     id("com.github.triplet.play") version "3.1.0"
-    id("io.objectbox")
     kotlin("android")
     kotlin("kapt")
+    id("io.objectbox")
     id("com.hiya.jacoco-android")
     id("scabbard.gradle") version "0.4.0"
 }
@@ -174,11 +174,6 @@ dependencies {
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
     implementation("androidx.core:core-ktx:1.3.2")
-
-    implementation("io.objectbox:objectbox-android:$objectboxVersion")
-    kapt("io.objectbox:objectbox-processor:$objectboxVersion")
-    // some useful Kotlin extension functions
-    implementation("io.objectbox:objectbox-kotlin:$objectboxVersion")
 
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
 
