@@ -128,7 +128,7 @@ kapt {
     correctErrorTypes = true
 }
 
-val daggerVersion = "2.32"
+val daggerVersion = "2.33"
 val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.1"
 val materialDialogsVersion = "0.9.6.0"
